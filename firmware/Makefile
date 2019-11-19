@@ -20,7 +20,7 @@
 #
 
 all:
-	$(error Please specifcy a target: build)
+	$(error Please specifcy a target: build, build-with-ca, bindata, clean)
 
 .PHONY: build
 build:
@@ -30,6 +30,18 @@ build:
 		bin-x86_64-efi/ipxe.efi \
 		bin-x86_64-efi/snponly.efi \
 		bin-i386-efi/ipxe.efi \
+		EMBED=../../boot.ipxe)
+
+.PHONY: build-with-ca
+build-with-ca:
+	(cd ipxe/src &&\
+	make bin/ipxe.pxe \
+		bin/undionly.kpxe \
+		bin-x86_64-efi/ipxe.efi \
+		bin-x86_64-efi/snponly.efi \
+		bin-i386-efi/ipxe.efi \
+		CERT=../../../out/CA.crt TRUST=../../../out/CA.crt \
+		DOWNLOAD_PROTO_HTTPS=1 IMAGE_TRUST_CMD=1 \
 		EMBED=../../boot.ipxe)
 
 .PHONY: bindata
