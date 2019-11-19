@@ -1,0 +1,71 @@
+#!ipxe
+#
+# This script was copied from https://github.com/danderson/netboot originally
+# written by Dave Anderson and Copyright 2016 Google Inc. released under the
+# Apache 2.0 license. Modified for use with Grendel.
+#
+# This is the iPXE boot script that we embed into the iPXE binary.
+#
+# The entire reason for the existence of this script is that iPXE very
+# eagerly configures DHCP as soon as it gets a DHCP response, and
+# because of this it might miss the ProxyDHCP response that tells it
+# how to boot. In this situation, `autoboot` (the default command)
+# just fails and falls out of the PXE boot codepath, so we end up with
+# machines that sometimes fail to "catch" the network boot.
+#
+# This script implements what the ipxe documentation recommends, which
+# is to just retry the `dhcp` command a bunch until ipxe does see a
+# ProxyDHCP response. It's quite ugly, and a proper fix should really
+# get upstreamed to ipxe, but for right now, this works.
+
+set attempts:int32 10
+set x:int32 0
+
+set user-class pixiecore
+
+# Try to get a filename from ProxyDHCP, retrying a couple of times if
+# we fail.
+:loop
+dhcp || goto nodhcp
+isset ${filename} || goto nobootconfig
+goto boot
+
+:nodhcp
+echo No DHCP response, retrying (attempt ${x}/${attempts})
+goto retry
+
+:nobootconfig
+echo No ProxyDHCP response, retrying (attempt ${x}/${attempts})
+goto retry
+
+:retry
+iseq ${x} ${attempts} && goto fail ||
+inc x
+goto loop
+
+# Got a filename from ProxyDHCP, that's the actual boot script,
+# off we go!
+:boot
+chain ${filename}
+
+# Failure at this point probably means Pixiecore changed its mind
+# about whether this machine should be booted in the middle of the
+# boot cycle, so we had already handed off to iPXE, but now we're
+# no longer serving a boot script for it.
+#
+# Reboot the machine to restart the whole cycle (and presumably skip
+# PXE completely this time).
+#
+# It's also possible we just got horribly unlucky and the network
+# environment is such that we're consistently missing the ProxyDHCP
+# reply. That really sucks, so give people pointers to bug filing
+# here.
+:fail
+echo Failed to get a ProxyDHCP response after ${attempts} attempts
+echo
+echo If you are sure that Pixiecore is still trying to boot this machine,
+echo please file a bug at https://github.com/google/netboot .
+echo
+echo Rebooting in 5 seconds...
+sleep 5
+reboot
