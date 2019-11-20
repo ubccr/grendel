@@ -25,6 +25,7 @@ all:
 .PHONY: build
 build:
 	(cd ipxe/src &&\
+	git checkout -- config/general.h &&\
 	make bin/ipxe.pxe \
 		bin/undionly.kpxe \
 		bin-x86_64-efi/ipxe.efi \
@@ -35,13 +36,15 @@ build:
 .PHONY: build-with-ca
 build-with-ca:
 	(cd ipxe/src &&\
+	git checkout -- config/general.h &&\
+	sed -i 's/^#undef\tDOWNLOAD_PROTO_HTTPS/#define\tDOWNLOAD_PROTO_HTTPS/' config/general.h &&\
+	sed -i '/^\/\/#define IMAGE_TRUST_CMD/s/^\/\///' config/general.h &&\
 	make bin/ipxe.pxe \
 		bin/undionly.kpxe \
 		bin-x86_64-efi/ipxe.efi \
 		bin-x86_64-efi/snponly.efi \
 		bin-i386-efi/ipxe.efi \
 		CERT=../../../out/CA.crt TRUST=../../../out/CA.crt \
-		DOWNLOAD_PROTO_HTTPS=1 IMAGE_TRUST_CMD=1 \
 		EMBED=../../boot.ipxe)
 
 .PHONY: bindata
@@ -58,4 +61,4 @@ bindata:
 .PHONY: clean
 clean:
 	rm -rf bin/
-	(cd ipxe/src && make veryclean)
+	(cd ipxe/src && git checkout -- config/general.h && make veryclean)
