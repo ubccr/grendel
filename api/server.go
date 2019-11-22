@@ -12,7 +12,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	log "github.com/sirupsen/logrus"
-	"go.universe.tf/netboot/dhcp4"
 	"go.universe.tf/netboot/pixiecore"
 )
 
@@ -104,30 +103,18 @@ func (s *Server) Serve() error {
 		s.HTTPScheme = "http"
 	}
 
-	newDHCP := dhcp4.NewConn
-	if s.DHCPNoBind {
-		newDHCP = dhcp4.NewSnooperConn
-	}
-
-	dhcp, err := newDHCP(fmt.Sprintf("%s:%d", s.Address, s.DHCPPort))
-	if err != nil {
-		return err
-	}
 	tftp, err := net.ListenPacket("udp", fmt.Sprintf("%s:%d", s.Address, s.TFTPPort))
 	if err != nil {
-		dhcp.Close()
 		return err
 	}
 	pxe, err := net.ListenPacket("udp", fmt.Sprintf("%s:%d", s.Address, s.PXEPort))
 	if err != nil {
-		dhcp.Close()
 		tftp.Close()
 		return err
 	}
 
 	echox, httpServer, err := s.serveHTTP()
 	if err != nil {
-		dhcp.Close()
 		tftp.Close()
 		pxe.Close()
 		return err
@@ -139,18 +126,16 @@ func (s *Server) Serve() error {
 	// will likely generate some spurious errors from the other
 	// goroutines, and we want them to be able to dump them without
 	// blocking.
-	s.errs = make(chan error, 6)
+	s.errs = make(chan error, 5)
 
 	s.debug("Init", "Starting Pixiecore goroutines")
 
-	go func() { s.errs <- s.serveDHCP(dhcp) }()
 	go func() { s.errs <- s.servePXE(pxe) }()
 	go func() { s.errs <- s.serveTFTP(tftp) }()
 	go func() { s.errs <- echox.StartServer(httpServer) }()
 
 	// Wait for either a fatal error, or Shutdown().
 	err = <-s.errs
-	dhcp.Close()
 	tftp.Close()
 	pxe.Close()
 

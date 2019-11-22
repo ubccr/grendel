@@ -14,8 +14,8 @@ import (
 func NewServeCommand() cli.Command {
 	return cli.Command{
 		Name:        "serve",
-		Usage:       "Start PXE server",
-		Description: "Start PXE server",
+		Usage:       "Start services",
+		Description: "Start services",
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "kernel",
@@ -47,11 +47,14 @@ func NewServeCommand() cli.Command {
 				Usage: "Path to private key",
 			},
 		},
+		Subcommands: []cli.Command{
+			NewDHCPCommand(),
+		},
 		Action: runServices,
 	}
 }
 
-func logger(subsystem, msg string) {
+func xlogger(subsystem, msg string) {
 	logrus.WithFields(logrus.Fields{
 		"subsystem": subsystem,
 	}).Info(msg)
@@ -82,7 +85,7 @@ func runServices(c *cli.Context) error {
 
 	server := &api.Server{
 		Ipxe:     map[pixiecore.Firmware][]byte{},
-		Log:      logger,
+		Log:      xlogger,
 		Debug:    debugger,
 		Booter:   booter,
 		Address:  c.String("listen-address"),
@@ -127,7 +130,7 @@ func runPXEServer(c *cli.Context) error {
 
 	server := &pixiecore.Server{
 		Ipxe:    map[pixiecore.Firmware][]byte{},
-		Log:     logger,
+		Log:     xlogger,
 		Debug:   debugger,
 		Booter:  booter,
 		Address: c.String("listen-address"),
