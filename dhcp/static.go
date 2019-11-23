@@ -85,12 +85,7 @@ func (s *Server) GetHost(mac string) (*model.Host, error) {
 	return host, nil
 }
 
-// LoadDHCPv4Records loads the DHCPv4Records global map with records stored on
-// the specified file. The records have to be one per line, a mac address and an
-// IPv4 address.
-// Copied from https://github.com/coredhcp/coredhcp/blob/master/plugins/file/plugin.go
-// Copyright (c) 2018 coredhcp
-func (s *Server) LoadDHCPv4Records(filename string) error {
+func (s *Server) LoadStaticLeases(filename string) error {
 	log.Infof("Reading static leases from file: %s", filename)
 	s.StaticLeases = make(map[string]*model.Host)
 

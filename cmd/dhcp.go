@@ -78,7 +78,7 @@ func runDHCP(c *cli.Context) error {
 	}
 
 	if c.IsSet("static-leases") {
-		err := srv.LoadDHCPv4Records(c.String("static-leases"))
+		err := srv.LoadStaticLeases(c.String("static-leases"))
 		if err != nil {
 			return err
 		}
