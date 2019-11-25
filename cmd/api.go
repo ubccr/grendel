@@ -1,27 +1,9 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
-	log "github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/api"
-	"github.com/ubccr/grendel/firmware"
 	"github.com/urfave/cli"
-	"go.universe.tf/netboot/pixiecore"
 )
-
-func xlogger(subsystem, msg string) {
-	log.WithFields(log.Fields{
-		"subsystem": subsystem,
-	}).Info(msg)
-}
-
-func debugger(subsystem, msg string) {
-	log.WithFields(log.Fields{
-		"subsystem": subsystem,
-	}).Debug(msg)
-}
 
 func NewAPICommand() cli.Command {
 	return cli.Command{
@@ -74,46 +56,13 @@ func NewAPICommand() cli.Command {
 }
 
 func runAPI(c *cli.Context) error {
-	spec := &pixiecore.Spec{
-		Kernel:  pixiecore.ID(c.String("kernel")),
-		Cmdline: c.String("cmdline"),
-		Message: c.String("bootmsg"),
-	}
-
-	for _, initrd := range c.StringSlice("initrd") {
-		spec.Initrd = append(spec.Initrd, pixiecore.ID(initrd))
-	}
-
-	booter, err := pixiecore.StaticBooter(spec)
+	apiServer, err := api.NewServer(c.String("listen-address"), c.Int("http-port"))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't make static booter: %s\n", err)
-		os.Exit(1)
+		return err
 	}
 
-	server := &api.Server{
-		Ipxe:     map[pixiecore.Firmware][]byte{},
-		Log:      xlogger,
-		Debug:    debugger,
-		Booter:   booter,
-		Address:  c.String("listen-address"),
-		CertFile: c.String("cert"),
-		KeyFile:  c.String("key"),
-	}
+	apiServer.Kernel = c.String("kernel")
+	apiServer.Initrd = c.StringSlice("initrd")
 
-	if server.CertFile != "" && server.KeyFile != "" {
-		hostname, err := os.Hostname()
-		if err != nil {
-			log.Errorf("Failed to fetch hostname: %s", err)
-			os.Exit(1)
-		}
-		server.Hostname = hostname
-	}
-
-	server.Ipxe[pixiecore.FirmwareX86PC] = firmware.MustAsset("undionly.kpxe")
-	server.Ipxe[pixiecore.FirmwareEFI32] = firmware.MustAsset("ipxe-i386.efi")
-	server.Ipxe[pixiecore.FirmwareEFI64] = firmware.MustAsset("snponly-x86_64.efi")
-	server.Ipxe[pixiecore.FirmwareEFIBC] = firmware.MustAsset("snponly-x86_64.efi")
-	server.Ipxe[pixiecore.FirmwareX86Ipxe] = firmware.MustAsset("ipxe.pxe")
-
-	return server.Serve()
+	return apiServer.Serve()
 }

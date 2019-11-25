@@ -5,7 +5,8 @@ import (
 )
 
 type Host struct {
-	MAC  net.HardwareAddr
-	IP   net.IP
-	FQDN string
+	MAC      net.HardwareAddr
+	IP       net.IP
+	FQDN     string
+	BootSpec string
 }
