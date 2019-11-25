@@ -62,6 +62,7 @@ func runAPI(c *cli.Context) error {
 	}
 
 	apiServer.Kernel = c.String("kernel")
+	apiServer.Cmdline = c.String("cmdline")
 	apiServer.Initrd = c.StringSlice("initrd")
 
 	return apiServer.Serve()

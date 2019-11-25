@@ -7,6 +7,9 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	log "github.com/sirupsen/logrus"
@@ -77,17 +80,17 @@ func (h *Handler) Ipxe(c echo.Context) error {
 }
 
 func (h *Handler) ipxeScript(mac net.HardwareAddr, serverHost, scheme string) ([]byte, error) {
-	if h.BootSpec.Kernel == "" {
+	if h.BootSpec.Kernel == nil {
 		return nil, errors.New("spec is missing Kernel")
 	}
 
-	urlTemplate := fmt.Sprintf("%s://%s/_/file?name=%%s&type=%%s&mac=%%s", scheme, serverHost)
+	urlTemplate := fmt.Sprintf("%s://%s/_/file?type=%%s&mac=%%s", scheme, serverHost)
 	var b bytes.Buffer
 	b.WriteString("#!ipxe\n")
-	u := fmt.Sprintf(urlTemplate, url.QueryEscape(string(h.BootSpec.Kernel)), "kernel", url.QueryEscape(mac.String()))
+	u := fmt.Sprintf(urlTemplate, "kernel", url.QueryEscape(mac.String()))
 	fmt.Fprintf(&b, "kernel --name kernel %s\n", u)
-	for i, initrd := range h.BootSpec.Initrd {
-		u = fmt.Sprintf(urlTemplate, url.QueryEscape(string(initrd)), "initrd", url.QueryEscape(mac.String()))
+	for i := range h.BootSpec.Initrd {
+		u = fmt.Sprintf(urlTemplate, fmt.Sprintf("initrd-%d", i), url.QueryEscape(mac.String()))
 		fmt.Fprintf(&b, "initrd --name initrd%d %s\n", i, u)
 	}
 
@@ -103,16 +106,33 @@ func (h *Handler) ipxeScript(mac net.HardwareAddr, serverHost, scheme string) ([
 }
 
 func (h *Handler) File(c echo.Context) error {
-	name := c.QueryParam("name")
-	if name == "" {
+	path := c.QueryParam("type")
+	if path == "" {
 		log.WithFields(log.Fields{
 			"url": c.Request().URL,
 			"ip":  c.RealIP(),
-		}).Error("HTTP bad request missing name")
-		return echo.NewHTTPError(http.StatusBadRequest, "missing name")
+		}).Error("HTTP bad request missing type")
+		return echo.NewHTTPError(http.StatusBadRequest, "missing type")
 	}
 
-	log.Infof("Sending file %q to %s", name, c.RealIP())
+	log.Infof("Got request for file %q to %s", path, c.RealIP())
 
-	return c.File(name)
+	switch {
+	case path == "kernel":
+		return h.serveBlob(c, path, h.BootSpec.Kernel)
+
+	case strings.HasPrefix(path, "initrd-"):
+		i, err := strconv.Atoi(path[7:])
+		if err != nil || i < 0 || i >= len(h.BootSpec.Initrd) {
+			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("no initrd with ID %q", i))
+		}
+		return h.serveBlob(c, path, h.BootSpec.Initrd[i])
+	}
+
+	return echo.NewHTTPError(http.StatusNotFound, "")
+}
+
+func (h *Handler) serveBlob(c echo.Context, name string, data []byte) error {
+	http.ServeContent(c.Response(), c.Request(), name, time.Time{}, bytes.NewReader(data))
+	return nil
 }

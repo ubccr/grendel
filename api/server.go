@@ -3,6 +3,7 @@ package api
 import (
 	"crypto/tls"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"time"
@@ -27,6 +28,7 @@ type Server struct {
 	CertFile      string
 	Hostname      string
 	Kernel        string
+	Cmdline       string
 	Initrd        []string
 }
 
@@ -88,10 +90,24 @@ func (s *Server) Serve() error {
 	e.HideBanner = true
 	e.Use(middleware.Recover())
 
+	kernel, err := ioutil.ReadFile(s.Kernel)
+	if err != nil {
+		return err
+	}
+	initrds := make([][]byte, 0)
+	for _, img := range s.Initrd {
+		data, err := ioutil.ReadFile(img)
+		if err != nil {
+			return err
+		}
+		initrds = append(initrds, data)
+	}
+
 	// TODO fix me
 	spec := &model.BootSpec{
-		Kernel: s.Kernel,
-		Initrd: s.Initrd,
+		Kernel:  kernel,
+		Initrd:  initrds,
+		Cmdline: s.Cmdline,
 	}
 
 	h, err := NewHandler(spec)

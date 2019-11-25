@@ -2,8 +2,8 @@ package model
 
 type BootSpec struct {
 	Name    string
-	Kernel  string
-	Initrd  []string
+	Kernel  []byte
+	Initrd  [][]byte
 	Cmdline string
 	Message string
 }
