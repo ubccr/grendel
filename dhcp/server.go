@@ -17,19 +17,24 @@ import (
 type Server struct {
 	ListenAddress net.IP
 	ServerAddress net.IP
+	IfIndex       int
 	Hostname      string
 	HTTPScheme    string
-	HTTPPort      int
 	Port          int
+	HTTPPort      int
+	PXEPort       int
 	MTU           int
 	ProxyOnly     bool
+	ServePXE      bool
 	StaticLeases  map[string]*model.Host
 	DNSServers    []net.IP
 	LeaseTime     time.Duration
+	srv           *server4.Server
+	srvPXE        *server4.Server
 }
 
 func NewServer(address string) (*Server, error) {
-	s := &Server{ProxyOnly: true}
+	s := &Server{ProxyOnly: true, ServePXE: true}
 
 	if address == "" {
 		address = fmt.Sprintf("%s:%d", net.IPv4zero.String(), dhcpv4.ServerPort)
@@ -84,6 +89,7 @@ func NewServer(address string) (*Server, error) {
 
 		log.Debugf("Found IP(s) for interface %s: %v", intf.Name, ips)
 		serverIps = append(serverIps, ips...)
+		s.IfIndex = intf.Index
 	}
 
 	if len(serverIps) == 0 {
@@ -166,12 +172,14 @@ func (s *Server) mainHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DH
 }
 
 func (s *Server) Serve() error {
-
 	if s.HTTPPort == 0 {
 		s.HTTPPort = 80
 	}
 	if s.HTTPScheme == "" {
 		s.HTTPScheme = "http"
+	}
+	if s.PXEPort == 0 {
+		s.PXEPort = 4011
 	}
 
 	listener := &net.UDPAddr{
@@ -183,6 +191,48 @@ func (s *Server) Serve() error {
 		return err
 	}
 
+	s.srv = srv
+
 	log.Debugf("Server Address: %s", s.ServerAddress.String())
-	return srv.Serve()
+
+	if !s.ServePXE {
+		return s.srv.Serve()
+	}
+
+	pxeListener := &net.UDPAddr{
+		IP:   s.ListenAddress,
+		Port: s.PXEPort,
+	}
+
+	srvPXE, err := server4.NewServer("", pxeListener, s.pxeHandler4)
+	if err != nil {
+		return err
+	}
+
+	s.srvPXE = srvPXE
+
+	errs := make(chan error, 2)
+
+	go func() { errs <- s.srv.Serve() }()
+	go func() { errs <- s.srvPXE.Serve() }()
+
+	err = <-errs
+	s.Shutdown()
+
+	return err
+}
+
+func (s *Server) Shutdown() {
+	err := s.srv.Close()
+	if err != nil {
+		log.Errorf("Failed to close dhcp server: %s", err)
+	}
+	if !s.ServePXE {
+		return
+	}
+
+	err = s.srvPXE.Close()
+	if err != nil {
+		log.Errorf("Failed to close pxe server: %s", err)
+	}
 }

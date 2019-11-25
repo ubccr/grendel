@@ -10,6 +10,7 @@ require (
 	github.com/labstack/echo/v4 v4.1.11
 	github.com/mdlayher/ethernet v0.0.0-20190606142754-0394541c37b7 // indirect
 	github.com/mdlayher/raw v0.0.0-20190606144222-a54781e5f38f // indirect
+	github.com/pin/tftp v2.1.0+incompatible
 	github.com/sirupsen/logrus v1.4.2
 	github.com/square/certstrap v1.2.0
 	github.com/u-root/u-root v5.0.0+incompatible // indirect

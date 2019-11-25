@@ -4,7 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"net"
+	//	"net"
 	"net/http"
 	"sync"
 	"time"
@@ -12,6 +12,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	log "github.com/sirupsen/logrus"
+	"github.com/ubccr/grendel/tftp"
 	"go.universe.tf/netboot/pixiecore"
 )
 
@@ -103,20 +104,19 @@ func (s *Server) Serve() error {
 		s.HTTPScheme = "http"
 	}
 
-	tftp, err := net.ListenPacket("udp", fmt.Sprintf("%s:%d", s.Address, s.TFTPPort))
-	if err != nil {
-		return err
-	}
-	pxe, err := net.ListenPacket("udp", fmt.Sprintf("%s:%d", s.Address, s.PXEPort))
-	if err != nil {
-		tftp.Close()
-		return err
-	}
+	//pxeConn, err := net.ListenPacket("udp", fmt.Sprintf("%s:%d", s.Address, s.PXEPort))
+	//if err != nil {
+	//		return err
+	//	}
 
 	echox, httpServer, err := s.serveHTTP()
 	if err != nil {
-		tftp.Close()
-		pxe.Close()
+		//		pxeConn.Close()
+		return err
+	}
+
+	tftpServer, err := tftp.NewServer(s.Address)
+	if err != nil {
 		return err
 	}
 
@@ -130,14 +130,14 @@ func (s *Server) Serve() error {
 
 	s.debug("Init", "Starting Pixiecore goroutines")
 
-	go func() { s.errs <- s.servePXE(pxe) }()
-	go func() { s.errs <- s.serveTFTP(tftp) }()
+	//	go func() { s.errs <- s.servePXE(pxeConn) }()
+	go func() { s.errs <- tftpServer.Serve() }()
 	go func() { s.errs <- echox.StartServer(httpServer) }()
 
 	// Wait for either a fatal error, or Shutdown().
 	err = <-s.errs
-	tftp.Close()
-	pxe.Close()
+	//	pxeConn.Close()
+	tftpServer.Shutdown()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
