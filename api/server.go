@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"crypto/tls"
 	"fmt"
 	//	"net"
@@ -12,7 +11,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	log "github.com/sirupsen/logrus"
-	"github.com/ubccr/grendel/tftp"
 	"go.universe.tf/netboot/pixiecore"
 )
 
@@ -115,11 +113,6 @@ func (s *Server) Serve() error {
 		return err
 	}
 
-	tftpServer, err := tftp.NewServer(s.Address)
-	if err != nil {
-		return err
-	}
-
 	s.events = make(map[string][]machineEvent)
 	// 5 buffer slots, one for each goroutine, plus one for
 	// Shutdown(). We only ever pull the first error out, but shutdown
@@ -131,22 +124,22 @@ func (s *Server) Serve() error {
 	s.debug("Init", "Starting Pixiecore goroutines")
 
 	//	go func() { s.errs <- s.servePXE(pxeConn) }()
-	go func() { s.errs <- tftpServer.Serve() }()
-	go func() { s.errs <- echox.StartServer(httpServer) }()
+	//go func() { s.errs <- tftpServer.Serve() }()
+	//go func() { s.errs <- echox.StartServer(httpServer) }()
 
 	// Wait for either a fatal error, or Shutdown().
-	err = <-s.errs
+	//err = <-s.errs
 	//	pxeConn.Close()
-	tftpServer.Shutdown()
+	//tftpServer.Shutdown()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	if err := echox.Shutdown(ctx); err != nil {
-		log.WithFields(log.Fields{
-			"err": err,
-		}).Error("Failed to stop http server")
-	}
-	return err
+	//	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	//	defer cancel()
+	//	if err := echox.Shutdown(ctx); err != nil {
+	//		log.WithFields(log.Fields{
+	//			"err": err,
+	//		}).Error("Failed to stop http server")
+	////	}
+	return echox.StartServer(httpServer)
 }
 
 // Start web server

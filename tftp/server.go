@@ -1,17 +1,16 @@
 package tftp
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/pin/tftp"
+	log "github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/firmware"
 	"github.com/ubccr/grendel/model"
 )
 
 type Server struct {
 	FirmwareBin map[model.Firmware][]byte
-	Port        int
 	Address     string
 	srv         *tftp.Server
 }
@@ -33,12 +32,8 @@ func NewServer(address string) (*Server, error) {
 }
 
 func (s *Server) Serve() error {
-
-	if s.Port == 0 {
-		s.Port = 69
-	}
-
-	return s.srv.ListenAndServe(fmt.Sprintf("%s:%d", s.Address, s.Port))
+	log.Infof("TFTP server listening on: %s", s.Address)
+	return s.srv.ListenAndServe(s.Address)
 }
 
 func (s *Server) Shutdown() {

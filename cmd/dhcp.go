@@ -19,13 +19,33 @@ func NewDHCPCommand() cli.Command {
 		Description: "Start DHCP server",
 		Flags: []cli.Flag{
 			cli.IntFlag{
-				Name:  "port",
+				Name:  "dhcp-port",
 				Value: dhcpv4.ServerPort,
 				Usage: "dhcp port to listen on",
 			},
 			cli.StringFlag{
 				Name:  "listen-address",
-				Usage: "dhcp address to listen on",
+				Value: "0.0.0.0",
+				Usage: "address to listen on",
+			},
+			cli.StringFlag{
+				Name:  "http-scheme",
+				Value: "http",
+				Usage: "http scheme",
+			},
+			cli.IntFlag{
+				Name:  "http-port",
+				Value: 80,
+				Usage: "http port",
+			},
+			cli.IntFlag{
+				Name:  "pxe-port",
+				Value: 4011,
+				Usage: "pxe port",
+			},
+			cli.StringFlag{
+				Name:  "hostname",
+				Usage: "Hostname",
 			},
 			cli.StringFlag{
 				Name:  "static-leases",
@@ -45,37 +65,46 @@ func NewDHCPCommand() cli.Command {
 				Value: 1500,
 				Usage: "dhcp interface MTU",
 			},
+			cli.BoolFlag{
+				Name:  "disable-pxe",
+				Usage: "Disable PXE server",
+			},
 		},
 		Action: runDHCP,
 	}
 }
 
 func runDHCP(c *cli.Context) error {
-	listenAddress := c.GlobalString("listen-address")
-	if c.IsSet("listen-address") {
-		listenAddress = c.String("listen-address")
-	}
-
-	address := fmt.Sprintf("%s:%d", listenAddress, c.Int("port"))
+	listenAddress := c.String("listen-address")
+	address := fmt.Sprintf("%s:%d", listenAddress, c.Int("dhcp-port"))
 
 	srv, err := dhcp.NewServer(address)
 	if err != nil {
 		return err
 	}
 
-	if c.GlobalString("cert") != "" && c.GlobalString("key") != "" {
-		srv.HTTPScheme = "https"
+	srv.HTTPScheme = c.String("http-scheme")
+	srv.HTTPPort = c.Int("http-port")
+
+	if srv.HTTPScheme == "https" && srv.HTTPPort == 80 {
 		srv.HTTPPort = 443
+	}
+
+	srv.Hostname = c.String("hostname")
+
+	if srv.Hostname == "" && srv.HTTPScheme == "https" {
 		hosts, err := net.LookupAddr(srv.ServerAddress.String())
 		if err == nil && len(hosts) > 0 {
 			fqdn := hosts[0]
 			srv.Hostname = strings.TrimSuffix(fqdn, ".")
-			log.Infof("Using HTTPS for ipxe: %s://%s:%d", srv.HTTPScheme, srv.Hostname, srv.HTTPPort)
-		} else {
-			log.Warning("Failed to lookup server hostname for HTTPS. Using IP")
-			log.Infof("Using HTTPS for ipxe: %s://%s:%d", srv.HTTPScheme, srv.ServerAddress, srv.HTTPPort)
 		}
 	}
+
+	if srv.Hostname == "" {
+		srv.Hostname = srv.ServerAddress.String()
+	}
+
+	log.Infof("Base URL for ipxe: %s://%s:%d", srv.HTTPScheme, srv.Hostname, srv.HTTPPort)
 
 	if c.IsSet("static-leases") {
 		err := srv.LoadStaticLeases(c.String("static-leases"))
@@ -102,6 +131,9 @@ func runDHCP(c *cli.Context) error {
 	}
 	srv.LeaseTime = leaseTime
 	srv.MTU = c.Int("mtu")
+
+	srv.PXEPort = c.Int("pxe-port")
+	srv.ServePXE = !c.Bool("disable-pxe")
 
 	return srv.Serve()
 }
