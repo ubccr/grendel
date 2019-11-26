@@ -4,8 +4,10 @@ import (
 	"time"
 
 	"github.com/pin/tftp"
-	log "github.com/sirupsen/logrus"
+	"github.com/ubccr/grendel/logger"
 )
+
+var log = logger.GetLogger("TFTP")
 
 type Server struct {
 	Address string

@@ -10,7 +10,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
+	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/util"
 )
@@ -18,6 +19,8 @@ import (
 const (
 	DefaultPort = 80
 )
+
+var log = logger.GetLogger("HTTP")
 
 type Server struct {
 	ListenAddress net.IP
@@ -74,7 +77,7 @@ func HTTPErrorHandler(err error, c echo.Context) {
 	}
 
 	if code == http.StatusNotFound {
-		log.WithFields(log.Fields{
+		log.WithFields(logrus.Fields{
 			"path": c.Request().URL,
 			"ip":   c.RealIP(),
 		}).Error("Requested path not found")
@@ -89,6 +92,7 @@ func (s *Server) Serve() error {
 	e.HTTPErrorHandler = HTTPErrorHandler
 	e.HideBanner = true
 	e.Use(middleware.Recover())
+	e.Logger = EchoLogger()
 
 	kernel, err := ioutil.ReadFile(s.Kernel)
 	if err != nil {

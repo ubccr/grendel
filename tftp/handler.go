@@ -7,23 +7,22 @@ import (
 	"strings"
 
 	"github.com/pin/tftp"
-	log "github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/firmware"
 	"github.com/ubccr/grendel/model"
 )
 
 func (s *Server) ReadHandler(token string, rf io.ReaderFrom) error {
-	log.Infof("Got TFTP read request with token: %s", token)
+	log.Infof("Got read request with token: %s", token)
 
 	fwtype, err := model.ParseFirmwareToken(token)
 	if err != nil {
-		log.Errorf("TFTP failed to parse token: %s", err)
+		log.Errorf("failed to parse token: %s", err)
 		return err
 	}
 
 	bs, err := firmware.GetBootLoader(fwtype)
 	if err != nil {
-		log.Errorf("TFTP: failed to fetch firmware %d: %s", fwtype, err)
+		log.Errorf("Failed to fetch firmware %d: %s", fwtype, err)
 		return fmt.Errorf("unknown firmware type %d", fwtype)
 	}
 

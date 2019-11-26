@@ -5,10 +5,12 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/cmd"
+	"github.com/ubccr/grendel/logger"
 	"github.com/urfave/cli"
 )
 
 var release = "(version not set)"
+var log = logger.GetLogger("main")
 
 func main() {
 	app := cli.NewApp()
@@ -22,9 +24,9 @@ func main() {
 	}
 	app.Before = func(c *cli.Context) error {
 		if c.GlobalBool("verbose") {
-			logrus.SetLevel(logrus.DebugLevel)
+			log.Logger.SetLevel(logrus.DebugLevel)
 		} else {
-			logrus.SetLevel(logrus.WarnLevel)
+			log.Logger.SetLevel(logrus.WarnLevel)
 		}
 
 		return nil
@@ -34,7 +36,7 @@ func main() {
 		cmd.NewServeCommand(),
 	}
 	if err := app.Run(os.Args); err != nil {
-		logrus.Error(err)
+		log.Error(err)
 		os.Exit(1)
 	}
 }

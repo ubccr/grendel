@@ -10,9 +10,11 @@ import (
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/insomniacslk/dhcp/dhcpv4/server4"
 	"github.com/insomniacslk/dhcp/interfaces"
-	log "github.com/sirupsen/logrus"
+	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
 )
+
+var log = logger.GetLogger("DHCP")
 
 type Server struct {
 	ListenAddress net.IP

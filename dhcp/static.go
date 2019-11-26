@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
-	log "github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/model"
 )
 

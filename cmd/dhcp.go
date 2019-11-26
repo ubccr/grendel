@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
-	log "github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/dhcp"
+	"github.com/ubccr/grendel/logger"
 	"github.com/urfave/cli"
 )
 
@@ -75,6 +75,8 @@ func NewDHCPCommand() cli.Command {
 }
 
 func runDHCP(c *cli.Context) error {
+	log := logger.GetLogger("DHCP")
+
 	listenAddress := c.String("listen-address")
 	address := fmt.Sprintf("%s:%d", listenAddress, c.Int("dhcp-port"))
 

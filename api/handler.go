@@ -14,7 +14,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/model"
 )
 
@@ -58,7 +58,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 
 	macStr := claims.MAC
 	if macStr == "" {
-		log.WithFields(log.Fields{
+		log.WithFields(logrus.Fields{
 			"url": c.Request().URL,
 			"ip":  c.RealIP(),
 		}).Error("HTTP bad request missing MAC address")
@@ -66,7 +66,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 	}
 	mac, err := net.ParseMAC(macStr)
 	if err != nil {
-		log.WithFields(log.Fields{
+		log.WithFields(logrus.Fields{
 			"url": c.Request().URL,
 			"ip":  c.RealIP(),
 			"mac": macStr,
@@ -76,11 +76,11 @@ func (h *Handler) Ipxe(c echo.Context) error {
 	}
 
 	script, err := h.ipxeScript(mac, c.Request().Host, c.Scheme(), c.QueryParam("token"))
-	log.WithFields(log.Fields{
+	log.WithFields(logrus.Fields{
 		"mac": mac,
 	}).Debug("Construct ipxe script")
 	if err != nil {
-		log.WithFields(log.Fields{
+		log.WithFields(logrus.Fields{
 			"url": c.Request().URL,
 			"ip":  c.RealIP(),
 			"mac": mac,
@@ -89,7 +89,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "couldn't get a boot script")
 	}
 
-	log.WithFields(log.Fields{
+	log.WithFields(logrus.Fields{
 		"mac": mac,
 		"ip":  c.RealIP(),
 	}).Info("Sending ipxe boot script")

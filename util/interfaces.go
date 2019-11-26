@@ -7,7 +7,6 @@ import (
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/insomniacslk/dhcp/interfaces"
-	log "github.com/sirupsen/logrus"
 )
 
 func GetInterfaceIP() (net.IP, error) {
@@ -34,7 +33,6 @@ func GetInterfaceIP() (net.IP, error) {
 			continue
 		}
 
-		log.Debugf("Found IP(s) for interface %s: %v", intf.Name, ips)
 		serverIps = append(serverIps, ips...)
 	}
 
