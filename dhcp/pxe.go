@@ -5,6 +5,7 @@ import (
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	log "github.com/sirupsen/logrus"
+	"github.com/ubccr/grendel/firmware"
 	"github.com/ubccr/grendel/model"
 )
 
@@ -23,7 +24,7 @@ func (s *Server) pxeHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DHC
 		return
 	}
 
-	fwtype, err := model.NewFirmwareFromDHCP(fwt, "")
+	fwtype, err := firmware.DetectBootLoader(fwt, "")
 	if err != nil {
 		log.Errorf("PXEServer failed to get firmware: %s", err)
 		return

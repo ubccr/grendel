@@ -5,18 +5,19 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/ubccr/grendel/firmware"
 )
 
 type FirmwareClaims struct {
-	ExpiresAt int64    `json:"exp"`
-	Firmware  Firmware `json:"fw"`
+	ExpiresAt int64               `json:"exp"`
+	Firmware  firmware.BootLoader `json:"fw"`
 }
 
 type BootClaims struct {
-	MAC          string       `json:"mac"`
-	BootSpec     string       `json:"bootspec"`
-	Firmware     Firmware     `json:"firmware"`
-	Architecture Architecture `json:"arch"`
+	MAC          string              `json:"mac"`
+	BootSpec     string              `json:"bootspec"`
+	Firmware     firmware.BootLoader `json:"firmware"`
+	Architecture Architecture        `json:"arch"`
 	jwt.StandardClaims
 }
 
@@ -34,7 +35,7 @@ func (p *FirmwareClaims) Valid() error {
 	return vErr
 }
 
-func NewBootToken(mac string, bootspec string, fwtype Firmware, arch Architecture) (string, error) {
+func NewBootToken(mac string, bootspec string, fwtype firmware.BootLoader, arch Architecture) (string, error) {
 	claims := &BootClaims{
 		MAC:          mac,
 		BootSpec:     bootspec,
@@ -54,7 +55,7 @@ func NewBootToken(mac string, bootspec string, fwtype Firmware, arch Architectur
 	return t, nil
 }
 
-func NewFirmwareToken(fwtype Firmware) (string, error) {
+func NewFirmwareToken(fwtype firmware.BootLoader) (string, error) {
 	claims := &FirmwareClaims{
 		Firmware:  fwtype,
 		ExpiresAt: time.Now().Add(time.Second * 60).Unix(),
@@ -70,7 +71,7 @@ func NewFirmwareToken(fwtype Firmware) (string, error) {
 	return t, nil
 }
 
-func ParseFirmwareToken(tokenString string) (Firmware, error) {
+func ParseFirmwareToken(tokenString string) (firmware.BootLoader, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &FirmwareClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])

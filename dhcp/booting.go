@@ -5,6 +5,7 @@ import (
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	log "github.com/sirupsen/logrus"
+	"github.com/ubccr/grendel/firmware"
 	"github.com/ubccr/grendel/model"
 )
 
@@ -19,7 +20,7 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 		userClass = string(req.Options.Get(dhcpv4.OptionUserClassInformation))
 	}
 
-	fwtype, err := model.NewFirmwareFromDHCP(fwt, userClass)
+	fwtype, err := firmware.DetectBootLoader(fwt, userClass)
 	if err != nil {
 		return fmt.Errorf("Failed to get PXE firmware from DHCP: %s", err)
 	}
@@ -48,7 +49,7 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 	log.Infof("Got valid request to boot %s (%s) %d", mach.MAC, mach.Arch, fwtype)
 
 	switch fwtype {
-	case model.FirmwareX86PC:
+	case firmware.X86PC:
 		// This is completely standard PXE: we tell the PXE client to
 		// bypass all the boot discovery rubbish that PXE supports,
 		// and just load a file from TFTP.
@@ -65,7 +66,7 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 		}
 		resp.UpdateOption(dhcpv4.OptBootFileName(token))
 
-	case model.FirmwareX86Ipxe:
+	case firmware.X86Ipxe:
 		log.Printf("DHCP - FirmwareX86Ipxe telling PXE client to boot tftp")
 		// Almost standard PXE, but the boot filename needs to be a URL.
 
@@ -81,7 +82,7 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 		}
 		resp.UpdateOption(dhcpv4.OptBootFileName(fmt.Sprintf("tftp://%s/%s", s.ServerAddress, token)))
 
-	case model.FirmwareEFI32, model.FirmwareEFI64, model.FirmwareEFIBC:
+	case firmware.EFI32, firmware.EFI64, firmware.EFIBC:
 		// In theory, the response we send for FirmwareX86PC should
 		// also work for EFI. However, some UEFI firmwares don't
 		// support PXE properly, and will ignore ProxyDHCP responses
@@ -108,7 +109,7 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 		}
 		resp.UpdateOption(dhcpv4.OptBootFileName(token))
 
-	case model.FirmwarePixiecoreIpxe:
+	case firmware.PixiecoreIpxe:
 		// We've already gone through one round of chainloading, now
 		// we can finally chainload to HTTP for the actual boot
 		// script.
