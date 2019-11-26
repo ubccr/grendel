@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"net/url"
+	"path"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	log "github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/model"
 )
@@ -26,8 +28,18 @@ func NewHandler(b *model.BootSpec) (*Handler, error) {
 
 func (h *Handler) SetupRoutes(e *echo.Echo) {
 	e.GET("/", h.Index).Name = "index"
-	e.GET("/_/ipxe", h.Ipxe).Name = "ipxe"
-	e.GET("/_/file", h.File).Name = "file"
+	r := e.Group("/_/")
+
+	config := middleware.JWTConfig{
+		Claims:      &model.BootClaims{},
+		ContextKey:  "bootspec",
+		SigningKey:  []byte("secret"), // TODO: obviously fix this
+		TokenLookup: "query:token",
+	}
+	r.Use(middleware.JWTWithConfig(config))
+	r.GET("ipxe", h.Ipxe)
+	r.GET("file/kernel", h.File)
+	r.GET("file/initrd-*", h.File)
 }
 
 func (h *Handler) Index(c echo.Context) error {
@@ -38,7 +50,13 @@ func (h *Handler) Index(c echo.Context) error {
 }
 
 func (h *Handler) Ipxe(c echo.Context) error {
-	macStr := c.QueryParam("mac")
+	bootToken := c.Get("bootspec").(*jwt.Token)
+	claims := bootToken.Claims.(*model.BootClaims)
+
+	log.Infof("iPXE Got valid boot token: %v", bootToken)
+	log.Infof("iPXE Got valid boot claims: %v", claims)
+
+	macStr := claims.MAC
 	if macStr == "" {
 		log.WithFields(log.Fields{
 			"url": c.Request().URL,
@@ -57,7 +75,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid MAC address")
 	}
 
-	script, err := h.ipxeScript(mac, c.Request().Host, c.Scheme())
+	script, err := h.ipxeScript(mac, c.Request().Host, c.Scheme(), c.QueryParam("token"))
 	log.WithFields(log.Fields{
 		"mac": mac,
 	}).Debug("Construct ipxe script")
@@ -79,18 +97,18 @@ func (h *Handler) Ipxe(c echo.Context) error {
 	return c.String(http.StatusOK, string(script))
 }
 
-func (h *Handler) ipxeScript(mac net.HardwareAddr, serverHost, scheme string) ([]byte, error) {
+func (h *Handler) ipxeScript(mac net.HardwareAddr, serverHost, scheme, token string) ([]byte, error) {
 	if h.BootSpec.Kernel == nil {
 		return nil, errors.New("spec is missing Kernel")
 	}
 
-	urlTemplate := fmt.Sprintf("%s://%s/_/file?type=%%s&mac=%%s", scheme, serverHost)
+	urlTemplate := fmt.Sprintf("%s://%s/_/file/%%s?token=%s", scheme, serverHost, token)
 	var b bytes.Buffer
 	b.WriteString("#!ipxe\n")
-	u := fmt.Sprintf(urlTemplate, "kernel", url.QueryEscape(mac.String()))
+	u := fmt.Sprintf(urlTemplate, "kernel")
 	fmt.Fprintf(&b, "kernel --name kernel %s\n", u)
 	for i := range h.BootSpec.Initrd {
-		u = fmt.Sprintf(urlTemplate, fmt.Sprintf("initrd-%d", i), url.QueryEscape(mac.String()))
+		u = fmt.Sprintf(urlTemplate, fmt.Sprintf("initrd-%d", i))
 		fmt.Fprintf(&b, "initrd --name initrd%d %s\n", i, u)
 	}
 
@@ -106,27 +124,26 @@ func (h *Handler) ipxeScript(mac net.HardwareAddr, serverHost, scheme string) ([
 }
 
 func (h *Handler) File(c echo.Context) error {
-	path := c.QueryParam("type")
-	if path == "" {
-		log.WithFields(log.Fields{
-			"url": c.Request().URL,
-			"ip":  c.RealIP(),
-		}).Error("HTTP bad request missing type")
-		return echo.NewHTTPError(http.StatusBadRequest, "missing type")
-	}
+	bootToken := c.Get("bootspec").(*jwt.Token)
+	claims := bootToken.Claims.(*model.BootClaims)
 
-	log.Infof("Got request for file %q to %s", path, c.RealIP())
+	log.Infof("FILE Got valid boot token: %v", bootToken)
+	log.Infof("FILE Got valid boot claims: %v", claims)
+
+	_, fileType := path.Split(c.Request().URL.Path)
+
+	log.Infof("Got request for file %q to %s", fileType, c.RealIP())
 
 	switch {
-	case path == "kernel":
-		return h.serveBlob(c, path, h.BootSpec.Kernel)
+	case fileType == "kernel":
+		return h.serveBlob(c, fileType, h.BootSpec.Kernel)
 
-	case strings.HasPrefix(path, "initrd-"):
-		i, err := strconv.Atoi(path[7:])
+	case strings.HasPrefix(fileType, "initrd-"):
+		i, err := strconv.Atoi(fileType[7:])
 		if err != nil || i < 0 || i >= len(h.BootSpec.Initrd) {
 			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("no initrd with ID %q", i))
 		}
-		return h.serveBlob(c, path, h.BootSpec.Initrd[i])
+		return h.serveBlob(c, fileType, h.BootSpec.Initrd[i])
 	}
 
 	return echo.NewHTTPError(http.StatusNotFound, "")

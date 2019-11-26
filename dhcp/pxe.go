@@ -1,7 +1,6 @@
 package dhcp
 
 import (
-	"fmt"
 	"net"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
@@ -67,7 +66,12 @@ func (s *Server) pxeHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DHC
 		resp.UpdateOption(dhcpv4.OptGeneric(dhcpv4.OptionClientMachineIdentifier, req.Options.Get(dhcpv4.OptionClientMachineIdentifier)))
 	}
 
-	resp.BootFileName = fmt.Sprintf("%s/%d", req.ClientHWAddr, fwtype)
+	token, err := model.NewFirmwareToken(fwtype)
+	if err != nil {
+		log.Errorf("Failed to generated signed PXE token")
+		return
+	}
+	resp.BootFileName = token
 
 	log.Debugf("PXEServer sending response")
 	log.Debugf(resp.Summary())

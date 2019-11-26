@@ -58,7 +58,12 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 		resp.UpdateOption(dhcpv4.OptGeneric(dhcpv4.OptionVendorSpecificInformation, pxe.ToBytes()))
 
 		resp.UpdateOption(dhcpv4.OptTFTPServerName(s.ServerAddress.String()))
-		resp.UpdateOption(dhcpv4.OptBootFileName(fmt.Sprintf("%s/%d", mach.MAC, fwtype)))
+
+		token, err := model.NewFirmwareToken(fwtype)
+		if err != nil {
+			return fmt.Errorf("DHCP - FirmwareX86PC failed to generated signed Firmware token")
+		}
+		resp.UpdateOption(dhcpv4.OptBootFileName(token))
 
 	case model.FirmwareX86Ipxe:
 		log.Printf("DHCP - FirmwareX86Ipxe telling PXE client to boot tftp")
@@ -69,7 +74,12 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 		resp.UpdateOption(dhcpv4.OptGeneric(dhcpv4.OptionVendorSpecificInformation, pxe.ToBytes()))
 
 		resp.UpdateOption(dhcpv4.OptTFTPServerName(s.ServerAddress.String()))
-		resp.UpdateOption(dhcpv4.OptBootFileName(fmt.Sprintf("tftp://%s/%s/%d", s.ServerAddress, mach.MAC, fwtype)))
+
+		token, err := model.NewFirmwareToken(fwtype)
+		if err != nil {
+			return fmt.Errorf("DHCP - FirmwareX86Ipxe failed to generated signed Firmware token")
+		}
+		resp.UpdateOption(dhcpv4.OptBootFileName(fmt.Sprintf("tftp://%s/%s", s.ServerAddress, token)))
 
 	case model.FirmwareEFI32, model.FirmwareEFI64, model.FirmwareEFIBC:
 		// In theory, the response we send for FirmwareX86PC should
@@ -91,7 +101,12 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 		// pxe.go).
 		log.Printf("DHCP - EFI boot PXE client")
 		resp.UpdateOption(dhcpv4.OptTFTPServerName(s.ServerAddress.String()))
-		resp.UpdateOption(dhcpv4.OptBootFileName(fmt.Sprintf("%s/%d", mach.MAC, fwtype)))
+
+		token, err := model.NewFirmwareToken(fwtype)
+		if err != nil {
+			return fmt.Errorf("DHCP - FirmwareEFI failed to generated signed Firmware token")
+		}
+		resp.UpdateOption(dhcpv4.OptBootFileName(token))
 
 	case model.FirmwarePixiecoreIpxe:
 		// We've already gone through one round of chainloading, now
@@ -101,7 +116,12 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 		if host == "" {
 			host = s.ServerAddress.String()
 		}
-		ipxeUrl := fmt.Sprintf("%s://%s:%d/_/ipxe?arch=%d&mac=%s", s.HTTPScheme, host, s.HTTPPort, mach.Arch, mach.MAC)
+
+		token, err := model.NewBootToken(mach.MAC.String(), "default", fwtype, mach.Arch)
+		if err != nil {
+			return fmt.Errorf("DHCP - FirmwarePixiecoreIpxe failed to generated signed Boot token")
+		}
+		ipxeUrl := fmt.Sprintf("%s://%s:%d/_/ipxe?token=%s", s.HTTPScheme, host, s.HTTPPort, token)
 		log.Printf("DHCP - FirmwarePixiecoreIpxe sending URL to iPXE script: %s", ipxeUrl)
 		resp.UpdateOption(dhcpv4.OptBootFileName(ipxeUrl))
 
