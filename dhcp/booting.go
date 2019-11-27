@@ -11,7 +11,8 @@ import (
 func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 	fwt, err := dhcpv4.GetUint16(dhcpv4.OptionClientSystemArchitectureType, req.Options)
 	if err != nil {
-		return fmt.Errorf("missing DHCP option 93 system architecture")
+		log.Infof("BootHandler4 ignoring packet - missing required DHCP option 93 system architecture")
+		return nil
 	}
 
 	userClass := ""
@@ -49,6 +50,14 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 
 	switch fwtype {
 	case firmware.X86PC:
+		if !s.ProxyOnly {
+			// If we're running both dhcp server and PXE Server then we need to
+			// bail here to direct the PXE client over to port 4011 for the
+			// bootfile. This is because we're running both dhcp and PXE on
+			// same server
+			return nil
+		}
+
 		// This is completely standard PXE: we tell the PXE client to
 		// bypass all the boot discovery rubbish that PXE supports,
 		// and just load a file from TFTP.
