@@ -94,6 +94,13 @@ func (s *Server) Serve() error {
 	e.Use(middleware.Recover())
 	e.Logger = EchoLogger()
 
+	renderer, err := NewTemplateRenderer()
+	if err != nil {
+		return err
+	}
+
+	e.Renderer = renderer
+
 	kernel, err := ioutil.ReadFile(s.Kernel)
 	if err != nil {
 		return err

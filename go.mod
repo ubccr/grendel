@@ -3,6 +3,7 @@ module github.com/ubccr/grendel
 go 1.13
 
 require (
+	github.com/GeertJohan/go.rice v1.0.0
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/howeyc/gopass v0.0.0-20190910152052-7cb4b85ec19c // indirect

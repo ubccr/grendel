@@ -1,0 +1,6 @@
+#!ipxe
+kernel --name kernel {{ .baseuri }}/_/file/kernel?token={{.token}}
+{{- range $i, $initrd := .bootspec.Initrd }}
+initrd --name initrd{{$i}} {{ $.baseuri }}/_/file/initrd-{{$i}}?token={{$.token}}
+{{ end -}}
+boot kernel initrd=initrd0 {{ .bootspec.Cmdline }}
