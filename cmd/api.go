@@ -57,6 +57,10 @@ func NewAPICommand() cli.Command {
 }
 
 func runAPI(c *cli.Context) error {
+	if c.IsSet("cert") && c.IsSet("key") && !c.IsSet("http-port") {
+		c.Set("http-port", "443")
+	}
+
 	staticBooter, err := model.NewStaticBooter(c.String("kernel"), c.StringSlice("initrd"), c.String("cmdline"))
 	if err != nil {
 		return err
@@ -66,6 +70,9 @@ func runAPI(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
+
+	apiServer.KeyFile = c.String("key")
+	apiServer.CertFile = c.String("cert")
 
 	return apiServer.Serve()
 }
