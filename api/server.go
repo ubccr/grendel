@@ -3,7 +3,6 @@ package api
 import (
 	"crypto/tls"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"time"
@@ -30,13 +29,11 @@ type Server struct {
 	KeyFile       string
 	CertFile      string
 	Hostname      string
-	Kernel        string
-	Cmdline       string
-	Initrd        []string
+	DB            model.Datastore
 }
 
-func NewServer(address string, port int) (*Server, error) {
-	s := &Server{}
+func NewServer(address string, port int, db model.Datastore) (*Server, error) {
+	s := &Server{DB: db}
 
 	if address == "" {
 		address = net.IPv4zero.String()
@@ -101,27 +98,7 @@ func (s *Server) Serve() error {
 
 	e.Renderer = renderer
 
-	kernel, err := ioutil.ReadFile(s.Kernel)
-	if err != nil {
-		return err
-	}
-	initrds := make([][]byte, 0)
-	for _, img := range s.Initrd {
-		data, err := ioutil.ReadFile(img)
-		if err != nil {
-			return err
-		}
-		initrds = append(initrds, data)
-	}
-
-	// TODO fix me
-	spec := &model.BootSpec{
-		Kernel:  kernel,
-		Initrd:  initrds,
-		Cmdline: s.Cmdline,
-	}
-
-	h, err := NewHandler(spec)
+	h, err := NewHandler(s.DB)
 	if err != nil {
 		return err
 	}

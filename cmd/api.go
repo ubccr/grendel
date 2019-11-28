@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/ubccr/grendel/api"
+	"github.com/ubccr/grendel/model"
 	"github.com/urfave/cli"
 )
 
@@ -56,14 +57,15 @@ func NewAPICommand() cli.Command {
 }
 
 func runAPI(c *cli.Context) error {
-	apiServer, err := api.NewServer(c.String("listen-address"), c.Int("http-port"))
+	staticBooter, err := model.NewStaticBooter(c.String("kernel"), c.StringSlice("initrd"), c.String("cmdline"))
 	if err != nil {
 		return err
 	}
 
-	apiServer.Kernel = c.String("kernel")
-	apiServer.Cmdline = c.String("cmdline")
-	apiServer.Initrd = c.StringSlice("initrd")
+	apiServer, err := api.NewServer(c.String("listen-address"), c.Int("http-port"), staticBooter)
+	if err != nil {
+		return err
+	}
 
 	return apiServer.Serve()
 }

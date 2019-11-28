@@ -18,11 +18,11 @@ import (
 )
 
 type Handler struct {
-	BootSpec *model.BootSpec
+	DB model.Datastore
 }
 
-func NewHandler(b *model.BootSpec) (*Handler, error) {
-	return &Handler{BootSpec: b}, nil
+func NewHandler(db model.Datastore) (*Handler, error) {
+	return &Handler{DB: db}, nil
 }
 
 func (h *Handler) SetupRoutes(e *echo.Echo) {
@@ -57,25 +57,34 @@ func (h *Handler) Ipxe(c echo.Context) error {
 	macStr := claims.MAC
 	if macStr == "" {
 		log.WithFields(logrus.Fields{
-			"url": c.Request().URL,
-			"ip":  c.RealIP(),
-		}).Error("HTTP bad request missing MAC address")
+			"ip": c.RealIP(),
+		}).Error("Bad request missing MAC address")
 		return echo.NewHTTPError(http.StatusBadRequest, "missing MAC address parameter")
 	}
+
 	mac, err := net.ParseMAC(macStr)
 	if err != nil {
 		log.WithFields(logrus.Fields{
-			"url": c.Request().URL,
 			"ip":  c.RealIP(),
 			"mac": macStr,
 			"err": err,
-		}).Error("HTTP bad request invalid mac")
+		}).Error("Bad request invalid MAC address")
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid MAC address")
+	}
+
+	bootSpec, err := h.DB.GetBootSpec(mac.String())
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"ip":  c.RealIP(),
+			"mac": mac.String(),
+			"err": err,
+		}).Error("Failed to find bootspec for host")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot spec")
 	}
 
 	data := map[string]interface{}{
 		"token":    c.QueryParam("token"),
-		"bootspec": h.BootSpec,
+		"bootspec": bootSpec,
 		"mac":      mac,
 		"baseuri":  fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host),
 	}
@@ -89,20 +98,48 @@ func (h *Handler) File(c echo.Context) error {
 
 	log.Infof("FILE Got valid boot claims: %v", claims)
 
+	macStr := claims.MAC
+	if macStr == "" {
+		log.WithFields(logrus.Fields{
+			"ip": c.RealIP(),
+		}).Error("Bad request missing MAC address")
+		return echo.NewHTTPError(http.StatusBadRequest, "missing MAC address parameter")
+	}
+
+	mac, err := net.ParseMAC(macStr)
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"ip":  c.RealIP(),
+			"mac": macStr,
+			"err": err,
+		}).Error("Bad request invalid MAC address")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid MAC address")
+	}
+
+	bootSpec, err := h.DB.GetBootSpec(mac.String())
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"ip":  c.RealIP(),
+			"mac": mac.String(),
+			"err": err,
+		}).Error("Failed to find bootspec for host")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot spec")
+	}
+
 	_, fileType := path.Split(c.Request().URL.Path)
 
 	log.Infof("Got request for file %q to %s", fileType, c.RealIP())
 
 	switch {
 	case fileType == "kernel":
-		return h.serveBlob(c, fileType, h.BootSpec.Kernel)
+		return h.serveBlob(c, fileType, bootSpec.Kernel)
 
 	case strings.HasPrefix(fileType, "initrd-"):
 		i, err := strconv.Atoi(fileType[7:])
-		if err != nil || i < 0 || i >= len(h.BootSpec.Initrd) {
+		if err != nil || i < 0 || i >= len(bootSpec.Initrd) {
 			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("no initrd with ID %q", i))
 		}
-		return h.serveBlob(c, fileType, h.BootSpec.Initrd[i])
+		return h.serveBlob(c, fileType, bootSpec.Initrd[i])
 	}
 
 	return echo.NewHTTPError(http.StatusNotFound, "")
