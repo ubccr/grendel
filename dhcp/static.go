@@ -1,18 +1,14 @@
 package dhcp
 
 import (
-	"bufio"
 	"fmt"
 	"net"
-	"os"
-	"strings"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
-	"github.com/ubccr/grendel/model"
 )
 
 func (s *Server) staticHandler4(req, resp *dhcpv4.DHCPv4) error {
-	host, err := s.GetHost(req.ClientHWAddr.String())
+	host, err := s.DB.GetHost(req.ClientHWAddr.String())
 	if err != nil {
 		return err
 	}
@@ -56,7 +52,7 @@ func (s *Server) staticAckHandler4(req, resp *dhcpv4.DHCPv4) error {
 		return fmt.Errorf("requested server ID does not match this server's ID. Got %v, want %v", req.ServerIPAddr, s.ServerAddress)
 	}
 
-	host, err := s.GetHost(req.ClientHWAddr.String())
+	host, err := s.DB.GetHost(req.ClientHWAddr.String())
 	if err != nil {
 		return err
 	}
@@ -72,57 +68,4 @@ func (s *Server) staticAckHandler4(req, resp *dhcpv4.DHCPv4) error {
 
 	resp.UpdateOption(dhcpv4.OptMessageType(dhcpv4.MessageTypeAck))
 	return s.staticHandler4(req, resp)
-}
-
-func (s *Server) GetHost(mac string) (*model.Host, error) {
-	host, ok := s.StaticLeases[mac]
-
-	if !ok {
-		return host, fmt.Errorf("MAC address %s is unknown", mac)
-	}
-
-	return host, nil
-}
-
-func (s *Server) LoadStaticLeases(filename string) error {
-	log.Infof("Reading static leases from file: %s", filename)
-	s.StaticLeases = make(map[string]*model.Host)
-
-	file, err := os.Open(filename)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		cols := strings.Split(scanner.Text(), "\t")
-		hwaddr, err := net.ParseMAC(cols[0])
-		if err != nil {
-			return fmt.Errorf("Malformed hardware address: %s", cols[0])
-		}
-		ipaddr := net.ParseIP(cols[1])
-		if ipaddr.To4() == nil {
-			return fmt.Errorf("Invalid IPv4 address: %v", cols[1])
-		}
-
-		host := &model.Host{MAC: hwaddr, IP: ipaddr}
-
-		if len(cols) > 2 {
-			host.FQDN = cols[2]
-		}
-
-		s.StaticLeases[hwaddr.String()] = host
-	}
-
-	if err := scanner.Err(); err != nil {
-		return err
-	}
-
-	if len(s.StaticLeases) > 0 {
-		s.ProxyOnly = false
-		log.Infof("Using %d static leases from %s", len(s.StaticLeases), filename)
-	}
-
-	return nil
 }

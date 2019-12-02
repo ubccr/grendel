@@ -28,15 +28,19 @@ type Server struct {
 	MTU           int
 	ProxyOnly     bool
 	ServePXE      bool
-	StaticLeases  map[string]*model.Host
+	DB            model.Datastore
 	DNSServers    []net.IP
 	LeaseTime     time.Duration
 	srv           *server4.Server
 	srvPXE        *server4.Server
 }
 
-func NewServer(address string) (*Server, error) {
-	s := &Server{ProxyOnly: true, ServePXE: true}
+func NewServer(db model.Datastore, address string) (*Server, error) {
+	s := &Server{DB: db, ProxyOnly: true, ServePXE: true}
+
+	if s.DB == nil {
+		s.ProxyOnly = true
+	}
 
 	if address == "" {
 		address = fmt.Sprintf("%s:%d", net.IPv4zero.String(), dhcpv4.ServerPort)

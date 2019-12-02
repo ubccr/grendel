@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/ubccr/grendel/model"
 	"github.com/urfave/cli"
 )
 
@@ -35,12 +36,19 @@ func NewServeAllCommand() cli.Command {
 }
 
 func runAllServices(c *cli.Context) error {
+	staticBooter, err := model.NewStaticBooter(c.String("static-hosts"), c.String("kernel"), c.StringSlice("initrd"), c.String("cmdline"))
+	if err != nil {
+		return err
+	}
+
+	DB = staticBooter
+
 	errs := make(chan error, 3)
 
 	go func() { errs <- runDHCP(c) }()
 	go func() { errs <- runTFTP(c) }()
 	go func() { errs <- runAPI(c) }()
 
-	err := <-errs
+	err = <-errs
 	return err
 }

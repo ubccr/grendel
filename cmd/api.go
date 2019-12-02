@@ -39,6 +39,10 @@ func NewAPICommand() cli.Command {
 				Usage: "http scheme",
 			},
 			cli.StringFlag{
+				Name:  "static-hosts",
+				Usage: "static hosts file",
+			},
+			cli.StringFlag{
 				Name:  "listen-address",
 				Value: "0.0.0.0",
 				Usage: "IPv4 address to listen on",
@@ -61,12 +65,16 @@ func runAPI(c *cli.Context) error {
 		c.Set("http-port", "443")
 	}
 
-	staticBooter, err := model.NewStaticBooter(c.String("kernel"), c.StringSlice("initrd"), c.String("cmdline"))
-	if err != nil {
-		return err
+	if DB == nil {
+		staticBooter, err := model.NewStaticBooter(c.String("static-hosts"), c.String("kernel"), c.StringSlice("initrd"), c.String("cmdline"))
+		if err != nil {
+			return err
+		}
+
+		DB = staticBooter
 	}
 
-	apiServer, err := api.NewServer(c.String("listen-address"), c.Int("http-port"), staticBooter)
+	apiServer, err := api.NewServer(DB, c.String("listen-address"), c.Int("http-port"))
 	if err != nil {
 		return err
 	}

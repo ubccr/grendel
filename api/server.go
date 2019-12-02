@@ -32,7 +32,7 @@ type Server struct {
 	DB            model.Datastore
 }
 
-func NewServer(address string, port int, db model.Datastore) (*Server, error) {
+func NewServer(db model.Datastore, address string, port int) (*Server, error) {
 	s := &Server{DB: db}
 
 	if address == "" {

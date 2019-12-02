@@ -48,10 +48,6 @@ func NewDHCPCommand() cli.Command {
 				Usage: "Hostname",
 			},
 			cli.StringFlag{
-				Name:  "static-leases",
-				Usage: "static dhcp leases file",
-			},
-			cli.StringFlag{
 				Name:  "lease-time",
 				Value: "24h",
 				Usage: "dhcp lease time duration",
@@ -80,7 +76,7 @@ func runDHCP(c *cli.Context) error {
 	listenAddress := c.String("listen-address")
 	address := fmt.Sprintf("%s:%d", listenAddress, c.Int("dhcp-port"))
 
-	srv, err := dhcp.NewServer(address)
+	srv, err := dhcp.NewServer(DB, address)
 	if err != nil {
 		return err
 	}
@@ -107,13 +103,6 @@ func runDHCP(c *cli.Context) error {
 	}
 
 	log.Infof("Base URL for ipxe: %s://%s:%d", srv.HTTPScheme, srv.Hostname, srv.HTTPPort)
-
-	if c.IsSet("static-leases") {
-		err := srv.LoadStaticLeases(c.String("static-leases"))
-		if err != nil {
-			return err
-		}
-	}
 
 	if c.IsSet("dns-server") {
 		srv.DNSServers = make([]net.IP, 0)
