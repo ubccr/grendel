@@ -89,9 +89,9 @@ func ParseFirmwareToken(tokenString string) (firmware.BootLoader, error) {
 		} else if ve.Errors&(jwt.ValidationErrorExpired|jwt.ValidationErrorNotValidYet) != 0 {
 			return 0, fmt.Errorf("Token is expired")
 		} else {
-			return 0, fmt.Errorf("Error parsing token: ", err)
+			return 0, fmt.Errorf("Error parsing token: %s", err)
 		}
 	}
 
-	return 0, fmt.Errorf("Failed to parsetoken: ", err)
+	return 0, fmt.Errorf("Failed to parsetoken: %s", err)
 }

@@ -21,6 +21,7 @@ require (
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/sirupsen/logrus v1.4.2
 	github.com/square/certstrap v1.2.0
+	github.com/timshannon/badgerhold v0.0.0-20191028155359-570a6f824389
 	github.com/u-root/u-root v5.0.0+incompatible // indirect
 	github.com/urfave/cli v1.22.1
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2

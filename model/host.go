@@ -5,8 +5,8 @@ import (
 )
 
 type Host struct {
-	MAC      net.HardwareAddr
-	IP       net.IP
-	FQDN     string
-	BootSpec string
+	MAC      net.HardwareAddr `json:"mac" badgerhold:"index"`
+	IP       net.IP           `json:"ip"`
+	FQDN     string           `json:"fqdn"`
+	BootSpec string           `json:bootspec"`
 }
