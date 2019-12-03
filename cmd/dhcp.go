@@ -65,6 +65,10 @@ func NewDHCPCommand() cli.Command {
 				Name:  "disable-pxe",
 				Usage: "Disable PXE server",
 			},
+			cli.BoolFlag{
+				Name:  "proxy-only",
+				Usage: "Run DHCP Proxy only",
+			},
 		},
 		Action: runDHCP,
 	}
@@ -76,7 +80,7 @@ func runDHCP(c *cli.Context) error {
 	listenAddress := c.String("listen-address")
 	address := fmt.Sprintf("%s:%d", listenAddress, c.Int("dhcp-port"))
 
-	srv, err := dhcp.NewServer(DB, address)
+	srv, err := dhcp.NewServer(DB, address, c.Bool("proxy-only"))
 	if err != nil {
 		return err
 	}

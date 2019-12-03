@@ -35,11 +35,11 @@ type Server struct {
 	srvPXE        *server4.Server
 }
 
-func NewServer(db model.Datastore, address string) (*Server, error) {
-	s := &Server{DB: db, ProxyOnly: true, ServePXE: true}
+func NewServer(db model.Datastore, address string, proxyOnly bool) (*Server, error) {
+	s := &Server{DB: db, ProxyOnly: proxyOnly, ServePXE: true}
 
-	if s.DB != nil {
-		s.ProxyOnly = false
+	if proxyOnly {
+		log.Debugf("Running in ProxyOnly mode")
 	}
 
 	if address == "" {
