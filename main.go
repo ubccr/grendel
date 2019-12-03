@@ -34,6 +34,7 @@ func main() {
 	app.Commands = []cli.Command{
 		cmd.NewCertsCommand(),
 		cmd.NewServeCommand(),
+		cmd.NewHostCommand(),
 	}
 	if err := app.Run(os.Args); err != nil {
 		log.Error(err)
