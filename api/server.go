@@ -107,8 +107,8 @@ func (s *Server) Serve() error {
 
 	httpServer := &http.Server{
 		Addr:         fmt.Sprintf("%s:%d", s.ListenAddress, s.Port),
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 5 * time.Second,
+		ReadTimeout:  5 * time.Minute,
+		WriteTimeout: 5 * time.Minute,
 		IdleTimeout:  120 * time.Second,
 	}
 

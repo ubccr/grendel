@@ -23,11 +23,7 @@ func NewKVStore(filename string) (*KVStore, error) {
 	return &KVStore{store: store}, nil
 }
 
-func (s *KVStore) DefaultBootSpec() (*BootSpec, error) {
-	return nil, nil
-}
-
-func (s *KVStore) GetBootSpec(mac string) (*BootSpec, error) {
+func (s *KVStore) GetBootImage(mac string) (*BootImage, error) {
 	return nil, nil
 }
 

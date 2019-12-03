@@ -25,8 +25,8 @@ func NewAPICommand() cli.Command {
 				Usage: "Kernel commandline arguments",
 			},
 			cli.StringFlag{
-				Name:  "bootmsg",
-				Usage: "Message to print on machines before booting",
+				Name:  "liveimg",
+				Usage: "Location of liveimg rootfs",
 			},
 			cli.IntFlag{
 				Name:  "http-port",
@@ -66,7 +66,7 @@ func runAPI(c *cli.Context) error {
 	}
 
 	if DB == nil {
-		staticBooter, err := model.NewStaticBooter(c.String("static-hosts"), c.String("kernel"), c.StringSlice("initrd"), c.String("cmdline"))
+		staticBooter, err := model.NewStaticBooter(c.String("static-hosts"), c.String("kernel"), c.StringSlice("initrd"), c.String("cmdline"), c.String("liveimg"))
 		if err != nil {
 			return err
 		}

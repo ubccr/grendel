@@ -36,7 +36,7 @@ func NewServeAllCommand() cli.Command {
 }
 
 func runAllServices(c *cli.Context) error {
-	staticBooter, err := model.NewStaticBooter(c.String("static-hosts"), c.String("kernel"), c.StringSlice("initrd"), c.String("cmdline"))
+	staticBooter, err := model.NewStaticBooter(c.String("static-hosts"), c.String("kernel"), c.StringSlice("initrd"), c.String("cmdline"), c.String("liveimg"))
 	if err != nil {
 		return err
 	}

@@ -42,7 +42,7 @@ func NewBootToken(mac string, bootspec string, fwtype firmware.BootLoader, arch 
 		Firmware:     fwtype,
 		Architecture: arch,
 	}
-	claims.ExpiresAt = time.Now().Add(time.Second * 60).Unix()
+	claims.ExpiresAt = time.Now().Add(time.Second * 60 * 60).Unix()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 

@@ -31,13 +31,14 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 
 	config := middleware.JWTConfig{
 		Claims:      &model.BootClaims{},
-		ContextKey:  "bootspec",
+		ContextKey:  ContextKeyJWT,
 		SigningKey:  []byte("secret"), // TODO: obviously fix this
 		TokenLookup: "query:token",
 	}
 	r.Use(middleware.JWTWithConfig(config))
 	r.GET("ipxe", h.Ipxe)
 	r.GET("file/kernel", h.File)
+	r.GET("file/liveimg", h.File)
 	r.GET("file/initrd-*", h.File)
 }
 
@@ -49,7 +50,7 @@ func (h *Handler) Index(c echo.Context) error {
 }
 
 func (h *Handler) Ipxe(c echo.Context) error {
-	bootToken := c.Get("bootspec").(*jwt.Token)
+	bootToken := c.Get(ContextKeyJWT).(*jwt.Token)
 	claims := bootToken.Claims.(*model.BootClaims)
 
 	log.Infof("iPXE Got valid boot claims: %v", claims)
@@ -72,7 +73,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid MAC address")
 	}
 
-	bootSpec, err := h.DB.GetBootSpec(mac.String())
+	bootImage, err := h.DB.GetBootImage(mac.String())
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"ip":  c.RealIP(),
@@ -82,18 +83,24 @@ func (h *Handler) Ipxe(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot spec")
 	}
 
+	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
+
+	if len(bootImage.LiveImage) > 0 && !strings.Contains(bootImage.CommandLine, "live") {
+		bootImage.CommandLine += fmt.Sprintf(" rd.noverifyssl root=live:%s/_/file/liveimg?token=%s", baseURI, c.QueryParam("token"))
+	}
+
 	data := map[string]interface{}{
-		"token":    c.QueryParam("token"),
-		"bootspec": bootSpec,
-		"mac":      mac,
-		"baseuri":  fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host),
+		"token":     c.QueryParam("token"),
+		"bootimage": bootImage,
+		"mac":       mac,
+		"baseuri":   baseURI,
 	}
 
 	return c.Render(http.StatusOK, "ipxe.tmpl", data)
 }
 
 func (h *Handler) File(c echo.Context) error {
-	bootToken := c.Get("bootspec").(*jwt.Token)
+	bootToken := c.Get(ContextKeyJWT).(*jwt.Token)
 	claims := bootToken.Claims.(*model.BootClaims)
 
 	log.Infof("FILE Got valid boot claims: %v", claims)
@@ -116,7 +123,7 @@ func (h *Handler) File(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid MAC address")
 	}
 
-	bootSpec, err := h.DB.GetBootSpec(mac.String())
+	bootImage, err := h.DB.GetBootImage(mac.String())
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"ip":  c.RealIP(),
@@ -132,14 +139,17 @@ func (h *Handler) File(c echo.Context) error {
 
 	switch {
 	case fileType == "kernel":
-		return h.serveBlob(c, fileType, bootSpec.Kernel)
+		return c.File(bootImage.KernelPath)
+
+	case fileType == "liveimg":
+		return c.File(bootImage.LiveImage)
 
 	case strings.HasPrefix(fileType, "initrd-"):
 		i, err := strconv.Atoi(fileType[7:])
-		if err != nil || i < 0 || i >= len(bootSpec.Initrd) {
+		if err != nil || i < 0 || i >= len(bootImage.InitrdPaths) {
 			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("no initrd with ID %q", i))
 		}
-		return h.serveBlob(c, fileType, bootSpec.Initrd[i])
+		return c.File(bootImage.InitrdPaths[i])
 	}
 
 	return echo.NewHTTPError(http.StatusNotFound, "")

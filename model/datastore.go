@@ -7,7 +7,6 @@ import (
 var log = logger.GetLogger("DB")
 
 type Datastore interface {
-	DefaultBootSpec() (*BootSpec, error)
-	GetBootSpec(mac string) (*BootSpec, error)
+	GetBootImage(mac string) (*BootImage, error)
 	GetHost(mac string) (*Host, error)
 }

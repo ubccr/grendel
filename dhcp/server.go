@@ -38,8 +38,8 @@ type Server struct {
 func NewServer(db model.Datastore, address string) (*Server, error) {
 	s := &Server{DB: db, ProxyOnly: true, ServePXE: true}
 
-	if s.DB == nil {
-		s.ProxyOnly = true
+	if s.DB != nil {
+		s.ProxyOnly = false
 	}
 
 	if address == "" {
