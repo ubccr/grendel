@@ -168,6 +168,10 @@ func (s *Server) mainHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DH
 	}
 
 	peer = &net.UDPAddr{IP: net.IPv4bcast, Port: dhcpv4.ClientPort}
+	if !req.GatewayIPAddr.IsUnspecified() {
+		peer = &net.UDPAddr{IP: req.GatewayIPAddr, Port: dhcpv4.ServerPort}
+		resp.SetUnicast()
+	}
 
 	log.Debugf("Sending DHCPv4 packet response")
 	log.Debugf(resp.Summary())
