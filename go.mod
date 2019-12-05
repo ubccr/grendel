@@ -20,6 +20,7 @@ require (
 	github.com/pin/tftp v2.1.0+incompatible
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/sirupsen/logrus v1.4.2
+	github.com/spf13/viper v1.3.2
 	github.com/square/certstrap v1.2.0
 	github.com/stmcginnis/gofish v0.2.0
 	github.com/timshannon/badgerhold v0.0.0-20191028155359-570a6f824389

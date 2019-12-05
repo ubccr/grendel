@@ -66,7 +66,7 @@ func (s *Server) pxeHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DHC
 		resp.UpdateOption(dhcpv4.OptGeneric(dhcpv4.OptionClientMachineIdentifier, req.Options.Get(dhcpv4.OptionClientMachineIdentifier)))
 	}
 
-	token, err := model.NewFirmwareToken(fwtype)
+	token, err := model.NewFirmwareToken(req.ClientHWAddr.String(), fwtype)
 	if err != nil {
 		log.Errorf("Failed to generated signed PXE token")
 		return

@@ -25,11 +25,6 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 		return fmt.Errorf("Failed to get PXE firmware from DHCP: %s", err)
 	}
 
-	mach, err := model.NewMachineFromDHCP(req.ClientHWAddr, fwt)
-	if err != nil {
-		return fmt.Errorf("Failed to get machine from DHCP: %s", err)
-	}
-
 	guid := req.Options.Get(dhcpv4.OptionClientMachineIdentifier)
 	switch len(guid) {
 	case 0:
@@ -46,7 +41,7 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 		return fmt.Errorf("malformed client GUID (option 97), wrong size")
 	}
 
-	log.Infof("Got valid request to boot %s (%s) %d", mach.MAC, mach.Arch, fwtype)
+	log.Infof("Got valid request to boot %s %d", req.ClientIPAddr, fwtype)
 
 	switch fwtype {
 	case firmware.X86PC:
@@ -68,7 +63,7 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 
 		resp.UpdateOption(dhcpv4.OptTFTPServerName(s.ServerAddress.String()))
 
-		token, err := model.NewFirmwareToken(fwtype)
+		token, err := model.NewFirmwareToken(req.ClientHWAddr.String(), fwtype)
 		if err != nil {
 			return fmt.Errorf("DHCP - FirmwareX86PC failed to generated signed Firmware token")
 		}
@@ -84,7 +79,7 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 
 		resp.UpdateOption(dhcpv4.OptTFTPServerName(s.ServerAddress.String()))
 
-		token, err := model.NewFirmwareToken(fwtype)
+		token, err := model.NewFirmwareToken(req.ClientHWAddr.String(), fwtype)
 		if err != nil {
 			return fmt.Errorf("DHCP - FirmwareX86Ipxe failed to generated signed Firmware token")
 		}
@@ -111,7 +106,7 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 		log.Printf("DHCP - EFI boot PXE client")
 		resp.UpdateOption(dhcpv4.OptTFTPServerName(s.ServerAddress.String()))
 
-		token, err := model.NewFirmwareToken(fwtype)
+		token, err := model.NewFirmwareToken(req.ClientHWAddr.String(), fwtype)
 		if err != nil {
 			return fmt.Errorf("DHCP - FirmwareEFI failed to generated signed Firmware token")
 		}
@@ -126,7 +121,7 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 			host = s.ServerAddress.String()
 		}
 
-		token, err := model.NewBootToken(mach.MAC.String(), "default", fwtype, mach.Arch)
+		token, err := model.NewBootToken(req.ClientHWAddr.String(), "default", fwtype)
 		if err != nil {
 			return fmt.Errorf("DHCP - FirmwarePixiecoreIpxe failed to generated signed Boot token")
 		}

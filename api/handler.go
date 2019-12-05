@@ -14,6 +14,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/model"
 )
 
@@ -32,7 +33,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	config := middleware.JWTConfig{
 		Claims:      &model.BootClaims{},
 		ContextKey:  ContextKeyJWT,
-		SigningKey:  []byte("secret"), // TODO: obviously fix this
+		SigningKey:  []byte(viper.GetString("secret")),
 		TokenLookup: "query:token",
 	}
 	r.Use(middleware.JWTWithConfig(config))
