@@ -67,7 +67,7 @@ func NewFirmwareToken(mac string, fwtype firmware.BootLoader) (string, error) {
 
 	claims := &FirmwareClaims{
 		Firmware:  fwtype,
-		ExpiresAt: time.Now().Add(time.Second * 60).Unix(),
+		ExpiresAt: time.Now().Add(time.Second * 60 * 60).Unix(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 

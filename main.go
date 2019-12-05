@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	golog "log"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -37,6 +39,7 @@ func main() {
 			log.Logger.SetLevel(logrus.DebugLevel)
 		} else {
 			log.Logger.SetLevel(logrus.WarnLevel)
+			golog.SetOutput(ioutil.Discard)
 		}
 
 		conf := c.GlobalString("conf")
