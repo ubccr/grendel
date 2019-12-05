@@ -38,3 +38,21 @@ func (s *StaticBooter) GetHost(mac string) (*Host, error) {
 
 	return nil, fmt.Errorf("Host not found with hwaddr: %s", mac)
 }
+
+func (s *StaticBooter) SaveHost(host *Host) error {
+	if s.hostList == nil {
+		s.hostList = make(map[string]*Host)
+	}
+
+	s.hostList[host.MAC.String()] = host
+	return nil
+}
+
+func (s *StaticBooter) HostList() ([]*Host, error) {
+	values := make([]*Host, 0, len(s.hostList))
+
+	for _, v := range s.hostList {
+		values = append(values, v)
+	}
+	return values, nil
+}

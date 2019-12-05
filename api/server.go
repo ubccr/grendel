@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
@@ -90,6 +91,7 @@ func (s *Server) Serve() error {
 	e.HideBanner = true
 	e.Use(middleware.Recover())
 	e.Logger = EchoLogger()
+	e.Validator = &CustomValidator{validator: validator.New()}
 
 	renderer, err := NewTemplateRenderer()
 	if err != nil {

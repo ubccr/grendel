@@ -61,6 +61,15 @@ func TestKVHost(t *testing.T) {
 	if testHost.FQDN != host.FQDN {
 		t.Errorf("Incorrect FQDN: got %s should be %s", testHost.FQDN, host.FQDN)
 	}
+
+	hostList, err := store.HostList()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(hostList) != 1 {
+		t.Errorf("Incorrect size of host list: got %d should be %d", len(hostList), 1)
+	}
 }
 
 func randmac() (net.HardwareAddr, error) {

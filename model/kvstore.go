@@ -47,6 +47,17 @@ func (s *KVStore) SaveHost(host *Host) error {
 	return s.store.Upsert(host.MAC, host)
 }
 
+func (s *KVStore) HostList() ([]*Host, error) {
+	var result []*Host
+
+	err := s.store.Find(&result, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func (s *KVStore) Close() error {
 	return s.store.Close()
 }

@@ -23,12 +23,17 @@ type Handler struct {
 }
 
 func NewHandler(db model.Datastore) (*Handler, error) {
-	return &Handler{DB: db}, nil
+	h := &Handler{
+		DB: db,
+	}
+
+	return h, nil
 }
 
 func (h *Handler) SetupRoutes(e *echo.Echo) {
 	e.GET("/", h.Index).Name = "index"
-	r := e.Group("/_/")
+
+	boot := e.Group("/_/")
 
 	config := middleware.JWTConfig{
 		Claims:      &model.BootClaims{},
@@ -36,11 +41,15 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 		SigningKey:  []byte(viper.GetString("secret")),
 		TokenLookup: "query:token",
 	}
-	r.Use(middleware.JWTWithConfig(config))
-	r.GET("ipxe", h.Ipxe)
-	r.GET("file/kernel", h.File)
-	r.GET("file/liveimg", h.File)
-	r.GET("file/initrd-*", h.File)
+	boot.Use(middleware.JWTWithConfig(config))
+	boot.GET("ipxe", h.Ipxe)
+	boot.GET("file/kernel", h.File)
+	boot.GET("file/liveimg", h.File)
+	boot.GET("file/initrd-*", h.File)
+
+	v1 := e.Group("/v1/")
+	v1.POST("host/add", h.HostAdd)
+	v1.GET("host/list", h.HostList)
 }
 
 func (h *Handler) Index(c echo.Context) error {
