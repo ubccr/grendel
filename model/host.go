@@ -7,10 +7,9 @@ import (
 )
 
 type Host struct {
-	MAC      net.HardwareAddr `json:"mac" badgerhold:"index" validate:"required"`
-	IP       net.IP           `json:"ip" validate:"required"`
-	FQDN     string           `json:"fqdn" validate:"required,fqdn"`
-	BootSpec string           `json:bootspec"`
+	MAC  net.HardwareAddr `json:"mac" badgerhold:"index" validate:"required"`
+	IP   net.IP           `json:"ip" validate:"required"`
+	FQDN string           `json:"fqdn" validate:"required,fqdn"`
 }
 
 func (h *Host) MarshalJSON() ([]byte, error) {
