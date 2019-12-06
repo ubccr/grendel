@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/pin/tftp"
-	"github.com/ubccr/grendel/firmware"
 	"github.com/ubccr/grendel/model"
 )
 
@@ -20,8 +19,8 @@ func (s *Server) ReadHandler(token string, rf io.ReaderFrom) error {
 		return err
 	}
 
-	bs, err := firmware.GetBootLoader(fwtype)
-	if err != nil {
+	bs := fwtype.ToBytes()
+	if bs == nil {
 		log.Errorf("Failed to fetch firmware %d: %s", fwtype, err)
 		return fmt.Errorf("unknown firmware type %d", fwtype)
 	}

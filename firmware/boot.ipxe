@@ -21,7 +21,7 @@
 set attempts:int32 10
 set x:int32 0
 
-set user-class pixiecore
+set user-class grendel
 
 # Try to get a filename from ProxyDHCP, retrying a couple of times if
 # we fail.
@@ -48,24 +48,7 @@ goto loop
 :boot
 chain ${filename}
 
-# Failure at this point probably means Pixiecore changed its mind
-# about whether this machine should be booted in the middle of the
-# boot cycle, so we had already handed off to iPXE, but now we're
-# no longer serving a boot script for it.
-#
-# Reboot the machine to restart the whole cycle (and presumably skip
-# PXE completely this time).
-#
-# It's also possible we just got horribly unlucky and the network
-# environment is such that we're consistently missing the ProxyDHCP
-# reply. That really sucks, so give people pointers to bug filing
-# here.
 :fail
 echo Failed to get a ProxyDHCP response after ${attempts} attempts
 echo
-echo If you are sure that Pixiecore is still trying to boot this machine,
-echo please file a bug at https://github.com/google/netboot .
-echo
-echo Rebooting in 5 seconds...
-sleep 5
-reboot
+prompt --key s --timeout 10000 PXEBoot failed, hit 's' for the iPXE shell; reboot in 10 seconds && shell || reboot

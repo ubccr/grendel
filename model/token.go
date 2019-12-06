@@ -13,14 +13,14 @@ import (
 )
 
 type FirmwareClaims struct {
-	ExpiresAt int64               `json:"exp"`
-	Firmware  firmware.BootLoader `json:"fw"`
+	ExpiresAt int64          `json:"exp"`
+	Firmware  firmware.Build `json:"fw"`
 }
 
 type BootClaims struct {
-	MAC      string              `json:"mac"`
-	BootSpec string              `json:"bootspec"`
-	Firmware firmware.BootLoader `json:"firmware"`
+	MAC      string         `json:"mac"`
+	BootSpec string         `json:"bootspec"`
+	Firmware firmware.Build `json:"firmware"`
 	jwt.StandardClaims
 }
 
@@ -42,7 +42,7 @@ func (p *FirmwareClaims) Valid() error {
 	return vErr
 }
 
-func NewBootToken(mac string, bootspec string, fwtype firmware.BootLoader) (string, error) {
+func NewBootToken(mac string, bootspec string, fwtype firmware.Build) (string, error) {
 	claims := &BootClaims{
 		MAC:      mac,
 		BootSpec: bootspec,
@@ -60,7 +60,7 @@ func NewBootToken(mac string, bootspec string, fwtype firmware.BootLoader) (stri
 	return t, nil
 }
 
-func NewFirmwareToken(mac string, fwtype firmware.BootLoader) (string, error) {
+func NewFirmwareToken(mac string, fwtype firmware.Build) (string, error) {
 	if !viper.GetBool("jwt_tokens") {
 		return fmt.Sprintf("%s/%d", mac, fwtype), nil
 	}
@@ -79,7 +79,7 @@ func NewFirmwareToken(mac string, fwtype firmware.BootLoader) (string, error) {
 	return t, nil
 }
 
-func ParseFirmwareToken(tokenString string) (firmware.BootLoader, error) {
+func ParseFirmwareToken(tokenString string) (firmware.Build, error) {
 	if !viper.GetBool("jwt_tokens") {
 		pathElements := strings.Split(tokenString, "/")
 		if len(pathElements) != 2 {
@@ -96,7 +96,7 @@ func ParseFirmwareToken(tokenString string) (firmware.BootLoader, error) {
 			return 0, fmt.Errorf("Invalid firmware type: %s", pathElements[1])
 		}
 
-		return firmware.BootLoader(i), nil
+		return firmware.Build(i), nil
 	}
 
 	token, err := jwt.ParseWithClaims(tokenString, &FirmwareClaims{}, func(token *jwt.Token) (interface{}, error) {

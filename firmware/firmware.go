@@ -2,85 +2,85 @@ package firmware
 
 import (
 	"fmt"
+	"github.com/insomniacslk/dhcp/iana"
 )
 
-// This code was adopted from Pixiecore
-// https://github.com/danderson/netboot/blob/master/pixiecore/pixiecore.go
+type Build int
 
-// BootLoader describes a kind of firmware attempting to boot.
-type BootLoader int
-
-// The bootloaders that Pixiecore knows how to handle.
 const (
-	X86PC         BootLoader = iota // "Classic" x86 BIOS with PXE/UNDI support
-	EFI32                           // 32-bit x86 processor running EFI
-	EFI64                           // 64-bit x86 processor running EFI
-	EFIBC                           // 64-bit x86 processor running EFI
-	X86Ipxe                         // "Classic" x86 BIOS running iPXE (no UNDI support)
-	PixiecoreIpxe                   // Pixiecore's iPXE, which has replaced the underlying firmware
+	IPXE Build = iota
+	EFI386
+	EFI64
+	SNPONLY
+	UNDI
+	GRENDEL
 )
 
-var (
-	IPXEBin map[BootLoader][]byte
-)
+// buildToBinary maps a Build to the raw bytes of the binary build
+var buildToBinary map[Build][]byte
+
+// buildToStringMap maps a Build to a binary build name
+var buildToStringMap = map[Build]string{
+	IPXE:    "ipxe.pxe",
+	EFI386:  "ipxe-i386.efi",
+	EFI64:   "ipxe-x86_64.efi",
+	SNPONLY: "snponly-x86_64.efi",
+	UNDI:    "undionly.kpxe",
+}
+
+// String returns a name for a given build.
+func (b Build) String() string {
+	if bt, ok := buildToStringMap[b]; ok {
+		return bt
+	}
+	return "unknown"
+}
+
+func (b Build) ToBytes() []byte {
+	if bt, ok := buildToBinary[b]; ok {
+		return bt
+	}
+	return nil
+}
 
 func init() {
-	IPXEBin = make(map[BootLoader][]byte, 0)
-	IPXEBin[X86PC] = MustAsset("undionly.kpxe")
-	IPXEBin[EFI32] = MustAsset("ipxe-i386.efi")
-	IPXEBin[EFI64] = MustAsset("snponly-x86_64.efi")
-	IPXEBin[EFIBC] = MustAsset("snponly-x86_64.efi")
-	IPXEBin[X86Ipxe] = MustAsset("ipxe.pxe")
+	buildToBinary = make(map[Build][]byte, 0)
+	buildToBinary[IPXE] = MustAsset(IPXE.String())
+	buildToBinary[EFI386] = MustAsset(EFI386.String())
+	buildToBinary[EFI64] = MustAsset(EFI64.String())
+	buildToBinary[SNPONLY] = MustAsset(SNPONLY.String())
+	buildToBinary[UNDI] = MustAsset(UNDI.String())
 }
 
-func GetBootLoader(bootLoader BootLoader) ([]byte, error) {
-	bs, ok := IPXEBin[bootLoader]
-	if !ok {
-		return nil, fmt.Errorf("unknown firmware type %d", bootLoader)
+func DetectBuild(archs iana.Archs, userClass string) (Build, error) {
+	var build Build
+
+	if archs == nil || len(archs) == 0 {
+		return build, fmt.Errorf("No Client System Architecture Types provided")
 	}
 
-	return bs, nil
-}
+	//XXX TODO use first arch? what to do if there's more than one??
+	arch := archs[0]
 
-func DetectBootLoader(fwt uint16, userClass string) (BootLoader, error) {
-	var fwtype BootLoader
-
-	// Basic firmware identification, based purely on the PXE architecture
-	// option.
-	switch fwt {
-	case 0:
-		fwtype = X86PC
-	case 6:
-		fwtype = EFI32
-	case 7:
-		fwtype = EFI64
-	case 9:
-		fwtype = EFIBC
+	switch arch {
+	case iana.INTEL_X86PC:
+		build = UNDI
+	case iana.EFI_IA32:
+		build = EFI386
+	case iana.EFI_BC, iana.EFI_X86_64:
+		build = EFI64
 	default:
-		return fwtype, fmt.Errorf("unsupported client firmware type: %d", fwt)
+		return build, fmt.Errorf("Unsupported Client System Architecture Type: %d", arch)
 	}
 
-	// Now, identify special sub-breeds of client firmware based on
-	// the user-class option. Note these only change the "firmware
-	// type", not the architecture we're reporting to Booters. We need
-	// to identify these as part of making the internal chainloading
-	// logic work properly.
 	if userClass != "" {
-		// If the client has had iPXE burned into its ROM (or is a VM
-		// that uses iPXE as the PXE "ROM"), special handling is
-		// needed because in this mode the client is using iPXE native
-		// drivers and chainloading to a UNDI stack won't work.
-		if userClass == "iPXE" && fwtype == X86PC {
-			fwtype = X86Ipxe
+		if userClass == "iPXE" && arch == iana.INTEL_X86PC {
+			build = IPXE
 		}
-		// If the client identifies as "pixiecore", we've already
-		// chainloaded this client to the full-featured copy of iPXE
-		// we supply. We have to distinguish this case so we don't
-		// loop on the chainload step.
-		if userClass == "pixiecore" {
-			fwtype = PixiecoreIpxe
+		if userClass == "grendel" {
+			build = GRENDEL
 		}
 	}
 
-	return fwtype, nil
+	return build, nil
 }

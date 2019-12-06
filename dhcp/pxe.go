@@ -17,33 +17,14 @@ func (s *Server) pxeHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DHC
 		return
 	}
 
-	fwt, err := dhcpv4.GetUint16(dhcpv4.OptionClientSystemArchitectureType, req.Options)
-	if err != nil {
-		log.Errorf("PXEServer missing DHCP option 93 system architecture")
+	if !req.Options.Has(dhcpv4.OptionClientSystemArchitectureType) {
+		log.Infof("PXEServer ignoring packet - missing client system architecture type")
 		return
 	}
 
-	fwtype, err := firmware.DetectBootLoader(fwt, "")
+	fwtype, err := firmware.DetectBuild(req.ClientArch(), "")
 	if err != nil {
 		log.Errorf("PXEServer failed to get firmware: %s", err)
-		return
-	}
-
-	guid := req.Options.Get(dhcpv4.OptionClientMachineIdentifier)
-	switch len(guid) {
-	case 0:
-		// A missing GUID is invalid according to the spec, however
-		// there are PXE ROMs in the wild that omit the GUID and still
-		// expect to boot. The only thing we do with the GUID is
-		// mirror it back to the client if it's there, so we might as
-		// well accept these buggy ROMs.
-	case 17:
-		if guid[0] != 0 {
-			log.Errorf("malformed client GUID (option 97), leading byte must be zero")
-			return
-		}
-	default:
-		log.Errorf("malformed client GUID (option 97), wrong size")
 		return
 	}
 

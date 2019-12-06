@@ -25,7 +25,13 @@ all:
 .PHONY: build
 build:
 	(cd ipxe/src &&\
-	git checkout -- config/general.h &&\
+	sed -i '/^\/\/#define VLAN_CMD/s/^\/\///' config/general.h &&\
+	sed -i '/^\/\/#define DIGEST_CMD/s/^\/\///' config/general.h &&\
+	sed -i '/^\/\/#define NSLOOKUP_CMD/s/^\/\///' config/general.h &&\
+	sed -i '/^\/\/#define PING_CMD/s/^\/\///' config/general.h &&\
+	sed -i '/^\/\/#define NTP_CMD/s/^\/\///' config/general.h &&\
+	sed -i '/^\/\/#define\tCONSOLE_SYSLOG/s/^\/\///' config/console.h &&\
+	sed -i '/^\/\/#define\tCONSOLE_SYSLOGS/s/^\/\///' config/console.h &&\
 	make bin/ipxe.pxe \
 		bin/undionly.kpxe \
 		bin-x86_64-efi/ipxe.efi \
@@ -36,9 +42,16 @@ build:
 .PHONY: build-with-ca
 build-with-ca:
 	(cd ipxe/src &&\
-	git checkout -- config/general.h &&\
 	sed -i 's/^#undef\tDOWNLOAD_PROTO_HTTPS/#define\tDOWNLOAD_PROTO_HTTPS/' config/general.h &&\
 	sed -i '/^\/\/#define IMAGE_TRUST_CMD/s/^\/\///' config/general.h &&\
+	sed -i '/^\/\/#define CERT_CMD/s/^\/\///' config/general.h &&\
+	sed -i '/^\/\/#define VLAN_CMD/s/^\/\///' config/general.h &&\
+	sed -i '/^\/\/#define DIGEST_CMD/s/^\/\///' config/general.h &&\
+	sed -i '/^\/\/#define NSLOOKUP_CMD/s/^\/\///' config/general.h &&\
+	sed -i '/^\/\/#define PING_CMD/s/^\/\///' config/general.h &&\
+	sed -i '/^\/\/#define NTP_CMD/s/^\/\///' config/general.h &&\
+	sed -i '/^\/\/#define\tCONSOLE_SYSLOG/s/^\/\///' config/console.h &&\
+	sed -i '/^\/\/#define\tCONSOLE_SYSLOGS/s/^\/\///' config/console.h &&\
 	make bin/ipxe.pxe \
 		bin/undionly.kpxe \
 		bin-x86_64-efi/ipxe.efi \
@@ -61,4 +74,4 @@ bindata:
 .PHONY: clean
 clean:
 	rm -rf bin/
-	(cd ipxe/src && git checkout -- config/general.h && make veryclean)
+	(cd ipxe/src && git checkout -- config/general.h && git checkout -- config/console.h && make veryclean)
