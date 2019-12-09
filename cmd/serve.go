@@ -16,6 +16,7 @@ func NewServeCommand() cli.Command {
 		Subcommands: []cli.Command{
 			NewDHCPCommand(),
 			NewTFTPCommand(),
+			NewDNSCommand(),
 			NewAPICommand(),
 			NewServeAllCommand(),
 		},

@@ -18,7 +18,7 @@ func flagExists(flags []cli.Flag, flag cli.Flag) bool {
 func NewServeAllCommand() cli.Command {
 	flags := make([]cli.Flag, 0)
 
-	for _, cmd := range []cli.Command{NewDHCPCommand(), NewTFTPCommand(), NewAPICommand()} {
+	for _, cmd := range []cli.Command{NewDHCPCommand(), NewTFTPCommand(), NewAPICommand(), NewDNSCommand()} {
 		for _, f := range cmd.Flags {
 			if !flagExists(flags, f) {
 				flags = append(flags, f)
@@ -43,11 +43,12 @@ func runAllServices(c *cli.Context) error {
 
 	DB = staticBooter
 
-	errs := make(chan error, 3)
+	errs := make(chan error, 4)
 
 	go func() { errs <- runDHCP(c) }()
 	go func() { errs <- runTFTP(c) }()
 	go func() { errs <- runAPI(c) }()
+	go func() { errs <- runDNS(c) }()
 
 	err = <-errs
 	return err
