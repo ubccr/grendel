@@ -33,6 +33,7 @@ require (
 	github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb
 	github.com/urfave/cli v1.22.1
 	github.com/vmware/goipmi v0.0.0-20181114221114-2333cd82d702
+	github.com/willf/bitset v1.1.10
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 	golang.org/x/crypto v0.0.0-20191117063200-497ca9f6d64f // indirect
 	golang.org/x/net v0.0.0-20191003171128-d98b1b443823 // indirect
