@@ -13,7 +13,7 @@ func (s *StaticBooter) GetBootImage(mac string) (*BootImage, error) {
 	return s.bootImage, nil
 }
 
-func NewStaticBooter(filename, kernelPath string, initrdPaths []string, cmdline, liveImage string) (*StaticBooter, error) {
+func NewStaticBooter(kernelPath string, initrdPaths []string, cmdline, liveImage string) (*StaticBooter, error) {
 	image := &BootImage{
 		KernelPath:  kernelPath,
 		InitrdPaths: initrdPaths,
@@ -21,14 +21,35 @@ func NewStaticBooter(filename, kernelPath string, initrdPaths []string, cmdline,
 		LiveImage:   liveImage,
 	}
 
-	hostList, err := ParseStaticHostList(filename)
-	if err != nil {
-		return nil, err
-	}
-
-	booter := &StaticBooter{bootImage: image, hostList: hostList}
+	booter := &StaticBooter{bootImage: image, hostList: make(map[string]*Host)}
 
 	return booter, nil
+}
+
+func (s *StaticBooter) LoadStaticHosts(filename string) error {
+	hostList, err := ParseStaticHostList(filename)
+	if err != nil {
+		return err
+	}
+
+	for k, v := range hostList {
+		s.hostList[k] = v
+	}
+
+	return nil
+}
+
+func (s *StaticBooter) LoadDHCPLeases(filename string) error {
+	hostList, err := ParseLeases(filename)
+	if err != nil {
+		return err
+	}
+
+	for k, v := range hostList {
+		s.hostList[k] = v
+	}
+
+	return nil
 }
 
 func (s *StaticBooter) GetHost(mac string) (*Host, error) {

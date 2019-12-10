@@ -2,10 +2,13 @@ package model
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"net"
 	"os"
 	"strings"
+
+	"github.com/ubccr/go-dhcpd-leases"
 )
 
 func ParseStaticHostList(filename string) (map[string]*Host, error) {
@@ -40,6 +43,33 @@ func ParseStaticHostList(filename string) (map[string]*Host, error) {
 
 	if err := scanner.Err(); err != nil {
 		return nil, err
+	}
+
+	return hostList, nil
+}
+
+func ParseLeases(filename string) (map[string]*Host, error) {
+	hostList := make(map[string]*Host)
+
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	hosts := leases.Parse(file)
+	if hosts == nil {
+		return nil, errors.New("No hosts found. Is this a dhcpd.leasts file?")
+	}
+
+	for _, h := range hosts {
+		host := &Host{MAC: h.Hardware.MACAddr, IP: h.IP}
+
+		if len(h.ClientHostname) > 0 {
+			host.FQDN = h.ClientHostname
+		}
+
+		hostList[host.MAC.String()] = host
 	}
 
 	return hostList, nil

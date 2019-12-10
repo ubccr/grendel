@@ -147,6 +147,10 @@ github.com/u-root/u-root v5.0.0+incompatible h1:hObldH1pHaXZXVeQnE7I0B23+HXDsGuX
 github.com/u-root/u-root v5.0.0+incompatible/go.mod h1:RYkpo8pTHrNjW08opNd/U6p/RJE7K0D8fXO0d47+3YY=
 github.com/ubccr/certstrap v1.2.1-0.20191119164315-e73497b6d54c h1:ei/jgx2a4l46tbhiN5ZcZys6eAi1aOFvMTnH8xCdPLU=
 github.com/ubccr/certstrap v1.2.1-0.20191119164315-e73497b6d54c/go.mod h1:Sb9QLXizjHdXxQ67ZH3yG0yvWHZNSXu50ZJCT4NxTFY=
+github.com/ubccr/go-dhcpd-leases v0.1.0 h1:l83YLXjMMx/GVFhOwmg1qNMjC3zMRGyTCzR0b82B4DE=
+github.com/ubccr/go-dhcpd-leases v0.1.0/go.mod h1:+sOGnAOUFs+7gDpMjVwZG5z/GG+fNGy5fDywpBRyUIY=
+github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb h1:ZpRWBdMht056oeHzR9bRf/8Zlik5CphNcvpkV3lsoLc=
+github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb/go.mod h1:+sOGnAOUFs+7gDpMjVwZG5z/GG+fNGy5fDywpBRyUIY=
 github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8/go.mod h1:VFNgLljTbGfSG7qAOspJ7OScBnGdDN/yBr0sguwnwf0=
 github.com/urfave/cli v1.22.1 h1:+mkCCcOFKPnCmVYVcURKps1Xe+3zP90gSYGNfRkjoIY=
 github.com/urfave/cli v1.22.1/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=

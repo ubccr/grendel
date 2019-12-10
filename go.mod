@@ -30,6 +30,7 @@ require (
 	github.com/stmcginnis/gofish v0.2.0
 	github.com/timshannon/badgerhold v0.0.0-20191028155359-570a6f824389
 	github.com/u-root/u-root v5.0.0+incompatible // indirect
+	github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb
 	github.com/urfave/cli v1.22.1
 	github.com/vmware/goipmi v0.0.0-20181114221114-2333cd82d702
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
