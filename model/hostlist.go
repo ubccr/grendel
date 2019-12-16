@@ -38,6 +38,10 @@ func ParseStaticHostList(filename string) (map[string]*Host, error) {
 			host.FQDN = cols[2]
 		}
 
+		if len(cols) > 3 && strings.ToLower(cols[3]) == "yes" {
+			host.Provision = true
+		}
+
 		hostList[hwaddr.String()] = host
 	}
 

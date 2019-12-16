@@ -31,7 +31,15 @@ func NewServeAllCommand() cli.Command {
 		},
 		cli.StringFlag{
 			Name:  "liveimg",
-			Usage: "Location of liveimg rootfs",
+			Usage: "Location of liveimg squashfs",
+		},
+		cli.StringFlag{
+			Name:  "rootfs",
+			Usage: "Location of rootfs",
+		},
+		cli.StringFlag{
+			Name:  "install-repo",
+			Usage: "URL of repo mirror",
 		},
 		cli.StringFlag{
 			Name:  "static-hosts",
@@ -61,7 +69,7 @@ func NewServeAllCommand() cli.Command {
 }
 
 func runAllServices(c *cli.Context) error {
-	staticBooter, err := model.NewStaticBooter(c.String("kernel"), c.StringSlice("initrd"), c.String("cmdline"), c.String("liveimg"))
+	staticBooter, err := model.NewStaticBooter(c.String("kernel"), c.StringSlice("initrd"), c.String("cmdline"), c.String("liveimg"), c.String("rootfs"), c.String("install-repo"))
 	if err != nil {
 		return err
 	}

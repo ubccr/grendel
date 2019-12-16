@@ -43,8 +43,10 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	}
 	boot.Use(middleware.JWTWithConfig(config))
 	boot.GET("ipxe", h.Ipxe)
+	boot.GET("kickstart", h.Kickstart)
 	boot.GET("file/kernel", h.File)
 	boot.GET("file/liveimg", h.File)
+	boot.GET("file/rootfs", h.File)
 	boot.GET("file/initrd-*", h.File)
 
 	v1 := e.Group("/v1/")
@@ -63,7 +65,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 	bootToken := c.Get(ContextKeyJWT).(*jwt.Token)
 	claims := bootToken.Claims.(*model.BootClaims)
 
-	log.Infof("iPXE Got valid boot claims: %v", claims)
+	log.Debugf("iPXE Got valid boot claims %s: %v", c.QueryParam("token"), claims)
 
 	macStr := claims.MAC
 	if macStr == "" {
@@ -93,10 +95,28 @@ func (h *Handler) Ipxe(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot spec")
 	}
 
+	host, err := h.DB.GetHost(mac.String())
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"ip":  c.RealIP(),
+			"mac": mac.String(),
+			"err": err,
+		}).Error("Failed to host")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid host")
+	}
+
 	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
 
-	if len(bootImage.LiveImage) > 0 && !strings.Contains(bootImage.CommandLine, "live") {
-		bootImage.CommandLine += fmt.Sprintf(" rd.noverifyssl root=live:%s/_/file/liveimg?token=%s", baseURI, c.QueryParam("token"))
+	if host.Provision {
+		bootImage.CommandLine += fmt.Sprintf(" ks=%s/_/kickstart?token=%s network ksdevice=bootif ks.device=bootif inst.stage2=%s ", baseURI, c.QueryParam("token"), bootImage.InstallRepo)
+		if viper.GetBool("noverifyssl") {
+			bootImage.CommandLine += " rd.noverifyssl noverifyssl inst.noverifyssl"
+		}
+	} else if len(bootImage.LiveImage) > 0 && !strings.Contains(bootImage.CommandLine, "live") {
+		bootImage.CommandLine += fmt.Sprintf(" root=live:%s/_/file/liveimg?token=%s", baseURI, c.QueryParam("token"))
+		if viper.GetBool("noverifyssl") {
+			bootImage.CommandLine += " rd.noverifyssl"
+		}
 	}
 
 	data := map[string]interface{}{
@@ -154,6 +174,9 @@ func (h *Handler) File(c echo.Context) error {
 	case fileType == "liveimg":
 		return c.File(bootImage.LiveImage)
 
+	case fileType == "rootfs":
+		return c.File(bootImage.RootFS)
+
 	case strings.HasPrefix(fileType, "initrd-"):
 		i, err := strconv.Atoi(fileType[7:])
 		if err != nil || i < 0 || i >= len(bootImage.InitrdPaths) {
@@ -168,4 +191,62 @@ func (h *Handler) File(c echo.Context) error {
 func (h *Handler) serveBlob(c echo.Context, name string, data []byte) error {
 	http.ServeContent(c.Response(), c.Request(), name, time.Time{}, bytes.NewReader(data))
 	return nil
+}
+
+func (h *Handler) Kickstart(c echo.Context) error {
+	bootToken := c.Get(ContextKeyJWT).(*jwt.Token)
+	claims := bootToken.Claims.(*model.BootClaims)
+
+	log.Infof("Kickstart got valid boot claims: %v", claims)
+
+	macStr := claims.MAC
+	if macStr == "" {
+		log.WithFields(logrus.Fields{
+			"ip": c.RealIP(),
+		}).Error("Bad request missing MAC address")
+		return echo.NewHTTPError(http.StatusBadRequest, "missing MAC address parameter")
+	}
+
+	mac, err := net.ParseMAC(macStr)
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"ip":  c.RealIP(),
+			"mac": macStr,
+			"err": err,
+		}).Error("Bad request invalid MAC address")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid MAC address")
+	}
+
+	bootImage, err := h.DB.GetBootImage(mac.String())
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"ip":  c.RealIP(),
+			"mac": mac.String(),
+			"err": err,
+		}).Error("Failed to find bootspec for host")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot spec")
+	}
+
+	host, err := h.DB.GetHost(mac.String())
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"ip":  c.RealIP(),
+			"mac": mac.String(),
+			"err": err,
+		}).Error("Failed to host")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid host")
+	}
+
+	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
+
+	data := map[string]interface{}{
+		"token":     c.QueryParam("token"),
+		"bootimage": bootImage,
+		"mac":       mac,
+		"baseuri":   baseURI,
+		"host":      host,
+		"rootpw":    viper.GetString("root_password"),
+	}
+
+	return c.Render(http.StatusOK, "kickstart.tmpl", data)
 }

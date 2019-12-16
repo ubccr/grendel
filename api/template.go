@@ -28,6 +28,16 @@ func NewTemplateRenderer() (*TemplateRenderer, error) {
 		return nil, err
 	}
 
+	kickstartString, err := templateBox.String("kickstart.tmpl")
+	if err != nil {
+		return nil, err
+	}
+
+	tmpl, err = tmpl.New("kickstart.tmpl").Parse(kickstartString)
+	if err != nil {
+		return nil, err
+	}
+
 	t := &TemplateRenderer{
 		templates: tmpl,
 	}

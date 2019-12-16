@@ -13,12 +13,14 @@ func (s *StaticBooter) GetBootImage(mac string) (*BootImage, error) {
 	return s.bootImage, nil
 }
 
-func NewStaticBooter(kernelPath string, initrdPaths []string, cmdline, liveImage string) (*StaticBooter, error) {
+func NewStaticBooter(kernelPath string, initrdPaths []string, cmdline, liveImage, rootFS, installRepo string) (*StaticBooter, error) {
 	image := &BootImage{
 		KernelPath:  kernelPath,
 		InitrdPaths: initrdPaths,
 		CommandLine: cmdline,
 		LiveImage:   liveImage,
+		RootFS:      rootFS,
+		InstallRepo: installRepo,
 	}
 
 	booter := &StaticBooter{bootImage: image, hostList: make(map[string]*Host)}
