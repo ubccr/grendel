@@ -14,7 +14,7 @@ func (s *Server) staticHandler4(req, resp *dhcpv4.DHCPv4) error {
 	}
 
 	resp.YourIPAddr = host.IP
-	log.Debugf("found IP address %s for MAC %s", host.IP, req.ClientHWAddr.String())
+	log.Infof("Found IP address %s for MAC %s", host.IP, req.ClientHWAddr.String())
 
 	// TODO make this configurable
 	netmask := net.IPv4Mask(255, 255, 255, 0)

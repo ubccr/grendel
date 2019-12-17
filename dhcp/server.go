@@ -148,7 +148,7 @@ func (s *Server) mainHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DH
 		if !s.ProxyOnly {
 			err := s.staticHandler4(req, resp)
 			if err != nil {
-				log.Errorf("Failed to find static DHCP lease: %s", err)
+				log.Infof("Ignorning request. Failed to find static lease - %s", err)
 				return
 			}
 		}

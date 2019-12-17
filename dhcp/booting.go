@@ -10,7 +10,7 @@ import (
 
 func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 	if !req.Options.Has(dhcpv4.OptionClientSystemArchitectureType) {
-		log.Infof("BootHandler4 ignoring packet - missing client system architecture type")
+		log.Debugf("BootHandler4 ignoring packet - missing client system architecture type")
 		return nil
 	}
 
