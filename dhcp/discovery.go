@@ -9,24 +9,24 @@ import (
 	"github.com/insomniacslk/dhcp/dhcpv4/server4"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
-	"github.com/ubccr/grendel/tor"
+	"github.com/ubccr/grendel/tors"
 )
 
 type discovery struct {
 	nodeset  *nodeset.NodeSet
 	seen     map[string]bool
 	count    int
-	macTable tor.MACTable
+	macTable tors.MACTable
 	subnet   net.IP
 	netmask  net.IPMask
 }
 
-func RunDiscovery(db model.Datastore, address, prefix, suffix, pattern string, subnet net.IP, netmask net.IPMask, switchClient tor.NetworkSwitch) error {
+func RunDiscovery(db model.Datastore, address, prefix, suffix, pattern string, subnet net.IP, netmask net.IPMask, switchClient tors.NetworkSwitch) error {
 	if address == "" {
 		address = fmt.Sprintf("%s:%d", net.IPv4zero.String(), dhcpv4.ServerPort)
 	}
 
-	var macTable tor.MACTable
+	var macTable tors.MACTable
 	if switchClient != nil {
 		mt, err := switchClient.GetMACTable()
 		if err != nil {
@@ -97,7 +97,7 @@ func (d *discovery) discoveryHandler4(conn net.PacketConn, peer net.Addr, req *d
 		return
 	}
 
-	var entry *tor.MACTableEntry
+	var entry *tors.MACTableEntry
 
 	if d.macTable != nil {
 		if _, ok := d.macTable[req.ClientHWAddr.String()]; !ok {

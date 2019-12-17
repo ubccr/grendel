@@ -1,4 +1,4 @@
-package tor
+package tors
 
 import (
 	"os"

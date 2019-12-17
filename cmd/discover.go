@@ -6,7 +6,7 @@ import (
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/ubccr/grendel/dhcp"
-	"github.com/ubccr/grendel/tor"
+	"github.com/ubccr/grendel/tors"
 	"github.com/urfave/cli"
 )
 
@@ -66,10 +66,10 @@ func runHostDiscover(c *cli.Context) error {
 	listenAddress := c.String("listen-address")
 	address := fmt.Sprintf("%s:%d", listenAddress, c.Int("dhcp-port"))
 
-	var switchClient tor.NetworkSwitch
+	var switchClient tors.NetworkSwitch
 
 	if c.IsSet("switch-api-endpoint") {
-		sw, err := tor.NewDellOS10(c.String("switch-api-endpoint"), c.String("switch-api-user"), c.String("switch-api-pass"), "", true)
+		sw, err := tors.NewDellOS10(c.String("switch-api-endpoint"), c.String("switch-api-user"), c.String("switch-api-pass"), "", true)
 		if err != nil {
 			return err
 		}

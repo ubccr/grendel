@@ -1,4 +1,4 @@
-package tor
+package tors
 
 import (
 	"crypto/tls"
@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -107,7 +108,7 @@ func (d *DellOS10) GetMACTable() (MACTable, error) {
 		return nil, err
 	}
 
-	//log.Debugf("DELLOS10 json response: %s", rawJson)
+	log.Debugf("DELLOS10 json response: %s", rawJson)
 
 	var dmacTable map[string]*dellMacTable
 	err = json.Unmarshal(rawJson, &dmacTable)
@@ -119,9 +120,22 @@ func (d *DellOS10) GetMACTable() (MACTable, error) {
 		macTable := make(MACTable, 0)
 
 		for _, entry := range rec.Entries {
+			// Parse port number from interface.
+			// Format is: ethernet node/slot/port[:subport]
+			parts := strings.Split(entry.Ifname, "/")
+			if len(parts) != 3 || !strings.HasPrefix(parts[0], "ethernet") {
+				log.Debugf("Invalid interface entry: %s", entry.Ifname)
+				continue
+			}
+
+			port, err := strconv.Atoi(parts[2])
+			if err != nil {
+				log.Debugf("Invalid interface entry port number not a number: %s", entry.Ifname)
+				continue
+			}
 			macTable[entry.MAC] = &MACTableEntry{
 				Ifname: entry.Ifname,
-				Port:   entry.PortIndex,
+				Port:   port,
 				VLAN:   entry.VLAN,
 				Type:   entry.Type,
 			}
