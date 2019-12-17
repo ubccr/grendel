@@ -13,10 +13,11 @@ type NodeSet struct {
 	size    int
 	current int
 	prefix  string
+	suffix  string
 }
 
-func NewNodeSet(prefix, pattern string) (*NodeSet, error) {
-	n := &NodeSet{prefix: prefix, current: -1}
+func NewNodeSet(prefix, suffix, pattern string) (*NodeSet, error) {
+	n := &NodeSet{prefix: prefix, suffix: suffix, current: -1}
 
 	pattern = strings.ReplaceAll(pattern, " ", "")
 
@@ -72,7 +73,7 @@ func (n *NodeSet) Next() bool {
 }
 
 func (n *NodeSet) Value() string {
-	return fmt.Sprintf("%s%02d", n.prefix, n.current)
+	return fmt.Sprintf("%s%02d%s", n.prefix, n.current, n.suffix)
 }
 
 func (n *NodeSet) IntValue() int {

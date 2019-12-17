@@ -37,6 +37,10 @@ func NewHostDiscoverCommand() cli.Command {
 				Usage:    "hostname prefix",
 			},
 			cli.StringFlag{
+				Name:  "suffix",
+				Usage: "hostname suffix",
+			},
+			cli.StringFlag{
 				Name:     "nodeset",
 				Required: true,
 				Usage:    "nodeset pattern",
@@ -79,5 +83,5 @@ func runHostDiscover(c *cli.Context) error {
 		return fmt.Errorf("Invalid IPv4 subnet address: %s", c.String("subnet"))
 	}
 
-	return dhcp.RunDiscovery(DB, address, c.String("prefix"), c.String("nodeset"), subnet, netmask, switchClient)
+	return dhcp.RunDiscovery(DB, address, c.String("prefix"), c.String("suffix"), c.String("nodeset"), subnet, netmask, switchClient)
 }

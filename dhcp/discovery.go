@@ -21,7 +21,7 @@ type discovery struct {
 	netmask  net.IPMask
 }
 
-func RunDiscovery(db model.Datastore, address, prefix, pattern string, subnet net.IP, netmask net.IPMask, switchClient tor.NetworkSwitch) error {
+func RunDiscovery(db model.Datastore, address, prefix, suffix, pattern string, subnet net.IP, netmask net.IPMask, switchClient tor.NetworkSwitch) error {
 	if address == "" {
 		address = fmt.Sprintf("%s:%d", net.IPv4zero.String(), dhcpv4.ServerPort)
 	}
@@ -55,7 +55,7 @@ func RunDiscovery(db model.Datastore, address, prefix, pattern string, subnet ne
 		Port: port,
 	}
 
-	nodeset, err := nodeset.NewNodeSet(prefix, pattern)
+	nodeset, err := nodeset.NewNodeSet(prefix, suffix, pattern)
 	if err != nil {
 		return err
 	}
