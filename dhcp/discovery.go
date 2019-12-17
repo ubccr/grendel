@@ -17,9 +17,11 @@ type discovery struct {
 	seen     map[string]bool
 	count    int
 	macTable tor.MACTable
+	subnet   net.IP
+	netmask  net.IPMask
 }
 
-func RunDiscovery(db model.Datastore, address, prefix, pattern string, switchClient tor.NetworkSwitch) error {
+func RunDiscovery(db model.Datastore, address, prefix, pattern string, subnet net.IP, netmask net.IPMask, switchClient tor.NetworkSwitch) error {
 	if address == "" {
 		address = fmt.Sprintf("%s:%d", net.IPv4zero.String(), dhcpv4.ServerPort)
 	}
@@ -58,7 +60,13 @@ func RunDiscovery(db model.Datastore, address, prefix, pattern string, switchCli
 		return err
 	}
 
-	d := &discovery{nodeset: nodeset, seen: make(map[string]bool), macTable: macTable}
+	d := &discovery{
+		nodeset:  nodeset,
+		seen:     make(map[string]bool),
+		macTable: macTable,
+		subnet:   subnet,
+		netmask:  netmask,
+	}
 
 	log.Infof("Running auto discovery for nodeset size: %d", d.nodeset.Len())
 
@@ -107,9 +115,12 @@ func (d *discovery) discoveryHandler4(conn net.PacketConn, peer net.Addr, req *d
 
 	d.seen[req.ClientHWAddr.String()] = true
 
+	ip := d.subnet.Mask(d.netmask)
 	if entry != nil {
-		fmt.Printf("%s\t%s\t%d\n", d.nodeset.Value(), req.ClientHWAddr, entry.Port)
+		ip[3] += uint8(entry.Port)
 	} else {
-		fmt.Printf("%s\t%s\n", d.nodeset.Value(), req.ClientHWAddr)
+		ip[3] += uint8(d.nodeset.IntValue())
 	}
+
+	fmt.Printf("%s\t%s\t%s\n", d.nodeset.Value(), req.ClientHWAddr, ip.String())
 }

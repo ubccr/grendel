@@ -74,3 +74,7 @@ func (n *NodeSet) Next() bool {
 func (n *NodeSet) Value() string {
 	return fmt.Sprintf("%s%02d", n.prefix, n.current)
 }
+
+func (n *NodeSet) IntValue() int {
+	return n.current
+}

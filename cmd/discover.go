@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"net"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/ubccr/grendel/dhcp"
@@ -24,6 +25,11 @@ func NewHostDiscoverCommand() cli.Command {
 				Name:  "listen-address",
 				Value: "0.0.0.0",
 				Usage: "address to listen on",
+			},
+			cli.StringFlag{
+				Name:     "subnet",
+				Required: true,
+				Usage:    "subnet to use for auto ip assignment (/24)",
 			},
 			cli.StringFlag{
 				Name:     "prefix",
@@ -67,5 +73,11 @@ func runHostDiscover(c *cli.Context) error {
 		switchClient = sw
 	}
 
-	return dhcp.RunDiscovery(DB, address, c.String("prefix"), c.String("nodeset"), switchClient)
+	netmask := net.IPv4Mask(255, 255, 255, 0)
+	subnet := net.ParseIP(c.String("subnet"))
+	if subnet == nil || subnet.To4() == nil {
+		return fmt.Errorf("Invalid IPv4 subnet address: %s", c.String("subnet"))
+	}
+
+	return dhcp.RunDiscovery(DB, address, c.String("prefix"), c.String("nodeset"), subnet, netmask, switchClient)
 }
