@@ -33,10 +33,14 @@ func main() {
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{Name: "conf,c", Usage: "Path to conf file"},
 		&cli.BoolFlag{Name: "verbose", Usage: "Print verbose messages"},
+		&cli.BoolFlag{Name: "debug", Usage: "Print debug messages"},
 	}
 	app.Before = func(c *cli.Context) error {
-		if c.GlobalBool("verbose") {
+		if c.GlobalBool("debug") {
 			log.Logger.SetLevel(logrus.DebugLevel)
+		} else if c.GlobalBool("verbose") {
+			log.Logger.SetLevel(logrus.InfoLevel)
+			golog.SetOutput(ioutil.Discard)
 		} else {
 			log.Logger.SetLevel(logrus.WarnLevel)
 			golog.SetOutput(ioutil.Discard)
