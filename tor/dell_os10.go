@@ -79,7 +79,9 @@ func (d *DellOS10) getRequest(url string) (*http.Request, error) {
 	}
 
 	req.Header.Set("Accept", "application/json")
-	req.SetBasicAuth(d.user, d.password)
+	if d.user != "" && d.password != "" {
+		req.SetBasicAuth(d.user, d.password)
+	}
 
 	return req, nil
 }

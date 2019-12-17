@@ -9,17 +9,28 @@ import (
 	"github.com/insomniacslk/dhcp/dhcpv4/server4"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
+	"github.com/ubccr/grendel/tor"
 )
 
 type discovery struct {
-	nodeset *nodeset.NodeSet
-	seen    map[string]bool
-	count   int
+	nodeset  *nodeset.NodeSet
+	seen     map[string]bool
+	count    int
+	macTable tor.MACTable
 }
 
-func RunDiscovery(db model.Datastore, address, prefix, pattern string) error {
+func RunDiscovery(db model.Datastore, address, prefix, pattern string, switchClient tor.NetworkSwitch) error {
 	if address == "" {
 		address = fmt.Sprintf("%s:%d", net.IPv4zero.String(), dhcpv4.ServerPort)
+	}
+
+	var macTable tor.MACTable
+	if switchClient != nil {
+		mt, err := switchClient.GetMACTable()
+		if err != nil {
+			return nil
+		}
+		macTable = mt
 	}
 
 	ipStr, portStr, err := net.SplitHostPort(address)
@@ -47,7 +58,7 @@ func RunDiscovery(db model.Datastore, address, prefix, pattern string) error {
 		return err
 	}
 
-	d := &discovery{nodeset: nodeset, seen: make(map[string]bool)}
+	d := &discovery{nodeset: nodeset, seen: make(map[string]bool), macTable: macTable}
 
 	log.Infof("Running auto discovery for nodeset size: %d", d.nodeset.Len())
 
@@ -73,16 +84,32 @@ func (d *discovery) discoveryHandler4(conn net.PacketConn, peer net.Addr, req *d
 		return
 	}
 
-	if !d.nodeset.Next() {
-		log.Errorf("No more values in nodeset")
-		return
-	}
-
 	if _, ok := d.seen[req.ClientHWAddr.String()]; ok {
 		log.Infof("Already seen mac address. skipping: %s", req.ClientHWAddr)
 		return
 	}
 
+	var entry *tor.MACTableEntry
+
+	if d.macTable != nil {
+		if _, ok := d.macTable[req.ClientHWAddr.String()]; !ok {
+			log.Infof("mac address does not exist in switch mac table. skipping: %s", req.ClientHWAddr)
+			return
+		}
+
+		entry = d.macTable[req.ClientHWAddr.String()]
+	}
+
+	if !d.nodeset.Next() {
+		log.Errorf("No more values in nodeset")
+		return
+	}
+
 	d.seen[req.ClientHWAddr.String()] = true
-	fmt.Printf("%s\t%s\n", d.nodeset.Value(), req.ClientHWAddr)
+
+	if entry != nil {
+		fmt.Printf("%s\t%s\t%d\n", d.nodeset.Value(), req.ClientHWAddr, entry.Port)
+	} else {
+		fmt.Printf("%s\t%s\n", d.nodeset.Value(), req.ClientHWAddr)
+	}
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/ubccr/grendel/dhcp"
+	"github.com/ubccr/grendel/tor"
 	"github.com/urfave/cli"
 )
 
@@ -34,6 +35,18 @@ func NewHostDiscoverCommand() cli.Command {
 				Required: true,
 				Usage:    "nodeset pattern",
 			},
+			cli.StringFlag{
+				Name:  "switch-api-endpoint",
+				Usage: "switch api endpoint",
+			},
+			cli.StringFlag{
+				Name:  "switch-api-user",
+				Usage: "switch api username",
+			},
+			cli.StringFlag{
+				Name:  "switch-api-pass",
+				Usage: "switch api password",
+			},
 		},
 		Action: runHostDiscover,
 	}
@@ -43,5 +56,16 @@ func runHostDiscover(c *cli.Context) error {
 	listenAddress := c.String("listen-address")
 	address := fmt.Sprintf("%s:%d", listenAddress, c.Int("dhcp-port"))
 
-	return dhcp.RunDiscovery(DB, address, c.String("prefix"), c.String("nodeset"))
+	var switchClient tor.NetworkSwitch
+
+	if c.IsSet("switch-api-endpoint") {
+		sw, err := tor.NewDellOS10(c.String("switch-api-endpoint"), c.String("switch-api-user"), c.String("switch-api-pass"), "", true)
+		if err != nil {
+			return err
+		}
+
+		switchClient = sw
+	}
+
+	return dhcp.RunDiscovery(DB, address, c.String("prefix"), c.String("nodeset"), switchClient)
 }
