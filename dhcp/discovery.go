@@ -84,5 +84,5 @@ func (d *discovery) discoveryHandler4(conn net.PacketConn, peer net.Addr, req *d
 	}
 
 	d.seen[req.ClientHWAddr.String()] = true
-	fmt.Printf("%s\t%s", d.nodeset.Value(), req.ClientHWAddr)
+	fmt.Printf("%s\t%s\n", d.nodeset.Value(), req.ClientHWAddr)
 }
