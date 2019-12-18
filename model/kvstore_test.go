@@ -37,11 +37,20 @@ func TestKVHost(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	bmcMac, err := randmac()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	host := &Host{
-		MAC:      mac,
-		IP:       net.IPv4zero,
-		FQDN:     "test.localhost",
-		BootSpec: "default",
+		MAC:  mac,
+		IP:   net.IPv4zero,
+		FQDN: "test.localhost",
+		BMCAddress: &NetworkAddress{
+			MAC:  bmcMac,
+			IP:   net.IPv4zero,
+			FQDN: "bmc-test.localhost",
+		},
 	}
 
 	err = store.SaveHost(host)
@@ -56,6 +65,10 @@ func TestKVHost(t *testing.T) {
 
 	if bytes.Compare(testHost.MAC, host.MAC) != 0 {
 		t.Errorf("Incorrect MAC address: got %s should be %s", testHost.MAC, host.MAC)
+	}
+
+	if bytes.Compare(testHost.BMCAddress.MAC, host.BMCAddress.MAC) != 0 {
+		t.Errorf("Incorrect BMC MAC address: got %s should be %s", testHost.BMCAddress.MAC, host.BMCAddress.MAC)
 	}
 
 	if testHost.FQDN != host.FQDN {

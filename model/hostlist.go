@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/ubccr/go-dhcpd-leases"
+	"github.com/ubccr/grendel/firmware"
 )
 
 func ParseStaticHostList(filename string) (map[string]*Host, error) {
@@ -41,6 +42,9 @@ func ParseStaticHostList(filename string) (map[string]*Host, error) {
 		if len(cols) > 3 && strings.ToLower(cols[3]) == "yes" {
 			host.Provision = true
 		}
+
+		//TODO make this configurable
+		host.Firmware = firmware.SNPONLY
 
 		hostList[hwaddr.String()] = host
 	}
