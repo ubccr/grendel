@@ -2,3 +2,4 @@ grendel
 grendel.yaml
 out/
 firmware/bin
+api/rice-box.go
