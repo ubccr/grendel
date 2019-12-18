@@ -3,6 +3,7 @@ package dns
 import (
 	"net"
 	"strings"
+	"sync"
 
 	"github.com/miekg/dns"
 	"github.com/ubccr/grendel/model"
@@ -17,6 +18,8 @@ type handler struct {
 	name6 map[string][]net.IP
 	addr  map[string][]string
 	ttl   uint32
+
+	sync.RWMutex
 }
 
 func NewHandler(db model.Datastore, ttl uint32) (*handler, error) {
@@ -99,6 +102,9 @@ func (h *handler) LookupStaticAddr(addr string) []string {
 		return nil
 	}
 
+	h.RLock()
+	defer h.RUnlock()
+
 	hosts := h.addr[addr]
 
 	if len(hosts) == 0 {
@@ -157,6 +163,9 @@ func (h *handler) ptr(zone string, ttl uint32, names []string) []dns.RR {
 }
 
 func (h *handler) lookupStaticHost(m map[string][]net.IP, host string) []net.IP {
+	h.RLock()
+	defer h.RUnlock()
+
 	if len(m) == 0 {
 		return nil
 	}
