@@ -169,6 +169,7 @@ func (s *Server) mainHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DH
 		}
 	default:
 		log.Warnf("DHCP Unhandled message type: %v", mt)
+		log.Debugf(resp.Summary())
 		return
 	}
 
