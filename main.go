@@ -40,11 +40,10 @@ func main() {
 			log.Logger.SetLevel(logrus.DebugLevel)
 		} else if c.GlobalBool("verbose") {
 			log.Logger.SetLevel(logrus.InfoLevel)
-			golog.SetOutput(ioutil.Discard)
 		} else {
 			log.Logger.SetLevel(logrus.WarnLevel)
-			golog.SetOutput(ioutil.Discard)
 		}
+		golog.SetOutput(ioutil.Discard)
 
 		conf := c.GlobalString("conf")
 		if len(conf) > 0 {
