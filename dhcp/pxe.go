@@ -9,7 +9,17 @@ import (
 )
 
 func (s *Server) pxeHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DHCPv4) {
-	log.Debugf("PXEServer Received DHCPv4 packet")
+	host, err := s.DB.GetHost(req.ClientHWAddr.String())
+	if err != nil {
+		return
+	}
+
+	if !host.Provision {
+		log.Infof("Host not set to providion: %s", host.MAC.String())
+		return
+	}
+
+	log.Debugf("PXEHandler Received DHCPv4 packet")
 	log.Debugf(req.Summary())
 
 	if req.OpCode != dhcpv4.OpcodeBootRequest {
@@ -26,6 +36,10 @@ func (s *Server) pxeHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DHC
 	if err != nil {
 		log.Errorf("PXEServer failed to get firmware: %s", err)
 		return
+	}
+	if host.Firmware != 0 {
+		log.Infof("Overriding firmware for host: %s", host.MAC.String())
+		fwtype = host.Firmware
 	}
 
 	log.Infof("PXEServer received valid request %s - %d", req.ClientHWAddr, fwtype)

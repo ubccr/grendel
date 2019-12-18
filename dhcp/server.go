@@ -113,16 +113,19 @@ func NewServer(db model.Datastore, address string, proxyOnly bool) (*Server, err
 }
 
 func (s *Server) mainHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DHCPv4) {
-	log.Debugf("Received DHCPv4 packet")
-	log.Debugf(req.Summary())
-
 	if req.OpCode != dhcpv4.OpcodeBootRequest {
-		log.Warningf("not a BootRequest, ignoring")
+		log.Debugf("Ignoring not a BootRequest")
+		return
+	}
+
+	host, err := s.DB.GetHost(req.ClientHWAddr.String())
+	if err != nil {
+		log.Debugf("Ignoring unknown client mac address: %s", req.ClientHWAddr)
 		return
 	}
 
 	resp, err := dhcpv4.NewReplyFromRequest(req,
-		dhcpv4.WithBroadcast(true),
+		//dhcpv4.WithBroadcast(true),
 		dhcpv4.WithServerIP(s.ServerAddress),
 		dhcpv4.WithMessageType(dhcpv4.MessageTypeOffer),
 		dhcpv4.WithOption(dhcpv4.OptClassIdentifier("PXEClient")),
@@ -133,22 +136,24 @@ func (s *Server) mainHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DH
 		return
 	}
 
+	// Copy hop count? is this needed?
+	resp.HopCount = req.HopCount
+
 	if req.Options.Has(dhcpv4.OptionClientMachineIdentifier) {
 		resp.UpdateOption(dhcpv4.OptGeneric(dhcpv4.OptionClientMachineIdentifier, req.Options.Get(dhcpv4.OptionClientMachineIdentifier)))
 	}
 
 	switch mt := req.MessageType(); mt {
 	case dhcpv4.MessageTypeDiscover:
-		err := s.bootingHandler4(req, resp)
+		err := s.bootingHandler4(host, req, resp)
 		if err != nil && s.ProxyOnly {
 			log.Errorf("Failed to add boot options to DHCP request: %s", err)
 			return
 		}
 
 		if !s.ProxyOnly {
-			err := s.staticHandler4(req, resp)
+			err := s.staticHandler4(host, req, resp)
 			if err != nil {
-				log.Infof("Ignorning request. Failed to find static lease - %s", err)
 				return
 			}
 		}
@@ -157,7 +162,7 @@ func (s *Server) mainHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DH
 			return
 		}
 
-		err := s.staticAckHandler4(req, resp)
+		err := s.staticAckHandler4(host, req, resp)
 		if err != nil {
 			log.Errorf("Failed to ack DHCP REQUEST: %s", err)
 			return
@@ -170,6 +175,9 @@ func (s *Server) mainHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DH
 	peer = &net.UDPAddr{IP: net.IPv4bcast, Port: dhcpv4.ClientPort}
 	if !req.GatewayIPAddr.IsUnspecified() {
 		peer = &net.UDPAddr{IP: req.GatewayIPAddr, Port: dhcpv4.ServerPort}
+		resp.SetBroadcast()
+	} else if req.ClientIPAddr != nil && !req.ClientIPAddr.Equal(net.IPv4zero) {
+		peer = &net.UDPAddr{IP: req.ClientIPAddr, Port: dhcpv4.ClientPort}
 		resp.SetUnicast()
 	}
 

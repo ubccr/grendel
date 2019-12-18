@@ -8,7 +8,12 @@ import (
 	"github.com/ubccr/grendel/model"
 )
 
-func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
+func (s *Server) bootingHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) error {
+	if !host.Provision {
+		log.Infof("Host not set to providion: %s", host.MAC.String())
+		return nil
+	}
+
 	if !req.Options.Has(dhcpv4.OptionClientSystemArchitectureType) {
 		log.Debugf("BootHandler4 ignoring packet - missing client system architecture type")
 		return nil
@@ -24,7 +29,8 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 		return fmt.Errorf("Failed to get PXE firmware from DHCP: %s", err)
 	}
 
-	log.Infof("Got valid request to boot %s %d", req.ClientIPAddr, fwtype)
+	log.Infof("BootHandler4 got valid request to boot %s %d", req.ClientIPAddr, fwtype)
+	log.Debugf(req.Summary())
 
 	switch fwtype {
 	case firmware.UNDI:
@@ -87,6 +93,10 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 		// and expect to be called again on port 4011 (which is in
 		// pxe.go).
 		log.Printf("EFI boot PXE client")
+		if host.Firmware != 0 {
+			log.Infof("Overriding firmware for host: %s", host.MAC.String())
+			fwtype = host.Firmware
+		}
 		resp.UpdateOption(dhcpv4.OptTFTPServerName(s.ServerAddress.String()))
 
 		token, err := model.NewFirmwareToken(req.ClientHWAddr.String(), fwtype)
@@ -99,16 +109,16 @@ func (s *Server) bootingHandler4(req, resp *dhcpv4.DHCPv4) error {
 		// We've already gone through one round of chainloading, now
 		// we can finally chainload to HTTP for the actual boot
 		// script.
-		host := s.Hostname
-		if host == "" {
-			host = s.ServerAddress.String()
+		hostName := s.Hostname
+		if hostName == "" {
+			hostName = s.ServerAddress.String()
 		}
 
 		token, err := model.NewBootToken(req.ClientHWAddr.String(), "default", fwtype)
 		if err != nil {
 			return fmt.Errorf("GRENDEL failed to generated signed Boot token")
 		}
-		ipxeUrl := fmt.Sprintf("%s://%s:%d/_/ipxe?token=%s", s.HTTPScheme, host, s.HTTPPort, token)
+		ipxeUrl := fmt.Sprintf("%s://%s:%d/_/ipxe?token=%s", s.HTTPScheme, hostName, s.HTTPPort, token)
 		log.Printf("Sending URL to iPXE script: %s", ipxeUrl)
 		resp.UpdateOption(dhcpv4.OptBootFileName(ipxeUrl))
 
