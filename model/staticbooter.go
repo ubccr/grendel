@@ -2,9 +2,12 @@ package model
 
 import (
 	"fmt"
+	"sync"
 )
 
 type StaticBooter struct {
+	sync.RWMutex
+
 	bootImage *BootImage
 	hostList  map[string]*Host
 }
@@ -34,6 +37,9 @@ func (s *StaticBooter) LoadStaticHosts(filename string) error {
 		return err
 	}
 
+	s.Lock()
+	defer s.Unlock()
+
 	for k, v := range hostList {
 		s.hostList[k] = v
 	}
@@ -47,6 +53,9 @@ func (s *StaticBooter) LoadDHCPLeases(filename string) error {
 		return err
 	}
 
+	s.Lock()
+	defer s.Unlock()
+
 	for k, v := range hostList {
 		s.hostList[k] = v
 	}
@@ -55,6 +64,9 @@ func (s *StaticBooter) LoadDHCPLeases(filename string) error {
 }
 
 func (s *StaticBooter) GetHost(mac string) (*Host, error) {
+	s.RLock()
+	defer s.RUnlock()
+
 	if host, ok := s.hostList[mac]; ok {
 		return host, nil
 	}
@@ -63,6 +75,9 @@ func (s *StaticBooter) GetHost(mac string) (*Host, error) {
 }
 
 func (s *StaticBooter) SaveHost(host *Host) error {
+	s.Lock()
+	defer s.Unlock()
+
 	if s.hostList == nil {
 		s.hostList = make(map[string]*Host)
 	}
@@ -72,6 +87,9 @@ func (s *StaticBooter) SaveHost(host *Host) error {
 }
 
 func (s *StaticBooter) HostList() ([]*Host, error) {
+	s.RLock()
+	defer s.RUnlock()
+
 	values := make([]*Host, 0, len(s.hostList))
 
 	for _, v := range s.hostList {
