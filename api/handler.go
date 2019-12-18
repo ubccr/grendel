@@ -106,24 +106,26 @@ func (h *Handler) Ipxe(c echo.Context) error {
 	}
 
 	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
+	commandLine := bootImage.CommandLine
 
 	if host.Provision {
-		bootImage.CommandLine += fmt.Sprintf(" ks=%s/_/kickstart?token=%s network ksdevice=bootif ks.device=bootif inst.stage2=%s ", baseURI, c.QueryParam("token"), bootImage.InstallRepo)
+		commandLine += fmt.Sprintf(" ks=%s/_/kickstart?token=%s network ksdevice=bootif ks.device=bootif inst.stage2=%s ", baseURI, c.QueryParam("token"), bootImage.InstallRepo)
 		if viper.GetBool("noverifyssl") {
-			bootImage.CommandLine += " rd.noverifyssl noverifyssl inst.noverifyssl"
+			commandLine += " rd.noverifyssl noverifyssl inst.noverifyssl"
 		}
 	} else if len(bootImage.LiveImage) > 0 && !strings.Contains(bootImage.CommandLine, "live") {
-		bootImage.CommandLine += fmt.Sprintf(" root=live:%s/_/file/liveimg?token=%s", baseURI, c.QueryParam("token"))
+		commandLine += fmt.Sprintf(" root=live:%s/_/file/liveimg?token=%s", baseURI, c.QueryParam("token"))
 		if viper.GetBool("noverifyssl") {
-			bootImage.CommandLine += " rd.noverifyssl"
+			commandLine += " rd.noverifyssl"
 		}
 	}
 
 	data := map[string]interface{}{
-		"token":     c.QueryParam("token"),
-		"bootimage": bootImage,
-		"mac":       mac,
-		"baseuri":   baseURI,
+		"token":       c.QueryParam("token"),
+		"bootimage":   bootImage,
+		"commandLine": commandLine,
+		"mac":         mac,
+		"baseuri":     baseURI,
 	}
 
 	return c.Render(http.StatusOK, "ipxe.tmpl", data)
