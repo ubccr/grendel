@@ -8,7 +8,7 @@ import (
 type Build int
 
 const (
-	IPXE Build = iota
+	IPXE Build = iota + 1
 	EFI386
 	EFI64
 	SNPONLY
@@ -28,12 +28,26 @@ var buildToStringMap = map[Build]string{
 	UNDI:    "undionly.kpxe",
 }
 
+func NewFromString(b string) Build {
+	for k, v := range buildToStringMap {
+		if v == b {
+			return k
+		}
+	}
+
+	return Build(0)
+}
+
 // String returns a name for a given build.
 func (b Build) String() string {
 	if bt, ok := buildToStringMap[b]; ok {
 		return bt
 	}
-	return "unknown"
+	return ""
+}
+
+func (b Build) IsNil() bool {
+	return int(b) == 0
 }
 
 func (b Build) ToBytes() []byte {

@@ -23,6 +23,7 @@ require (
 	github.com/onsi/gomega v1.7.1 // indirect
 	github.com/pin/tftp v2.1.0+incompatible
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
+	github.com/segmentio/ksuid v1.0.2
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/viper v1.3.2

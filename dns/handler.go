@@ -37,22 +37,24 @@ func NewHandler(db model.Datastore, ttl uint32) (*handler, error) {
 	}
 
 	for _, host := range hostList {
-		name := Normalize(host.FQDN)
-		family := 0
-		if host.IP.To4() != nil {
-			family = 1
-		} else {
-			family = 2
+		for _, nic := range host.Interfaces {
+			name := Normalize(nic.FQDN)
+			family := 0
+			if nic.IP.To4() != nil {
+				family = 1
+			} else {
+				family = 2
+			}
+			switch family {
+			case 1:
+				h.name4[name] = append(h.name4[name], nic.IP)
+			case 2:
+				h.name6[name] = append(h.name6[name], nic.IP)
+			default:
+				continue
+			}
+			h.addr[nic.IP.String()] = append(h.addr[nic.IP.String()], name)
 		}
-		switch family {
-		case 1:
-			h.name4[name] = append(h.name4[name], host.IP)
-		case 2:
-			h.name6[name] = append(h.name6[name], host.IP)
-		default:
-			continue
-		}
-		h.addr[host.IP.String()] = append(h.addr[host.IP.String()], name)
 	}
 
 	return h, nil

@@ -8,9 +8,23 @@ import (
 	"os"
 	"strings"
 
+	"github.com/segmentio/ksuid"
 	"github.com/ubccr/go-dhcpd-leases"
-	"github.com/ubccr/grendel/firmware"
 )
+
+type HostList []*Host
+
+func (hl HostList) FilterPrefix(prefix string) HostList {
+	n := 0
+	for _, host := range hl {
+		if strings.HasPrefix(host.Name, prefix) {
+			hl[n] = host
+			n++
+		}
+	}
+
+	return hl[:n]
+}
 
 func ParseStaticHostList(filename string) (map[string]*Host, error) {
 	hostList := make(map[string]*Host)
@@ -33,20 +47,25 @@ func ParseStaticHostList(filename string) (map[string]*Host, error) {
 			return nil, fmt.Errorf("Invalid IPv4 address: %v", cols[1])
 		}
 
-		host := &Host{MAC: hwaddr, IP: ipaddr}
+		nic := &NetInterface{MAC: hwaddr, IP: ipaddr}
 
 		if len(cols) > 2 {
-			host.FQDN = cols[2]
+			nic.FQDN = cols[2]
 		}
+
+		uuid, err := ksuid.NewRandom()
+		if err != nil {
+			return nil, err
+		}
+
+		host := &Host{ID: uuid}
+		host.Interfaces = []*NetInterface{nic}
 
 		if len(cols) > 3 && strings.ToLower(cols[3]) == "yes" {
 			host.Provision = true
 		}
 
-		//TODO make this configurable
-		host.Firmware = firmware.SNPONLY
-
-		hostList[hwaddr.String()] = host
+		hostList[host.ID.String()] = host
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -71,13 +90,21 @@ func ParseLeases(filename string) (map[string]*Host, error) {
 	}
 
 	for _, h := range hosts {
-		host := &Host{MAC: h.Hardware.MACAddr, IP: h.IP}
+		nic := &NetInterface{MAC: h.Hardware.MACAddr, IP: h.IP}
 
 		if len(h.ClientHostname) > 0 {
-			host.FQDN = h.ClientHostname
+			nic.FQDN = h.ClientHostname
 		}
 
-		hostList[host.MAC.String()] = host
+		uuid, err := ksuid.NewRandom()
+		if err != nil {
+			return nil, err
+		}
+
+		host := &Host{ID: uuid}
+		host.Interfaces = []*NetInterface{nic}
+
+		hostList[host.ID.String()] = host
 	}
 
 	return hostList, nil

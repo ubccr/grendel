@@ -67,42 +67,48 @@ func (h *Handler) Ipxe(c echo.Context) error {
 
 	log.Debugf("iPXE Got valid boot claims %s: %v", c.QueryParam("token"), claims)
 
-	macStr := claims.MAC
-	if macStr == "" {
-		log.WithFields(logrus.Fields{
-			"ip": c.RealIP(),
-		}).Error("Bad request missing MAC address")
-		return echo.NewHTTPError(http.StatusBadRequest, "missing MAC address parameter")
-	}
-
-	mac, err := net.ParseMAC(macStr)
+	bootImage, err := h.DB.GetBootImage(claims.ID)
 	if err != nil {
 		log.WithFields(logrus.Fields{
-			"ip":  c.RealIP(),
-			"mac": macStr,
-			"err": err,
-		}).Error("Bad request invalid MAC address")
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid MAC address")
+			"ip":      c.RealIP(),
+			"host_id": claims.ID,
+			"mac":     claims.MAC,
+			"err":     err,
+		}).Error("iPXE failed to find boot image for host")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot image")
 	}
 
-	bootImage, err := h.DB.GetBootImage(mac.String())
+	host, err := h.DB.GetHost(claims.ID)
 	if err != nil {
 		log.WithFields(logrus.Fields{
-			"ip":  c.RealIP(),
-			"mac": mac.String(),
-			"err": err,
-		}).Error("Failed to find bootspec for host")
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot spec")
-	}
-
-	host, err := h.DB.GetHost(mac.String())
-	if err != nil {
-		log.WithFields(logrus.Fields{
-			"ip":  c.RealIP(),
-			"mac": mac.String(),
-			"err": err,
-		}).Error("Failed to host")
+			"ip":      c.RealIP(),
+			"host_id": claims.ID,
+			"mac":     claims.MAC,
+			"err":     err,
+		}).Error("iPXE failed to find host")
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid host")
+	}
+
+	mac, err := net.ParseMAC(claims.MAC)
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"ip":      c.RealIP(),
+			"host_id": claims.ID,
+			"mac":     claims.MAC,
+			"err":     err,
+		}).Error("iPXE got invalid mac address")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid mac address")
+	}
+
+	nic := host.Interface(mac)
+	if nic == nil {
+		log.WithFields(logrus.Fields{
+			"ip":      c.RealIP(),
+			"host_id": claims.ID,
+			"mac":     claims.MAC,
+			"err":     err,
+		}).Error("iPXE got invalid boot interface for host")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot interface")
 	}
 
 	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
@@ -124,7 +130,8 @@ func (h *Handler) Ipxe(c echo.Context) error {
 		"token":       c.QueryParam("token"),
 		"bootimage":   bootImage,
 		"commandLine": commandLine,
-		"mac":         mac,
+		"nic":         nic,
+		"host":        host,
 		"baseuri":     baseURI,
 	}
 
@@ -155,7 +162,7 @@ func (h *Handler) File(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid MAC address")
 	}
 
-	bootImage, err := h.DB.GetBootImage(mac.String())
+	bootImage, err := h.DB.GetBootImage(claims.ID)
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"ip":  c.RealIP(),
@@ -201,42 +208,48 @@ func (h *Handler) Kickstart(c echo.Context) error {
 
 	log.Infof("Kickstart got valid boot claims: %v", claims)
 
-	macStr := claims.MAC
-	if macStr == "" {
-		log.WithFields(logrus.Fields{
-			"ip": c.RealIP(),
-		}).Error("Bad request missing MAC address")
-		return echo.NewHTTPError(http.StatusBadRequest, "missing MAC address parameter")
-	}
-
-	mac, err := net.ParseMAC(macStr)
+	bootImage, err := h.DB.GetBootImage(claims.ID)
 	if err != nil {
 		log.WithFields(logrus.Fields{
-			"ip":  c.RealIP(),
-			"mac": macStr,
-			"err": err,
-		}).Error("Bad request invalid MAC address")
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid MAC address")
-	}
-
-	bootImage, err := h.DB.GetBootImage(mac.String())
-	if err != nil {
-		log.WithFields(logrus.Fields{
-			"ip":  c.RealIP(),
-			"mac": mac.String(),
-			"err": err,
-		}).Error("Failed to find bootspec for host")
+			"ip":      c.RealIP(),
+			"host_id": claims.ID,
+			"mac":     claims.MAC,
+			"err":     err,
+		}).Error("Kickstart failed to find boot image for host")
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot spec")
 	}
 
-	host, err := h.DB.GetHost(mac.String())
+	host, err := h.DB.GetHost(claims.ID)
 	if err != nil {
 		log.WithFields(logrus.Fields{
-			"ip":  c.RealIP(),
-			"mac": mac.String(),
-			"err": err,
-		}).Error("Failed to host")
+			"ip":      c.RealIP(),
+			"host_id": claims.ID,
+			"mac":     claims.MAC,
+			"err":     err,
+		}).Error("Kickstart failed to find host")
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid host")
+	}
+
+	mac, err := net.ParseMAC(claims.MAC)
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"ip":      c.RealIP(),
+			"host_id": claims.ID,
+			"mac":     claims.MAC,
+			"err":     err,
+		}).Error("Kickstart got invalid mac address")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid mac address")
+	}
+
+	nic := host.Interface(mac)
+	if nic == nil {
+		log.WithFields(logrus.Fields{
+			"ip":      c.RealIP(),
+			"host_id": claims.ID,
+			"mac":     claims.MAC,
+			"err":     err,
+		}).Error("Kickstart got invalid boot interface for host")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot interface")
 	}
 
 	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
@@ -244,9 +257,9 @@ func (h *Handler) Kickstart(c echo.Context) error {
 	data := map[string]interface{}{
 		"token":     c.QueryParam("token"),
 		"bootimage": bootImage,
-		"mac":       mac,
 		"baseuri":   baseURI,
 		"host":      host,
+		"nic":       nic,
 		"rootpw":    viper.GetString("root_password"),
 	}
 

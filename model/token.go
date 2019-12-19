@@ -18,9 +18,8 @@ type FirmwareClaims struct {
 }
 
 type BootClaims struct {
-	MAC      string         `json:"mac"`
-	BootSpec string         `json:"bootspec"`
-	Firmware firmware.Build `json:"firmware"`
+	ID  string `json:"id"`
+	MAC string `json:"mac"`
 	jwt.StandardClaims
 }
 
@@ -42,11 +41,10 @@ func (p *FirmwareClaims) Valid() error {
 	return vErr
 }
 
-func NewBootToken(mac string, bootspec string, fwtype firmware.Build) (string, error) {
+func NewBootToken(id, mac string) (string, error) {
 	claims := &BootClaims{
-		MAC:      mac,
-		BootSpec: bootspec,
-		Firmware: fwtype,
+		ID:  id,
+		MAC: mac,
 	}
 	claims.ExpiresAt = time.Now().Add(time.Second * 60 * 60).Unix()
 

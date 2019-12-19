@@ -9,13 +9,13 @@ import (
 )
 
 func (s *Server) pxeHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DHCPv4) {
-	host, err := s.DB.GetHost(req.ClientHWAddr.String())
-	if err != nil {
+	host := s.LookupStaticHost(req.ClientHWAddr.String())
+	if host == nil {
 		return
 	}
 
 	if !host.Provision {
-		log.Infof("Host not set to providion: %s", host.MAC.String())
+		log.Infof("Host not set to providion: %s", req.ClientHWAddr.String())
 		return
 	}
 
@@ -38,7 +38,7 @@ func (s *Server) pxeHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DHC
 		return
 	}
 	if host.Firmware != 0 {
-		log.Infof("Overriding firmware for host: %s", host.MAC.String())
+		log.Infof("Overriding firmware for host: %s", req.ClientHWAddr.String())
 		fwtype = host.Firmware
 	}
 

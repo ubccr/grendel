@@ -8,7 +8,7 @@ var log = logger.GetLogger("DB")
 
 type Datastore interface {
 	GetBootImage(mac string) (*BootImage, error)
-	GetHost(mac string) (*Host, error)
-	HostList() ([]*Host, error)
+	GetHost(id string) (*Host, error)
+	HostList() (HostList, error)
 	SaveHost(host *Host) error
 }

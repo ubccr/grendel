@@ -3,6 +3,8 @@ package model
 import (
 	"fmt"
 	"sync"
+
+	"github.com/segmentio/ksuid"
 )
 
 type StaticBooter struct {
@@ -63,15 +65,15 @@ func (s *StaticBooter) LoadDHCPLeases(filename string) error {
 	return nil
 }
 
-func (s *StaticBooter) GetHost(mac string) (*Host, error) {
+func (s *StaticBooter) GetHost(id string) (*Host, error) {
 	s.RLock()
 	defer s.RUnlock()
 
-	if host, ok := s.hostList[mac]; ok {
+	if host, ok := s.hostList[id]; ok {
 		return host, nil
 	}
 
-	return nil, fmt.Errorf("Host not found with hwaddr: %s", mac)
+	return nil, fmt.Errorf("Host not found with id: %s", id)
 }
 
 func (s *StaticBooter) SaveHost(host *Host) error {
@@ -82,15 +84,24 @@ func (s *StaticBooter) SaveHost(host *Host) error {
 		s.hostList = make(map[string]*Host)
 	}
 
-	s.hostList[host.MAC.String()] = host
+	if host.ID.IsNil() {
+		uuid, err := ksuid.NewRandom()
+		if err != nil {
+			return err
+		}
+		host.ID = uuid
+	}
+
+	s.hostList[host.ID.String()] = host
+
 	return nil
 }
 
-func (s *StaticBooter) HostList() ([]*Host, error) {
+func (s *StaticBooter) HostList() (HostList, error) {
 	s.RLock()
 	defer s.RUnlock()
 
-	values := make([]*Host, 0, len(s.hostList))
+	values := make(HostList, 0, len(s.hostList))
 
 	for _, v := range s.hostList {
 		values = append(values, v)

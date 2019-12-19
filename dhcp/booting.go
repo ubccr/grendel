@@ -10,7 +10,7 @@ import (
 
 func (s *Server) bootingHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) error {
 	if !host.Provision {
-		log.Infof("Host not set to providion: %s", host.MAC.String())
+		log.Infof("Host not set to provision: %s", req.ClientHWAddr.String())
 		return nil
 	}
 
@@ -94,7 +94,7 @@ func (s *Server) bootingHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) err
 		// pxe.go).
 		log.Printf("EFI boot PXE client")
 		if host.Firmware != 0 {
-			log.Infof("Overriding firmware for host: %s", host.MAC.String())
+			log.Infof("Overriding firmware for host: %s", req.ClientHWAddr.String())
 			fwtype = host.Firmware
 		}
 		resp.UpdateOption(dhcpv4.OptTFTPServerName(s.ServerAddress.String()))
@@ -114,10 +114,11 @@ func (s *Server) bootingHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) err
 			hostName = s.ServerAddress.String()
 		}
 
-		token, err := model.NewBootToken(req.ClientHWAddr.String(), "default", fwtype)
+		token, err := model.NewBootToken(host.ID.String(), req.ClientHWAddr.String())
 		if err != nil {
-			return fmt.Errorf("GRENDEL failed to generated signed Boot token")
+			return fmt.Errorf("Failed to generate signed boot token: %s", err)
 		}
+
 		ipxeUrl := fmt.Sprintf("%s://%s:%d/_/ipxe?token=%s", s.HTTPScheme, hostName, s.HTTPPort, token)
 		log.Printf("Sending URL to iPXE script: %s", ipxeUrl)
 		resp.UpdateOption(dhcpv4.OptBootFileName(ipxeUrl))

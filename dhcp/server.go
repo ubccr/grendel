@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/insomniacslk/dhcp/dhcpv4/server4"
 	"github.com/insomniacslk/dhcp/interfaces"
+	"github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
 )
@@ -33,6 +35,9 @@ type Server struct {
 	LeaseTime     time.Duration
 	srv           *server4.Server
 	srvPXE        *server4.Server
+	leases4       map[string]*model.Host
+
+	sync.RWMutex
 }
 
 func NewServer(db model.Datastore, address string, proxyOnly bool) (*Server, error) {
@@ -109,6 +114,11 @@ func NewServer(db model.Datastore, address string, proxyOnly bool) (*Server, err
 	s.ServerAddress = serverIps[0]
 	s.ListenAddress = ip
 
+	err = s.LoadHosts()
+	if err != nil {
+		return nil, err
+	}
+
 	return s, nil
 }
 
@@ -118,8 +128,8 @@ func (s *Server) mainHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DH
 		return
 	}
 
-	host, err := s.DB.GetHost(req.ClientHWAddr.String())
-	if err != nil {
+	host := s.LookupStaticHost(req.ClientHWAddr.String())
+	if host == nil {
 		log.Debugf("Ignoring unknown client mac address: %s", req.ClientHWAddr)
 		return
 	}
@@ -147,7 +157,11 @@ func (s *Server) mainHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DH
 	case dhcpv4.MessageTypeDiscover:
 		err := s.bootingHandler4(host, req, resp)
 		if err != nil && s.ProxyOnly {
-			log.Errorf("Failed to add boot options to DHCP request: %s", err)
+			log.WithFields(logrus.Fields{
+				"mac":     req.ClientHWAddr.String(),
+				"host_id": host.ID.String(),
+				"err":     err,
+			}).Error("Failed to add boot options to DHCP request")
 			return
 		}
 
@@ -254,4 +268,44 @@ func (s *Server) Shutdown() {
 	if err != nil {
 		log.Errorf("Failed to close pxe server: %s", err)
 	}
+}
+
+func (s *Server) LookupStaticHost(mac string) *model.Host {
+	s.RLock()
+	defer s.RUnlock()
+
+	if len(s.leases4) == 0 {
+		return nil
+	}
+
+	host, ok := s.leases4[mac]
+	if !ok {
+		return nil
+	}
+
+	return host
+}
+
+func (s *Server) LoadHosts() error {
+	hostList, err := s.DB.HostList()
+	if err != nil {
+		return err
+	}
+
+	s.Lock()
+	defer s.Unlock()
+
+	s.leases4 = make(map[string]*model.Host, 0)
+
+	for _, host := range hostList {
+		for _, nic := range host.Interfaces {
+			if nic.IP.To4() == nil {
+				continue
+			}
+
+			s.leases4[nic.MAC.String()] = host
+		}
+	}
+
+	return nil
 }

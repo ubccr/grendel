@@ -1,46 +1,58 @@
 package model
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net"
 
+	"github.com/segmentio/ksuid"
 	"github.com/ubccr/grendel/firmware"
 )
 
-type NetworkAddress struct {
-	MAC  net.HardwareAddr `json:"mac"`
-	IP   net.IP           `json:"ip"`
-	FQDN string           `json:"fqdn"`
+type Host struct {
+	ID         ksuid.KSUID     `json:"id" badgerhold:"index"`
+	Name       string          `json:"name" badgerhold:"unique" validate:"required,hostname"`
+	Interfaces []*NetInterface `json:"interfaces"`
+	Provision  bool            `json:"provision"`
+	Firmware   firmware.Build  `json:"firmware"`
 }
 
-type Host struct {
-	MAC        net.HardwareAddr `json:"mac" badgerhold:"index" validate:"required"`
-	IP         net.IP           `json:"ip" validate:"required"`
-	FQDN       string           `json:"fqdn" validate:"required,fqdn"`
-	Provision  bool             `json:"provision"`
-	BMCAddress *NetworkAddress  `json:"bmc_address"`
-	Firmware   firmware.Build
+func (h *Host) Interface(mac net.HardwareAddr) *NetInterface {
+	for _, nic := range h.Interfaces {
+		if bytes.Compare(nic.MAC, mac) == 0 {
+			return nic
+		}
+	}
+
+	return nil
+}
+
+func (h *Host) InterfaceBMC() *NetInterface {
+	for _, nic := range h.Interfaces {
+		if nic.BMC {
+			return nic
+		}
+	}
+
+	return nil
 }
 
 func (h *Host) MarshalJSON() ([]byte, error) {
 	type Alias Host
 	return json.Marshal(&struct {
-		MAC string `json:"mac"`
-		IP  string `json:"ip"`
+		Firmware string `json:"firmware"`
 		*Alias
 	}{
-		MAC:   h.MAC.String(),
-		IP:    h.IP.String(),
-		Alias: (*Alias)(h),
+		Firmware: h.Firmware.String(),
+		Alias:    (*Alias)(h),
 	})
 }
 
 func (h *Host) UnmarshalJSON(data []byte) error {
 	type Alias Host
 	aux := &struct {
-		MAC string `json:"mac"`
-		IP  string `json:"ip"`
+		Firmware string `json:"firmware"`
 		*Alias
 	}{
 		Alias: (*Alias)(h),
@@ -48,55 +60,11 @@ func (h *Host) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return err
 	}
-	mac, err := net.ParseMAC(aux.MAC)
-	if err != nil {
-		return err
-	}
-	ip := net.ParseIP(aux.IP)
-	if ip == nil || ip.To4() == nil {
-		return fmt.Errorf("Invalid IPv4 address: %s", aux.IP)
+
+	h.Firmware = firmware.NewFromString(aux.Firmware)
+	if len(aux.Firmware) != 0 && h.Firmware.IsNil() {
+		return fmt.Errorf("Invalid firmware build: %s", aux.Firmware)
 	}
 
-	h.MAC = mac
-	h.IP = ip
-	return nil
-}
-
-func (h *NetworkAddress) MarshalJSON() ([]byte, error) {
-	type Alias NetworkAddress
-	return json.Marshal(&struct {
-		MAC string `json:"mac"`
-		IP  string `json:"ip"`
-		*Alias
-	}{
-		MAC:   h.MAC.String(),
-		IP:    h.IP.String(),
-		Alias: (*Alias)(h),
-	})
-}
-
-func (h *NetworkAddress) UnmarshalJSON(data []byte) error {
-	type Alias NetworkAddress
-	aux := &struct {
-		MAC string `json:"mac"`
-		IP  string `json:"ip"`
-		*Alias
-	}{
-		Alias: (*Alias)(h),
-	}
-	if err := json.Unmarshal(data, &aux); err != nil {
-		return err
-	}
-	mac, err := net.ParseMAC(aux.MAC)
-	if err != nil {
-		return err
-	}
-	ip := net.ParseIP(aux.IP)
-	if ip == nil || ip.To4() == nil {
-		return fmt.Errorf("Invalid IPv4 address: %s", aux.IP)
-	}
-
-	h.MAC = mac
-	h.IP = ip
 	return nil
 }
