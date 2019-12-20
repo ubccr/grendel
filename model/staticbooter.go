@@ -1,10 +1,18 @@
 package model
 
 import (
+	"bufio"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"net"
+	"strings"
 	"sync"
 
 	"github.com/segmentio/ksuid"
+	"github.com/ubccr/go-dhcpd-leases"
 )
 
 type StaticBooter struct {
@@ -33,24 +41,91 @@ func NewStaticBooter(kernelPath string, initrdPaths []string, cmdline, liveImage
 	return booter, nil
 }
 
-func (s *StaticBooter) LoadStaticHosts(filename string) error {
-	hostList, err := ParseStaticHostList(filename)
-	if err != nil {
-		return err
-	}
-
+func (s *StaticBooter) LoadStaticHosts(reader io.Reader) error {
 	s.Lock()
 	defer s.Unlock()
 
-	for k, v := range hostList {
-		s.hostList[k] = v
+	s.hostList = make(map[string]*Host)
+
+	scanner := bufio.NewScanner(reader)
+	for scanner.Scan() {
+		cols := strings.Split(scanner.Text(), "\t")
+		hwaddr, err := net.ParseMAC(cols[0])
+		if err != nil {
+			return fmt.Errorf("Malformed hardware address: %s", cols[0])
+		}
+		ipaddr := net.ParseIP(cols[1])
+		if ipaddr.To4() == nil {
+			return fmt.Errorf("Invalid IPv4 address: %v", cols[1])
+		}
+
+		nic := &NetInterface{MAC: hwaddr, IP: ipaddr}
+
+		if len(cols) > 2 {
+			nic.FQDN = cols[2]
+		}
+
+		uuid, err := ksuid.NewRandom()
+		if err != nil {
+			return err
+		}
+
+		host := &Host{ID: uuid}
+		host.Interfaces = []*NetInterface{nic}
+
+		if len(cols) > 3 && strings.ToLower(cols[3]) == "yes" {
+			host.Provision = true
+		}
+
+		s.hostList[host.ID.String()] = host
+	}
+
+	if err := scanner.Err(); err != nil {
+		return err
 	}
 
 	return nil
 }
 
-func (s *StaticBooter) LoadDHCPLeases(filename string) error {
-	hostList, err := ParseLeases(filename)
+func (s *StaticBooter) LoadDHCPLeases(reader io.Reader) error {
+	hosts := leases.Parse(reader)
+	if hosts == nil {
+		return errors.New("No hosts found. Is this a dhcpd.leasts file?")
+	}
+
+	s.Lock()
+	defer s.Unlock()
+
+	s.hostList = make(map[string]*Host)
+	for _, h := range hosts {
+		nic := &NetInterface{MAC: h.Hardware.MACAddr, IP: h.IP}
+
+		if len(h.ClientHostname) > 0 {
+			nic.FQDN = h.ClientHostname
+		}
+
+		uuid, err := ksuid.NewRandom()
+		if err != nil {
+			return err
+		}
+
+		host := &Host{ID: uuid}
+		host.Interfaces = []*NetInterface{nic}
+
+		s.hostList[host.ID.String()] = host
+	}
+
+	return nil
+}
+
+func (s *StaticBooter) LoadJSON(reader io.Reader) error {
+	jsonBlob, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return err
+	}
+
+	var hostList HostList
+	err = json.Unmarshal(jsonBlob, &hostList)
 	if err != nil {
 		return err
 	}
@@ -58,8 +133,17 @@ func (s *StaticBooter) LoadDHCPLeases(filename string) error {
 	s.Lock()
 	defer s.Unlock()
 
-	for k, v := range hostList {
-		s.hostList[k] = v
+	s.hostList = make(map[string]*Host)
+	for _, h := range hostList {
+		if h.ID.IsNil() {
+			uuid, err := ksuid.NewRandom()
+			if err != nil {
+				return err
+			}
+
+			h.ID = uuid
+		}
+		s.hostList[h.ID.String()] = h
 	}
 
 	return nil

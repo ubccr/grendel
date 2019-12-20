@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/ubccr/grendel/model"
 	"github.com/urfave/cli"
 )
@@ -49,6 +51,10 @@ func NewServeAllCommand() cli.Command {
 			Name:  "dhcp-leases",
 			Usage: "dhcp leases file",
 		},
+		cli.StringFlag{
+			Name:  "json-hosts",
+			Usage: "json hosts file",
+		},
 	}
 
 	for _, cmd := range []cli.Command{NewDHCPCommand(), NewTFTPCommand(), NewAPICommand(), NewDNSCommand()} {
@@ -75,14 +81,39 @@ func runAllServices(c *cli.Context) error {
 	}
 
 	if c.IsSet("static-hosts") {
-		err := staticBooter.LoadStaticHosts(c.String("static-hosts"))
+		file, err := os.Open(c.String("static-hosts"))
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		err = staticBooter.LoadStaticHosts(file)
 		if err != nil {
 			return err
 		}
 	}
 
 	if c.IsSet("dhcp-leases") {
-		err := staticBooter.LoadDHCPLeases(c.String("dhcp-leases"))
+		file, err := os.Open(c.String("dhcp-leases"))
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		err = staticBooter.LoadDHCPLeases(file)
+		if err != nil {
+			return err
+		}
+	}
+
+	if c.IsSet("json-hosts") {
+		file, err := os.Open(c.String("json-hosts"))
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+
+		err = staticBooter.LoadJSON(file)
 		if err != nil {
 			return err
 		}
