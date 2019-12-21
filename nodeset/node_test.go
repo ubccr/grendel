@@ -6,7 +6,7 @@ import (
 )
 
 func TestNodeSet(t *testing.T) {
-	ns, err := NewNodeSet("cpn-d13", "1-10,22,24")
+	ns, err := NewNodeSet("cpn-d13-", "", "1-10,22,24")
 	if err != nil {
 		t.Fatal(err)
 	}
