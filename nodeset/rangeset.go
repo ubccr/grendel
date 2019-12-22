@@ -1,6 +1,7 @@
 package nodeset
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"math"
@@ -21,6 +22,11 @@ type RangeSet struct {
 	padding int
 }
 
+type slice struct {
+	start uint
+	stop  uint
+}
+
 func NewRangeSet(pattern string) (rs *RangeSet, err error) {
 	rs = &RangeSet{}
 	for _, subrange := range strings.Split(pattern, ",") {
@@ -28,10 +34,16 @@ func NewRangeSet(pattern string) (rs *RangeSet, err error) {
 			return nil, fmt.Errorf("emtpy range - %w", ErrParseRangeSet)
 		}
 
+		baserange := subrange
 		step := 1
-		parts := strings.SplitN(subrange, "/", 2)
-		baserange := parts[0]
-		if len(parts) > 1 && parts[1] != "" {
+		if strings.Index(subrange, "/") >= 0 {
+			parts := strings.SplitN(subrange, "/", 2)
+			baserange = parts[0]
+			if len(parts) != 2 || parts[1] == "" {
+				return nil, fmt.Errorf("cannont parse step %s - %w", subrange, ErrParseRangeSet)
+			}
+
+			var err error
 			step, err = strconv.Atoi(parts[1])
 			if err != nil {
 				return nil, fmt.Errorf("cannont convert step to integer %s - %w", subrange, ErrParseRangeSet)
@@ -39,8 +51,19 @@ func NewRangeSet(pattern string) (rs *RangeSet, err error) {
 		}
 
 		var start, stop, pad int
+		parts := []string{baserange}
 
-		parts = strings.SplitN(baserange, "-", 2)
+		if strings.Index(baserange, "-") < 0 {
+			if step != 1 {
+				return nil, fmt.Errorf("invalid step usage %s - %w", subrange, ErrParseRangeSet)
+			}
+		} else {
+			parts = strings.SplitN(baserange, "-", 2)
+			if len(parts) != 2 || parts[1] == "" {
+				return nil, fmt.Errorf("cannpt parse end value %s - %w", subrange, ErrParseRangeSet)
+			}
+		}
+
 		start, err = strconv.Atoi(parts[0])
 		if err != nil {
 			return nil, fmt.Errorf("cannont convert starting range to integer %s - %w", parts[0], ErrParseRangeSet)
@@ -57,11 +80,13 @@ func NewRangeSet(pattern string) (rs *RangeSet, err error) {
 			}
 		}
 
-		if len(parts) == 2 && parts[1] != "" {
+		if len(parts) == 2 {
 			stop, err = strconv.Atoi(parts[1])
 			if err != nil {
 				return nil, fmt.Errorf("cannont convert ending range to integer %s - %w", parts[1], ErrParseRangeSet)
 			}
+		} else {
+			stop = start
 		}
 
 		if stop > math.MaxInt64 || start > stop || step < 1 {
@@ -88,7 +113,6 @@ func (rs *RangeSet) AddRange(start, stop, step, pad int) error {
 		return fmt.Errorf("range too large - %w", ErrInvalidRangeSet)
 	}
 
-	// inherit padding info only if currently not defined
 	if pad > 0 && rs.padding == 0 {
 		rs.padding = pad
 	}
@@ -103,11 +127,45 @@ func (rs *RangeSet) Len() int {
 }
 
 func (rs *RangeSet) String() string {
-	return rs.bits.String()
+	var buffer bytes.Buffer
+	slices := rs.slices()
+	for i, sli := range slices {
+		if sli.start+1 == sli.stop {
+			buffer.WriteString(fmt.Sprintf("%0*d", rs.padding, sli.start))
+		} else {
+			buffer.WriteString(fmt.Sprintf("%0*d-%0*d", rs.padding, sli.start, rs.padding, sli.stop-1))
+		}
+		if i != len(slices)-1 {
+			buffer.WriteString(",")
+		}
+	}
+	return buffer.String()
 }
 
 func (rs *RangeSet) update(start, stop, step int) {
 	for i := start; i < stop; i += step {
 		rs.bits.Set(uint(i))
 	}
+}
+
+func (s *slice) String() string {
+	return fmt.Sprintf("%d-%d", s.start, s.stop)
+}
+
+func (rs *RangeSet) slices() []*slice {
+	result := make([]*slice, 0)
+	i, e := rs.bits.NextSet(0)
+	k := i
+	j := i
+	for e {
+		if i-j > 1 {
+			result = append(result, &slice{k, j + 1})
+			k = i
+		}
+		j = i
+		i, e = rs.bits.NextSet(i + 1)
+	}
+	result = append(result, &slice{k, j + 1})
+
+	return result
 }

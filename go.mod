@@ -29,6 +29,7 @@ require (
 	github.com/spf13/viper v1.3.2
 	github.com/square/certstrap v1.2.0
 	github.com/stmcginnis/gofish v0.2.0
+	github.com/stretchr/testify v1.4.0
 	github.com/timshannon/badgerhold v0.0.0-20191028155359-570a6f824389
 	github.com/u-root/u-root v5.0.0+incompatible // indirect
 	github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb
