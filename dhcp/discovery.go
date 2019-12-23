@@ -3,6 +3,7 @@ package dhcp
 import (
 	"fmt"
 	"net"
+	"regexp"
 	"strconv"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
@@ -12,8 +13,12 @@ import (
 	"github.com/ubccr/grendel/tors"
 )
 
+var (
+	nodeNumberRegexp = regexp.MustCompile(`(\d+)$`)
+)
+
 type discovery struct {
-	nodeset  *nodeset.NodeSet
+	nodeset  *nodeset.NodeSetIterator
 	seen     map[string]bool
 	count    int
 	macTable tors.MACTable
@@ -21,7 +26,7 @@ type discovery struct {
 	netmask  net.IPMask
 }
 
-func RunDiscovery(db model.Datastore, address, prefix, suffix, pattern string, subnet net.IP, netmask net.IPMask, switchClient tors.NetworkSwitch) error {
+func RunDiscovery(db model.Datastore, address, nodestr string, subnet net.IP, netmask net.IPMask, switchClient tors.NetworkSwitch) error {
 	if address == "" {
 		address = fmt.Sprintf("%s:%d", net.IPv4zero.String(), dhcpv4.ServerPort)
 	}
@@ -55,13 +60,13 @@ func RunDiscovery(db model.Datastore, address, prefix, suffix, pattern string, s
 		Port: port,
 	}
 
-	nodeset, err := nodeset.NewNodeSet(prefix, suffix, pattern)
+	nodeset, err := nodeset.NewNodeSet(nodestr)
 	if err != nil {
 		return err
 	}
 
 	d := &discovery{
-		nodeset:  nodeset,
+		nodeset:  nodeset.Iterator(),
 		seen:     make(map[string]bool),
 		macTable: macTable,
 		subnet:   subnet,
@@ -119,7 +124,13 @@ func (d *discovery) discoveryHandler4(conn net.PacketConn, peer net.Addr, req *d
 	if entry != nil {
 		ip[3] += uint8(entry.Port)
 	} else {
-		ip[3] += uint8(d.nodeset.IntValue())
+		matches := nodeNumberRegexp.FindStringSubmatch(d.nodeset.Value())
+		if len(matches) != 2 {
+			log.Errorf("node doesn't end in number. failed to generate IP address: %s", d.nodeset.Value())
+			return
+		}
+		num, _ := strconv.Atoi(matches[1])
+		ip[3] += uint8(num)
 	}
 
 	fmt.Printf("%s\t%s\t%s\n", d.nodeset.Value(), req.ClientHWAddr, ip.String())

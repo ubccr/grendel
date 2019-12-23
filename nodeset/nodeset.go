@@ -1,81 +1,138 @@
 package nodeset
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
-	"strconv"
+	"regexp"
+	"sort"
 	"strings"
 
-	"github.com/willf/bitset"
+	"github.com/schwarmco/go-cartesian-product"
+)
+
+var (
+	ErrInvalidNodeSet = errors.New("invalid nodeset")
+	ErrParseNodeSet   = errors.New("nodeset parse error")
+	rangeSetRegexp    = regexp.MustCompile(`(\[[^\[\]]+\])`)
 )
 
 type NodeSet struct {
-	bits    bitset.BitSet
-	size    int
-	current int
-	prefix  string
-	suffix  string
+	pat map[string]*RangeSetND
 }
 
-func NewNodeSet(prefix, suffix, pattern string) (*NodeSet, error) {
-	n := &NodeSet{prefix: prefix, suffix: suffix, current: -1}
+func NewNodeSet(nodestr string) (*NodeSet, error) {
+	nodestr = strings.TrimSpace(nodestr)
+	if nodestr == "" {
+		return nil, fmt.Errorf("emtpy nodeset - %w", ErrParseNodeSet)
+	}
 
-	pattern = strings.ReplaceAll(pattern, " ", "")
+	ranges := rangeSetRegexp.FindAllStringSubmatch(nodestr, -1)
+	patterns := rangeSetRegexp.ReplaceAllString(nodestr, "%s")
 
-	intervals := strings.Split(pattern, ",")
+	if strings.Index(patterns, "[") != -1 {
+		return nil, fmt.Errorf("unbalanced '[' found while parsing %s - %w", nodestr, ErrParseNodeSet)
+	}
+	if strings.Index(patterns, "]") != -1 {
+		return nil, fmt.Errorf("unbalanced ']' found while parsing %s - %w", nodestr, ErrParseNodeSet)
+	}
 
-	for _, i := range intervals {
-		numbers := strings.Split(i, "-")
+	ns := &NodeSet{pat: make(map[string]*RangeSetND, 0)}
 
-		if len(numbers) == 1 {
-			bit, err := strconv.Atoi(numbers[0])
+	ridx := 0
+	for _, pattern := range strings.Split(patterns, ",") {
+		rangeSetCount := strings.Count(pattern, "%s")
+		if rangeSetCount > 0 {
+			rangeSets := make([]string, 0)
+			for i := ridx; i < ridx+rangeSetCount; i++ {
+				rangeSets = append(rangeSets, strings.Trim(ranges[i][1], "[]"))
+			}
+
+			rsnd, err := NewRangeSetND(rangeSets)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("%w", err)
 			}
-			n.bits.Set(uint(bit))
-			n.size++
-		} else if len(numbers) == 2 {
-			from, err := strconv.Atoi(numbers[0])
-			if err != nil {
-				return nil, err
-			}
-			to, err := strconv.Atoi(numbers[1])
-			if err != nil {
-				return nil, err
-			}
-
-			for j := from; j <= to; j++ {
-				n.bits.Set(uint(j))
-				n.size++
-			}
+			ns.pat[pattern] = rsnd
+			ridx += rangeSetCount
+		} else {
+			ns.pat[pattern] = nil
 		}
 	}
 
-	return n, nil
+	return ns, nil
 }
 
-func (n *NodeSet) Len() int {
-	return n.size
-}
+func (ns *NodeSet) Len() int {
+	size := 0
+	for _, rs := range ns.pat {
+		if rs == nil {
+			size++
+			continue
+		}
 
-func (n *NodeSet) Next() bool {
-	if !n.bits.Any() {
-		return false
+		size += rs.Len()
 	}
 
-	bit, ok := n.bits.NextSet(uint(n.current) + 1)
-	if !ok {
-		return false
+	return size
+}
+
+func (ns *NodeSet) String() string {
+	var buffer bytes.Buffer
+
+	i := 0
+	for pat, rs := range ns.pat {
+		if rs == nil {
+			buffer.WriteString(pat)
+		} else {
+			ranges := rs.Ranges()
+			params := make([]interface{}, 0, len(ranges))
+			for _, r := range ranges {
+				params = append(params, fmt.Sprintf("[%s]", r.String()))
+			}
+			buffer.WriteString(fmt.Sprintf(pat, params...))
+		}
+
+		if i != len(ns.pat)-1 {
+			buffer.WriteString(",")
+		}
+
+		i++
 	}
 
-	n.current = int(bit)
-
-	return true
+	return buffer.String()
 }
 
-func (n *NodeSet) Value() string {
-	return fmt.Sprintf("%s%02d%s", n.prefix, n.current, n.suffix)
+func (ns *NodeSet) Iterator() *NodeSetIterator {
+	nodes := make([]string, 0, ns.Len())
+
+	for pat, rsnd := range ns.pat {
+		if rsnd == nil || rsnd.Len() == 0 {
+			nodes = append(nodes, pat)
+			continue
+		}
+
+		ranges := rsnd.Ranges()
+		slices := make([][]interface{}, rsnd.Dim())
+		for i := 0; i < rsnd.Dim(); i++ {
+			strings := ranges[i].Strings()
+			slices[i] = toIface(strings)
+		}
+
+		c := cartesian.Iter(slices...)
+		for rec := range c {
+			nodes = append(nodes, fmt.Sprintf(pat, rec...))
+		}
+	}
+
+	sort.Strings(nodes)
+
+	return &NodeSetIterator{nodes: nodes, current: -1}
 }
 
-func (n *NodeSet) IntValue() int {
-	return n.current
+func toIface(list []string) []interface{} {
+	vals := make([]interface{}, len(list))
+	for i, v := range list {
+		vals[i] = v
+	}
+	return vals
 }

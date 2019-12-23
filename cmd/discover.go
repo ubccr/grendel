@@ -32,18 +32,9 @@ func NewHostDiscoverCommand() cli.Command {
 				Usage:    "subnet to use for auto ip assignment (/24)",
 			},
 			cli.StringFlag{
-				Name:     "prefix",
-				Required: true,
-				Usage:    "hostname prefix",
-			},
-			cli.StringFlag{
-				Name:  "suffix",
-				Usage: "hostname suffix",
-			},
-			cli.StringFlag{
 				Name:     "nodeset",
 				Required: true,
-				Usage:    "nodeset pattern",
+				Usage:    "node set",
 			},
 			cli.StringFlag{
 				Name:  "switch-api-endpoint",
@@ -83,5 +74,5 @@ func runHostDiscover(c *cli.Context) error {
 		return fmt.Errorf("Invalid IPv4 subnet address: %s", c.String("subnet"))
 	}
 
-	return dhcp.RunDiscovery(DB, address, c.String("prefix"), c.String("suffix"), c.String("nodeset"), subnet, netmask, switchClient)
+	return dhcp.RunDiscovery(DB, address, c.String("nodeset"), subnet, netmask, switchClient)
 }
