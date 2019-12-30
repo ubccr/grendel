@@ -11,6 +11,7 @@ import (
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/ubccr/grendel/dhcp"
+	"github.com/ubccr/grendel/firmware"
 	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/tors"
@@ -144,6 +145,7 @@ func discoverFromFile(db model.Datastore, file, domain string, subnet, bmcSubnet
 		host := &model.Host{
 			Name:       cols[0],
 			Provision:  true,
+			Firmware:   firmware.SNPONLY,
 			Interfaces: make([]*model.NetInterface, 0),
 		}
 
