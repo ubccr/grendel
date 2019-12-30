@@ -35,7 +35,7 @@ func RunDiscovery(db model.Datastore, address, nodestr string, subnet net.IP, ne
 	if switchClient != nil {
 		mt, err := switchClient.GetMACTable()
 		if err != nil {
-			return nil
+			return err
 		}
 		macTable = mt
 	}

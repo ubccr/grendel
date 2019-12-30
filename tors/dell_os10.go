@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"strconv"
 	"strings"
@@ -133,11 +134,19 @@ func (d *DellOS10) GetMACTable() (MACTable, error) {
 				log.Debugf("Invalid interface entry port number not a number: %s", entry.Ifname)
 				continue
 			}
+
+			mac, err := net.ParseMAC(entry.MAC)
+			if err != nil {
+				log.Errorf("Invalid mac address entry %s: ", entry.MAC, err)
+				continue
+			}
+
 			macTable[entry.MAC] = &MACTableEntry{
 				Ifname: entry.Ifname,
 				Port:   port,
 				VLAN:   entry.VLAN,
 				Type:   entry.Type,
+				MAC:    mac,
 			}
 		}
 
