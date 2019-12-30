@@ -137,6 +137,10 @@ func discoverFromFile(db model.Datastore, file, domain string, subnet, bmcSubnet
 			continue
 		}
 
+		if len(entries) <= 1 {
+			log.Warnf("Only found 1 port entry. Missing BMC?: %s port: %d", cols[0], port)
+		}
+
 		host := &model.Host{
 			Name:       cols[0],
 			Provision:  true,
