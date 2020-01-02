@@ -38,7 +38,8 @@ func (r *Redfish) PowerCycle() error {
 	}
 
 	for _, system := range ss {
-		err = system.Reset("GracefulRestart")
+		//err = system.Reset("GracefulRestart")
+		err = system.Reset(redfish.ForceRestartResetType)
 		if err != nil {
 			return err
 		}
