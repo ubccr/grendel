@@ -56,6 +56,10 @@ func NewDHCPCommand() cli.Command {
 				Name:  "dns-server",
 				Usage: "dns server IP addresses",
 			},
+			cli.StringSliceFlag{
+				Name:  "domain-search",
+				Usage: "domain search list",
+			},
 			cli.IntFlag{
 				Name:  "mtu",
 				Value: 1500,
@@ -118,6 +122,11 @@ func runDHCP(c *cli.Context) error {
 			srv.DNSServers = append(srv.DNSServers, dnsip)
 		}
 		log.Infof("Using DNS servers: %v", srv.DNSServers)
+	}
+
+	if c.IsSet("domain-search") {
+		srv.DomainSearchList = c.StringSlice("domain-search")
+		log.Infof("Using Domain Search List: %v", srv.DomainSearchList)
 	}
 
 	leaseTime, err := time.ParseDuration(c.String("lease-time"))

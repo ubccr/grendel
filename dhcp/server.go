@@ -19,23 +19,24 @@ import (
 var log = logger.GetLogger("DHCP")
 
 type Server struct {
-	ListenAddress net.IP
-	ServerAddress net.IP
-	IfIndex       int
-	Hostname      string
-	HTTPScheme    string
-	Port          int
-	HTTPPort      int
-	PXEPort       int
-	MTU           int
-	ProxyOnly     bool
-	ServePXE      bool
-	DB            model.Datastore
-	DNSServers    []net.IP
-	LeaseTime     time.Duration
-	srv           *server4.Server
-	srvPXE        *server4.Server
-	leases4       map[string]*model.Host
+	ListenAddress    net.IP
+	ServerAddress    net.IP
+	IfIndex          int
+	Hostname         string
+	HTTPScheme       string
+	Port             int
+	HTTPPort         int
+	PXEPort          int
+	MTU              int
+	ProxyOnly        bool
+	ServePXE         bool
+	DB               model.Datastore
+	DNSServers       []net.IP
+	DomainSearchList []string
+	LeaseTime        time.Duration
+	srv              *server4.Server
+	srvPXE           *server4.Server
+	leases4          map[string]*model.Host
 
 	sync.RWMutex
 }

@@ -5,6 +5,7 @@ import (
 	"net"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
+	"github.com/insomniacslk/dhcp/rfc1035label"
 	"github.com/ubccr/grendel/model"
 )
 
@@ -42,6 +43,12 @@ func (s *Server) staticHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) erro
 
 	if len(nic.FQDN) > 0 {
 		resp.Options.Update(dhcpv4.OptHostName(nic.FQDN))
+	}
+
+	if len(s.DomainSearchList) > 0 {
+		resp.Options.Update(dhcpv4.OptDomainSearch(&rfc1035label.Labels{
+			Labels: s.DomainSearchList,
+		}))
 	}
 
 	return nil
