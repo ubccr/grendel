@@ -84,7 +84,7 @@ func (h *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		m.SetRcode(r, dns.RcodeSuccess)
 	} else {
 		// XXX consider sending back NXDOMAIN here
-		m.SetRcode(r, dns.RcodeServerFailure)
+		m.SetRcode(r, dns.RcodeNameError)
 	}
 
 	w.WriteMsg(m)
