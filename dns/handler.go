@@ -64,14 +64,12 @@ func (h *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	m := new(dns.Msg)
 	m.SetReply(r)
 
-	qname := m.Question[0].Name
+	qname := h.Name(r)
 	answers := []dns.RR{}
-	switch r.Question[0].Qtype {
+	switch h.QType(r) {
 	case dns.TypePTR:
 		names := h.LookupStaticAddr(ExtractAddressFromReverse(qname))
-		if len(names) != 0 {
-			answers = h.ptr(qname, h.ttl, names)
-		}
+		answers = h.ptr(qname, h.ttl, names)
 	case dns.TypeAAAA:
 		ips := h.LookupStaticHostV6(qname)
 		answers = aaaa(qname, h.ttl, ips)
@@ -83,6 +81,10 @@ func (h *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	if len(answers) != 0 {
 		m.Authoritative = true
 		m.Answer = answers
+		m.SetRcode(r, dns.RcodeSuccess)
+	} else {
+		// XXX consider sending back NXDOMAIN here
+		m.SetRcode(r, dns.RcodeServerFailure)
 	}
 
 	w.WriteMsg(m)
@@ -179,4 +181,20 @@ func (h *handler) lookupStaticHost(m map[string][]net.IP, host string) []net.IP 
 	ipsCp := make([]net.IP, len(ips))
 	copy(ipsCp, ips)
 	return ipsCp
+}
+
+func (h *handler) Name(r *dns.Msg) string {
+	if len(r.Question) == 0 {
+		return "."
+	}
+
+	return strings.ToLower(dns.Name(r.Question[0].Name).String())
+}
+
+func (h *handler) QType(r *dns.Msg) uint16 {
+	if len(r.Question) == 0 {
+		return 0
+	}
+
+	return r.Question[0].Qtype
 }
