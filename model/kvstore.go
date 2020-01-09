@@ -1,8 +1,11 @@
 package model
 
 import (
+	"fmt"
+
 	"github.com/segmentio/ksuid"
 	"github.com/timshannon/badgerhold"
+	"github.com/ubccr/grendel/nodeset"
 )
 
 type KVStore struct {
@@ -26,7 +29,7 @@ func (s *KVStore) GetBootImage(mac string) (*BootImage, error) {
 	return nil, nil
 }
 
-func (s *KVStore) GetHost(id string) (*Host, error) {
+func (s *KVStore) GetHostByID(id string) (*Host, error) {
 	uuid, err := ksuid.Parse(id)
 	if err != nil {
 		return nil, err
@@ -40,6 +43,25 @@ func (s *KVStore) GetHost(id string) (*Host, error) {
 	}
 
 	return host, nil
+}
+
+func (s *KVStore) GetHostByName(name string) (*Host, error) {
+	host := make([]*Host, 0)
+
+	err := s.store.Find(&host, badgerhold.Where("Name").Eq(name))
+	if err != nil {
+		return nil, err
+	}
+
+	if len(host) == 0 {
+		return nil, fmt.Errorf("Host not found with name: %s", name)
+	}
+
+	if len(host) > 1 {
+		log.Warnf("Multiple hosts found with nam name: %s", name)
+	}
+
+	return host[0], nil
 }
 
 func (s *KVStore) SaveHost(host *Host) error {
@@ -63,6 +85,20 @@ func (s *KVStore) HostList() (HostList, error) {
 	}
 
 	return result, nil
+}
+
+func (s *KVStore) Find(ns *nodeset.NodeSet) (HostList, error) {
+	values := make(HostList, 0)
+
+	it := ns.Iterator()
+	for it.Next() {
+		host, err := s.GetHostByName(it.Value())
+		if err == nil {
+			values = append(values, host)
+		}
+	}
+
+	return values, nil
 }
 
 func (s *KVStore) Close() error {

@@ -39,16 +39,22 @@ func (n *NetInterface) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return err
 	}
-	mac, err := net.ParseMAC(aux.MAC)
-	if err != nil {
-		return err
-	}
-	ip := net.ParseIP(aux.IP)
-	if ip == nil || ip.To4() == nil {
-		return fmt.Errorf("Invalid IPv4 address: %s", aux.IP)
+	if aux.MAC != "" {
+		mac, err := net.ParseMAC(aux.MAC)
+		if err != nil {
+			return err
+		}
+
+		n.MAC = mac
 	}
 
-	n.MAC = mac
-	n.IP = ip
+	if aux.IP != "" {
+		ip := net.ParseIP(aux.IP)
+		if ip == nil || ip.To4() == nil {
+			return fmt.Errorf("Invalid IPv4 address: %s", aux.IP)
+		}
+
+		n.IP = ip
+	}
 	return nil
 }

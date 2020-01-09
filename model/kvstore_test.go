@@ -8,6 +8,8 @@ import (
 	"net"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestKVDB(t *testing.T) {
@@ -17,9 +19,7 @@ func TestKVDB(t *testing.T) {
 	store, err := NewKVStore(dir)
 	defer store.Close()
 
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 }
 
 func TestKVHost(t *testing.T) {
@@ -29,19 +29,13 @@ func TestKVHost(t *testing.T) {
 	store, err := NewKVStore(dir)
 	defer store.Close()
 
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 
 	mac, err := randmac()
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 
 	bmcMac, err := randmac()
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 
 	host := &Host{
 		Interfaces: []*NetInterface{
@@ -60,53 +54,34 @@ func TestKVHost(t *testing.T) {
 	}
 
 	err = store.SaveHost(host)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 
-	testHost, err := store.GetHost(host.ID.String())
-	if err != nil {
-		t.Fatal(err)
-	}
+	testHost, err := store.GetHostByID(host.ID.String())
+	assert.Nil(t, err)
 
-	if len(testHost.Interfaces) != 2 {
-		t.Errorf("Host should have 2 network addresses got: %d", len(testHost.Interfaces))
-	}
+	assert.Equal(t, 2, len(testHost.Interfaces))
 
 	nic := testHost.Interface(mac)
-	if nic == nil {
-		t.Errorf("Failed to find network interface for host")
-	}
+	assert.NotNil(t, nic)
 
-	if bytes.Compare(nic.MAC, host.Interface(mac).MAC) != 0 {
-		t.Errorf("Incorrect MAC address: got %s should be %s", nic.MAC, host.Interface(mac).MAC)
-	}
+	assert.Equal(t, 0, bytes.Compare(nic.MAC, host.Interface(mac).MAC))
 
 	bmc := testHost.InterfaceBMC()
-	if nic == nil {
-		t.Errorf("Failed to find BMC interface for host")
-	}
+	assert.NotNil(t, bmc)
 
-	if bytes.Compare(bmc.MAC, host.InterfaceBMC().MAC) != 0 {
-		t.Errorf("Incorrect BMC MAC address: got %s should be %s", bmc.MAC, host.InterfaceBMC().MAC)
-	}
+	assert.Equal(t, 0, bytes.Compare(bmc.MAC, host.InterfaceBMC().MAC))
 
-	if nic.FQDN != host.Interface(mac).FQDN {
-		t.Errorf("Incorrect FQDN: got %s should be %s", nic.FQDN, host.Interface(mac).FQDN)
-	}
-
-	if bmc.FQDN != host.InterfaceBMC().FQDN {
-		t.Errorf("Incorrect FQDN: got %s should be %s", bmc.FQDN, host.InterfaceBMC().FQDN)
-	}
+	assert.Equal(t, nic.FQDN, host.Interface(mac).FQDN)
+	assert.Equal(t, bmc.FQDN, host.InterfaceBMC().FQDN)
 
 	hostList, err := store.HostList()
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 
-	if len(hostList) != 1 {
-		t.Errorf("Incorrect size of host list: got %d should be %d", len(hostList), 1)
-	}
+	assert.Equal(t, 1, len(hostList))
+
+	h2, err := store.GetHostByName(host.Name)
+	assert.Nil(t, err)
+	assert.Equal(t, host.ID, h2.ID)
 }
 
 func TestKVHostList(t *testing.T) {
@@ -115,21 +90,14 @@ func TestKVHostList(t *testing.T) {
 
 	store, err := NewKVStore(dir)
 	defer store.Close()
-
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 
 	for i := 0; i < 11; i++ {
 		mac, err := randmac()
-		if err != nil {
-			t.Fatal(err)
-		}
+		assert.Nil(t, err)
 
 		bmcMac, err := randmac()
-		if err != nil {
-			t.Fatal(err)
-		}
+		assert.Nil(t, err)
 
 		host := &Host{
 			Name: fmt.Sprintf("test-%d", i),
@@ -149,23 +117,14 @@ func TestKVHostList(t *testing.T) {
 		}
 
 		err = store.SaveHost(host)
-		if err != nil {
-			t.Fatalf("Failed to save host: %#v - %s", host, err)
-		}
+		assert.Nil(t, err)
 	}
 
 	hostList, err := store.HostList()
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
 
-	if len(hostList.FilterPrefix("test-")) != 11 {
-		t.Errorf("Incorrect size of host list: got %d should be %d", len(hostList), 1)
-	}
-
-	if len(hostList.FilterPrefix("test-1")) != 2 {
-		t.Errorf("Incorrect size of host list: got %d should be %d", len(hostList), 1)
-	}
+	assert.Equal(t, 11, len(hostList.FilterPrefix("test-")))
+	assert.Equal(t, 2, len(hostList.FilterPrefix("test-1")))
 }
 
 func randmac() (net.HardwareAddr, error) {

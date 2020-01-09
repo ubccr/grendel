@@ -13,6 +13,7 @@ import (
 
 	"github.com/segmentio/ksuid"
 	"github.com/ubccr/go-dhcpd-leases"
+	"github.com/ubccr/grendel/nodeset"
 )
 
 type StaticBooter struct {
@@ -149,7 +150,7 @@ func (s *StaticBooter) LoadJSON(reader io.Reader) error {
 	return nil
 }
 
-func (s *StaticBooter) GetHost(id string) (*Host, error) {
+func (s *StaticBooter) GetHostByID(id string) (*Host, error) {
 	s.RLock()
 	defer s.RUnlock()
 
@@ -158,6 +159,19 @@ func (s *StaticBooter) GetHost(id string) (*Host, error) {
 	}
 
 	return nil, fmt.Errorf("Host not found with id: %s", id)
+}
+
+func (s *StaticBooter) GetHostByName(name string) (*Host, error) {
+	s.RLock()
+	defer s.RUnlock()
+
+	for _, host := range s.hostList {
+		if name == host.Name {
+			return host, nil
+		}
+	}
+
+	return nil, fmt.Errorf("Host not found with name: %s", name)
 }
 
 func (s *StaticBooter) SaveHost(host *Host) error {
@@ -190,5 +204,22 @@ func (s *StaticBooter) HostList() (HostList, error) {
 	for _, v := range s.hostList {
 		values = append(values, v)
 	}
+	return values, nil
+}
+
+func (s *StaticBooter) Find(ns *nodeset.NodeSet) (HostList, error) {
+	s.RLock()
+	defer s.RUnlock()
+
+	values := make(HostList, 0)
+
+	it := ns.Iterator()
+	for it.Next() {
+		host, err := s.GetHostByName(it.Value())
+		if err == nil {
+			values = append(values, host)
+		}
+	}
+
 	return values, nil
 }
