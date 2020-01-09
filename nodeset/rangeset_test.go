@@ -75,6 +75,24 @@ func TestRangeSetBadSyntax(t *testing.T) {
 	}
 }
 
+func TestRangeSetSuperset(t *testing.T) {
+	r1, err := NewRangeSet("1-100,102,105-242,800")
+	assert.Nil(t, err)
+	assert.Equal(t, 240, r1.Len())
+
+	r2, err := NewRangeSet("3-98,140-199,800")
+	assert.Nil(t, err)
+	assert.Equal(t, 157, r2.Len())
+	assert.True(t, r1.Superset(r1))
+	assert.True(t, r1.Superset(r2))
+	assert.True(t, r2.Subset(r1))
+
+	r3, err := NewRangeSet("3-98,140-199,243,800")
+	assert.Nil(t, err)
+	assert.Equal(t, 158, r3.Len())
+	assert.False(t, r1.Superset(r3))
+}
+
 type testRangeSetND struct {
 	test   []string
 	result string
@@ -95,4 +113,26 @@ func TestRangeSetND(t *testing.T) {
 		assert.Equal(t, rstest.result, r1.String())
 		assert.Equal(t, rstest.length, r1.Len())
 	}
+}
+
+func TestRangeSetNDSuperset(t *testing.T) {
+	r1, err := NewRangeSetND([]string{"0-10", "40-60"})
+	assert.Nil(t, err)
+	assert.True(t, r1.Superset(r1))
+	assert.True(t, r1.Subset(r1))
+
+	r2, err := NewRangeSetND([]string{"0-10", "40-60"})
+	assert.Nil(t, err)
+	assert.True(t, r2.Subset(r1))
+	assert.True(t, r1.Subset(r2))
+	assert.True(t, r2.Superset(r1))
+	assert.True(t, r1.Superset(r2))
+
+	r1, err = NewRangeSetND([]string{"0-10", "40-60"})
+	assert.Nil(t, err)
+
+	r2, err = NewRangeSetND([]string{"4", "40-41"})
+	assert.False(t, r1.Subset(r2))
+	assert.True(t, r2.Subset(r1))
+	assert.True(t, r1.Superset(r2))
 }

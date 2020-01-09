@@ -1,7 +1,7 @@
 package nodeset
 
 import (
-	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"regexp"
@@ -24,7 +24,7 @@ type NodeSet struct {
 func NewNodeSet(nodestr string) (*NodeSet, error) {
 	nodestr = strings.TrimSpace(nodestr)
 	if nodestr == "" {
-		return nil, fmt.Errorf("emtpy nodeset - %w", ErrParseNodeSet)
+		return nil, fmt.Errorf("empty nodeset - %w", ErrParseNodeSet)
 	}
 
 	ranges := rangeSetRegexp.FindAllStringSubmatch(nodestr, -1)
@@ -77,29 +77,48 @@ func (ns *NodeSet) Len() int {
 }
 
 func (ns *NodeSet) String() string {
-	var buffer bytes.Buffer
+	list := ns.toStringList()
+	return strings.Join(list, ",")
+}
 
-	i := 0
+func (ns *NodeSet) toStringList() []string {
+	list := make([]string, 0)
+
 	for pat, rs := range ns.pat {
 		if rs == nil {
-			buffer.WriteString(pat)
+			list = append(list, pat)
 		} else {
 			ranges := rs.Ranges()
 			params := make([]interface{}, 0, len(ranges))
 			for _, r := range ranges {
 				params = append(params, fmt.Sprintf("[%s]", r.String()))
 			}
-			buffer.WriteString(fmt.Sprintf(pat, params...))
+			list = append(list, fmt.Sprintf(pat, params...))
 		}
-
-		if i != len(ns.pat)-1 {
-			buffer.WriteString(",")
-		}
-
-		i++
 	}
 
-	return buffer.String()
+	return list
+}
+
+func (ns *NodeSet) MarshalJSON() ([]byte, error) {
+	list := ns.toStringList()
+	return json.Marshal(&list)
+}
+
+func (ns *NodeSet) UnmarshalJSON(data []byte) error {
+	var list []string
+	if err := json.Unmarshal(data, &list); err != nil {
+		return err
+	}
+
+	n, err := NewNodeSet(strings.Join(list, ","))
+	if err != nil {
+		return err
+	}
+
+	*ns = *n
+
+	return nil
 }
 
 func (ns *NodeSet) Iterator() *NodeSetIterator {

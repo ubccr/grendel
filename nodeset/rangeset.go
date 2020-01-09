@@ -47,7 +47,7 @@ func NewRangeSet(pattern string) (rs *RangeSet, err error) {
 
 func (rs *RangeSet) AddString(subrange string) (err error) {
 	if subrange == "" {
-		return fmt.Errorf("emtpy range - %w", ErrParseRangeSet)
+		return fmt.Errorf("empty range - %w", ErrParseRangeSet)
 	}
 
 	baserange := subrange
@@ -132,6 +132,14 @@ func (rs *RangeSet) AddSlice(slice *Slice) error {
 	rs.update(slice)
 
 	return nil
+}
+
+func (rs *RangeSet) Superset(other *RangeSet) bool {
+	return rs.bits.IsSuperSet(&other.bits)
+}
+
+func (rs *RangeSet) Subset(other *RangeSet) bool {
+	return other.bits.IsSuperSet(&rs.bits)
 }
 
 func (rs *RangeSet) Len() int {
@@ -253,4 +261,23 @@ func (nd *RangeSetND) String() string {
 
 func (nd *RangeSetND) Ranges() []*RangeSet {
 	return nd.ranges
+}
+
+func (nd *RangeSetND) Superset(other *RangeSetND) bool {
+	if nd.Dim() != other.Dim() {
+		return false
+	}
+
+	count := 0
+	for i, rs := range nd.ranges {
+		if rs.Superset(other.ranges[i]) {
+			count++
+		}
+	}
+
+	return count == len(nd.ranges)
+}
+
+func (nd *RangeSetND) Subset(other *RangeSetND) bool {
+	return other.Superset(nd)
 }

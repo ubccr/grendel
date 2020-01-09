@@ -1,7 +1,9 @@
 package nodeset
 
 import (
+	"encoding/json"
 	"fmt"
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -49,4 +51,34 @@ func TestNodeSetIterator(t *testing.T) {
 
 	assert.Equal(t, 10, len(result))
 	assert.EqualValues(t, test, result)
+}
+
+func TestNodeSetJSON(t *testing.T) {
+	tests := []testNodeSet{
+		testNodeSet{`["cws-machin"]`, "cws-machin", 1},
+		testNodeSet{`["cpn-d13-[01-10]","cpn-d14-[01-05]"]`, "cpn-d13-[01-10],cpn-d14-[01-05]", 15},
+	}
+
+	for _, nstest := range tests {
+		var n1 NodeSet
+		err := json.Unmarshal([]byte(nstest.test), &n1)
+		assert.Nil(t, err)
+
+		assert.Equal(t, nstest.result, n1.String())
+		assert.Equal(t, nstest.length, n1.Len())
+
+		data, err := json.Marshal(&n1)
+		assert.Nil(t, err)
+
+		var l1 []string
+		err = json.Unmarshal(data, &l1)
+		assert.Nil(t, err)
+
+		var l2 []string
+		err = json.Unmarshal([]byte(nstest.test), &l2)
+
+		sort.Strings(l1)
+
+		assert.Equal(t, l2, l1)
+	}
 }
