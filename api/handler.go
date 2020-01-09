@@ -51,6 +51,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 
 	v1 := e.Group("/v1/")
 	v1.POST("host/add", h.HostAdd)
+	v1.POST("host/netboot", h.HostNetBoot)
 	v1.GET("host/list", h.HostList)
 }
 
@@ -78,7 +79,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot image")
 	}
 
-	host, err := h.DB.GetHost(claims.ID)
+	host, err := h.DB.GetHostByID(claims.ID)
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"ip":      c.RealIP(),
@@ -219,7 +220,7 @@ func (h *Handler) Kickstart(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot spec")
 	}
 
-	host, err := h.DB.GetHost(claims.ID)
+	host, err := h.DB.GetHostByID(claims.ID)
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"ip":      c.RealIP(),
