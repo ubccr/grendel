@@ -3,6 +3,8 @@ package bmc
 import (
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRedfish(t *testing.T) {
@@ -15,13 +17,10 @@ func TestRedfish(t *testing.T) {
 	}
 
 	r, err := NewRedfish(endpoint, user, pass, true)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.Nil(t, err)
+	defer r.Logout()
 
-	service := r.client.Service
-	_, err = service.Systems()
-	if err != nil {
-		t.Fatal(err)
-	}
+	system, err := r.GetSystem()
+	assert.Nil(t, err)
+	assert.Greater(t, len(system.BIOSVersion), 0)
 }

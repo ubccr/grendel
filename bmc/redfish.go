@@ -1,6 +1,8 @@
 package bmc
 
 import (
+	"errors"
+
 	"github.com/stmcginnis/gofish"
 	"github.com/stmcginnis/gofish/redfish"
 )
@@ -8,6 +10,12 @@ import (
 type Redfish struct {
 	config gofish.ClientConfig
 	client *gofish.APIClient
+}
+
+var resetTypeOrder = []string{
+	"PowerCycle",
+	"GracefulRestart",
+	"ForceRestart",
 }
 
 func NewRedfish(endpoint, user, pass string, insecure bool) (*Redfish, error) {
@@ -37,15 +45,22 @@ func (r *Redfish) PowerCycle() error {
 		return err
 	}
 
+	// XXX Only reset the first supported system?
 	for _, system := range ss {
-		//err = system.Reset("GracefulRestart")
-		err = system.Reset(redfish.ForceRestartResetType)
-		if err != nil {
-			return err
+		for _, resetType := range resetTypeOrder {
+			for _, rt := range system.SupportedResetTypes {
+				if resetType == string(rt) {
+					err = system.Reset(rt)
+					if err != nil {
+						return err
+					}
+					return nil
+				}
+			}
 		}
 	}
 
-	return nil
+	return errors.New("Failed to find a supported reset type")
 }
 
 func (r *Redfish) EnablePXE() error {
@@ -68,4 +83,32 @@ func (r *Redfish) EnablePXE() error {
 	}
 
 	return nil
+}
+
+func (r *Redfish) GetSystem() (*System, error) {
+	service := r.client.Service
+	ss, err := service.Systems()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(ss) == 0 {
+		return nil, errors.New("Failed to find system")
+	}
+
+	sys := ss[0]
+
+	system := &System{
+		BIOSVersion:    sys.BIOSVersion,
+		SerialNumber:   sys.SKU,
+		Manufacturer:   sys.Manufacturer,
+		PowerStatus:    string(sys.PowerState),
+		Health:         string(sys.Status.Health),
+		TotalMemory:    sys.MemorySummary.TotalSystemMemoryGiB,
+		ProcessorCount: sys.ProcessorSummary.LogicalProcessorCount,
+		BootNext:       sys.Boot.BootNext,
+		BootOrder:      sys.Boot.BootOrder,
+	}
+
+	return system, nil
 }
