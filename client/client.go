@@ -15,6 +15,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/api"
 	"github.com/ubccr/grendel/bmc"
+	"github.com/ubccr/grendel/model"
+	"github.com/ubccr/grendel/nodeset"
 )
 
 type Client struct {
@@ -51,11 +53,20 @@ func NewClient(endpoint, clientID, secret, cacert string, insecure bool) (*Clien
 }
 
 func (c *Client) URL(resource string) string {
+	log.Debugf("Resource: %s", resource)
 	return fmt.Sprintf("%s%s", c.endpoint, resource)
 }
 
+func (c *Client) getRequest(url string) (*http.Request, error) {
+	return c.newRequest(http.MethodGet, url, nil)
+}
+
 func (c *Client) postRequest(url string, body io.Reader) (*http.Request, error) {
-	req, err := http.NewRequest(http.MethodPost, url, body)
+	return c.newRequest(http.MethodPost, url, body)
+}
+
+func (c *Client) newRequest(method, url string, body io.Reader) (*http.Request, error) {
+	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		return nil, err
 	}
@@ -146,4 +157,41 @@ func (c *Client) BMCStatus(params api.NetbootParams) (BMCResult, error) {
 	}
 
 	return bmcResult, nil
+}
+
+func (c *Client) HostFind(ns *nodeset.NodeSet) (model.HostList, error) {
+	endpoint := fmt.Sprintf("%s/%s", GRENDEL_API_HOST_FIND, ns.String())
+	req, err := c.getRequest(c.URL(endpoint))
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode == http.StatusInternalServerError {
+		return nil, fmt.Errorf("Failed to find hosts: %d", res.StatusCode)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("Failed to find hosts unknown error code: %d", res.StatusCode)
+	}
+
+	rawJson, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Debugf("find response: %s", rawJson)
+
+	var hostList model.HostList
+	err = json.Unmarshal(rawJson, &hostList)
+	if err != nil {
+		return nil, err
+	}
+
+	return hostList, nil
 }

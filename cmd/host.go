@@ -10,9 +10,9 @@ func NewHostCommand() cli.Command {
 		Usage:       "Host commands",
 		Description: "Host commands",
 		Subcommands: []cli.Command{
-			NewNetbootCommand(),
-			NewBMCStatusCommand(),
 			NewHostDiscoverCommand(),
+			NewHostShowCommand(),
+			NewBMCCommand(),
 		},
 	}
 }

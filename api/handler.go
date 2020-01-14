@@ -54,6 +54,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	v1.POST("host/netboot", h.HostNetBoot)
 	v1.POST("host/power", h.HostPowerStatus)
 	v1.GET("host/list", h.HostList)
+	v1.GET("host/find/*", h.HostFind)
 }
 
 func (h *Handler) Index(c echo.Context) error {

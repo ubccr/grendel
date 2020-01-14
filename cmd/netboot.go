@@ -3,16 +3,18 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"time"
 
+	"github.com/korovkin/limiter"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/api"
 	"github.com/ubccr/grendel/bmc"
 	"github.com/ubccr/grendel/client"
 	"github.com/ubccr/grendel/nodeset"
 	"github.com/urfave/cli"
 )
 
-func NewNetbootCommand() cli.Command {
+func NewBMCNetbootCommand() cli.Command {
 	return cli.Command{
 		Name:        "netboot",
 		Usage:       "Enable PXE and reboot host",
@@ -51,6 +53,11 @@ func NewNetbootCommand() cli.Command {
 				Value: 0,
 				Usage: "delay",
 			},
+			cli.IntFlag{
+				Name:  "fanout",
+				Value: 1,
+				Usage: "fanout",
+			},
 		},
 		Action: runNetboot,
 	}
@@ -74,6 +81,20 @@ func runNetboot(c *cli.Context) error {
 		return errors.New("Please set grendel-endpoint")
 	}
 
+	bmcUsername := viper.GetString("bmc_user")
+	if c.IsSet("bmc-user") {
+		bmcUsername = c.String("bmc-user")
+	}
+
+	bmcPassword := viper.GetString("bmc_pass")
+	if c.IsSet("bmc-pass") {
+		bmcPassword = c.String("bmc-pass")
+	}
+
+	if bmcUsername == "" || bmcPassword == "" {
+		return errors.New("Please set bmc_user and bmc_password")
+	}
+
 	ns, err := nodeset.NewNodeSet(c.String("nodeset"))
 	if err != nil {
 		return err
@@ -88,23 +109,55 @@ func runNetboot(c *cli.Context) error {
 		return err
 	}
 
-	params := api.NetbootParams{
-		Username: c.String("bmc-user"),
-		Password: c.String("bmc-pass"),
-		IPMI:     c.Bool("ipmi"),
-		Reboot:   c.Bool("reboot"),
-		Nodeset:  ns,
-		Delay:    c.Int("delay"),
-	}
-
-	res, err := gc.Netboot(params)
+	hostList, err := gc.HostFind(ns)
 	if err != nil {
 		return err
 	}
 
-	for host, err := range res {
-		fmt.Printf("%s: %s\n", host, err)
+	limit := limiter.NewConcurrencyLimiter(c.Int("fanout"))
+	for _, host := range hostList {
+		limit.Execute(func() {
+			bmcIntf := host.InterfaceBMC()
+			if bmcIntf == nil {
+				log.WithFields(log.Fields{
+					"name": host.Name,
+					"ID":   host.ID,
+				}).Error("BMC interface not found")
+				return
+			}
+
+			bmcAddress := bmcIntf.FQDN
+			if bmcAddress == "" {
+				bmcAddress = bmcIntf.IP.String()
+			}
+
+			if bmcAddress == "" {
+				log.WithFields(log.Fields{
+					"name": host.Name,
+					"ID":   host.ID,
+				}).Error("BMC address not set")
+				return
+			} else if !c.Bool("ipmi") {
+				bmcAddress = fmt.Sprintf("https://%s", bmcAddress)
+			}
+
+			err = netbootUsingEndpoint(bmcAddress, bmcUsername, bmcPassword, c.Bool("ipmi"), c.Bool("reboot"))
+			if err != nil {
+				log.WithFields(log.Fields{
+					"err":  err,
+					"name": host.Name,
+					"ID":   host.ID,
+				}).Error("Failed to netboot host")
+				return
+			}
+
+			fmt.Printf("%s: OK\n", host.Name)
+		})
+
+		time.Sleep(time.Duration(c.Int("delay")) * time.Second)
 	}
+
+	limit.Wait()
 
 	return nil
 }
@@ -124,9 +177,10 @@ func netbootUsingEndpoint(endpoint, user, pass string, useIPMI, reboot bool) err
 		if err != nil {
 			return err
 		}
-		defer redfish.Logout()
 		sysmgr = redfish
 	}
+
+	defer sysmgr.Logout()
 
 	err = sysmgr.EnablePXE()
 	if err != nil {

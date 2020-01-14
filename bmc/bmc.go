@@ -8,6 +8,7 @@ type SystemManager interface {
 }
 
 type System struct {
+	Name           string   `json:"name"`
 	BIOSVersion    string   `json:"bios_version"`
 	SerialNumber   string   `json:"serial_number"`
 	Manufacturer   string   `json:"manufacturer"`

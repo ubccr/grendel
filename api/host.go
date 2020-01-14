@@ -2,10 +2,12 @@ package api
 
 import (
 	"net/http"
+	"path"
 
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/model"
+	"github.com/ubccr/grendel/nodeset"
 )
 
 func (h *Handler) HostAdd(c echo.Context) error {
@@ -50,6 +52,29 @@ func (h *Handler) HostList(c echo.Context) error {
 			"err": err,
 		}).Error("Failed to fetch host list from datastore")
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fetch hosts")
+	}
+	return c.JSON(http.StatusOK, hostList)
+}
+
+func (h *Handler) HostFind(c echo.Context) error {
+	_, nodesetString := path.Split(c.Request().URL.Path)
+
+	nodeset, err := nodeset.NewNodeSet(nodesetString)
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"err": err,
+		}).Warn("Invalid nodeset")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid data")
+	}
+
+	log.Infof("Got nodeset: %s", nodeset.String())
+
+	hostList, err := h.DB.Find(nodeset)
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"err": err,
+		}).Error("Failed to find hosts from datastore")
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to find hosts")
 	}
 	return c.JSON(http.StatusOK, hostList)
 }
