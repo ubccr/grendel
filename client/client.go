@@ -14,6 +14,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/api"
+	"github.com/ubccr/grendel/bmc"
 )
 
 type Client struct {
@@ -24,6 +25,7 @@ type Client struct {
 }
 
 type NetbootResult map[string]string
+type BMCResult map[string]*bmc.System
 
 func NewClient(endpoint, clientID, secret, cacert string, insecure bool) (*Client, error) {
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure}}
@@ -103,4 +105,45 @@ func (c *Client) Netboot(params api.NetbootParams) (NetbootResult, error) {
 	}
 
 	return netbootResult, nil
+}
+
+func (c *Client) BMCStatus(params api.NetbootParams) (BMCResult, error) {
+	data, err := json.Marshal(&params)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := c.postRequest(c.URL(GRENDEL_API_POWER), bytes.NewBuffer(data))
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode == http.StatusInternalServerError {
+		return nil, fmt.Errorf("Failed to fetch power: %d", res.StatusCode)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("Failed to fetch power unknown error code: %d", res.StatusCode)
+	}
+
+	rawJson, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Debugf("power json response: %s", rawJson)
+
+	var bmcResult BMCResult
+	err = json.Unmarshal(rawJson, &bmcResult)
+	if err != nil {
+		return nil, err
+	}
+
+	return bmcResult, nil
 }

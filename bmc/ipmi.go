@@ -26,6 +26,10 @@ func NewIPMI(hostname, user, pass string, port int) (*IPMI, error) {
 	return &IPMI{client: client}, nil
 }
 
+func (i *IPMI) Logout() {
+	i.client.Close()
+}
+
 func (i *IPMI) PowerCycle() error {
 	err := i.client.Open()
 	if err != nil {

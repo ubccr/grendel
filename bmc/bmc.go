@@ -3,6 +3,7 @@ package bmc
 type SystemManager interface {
 	PowerCycle() error
 	EnablePXE() error
+	Logout()
 	GetSystem() (*System, error)
 }
 
@@ -15,5 +16,5 @@ type System struct {
 	TotalMemory    float32  `json:"total_memory"`
 	ProcessorCount int      `json:"processor_count"`
 	BootNext       string   `json:"boot_next"`
-	BootOrder      []string `json:"boot_next"`
+	BootOrder      []string `json:"boot_order"`
 }

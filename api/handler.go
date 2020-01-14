@@ -52,6 +52,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	v1 := e.Group("/v1/")
 	v1.POST("host/add", h.HostAdd)
 	v1.POST("host/netboot", h.HostNetBoot)
+	v1.POST("host/power", h.HostPowerStatus)
 	v1.GET("host/list", h.HostList)
 }
 

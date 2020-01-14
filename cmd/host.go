@@ -11,6 +11,7 @@ func NewHostCommand() cli.Command {
 		Description: "Host commands",
 		Subcommands: []cli.Command{
 			NewNetbootCommand(),
+			NewBMCStatusCommand(),
 			NewHostDiscoverCommand(),
 		},
 	}
