@@ -12,6 +12,7 @@ import (
 	"github.com/insomniacslk/dhcp/dhcpv4/server4"
 	"github.com/insomniacslk/dhcp/interfaces"
 	"github.com/sirupsen/logrus"
+	"github.com/ubccr/grendel/client"
 	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
 )
@@ -30,7 +31,7 @@ type Server struct {
 	MTU              int
 	ProxyOnly        bool
 	ServePXE         bool
-	DB               model.Datastore
+	Client           *client.Client
 	DNSServers       []net.IP
 	DomainSearchList []string
 	LeaseTime        time.Duration
@@ -41,8 +42,8 @@ type Server struct {
 	sync.RWMutex
 }
 
-func NewServer(db model.Datastore, address string, proxyOnly bool) (*Server, error) {
-	s := &Server{DB: db, ProxyOnly: proxyOnly, ServePXE: true}
+func NewServer(client *client.Client, address string, proxyOnly bool) (*Server, error) {
+	s := &Server{Client: client, ProxyOnly: proxyOnly, ServePXE: true}
 
 	if proxyOnly {
 		log.Debugf("Running in ProxyOnly mode")
@@ -288,7 +289,7 @@ func (s *Server) LookupStaticHost(mac string) *model.Host {
 }
 
 func (s *Server) LoadHosts() error {
-	hostList, err := s.DB.HostList()
+	hostList, err := s.Client.HostList()
 	if err != nil {
 		return err
 	}

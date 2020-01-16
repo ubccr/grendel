@@ -15,55 +15,55 @@ import (
 	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/tors"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
-func NewHostDiscoverCommand() cli.Command {
-	return cli.Command{
+func NewHostDiscoverCommand() *cli.Command {
+	return &cli.Command{
 		Name:        "discover",
 		Usage:       "Auto-discover hosts from DHCP",
 		Description: "Auto-discover hosts from DHCP",
 		Flags: []cli.Flag{
-			cli.IntFlag{
+			&cli.IntFlag{
 				Name:  "dhcp-port",
 				Value: dhcpv4.ServerPort,
 				Usage: "dhcp port to listen on",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "listen-address",
 				Value: "0.0.0.0",
 				Usage: "address to listen on",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "from-file",
 				Usage: "use hostname to portnumber mapping file instead of DHCP",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:     "subnet",
 				Required: true,
 				Usage:    "subnet to use for auto ip assignment (/24)",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "bmc-subnet",
 				Usage: "subnet for bmc",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "domain",
 				Usage: "domain",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "nodeset",
 				Usage: "node set",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "switch-api-endpoint",
 				Usage: "switch api endpoint",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "switch-api-user",
 				Usage: "switch api username",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "switch-api-pass",
 				Usage: "switch api password",
 			},
@@ -99,16 +99,16 @@ func runHostDiscover(c *cli.Context) error {
 			return fmt.Errorf("Switch is required when discovering hosts from file")
 		}
 
-		return discoverFromFile(DB, c.String("from-file"), c.String("domain"), subnet, bmcSubnet, netmask, switchClient)
+		return discoverFromFile(c.String("from-file"), c.String("domain"), subnet, bmcSubnet, netmask, switchClient)
 	}
 
 	listenAddress := c.String("listen-address")
 	address := fmt.Sprintf("%s:%d", listenAddress, c.Int("dhcp-port"))
 
-	return dhcp.RunDiscovery(DB, address, c.String("nodeset"), subnet, netmask, switchClient)
+	return dhcp.RunDiscovery(address, c.String("nodeset"), subnet, netmask, switchClient)
 }
 
-func discoverFromFile(db model.Datastore, file, domain string, subnet, bmcSubnet net.IP, netmask net.IPMask, switchClient tors.NetworkSwitch) error {
+func discoverFromFile(file, domain string, subnet, bmcSubnet net.IP, netmask net.IPMask, switchClient tors.NetworkSwitch) error {
 	log := logger.GetLogger("DISCOVER")
 
 	macTable, err := switchClient.GetMACTable()

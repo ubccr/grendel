@@ -1,6 +1,8 @@
 grendel
 grendel.yaml
 grendel.yml
+grendel.toml
 out/
 firmware/bin
 api/rice-box.go
+provision/rice-box.go

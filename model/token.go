@@ -24,7 +24,7 @@ type BootClaims struct {
 }
 
 func init() {
-	viper.SetDefault("jwt_tokens", true)
+	viper.SetDefault("provision.jwt_tokens", true)
 }
 
 func (p *FirmwareClaims) Valid() error {
@@ -50,7 +50,7 @@ func NewBootToken(id, mac string) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	t, err := token.SignedString([]byte(viper.GetString("secret")))
+	t, err := token.SignedString([]byte(viper.GetString("provision.secret")))
 	if err != nil {
 		return "", err
 	}
@@ -59,7 +59,7 @@ func NewBootToken(id, mac string) (string, error) {
 }
 
 func NewFirmwareToken(mac string, fwtype firmware.Build) (string, error) {
-	if !viper.GetBool("jwt_tokens") {
+	if !viper.GetBool("provision.jwt_tokens") {
 		return fmt.Sprintf("%s/%d", mac, fwtype), nil
 	}
 
@@ -69,7 +69,7 @@ func NewFirmwareToken(mac string, fwtype firmware.Build) (string, error) {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	t, err := token.SignedString([]byte(viper.GetString("secret")))
+	t, err := token.SignedString([]byte(viper.GetString("provision.secret")))
 	if err != nil {
 		return "", err
 	}
@@ -78,7 +78,7 @@ func NewFirmwareToken(mac string, fwtype firmware.Build) (string, error) {
 }
 
 func ParseFirmwareToken(tokenString string) (firmware.Build, error) {
-	if !viper.GetBool("jwt_tokens") {
+	if !viper.GetBool("provision.jwt_tokens") {
 		pathElements := strings.Split(tokenString, "/")
 		if len(pathElements) != 2 {
 			return 0, fmt.Errorf("Invalid tftp file path: %s", tokenString)
@@ -102,7 +102,7 @@ func ParseFirmwareToken(tokenString string) (firmware.Build, error) {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte(viper.GetString("secret")), nil
+		return []byte(viper.GetString("provision.secret")), nil
 	})
 
 	if claims, ok := token.Claims.(*FirmwareClaims); ok && token.Valid {

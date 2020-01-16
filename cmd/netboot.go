@@ -11,49 +11,45 @@ import (
 	"github.com/ubccr/grendel/bmc"
 	"github.com/ubccr/grendel/client"
 	"github.com/ubccr/grendel/nodeset"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
-func NewBMCNetbootCommand() cli.Command {
-	return cli.Command{
+func NewBMCNetbootCommand() *cli.Command {
+	return &cli.Command{
 		Name:        "netboot",
 		Usage:       "Enable PXE and reboot host",
 		Description: "Enabel PXE and reboot host",
 		Flags: []cli.Flag{
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "nodeset",
 				Usage: "Set of nodes to netboot",
 			},
-			cli.StringFlag{
-				Name:  "grendel-endpoint",
-				Usage: "grendel endpoint url",
-			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "bmc-endpoint",
 				Usage: "bmc endpoint url",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "bmc-user",
 				Usage: "BMC Username",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "bmc-pass",
 				Usage: "BMC Password",
 			},
-			cli.BoolFlag{
+			&cli.BoolFlag{
 				Name:  "ipmi",
 				Usage: "Use ipmi instead of redfish",
 			},
-			cli.BoolFlag{
+			&cli.BoolFlag{
 				Name:  "reboot",
 				Usage: "Reboot nodes",
 			},
-			cli.IntFlag{
+			&cli.IntFlag{
 				Name:  "delay",
 				Value: 0,
 				Usage: "delay",
 			},
-			cli.IntFlag{
+			&cli.IntFlag{
 				Name:  "fanout",
 				Value: 1,
 				Usage: "fanout",
@@ -72,21 +68,12 @@ func runNetboot(c *cli.Context) error {
 		return netbootUsingEndpoint(c.String("bmc-endpoint"), c.String("bmc-user"), c.String("bmc-pass"), c.Bool("ipmi"), c.Bool("reboot"))
 	}
 
-	grendelEndpoint := viper.GetString("grendel_endpoint")
-	if c.IsSet("grendel-endpoint") {
-		grendelEndpoint = c.String("grendel-endpoint")
-	}
-
-	if grendelEndpoint == "" {
-		return errors.New("Please set grendel-endpoint")
-	}
-
-	bmcUsername := viper.GetString("bmc_user")
+	bmcUsername := viper.GetString("bmc.user")
 	if c.IsSet("bmc-user") {
 		bmcUsername = c.String("bmc-user")
 	}
 
-	bmcPassword := viper.GetString("bmc_pass")
+	bmcPassword := viper.GetString("bmc.password")
 	if c.IsSet("bmc-pass") {
 		bmcPassword = c.String("bmc-pass")
 	}
@@ -104,7 +91,7 @@ func runNetboot(c *cli.Context) error {
 		return errors.New("Node nodes in nodeset")
 	}
 
-	gc, err := client.NewClient(grendelEndpoint, "", "", "", true)
+	gc, err := client.NewClient()
 	if err != nil {
 		return err
 	}

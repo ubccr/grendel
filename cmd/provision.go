@@ -1,15 +1,15 @@
 package cmd
 
 import (
-	"github.com/ubccr/grendel/api"
+	"github.com/ubccr/grendel/provision"
 	"github.com/urfave/cli/v2"
 )
 
-func NewAPICommand() *cli.Command {
+func NewProvisionCommand() *cli.Command {
 	return &cli.Command{
-		Name:        "api",
-		Usage:       "Start API HTTP server",
-		Description: "Start API HTTP server",
+		Name:        "provision",
+		Usage:       "Start HTTP provision server",
+		Description: "Start HTTP provision server",
 		Flags: []cli.Flag{
 			&cli.IntFlag{
 				Name:  "http-port",
@@ -27,10 +27,6 @@ func NewAPICommand() *cli.Command {
 				Usage: "IPv4 address to listen on",
 			},
 			&cli.StringFlag{
-				Name:  "socket-path",
-				Usage: "Unix domain socket path",
-			},
-			&cli.StringFlag{
 				Name:  "cert",
 				Usage: "Path to certificate",
 			},
@@ -39,23 +35,23 @@ func NewAPICommand() *cli.Command {
 				Usage: "Path to private key",
 			},
 		},
-		Action: runAPI,
+		Action: runProvision,
 	}
 }
 
-func runAPI(c *cli.Context) error {
+func runProvision(c *cli.Context) error {
 	httpPort := c.Int("http-port")
 	if c.IsSet("cert") && c.IsSet("key") && !c.IsSet("http-port") {
 		httpPort = 443
 	}
 
-	apiServer, err := api.NewServer(DB, c.String("socket-path"), c.String("listen-address"), httpPort)
+	provisionServer, err := provision.NewServer(DB, c.String("listen-address"), httpPort)
 	if err != nil {
 		return err
 	}
 
-	apiServer.KeyFile = c.String("key")
-	apiServer.CertFile = c.String("cert")
+	provisionServer.KeyFile = c.String("key")
+	provisionServer.CertFile = c.String("cert")
 
-	return apiServer.Serve()
+	return provisionServer.Serve()
 }

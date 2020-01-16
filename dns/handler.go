@@ -6,32 +6,32 @@ import (
 	"sync"
 
 	"github.com/miekg/dns"
-	"github.com/ubccr/grendel/model"
+	"github.com/ubccr/grendel/client"
 )
 
 // This code is based of the hosts plugin from coredns
 // https://github.com/coredns/coredns/tree/master/plugin/hosts
 
 type handler struct {
-	db    model.Datastore
-	name4 map[string][]net.IP
-	name6 map[string][]net.IP
-	addr  map[string][]string
-	ttl   uint32
+	client *client.Client
+	name4  map[string][]net.IP
+	name6  map[string][]net.IP
+	addr   map[string][]string
+	ttl    uint32
 
 	sync.RWMutex
 }
 
-func NewHandler(db model.Datastore, ttl uint32) (*handler, error) {
+func NewHandler(client *client.Client, ttl uint32) (*handler, error) {
 	h := &handler{
-		db:    db,
-		ttl:   ttl,
-		name4: make(map[string][]net.IP),
-		name6: make(map[string][]net.IP),
-		addr:  make(map[string][]string),
+		client: client,
+		ttl:    ttl,
+		name4:  make(map[string][]net.IP),
+		name6:  make(map[string][]net.IP),
+		addr:   make(map[string][]string),
 	}
 
-	hostList, err := h.db.HostList()
+	hostList, err := h.client.HostList()
 	if err != nil {
 		return nil, err
 	}

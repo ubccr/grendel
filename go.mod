@@ -8,6 +8,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-playground/validator/v10 v10.0.1
 	github.com/golang/protobuf v1.3.2 // indirect
+	github.com/hashicorp/go-retryablehttp v0.6.4
 	github.com/howeyc/gopass v0.0.0-20190910152052-7cb4b85ec19c // indirect
 	github.com/hugelgupf/socketpair v0.0.0-20190730060125-05d35a94e714 // indirect
 	github.com/insomniacslk/dhcp v0.0.0-20191120203056-ec0e0154d15c
@@ -36,6 +37,7 @@ require (
 	github.com/u-root/u-root v5.0.0+incompatible // indirect
 	github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb
 	github.com/urfave/cli v1.22.1
+	github.com/urfave/cli/v2 v2.1.1
 	github.com/vmware/goipmi v0.0.0-20181114221114-2333cd82d702
 	github.com/willf/bitset v1.1.10
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
@@ -45,4 +47,4 @@ require (
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )
 
-replace github.com/square/certstrap => github.com/ubccr/certstrap v1.2.1-0.20191119164315-e73497b6d54c
+replace github.com/square/certstrap => github.com/ubccr/certstrap v1.2.1-0.20200115142812-0c31c5e59383

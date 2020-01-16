@@ -8,7 +8,6 @@ import (
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/insomniacslk/dhcp/dhcpv4/server4"
-	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
 	"github.com/ubccr/grendel/tors"
 )
@@ -26,7 +25,7 @@ type discovery struct {
 	netmask  net.IPMask
 }
 
-func RunDiscovery(db model.Datastore, address, nodestr string, subnet net.IP, netmask net.IPMask, switchClient tors.NetworkSwitch) error {
+func RunDiscovery(address, nodestr string, subnet net.IP, netmask net.IPMask, switchClient tors.NetworkSwitch) error {
 	if address == "" {
 		address = fmt.Sprintf("%s:%d", net.IPv4zero.String(), dhcpv4.ServerPort)
 	}

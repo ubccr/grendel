@@ -7,69 +7,70 @@ import (
 	"time"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
+	"github.com/ubccr/grendel/client"
 	"github.com/ubccr/grendel/dhcp"
 	"github.com/ubccr/grendel/logger"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
-func NewDHCPCommand() cli.Command {
-	return cli.Command{
+func NewDHCPCommand() *cli.Command {
+	return &cli.Command{
 		Name:        "dhcp",
 		Usage:       "Start DHCP server",
 		Description: "Start DHCP server",
 		Flags: []cli.Flag{
-			cli.IntFlag{
+			&cli.IntFlag{
 				Name:  "dhcp-port",
 				Value: dhcpv4.ServerPort,
 				Usage: "dhcp port to listen on",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "listen-address",
 				Value: "0.0.0.0",
 				Usage: "address to listen on",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "http-scheme",
 				Value: "http",
 				Usage: "http scheme",
 			},
-			cli.IntFlag{
+			&cli.IntFlag{
 				Name:  "http-port",
 				Value: 80,
 				Usage: "http port",
 			},
-			cli.IntFlag{
+			&cli.IntFlag{
 				Name:  "pxe-port",
 				Value: 4011,
 				Usage: "pxe port",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "hostname",
 				Usage: "Hostname",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "lease-time",
 				Value: "24h",
 				Usage: "dhcp lease time duration",
 			},
-			cli.StringSliceFlag{
+			&cli.StringSliceFlag{
 				Name:  "dns-server",
 				Usage: "dns server IP addresses",
 			},
-			cli.StringSliceFlag{
+			&cli.StringSliceFlag{
 				Name:  "domain-search",
 				Usage: "domain search list",
 			},
-			cli.IntFlag{
+			&cli.IntFlag{
 				Name:  "mtu",
 				Value: 1500,
 				Usage: "dhcp interface MTU",
 			},
-			cli.BoolFlag{
+			&cli.BoolFlag{
 				Name:  "disable-pxe",
 				Usage: "Disable PXE server",
 			},
-			cli.BoolFlag{
+			&cli.BoolFlag{
 				Name:  "proxy-only",
 				Usage: "Run DHCP Proxy only",
 			},
@@ -84,7 +85,12 @@ func runDHCP(c *cli.Context) error {
 	listenAddress := c.String("listen-address")
 	address := fmt.Sprintf("%s:%d", listenAddress, c.Int("dhcp-port"))
 
-	srv, err := dhcp.NewServer(DB, address, c.Bool("proxy-only"))
+	gc, err := client.NewClient()
+	if err != nil {
+		return err
+	}
+
+	srv, err := dhcp.NewServer(gc, address, c.Bool("proxy-only"))
 	if err != nil {
 		return err
 	}

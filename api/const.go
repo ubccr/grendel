@@ -1,5 +1,5 @@
 package api
 
 const (
-	ContextKeyJWT = "grendeljwt"
+	ContextKeyJWT = "grendelapi"
 )

@@ -3,27 +3,28 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/ubccr/grendel/client"
 	"github.com/ubccr/grendel/dns"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
-func NewDNSCommand() cli.Command {
-	return cli.Command{
+func NewDNSCommand() *cli.Command {
+	return &cli.Command{
 		Name:        "dns",
 		Usage:       "Start DNS server",
 		Description: "Start DNS server",
 		Flags: []cli.Flag{
-			cli.IntFlag{
+			&cli.IntFlag{
 				Name:  "dns-port",
 				Value: 53,
 				Usage: "dns port to listen on",
 			},
-			cli.IntFlag{
+			&cli.IntFlag{
 				Name:  "dns-ttl",
 				Value: 86400,
 				Usage: "dns ttl for records",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "listen-address",
 				Value: "0.0.0.0",
 				Usage: "address to listen on",
@@ -38,7 +39,12 @@ func runDNS(c *cli.Context) error {
 
 	address := fmt.Sprintf("%s:%d", listenAddress, c.Int("dns-port"))
 
-	dnsServer, err := dns.NewServer(DB, address, c.Int("dns-ttl"))
+	gc, err := client.NewClient()
+	if err != nil {
+		return err
+	}
+
+	dnsServer, err := dns.NewServer(gc, address, c.Int("dns-ttl"))
 	if err != nil {
 		return err
 	}

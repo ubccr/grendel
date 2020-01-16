@@ -11,7 +11,7 @@ import (
 	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/util"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 var release = "(version not set)"
@@ -19,7 +19,7 @@ var log = logger.GetLogger("main")
 
 func init() {
 	viper.SetConfigName("grendel")
-	viper.SetConfigType("yaml")
+	viper.SetConfigType("toml")
 	viper.AddConfigPath("/etc/grendel/")
 }
 
@@ -28,24 +28,23 @@ func main() {
 	app.Name = "grendel"
 	app.Version = release
 	app.Usage = "provisioning system for high-performance Linux clusters"
-	app.Author = "Andrew E. Bruno"
-	app.Email = "aebruno2@buffalo.edu"
+	app.Authors = []*cli.Author{{Name: "Andrew E. Bruno", Email: "aebruno2@buffalo.edu"}}
 	app.Flags = []cli.Flag{
 		&cli.StringFlag{Name: "conf,c", Usage: "Path to conf file"},
 		&cli.BoolFlag{Name: "verbose", Usage: "Print verbose messages"},
 		&cli.BoolFlag{Name: "debug", Usage: "Print debug messages"},
 	}
 	app.Before = func(c *cli.Context) error {
-		if c.GlobalBool("debug") {
+		if c.Bool("debug") {
 			log.Logger.SetLevel(logrus.DebugLevel)
-		} else if c.GlobalBool("verbose") {
+		} else if c.Bool("verbose") {
 			log.Logger.SetLevel(logrus.InfoLevel)
 		} else {
 			log.Logger.SetLevel(logrus.WarnLevel)
 		}
 		golog.SetOutput(ioutil.Discard)
 
-		conf := c.GlobalString("conf")
+		conf := c.String("conf")
 		if len(conf) > 0 {
 			viper.SetConfigFile(conf)
 
@@ -55,18 +54,27 @@ func main() {
 			}
 		}
 
-		if !viper.IsSet("secret") {
+		if !viper.IsSet("provision.secret") {
 			secret, err := util.GenerateSecret(32)
 			if err != nil {
 				return err
 			}
 
-			viper.Set("secret", secret)
+			viper.Set("provision.secret", secret)
+		}
+
+		if !viper.IsSet("api.secret") {
+			secret, err := util.GenerateSecret(32)
+			if err != nil {
+				return err
+			}
+
+			viper.Set("api.secret", secret)
 		}
 
 		return nil
 	}
-	app.Commands = []cli.Command{
+	app.Commands = []*cli.Command{
 		cmd.NewCertsCommand(),
 		cmd.NewServeCommand(),
 		cmd.NewHostCommand(),

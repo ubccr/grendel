@@ -2,14 +2,15 @@ package cmd
 
 import (
 	"os"
+	"reflect"
 
 	"github.com/ubccr/grendel/model"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func flagExists(flags []cli.Flag, flag cli.Flag) bool {
 	for _, f := range flags {
-		if flag.GetName() == f.GetName() {
+		if reflect.DeepEqual(flag.Names(), f.Names()) {
 			return true
 		}
 	}
@@ -17,47 +18,47 @@ func flagExists(flags []cli.Flag, flag cli.Flag) bool {
 	return false
 }
 
-func NewServeAllCommand() cli.Command {
+func NewServeAllCommand() *cli.Command {
 	flags := []cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "kernel",
 			Usage: "Location of kernel vmlinuz file",
 		},
-		cli.StringSliceFlag{
+		&cli.StringSliceFlag{
 			Name:  "initrd",
 			Usage: "Location of initrd file(s)",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "cmdline",
 			Usage: "Kernel commandline arguments",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "liveimg",
 			Usage: "Location of liveimg squashfs",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "rootfs",
 			Usage: "Location of rootfs",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "install-repo",
 			Usage: "URL of repo mirror",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "static-hosts",
 			Usage: "static hosts file",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "dhcp-leases",
 			Usage: "dhcp leases file",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "json-hosts",
 			Usage: "json hosts file",
 		},
 	}
 
-	for _, cmd := range []cli.Command{NewDHCPCommand(), NewTFTPCommand(), NewAPICommand(), NewDNSCommand()} {
+	for _, cmd := range []*cli.Command{NewDHCPCommand(), NewTFTPCommand(), NewAPICommand(), NewProvisionCommand(), NewDNSCommand()} {
 		for _, f := range cmd.Flags {
 			if !flagExists(flags, f) {
 				flags = append(flags, f)
@@ -65,7 +66,7 @@ func NewServeAllCommand() cli.Command {
 		}
 	}
 
-	return cli.Command{
+	return &cli.Command{
 		Name:        "all",
 		Usage:       "Start all services",
 		Description: "Start all services",
@@ -119,13 +120,18 @@ func runAllServices(c *cli.Context) error {
 		}
 	}
 
+	if !c.IsSet("socket-path") {
+		c.Set("socket-path", "grendel-api.socket")
+	}
+
 	DB = staticBooter
 
-	errs := make(chan error, 4)
+	errs := make(chan error, 5)
 
+	go func() { errs <- runAPI(c) }()
 	go func() { errs <- runDHCP(c) }()
 	go func() { errs <- runTFTP(c) }()
-	go func() { errs <- runAPI(c) }()
+	go func() { errs <- runProvision(c) }()
 	go func() { errs <- runDNS(c) }()
 
 	err = <-errs

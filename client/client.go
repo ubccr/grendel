@@ -1,37 +1,39 @@
 package client
 
 import (
-	"bytes"
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
-	log "github.com/sirupsen/logrus"
-	"github.com/ubccr/grendel/api"
-	"github.com/ubccr/grendel/bmc"
+	"github.com/hashicorp/go-retryablehttp"
+	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
 )
+
+var log = logger.GetLogger("CLIENT")
 
 type Client struct {
 	endpoint string
 	clientID string
 	secret   string
-	client   *http.Client
+	client   *retryablehttp.Client
 }
 
-type NetbootResult map[string]string
-type BMCResult map[string]*bmc.System
+func NewClient() (*Client, error) {
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: viper.GetBool("api.insecure")}}
 
-func NewClient(endpoint, clientID, secret, cacert string, insecure bool) (*Client, error) {
-	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure}}
-
+	cacert := viper.GetString("client.cacert")
 	pem, err := ioutil.ReadFile(cacert)
 	if err == nil {
 		certPool := x509.NewCertPool()
@@ -42,14 +44,34 @@ func NewClient(endpoint, clientID, secret, cacert string, insecure bool) (*Clien
 		tr = &http.Transport{TLSClientConfig: &tls.Config{RootCAs: certPool, InsecureSkipVerify: false}}
 	}
 
+	endpoint := viper.GetString("client.api_endpoint")
+
 	c := &Client{
-		clientID: clientID,
-		secret:   secret,
+		clientID: viper.GetString("client.client_id"),
+		secret:   viper.GetString("client.client_secret"),
 		endpoint: strings.TrimSuffix(endpoint, "/"),
-		client:   &http.Client{Timeout: time.Second * 3600, Transport: tr},
 	}
 
+	// Are we using unix domain socket?
+	if _, err := os.Stat(endpoint); err == nil {
+		tr = &http.Transport{
+			DialContext: func(ctx context.Context, _, addr string) (net.Conn, error) {
+				dialer := net.Dialer{}
+				return dialer.DialContext(ctx, "unix", endpoint)
+			},
+		}
+		c.endpoint = "http://unix"
+	}
+
+	c.client = retryablehttp.NewClient()
+	c.client.HTTPClient = &http.Client{Timeout: time.Second * 3600, Transport: tr}
+	c.client.Logger = log
+
 	return c, nil
+}
+
+func (c *Client) RetryMax(max int) {
+	c.client.RetryMax = max
 }
 
 func (c *Client) URL(resource string) string {
@@ -77,107 +99,38 @@ func (c *Client) newRequest(method, url string, body io.Reader) (*http.Request, 
 	return req, nil
 }
 
-func (c *Client) Netboot(params api.NetbootParams) (NetbootResult, error) {
-	data, err := json.Marshal(&params)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := c.postRequest(c.URL(GRENDEL_API_NETBOOT), bytes.NewBuffer(data))
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := c.client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode == http.StatusInternalServerError {
-		return nil, fmt.Errorf("Failed to netboot hosts: %d", res.StatusCode)
-	}
-
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Failed to netboot hosts unknown error code: %d", res.StatusCode)
-	}
-
-	rawJson, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	log.Debugf("netboot json response: %s", rawJson)
-
-	var netbootResult NetbootResult
-	err = json.Unmarshal(rawJson, &netbootResult)
-	if err != nil {
-		return nil, err
-	}
-
-	return netbootResult, nil
-}
-
-func (c *Client) BMCStatus(params api.NetbootParams) (BMCResult, error) {
-	data, err := json.Marshal(&params)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := c.postRequest(c.URL(GRENDEL_API_POWER), bytes.NewBuffer(data))
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := c.client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode == http.StatusInternalServerError {
-		return nil, fmt.Errorf("Failed to fetch power: %d", res.StatusCode)
-	}
-
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Failed to fetch power unknown error code: %d", res.StatusCode)
-	}
-
-	rawJson, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	log.Debugf("power json response: %s", rawJson)
-
-	var bmcResult BMCResult
-	err = json.Unmarshal(rawJson, &bmcResult)
-	if err != nil {
-		return nil, err
-	}
-
-	return bmcResult, nil
-}
-
 func (c *Client) HostFind(ns *nodeset.NodeSet) (model.HostList, error) {
 	endpoint := fmt.Sprintf("%s/%s", GRENDEL_API_HOST_FIND, ns.String())
+	return c.hostList(endpoint)
+}
+
+func (c *Client) HostList() (model.HostList, error) {
+	return c.hostList(GRENDEL_API_HOST_LIST)
+}
+
+func (c *Client) hostList(endpoint string) (model.HostList, error) {
 	req, err := c.getRequest(c.URL(endpoint))
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := c.client.Do(req)
+	rreq, err := retryablehttp.FromRequest(req)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.client.Do(rreq)
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode == http.StatusInternalServerError {
-		return nil, fmt.Errorf("Failed to find hosts: %d", res.StatusCode)
+		return nil, fmt.Errorf("Failed to fetch hosts: %d", res.StatusCode)
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Failed to find hosts unknown error code: %d", res.StatusCode)
+		return nil, fmt.Errorf("Failed to fetch hosts unknown error code: %d", res.StatusCode)
 	}
 
 	rawJson, err := ioutil.ReadAll(res.Body)
@@ -185,7 +138,7 @@ func (c *Client) HostFind(ns *nodeset.NodeSet) (model.HostList, error) {
 		return nil, err
 	}
 
-	log.Debugf("find response: %s", rawJson)
+	// log.Debugf("JSON response: %s", rawJson)
 
 	var hostList model.HostList
 	err = json.Unmarshal(rawJson, &hostList)

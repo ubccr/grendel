@@ -1,15 +1,15 @@
 package cmd
 
 import (
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
-func NewHostCommand() cli.Command {
-	return cli.Command{
+func NewHostCommand() *cli.Command {
+	return &cli.Command{
 		Name:        "host",
 		Usage:       "Host commands",
 		Description: "Host commands",
-		Subcommands: []cli.Command{
+		Subcommands: []*cli.Command{
 			NewHostDiscoverCommand(),
 			NewHostShowCommand(),
 			NewBMCCommand(),

@@ -4,21 +4,21 @@ import (
 	"fmt"
 
 	"github.com/ubccr/grendel/tftp"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
-func NewTFTPCommand() cli.Command {
-	return cli.Command{
+func NewTFTPCommand() *cli.Command {
+	return &cli.Command{
 		Name:        "tftp",
 		Usage:       "Start TFTP server",
 		Description: "Start TFTP server",
 		Flags: []cli.Flag{
-			cli.IntFlag{
+			&cli.IntFlag{
 				Name:  "tftp-port",
 				Value: 69,
 				Usage: "tftp port to listen on",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "listen-address",
 				Value: "0.0.0.0",
 				Usage: "address to listen on",

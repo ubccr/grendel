@@ -14,42 +14,38 @@ import (
 	"github.com/ubccr/grendel/client"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
-func NewBMCStatusCommand() cli.Command {
-	return cli.Command{
+func NewBMCStatusCommand() *cli.Command {
+	return &cli.Command{
 		Name:        "status",
 		Usage:       "Show bmc status",
 		Description: "Show bmc status",
 		Flags: []cli.Flag{
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:     "nodeset",
 				Required: true,
 				Usage:    "Set of nodes to netboot",
 			},
-			cli.StringFlag{
-				Name:  "grendel-endpoint",
-				Usage: "grendel endpoint url",
-			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "bmc-user",
 				Usage: "BMC Username",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "bmc-pass",
 				Usage: "BMC Password",
 			},
-			cli.BoolFlag{
+			&cli.BoolFlag{
 				Name:  "ipmi",
 				Usage: "Use ipmi instead of redfish",
 			},
-			cli.IntFlag{
+			&cli.IntFlag{
 				Name:  "delay",
 				Value: 0,
 				Usage: "delay",
 			},
-			cli.IntFlag{
+			&cli.IntFlag{
 				Name:  "fanout",
 				Value: 1,
 				Usage: "fanout",
@@ -60,21 +56,12 @@ func NewBMCStatusCommand() cli.Command {
 }
 
 func runBMCStatus(c *cli.Context) error {
-	grendelEndpoint := viper.GetString("grendel_endpoint")
-	if c.IsSet("grendel-endpoint") {
-		grendelEndpoint = c.String("grendel-endpoint")
-	}
-
-	if grendelEndpoint == "" {
-		return errors.New("Please set grendel-endpoint")
-	}
-
-	bmcUsername := viper.GetString("bmc_user")
+	bmcUsername := viper.GetString("bmc.user")
 	if c.IsSet("bmc-user") {
 		bmcUsername = c.String("bmc-user")
 	}
 
-	bmcPassword := viper.GetString("bmc_pass")
+	bmcPassword := viper.GetString("bmc.password")
 	if c.IsSet("bmc-pass") {
 		bmcPassword = c.String("bmc-pass")
 	}
@@ -92,7 +79,7 @@ func runBMCStatus(c *cli.Context) error {
 		return errors.New("Node nodes in nodeset")
 	}
 
-	gc, err := client.NewClient(grendelEndpoint, "", "", "", true)
+	gc, err := client.NewClient()
 	if err != nil {
 		return err
 	}
