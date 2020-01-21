@@ -10,7 +10,6 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -52,8 +51,8 @@ func NewClient() (*Client, error) {
 		endpoint: strings.TrimSuffix(endpoint, "/"),
 	}
 
-	// Are we using unix domain socket?
-	if _, err := os.Stat(endpoint); err == nil {
+	// Is endpoint a path to a unix domain socket?
+	if !strings.HasPrefix(endpoint, "http://") && !strings.HasPrefix(endpoint, "https://") {
 		tr = &http.Transport{
 			DialContext: func(ctx context.Context, _, addr string) (net.Conn, error) {
 				dialer := net.Dialer{}
