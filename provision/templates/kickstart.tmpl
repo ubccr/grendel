@@ -4,7 +4,7 @@ liveimg --url="{{ .baseuri }}/_/file/liveimg?token={{.token}}"
 lang en_US.UTF-8
 selinux --disabled
 keyboard us
-timezone America/New_York
+timezone --utc America/New_York
 skipx
 
 network --bootproto dhcp --hostname {{ .nic.FQDN }} --device={{ .nic.MAC }}
