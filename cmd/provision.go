@@ -34,6 +34,10 @@ func NewProvisionCommand() *cli.Command {
 				Name:  "key",
 				Usage: "Path to private key",
 			},
+			&cli.StringFlag{
+				Name:  "repo-dir",
+				Usage: "Path to repo dir",
+			},
 		},
 		Action: runProvision,
 	}
@@ -52,6 +56,7 @@ func runProvision(c *cli.Context) error {
 
 	provisionServer.KeyFile = c.String("key")
 	provisionServer.CertFile = c.String("cert")
+	provisionServer.RepoDir = c.String("repo-dir")
 
 	return provisionServer.Serve()
 }

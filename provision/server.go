@@ -29,6 +29,7 @@ type Server struct {
 	KeyFile       string
 	CertFile      string
 	Hostname      string
+	RepoDir       string
 	DB            model.Datastore
 }
 
@@ -90,6 +91,12 @@ func (s *Server) Serve() error {
 	e.HideBanner = true
 	e.Use(middleware.Recover())
 	e.Logger = EchoLogger()
+
+	if len(s.RepoDir) > 0 {
+		e.Static("/repo", s.RepoDir)
+		//fs := http.FileServer(http.Dir(s.RepoDir))
+		//e.GET("/repo/*", echo.WrapHandler(http.StripPrefix("/repo/", fs)))
+	}
 
 	renderer, err := NewTemplateRenderer()
 	if err != nil {
