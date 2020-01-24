@@ -109,6 +109,42 @@ func TestBuntStoreHostFind(t *testing.T) {
 	}
 }
 
+func TestBuntStoreProvision(t *testing.T) {
+	assert := assert.New(t)
+
+	store, err := NewBuntStore(":memory:")
+	defer store.Close()
+	assert.NoError(err)
+
+	size := 20
+	for i := 0; i < size; i++ {
+		host := HostFactory.MustCreate().(*Host)
+		host.Name = fmt.Sprintf("tux-%02d", i)
+		err := store.StoreHost(host)
+		assert.NoError(err)
+	}
+
+	ns, err := nodeset.NewNodeSet("tux-[05-14]")
+	if assert.NoError(err) {
+		hosts, err := store.FindHosts(ns)
+		assert.NoError(err)
+		assert.Equal(10, len(hosts))
+		for _, host := range hosts {
+			assert.False(host.Provision)
+		}
+
+		err = store.ProvisionHosts(ns, true)
+		assert.NoError(err)
+
+		hosts, err = store.FindHosts(ns)
+		assert.NoError(err)
+		assert.Equal(10, len(hosts))
+		for _, host := range hosts {
+			assert.True(host.Provision)
+		}
+	}
+}
+
 func BenchmarkBuntStoreWriteHost(b *testing.B) {
 	file := tempfile()
 	defer os.Remove(file)

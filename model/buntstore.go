@@ -10,6 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/tidwall/buntdb"
 	"github.com/tidwall/gjson"
+	"github.com/tidwall/sjson"
 	"github.com/ubccr/grendel/nodeset"
 )
 
@@ -236,4 +237,39 @@ func (s *BuntStore) FindHosts(ns *nodeset.NodeSet) (HostList, error) {
 	}
 
 	return hosts, nil
+}
+
+// ProvisionHosts sets all hosts in the given NodeSet to provision (true) or unprovision (false)
+func (s *BuntStore) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
+	it := ns.Iterator()
+
+	err := s.db.Update(func(tx *buntdb.Tx) error {
+		for it.Next() {
+			key := "hosts:" + it.Value()
+			val, err := tx.Get(key, false)
+			if err != nil {
+				if err != buntdb.ErrNotFound {
+					return err
+				}
+				continue
+			}
+
+			val, err = sjson.Set(val, "provision", provision)
+			if err != nil {
+				return err
+			}
+
+			_, _, err = tx.Set(key, val, nil)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

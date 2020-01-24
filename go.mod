@@ -37,6 +37,7 @@ require (
 	github.com/stretchr/testify v1.4.0
 	github.com/tidwall/buntdb v1.1.2
 	github.com/tidwall/gjson v1.3.4
+	github.com/tidwall/sjson v1.0.4
 	github.com/u-root/u-root v5.0.0+incompatible // indirect
 	github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb
 	github.com/urfave/cli/v2 v2.1.1
