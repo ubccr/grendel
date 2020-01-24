@@ -6,6 +6,7 @@ import (
 
 	"github.com/Pallinder/go-randomdata"
 	"github.com/bluele/factory-go/factory"
+	"github.com/segmentio/ksuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -29,6 +30,11 @@ var HostFactory = factory.NewFactory(
 	host := args.Instance().(*Host)
 	host.Interfaces[0].BMC = false
 	host.Interfaces[1].BMC = true
+	uuid, err := ksuid.NewRandom()
+	if err != nil {
+		return err
+	}
+	host.ID = uuid
 	return nil
 }).SubSliceFactory("Interfaces", NetInterfaceFactory, func() int { return 2 })
 
@@ -39,5 +45,6 @@ func TestFactory(t *testing.T) {
 		host := HostFactory.MustCreate().(*Host)
 		assert.Greater(len(host.Name), 1)
 		assert.Equal(2, len(host.Interfaces))
+		assert.False(host.ID.IsNil())
 	}
 }

@@ -4,15 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"strings"
 
+	"github.com/segmentio/ksuid"
+	"github.com/sirupsen/logrus"
 	"github.com/tidwall/buntdb"
 	"github.com/tidwall/gjson"
 )
 
+// BuntStore implements a Grendel Datastore using BuntDB
 type BuntStore struct {
 	db *buntdb.DB
 }
 
+// NewBuntStore returns a new BuntStore using the given database filename. For memory only you can provide `:memory:`
 func NewBuntStore(filename string) (*BuntStore, error) {
 	db, err := buntdb.Open(filename)
 	if err != nil {
@@ -27,13 +32,27 @@ func NewBuntStore(filename string) (*BuntStore, error) {
 	return &BuntStore{db: db}, nil
 }
 
-func (kv *BuntStore) Close() error {
-	return kv.db.Close()
+// Close closes the BuntStore database
+func (s *BuntStore) Close() error {
+	return s.db.Close()
 }
 
+// StoreHost stores a host in the data store. If the host exists it is overwritten
 func (s *BuntStore) StoreHost(host *Host) error {
 	if host.Name == "" {
 		return fmt.Errorf("name required:  %w", ErrInvalidData)
+	}
+
+	// Keys are case-insensitive
+	host.Name = strings.ToLower(host.Name)
+
+	if host.ID.IsNil() {
+		uuid, err := ksuid.NewRandom()
+		if err != nil {
+			return err
+		}
+
+		host.ID = uuid
 	}
 
 	val, err := json.Marshal(host)
@@ -41,14 +60,21 @@ func (s *BuntStore) StoreHost(host *Host) error {
 		return err
 	}
 
+	hostJSON := string(val)
+
 	err = s.db.Update(func(tx *buntdb.Tx) error {
-		_, _, err := tx.Set("hosts:"+host.Name, string(val), nil)
+		_, _, err := tx.Set("hosts:"+host.Name, hostJSON, nil)
 		return err
 	})
+
+	if err != nil {
+		return err
+	}
 
 	return err
 }
 
+// LoadHostByName returns the Host with the given name
 func (s *BuntStore) LoadHostByName(name string) (*Host, error) {
 	var host *Host
 
@@ -83,6 +109,7 @@ func (s *BuntStore) LoadHostByName(name string) (*Host, error) {
 	return host, nil
 }
 
+// LoadHostByID returns the Host with the given ID
 func (s *BuntStore) LoadHostByID(id string) (*Host, error) {
 	hostJSON := ""
 
@@ -114,6 +141,7 @@ func (s *BuntStore) LoadHostByID(id string) (*Host, error) {
 	return &host, nil
 }
 
+// LoadNetInterfaces returns the list of IPs with the given FQDN
 func (s *BuntStore) LoadNetInterfaces(fqdn string) ([]net.IP, error) {
 	ips := make([]net.IP, 0)
 
@@ -145,4 +173,32 @@ func (s *BuntStore) LoadNetInterfaces(fqdn string) ([]net.IP, error) {
 	}
 
 	return ips, nil
+}
+
+// Hosts returns a list of all the hosts
+func (s *BuntStore) Hosts() (HostList, error) {
+	hosts := make(HostList, 0)
+
+	err := s.db.View(func(tx *buntdb.Tx) error {
+		err := tx.AscendKeys("hosts:*", func(key, value string) bool {
+			var h Host
+			err := json.Unmarshal([]byte(value), &h)
+			if err == nil {
+				hosts = append(hosts, &h)
+			} else {
+				log.WithFields(logrus.Fields{
+					"err": err,
+				}).Warn("Invalid host json stored in db")
+			}
+			return true
+		})
+
+		return err
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return hosts, nil
 }

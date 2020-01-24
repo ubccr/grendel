@@ -3,6 +3,7 @@ package model
 
 import (
 	"errors"
+	"net"
 
 	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/nodeset"
@@ -45,7 +46,7 @@ type Datastore interface {
 	// ProvisionHosts sets all hosts in the given NodeSet to provision (true) or unprovision (false)
 	ProvisionHosts(ns *nodeset.NodeSet, provision bool) error
 
-	// StoreHost stores a host in the data store
+	// StoreHost stores a host in the data store. If the host exists it is overwritten
 	StoreHost(host *Host) error
 
 	// LoadHostByID returns the Host with the given ID
@@ -53,4 +54,7 @@ type Datastore interface {
 
 	// LoadHostByName returns the Host with the given name
 	LoadHostByName(name string) (*Host, error)
+
+	// LoadNetInterfaces returns the list of IPs with the given FQDN
+	LoadNetInterfaces(fqdn string) ([]net.IP, error)
 }

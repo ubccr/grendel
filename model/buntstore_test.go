@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"io/ioutil"
 	"math/rand"
 	"os"
@@ -25,36 +26,62 @@ func TestBuntStoreHost(t *testing.T) {
 	defer store.Close()
 	assert.NoError(err)
 
-	badhost := &Host{}
-	err = store.StoreHost(badhost)
-	assert.Error(ErrInvalidData, err)
-
 	host := HostFactory.MustCreate().(*Host)
 
 	err = store.StoreHost(host)
 	assert.NoError(err)
 
-	_, err = store.LoadHostByID("notfound")
-	assert.Error(ErrNotFound, err)
-
-	_, err = store.LoadHostByName("notfound")
-	assert.Error(ErrNotFound, err)
-
 	testHost, err := store.LoadHostByID(host.ID.String())
-	assert.Nil(err)
-	assert.Equal(2, len(testHost.Interfaces))
+	if assert.NoError(err) {
+		assert.Equal(2, len(testHost.Interfaces))
+	}
 
 	testHost2, err := store.LoadHostByName(host.Name)
-	if assert.Nil(err) {
+	if assert.NoError(err) {
 		assert.Equal(host.Name, testHost2.Name)
 		assert.True(host.Interfaces[0].IP.Equal(testHost2.Interfaces[0].IP))
 	}
 
 	testIPs, err := store.LoadNetInterfaces(host.Interfaces[0].FQDN)
-	if assert.Nil(err) {
+	if assert.NoError(err) {
 		assert.Equal(1, len(testIPs))
 		assert.Equal(host.Interfaces[0].IP.String(), testIPs[0].String())
 	}
+
+	badhost := &Host{}
+	err = store.StoreHost(badhost)
+	if assert.Error(err) {
+		assert.True(errors.Is(err, ErrInvalidData))
+	}
+
+	_, err = store.LoadHostByID("notfound")
+	if assert.Error(err) {
+		assert.True(errors.Is(err, ErrNotFound))
+	}
+
+	_, err = store.LoadHostByName("notfound")
+	if assert.Error(err) {
+		assert.True(errors.Is(err, ErrNotFound))
+	}
+}
+
+func TestBuntStoreHostList(t *testing.T) {
+	assert := assert.New(t)
+
+	store, err := NewBuntStore(":memory:")
+	defer store.Close()
+	assert.NoError(err)
+
+	size := 10
+	for i := 0; i < size; i++ {
+		host := HostFactory.MustCreate().(*Host)
+		err := store.StoreHost(host)
+		assert.NoError(err)
+	}
+
+	hosts, err := store.Hosts()
+	assert.NoError(err)
+	assert.Equal(10, len(hosts))
 }
 
 func BenchmarkBuntStoreWriteHost(b *testing.B) {
