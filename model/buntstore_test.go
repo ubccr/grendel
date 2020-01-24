@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"os"
@@ -9,6 +10,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/ubccr/grendel/nodeset"
 )
 
 func tempfile() string {
@@ -84,6 +86,29 @@ func TestBuntStoreHostList(t *testing.T) {
 	assert.Equal(10, len(hosts))
 }
 
+func TestBuntStoreHostFind(t *testing.T) {
+	assert := assert.New(t)
+
+	store, err := NewBuntStore(":memory:")
+	defer store.Close()
+	assert.NoError(err)
+
+	size := 20
+	for i := 0; i < size; i++ {
+		host := HostFactory.MustCreate().(*Host)
+		host.Name = fmt.Sprintf("tux-%02d", i)
+		err := store.StoreHost(host)
+		assert.NoError(err)
+	}
+
+	ns, err := nodeset.NewNodeSet("tux-[05-14]")
+	if assert.NoError(err) {
+		hosts, err := store.FindHosts(ns)
+		assert.NoError(err)
+		assert.Equal(10, len(hosts))
+	}
+}
+
 func BenchmarkBuntStoreWriteHost(b *testing.B) {
 	file := tempfile()
 	defer os.Remove(file)
@@ -106,7 +131,91 @@ func BenchmarkBuntStoreWriteHost(b *testing.B) {
 	}
 }
 
-func BenchmarkBuntStoreReadHost(b *testing.B) {
+func BenchmarkBuntStoreReadAll(b *testing.B) {
+	file := tempfile()
+	defer os.Remove(file)
+
+	store, err := NewBuntStore(file)
+	defer store.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	size := 5000
+	rand.Seed(time.Now().UnixNano())
+	hosts := make(HostList, size)
+	for i := 0; i < size; i++ {
+		host := HostFactory.MustCreate().(*Host)
+		err = store.StoreHost(host)
+		if err != nil {
+			panic(err)
+		}
+		hosts[i] = host
+	}
+
+	for n := 0; n < b.N; n++ {
+		_, err := store.Hosts()
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func BenchmarkBuntStoreFind(b *testing.B) {
+	file := tempfile()
+	defer os.Remove(file)
+
+	store, err := NewBuntStore(file)
+	defer store.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	size := 5000
+	rand.Seed(time.Now().UnixNano())
+	hosts := make(HostList, size)
+	for i := 0; i < size; i++ {
+		host := HostFactory.MustCreate().(*Host)
+		host.Name = fmt.Sprintf("tux-%04d", i)
+		err = store.StoreHost(host)
+		if err != nil {
+			panic(err)
+		}
+		hosts[i] = host
+	}
+
+	b.SetParallelism(128)
+	for n := 0; n < b.N; n++ {
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				n := rand.Intn(int(size / 2))
+				start := rand.Intn(int(size / 2))
+				end := start + n
+				if end > size-1 {
+					end = size - 1
+				}
+
+				n = end - start
+
+				ns, err := nodeset.NewNodeSet(fmt.Sprintf("tux-[%04d-%04d]", start, end))
+				if err != nil {
+					panic(err)
+				}
+
+				hosts, err := store.FindHosts(ns)
+				if err != nil {
+					panic(err)
+				}
+
+				if len(hosts) != n+1 {
+					panic("Invalid length")
+				}
+			}
+		})
+	}
+}
+
+func BenchmarkBuntStoreRandomRead(b *testing.B) {
 	file := tempfile()
 	defer os.Remove(file)
 

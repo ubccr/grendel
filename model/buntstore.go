@@ -10,6 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/tidwall/buntdb"
 	"github.com/tidwall/gjson"
+	"github.com/ubccr/grendel/nodeset"
 )
 
 // BuntStore implements a Grendel Datastore using BuntDB
@@ -194,6 +195,40 @@ func (s *BuntStore) Hosts() (HostList, error) {
 		})
 
 		return err
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return hosts, nil
+}
+
+// FindHosts returns a list of all the hosts in the given NodeSet
+func (s *BuntStore) FindHosts(ns *nodeset.NodeSet) (HostList, error) {
+	hosts := make(HostList, 0)
+
+	it := ns.Iterator()
+
+	err := s.db.View(func(tx *buntdb.Tx) error {
+		for it.Next() {
+			val, err := tx.Get("hosts:"+it.Value(), false)
+			if err != nil {
+				if err != buntdb.ErrNotFound {
+					return err
+				}
+				continue
+			}
+
+			var h Host
+			err = json.Unmarshal([]byte(val), &h)
+			if err != nil {
+				return err
+			}
+
+			hosts = append(hosts, &h)
+		}
+		return nil
 	})
 
 	if err != nil {
