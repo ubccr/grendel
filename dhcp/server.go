@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
@@ -37,9 +36,7 @@ type Server struct {
 	LeaseTime        time.Duration
 	srv              *server4.Server
 	srvPXE           *server4.Server
-	leases4          map[string]*model.Host
-
-	sync.RWMutex
+	leases4          *model.HostMap
 }
 
 func NewServer(client *client.Client, address string, proxyOnly bool) (*Server, error) {
@@ -273,14 +270,7 @@ func (s *Server) Shutdown() {
 }
 
 func (s *Server) LookupStaticHost(mac string) *model.Host {
-	s.RLock()
-	defer s.RUnlock()
-
-	if len(s.leases4) == 0 {
-		return nil
-	}
-
-	host, ok := s.leases4[mac]
+	host, ok := s.leases4.Load(mac)
 	if !ok {
 		return nil
 	}
@@ -294,10 +284,7 @@ func (s *Server) LoadHosts() error {
 		return err
 	}
 
-	s.Lock()
-	defer s.Unlock()
-
-	s.leases4 = make(map[string]*model.Host, 0)
+	s.leases4 = model.NewHostMap()
 
 	for _, host := range hostList {
 		for _, nic := range host.Interfaces {
@@ -305,7 +292,7 @@ func (s *Server) LoadHosts() error {
 				continue
 			}
 
-			s.leases4[nic.MAC.String()] = host
+			s.leases4.Store(nic.MAC.String(), host)
 		}
 	}
 

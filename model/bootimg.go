@@ -1,12 +1,21 @@
 package model
 
+import (
+	"github.com/segmentio/ksuid"
+)
+
+type BootImageList []*BootImage
+
 type BootImage struct {
-	ID          uint64   `json:"id" badgerhold:"key"`
-	Name        string   `json:"name"`
-	KernelPath  string   `json:"kernel"`
-	InitrdPaths []string `json:"initrd"`
-	LiveImage   string   `json:"liveimg"`
-	RootFS      string   `json:"rootfs"`
-	InstallRepo string   `json:"install_repo"`
-	CommandLine string   `json:"cmdline"`
+	ID          ksuid.KSUID `json:"id" badgerhold:"index"`
+	Name        string      `json:"name"`
+	KernelPath  string      `json:"kernel"`
+	InitrdPaths []string    `json:"initrd"`
+	LiveImage   string      `json:"liveimg"`
+	InstallRepo string      `json:"install_repo"`
+	CommandLine string      `json:"cmdline"`
+}
+
+func NewBootImageList() BootImageList {
+	return make(BootImageList, 0)
 }

@@ -17,37 +17,12 @@ import (
 )
 
 type StaticBooter struct {
-	sync.RWMutex
-
-	bootImage *BootImage
-	hostList  map[string]*Host
+	DefaultBooter string
+	bootImageMap  sync.Map
+	hostMap       sync.Map
 }
 
-func (s *StaticBooter) GetBootImage(mac string) (*BootImage, error) {
-	return s.bootImage, nil
-}
-
-func NewStaticBooter(kernelPath string, initrdPaths []string, cmdline, liveImage, rootFS, installRepo string) (*StaticBooter, error) {
-	image := &BootImage{
-		KernelPath:  kernelPath,
-		InitrdPaths: initrdPaths,
-		CommandLine: cmdline,
-		LiveImage:   liveImage,
-		RootFS:      rootFS,
-		InstallRepo: installRepo,
-	}
-
-	booter := &StaticBooter{bootImage: image, hostList: make(map[string]*Host)}
-
-	return booter, nil
-}
-
-func (s *StaticBooter) LoadStaticHosts(reader io.Reader) error {
-	s.Lock()
-	defer s.Unlock()
-
-	s.hostList = make(map[string]*Host)
-
+func (s *StaticBooter) LoadHostTSV(reader io.Reader) error {
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
 		cols := strings.Split(scanner.Text(), "\t")
@@ -78,7 +53,7 @@ func (s *StaticBooter) LoadStaticHosts(reader io.Reader) error {
 			host.Provision = true
 		}
 
-		s.hostList[host.ID.String()] = host
+		s.hostMap.Store(host.Name, host)
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -94,10 +69,6 @@ func (s *StaticBooter) LoadDHCPLeases(reader io.Reader) error {
 		return errors.New("No hosts found. Is this a dhcpd.leasts file?")
 	}
 
-	s.Lock()
-	defer s.Unlock()
-
-	s.hostList = make(map[string]*Host)
 	for _, h := range hosts {
 		nic := &NetInterface{MAC: h.Hardware.MACAddr, IP: h.IP}
 
@@ -113,13 +84,13 @@ func (s *StaticBooter) LoadDHCPLeases(reader io.Reader) error {
 		host := &Host{ID: uuid}
 		host.Interfaces = []*NetInterface{nic}
 
-		s.hostList[host.ID.String()] = host
+		s.hostMap.Store(host.Name, host)
 	}
 
 	return nil
 }
 
-func (s *StaticBooter) LoadJSON(reader io.Reader) error {
+func (s *StaticBooter) LoadHostJSON(reader io.Reader) error {
 	jsonBlob, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return err
@@ -131,10 +102,6 @@ func (s *StaticBooter) LoadJSON(reader io.Reader) error {
 		return err
 	}
 
-	s.Lock()
-	defer s.Unlock()
-
-	s.hostList = make(map[string]*Host)
 	for _, h := range hostList {
 		if h.ID.IsNil() {
 			uuid, err := ksuid.NewRandom()
@@ -144,44 +111,68 @@ func (s *StaticBooter) LoadJSON(reader io.Reader) error {
 
 			h.ID = uuid
 		}
-		s.hostList[h.ID.String()] = h
+		s.hostMap.Store(h.Name, h)
 	}
 
 	return nil
 }
 
-func (s *StaticBooter) GetHostByID(id string) (*Host, error) {
-	s.RLock()
-	defer s.RUnlock()
-
-	if host, ok := s.hostList[id]; ok {
-		return host, nil
+func (s *StaticBooter) LoadBootImageJSON(reader io.Reader) error {
+	jsonBlob, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return err
 	}
 
-	return nil, fmt.Errorf("Host not found with id: %s", id)
-}
+	var bootImageList BootImageList
+	err = json.Unmarshal(jsonBlob, &bootImageList)
+	if err != nil {
+		return err
+	}
 
-func (s *StaticBooter) GetHostByName(name string) (*Host, error) {
-	s.RLock()
-	defer s.RUnlock()
+	for _, bi := range bootImageList {
+		if bi.ID.IsNil() {
+			uuid, err := ksuid.NewRandom()
+			if err != nil {
+				return err
+			}
 
-	for _, host := range s.hostList {
-		if name == host.Name {
-			return host, nil
+			bi.ID = uuid
 		}
+		s.bootImageMap.Store(bi.Name, bi)
 	}
 
-	return nil, fmt.Errorf("Host not found with name: %s", name)
+	return nil
 }
 
-func (s *StaticBooter) SaveHost(host *Host) error {
-	s.Lock()
-	defer s.Unlock()
-
-	if s.hostList == nil {
-		s.hostList = make(map[string]*Host)
+func (s *StaticBooter) LoadHostByName(name string) (*Host, error) {
+	if host, ok := s.hostMap.Load(name); ok {
+		return host.(*Host), nil
 	}
 
+	return nil, ErrNotFound
+}
+
+func (s *StaticBooter) LoadHostByID(id string) (*Host, error) {
+	var host *Host
+
+	s.hostMap.Range(func(key, value interface{}) bool {
+		h := value.(*Host)
+		if id == h.ID.String() {
+			host = h
+			return false
+		}
+
+		return true
+	})
+
+	if host == nil {
+		return nil, ErrNotFound
+	}
+
+	return host, nil
+}
+
+func (s *StaticBooter) StoreHost(host *Host) error {
 	if host.ID.IsNil() {
 		uuid, err := ksuid.NewRandom()
 		if err != nil {
@@ -190,36 +181,102 @@ func (s *StaticBooter) SaveHost(host *Host) error {
 		host.ID = uuid
 	}
 
-	s.hostList[host.ID.String()] = host
+	s.hostMap.Store(host.Name, host)
 
 	return nil
 }
 
-func (s *StaticBooter) HostList() (HostList, error) {
-	s.RLock()
-	defer s.RUnlock()
+func (s *StaticBooter) Hosts() (HostList, error) {
+	values := make(HostList, 0)
 
-	values := make(HostList, 0, len(s.hostList))
+	s.hostMap.Range(func(key, value interface{}) bool {
+		values = append(values, value.(*Host))
+		return true
+	})
 
-	for _, v := range s.hostList {
-		values = append(values, v)
-	}
 	return values, nil
 }
 
-func (s *StaticBooter) Find(ns *nodeset.NodeSet) (HostList, error) {
-	s.RLock()
-	defer s.RUnlock()
-
+func (s *StaticBooter) FindHosts(ns *nodeset.NodeSet) (HostList, error) {
 	values := make(HostList, 0)
 
 	it := ns.Iterator()
 	for it.Next() {
-		host, err := s.GetHostByName(it.Value())
+		host, err := s.LoadHostByName(it.Value())
 		if err == nil {
 			values = append(values, host)
 		}
 	}
 
 	return values, nil
+}
+
+func (s *StaticBooter) BootImages() (BootImageList, error) {
+	values := make(BootImageList, 0)
+
+	s.bootImageMap.Range(func(key, value interface{}) bool {
+		values = append(values, value.(*BootImage))
+		return true
+	})
+
+	return values, nil
+}
+
+func (s *StaticBooter) LoadBootImage(name string) (*BootImage, error) {
+	if name == "" {
+		name = s.DefaultBooter
+	}
+
+	if bootImage, ok := s.bootImageMap.Load(name); ok {
+		return bootImage.(*BootImage), nil
+	}
+
+	return nil, ErrNotFound
+}
+
+func (s *StaticBooter) DefaultBootImage() (*BootImage, error) {
+	return s.LoadBootImage(s.DefaultBooter)
+}
+
+func (s *StaticBooter) StoreBootImage(bootImage *BootImage) error {
+	if bootImage.ID.IsNil() {
+		uuid, err := ksuid.NewRandom()
+		if err != nil {
+			return err
+		}
+		bootImage.ID = uuid
+	}
+
+	s.bootImageMap.Store(bootImage.Name, bootImage)
+
+	return nil
+}
+
+func (s *StaticBooter) SetBootImage(ns *nodeset.NodeSet, imageName string) error {
+	image, err := s.LoadBootImage(imageName)
+	if err != nil {
+		return err
+	}
+
+	it := ns.Iterator()
+	for it.Next() {
+		host, err := s.LoadHostByName(it.Value())
+		if err == nil {
+			host.BootImage = image.Name
+		}
+	}
+
+	return nil
+}
+
+func (s *StaticBooter) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
+	it := ns.Iterator()
+	for it.Next() {
+		host, err := s.LoadHostByName(it.Value())
+		if err == nil {
+			host.Provision = provision
+		}
+	}
+
+	return nil
 }

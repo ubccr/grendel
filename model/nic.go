@@ -9,8 +9,8 @@ import (
 type NetInterface struct {
 	MAC  net.HardwareAddr `json:"mac" badgerhold:"unique" validate:"required"`
 	Name string           `json:"ifname"`
-	IP   net.IP           `json:"ip"`
-	FQDN string           `json:"fqdn"`
+	IP   net.IP           `json:"ip" badgerhold:"unique"`
+	FQDN string           `json:"fqdn" badgerhold:"unique"`
 	BMC  bool             `json:"bmc"`
 }
 

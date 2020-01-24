@@ -63,18 +63,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 
 	log.Debugf("iPXE Got valid boot claims %s: %v", c.QueryParam("token"), claims)
 
-	bootImage, err := h.DB.GetBootImage(claims.ID)
-	if err != nil {
-		log.WithFields(logrus.Fields{
-			"ip":      c.RealIP(),
-			"host_id": claims.ID,
-			"mac":     claims.MAC,
-			"err":     err,
-		}).Error("iPXE failed to find boot image for host")
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot image")
-	}
-
-	host, err := h.DB.GetHostByID(claims.ID)
+	host, err := h.DB.LoadHostByID(claims.ID)
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"ip":      c.RealIP(),
@@ -105,6 +94,17 @@ func (h *Handler) Ipxe(c echo.Context) error {
 			"err":     err,
 		}).Error("iPXE got invalid boot interface for host")
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot interface")
+	}
+
+	bootImage, err := h.DB.LoadBootImage(host.BootImage)
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"ip":      c.RealIP(),
+			"host_id": claims.ID,
+			"mac":     claims.MAC,
+			"err":     err,
+		}).Error("iPXE failed to find boot image for host")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot image")
 	}
 
 	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
@@ -148,24 +148,26 @@ func (h *Handler) File(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "missing MAC address parameter")
 	}
 
-	mac, err := net.ParseMAC(macStr)
+	host, err := h.DB.LoadHostByID(claims.ID)
 	if err != nil {
 		log.WithFields(logrus.Fields{
-			"ip":  c.RealIP(),
-			"mac": macStr,
-			"err": err,
-		}).Error("Bad request invalid MAC address")
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid MAC address")
+			"ip":      c.RealIP(),
+			"host_id": claims.ID,
+			"mac":     claims.MAC,
+			"err":     err,
+		}).Error("Bad request failed to find host")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid host")
 	}
 
-	bootImage, err := h.DB.GetBootImage(claims.ID)
+	bootImage, err := h.DB.LoadBootImage(host.BootImage)
 	if err != nil {
 		log.WithFields(logrus.Fields{
-			"ip":  c.RealIP(),
-			"mac": mac.String(),
-			"err": err,
-		}).Error("Failed to find bootspec for host")
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot spec")
+			"ip":      c.RealIP(),
+			"host_id": claims.ID,
+			"mac":     claims.MAC,
+			"err":     err,
+		}).Error("Bad request failed to find boot image for host")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot image")
 	}
 
 	_, fileType := path.Split(c.Request().URL.Path)
@@ -178,9 +180,6 @@ func (h *Handler) File(c echo.Context) error {
 
 	case fileType == "liveimg":
 		return c.File(bootImage.LiveImage)
-
-	case fileType == "rootfs":
-		return c.File(bootImage.RootFS)
 
 	case strings.HasPrefix(fileType, "initrd-"):
 		i, err := strconv.Atoi(fileType[7:])
@@ -204,18 +203,7 @@ func (h *Handler) Kickstart(c echo.Context) error {
 
 	log.Infof("Kickstart got valid boot claims: %v", claims)
 
-	bootImage, err := h.DB.GetBootImage(claims.ID)
-	if err != nil {
-		log.WithFields(logrus.Fields{
-			"ip":      c.RealIP(),
-			"host_id": claims.ID,
-			"mac":     claims.MAC,
-			"err":     err,
-		}).Error("Kickstart failed to find boot image for host")
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot spec")
-	}
-
-	host, err := h.DB.GetHostByID(claims.ID)
+	host, err := h.DB.LoadHostByID(claims.ID)
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"ip":      c.RealIP(),
@@ -224,6 +212,17 @@ func (h *Handler) Kickstart(c echo.Context) error {
 			"err":     err,
 		}).Error("Kickstart failed to find host")
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid host")
+	}
+
+	bootImage, err := h.DB.LoadBootImage(host.BootImage)
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"ip":      c.RealIP(),
+			"host_id": claims.ID,
+			"mac":     claims.MAC,
+			"err":     err,
+		}).Error("Kickstart failed to find boot image for host")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot image")
 	}
 
 	mac, err := net.ParseMAC(claims.MAC)

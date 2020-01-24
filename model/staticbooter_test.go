@@ -3,29 +3,41 @@ package model
 import (
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/ubccr/grendel/nodeset"
 )
 
 func TestStaticBooterLoadJSON(t *testing.T) {
-	test := strings.NewReader(TestHostListJSON)
+	testHostJSON := strings.NewReader(TestHostListJSON)
+	testBootImageJSON := strings.NewReader(TestBootImageListJSON)
 
-	staticBooter, err := NewStaticBooter("", []string{}, "", "", "", "")
-	if err != nil {
-		t.Fatal(err)
-	}
+	staticBooter := &StaticBooter{}
 
-	err = staticBooter.LoadJSON(test)
-	if err != nil {
-		t.Fatal(err)
-	}
+	err := staticBooter.LoadBootImageJSON(testBootImageJSON)
+	assert.Nil(t, err)
 
-	hostList, err := staticBooter.HostList()
-	if err != nil {
-		t.Fatal(err)
-	}
+	err = staticBooter.LoadHostJSON(testHostJSON)
+	assert.Nil(t, err)
 
-	if len(hostList) != 1 {
-		t.Errorf("Wrong size for host list from json")
-	}
+	hostList, err := staticBooter.Hosts()
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(hostList))
+	assert.Equal(t, "centos6", hostList[0].BootImage)
+
+	ns, err := nodeset.NewNodeSet("tux01")
+	assert.Nil(t, err)
+
+	err = staticBooter.SetBootImage(ns, "noexist")
+	assert.NotNil(t, err)
+
+	err = staticBooter.SetBootImage(ns, "centos7")
+	assert.Nil(t, err)
+
+	hostList, err = staticBooter.Hosts()
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(hostList))
+	assert.Equal(t, "centos7", hostList[0].BootImage)
 }
 
 const TestHostListJSON = `[
@@ -42,6 +54,19 @@ const TestHostListJSON = `[
             }
         ],
         "name": "tux01",
+        "boot_image": "centos6",
         "provision": true
+    }
+]`
+
+const TestBootImageListJSON = `[
+    {
+        "name": "centos7",
+        "kernel": "/usr/local/share/image-boot/centos/vmlinuz",
+        "initrd": [
+            "/usr/local/share/image-boot/centos/ccr-initrd.img"
+        ],
+        "liveimg": "/usr/local/share/image-boot/node/compute-node.squashfs",
+        "install_repo": "centos7"
     }
 ]`

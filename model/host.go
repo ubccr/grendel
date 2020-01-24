@@ -16,6 +16,7 @@ type Host struct {
 	Interfaces []*NetInterface `json:"interfaces"`
 	Provision  bool            `json:"provision"`
 	Firmware   firmware.Build  `json:"firmware"`
+	BootImage  string          `json:"boot_image"`
 }
 
 func (h *Host) Interface(mac net.HardwareAddr) *NetInterface {

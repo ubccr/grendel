@@ -76,7 +76,17 @@ func NewServeAllCommand() *cli.Command {
 }
 
 func runAllServices(c *cli.Context) error {
-	staticBooter, err := model.NewStaticBooter(c.String("kernel"), c.StringSlice("initrd"), c.String("cmdline"), c.String("liveimg"), c.String("rootfs"), c.String("install-repo"))
+	image := &model.BootImage{
+		KernelPath:  c.String("kernel"),
+		InitrdPaths: c.StringSlice("initrd"),
+		CommandLine: c.String("cmdline"),
+		LiveImage:   c.String("liveimg"),
+		InstallRepo: c.String("install-repo"),
+	}
+
+	staticBooter := &model.StaticBooter{}
+
+	err := staticBooter.StoreBootImage(image)
 	if err != nil {
 		return err
 	}
@@ -88,7 +98,7 @@ func runAllServices(c *cli.Context) error {
 		}
 		defer file.Close()
 
-		err = staticBooter.LoadStaticHosts(file)
+		err = staticBooter.LoadHostTSV(file)
 		if err != nil {
 			return err
 		}
@@ -114,7 +124,7 @@ func runAllServices(c *cli.Context) error {
 		}
 		defer file.Close()
 
-		err = staticBooter.LoadJSON(file)
+		err = staticBooter.LoadHostJSON(file)
 		if err != nil {
 			return err
 		}

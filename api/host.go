@@ -32,7 +32,7 @@ func (h *Handler) HostAdd(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid data")
 	}
 
-	err = h.DB.SaveHost(host)
+	err = h.DB.StoreHost(host)
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"ip":  c.RealIP(),
@@ -45,7 +45,7 @@ func (h *Handler) HostAdd(c echo.Context) error {
 }
 
 func (h *Handler) HostList(c echo.Context) error {
-	hostList, err := h.DB.HostList()
+	hostList, err := h.DB.Hosts()
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"ip":  c.RealIP(),
@@ -69,7 +69,7 @@ func (h *Handler) HostFind(c echo.Context) error {
 
 	log.Infof("Got nodeset: %s", nodeset.String())
 
-	hostList, err := h.DB.Find(nodeset)
+	hostList, err := h.DB.FindHosts(nodeset)
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"err": err,

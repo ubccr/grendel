@@ -10,25 +10,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestKVStoreDB(t *testing.T) {
-	dir := tempdir()
-	defer os.RemoveAll(dir)
-
-	store, err := NewKVStore(dir)
-	defer store.Close()
-
-	assert.Nil(t, err)
+func tempfile() string {
+	name, err := ioutil.TempFile("", "grendel-bunt-")
+	if err != nil {
+		panic(err)
+	}
+	return name.Name()
 }
 
-func TestKVStoreHost(t *testing.T) {
+func TestBuntStoreHost(t *testing.T) {
 	assert := assert.New(t)
 
-	dir := tempdir()
-	defer os.RemoveAll(dir)
-
-	store, err := NewKVStore(dir)
+	store, err := NewBuntStore(":memory:")
 	defer store.Close()
 	assert.NoError(err)
+
+	badhost := &Host{}
+	err = store.StoreHost(badhost)
+	assert.Error(ErrInvalidData, err)
 
 	host := HostFactory.MustCreate().(*Host)
 
@@ -50,21 +49,20 @@ func TestKVStoreHost(t *testing.T) {
 		assert.Equal(host.Name, testHost2.Name)
 		assert.True(host.Interfaces[0].IP.Equal(testHost2.Interfaces[0].IP))
 	}
-}
 
-func tempdir() string {
-	name, err := ioutil.TempDir("", "grendel-")
-	if err != nil {
-		panic(err)
+	testIPs, err := store.LoadNetInterfaces(host.Interfaces[0].FQDN)
+	if assert.Nil(err) {
+		assert.Equal(1, len(testIPs))
+		assert.Equal(host.Interfaces[0].IP.String(), testIPs[0].String())
 	}
-	return name
 }
 
-func BenchmarkKVStoreWriteHost(b *testing.B) {
-	dir := tempdir()
-	defer os.RemoveAll(dir)
+func BenchmarkBuntStoreWriteHost(b *testing.B) {
+	file := tempfile()
+	defer os.Remove(file)
 
-	store, err := NewKVStore(dir)
+	store, err := NewBuntStore(file)
+	defer store.Close()
 	if err != nil {
 		panic(err)
 	}
@@ -81,11 +79,11 @@ func BenchmarkKVStoreWriteHost(b *testing.B) {
 	}
 }
 
-func BenchmarkKVStoreReadHost(b *testing.B) {
-	dir := tempdir()
-	defer os.RemoveAll(dir)
+func BenchmarkBuntStoreReadHost(b *testing.B) {
+	file := tempfile()
+	defer os.Remove(file)
 
-	store, err := NewKVStore(dir)
+	store, err := NewBuntStore(file)
 	defer store.Close()
 	if err != nil {
 		panic(err)
@@ -108,7 +106,6 @@ func BenchmarkKVStoreReadHost(b *testing.B) {
 		b.RunParallel(func(pb *testing.PB) {
 			for pb.Next() {
 				pick := hosts[rand.Intn(size)]
-
 				_, err := store.LoadHostByID(pick.ID.String())
 				if err != nil {
 					panic(err)
@@ -118,7 +115,13 @@ func BenchmarkKVStoreReadHost(b *testing.B) {
 				if err != nil {
 					panic(err)
 				}
+
+				ips, err := store.LoadNetInterfaces(pick.Interfaces[0].FQDN)
+				if err != nil || len(ips) != 1 {
+					panic(err)
+				}
 			}
 		})
+
 	}
 }
