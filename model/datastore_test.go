@@ -64,7 +64,9 @@ func TestFactory(t *testing.T) {
 }
 
 func BenchmarkGJSONUnmarshall(b *testing.B) {
+	b.StopTimer()
 	jsonStr := string(TestHostJSON)
+	b.StartTimer()
 	for n := 0; n < b.N; n++ {
 		host := &Host{}
 		host.FromJSON(jsonStr)
@@ -72,9 +74,11 @@ func BenchmarkGJSONUnmarshall(b *testing.B) {
 }
 
 func BenchmarkGJSONMarshall(b *testing.B) {
+	b.StopTimer()
 	jsonStr := string(TestHostJSON)
 	host := &Host{}
 	host.FromJSON(jsonStr)
+	b.StartTimer()
 	for n := 0; n < b.N; n++ {
 		host.ToJSON()
 	}
@@ -91,11 +95,13 @@ func BenchmarkEncodeUnmarshall(b *testing.B) {
 }
 
 func BenchmarkEncodeMarshall(b *testing.B) {
+	b.StopTimer()
 	var host Host
 	err := json.Unmarshal(TestHostJSON, &host)
 	if err != nil {
 		panic(err)
 	}
+	b.StartTimer()
 	for n := 0; n < b.N; n++ {
 		_, err := json.Marshal(&host)
 		if err != nil {
