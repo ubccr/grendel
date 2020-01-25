@@ -33,24 +33,24 @@ func TestBuntStoreHost(t *testing.T) {
 	err = store.StoreHost(host)
 	assert.NoError(err)
 
-	testHost, err := store.LoadHostByID(host.ID.String())
+	testHost, err := store.LoadHostFromID(host.ID.String())
 	if assert.NoError(err) {
 		assert.Equal(2, len(testHost.Interfaces))
 	}
 
-	testHost2, err := store.LoadHostByName(host.Name)
+	testHost2, err := store.LoadHostFromName(host.Name)
 	if assert.NoError(err) {
 		assert.Equal(host.Name, testHost2.Name)
 		assert.True(host.Interfaces[0].IP.Equal(testHost2.Interfaces[0].IP))
 	}
 
-	testHost3, err := store.LoadHostByMAC(host.Interfaces[0].MAC.String())
+	testHost3, err := store.LoadHostFromMAC(host.Interfaces[0].MAC.String())
 	if assert.NoError(err) {
 		assert.Equal(host.Name, testHost3.Name)
 		assert.Equal(host.Interfaces[0].MAC.String(), testHost3.Interfaces[0].MAC.String())
 	}
 
-	testIPs, err := store.LoadNetInterfaces(host.Interfaces[0].FQDN)
+	testIPs, err := store.LoadIPsFromFQDN(host.Interfaces[0].FQDN)
 	if assert.NoError(err) {
 		assert.Equal(1, len(testIPs))
 		assert.Equal(host.Interfaces[0].IP.String(), testIPs[0].String())
@@ -62,17 +62,17 @@ func TestBuntStoreHost(t *testing.T) {
 		assert.True(errors.Is(err, ErrInvalidData))
 	}
 
-	_, err = store.LoadHostByID("notfound")
+	_, err = store.LoadHostFromID("notfound")
 	if assert.Error(err) {
 		assert.True(errors.Is(err, ErrNotFound))
 	}
 
-	_, err = store.LoadHostByName("notfound")
+	_, err = store.LoadHostFromName("notfound")
 	if assert.Error(err) {
 		assert.True(errors.Is(err, ErrNotFound))
 	}
 
-	_, err = store.LoadHostByMAC("notfound")
+	_, err = store.LoadHostFromMAC("notfound")
 	if assert.Error(err) {
 		assert.True(errors.Is(err, ErrNotFound))
 	}
@@ -239,7 +239,7 @@ func BenchmarkBuntStoreWriteHost(b *testing.B) {
 	store, err := NewBuntStore(file)
 	defer store.Close()
 	if err != nil {
-		panic(err)
+		b.Fatal(err)
 	}
 
 	size := 5000
@@ -249,7 +249,7 @@ func BenchmarkBuntStoreWriteHost(b *testing.B) {
 			host := HostFactory.MustCreate().(*Host)
 			err := store.StoreHost(host)
 			if err != nil {
-				panic(err)
+				b.Fatal(err)
 			}
 		}
 	}
@@ -262,7 +262,7 @@ func BenchmarkBuntStoreReadAll(b *testing.B) {
 	store, err := NewBuntStore(file)
 	defer store.Close()
 	if err != nil {
-		panic(err)
+		b.Fatal(err)
 	}
 
 	size := 5000
@@ -272,7 +272,7 @@ func BenchmarkBuntStoreReadAll(b *testing.B) {
 		host := HostFactory.MustCreate().(*Host)
 		err = store.StoreHost(host)
 		if err != nil {
-			panic(err)
+			b.Fatal(err)
 		}
 		hosts[i] = host
 	}
@@ -281,19 +281,19 @@ func BenchmarkBuntStoreReadAll(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		_, err := store.Hosts()
 		if err != nil {
-			panic(err)
+			b.Fatal(err)
 		}
 	}
 }
 
-func BenchmarkBuntStoreFind(b *testing.B) {
+func BenchmarkBuntStoreParallelFind(b *testing.B) {
 	file := tempfile()
 	defer os.Remove(file)
 
 	store, err := NewBuntStore(file)
 	defer store.Close()
 	if err != nil {
-		panic(err)
+		b.Fatal(err)
 	}
 
 	size := 5000
@@ -304,7 +304,7 @@ func BenchmarkBuntStoreFind(b *testing.B) {
 		host.Name = fmt.Sprintf("tux-%04d", i)
 		err = store.StoreHost(host)
 		if err != nil {
-			panic(err)
+			b.Fatal(err)
 		}
 		hosts[i] = host
 	}
@@ -325,30 +325,30 @@ func BenchmarkBuntStoreFind(b *testing.B) {
 
 				ns, err := nodeset.NewNodeSet(fmt.Sprintf("tux-[%04d-%04d]", start, end))
 				if err != nil {
-					panic(err)
+					b.Fatal(err)
 				}
 
 				hosts, err := store.FindHosts(ns)
 				if err != nil {
-					panic(err)
+					b.Fatal(err)
 				}
 
 				if len(hosts) != n+1 {
-					panic("Invalid length")
+					b.Fatal(err)
 				}
 			}
 		})
 	}
 }
 
-func BenchmarkBuntStoreRandomRead(b *testing.B) {
+func BenchmarkBuntStoreRandomParallelReads(b *testing.B) {
 	file := tempfile()
 	defer os.Remove(file)
 
 	store, err := NewBuntStore(file)
 	defer store.Close()
 	if err != nil {
-		panic(err)
+		b.Fatal(err)
 	}
 
 	size := 5000
@@ -358,7 +358,7 @@ func BenchmarkBuntStoreRandomRead(b *testing.B) {
 		host := HostFactory.MustCreate().(*Host)
 		err = store.StoreHost(host)
 		if err != nil {
-			panic(err)
+			b.Fatal(err)
 		}
 		hosts[i] = host
 	}
@@ -369,22 +369,54 @@ func BenchmarkBuntStoreRandomRead(b *testing.B) {
 		b.RunParallel(func(pb *testing.PB) {
 			for pb.Next() {
 				pick := hosts[rand.Intn(size)]
-				_, err := store.LoadHostByID(pick.ID.String())
+				_, err := store.LoadHostFromID(pick.ID.String())
 				if err != nil {
-					panic(err)
+					b.Fatal(err)
 				}
 
-				_, err = store.LoadHostByName(pick.Name)
+				_, err = store.LoadHostFromName(pick.Name)
 				if err != nil {
-					panic(err)
+					b.Fatal(err)
 				}
 
-				ips, err := store.LoadNetInterfaces(pick.Interfaces[0].FQDN)
+				ips, err := store.LoadIPsFromFQDN(pick.Interfaces[0].FQDN)
 				if err != nil || len(ips) != 1 {
-					panic(err)
+					b.Fatal(err)
 				}
 			}
 		})
 
+	}
+}
+
+func BenchmarkBuntStoreLoadIPsFromFQDN(b *testing.B) {
+	file := tempfile()
+	defer os.Remove(file)
+
+	store, err := NewBuntStore(file)
+	defer store.Close()
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	size := 5000
+	rand.Seed(time.Now().UnixNano())
+	hosts := make(HostList, size)
+	for i := 0; i < size; i++ {
+		host := HostFactory.MustCreate().(*Host)
+		err = store.StoreHost(host)
+		if err != nil {
+			b.Fatal(err)
+		}
+		hosts[i] = host
+	}
+
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		pick := hosts[rand.Intn(size)]
+		ips, err := store.LoadIPsFromFQDN(pick.Interfaces[0].FQDN)
+		if err != nil || len(ips) != 1 {
+			b.Fatal(err)
+		}
 	}
 }

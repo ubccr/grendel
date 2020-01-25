@@ -82,8 +82,8 @@ func (s *BuntStore) StoreHost(host *Host) error {
 	return err
 }
 
-// LoadHostByName returns the Host with the given name
-func (s *BuntStore) LoadHostByName(name string) (*Host, error) {
+// LoadHostFromName returns the Host with the given name
+func (s *BuntStore) LoadHostFromName(name string) (*Host, error) {
 	var host *Host
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
@@ -113,8 +113,8 @@ func (s *BuntStore) LoadHostByName(name string) (*Host, error) {
 	return host, nil
 }
 
-// LoadHostByID returns the Host with the given ID
-func (s *BuntStore) LoadHostByID(id string) (*Host, error) {
+// LoadHostFromID returns the Host with the given ID
+func (s *BuntStore) LoadHostFromID(id string) (*Host, error) {
 	hostJSON := ""
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
@@ -141,8 +141,8 @@ func (s *BuntStore) LoadHostByID(id string) (*Host, error) {
 	return host, nil
 }
 
-// LoadNetInterfaces returns the list of IPs with the given FQDN
-func (s *BuntStore) LoadNetInterfaces(fqdn string) ([]net.IP, error) {
+// LoadIPsFromFQDN returns the list of IPs with the given FQDN
+func (s *BuntStore) LoadIPsFromFQDN(fqdn string) ([]net.IP, error) {
 	ips := make([]net.IP, 0)
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
@@ -175,8 +175,8 @@ func (s *BuntStore) LoadNetInterfaces(fqdn string) ([]net.IP, error) {
 	return ips, nil
 }
 
-// LoadHostByMAC returns the Host that has a network interface with the give MAC address
-func (s *BuntStore) LoadHostByMAC(mac string) (*Host, error) {
+// LoadHostFromMAC returns the Host that has a network interface with the give MAC address
+func (s *BuntStore) LoadHostFromMAC(mac string) (*Host, error) {
 	hostJSON := ""
 
 	err := s.db.View(func(tx *buntdb.Tx) error {

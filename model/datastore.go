@@ -46,15 +46,15 @@ type Datastore interface {
 	// StoreHost stores a host in the data store. If the host exists it is overwritten
 	StoreHost(host *Host) error
 
-	// LoadHostByID returns the Host with the given ID
-	LoadHostByID(id string) (*Host, error)
+	// LoadHostFromID returns the Host with the given ID
+	LoadHostFromID(id string) (*Host, error)
 
-	// LoadHostByName returns the Host with the given name
-	LoadHostByName(name string) (*Host, error)
+	// LoadHostFromName returns the Host with the given name
+	LoadHostFromName(name string) (*Host, error)
 
-	// LoadHostByMAC returns the Host that has a network interface with the give MAC address
-	LoadHostByMAC(mac string) (*Host, error)
+	// LoadHostFromMAC returns the Host that has a network interface with the give MAC address
+	LoadHostFromMAC(mac string) (*Host, error)
 
-	// LoadNetInterfaces returns the list of IPs with the given FQDN
-	LoadNetInterfaces(fqdn string) ([]net.IP, error)
+	// LoadIPsFromFQDN returns the list of IPs with the given FQDN
+	LoadIPsFromFQDN(fqdn string) ([]net.IP, error)
 }

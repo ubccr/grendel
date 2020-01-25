@@ -87,7 +87,7 @@ func BenchmarkEncodeUnmarshall(b *testing.B) {
 		var host Host
 		err := json.Unmarshal(TestHostJSON, &host)
 		if err != nil {
-			panic(err)
+			b.Fatal(err)
 		}
 	}
 }
@@ -96,13 +96,13 @@ func BenchmarkEncodeMarshall(b *testing.B) {
 	var host Host
 	err := json.Unmarshal(TestHostJSON, &host)
 	if err != nil {
-		panic(err)
+		b.Fatal(err)
 	}
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		_, err := json.Marshal(&host)
 		if err != nil {
-			panic(err)
+			b.Fatal(err)
 		}
 	}
 }
