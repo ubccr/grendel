@@ -46,33 +46,44 @@ func (s *BuntStore) Close() error {
 
 // StoreHost stores a host in the data store. If the host exists it is overwritten
 func (s *BuntStore) StoreHost(host *Host) error {
-	if host.Name == "" {
-		return fmt.Errorf("name required:  %w", ErrInvalidData)
-	}
+	hostList := HostList{host}
+	return s.StoreHosts(hostList)
+}
 
-	// Keys are case-insensitive
-	host.Name = strings.ToLower(host.Name)
-
-	// XXX need to check for dups?
-	if host.ID.IsNil() {
-		uuid, err := ksuid.NewRandom()
-		if err != nil {
-			return err
+// StoreHosts stores a list of host in the data store. If the host exists it is overwritten
+func (s *BuntStore) StoreHosts(hosts HostList) error {
+	for _, host := range hosts {
+		if host.Name == "" {
+			return fmt.Errorf("name required:  %w", ErrInvalidData)
 		}
 
-		host.ID = uuid
+		// Keys are case-insensitive
+		host.Name = strings.ToLower(host.Name)
+
+		// XXX need to check for dups?
+		if host.ID.IsNil() {
+			uuid, err := ksuid.NewRandom()
+			if err != nil {
+				return err
+			}
+
+			host.ID = uuid
+		}
 	}
 
-	val, err := json.Marshal(host)
-	if err != nil {
-		return err
-	}
+	err := s.db.Update(func(tx *buntdb.Tx) error {
+		for _, host := range hosts {
+			val, err := json.Marshal(host)
+			if err != nil {
+				return err
+			}
 
-	hostJSON := string(val)
+			hostJSON := string(val)
 
-	err = s.db.Update(func(tx *buntdb.Tx) error {
-		_, _, err := tx.Set(HostKeyPrefix+":"+host.Name, hostJSON, nil)
-		return err
+			_, _, err = tx.Set(HostKeyPrefix+":"+host.Name, hostJSON, nil)
+			return err
+		}
+		return nil
 	})
 
 	if err != nil {

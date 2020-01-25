@@ -43,8 +43,11 @@ type Datastore interface {
 	// ProvisionHosts sets all hosts in the given NodeSet to provision (true) or unprovision (false)
 	ProvisionHosts(ns *nodeset.NodeSet, provision bool) error
 
-	// StoreHost stores a host in the data store. If the host exists it is overwritten
+	// StoreHosts stores a hosts in the data store. If the host exists it is overwritten
 	StoreHost(host *Host) error
+
+	// StoreHosts stores a list of hosts in the data store. If the host exists it is overwritten
+	StoreHosts(hosts HostList) error
 
 	// LoadHostFromID returns the Host with the given ID
 	LoadHostFromID(id string) (*Host, error)

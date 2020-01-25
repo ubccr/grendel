@@ -238,7 +238,7 @@ func TestBuntStoreBootImage(t *testing.T) {
 	}
 }
 
-func BenchmarkBuntStoreWriteHost(b *testing.B) {
+func BenchmarkBuntStoreWriteHosts(b *testing.B) {
 	file := tempfile()
 	defer os.Remove(file)
 
@@ -249,11 +249,40 @@ func BenchmarkBuntStoreWriteHost(b *testing.B) {
 	}
 
 	size := 5000
+	hosts := make(HostList, size)
+	for i := 0; i < size; i++ {
+		host := HostFactory.MustCreate().(*Host)
+		hosts[i] = host
+	}
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		err := store.StoreHosts(hosts)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+func BenchmarkBuntStoreWriteSingleHost(b *testing.B) {
+	file := tempfile()
+	defer os.Remove(file)
+
+	store, err := NewBuntStore(file)
+	defer store.Close()
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	size := 5000
+	hosts := make(HostList, size)
+	for i := 0; i < size; i++ {
+		host := HostFactory.MustCreate().(*Host)
+		hosts[i] = host
+	}
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		for i := 0; i < size; i++ {
-			host := HostFactory.MustCreate().(*Host)
-			err := store.StoreHost(host)
+			err := store.StoreHost(hosts[i])
 			if err != nil {
 				b.Fatal(err)
 			}
