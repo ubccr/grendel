@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"net"
 	"testing"
 
@@ -9,6 +10,8 @@ import (
 	"github.com/segmentio/ksuid"
 	"github.com/stretchr/testify/assert"
 )
+
+var TestHostJSON = []byte(`{"firmware": "","id": "1VCnR6qevU5BbihTIvZEhX002CI","interfaces": [{"bmc": false,"fqdn": "tux01.compute.local", "ifname": "", "ip": "10.10.1.2", "mac": "d0:93:ae:e1:b5:2e" } ], "name": "tux01", "boot_image": "centos6", "provision": true }`)
 
 var NetInterfaceFactory = factory.NewFactory(
 	&NetInterface{},
@@ -38,6 +41,14 @@ var HostFactory = factory.NewFactory(
 	return nil
 }).SubSliceFactory("Interfaces", NetInterfaceFactory, func() int { return 2 })
 
+var BootImageFactory = factory.NewFactory(
+	&BootImage{},
+).Attr("Name", func(args factory.Args) (interface{}, error) {
+	return randomdata.Alphanumeric(randomdata.Number(2, 10)), nil
+}).Attr("KernelPath", func(args factory.Args) (interface{}, error) {
+	return randomdata.Alphanumeric(randomdata.Number(5, 50)), nil
+})
+
 func TestFactory(t *testing.T) {
 	assert := assert.New(t)
 
@@ -46,5 +57,49 @@ func TestFactory(t *testing.T) {
 		assert.Greater(len(host.Name), 1)
 		assert.Equal(2, len(host.Interfaces))
 		assert.False(host.ID.IsNil())
+
+		image := BootImageFactory.MustCreate().(*BootImage)
+		assert.Greater(len(image.Name), 1)
+	}
+}
+
+func BenchmarkGJSONUnmarshall(b *testing.B) {
+	jsonStr := string(TestHostJSON)
+	for n := 0; n < b.N; n++ {
+		host := &Host{}
+		host.FromJSON(jsonStr)
+	}
+}
+
+func BenchmarkGJSONMarshall(b *testing.B) {
+	jsonStr := string(TestHostJSON)
+	host := &Host{}
+	host.FromJSON(jsonStr)
+	for n := 0; n < b.N; n++ {
+		host.ToJSON()
+	}
+}
+
+func BenchmarkEncodeUnmarshall(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		var host Host
+		err := json.Unmarshal(TestHostJSON, &host)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func BenchmarkEncodeMarshall(b *testing.B) {
+	var host Host
+	err := json.Unmarshal(TestHostJSON, &host)
+	if err != nil {
+		panic(err)
+	}
+	for n := 0; n < b.N; n++ {
+		_, err := json.Marshal(&host)
+		if err != nil {
+			panic(err)
+		}
 	}
 }

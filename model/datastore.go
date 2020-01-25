@@ -28,9 +28,6 @@ type Datastore interface {
 	// LoadBootImage returns a BootImage with the given name
 	LoadBootImage(name string) (*BootImage, error)
 
-	// DefaultBootImage returns the default BootImage
-	DefaultBootImage() (*BootImage, error)
-
 	// StoreBootImage stores the BootImage in the data store
 	StoreBootImage(image *BootImage) error
 
@@ -54,6 +51,9 @@ type Datastore interface {
 
 	// LoadHostByName returns the Host with the given name
 	LoadHostByName(name string) (*Host, error)
+
+	// LoadHostByMAC returns the Host that has a network interface with the give MAC address
+	LoadHostByMAC(mac string) (*Host, error)
 
 	// LoadNetInterfaces returns the list of IPs with the given FQDN
 	LoadNetInterfaces(fqdn string) ([]net.IP, error)

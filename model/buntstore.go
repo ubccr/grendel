@@ -14,6 +14,11 @@ import (
 	"github.com/ubccr/grendel/nodeset"
 )
 
+const (
+	HostKeyPrefix      = "host"
+	BootImageKeyPrefix = "host"
+)
+
 // BuntStore implements a Grendel Datastore using BuntDB
 type BuntStore struct {
 	db *buntdb.DB
@@ -26,7 +31,7 @@ func NewBuntStore(filename string) (*BuntStore, error) {
 		return nil, err
 	}
 
-	err = db.CreateIndex("id", "hosts:*", buntdb.IndexJSON("id"))
+	err = db.CreateIndex("id", HostKeyPrefix+":*", buntdb.IndexJSON("id"))
 	if err != nil && err != buntdb.ErrIndexExists {
 		return nil, err
 	}
@@ -48,6 +53,7 @@ func (s *BuntStore) StoreHost(host *Host) error {
 	// Keys are case-insensitive
 	host.Name = strings.ToLower(host.Name)
 
+	// XXX need to check for dups?
 	if host.ID.IsNil() {
 		uuid, err := ksuid.NewRandom()
 		if err != nil {
@@ -65,7 +71,7 @@ func (s *BuntStore) StoreHost(host *Host) error {
 	hostJSON := string(val)
 
 	err = s.db.Update(func(tx *buntdb.Tx) error {
-		_, _, err := tx.Set("hosts:"+host.Name, hostJSON, nil)
+		_, _, err := tx.Set(HostKeyPrefix+":"+host.Name, hostJSON, nil)
 		return err
 	})
 
@@ -81,7 +87,7 @@ func (s *BuntStore) LoadHostByName(name string) (*Host, error) {
 	var host *Host
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
-		val, err := tx.Get("hosts:"+name, false)
+		val, err := tx.Get(HostKeyPrefix+":"+name, false)
 		if err != nil {
 			if err != buntdb.ErrNotFound {
 				return err
@@ -90,13 +96,9 @@ func (s *BuntStore) LoadHostByName(name string) (*Host, error) {
 			return nil
 		}
 
-		var h Host
-		err = json.Unmarshal([]byte(val), &h)
-		if err != nil {
-			return err
-		}
+		host = &Host{}
+		host.FromJSON(val)
 
-		host = &h
 		return nil
 	})
 
@@ -134,13 +136,9 @@ func (s *BuntStore) LoadHostByID(id string) (*Host, error) {
 		return nil, fmt.Errorf("host with id %s:  %w", id, ErrNotFound)
 	}
 
-	var host Host
-	err = json.Unmarshal([]byte(hostJSON), &host)
-	if err != nil {
-		return nil, err
-	}
-
-	return &host, nil
+	host := &Host{}
+	host.FromJSON(hostJSON)
+	return host, nil
 }
 
 // LoadNetInterfaces returns the list of IPs with the given FQDN
@@ -148,7 +146,7 @@ func (s *BuntStore) LoadNetInterfaces(fqdn string) ([]net.IP, error) {
 	ips := make([]net.IP, 0)
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
-		err := tx.AscendKeys("hosts:*", func(key, value string) bool {
+		err := tx.AscendKeys(HostKeyPrefix+":*", func(key, value string) bool {
 			res := gjson.Get(value, "interfaces")
 			for _, i := range res.Array() {
 				if i.Get("fqdn").String() == fqdn {
@@ -177,21 +175,48 @@ func (s *BuntStore) LoadNetInterfaces(fqdn string) ([]net.IP, error) {
 	return ips, nil
 }
 
+// LoadHostByMAC returns the Host that has a network interface with the give MAC address
+func (s *BuntStore) LoadHostByMAC(mac string) (*Host, error) {
+	hostJSON := ""
+
+	err := s.db.View(func(tx *buntdb.Tx) error {
+		err := tx.AscendKeys(HostKeyPrefix+":*", func(key, value string) bool {
+			res := gjson.Get(value, "interfaces")
+			for _, i := range res.Array() {
+				if i.Get("mac").String() == mac {
+					hostJSON = value
+					return false
+				}
+			}
+
+			return true
+		})
+
+		return err
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if hostJSON == "" {
+		return nil, fmt.Errorf("no host found with mac address %s:  %w", mac, ErrNotFound)
+	}
+
+	host := &Host{}
+	host.FromJSON(hostJSON)
+	return host, nil
+}
+
 // Hosts returns a list of all the hosts
 func (s *BuntStore) Hosts() (HostList, error) {
 	hosts := make(HostList, 0)
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
-		err := tx.AscendKeys("hosts:*", func(key, value string) bool {
-			var h Host
-			err := json.Unmarshal([]byte(value), &h)
-			if err == nil {
-				hosts = append(hosts, &h)
-			} else {
-				log.WithFields(logrus.Fields{
-					"err": err,
-				}).Warn("Invalid host json stored in db")
-			}
+		err := tx.AscendKeys(HostKeyPrefix+":*", func(key, value string) bool {
+			h := &Host{}
+			h.FromJSON(value)
+			hosts = append(hosts, h)
 			return true
 		})
 
@@ -213,7 +238,7 @@ func (s *BuntStore) FindHosts(ns *nodeset.NodeSet) (HostList, error) {
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
 		for it.Next() {
-			val, err := tx.Get("hosts:"+it.Value(), false)
+			val, err := tx.Get(HostKeyPrefix+":"+it.Value(), false)
 			if err != nil {
 				if err != buntdb.ErrNotFound {
 					return err
@@ -221,13 +246,9 @@ func (s *BuntStore) FindHosts(ns *nodeset.NodeSet) (HostList, error) {
 				continue
 			}
 
-			var h Host
-			err = json.Unmarshal([]byte(val), &h)
-			if err != nil {
-				return err
-			}
-
-			hosts = append(hosts, &h)
+			h := &Host{}
+			h.FromJSON(val)
+			hosts = append(hosts, h)
 		}
 		return nil
 	})
@@ -245,7 +266,7 @@ func (s *BuntStore) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
 
 	err := s.db.Update(func(tx *buntdb.Tx) error {
 		for it.Next() {
-			key := "hosts:" + it.Value()
+			key := HostKeyPrefix + ":" + it.Value()
 			val, err := tx.Get(key, false)
 			if err != nil {
 				if err != buntdb.ErrNotFound {
@@ -272,4 +293,140 @@ func (s *BuntStore) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
 	}
 
 	return nil
+}
+
+// SetBootImage sets all hosts to use the BootImage with the given name
+func (s *BuntStore) SetBootImage(ns *nodeset.NodeSet, name string) error {
+	it := ns.Iterator()
+
+	err := s.db.Update(func(tx *buntdb.Tx) error {
+		for it.Next() {
+			key := HostKeyPrefix + ":" + it.Value()
+			val, err := tx.Get(key, false)
+			if err != nil {
+				if err != buntdb.ErrNotFound {
+					return err
+				}
+				continue
+			}
+
+			val, err = sjson.Set(val, "boot_image", name)
+			if err != nil {
+				return err
+			}
+
+			_, _, err = tx.Set(key, val, nil)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// StoreBootImage stores the BootImage in the data store
+func (s *BuntStore) StoreBootImage(image *BootImage) error {
+	if image.Name == "" {
+		return fmt.Errorf("name required:  %w", ErrInvalidData)
+	}
+
+	// Keys are case-insensitive
+	image.Name = strings.ToLower(image.Name)
+
+	// XXX need to check for dups?
+	if image.ID.IsNil() {
+		uuid, err := ksuid.NewRandom()
+		if err != nil {
+			return err
+		}
+
+		image.ID = uuid
+	}
+
+	val, err := json.Marshal(image)
+	if err != nil {
+		return err
+	}
+
+	imageJSON := string(val)
+
+	err = s.db.Update(func(tx *buntdb.Tx) error {
+		_, _, err := tx.Set(BootImageKeyPrefix+":"+image.Name, imageJSON, nil)
+		return err
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+// LoadBootImage returns a BootImage with the given name
+func (s *BuntStore) LoadBootImage(name string) (*BootImage, error) {
+	var image *BootImage
+
+	err := s.db.View(func(tx *buntdb.Tx) error {
+		val, err := tx.Get(BootImageKeyPrefix+":"+name, false)
+		if err != nil {
+			if err != buntdb.ErrNotFound {
+				return err
+			}
+
+			return nil
+		}
+
+		var i BootImage
+		err = json.Unmarshal([]byte(val), &i)
+		if err != nil {
+			return err
+		}
+
+		image = &i
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if image == nil {
+		return nil, fmt.Errorf("boot image with name %s:  %w", name, ErrNotFound)
+	}
+
+	return image, nil
+}
+
+// BootImages returns a list of all boot images
+func (s *BuntStore) BootImages() (BootImageList, error) {
+	images := make(BootImageList, 0)
+
+	err := s.db.View(func(tx *buntdb.Tx) error {
+		err := tx.AscendKeys(BootImageKeyPrefix+":*", func(key, value string) bool {
+			var i BootImage
+			err := json.Unmarshal([]byte(value), &i)
+			if err == nil {
+				images = append(images, &i)
+			} else {
+				log.WithFields(logrus.Fields{
+					"err": err,
+				}).Warn("Invalid boot image json stored in db")
+			}
+			return true
+		})
+
+		return err
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return images, nil
 }

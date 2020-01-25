@@ -44,6 +44,12 @@ func TestBuntStoreHost(t *testing.T) {
 		assert.True(host.Interfaces[0].IP.Equal(testHost2.Interfaces[0].IP))
 	}
 
+	testHost3, err := store.LoadHostByMAC(host.Interfaces[0].MAC.String())
+	if assert.NoError(err) {
+		assert.Equal(host.Name, testHost3.Name)
+		assert.Equal(host.Interfaces[0].MAC.String(), testHost3.Interfaces[0].MAC.String())
+	}
+
 	testIPs, err := store.LoadNetInterfaces(host.Interfaces[0].FQDN)
 	if assert.NoError(err) {
 		assert.Equal(1, len(testIPs))
@@ -62,6 +68,11 @@ func TestBuntStoreHost(t *testing.T) {
 	}
 
 	_, err = store.LoadHostByName("notfound")
+	if assert.Error(err) {
+		assert.True(errors.Is(err, ErrNotFound))
+	}
+
+	_, err = store.LoadHostByMAC("notfound")
 	if assert.Error(err) {
 		assert.True(errors.Is(err, ErrNotFound))
 	}
@@ -142,6 +153,82 @@ func TestBuntStoreProvision(t *testing.T) {
 		for _, host := range hosts {
 			assert.True(host.Provision)
 		}
+	}
+}
+
+func TestBuntStoreSetBootImage(t *testing.T) {
+	assert := assert.New(t)
+
+	store, err := NewBuntStore(":memory:")
+	defer store.Close()
+	assert.NoError(err)
+
+	size := 20
+	for i := 0; i < size; i++ {
+		host := HostFactory.MustCreate().(*Host)
+		host.Name = fmt.Sprintf("tux-%02d", i)
+		err := store.StoreHost(host)
+		assert.NoError(err)
+	}
+
+	ns, err := nodeset.NewNodeSet("tux-[05-14]")
+	if assert.NoError(err) {
+		hosts, err := store.FindHosts(ns)
+		assert.NoError(err)
+		assert.Equal(10, len(hosts))
+		for _, host := range hosts {
+			assert.Equal("", host.BootImage)
+		}
+
+		err = store.SetBootImage(ns, "centos7")
+		assert.NoError(err)
+
+		hosts, err = store.FindHosts(ns)
+		assert.NoError(err)
+		assert.Equal(10, len(hosts))
+		for _, host := range hosts {
+			assert.Equal("centos7", host.BootImage)
+		}
+	}
+}
+
+func TestBuntStoreBootImage(t *testing.T) {
+	assert := assert.New(t)
+
+	store, err := NewBuntStore(":memory:")
+	defer store.Close()
+	assert.NoError(err)
+
+	image := BootImageFactory.MustCreate().(*BootImage)
+
+	err = store.StoreBootImage(image)
+	assert.NoError(err)
+
+	testImage, err := store.LoadBootImage(image.Name)
+	if assert.NoError(err) {
+		assert.Equal(image.Name, testImage.Name)
+	}
+
+	badimage := &BootImage{}
+	err = store.StoreBootImage(badimage)
+	if assert.Error(err) {
+		assert.True(errors.Is(err, ErrInvalidData))
+	}
+
+	_, err = store.LoadBootImage("notfound")
+	if assert.Error(err) {
+		assert.True(errors.Is(err, ErrNotFound))
+	}
+
+	for i := 0; i < 5; i++ {
+		image := BootImageFactory.MustCreate().(*BootImage)
+		err := store.StoreBootImage(image)
+		assert.NoError(err)
+	}
+
+	images, err := store.BootImages()
+	if assert.NoError(err) {
+		assert.Equal(6, len(images))
 	}
 }
 

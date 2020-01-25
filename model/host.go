@@ -7,12 +7,14 @@ import (
 	"net"
 
 	"github.com/segmentio/ksuid"
+	"github.com/tidwall/gjson"
+	"github.com/tidwall/sjson"
 	"github.com/ubccr/grendel/firmware"
 )
 
 type Host struct {
-	ID         ksuid.KSUID     `json:"id" badgerhold:"index"`
-	Name       string          `json:"name" badgerhold:"unique" validate:"required,hostname"`
+	ID         ksuid.KSUID     `json:"id"`
+	Name       string          `json:"name" validate:"required,hostname"`
 	Interfaces []*NetInterface `json:"interfaces"`
 	Provision  bool            `json:"provision"`
 	Firmware   firmware.Build  `json:"firmware"`
@@ -37,6 +39,49 @@ func (h *Host) InterfaceBMC() *NetInterface {
 	}
 
 	return nil
+}
+
+func (h *Host) FromJSON(hostJSON string) {
+	h.Name = gjson.Get(hostJSON, "name").String()
+	h.BootImage = gjson.Get(hostJSON, "boot_image").String()
+	h.Provision = gjson.Get(hostJSON, "provision").Bool()
+	h.ID, _ = ksuid.Parse(gjson.Get(hostJSON, "id").String())
+	h.Firmware = firmware.NewFromString(gjson.Get(hostJSON, "firmware").String())
+
+	h.Interfaces = make([]*NetInterface, 0)
+	res := gjson.Get(hostJSON, "interfaces")
+	for _, i := range res.Array() {
+		nic := &NetInterface{}
+		nic.Name = i.Get("name").String()
+		nic.FQDN = i.Get("fqdn").String()
+		nic.BMC = i.Get("bmc").Bool()
+		nic.IP = net.ParseIP(i.Get("ip").String())
+		nic.MAC, _ = net.ParseMAC(i.Get("mac").String())
+		h.Interfaces = append(h.Interfaces, nic)
+	}
+}
+
+func (h *Host) ToJSON() string {
+	hostJSON := `{"id": "", "firmware": "", "interfaces": [], "name": "", "provision": false, "boot_image": ""}`
+
+	hostJSON, _ = sjson.Set(hostJSON, "id", h.ID.String())
+	hostJSON, _ = sjson.Set(hostJSON, "name", h.Name)
+	hostJSON, _ = sjson.Set(hostJSON, "boot_image", h.BootImage)
+	hostJSON, _ = sjson.Set(hostJSON, "firmware", h.Firmware.String())
+	hostJSON, _ = sjson.Set(hostJSON, "provision", h.Provision)
+
+	for _, nic := range h.Interfaces {
+		n := map[string]interface{}{
+			"mac":    nic.MAC.String(),
+			"ip":     nic.IP.String(),
+			"ifname": nic.Name,
+			"fqdn":   nic.FQDN,
+			"bmc":    nic.BMC,
+		}
+		hostJSON, _ = sjson.Set(hostJSON, "interfaces.-1", n)
+	}
+
+	return hostJSON
 }
 
 func (h *Host) MarshalJSON() ([]byte, error) {

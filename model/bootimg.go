@@ -7,7 +7,7 @@ import (
 type BootImageList []*BootImage
 
 type BootImage struct {
-	ID          ksuid.KSUID `json:"id" badgerhold:"index"`
+	ID          ksuid.KSUID `json:"id"`
 	Name        string      `json:"name"`
 	KernelPath  string      `json:"kernel"`
 	InitrdPaths []string    `json:"initrd"`
