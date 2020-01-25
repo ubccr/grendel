@@ -149,8 +149,8 @@ func (s *BuntStore) LoadHostFromID(id string) (*Host, error) {
 	return host, nil
 }
 
-// ResolveFQDN returns the list of IPs with the given FQDN
-func (s *BuntStore) ResolveFQDN(fqdn string) ([]net.IP, error) {
+// ResolveIPv4 returns the list of IPv4 addresses with the given FQDN
+func (s *BuntStore) ResolveIPv4(fqdn string) ([]net.IP, error) {
 	ips := make([]net.IP, 0)
 
 	err := s.db.View(func(tx *buntdb.Tx) error {

@@ -50,7 +50,7 @@ func TestBuntStoreHost(t *testing.T) {
 		assert.Equal(host.Interfaces[0].MAC.String(), testHost3.Interfaces[0].MAC.String())
 	}
 
-	testIPs, err := store.ResolveFQDN(host.Interfaces[0].FQDN)
+	testIPs, err := store.ResolveIPv4(host.Interfaces[0].FQDN)
 	if assert.NoError(err) {
 		assert.Equal(1, len(testIPs))
 		assert.Equal(host.Interfaces[0].IP.String(), testIPs[0].String())
@@ -420,7 +420,7 @@ func BenchmarkBuntStoreRandomParallelReads(b *testing.B) {
 					b.Fatal(err)
 				}
 
-				ips, err := store.ResolveFQDN(pick.Interfaces[0].FQDN)
+				ips, err := store.ResolveIPv4(pick.Interfaces[0].FQDN)
 				if err != nil || len(ips) != 1 {
 					b.Fatal(err)
 				}
@@ -430,7 +430,7 @@ func BenchmarkBuntStoreRandomParallelReads(b *testing.B) {
 	}
 }
 
-func BenchmarkBuntStoreResolveFQDN(b *testing.B) {
+func BenchmarkBuntStoreResolveIPv4(b *testing.B) {
 	file := tempfile()
 	defer os.Remove(file)
 
@@ -456,7 +456,7 @@ func BenchmarkBuntStoreResolveFQDN(b *testing.B) {
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		pick := hosts[rand.Intn(size)]
-		ips, err := store.ResolveFQDN(pick.Interfaces[0].FQDN)
+		ips, err := store.ResolveIPv4(pick.Interfaces[0].FQDN)
 		if err != nil {
 			b.Fatal(err)
 		}
