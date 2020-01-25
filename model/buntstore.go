@@ -141,8 +141,8 @@ func (s *BuntStore) LoadHostFromID(id string) (*Host, error) {
 	return host, nil
 }
 
-// LoadIPsFromFQDN returns the list of IPs with the given FQDN
-func (s *BuntStore) LoadIPsFromFQDN(fqdn string) ([]net.IP, error) {
+// ResolveFQDN returns the list of IPs with the given FQDN
+func (s *BuntStore) ResolveFQDN(fqdn string) ([]net.IP, error) {
 	ips := make([]net.IP, 0)
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
@@ -154,6 +154,8 @@ func (s *BuntStore) LoadIPsFromFQDN(fqdn string) ([]net.IP, error) {
 					if ip != nil && ip.To4() != nil {
 						ips = append(ips, ip)
 					}
+
+					// XXX stop after first match. consider changing this
 					return false
 				}
 			}
@@ -168,11 +170,39 @@ func (s *BuntStore) LoadIPsFromFQDN(fqdn string) ([]net.IP, error) {
 		return nil, err
 	}
 
-	if len(ips) == 0 {
-		return nil, fmt.Errorf("interfaces with fqdn %s:  %w", fqdn, ErrNotFound)
+	return ips, nil
+}
+
+// ReverseResolve returns the list of FQDNs for the given IP
+func (s *BuntStore) ReverseResolve(ip string) ([]string, error) {
+	fqdn := make([]string, 0)
+
+	err := s.db.View(func(tx *buntdb.Tx) error {
+		err := tx.AscendKeys(HostKeyPrefix+":*", func(key, value string) bool {
+			res := gjson.Get(value, "interfaces")
+			for _, i := range res.Array() {
+				if i.Get("ip").String() == ip {
+					name := i.Get("fqdn").String()
+					if name != "" {
+						fqdn = append(fqdn, name)
+					}
+
+					// XXX stop after first match. consider changing this
+					return false
+				}
+			}
+
+			return true
+		})
+
+		return err
+	})
+
+	if err != nil {
+		return nil, err
 	}
 
-	return ips, nil
+	return fqdn, nil
 }
 
 // LoadHostFromMAC returns the Host that has a network interface with the give MAC address

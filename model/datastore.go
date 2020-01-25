@@ -55,6 +55,9 @@ type Datastore interface {
 	// LoadHostFromMAC returns the Host that has a network interface with the give MAC address
 	LoadHostFromMAC(mac string) (*Host, error)
 
-	// LoadIPsFromFQDN returns the list of IPs with the given FQDN
+	// ResolveFQDN returns the list of IPs with the given FQDN
 	LoadIPsFromFQDN(fqdn string) ([]net.IP, error)
+
+	// ReverseResolve returns the list of FQDNs for the given IP
+	ReverseResolve(ip string) ([]string, error)
 }

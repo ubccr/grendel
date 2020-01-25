@@ -50,10 +50,16 @@ func TestBuntStoreHost(t *testing.T) {
 		assert.Equal(host.Interfaces[0].MAC.String(), testHost3.Interfaces[0].MAC.String())
 	}
 
-	testIPs, err := store.LoadIPsFromFQDN(host.Interfaces[0].FQDN)
+	testIPs, err := store.ResolveFQDN(host.Interfaces[0].FQDN)
 	if assert.NoError(err) {
 		assert.Equal(1, len(testIPs))
 		assert.Equal(host.Interfaces[0].IP.String(), testIPs[0].String())
+	}
+
+	testNames, err := store.ReverseResolve(host.Interfaces[0].IP.String())
+	if assert.NoError(err) {
+		assert.Equal(1, len(testNames))
+		assert.Equal(host.Interfaces[0].FQDN, testNames[0])
 	}
 
 	badhost := &Host{}
@@ -379,7 +385,7 @@ func BenchmarkBuntStoreRandomParallelReads(b *testing.B) {
 					b.Fatal(err)
 				}
 
-				ips, err := store.LoadIPsFromFQDN(pick.Interfaces[0].FQDN)
+				ips, err := store.ResolveFQDN(pick.Interfaces[0].FQDN)
 				if err != nil || len(ips) != 1 {
 					b.Fatal(err)
 				}
@@ -389,7 +395,7 @@ func BenchmarkBuntStoreRandomParallelReads(b *testing.B) {
 	}
 }
 
-func BenchmarkBuntStoreLoadIPsFromFQDN(b *testing.B) {
+func BenchmarkBuntStoreResolveFQDN(b *testing.B) {
 	file := tempfile()
 	defer os.Remove(file)
 
@@ -414,8 +420,40 @@ func BenchmarkBuntStoreLoadIPsFromFQDN(b *testing.B) {
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		pick := hosts[rand.Intn(size)]
-		ips, err := store.LoadIPsFromFQDN(pick.Interfaces[0].FQDN)
+		ips, err := store.ResolveFQDN(pick.Interfaces[0].FQDN)
 		if err != nil || len(ips) != 1 {
+			b.Fatal(err)
+		}
+	}
+}
+
+func BenchmarkBuntStoreReverseResolve(b *testing.B) {
+	file := tempfile()
+	defer os.Remove(file)
+
+	store, err := NewBuntStore(file)
+	defer store.Close()
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	size := 5000
+	rand.Seed(time.Now().UnixNano())
+	hosts := make(HostList, size)
+	for i := 0; i < size; i++ {
+		host := HostFactory.MustCreate().(*Host)
+		err = store.StoreHost(host)
+		if err != nil {
+			b.Fatal(err)
+		}
+		hosts[i] = host
+	}
+
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		pick := hosts[rand.Intn(size)]
+		names, err := store.ReverseResolve(pick.Interfaces[0].IP.String())
+		if err != nil || len(names) != 1 {
 			b.Fatal(err)
 		}
 	}
