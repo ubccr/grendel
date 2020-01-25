@@ -14,6 +14,7 @@ import (
 	"github.com/segmentio/ksuid"
 	"github.com/ubccr/go-dhcpd-leases"
 	"github.com/ubccr/grendel/nodeset"
+	"github.com/ubccr/grendel/util"
 )
 
 type StaticBooter struct {
@@ -144,7 +145,7 @@ func (s *StaticBooter) LoadBootImageJSON(reader io.Reader) error {
 	return nil
 }
 
-func (s *StaticBooter) LoadHostByName(name string) (*Host, error) {
+func (s *StaticBooter) LoadHostFromName(name string) (*Host, error) {
 	if host, ok := s.hostMap.Load(name); ok {
 		return host.(*Host), nil
 	}
@@ -152,7 +153,7 @@ func (s *StaticBooter) LoadHostByName(name string) (*Host, error) {
 	return nil, ErrNotFound
 }
 
-func (s *StaticBooter) LoadHostByID(id string) (*Host, error) {
+func (s *StaticBooter) LoadHostFromID(id string) (*Host, error) {
 	var host *Host
 
 	s.hostMap.Range(func(key, value interface{}) bool {
@@ -170,6 +171,17 @@ func (s *StaticBooter) LoadHostByID(id string) (*Host, error) {
 	}
 
 	return host, nil
+}
+
+func (s *StaticBooter) StoreHosts(hosts HostList) error {
+	for _, host := range hosts {
+		err := s.StoreHost(host)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (s *StaticBooter) StoreHost(host *Host) error {
@@ -202,7 +214,7 @@ func (s *StaticBooter) FindHosts(ns *nodeset.NodeSet) (HostList, error) {
 
 	it := ns.Iterator()
 	for it.Next() {
-		host, err := s.LoadHostByName(it.Value())
+		host, err := s.LoadHostFromName(it.Value())
 		if err == nil {
 			values = append(values, host)
 		}
@@ -260,7 +272,7 @@ func (s *StaticBooter) SetBootImage(ns *nodeset.NodeSet, imageName string) error
 
 	it := ns.Iterator()
 	for it.Next() {
-		host, err := s.LoadHostByName(it.Value())
+		host, err := s.LoadHostFromName(it.Value())
 		if err == nil {
 			host.BootImage = image.Name
 		}
@@ -272,11 +284,67 @@ func (s *StaticBooter) SetBootImage(ns *nodeset.NodeSet, imageName string) error
 func (s *StaticBooter) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
 	it := ns.Iterator()
 	for it.Next() {
-		host, err := s.LoadHostByName(it.Value())
+		host, err := s.LoadHostFromName(it.Value())
 		if err == nil {
 			host.Provision = provision
 		}
 	}
 
 	return nil
+}
+
+func (s *StaticBooter) LoadHostFromMAC(mac string) (*Host, error) {
+	var host *Host
+
+	s.hostMap.Range(func(key, value interface{}) bool {
+		h := value.(*Host)
+		for _, nic := range h.Interfaces {
+			if nic.MAC.String() == mac {
+				host = h
+				return false
+			}
+		}
+		return true
+	})
+
+	if host == nil {
+		return nil, ErrNotFound
+	}
+
+	return host, nil
+}
+
+func (s *StaticBooter) ResolveIPv4(fqdn string) ([]net.IP, error) {
+	fqdn = util.Normalize(fqdn)
+	ips := make([]net.IP, 0)
+
+	s.hostMap.Range(func(key, value interface{}) bool {
+		h := value.(*Host)
+		for _, nic := range h.Interfaces {
+			if util.Normalize(nic.FQDN) == fqdn {
+				ips = append(ips, nic.IP)
+				return false
+			}
+		}
+		return true
+	})
+
+	return ips, nil
+}
+
+func (s *StaticBooter) ReverseResolve(ip string) ([]string, error) {
+	names := make([]string, 0)
+
+	s.hostMap.Range(func(key, value interface{}) bool {
+		h := value.(*Host)
+		for _, nic := range h.Interfaces {
+			if nic.IP.String() == ip {
+				names = append(names, nic.FQDN)
+				return false
+			}
+		}
+		return true
+	})
+
+	return names, nil
 }

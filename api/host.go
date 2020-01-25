@@ -11,9 +11,9 @@ import (
 )
 
 func (h *Handler) HostAdd(c echo.Context) error {
-	host := new(model.Host)
+	var hosts model.HostList
 
-	if err := c.Bind(host); err != nil {
+	if err := c.Bind(&hosts); err != nil {
 		log.WithFields(logrus.Fields{
 			"ip":  c.RealIP(),
 			"err": err,
@@ -21,27 +21,32 @@ func (h *Handler) HostAdd(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "malformed input data")
 	}
 
-	log.Debugf("Got host: %#v", host)
+	log.Debugf("Got %d hosts", len(hosts))
 
-	err := c.Validate(host)
+	for _, host := range hosts {
+		err := c.Validate(host)
+		if err != nil {
+			log.WithFields(logrus.Fields{
+				"ip":  c.RealIP(),
+				"err": err,
+			}).Warn("Add host invalid data")
+			return echo.NewHTTPError(http.StatusBadRequest, "invalid data")
+		}
+	}
+
+	err := h.DB.StoreHosts(hosts)
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"ip":  c.RealIP(),
 			"err": err,
-		}).Warn("Add host invalid data")
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid data")
+		}).Error("Failed to save hosts to datastore")
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to save hosts")
 	}
 
-	err = h.DB.StoreHost(host)
-	if err != nil {
-		log.WithFields(logrus.Fields{
-			"ip":  c.RealIP(),
-			"err": err,
-		}).Error("Failed to save host to datastore")
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to save host")
+	res := map[string]interface{}{
+		"hosts": len(hosts),
 	}
-
-	return c.JSON(http.StatusCreated, host)
+	return c.JSON(http.StatusCreated, res)
 }
 
 func (h *Handler) HostList(c echo.Context) error {

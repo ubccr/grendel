@@ -12,6 +12,7 @@ import (
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
 	"github.com/ubccr/grendel/nodeset"
+	"github.com/ubccr/grendel/util"
 )
 
 const (
@@ -151,13 +152,14 @@ func (s *BuntStore) LoadHostFromID(id string) (*Host, error) {
 
 // ResolveIPv4 returns the list of IPv4 addresses with the given FQDN
 func (s *BuntStore) ResolveIPv4(fqdn string) ([]net.IP, error) {
+	fqdn = util.Normalize(fqdn)
 	ips := make([]net.IP, 0)
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
 		err := tx.AscendKeys(HostKeyPrefix+":*", func(key, value string) bool {
 			res := gjson.Get(value, "interfaces")
 			for _, i := range res.Array() {
-				if i.Get("fqdn").String() == fqdn {
+				if util.Normalize(i.Get("fqdn").String()) == fqdn {
 					ip := net.ParseIP(i.Get("ip").String())
 					if ip != nil && ip.To4() != nil {
 						ips = append(ips, ip)

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
-	"github.com/ubccr/grendel/client"
 	"github.com/ubccr/grendel/dhcp"
 	"github.com/ubccr/grendel/logger"
 	"github.com/urfave/cli/v2"
@@ -85,12 +84,7 @@ func runDHCP(c *cli.Context) error {
 	listenAddress := c.String("listen-address")
 	address := fmt.Sprintf("%s:%d", listenAddress, c.Int("dhcp-port"))
 
-	gc, err := client.NewClient()
-	if err != nil {
-		return err
-	}
-
-	srv, err := dhcp.NewServer(gc, address, c.Bool("proxy-only"))
+	srv, err := dhcp.NewServer(DB, address, c.Bool("proxy-only"))
 	if err != nil {
 		return err
 	}

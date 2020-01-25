@@ -52,14 +52,16 @@ func TestBuntStoreHost(t *testing.T) {
 
 	testIPs, err := store.ResolveIPv4(host.Interfaces[0].FQDN)
 	if assert.NoError(err) {
-		assert.Equal(1, len(testIPs))
-		assert.Equal(host.Interfaces[0].IP.String(), testIPs[0].String())
+		if assert.Equal(1, len(testIPs)) {
+			assert.Equal(host.Interfaces[0].IP.String(), testIPs[0].String())
+		}
 	}
 
 	testNames, err := store.ReverseResolve(host.Interfaces[0].IP.String())
 	if assert.NoError(err) {
-		assert.Equal(1, len(testNames))
-		assert.Equal(host.Interfaces[0].FQDN, testNames[0])
+		if assert.Equal(1, len(testNames)) {
+			assert.Equal(host.Interfaces[0].FQDN, testNames[0])
+		}
 	}
 
 	badhost := &Host{}

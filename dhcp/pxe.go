@@ -1,6 +1,7 @@
 package dhcp
 
 import (
+	"errors"
 	"net"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
@@ -9,8 +10,11 @@ import (
 )
 
 func (s *Server) pxeHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DHCPv4) {
-	host := s.LookupStaticHost(req.ClientHWAddr.String())
-	if host == nil {
+	host, err := s.DB.LoadHostFromMAC(req.ClientHWAddr.String())
+	if err != nil {
+		if !errors.Is(err, model.ErrNotFound) {
+			log.Errorf("PXEServer failed to find host: %s", err)
+		}
 		return
 	}
 

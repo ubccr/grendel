@@ -1,4 +1,4 @@
-package dns
+package util
 
 import (
 	"net"

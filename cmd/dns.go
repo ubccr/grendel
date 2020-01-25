@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/ubccr/grendel/client"
 	"github.com/ubccr/grendel/dns"
 	"github.com/urfave/cli/v2"
 )
@@ -39,12 +38,7 @@ func runDNS(c *cli.Context) error {
 
 	address := fmt.Sprintf("%s:%d", listenAddress, c.Int("dns-port"))
 
-	gc, err := client.NewClient()
-	if err != nil {
-		return err
-	}
-
-	dnsServer, err := dns.NewServer(gc, address, c.Int("dns-ttl"))
+	dnsServer, err := dns.NewServer(DB, address, c.Int("dns-ttl"))
 	if err != nil {
 		return err
 	}

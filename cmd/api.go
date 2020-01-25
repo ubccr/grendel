@@ -12,17 +12,17 @@ func NewAPICommand() *cli.Command {
 		Description: "Start API HTTP server",
 		Flags: []cli.Flag{
 			&cli.IntFlag{
-				Name:  "http-port",
-				Value: 80,
+				Name:  "api-port",
+				Value: 6667,
 				Usage: "http port to listen on",
 			},
 			&cli.StringFlag{
-				Name:  "http-scheme",
+				Name:  "api-scheme",
 				Value: "http",
-				Usage: "http scheme",
+				Usage: "api http scheme",
 			},
 			&cli.StringFlag{
-				Name:  "listen-address",
+				Name:  "api-address",
 				Value: "0.0.0.0",
 				Usage: "IPv4 address to listen on",
 			},
@@ -44,12 +44,9 @@ func NewAPICommand() *cli.Command {
 }
 
 func runAPI(c *cli.Context) error {
-	httpPort := c.Int("http-port")
-	if c.IsSet("cert") && c.IsSet("key") && !c.IsSet("http-port") {
-		httpPort = 443
-	}
+	httpPort := c.Int("api-port")
 
-	apiServer, err := api.NewServer(DB, c.String("socket-path"), c.String("listen-address"), httpPort)
+	apiServer, err := api.NewServer(DB, c.String("socket-path"), c.String("api-address"), httpPort)
 	if err != nil {
 		return err
 	}

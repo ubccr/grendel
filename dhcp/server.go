@@ -11,7 +11,6 @@ import (
 	"github.com/insomniacslk/dhcp/dhcpv4/server4"
 	"github.com/insomniacslk/dhcp/interfaces"
 	"github.com/sirupsen/logrus"
-	"github.com/ubccr/grendel/client"
 	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
 )
@@ -30,17 +29,16 @@ type Server struct {
 	MTU              int
 	ProxyOnly        bool
 	ServePXE         bool
-	Client           *client.Client
+	DB               model.Datastore
 	DNSServers       []net.IP
 	DomainSearchList []string
 	LeaseTime        time.Duration
 	srv              *server4.Server
 	srvPXE           *server4.Server
-	leases4          *model.HostMap
 }
 
-func NewServer(client *client.Client, address string, proxyOnly bool) (*Server, error) {
-	s := &Server{Client: client, ProxyOnly: proxyOnly, ServePXE: true}
+func NewServer(db model.Datastore, address string, proxyOnly bool) (*Server, error) {
+	s := &Server{DB: db, ProxyOnly: proxyOnly, ServePXE: true}
 
 	if proxyOnly {
 		log.Debugf("Running in ProxyOnly mode")
@@ -113,11 +111,6 @@ func NewServer(client *client.Client, address string, proxyOnly bool) (*Server, 
 	s.ServerAddress = serverIps[0]
 	s.ListenAddress = ip
 
-	err = s.LoadHosts()
-	if err != nil {
-		return nil, err
-	}
-
 	return s, nil
 }
 
@@ -127,9 +120,13 @@ func (s *Server) mainHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DH
 		return
 	}
 
-	host := s.LookupStaticHost(req.ClientHWAddr.String())
-	if host == nil {
-		log.Debugf("Ignoring unknown client mac address: %s", req.ClientHWAddr)
+	host, err := s.DB.LoadHostFromMAC(req.ClientHWAddr.String())
+	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			log.Debugf("Ignoring unknown client mac address: %s", req.ClientHWAddr)
+		} else {
+			log.Errorf("Failed to find host from database: %s", err)
+		}
 		return
 	}
 
@@ -267,34 +264,4 @@ func (s *Server) Shutdown() {
 	if err != nil {
 		log.Errorf("Failed to close pxe server: %s", err)
 	}
-}
-
-func (s *Server) LookupStaticHost(mac string) *model.Host {
-	host, ok := s.leases4.Load(mac)
-	if !ok {
-		return nil
-	}
-
-	return host
-}
-
-func (s *Server) LoadHosts() error {
-	hostList, err := s.Client.HostList()
-	if err != nil {
-		return err
-	}
-
-	s.leases4 = model.NewHostMap()
-
-	for _, host := range hostList {
-		for _, nic := range host.Interfaces {
-			if nic.IP.To4() == nil {
-				continue
-			}
-
-			s.leases4.Store(nic.MAC.String(), host)
-		}
-	}
-
-	return nil
 }

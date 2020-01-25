@@ -63,7 +63,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 
 	log.Debugf("iPXE Got valid boot claims %s: %v", c.QueryParam("token"), claims)
 
-	host, err := h.DB.LoadHostByID(claims.ID)
+	host, err := h.DB.LoadHostFromID(claims.ID)
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"ip":      c.RealIP(),
@@ -148,7 +148,7 @@ func (h *Handler) File(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "missing MAC address parameter")
 	}
 
-	host, err := h.DB.LoadHostByID(claims.ID)
+	host, err := h.DB.LoadHostFromID(claims.ID)
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"ip":      c.RealIP(),
@@ -203,7 +203,7 @@ func (h *Handler) Kickstart(c echo.Context) error {
 
 	log.Infof("Kickstart got valid boot claims: %v", claims)
 
-	host, err := h.DB.LoadHostByID(claims.ID)
+	host, err := h.DB.LoadHostFromID(claims.ID)
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"ip":      c.RealIP(),

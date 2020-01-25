@@ -130,9 +130,9 @@ func runAllServices(c *cli.Context) error {
 		}
 	}
 
-	if !c.IsSet("socket-path") {
-		c.Set("socket-path", "grendel-api.socket")
-	}
+	//	if !c.IsSet("socket-path") {
+	//		c.Set("socket-path", "grendel-api.socket")
+	//	}
 
 	DB = staticBooter
 

@@ -2,8 +2,8 @@ package dns
 
 import (
 	"github.com/miekg/dns"
-	"github.com/ubccr/grendel/client"
 	"github.com/ubccr/grendel/logger"
+	"github.com/ubccr/grendel/model"
 )
 
 var log = logger.GetLogger("DNS")
@@ -14,11 +14,11 @@ type Server struct {
 	srv *dns.Server
 }
 
-func NewServer(client *client.Client, address string, ttl int) (*Server, error) {
+func NewServer(db model.Datastore, address string, ttl int) (*Server, error) {
 	s := &Server{Address: address}
 
 	s.srv = &dns.Server{Addr: address, Net: "udp"}
-	h, err := NewHandler(client, uint32(ttl))
+	h, err := NewHandler(db, uint32(ttl))
 	if err != nil {
 		return nil, err
 	}
