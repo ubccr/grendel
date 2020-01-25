@@ -52,9 +52,9 @@ func (s *BuntStore) StoreHost(host *Host) error {
 
 // StoreHosts stores a list of host in the data store. If the host exists it is overwritten
 func (s *BuntStore) StoreHosts(hosts HostList) error {
-	for _, host := range hosts {
+	for idx, host := range hosts {
 		if host.Name == "" {
-			return fmt.Errorf("name required:  %w", ErrInvalidData)
+			return fmt.Errorf("host name required for host %d: %w", idx, ErrInvalidData)
 		}
 
 		// Keys are case-insensitive
@@ -78,17 +78,14 @@ func (s *BuntStore) StoreHosts(hosts HostList) error {
 				return err
 			}
 
-			hostJSON := string(val)
-
-			_, _, err = tx.Set(HostKeyPrefix+":"+host.Name, hostJSON, nil)
-			return err
+			_, _, err = tx.Set(HostKeyPrefix+":"+host.Name, string(val), nil)
+			if err != nil {
+				return err
+			}
 		}
+
 		return nil
 	})
-
-	if err != nil {
-		return err
-	}
 
 	return err
 }

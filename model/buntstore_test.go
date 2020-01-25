@@ -305,18 +305,22 @@ func BenchmarkBuntStoreReadAll(b *testing.B) {
 	hosts := make(HostList, size)
 	for i := 0; i < size; i++ {
 		host := HostFactory.MustCreate().(*Host)
-		err = store.StoreHost(host)
-		if err != nil {
-			b.Fatal(err)
-		}
 		hosts[i] = host
+	}
+
+	err = store.StoreHosts(hosts)
+	if err != nil {
+		b.Fatal(err)
 	}
 
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		_, err := store.Hosts()
+		list, err := store.Hosts()
 		if err != nil {
 			b.Fatal(err)
+		}
+		if len(list) != size {
+			b.Fatalf("wrong size: expected %d got %d", size, len(list))
 		}
 	}
 }
@@ -337,11 +341,12 @@ func BenchmarkBuntStoreParallelFind(b *testing.B) {
 	for i := 0; i < size; i++ {
 		host := HostFactory.MustCreate().(*Host)
 		host.Name = fmt.Sprintf("tux-%04d", i)
-		err = store.StoreHost(host)
-		if err != nil {
-			b.Fatal(err)
-		}
 		hosts[i] = host
+	}
+
+	err = store.StoreHosts(hosts)
+	if err != nil {
+		b.Fatal(err)
 	}
 
 	b.SetParallelism(128)
@@ -369,7 +374,7 @@ func BenchmarkBuntStoreParallelFind(b *testing.B) {
 				}
 
 				if len(hosts) != n+1 {
-					b.Fatal(err)
+					b.Fatalf("wrong host count found: expected %d got %d", n+1, len(hosts))
 				}
 			}
 		})
@@ -391,11 +396,12 @@ func BenchmarkBuntStoreRandomParallelReads(b *testing.B) {
 	hosts := make(HostList, size)
 	for i := 0; i < size; i++ {
 		host := HostFactory.MustCreate().(*Host)
-		err = store.StoreHost(host)
-		if err != nil {
-			b.Fatal(err)
-		}
 		hosts[i] = host
+	}
+
+	err = store.StoreHosts(hosts)
+	if err != nil {
+		b.Fatal(err)
 	}
 
 	b.SetParallelism(128)
@@ -439,19 +445,23 @@ func BenchmarkBuntStoreResolveFQDN(b *testing.B) {
 	hosts := make(HostList, size)
 	for i := 0; i < size; i++ {
 		host := HostFactory.MustCreate().(*Host)
-		err = store.StoreHost(host)
-		if err != nil {
-			b.Fatal(err)
-		}
 		hosts[i] = host
+	}
+
+	err = store.StoreHosts(hosts)
+	if err != nil {
+		b.Fatal(err)
 	}
 
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		pick := hosts[rand.Intn(size)]
 		ips, err := store.ResolveFQDN(pick.Interfaces[0].FQDN)
-		if err != nil || len(ips) != 1 {
+		if err != nil {
 			b.Fatal(err)
+		}
+		if len(ips) != 1 {
+			b.Fatalf("IPs not found")
 		}
 	}
 }
@@ -471,19 +481,23 @@ func BenchmarkBuntStoreReverseResolve(b *testing.B) {
 	hosts := make(HostList, size)
 	for i := 0; i < size; i++ {
 		host := HostFactory.MustCreate().(*Host)
-		err = store.StoreHost(host)
-		if err != nil {
-			b.Fatal(err)
-		}
 		hosts[i] = host
+	}
+
+	err = store.StoreHosts(hosts)
+	if err != nil {
+		b.Fatal(err)
 	}
 
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		pick := hosts[rand.Intn(size)]
 		names, err := store.ReverseResolve(pick.Interfaces[0].IP.String())
-		if err != nil || len(names) != 1 {
+		if err != nil {
 			b.Fatal(err)
+		}
+		if len(names) != 1 {
+			b.Fatalf("names not found")
 		}
 	}
 }
