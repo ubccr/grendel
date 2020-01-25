@@ -233,7 +233,6 @@ func TestBuntStoreBootImage(t *testing.T) {
 }
 
 func BenchmarkBuntStoreWriteHost(b *testing.B) {
-	b.StopTimer()
 	file := tempfile()
 	defer os.Remove(file)
 
@@ -244,7 +243,7 @@ func BenchmarkBuntStoreWriteHost(b *testing.B) {
 	}
 
 	size := 5000
-	b.StartTimer()
+	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		for i := 0; i < size; i++ {
 			host := HostFactory.MustCreate().(*Host)
@@ -257,7 +256,6 @@ func BenchmarkBuntStoreWriteHost(b *testing.B) {
 }
 
 func BenchmarkBuntStoreReadAll(b *testing.B) {
-	b.StopTimer()
 	file := tempfile()
 	defer os.Remove(file)
 
@@ -279,7 +277,7 @@ func BenchmarkBuntStoreReadAll(b *testing.B) {
 		hosts[i] = host
 	}
 
-	b.StartTimer()
+	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		_, err := store.Hosts()
 		if err != nil {
@@ -289,7 +287,6 @@ func BenchmarkBuntStoreReadAll(b *testing.B) {
 }
 
 func BenchmarkBuntStoreFind(b *testing.B) {
-	b.StopTimer()
 	file := tempfile()
 	defer os.Remove(file)
 
@@ -313,7 +310,7 @@ func BenchmarkBuntStoreFind(b *testing.B) {
 	}
 
 	b.SetParallelism(128)
-	b.StartTimer()
+	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		b.RunParallel(func(pb *testing.PB) {
 			for pb.Next() {
@@ -345,7 +342,6 @@ func BenchmarkBuntStoreFind(b *testing.B) {
 }
 
 func BenchmarkBuntStoreRandomRead(b *testing.B) {
-	b.StopTimer()
 	file := tempfile()
 	defer os.Remove(file)
 
@@ -368,7 +364,7 @@ func BenchmarkBuntStoreRandomRead(b *testing.B) {
 	}
 
 	b.SetParallelism(128)
-	b.StartTimer()
+	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		b.RunParallel(func(pb *testing.PB) {
 			for pb.Next() {
