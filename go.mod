@@ -6,16 +6,13 @@ require (
 	github.com/GeertJohan/go.rice v1.0.0
 	github.com/Pallinder/go-randomdata v1.2.0
 	github.com/bluele/factory-go v0.0.0-20181130035244-e6e8633dd3fe
-	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-playground/validator/v10 v10.0.1
 	github.com/golang/protobuf v1.3.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.6.4
-	github.com/howeyc/gopass v0.0.0-20190910152052-7cb4b85ec19c // indirect
 	github.com/hugelgupf/socketpair v0.0.0-20190730060125-05d35a94e714 // indirect
 	github.com/insomniacslk/dhcp v0.0.0-20191120203056-ec0e0154d15c
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
-	github.com/korovkin/limiter v0.0.0-20190919045942-dac5a6b2a536
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/labstack/echo/v4 v4.1.11
 	github.com/labstack/gommon v0.3.0
@@ -23,6 +20,7 @@ require (
 	github.com/mdlayher/raw v0.0.0-20190606144222-a54781e5f38f // indirect
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
 	github.com/miekg/dns v1.1.24
+	github.com/mitchellh/go-homedir v1.1.0
 	github.com/onsi/ginkgo v1.10.3 // indirect
 	github.com/onsi/gomega v1.7.1 // indirect
 	github.com/pin/tftp v2.1.0+incompatible
@@ -31,8 +29,8 @@ require (
 	github.com/segmentio/ksuid v1.0.2
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/afero v1.2.2 // indirect
+	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.3.2
-	github.com/square/certstrap v1.2.0
 	github.com/stmcginnis/gofish v0.2.0
 	github.com/stretchr/testify v1.4.0
 	github.com/tidwall/buntdb v1.1.2
@@ -40,7 +38,6 @@ require (
 	github.com/tidwall/sjson v1.0.4
 	github.com/u-root/u-root v5.0.0+incompatible // indirect
 	github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb
-	github.com/urfave/cli/v2 v2.1.1
 	github.com/vmware/goipmi v0.0.0-20181114221114-2333cd82d702
 	github.com/willf/bitset v1.1.10
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
