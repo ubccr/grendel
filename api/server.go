@@ -1,11 +1,13 @@
 package api
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -18,7 +20,7 @@ import (
 )
 
 const (
-	DefaultPort = 80
+	DefaultPort = 6669
 )
 
 var log = logger.GetLogger("API")
@@ -35,22 +37,32 @@ type Server struct {
 	DB            model.Datastore
 }
 
-func NewServer(db model.Datastore, socket, address string, port int) (*Server, error) {
-	s := &Server{DB: db}
+func NewServer(db model.Datastore, socket, address string) (*Server, error) {
+	s := &Server{DB: db, SocketPath: socket}
 
-	if address == "" {
-		address = net.IPv4zero.String()
+	shost, sport, err := net.SplitHostPort(address)
+	if err != nil {
+		return nil, err
 	}
 
-	if port == 0 {
-		port = DefaultPort
+	if shost == "" {
+		shost = net.IPv4zero.String()
+	}
+
+	port := DefaultPort
+	if sport != "" {
+		var err error
+		port, err = strconv.Atoi(sport)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	s.Port = port
 
-	ip := net.ParseIP(address)
+	ip := net.ParseIP(shost)
 	if ip == nil || ip.To4() == nil {
-		return nil, fmt.Errorf("Invalid IPv4 address: %s", address)
+		return nil, fmt.Errorf("Invalid IPv4 address: %s", shost)
 	}
 
 	s.ListenAddress = ip
@@ -66,7 +78,6 @@ func NewServer(db model.Datastore, socket, address string, port int) (*Server, e
 	}
 
 	s.ServerAddress = ipaddr
-	s.SocketPath = socket
 
 	return s, nil
 }
@@ -88,7 +99,7 @@ func HTTPErrorHandler(err error, c echo.Context) {
 	c.Logger().Error(err)
 }
 
-func (s *Server) Serve() error {
+func (s *Server) Serve(ctx context.Context) error {
 	e := echo.New()
 	e.HTTPErrorHandler = HTTPErrorHandler
 	e.HideBanner = true
@@ -145,12 +156,27 @@ func (s *Server) Serve() error {
 		}
 
 		s.Scheme = "https"
-		log.Printf("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
 	} else {
 		s.Scheme = "http"
 		httpServer.Addr = fmt.Sprintf("%s:%d", s.ListenAddress, s.Port)
-		log.Printf("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
 	}
 
-	return e.StartServer(httpServer)
+	go func() {
+		<-ctx.Done()
+
+		log.Info("Shutting down API server...")
+		ctxShutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		if err := httpServer.Shutdown(ctxShutdown); err != nil && err != http.ErrServerClosed {
+			log.Errorf("Failed shutting down API server: %v", err)
+		}
+	}()
+
+	log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
+	if err := e.StartServer(httpServer); err != nil && err != http.ErrServerClosed {
+		return err
+	}
+
+	return nil
 }

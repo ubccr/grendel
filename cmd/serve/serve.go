@@ -22,20 +22,24 @@ var (
 	serveCmd = &cobra.Command{
 		Use:   "serve",
 		Short: "Run services",
-		Long:  `Run grendle services`,
+		Long:  `Run grendel services`,
 		RunE: func(command *cobra.Command, args []string) error {
 			ctx, cancel := NewInterruptContext()
 
 			var wg sync.WaitGroup
-			wg.Add(2)
-			errs := make(chan error, 2)
+			wg.Add(3)
+			errs := make(chan error, 3)
 
 			go func() {
-				errs <- serveDNS(ctx)
+				errs <- serveAPI(ctx)
 				wg.Done()
 			}()
 			go func() {
 				errs <- serveTFTP(ctx)
+				wg.Done()
+			}()
+			go func() {
+				errs <- serveDNS(ctx)
 				wg.Done()
 			}()
 
@@ -95,6 +99,16 @@ func init() {
 	// TFTP
 	serveCmd.PersistentFlags().String("tftp-listen", "0.0.0.0:69", "address to listen on")
 	viper.BindPFlag("tftp.listen", serveCmd.PersistentFlags().Lookup("tftp-listen"))
+
+	// API
+	serveCmd.PersistentFlags().String("api-listen", "0.0.0.0:6669", "address to listen on")
+	viper.BindPFlag("api.listen", serveCmd.PersistentFlags().Lookup("api-listen"))
+	serveCmd.PersistentFlags().String("api-socket", "", "path to unix socket")
+	viper.BindPFlag("api.socket_path", serveCmd.PersistentFlags().Lookup("api-socket"))
+	serveCmd.PersistentFlags().String("api-cert", "", "path to ssl cert")
+	viper.BindPFlag("api.cert", serveCmd.PersistentFlags().Lookup("api-cert"))
+	serveCmd.PersistentFlags().String("api-key", "", "path to ssl key")
+	viper.BindPFlag("api.key", serveCmd.PersistentFlags().Lookup("api-key"))
 
 	serveCmd.PersistentPreRunE = func(command *cobra.Command, args []string) error {
 		err := cmd.SetupLogging()
