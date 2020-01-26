@@ -21,7 +21,7 @@ const (
 	DefaultPort = 80
 )
 
-var log = logger.GetLogger("HTTP")
+var log = logger.GetLogger("PROVISION")
 
 type Server struct {
 	ListenAddress net.IP
