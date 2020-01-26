@@ -24,22 +24,11 @@ var (
 		Short: "Run services",
 		Long:  `Run grendle services`,
 		RunE: func(command *cobra.Command, args []string) error {
-			cmd.Log.Printf("Testing: %s", viper.GetString("dbpath"))
-
-			c := make(chan os.Signal, 1)
-			signal.Notify(c, os.Interrupt)
-
-			ctx, cancel := context.WithCancel(context.Background())
-
-			go func() {
-				oscall := <-c
-				cmd.Log.Debugf("Signal interrupt system call: %+v", oscall)
-				cancel()
-			}()
+			ctx, cancel := NewInterruptContext()
 
 			var wg sync.WaitGroup
 			wg.Add(2)
-			errs := make(chan error, 1)
+			errs := make(chan error, 2)
 
 			go func() {
 				errs <- serveDNS(ctx)
@@ -78,6 +67,21 @@ var (
 	}
 )
 
+func NewInterruptContext() (context.Context, context.CancelFunc) {
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	go func() {
+		oscall := <-c
+		cmd.Log.Debugf("Signal interrupt system call: %+v", oscall)
+		cancel()
+	}()
+
+	return ctx, cancel
+}
+
 func init() {
 	serveCmd.PersistentFlags().String("dbpath", ":memory:", "path to database file")
 	viper.BindPFlag("dbpath", serveCmd.PersistentFlags().Lookup("dbpath"))
@@ -102,6 +106,8 @@ func init() {
 		if err != nil {
 			return err
 		}
+
+		cmd.Log.Infof("Using database path: %s", viper.GetString("dbpath"))
 
 		return nil
 	}

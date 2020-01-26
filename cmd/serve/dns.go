@@ -2,12 +2,9 @@ package serve
 
 import (
 	"context"
-	"os"
-	"os/signal"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/dns"
 )
 
@@ -21,17 +18,7 @@ var (
 		Short: "Run DNS server",
 		Long:  `Run DNS server`,
 		RunE: func(command *cobra.Command, args []string) error {
-			c := make(chan os.Signal, 1)
-			signal.Notify(c, os.Interrupt)
-
-			ctx, cancel := context.WithCancel(context.Background())
-
-			go func() {
-				oscall := <-c
-				cmd.Log.Debugf("Signal interrupt system call: %+v", oscall)
-				cancel()
-			}()
-
+			ctx, _ := NewInterruptContext()
 			return serveDNS(ctx)
 		},
 	}
