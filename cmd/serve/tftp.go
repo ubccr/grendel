@@ -9,6 +9,9 @@ import (
 )
 
 func init() {
+	tftpCmd.PersistentFlags().String("tftp-listen", "0.0.0.0:69", "address to listen on")
+	viper.BindPFlag("tftp.listen", tftpCmd.PersistentFlags().Lookup("tftp-listen"))
+
 	serveCmd.AddCommand(tftpCmd)
 }
 

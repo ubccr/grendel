@@ -1,10 +1,12 @@
 package provision
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"net"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -33,22 +35,32 @@ type Server struct {
 	DB            model.Datastore
 }
 
-func NewServer(db model.Datastore, address string, port int) (*Server, error) {
+func NewServer(db model.Datastore, address string) (*Server, error) {
 	s := &Server{DB: db}
 
-	if address == "" {
-		address = net.IPv4zero.String()
+	shost, sport, err := net.SplitHostPort(address)
+	if err != nil {
+		return nil, err
 	}
 
-	if port == 0 {
-		port = DefaultPort
+	if shost == "" {
+		shost = net.IPv4zero.String()
+	}
+
+	port := DefaultPort
+	if sport != "" {
+		var err error
+		port, err = strconv.Atoi(sport)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	s.Port = port
 
-	ip := net.ParseIP(address)
+	ip := net.ParseIP(shost)
 	if ip == nil || ip.To4() == nil {
-		return nil, fmt.Errorf("Invalid IPv4 address: %s", address)
+		return nil, fmt.Errorf("Invalid IPv4 address: %s", shost)
 	}
 
 	s.ListenAddress = ip
@@ -85,7 +97,7 @@ func HTTPErrorHandler(err error, c echo.Context) {
 	c.Logger().Error(err)
 }
 
-func (s *Server) Serve() error {
+func (s *Server) Serve(ctx context.Context) error {
 	e := echo.New()
 	e.HTTPErrorHandler = HTTPErrorHandler
 	e.HideBanner = true
@@ -150,11 +162,27 @@ func (s *Server) Serve() error {
 
 		s.Scheme = "https"
 		httpServer.Addr = fmt.Sprintf("%s:%d", s.ListenAddress, s.Port)
-		log.Printf("Running on https://%s:%d", s.ListenAddress, s.Port)
 	} else {
 		log.Warn("**WARNING*** SSL/TLS not enabled. HTTP communication will not be encrypted and vulnerable to snooping.")
-		log.Printf("Running on http://%s:%d", s.ListenAddress, s.Port)
+		s.Scheme = "http"
 	}
 
-	return e.StartServer(httpServer)
+	go func() {
+		<-ctx.Done()
+
+		log.Info("Shutting down Provision server...")
+		ctxShutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		if err := httpServer.Shutdown(ctxShutdown); err != nil && err != http.ErrServerClosed {
+			log.Errorf("Failed shutting down Provision server: %v", err)
+		}
+	}()
+
+	log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
+	if err := e.StartServer(httpServer); err != nil && err != http.ErrServerClosed {
+		return err
+	}
+
+	return nil
 }

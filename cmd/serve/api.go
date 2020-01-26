@@ -9,6 +9,16 @@ import (
 )
 
 func init() {
+
+	apiCmd.PersistentFlags().String("api-listen", "0.0.0.0:6669", "address to listen on")
+	viper.BindPFlag("api.listen", apiCmd.PersistentFlags().Lookup("api-listen"))
+	apiCmd.PersistentFlags().String("api-socket", "", "path to unix socket")
+	viper.BindPFlag("api.socket_path", apiCmd.PersistentFlags().Lookup("api-socket"))
+	apiCmd.PersistentFlags().String("api-cert", "", "path to ssl cert")
+	viper.BindPFlag("api.cert", apiCmd.PersistentFlags().Lookup("api-cert"))
+	apiCmd.PersistentFlags().String("api-key", "", "path to ssl key")
+	viper.BindPFlag("api.key", apiCmd.PersistentFlags().Lookup("api-key"))
+
 	serveCmd.AddCommand(apiCmd)
 }
 

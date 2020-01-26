@@ -9,6 +9,11 @@ import (
 )
 
 func init() {
+	dnsCmd.PersistentFlags().String("dns-listen", "0.0.0.0:53", "address to listen on")
+	dnsCmd.PersistentFlags().Int("dns-ttl", 300, "ttl for dns records")
+	viper.BindPFlag("dns.listen", dnsCmd.PersistentFlags().Lookup("dns-listen"))
+	viper.BindPFlag("dns.ttl", dnsCmd.PersistentFlags().Lookup("dns-ttl"))
+
 	serveCmd.AddCommand(dnsCmd)
 }
 

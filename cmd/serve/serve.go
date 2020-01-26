@@ -27,8 +27,8 @@ var (
 			ctx, cancel := NewInterruptContext()
 
 			var wg sync.WaitGroup
-			wg.Add(3)
-			errs := make(chan error, 3)
+			wg.Add(4)
+			errs := make(chan error, 4)
 
 			go func() {
 				errs <- serveAPI(ctx)
@@ -40,6 +40,10 @@ var (
 			}()
 			go func() {
 				errs <- serveDNS(ctx)
+				wg.Done()
+			}()
+			go func() {
+				errs <- serveProvision(ctx)
 				wg.Done()
 			}()
 
@@ -89,26 +93,6 @@ func NewInterruptContext() (context.Context, context.CancelFunc) {
 func init() {
 	serveCmd.PersistentFlags().String("dbpath", ":memory:", "path to database file")
 	viper.BindPFlag("dbpath", serveCmd.PersistentFlags().Lookup("dbpath"))
-
-	// DNS
-	serveCmd.PersistentFlags().String("dns-listen", "0.0.0.0:53", "address to listen on")
-	serveCmd.PersistentFlags().Int("dns-ttl", 300, "ttl for dns records")
-	viper.BindPFlag("dns.listen", serveCmd.PersistentFlags().Lookup("dns-listen"))
-	viper.BindPFlag("dns.ttl", serveCmd.PersistentFlags().Lookup("dns-ttl"))
-
-	// TFTP
-	serveCmd.PersistentFlags().String("tftp-listen", "0.0.0.0:69", "address to listen on")
-	viper.BindPFlag("tftp.listen", serveCmd.PersistentFlags().Lookup("tftp-listen"))
-
-	// API
-	serveCmd.PersistentFlags().String("api-listen", "0.0.0.0:6669", "address to listen on")
-	viper.BindPFlag("api.listen", serveCmd.PersistentFlags().Lookup("api-listen"))
-	serveCmd.PersistentFlags().String("api-socket", "", "path to unix socket")
-	viper.BindPFlag("api.socket_path", serveCmd.PersistentFlags().Lookup("api-socket"))
-	serveCmd.PersistentFlags().String("api-cert", "", "path to ssl cert")
-	viper.BindPFlag("api.cert", serveCmd.PersistentFlags().Lookup("api-cert"))
-	serveCmd.PersistentFlags().String("api-key", "", "path to ssl key")
-	viper.BindPFlag("api.key", serveCmd.PersistentFlags().Lookup("api-key"))
 
 	serveCmd.PersistentPreRunE = func(command *cobra.Command, args []string) error {
 		err := cmd.SetupLogging()
