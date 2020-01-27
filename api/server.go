@@ -19,10 +19,6 @@ import (
 	"github.com/ubccr/grendel/util"
 )
 
-const (
-	DefaultPort = 6669
-)
-
 var log = logger.GetLogger("API")
 
 type Server struct {
