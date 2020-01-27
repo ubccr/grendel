@@ -1,9 +1,8 @@
 package bmc
 
 import (
-	"encoding/json"
 	"errors"
-	"os"
+	"fmt"
 	"strings"
 	"time"
 
@@ -11,17 +10,17 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/bmc"
 	"github.com/ubccr/grendel/client"
 	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/nodeset"
 )
 
 var (
-	statusCmd = &cobra.Command{
-		Use:   "status",
-		Short: "Check BMC status",
-		Long:  `Check BMC status`,
+	reboot     bool
+	netbootCmd = &cobra.Command{
+		Use:   "netboot",
+		Short: "Set hosts to PXE netboot",
+		Long:  `Set hosts to PXE netboot`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
 			ns, err := nodeset.NewNodeSet(strings.Join(args, ","))
@@ -33,16 +32,17 @@ var (
 				return errors.New("Node nodes in nodeset")
 			}
 
-			return runStatus(ns)
+			return runNetboot(ns)
 		},
 	}
 )
 
 func init() {
-	bmcCmd.AddCommand(statusCmd)
+	netbootCmd.Flags().BoolVarP(&reboot, "reboot", "r", false, "Reboot nodes")
+	bmcCmd.AddCommand(netbootCmd)
 }
 
-func runStatus(ns *nodeset.NodeSet) error {
+func runNetboot(ns *nodeset.NodeSet) error {
 	gc, err := client.NewClient()
 	if err != nil {
 		return err
@@ -56,9 +56,6 @@ func runStatus(ns *nodeset.NodeSet) error {
 	if len(hostList) == 0 {
 		return errors.New("No hosts found")
 	}
-
-	enc := json.NewEncoder(os.Stdout)
-	enc.SetIndent("", "    ")
 
 	delay := viper.GetInt("bmc.delay")
 	limit := limiter.NewConcurrencyLimiter(viper.GetInt("bmc.fanout"))
@@ -75,30 +72,29 @@ func runStatus(ns *nodeset.NodeSet) error {
 			}
 			defer sysmgr.Logout()
 
-			system, err := sysmgr.GetSystem()
+			err = sysmgr.EnablePXE()
 			if err != nil {
 				cmd.Log.WithFields(logrus.Fields{
 					"err":  err,
 					"name": host.Name,
 					"ID":   host.ID,
-				}).Error("Failed to fetch system info from BMC")
+				}).Error("Failed to enabel PXE on next boot")
 				return
 			}
 
-			if system.Name == "" {
-				system.Name = host.Name
+			if reboot {
+				err = sysmgr.PowerCycle()
+				if err != nil {
+					cmd.Log.WithFields(logrus.Fields{
+						"err":  err,
+						"name": host.Name,
+						"ID":   host.ID,
+					}).Error("Failed to power cycle node")
+					return
+				}
 			}
 
-			rec := make(map[string]*bmc.System, 1)
-			rec[host.Name] = system
-
-			if err := enc.Encode(rec); err != nil {
-				cmd.Log.WithFields(logrus.Fields{
-					"err":  err,
-					"name": host.Name,
-					"ID":   host.ID,
-				}).Error("Failed to encode json")
-			}
+			fmt.Printf("%s: OK\n", host.Name)
 		})
 
 		time.Sleep(time.Duration(delay) * time.Second)
