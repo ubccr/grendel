@@ -43,10 +43,40 @@ var (
 )
 
 func init() {
+	serveCmd.PersistentFlags().String("dbpath", ":memory:", "path to database file")
+	viper.BindPFlag("dbpath", serveCmd.PersistentFlags().Lookup("dbpath"))
 	serveCmd.PersistentFlags().StringVar(&hostsFile, "hosts", "", "path to hosts file")
 	serveCmd.PersistentFlags().StringVar(&imagesFile, "images", "", "path to boot images file")
 	serveCmd.PersistentFlags().StringSlice("services", []string{}, "enabled services")
 	viper.BindPFlag("services", serveCmd.PersistentFlags().Lookup("services"))
+
+	serveCmd.PersistentPreRunE = func(command *cobra.Command, args []string) error {
+		err := cmd.SetupLogging()
+		if err != nil {
+			return err
+		}
+
+		DB, err = model.NewBuntStore(viper.GetString("dbpath"))
+		if err != nil {
+			return err
+		}
+
+		cmd.Log.Infof("Using database path: %s", viper.GetString("dbpath"))
+
+		return nil
+	}
+
+	serveCmd.PersistentPostRunE = func(command *cobra.Command, args []string) error {
+		if DB != nil {
+			cmd.Log.Info("Closing Database")
+			err := DB.Close()
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
 
 	cmd.Root.AddCommand(serveCmd)
 }
@@ -176,37 +206,4 @@ func NewInterruptContext() (context.Context, context.CancelFunc) {
 	}()
 
 	return ctx, cancel
-}
-
-func init() {
-	serveCmd.PersistentFlags().String("dbpath", ":memory:", "path to database file")
-	viper.BindPFlag("dbpath", serveCmd.PersistentFlags().Lookup("dbpath"))
-
-	serveCmd.PersistentPreRunE = func(command *cobra.Command, args []string) error {
-		err := cmd.SetupLogging()
-		if err != nil {
-			return err
-		}
-
-		DB, err = model.NewBuntStore(viper.GetString("dbpath"))
-		if err != nil {
-			return err
-		}
-
-		cmd.Log.Infof("Using database path: %s", viper.GetString("dbpath"))
-
-		return nil
-	}
-
-	serveCmd.PersistentPostRunE = func(command *cobra.Command, args []string) error {
-		if DB != nil {
-			cmd.Log.Info("Closing Database")
-			err := DB.Close()
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
-	}
 }

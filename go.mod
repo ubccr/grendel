@@ -13,6 +13,7 @@ require (
 	github.com/hugelgupf/socketpair v0.0.0-20190730060125-05d35a94e714 // indirect
 	github.com/insomniacslk/dhcp v0.0.0-20191120203056-ec0e0154d15c
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
+	github.com/korovkin/limiter v0.0.0-20190919045942-dac5a6b2a536
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/labstack/echo/v4 v4.1.11
 	github.com/labstack/gommon v0.3.0
