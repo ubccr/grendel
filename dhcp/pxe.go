@@ -81,7 +81,7 @@ func (s *PXEServer) pxeHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.
 	}
 
 	if !host.Provision {
-		s.log.Infof("Host not set to providion: %s", req.ClientHWAddr.String())
+		s.log.Infof("Host %s not set to provision: %s", host.Name, req.ClientHWAddr.String())
 		return
 	}
 
