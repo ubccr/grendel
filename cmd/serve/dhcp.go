@@ -66,33 +66,33 @@ func serveDHCP(ctx context.Context) error {
 		provisionIP = srv.ServerAddress
 	}
 
-	srv.HTTPPort, err = strconv.Atoi(portStr)
+	srv.ProvisionPort, err = strconv.Atoi(portStr)
 	if err != nil {
 		return err
 	}
 
-	srv.HTTPScheme = viper.GetString("provision.scheme")
-	if srv.HTTPScheme == "" {
-		srv.HTTPScheme = "http"
+	srv.ProvisionScheme = viper.GetString("provision.scheme")
+	if srv.ProvisionScheme == "" {
+		srv.ProvisionScheme = "http"
 	}
 
 	if viper.IsSet("provision.hostname") {
-		srv.Hostname = viper.GetString("provision.hostname")
+		srv.ProvisionHostname = viper.GetString("provision.hostname")
 	}
 
-	if srv.Hostname == "" && srv.HTTPScheme == "https" {
+	if srv.ProvisionHostname == "" && srv.ProvisionScheme == "https" {
 		hosts, err := net.LookupAddr(provisionIP.String())
 		if err == nil && len(hosts) > 0 {
 			fqdn := hosts[0]
-			srv.Hostname = strings.TrimSuffix(fqdn, ".")
+			srv.ProvisionHostname = strings.TrimSuffix(fqdn, ".")
 		}
 	}
 
-	if srv.Hostname == "" {
-		srv.Hostname = provisionIP.String()
+	if srv.ProvisionHostname == "" {
+		srv.ProvisionHostname = provisionIP.String()
 	}
 
-	dhcpLog.Infof("Base URL for ipxe: %s://%s:%d", srv.HTTPScheme, srv.Hostname, srv.HTTPPort)
+	dhcpLog.Infof("Base URL for ipxe: %s://%s:%d", srv.ProvisionScheme, srv.ProvisionHostname, srv.ProvisionPort)
 
 	if viper.IsSet("dhcp.dns_servers") {
 		srv.DNSServers = make([]net.IP, 0)

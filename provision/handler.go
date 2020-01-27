@@ -19,15 +19,31 @@ import (
 )
 
 type Handler struct {
-	DB model.DataStore
+	DB               model.DataStore
+	DefaultImageName string
 }
 
-func NewHandler(db model.DataStore) (*Handler, error) {
+func NewHandler(db model.DataStore, defaultImageName string) (*Handler, error) {
 	h := &Handler{
-		DB: db,
+		DB:               db,
+		DefaultImageName: defaultImageName,
+	}
+
+	_, err := h.DB.LoadBootImage(defaultImageName)
+	if err != nil {
+		return nil, err
+
 	}
 
 	return h, nil
+}
+
+func (h *Handler) LoadBootImageWithDefault(name string) (*model.BootImage, error) {
+	if name == "" {
+		return h.DB.LoadBootImage(h.DefaultImageName)
+	}
+
+	return h.DB.LoadBootImage(name)
 }
 
 func (h *Handler) SetupRoutes(e *echo.Echo) {
@@ -96,7 +112,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot interface")
 	}
 
-	bootImage, err := h.DB.LoadBootImage(host.BootImage)
+	bootImage, err := h.LoadBootImageWithDefault(host.BootImage)
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"ip":      c.RealIP(),
@@ -107,6 +123,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot image")
 	}
 
+	log.Infof("IPXE booting host %s with image %s", host.Name, bootImage.Name)
 	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
 	commandLine := bootImage.CommandLine
 
@@ -159,7 +176,7 @@ func (h *Handler) File(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid host")
 	}
 
-	bootImage, err := h.DB.LoadBootImage(host.BootImage)
+	bootImage, err := h.LoadBootImageWithDefault(host.BootImage)
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"ip":      c.RealIP(),
@@ -214,7 +231,7 @@ func (h *Handler) Kickstart(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid host")
 	}
 
-	bootImage, err := h.DB.LoadBootImage(host.BootImage)
+	bootImage, err := h.LoadBootImageWithDefault(host.BootImage)
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"ip":      c.RealIP(),

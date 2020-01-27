@@ -109,7 +109,7 @@ func (s *Server) bootingHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) err
 		// We've already gone through one round of chainloading, now
 		// we can finally chainload to HTTP for the actual boot
 		// script.
-		hostName := s.Hostname
+		hostName := s.ProvisionHostname
 		if hostName == "" {
 			hostName = s.ServerAddress.String()
 		}
@@ -119,7 +119,7 @@ func (s *Server) bootingHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) err
 			return fmt.Errorf("Failed to generate signed boot token: %s", err)
 		}
 
-		ipxeUrl := fmt.Sprintf("%s://%s:%d/_/ipxe?token=%s", s.HTTPScheme, hostName, s.HTTPPort, token)
+		ipxeUrl := fmt.Sprintf("%s://%s:%d/_/ipxe?token=%s", s.ProvisionScheme, hostName, s.ProvisionPort, token)
 		log.Printf("Sending URL to iPXE script: %s", ipxeUrl)
 		resp.UpdateOption(dhcpv4.OptBootFileName(ipxeUrl))
 

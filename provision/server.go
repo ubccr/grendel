@@ -30,7 +30,6 @@ type Server struct {
 	Scheme        string
 	KeyFile       string
 	CertFile      string
-	Hostname      string
 	RepoDir       string
 	DB            model.DataStore
 }
@@ -97,7 +96,7 @@ func HTTPErrorHandler(err error, c echo.Context) {
 	c.Logger().Error(err)
 }
 
-func (s *Server) Serve(ctx context.Context) error {
+func (s *Server) Serve(ctx context.Context, defaultImageName string) error {
 	e := echo.New()
 	e.HTTPErrorHandler = HTTPErrorHandler
 	e.HideBanner = true
@@ -105,6 +104,7 @@ func (s *Server) Serve(ctx context.Context) error {
 	e.Logger = EchoLogger()
 
 	if len(s.RepoDir) > 0 {
+		log.Infof("Using repo dir: %s", s.RepoDir)
 		e.Static("/repo", s.RepoDir)
 		//fs := http.FileServer(http.Dir(s.RepoDir))
 		//e.GET("/repo/*", echo.WrapHandler(http.StripPrefix("/repo/", fs)))
@@ -117,7 +117,7 @@ func (s *Server) Serve(ctx context.Context) error {
 
 	e.Renderer = renderer
 
-	h, err := NewHandler(s.DB)
+	h, err := NewHandler(s.DB, defaultImageName)
 	if err != nil {
 		return err
 	}

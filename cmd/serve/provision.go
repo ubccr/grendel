@@ -9,12 +9,16 @@ import (
 )
 
 func init() {
-	provisionCmd.PersistentFlags().String("provision-listen", "0.0.0.0:80", "address to listen on")
-	viper.BindPFlag("provision.listen", provisionCmd.PersistentFlags().Lookup("provision-listen"))
-	provisionCmd.PersistentFlags().String("provision-cert", "", "path to ssl cert")
-	viper.BindPFlag("provision.cert", provisionCmd.PersistentFlags().Lookup("provision-cert"))
-	provisionCmd.PersistentFlags().String("provision-key", "", "path to ssl key")
-	viper.BindPFlag("provision.key", provisionCmd.PersistentFlags().Lookup("provision-key"))
+	provisionCmd.Flags().String("provision-listen", "0.0.0.0:80", "address to listen on")
+	viper.BindPFlag("provision.listen", provisionCmd.Flags().Lookup("provision-listen"))
+	provisionCmd.Flags().String("provision-cert", "", "path to ssl cert")
+	viper.BindPFlag("provision.cert", provisionCmd.Flags().Lookup("provision-cert"))
+	provisionCmd.Flags().String("provision-key", "", "path to ssl key")
+	viper.BindPFlag("provision.key", provisionCmd.Flags().Lookup("provision-key"))
+	provisionCmd.Flags().String("default-image", "", "default image name")
+	viper.BindPFlag("provision.default_image", provisionCmd.Flags().Lookup("default-image"))
+	provisionCmd.Flags().String("repo-dir", "", "path to repo dir")
+	viper.BindPFlag("provision.repo_dir", provisionCmd.Flags().Lookup("repo-dir"))
 
 	serveCmd.AddCommand(provisionCmd)
 }
@@ -39,8 +43,9 @@ func serveProvision(ctx context.Context) error {
 
 	srv.KeyFile = viper.GetString("provision.key")
 	srv.CertFile = viper.GetString("provision.cert")
+	srv.RepoDir = viper.GetString("provision.repo_dir")
 
-	if err := srv.Serve(ctx); err != nil {
+	if err := srv.Serve(ctx, viper.GetString("provision.default_image")); err != nil {
 		return err
 	}
 

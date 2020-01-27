@@ -19,19 +19,19 @@ import (
 var log = logger.GetLogger("DHCP")
 
 type Server struct {
-	ListenAddress    net.IP
-	ServerAddress    net.IP
-	Hostname         string
-	HTTPScheme       string
-	Port             int
-	HTTPPort         int
-	MTU              int
-	ProxyOnly        bool
-	DB               model.DataStore
-	DNSServers       []net.IP
-	DomainSearchList []string
-	LeaseTime        time.Duration
-	srv              *server4.Server
+	ListenAddress     net.IP
+	ServerAddress     net.IP
+	Port              int
+	ProvisionHostname string
+	ProvisionScheme   string
+	ProvisionPort     int
+	MTU               int
+	ProxyOnly         bool
+	DB                model.DataStore
+	DNSServers        []net.IP
+	DomainSearchList  []string
+	LeaseTime         time.Duration
+	srv               *server4.Server
 }
 
 func NewServer(db model.DataStore, address string) (*Server, error) {
@@ -162,12 +162,12 @@ func (s *Server) mainHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DH
 }
 
 func (s *Server) Serve(ctx context.Context) error {
-	if s.HTTPPort == 0 {
-		s.HTTPPort = 80
+	if s.ProvisionPort == 0 {
+		s.ProvisionPort = 80
 	}
 
-	if s.HTTPScheme == "" {
-		s.HTTPScheme = "http"
+	if s.ProvisionScheme == "" {
+		s.ProvisionScheme = "http"
 	}
 
 	listener := &net.UDPAddr{
