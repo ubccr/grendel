@@ -370,40 +370,48 @@ func (s *BuntStore) SetBootImage(ns *nodeset.NodeSet, name string) error {
 	return nil
 }
 
-// StoreBootImage stores the BootImage in the data store
+// StoreBootImage stores a boot image in the data store. If the boot image exists it is overwritten
 func (s *BuntStore) StoreBootImage(image *BootImage) error {
-	if image.Name == "" {
-		return fmt.Errorf("name required:  %w", ErrInvalidData)
-	}
+	imageList := BootImageList{image}
+	return s.StoreBootImages(imageList)
+}
 
-	// Keys are case-insensitive
-	image.Name = strings.ToLower(image.Name)
-
-	// XXX need to check for dups?
-	if image.ID.IsNil() {
-		uuid, err := ksuid.NewRandom()
-		if err != nil {
-			return err
+// StoreBootImages stores a list of boot images in the data store. If the boot image exists it is overwritten
+func (s *BuntStore) StoreBootImages(images BootImageList) error {
+	for idx, image := range images {
+		if image.Name == "" {
+			return fmt.Errorf("name required for boot image %d: %w", idx, ErrInvalidData)
 		}
 
-		image.ID = uuid
+		// Keys are case-insensitive
+		image.Name = strings.ToLower(image.Name)
+
+		// XXX need to check for dups?
+		if image.ID.IsNil() {
+			uuid, err := ksuid.NewRandom()
+			if err != nil {
+				return err
+			}
+
+			image.ID = uuid
+		}
 	}
 
-	val, err := json.Marshal(image)
-	if err != nil {
-		return err
-	}
+	err := s.db.Update(func(tx *buntdb.Tx) error {
+		for _, image := range images {
+			val, err := json.Marshal(image)
+			if err != nil {
+				return err
+			}
 
-	imageJSON := string(val)
+			_, _, err = tx.Set(BootImageKeyPrefix+":"+image.Name, string(val), nil)
+			if err != nil {
+				return err
+			}
+		}
 
-	err = s.db.Update(func(tx *buntdb.Tx) error {
-		_, _, err := tx.Set(BootImageKeyPrefix+":"+image.Name, imageJSON, nil)
-		return err
+		return nil
 	})
-
-	if err != nil {
-		return err
-	}
 
 	return err
 }

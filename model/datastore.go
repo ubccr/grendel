@@ -31,6 +31,9 @@ type Datastore interface {
 	// StoreBootImage stores the BootImage in the data store
 	StoreBootImage(image *BootImage) error
 
+	// StoreBootImages stores a list of BootImages in the data store
+	StoreBootImages(images BootImageList) error
+
 	// SetBootImage sets all hosts to use the BootImage with the given name
 	SetBootImage(ns *nodeset.NodeSet, name string) error
 
