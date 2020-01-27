@@ -10,8 +10,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/dhcp"
+	"github.com/ubccr/grendel/logger"
 )
 
 func init() {
@@ -32,6 +32,7 @@ func init() {
 }
 
 var (
+	dhcpLog = logger.GetLogger("DHCP")
 	dhcpCmd = &cobra.Command{
 		Use:   "dhcp",
 		Short: "Run DHCP server",
@@ -91,7 +92,7 @@ func serveDHCP(ctx context.Context) error {
 		srv.Hostname = provisionIP.String()
 	}
 
-	cmd.Log.Infof("Base URL for ipxe: %s://%s:%d", srv.HTTPScheme, srv.Hostname, srv.HTTPPort)
+	dhcpLog.Infof("Base URL for ipxe: %s://%s:%d", srv.HTTPScheme, srv.Hostname, srv.HTTPPort)
 
 	if viper.IsSet("dhcp.dns_servers") {
 		srv.DNSServers = make([]net.IP, 0)
@@ -102,12 +103,12 @@ func serveDHCP(ctx context.Context) error {
 			}
 			srv.DNSServers = append(srv.DNSServers, dnsip)
 		}
-		cmd.Log.Infof("Using DNS servers: %v", srv.DNSServers)
+		dhcpLog.Infof("Using DNS servers: %v", srv.DNSServers)
 	}
 
 	if viper.IsSet("dhcp.domain_search") {
 		srv.DomainSearchList = viper.GetStringSlice("dhcp.domain_search")
-		cmd.Log.Infof("Using Domain Search List: %v", srv.DomainSearchList)
+		dhcpLog.Infof("Using Domain Search List: %v", srv.DomainSearchList)
 	}
 
 	leaseTime, err := time.ParseDuration(viper.GetString("dhcp.lease_time"))
@@ -116,12 +117,12 @@ func serveDHCP(ctx context.Context) error {
 	}
 	srv.LeaseTime = leaseTime
 	srv.MTU = viper.GetInt("dhcp.mtu")
-	cmd.Log.Infof("Default lease time: %s", srv.LeaseTime)
-	cmd.Log.Infof("Default mtu: %d", srv.MTU)
+	dhcpLog.Infof("Default lease time: %s", srv.LeaseTime)
+	dhcpLog.Infof("Default mtu: %d", srv.MTU)
 
 	srv.ProxyOnly = viper.GetBool("dhcp.proxy_only")
 	if srv.ProxyOnly {
-		cmd.Log.Infof("Running in ProxyOnly mode")
+		dhcpLog.Infof("Running in ProxyOnly mode")
 	}
 
 	if err := srv.Serve(ctx); err != nil {

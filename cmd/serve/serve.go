@@ -2,6 +2,8 @@ package serve
 
 import (
 	"context"
+	"encoding/json"
+	"io/ioutil"
 	"os"
 	"os/signal"
 	"sync"
@@ -13,75 +15,153 @@ import (
 	"github.com/ubccr/grendel/model"
 )
 
-func init() {
-	cmd.Root.AddCommand(serveCmd)
-}
-
 var (
-	DB       *model.BuntStore
-	serveCmd = &cobra.Command{
+	DB         *model.BuntStore
+	hostsFile  string
+	imagesFile string
+	serveCmd   = &cobra.Command{
 		Use:   "serve",
 		Short: "Run services",
 		Long:  `Run grendel services`,
 		RunE: func(command *cobra.Command, args []string) error {
-			ctx, cancel := NewInterruptContext()
-
-			var wg sync.WaitGroup
-			wg.Add(6)
-			errs := make(chan error, 6)
-
-			go func() {
-				errs <- serveAPI(ctx)
-				wg.Done()
-			}()
-			go func() {
-				errs <- serveTFTP(ctx)
-				wg.Done()
-			}()
-			go func() {
-				errs <- serveDNS(ctx)
-				wg.Done()
-			}()
-			go func() {
-				errs <- serveProvision(ctx)
-				wg.Done()
-			}()
-			go func() {
-				errs <- serveDHCP(ctx)
-				wg.Done()
-			}()
-			go func() {
-				errs <- servePXE(ctx)
-				wg.Done()
-			}()
-
-			// Fail if any servers error out
-			err := <-errs
-
-			cmd.Log.Infof("Waiting for all services to shutdown...")
-
-			ctxShutdown, cancelShutdown := context.WithTimeout(context.Background(), 10*time.Second)
-			defer cancelShutdown()
-
-			cancel()
-
-			done := make(chan struct{})
-			go func() {
-				wg.Wait()
-				close(done)
-			}()
-
-			select {
-			case <-done:
-				cmd.Log.Info("All services shutdown")
-			case <-ctxShutdown.Done():
-				cmd.Log.Warning("Timeout reached")
+			if hostsFile != "" {
+				err := loadHostJSON()
+				if err != nil {
+					return err
+				}
+			}
+			if imagesFile != "" {
+				err := loadImageJSON()
+				if err != nil {
+					return err
+				}
 			}
 
-			return err
+			return runServices()
 		},
 	}
 )
+
+func init() {
+	serveCmd.PersistentFlags().StringVar(&hostsFile, "hosts", "", "path to hosts file")
+	serveCmd.PersistentFlags().StringVar(&imagesFile, "images", "", "path to boot images file")
+	serveCmd.PersistentFlags().StringSlice("services", []string{}, "enabled services")
+	viper.BindPFlag("services", serveCmd.PersistentFlags().Lookup("services"))
+
+	cmd.Root.AddCommand(serveCmd)
+}
+
+func loadHostJSON() error {
+	file, err := os.Open(hostsFile)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	jsonBlob, err := ioutil.ReadAll(file)
+	if err != nil {
+		return err
+	}
+
+	var hostList model.HostList
+	err = json.Unmarshal(jsonBlob, &hostList)
+	if err != nil {
+		return err
+	}
+
+	err = DB.StoreHosts(hostList)
+	if err != nil {
+		return err
+	}
+
+	cmd.Log.Infof("Successfully loaded %d hosts", len(hostList))
+	return nil
+}
+
+func loadImageJSON() error {
+	file, err := os.Open(imagesFile)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	jsonBlob, err := ioutil.ReadAll(file)
+	if err != nil {
+		return err
+	}
+
+	var imageList model.BootImageList
+	err = json.Unmarshal(jsonBlob, &imageList)
+	if err != nil {
+		return err
+	}
+
+	err = DB.StoreBootImages(imageList)
+	if err != nil {
+		return err
+	}
+
+	cmd.Log.Infof("Successfully loaded %d boot images", len(imageList))
+	return nil
+}
+
+func runServices() error {
+	ctx, cancel := NewInterruptContext()
+
+	var wg sync.WaitGroup
+	wg.Add(6)
+	errs := make(chan error, 6)
+
+	go func() {
+		errs <- serveAPI(ctx)
+		wg.Done()
+	}()
+	go func() {
+		errs <- serveTFTP(ctx)
+		wg.Done()
+	}()
+	go func() {
+		errs <- serveDNS(ctx)
+		wg.Done()
+	}()
+	go func() {
+		errs <- serveProvision(ctx)
+		wg.Done()
+	}()
+	go func() {
+		errs <- serveDHCP(ctx)
+		wg.Done()
+	}()
+	go func() {
+		errs <- servePXE(ctx)
+		wg.Done()
+	}()
+
+	// Fail if any servers error out
+	err := <-errs
+
+	cmd.Log.Infof("Waiting for all services to shutdown...")
+
+	ctxShutdown, cancelShutdown := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancelShutdown()
+
+	cancel()
+
+	done := make(chan struct{})
+	go func() {
+		wg.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		cmd.Log.Info("All services shutdown")
+	case <-ctxShutdown.Done():
+		cmd.Log.Warning("Timeout reached")
+	}
+
+	return err
+}
 
 func NewInterruptContext() (context.Context, context.CancelFunc) {
 	c := make(chan os.Signal, 1)
