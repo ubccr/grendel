@@ -26,7 +26,8 @@ type Client struct {
 	endpoint string
 	clientID string
 	secret   string
-	client   *retryablehttp.Client
+	rclient  *retryablehttp.Client
+	client   *http.Client
 }
 
 func NewClient() (*Client, error) {
@@ -62,15 +63,17 @@ func NewClient() (*Client, error) {
 		c.endpoint = "http://unix"
 	}
 
-	c.client = retryablehttp.NewClient()
-	c.client.HTTPClient = &http.Client{Timeout: time.Second * 3600, Transport: tr}
-	c.client.Logger = log
+	c.rclient = retryablehttp.NewClient()
+	c.rclient.HTTPClient = &http.Client{Timeout: time.Second * 3600, Transport: tr}
+	c.rclient.Logger = log
+
+	c.client = &http.Client{Timeout: time.Second * 3600, Transport: tr}
 
 	return c, nil
 }
 
 func (c *Client) RetryMax(max int) {
-	c.client.RetryMax = max
+	c.rclient.RetryMax = max
 }
 
 func (c *Client) URL(resource string) string {
@@ -98,12 +101,12 @@ func (c *Client) newRequest(method, url string, body io.Reader) (*http.Request, 
 	return req, nil
 }
 
-func (c *Client) HostFind(ns *nodeset.NodeSet) (model.HostList, error) {
+func (c *Client) FindHosts(ns *nodeset.NodeSet) (model.HostList, error) {
 	endpoint := fmt.Sprintf("%s/%s", GRENDEL_API_HOST_FIND, ns.String())
 	return c.hostList(endpoint)
 }
 
-func (c *Client) HostList() (model.HostList, error) {
+func (c *Client) Hosts() (model.HostList, error) {
 	return c.hostList(GRENDEL_API_HOST_LIST)
 }
 
@@ -118,7 +121,7 @@ func (c *Client) hostList(endpoint string) (model.HostList, error) {
 		return nil, err
 	}
 
-	res, err := c.client.Do(rreq)
+	res, err := c.rclient.Do(rreq)
 	if err != nil {
 		return nil, err
 	}
@@ -146,4 +149,27 @@ func (c *Client) hostList(endpoint string) (model.HostList, error) {
 	}
 
 	return hostList, nil
+}
+
+func (c *Client) StoreHostsReader(hosts io.Reader) error {
+	req, err := c.postRequest(c.URL(GRENDEL_API_HOST_ADD), hosts)
+	if err != nil {
+		return err
+	}
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode == http.StatusInternalServerError {
+		return fmt.Errorf("Failed to add hosts: %d", res.StatusCode)
+	}
+
+	if res.StatusCode != http.StatusCreated {
+		return fmt.Errorf("Failed to add hosts unknown error code: %d", res.StatusCode)
+	}
+
+	return nil
 }

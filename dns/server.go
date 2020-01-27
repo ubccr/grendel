@@ -17,7 +17,7 @@ type Server struct {
 	srv *dns.Server
 }
 
-func NewServer(db model.Datastore, address string, ttl int) (*Server, error) {
+func NewServer(db model.DataStore, address string, ttl int) (*Server, error) {
 	s := &Server{Address: address}
 
 	s.srv = &dns.Server{Addr: address, Net: "udp"}

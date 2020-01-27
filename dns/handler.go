@@ -14,11 +14,11 @@ import (
 // https://github.com/coredns/coredns/tree/master/plugin/hosts
 
 type handler struct {
-	db  model.Datastore
+	db  model.DataStore
 	ttl uint32
 }
 
-func NewHandler(db model.Datastore, ttl uint32) (*handler, error) {
+func NewHandler(db model.DataStore, ttl uint32) (*handler, error) {
 	h := &handler{
 		db:  db,
 		ttl: ttl,

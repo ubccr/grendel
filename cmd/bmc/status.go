@@ -48,7 +48,7 @@ func runStatus(ns *nodeset.NodeSet) error {
 		return err
 	}
 
-	hostList, err := gc.HostFind(ns)
+	hostList, err := gc.FindHosts(ns)
 	if err != nil {
 		return err
 	}

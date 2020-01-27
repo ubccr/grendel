@@ -32,10 +32,10 @@ type Server struct {
 	CertFile      string
 	Hostname      string
 	RepoDir       string
-	DB            model.Datastore
+	DB            model.DataStore
 }
 
-func NewServer(db model.Datastore, address string) (*Server, error) {
+func NewServer(db model.DataStore, address string) (*Server, error) {
 	s := &Server{DB: db}
 
 	shost, sport, err := net.SplitHostPort(address)

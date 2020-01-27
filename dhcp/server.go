@@ -27,14 +27,14 @@ type Server struct {
 	HTTPPort         int
 	MTU              int
 	ProxyOnly        bool
-	DB               model.Datastore
+	DB               model.DataStore
 	DNSServers       []net.IP
 	DomainSearchList []string
 	LeaseTime        time.Duration
 	srv              *server4.Server
 }
 
-func NewServer(db model.Datastore, address string) (*Server, error) {
+func NewServer(db model.DataStore, address string) (*Server, error) {
 	s := &Server{DB: db}
 
 	if address == "" {

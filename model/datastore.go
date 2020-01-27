@@ -20,8 +20,8 @@ var (
 	ErrInvalidData = errors.New("invalid data")
 )
 
-// Datastore
-type Datastore interface {
+// DataStore
+type DataStore interface {
 	// BootImages returns a list of all boot images
 	BootImages() (BootImageList, error)
 
@@ -66,4 +66,11 @@ type Datastore interface {
 
 	// ReverseResolve returns the list of FQDNs for the given IP
 	ReverseResolve(ip string) ([]string, error)
+
+	// Close data store
+	Close() error
+}
+
+func NewDataStore(path string) (DataStore, error) {
+	return NewBuntStore(path)
 }

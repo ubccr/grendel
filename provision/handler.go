@@ -19,10 +19,10 @@ import (
 )
 
 type Handler struct {
-	DB model.Datastore
+	DB model.DataStore
 }
 
-func NewHandler(db model.Datastore) (*Handler, error) {
+func NewHandler(db model.DataStore) (*Handler, error) {
 	h := &Handler{
 		DB: db,
 	}

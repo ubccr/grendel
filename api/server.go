@@ -30,10 +30,10 @@ type Server struct {
 	KeyFile       string
 	CertFile      string
 	Hostname      string
-	DB            model.Datastore
+	DB            model.DataStore
 }
 
-func NewServer(db model.Datastore, socket, address string) (*Server, error) {
+func NewServer(db model.DataStore, socket, address string) (*Server, error) {
 	s := &Server{DB: db, SocketPath: socket}
 
 	if socket != "" {

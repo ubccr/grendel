@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	DB         *model.BuntStore
+	DB         model.DataStore
 	hostsFile  string
 	imagesFile string
 	serveCmd   = &cobra.Command{
@@ -56,7 +56,7 @@ func init() {
 			return err
 		}
 
-		DB, err = model.NewBuntStore(viper.GetString("dbpath"))
+		DB, err = model.NewDataStore(viper.GetString("dbpath"))
 		if err != nil {
 			return err
 		}

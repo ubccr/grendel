@@ -22,7 +22,7 @@ const (
 )
 
 type PXEServer struct {
-	DB            model.Datastore
+	DB            model.DataStore
 	ListenAddress net.IP
 	ServerAddress net.IP
 	Port          int
@@ -30,7 +30,7 @@ type PXEServer struct {
 	log           *logrus.Entry
 }
 
-func NewPXEServer(db model.Datastore, address string) (*PXEServer, error) {
+func NewPXEServer(db model.DataStore, address string) (*PXEServer, error) {
 	s := &PXEServer{DB: db, log: logger.GetLogger("PXE")}
 
 	if address == "" {

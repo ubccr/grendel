@@ -21,7 +21,7 @@ func (h *Handler) HostAdd(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "malformed input data")
 	}
 
-	log.Debugf("Got %d hosts", len(hosts))
+	log.Infof("Attempting to add %d hosts", len(hosts))
 
 	for _, host := range hosts {
 		err := c.Validate(host)
@@ -42,6 +42,8 @@ func (h *Handler) HostAdd(c echo.Context) error {
 		}).Error("Failed to save hosts to datastore")
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to save hosts")
 	}
+
+	log.Infof("Added %d hosts successfully", len(hosts))
 
 	res := map[string]interface{}{
 		"hosts": len(hosts),
