@@ -80,7 +80,7 @@ func serveDHCP(ctx context.Context) error {
 	}
 
 	if srv.Hostname == "" && srv.HTTPScheme == "https" {
-		hosts, err := net.LookupAddr(srv.ServerAddress.String())
+		hosts, err := net.LookupAddr(provisionIP.String())
 		if err == nil && len(hosts) > 0 {
 			fqdn := hosts[0]
 			srv.Hostname = strings.TrimSuffix(fqdn, ".")
