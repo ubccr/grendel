@@ -1,52 +1,114 @@
 package dhcp
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"net"
+	"strconv"
+	"time"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
+	"github.com/insomniacslk/dhcp/dhcpv4/server4"
+	"github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/firmware"
+	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
+	"github.com/ubccr/grendel/util"
 )
 
-func (s *Server) pxeHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DHCPv4) {
+const (
+	DefaultPXEPort = 4011
+)
+
+type PXEServer struct {
+	DB            model.Datastore
+	ListenAddress net.IP
+	ServerAddress net.IP
+	Port          int
+	srv           *server4.Server
+	log           *logrus.Entry
+}
+
+func NewPXEServer(db model.Datastore, address string) (*PXEServer, error) {
+	s := &PXEServer{DB: db, log: logger.GetLogger("PXE")}
+
+	if address == "" {
+		address = fmt.Sprintf("%s:%d", net.IPv4zero.String(), DefaultPXEPort)
+	}
+
+	ipStr, portStr, err := net.SplitHostPort(address)
+	if err != nil {
+		return nil, err
+	}
+
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		return nil, err
+	}
+
+	s.Port = port
+
+	ip := net.ParseIP(ipStr)
+	if ip == nil || ip.To4() == nil {
+		return nil, fmt.Errorf("Invalid IPv4 address: %s", ipStr)
+	}
+
+	s.ListenAddress = ip
+
+	if !ip.To4().Equal(net.IPv4zero) {
+		s.ServerAddress = ip
+		return s, nil
+	}
+
+	ipaddr, err := util.GetInterfaceIP()
+	if err != nil {
+		return nil, err
+	}
+
+	s.ServerAddress = ipaddr
+
+	return s, nil
+}
+
+func (s *PXEServer) pxeHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DHCPv4) {
 	host, err := s.DB.LoadHostFromMAC(req.ClientHWAddr.String())
 	if err != nil {
 		if !errors.Is(err, model.ErrNotFound) {
-			log.Errorf("PXEServer failed to find host: %s", err)
+			s.log.Errorf("failed to find host: %s", err)
 		}
 		return
 	}
 
 	if !host.Provision {
-		log.Infof("Host not set to providion: %s", req.ClientHWAddr.String())
+		s.log.Infof("Host not set to providion: %s", req.ClientHWAddr.String())
 		return
 	}
 
-	log.Debugf("PXEHandler Received DHCPv4 packet")
-	log.Debugf(req.Summary())
+	s.log.Debugf("Received DHCPv4 packet")
+	s.log.Debugf(req.Summary())
 
 	if req.OpCode != dhcpv4.OpcodeBootRequest {
-		log.Warningf("PXEServer not a BootRequest, ignoring")
+		s.log.Warningf("not a BootRequest, ignoring")
 		return
 	}
 
 	if !req.Options.Has(dhcpv4.OptionClientSystemArchitectureType) {
-		log.Infof("PXEServer ignoring packet - missing client system architecture type")
+		s.log.Infof("ignoring packet - missing client system architecture type")
 		return
 	}
 
 	fwtype, err := firmware.DetectBuild(req.ClientArch(), "")
 	if err != nil {
-		log.Errorf("PXEServer failed to get firmware: %s", err)
+		s.log.Errorf("failed to get firmware: %s", err)
 		return
 	}
 	if host.Firmware != 0 {
-		log.Infof("Overriding firmware for host: %s", req.ClientHWAddr.String())
+		s.log.Infof("Overriding firmware for host: %s", req.ClientHWAddr.String())
 		fwtype = host.Firmware
 	}
 
-	log.Infof("PXEServer received valid request %s - %d", req.ClientHWAddr, fwtype)
+	s.log.Infof("Received valid request %s - %d", req.ClientHWAddr, fwtype)
 
 	resp, err := dhcpv4.NewReplyFromRequest(req,
 		dhcpv4.WithBroadcast(false),
@@ -57,7 +119,7 @@ func (s *Server) pxeHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DHC
 		dhcpv4.WithOption(dhcpv4.OptServerIdentifier(s.ServerAddress)),
 	)
 	if err != nil {
-		log.Printf("PXEServer failed to build reply: %v", err)
+		s.log.Errorf("failed to build reply: %v", err)
 		return
 	}
 
@@ -67,15 +129,67 @@ func (s *Server) pxeHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DHC
 
 	token, err := model.NewFirmwareToken(req.ClientHWAddr.String(), fwtype)
 	if err != nil {
-		log.Errorf("Failed to generated signed PXE token")
+		s.log.Errorf("Failed to generated signed firmware token")
 		return
 	}
 	resp.BootFileName = token
 
-	log.Debugf("PXEServer sending response")
-	log.Debugf(resp.Summary())
+	s.log.Debugf("Sending response")
+	s.log.Debugf(resp.Summary())
 
 	if _, err := conn.WriteTo(resp.ToBytes(), peer); err != nil {
-		log.Printf("PXEServer conn.Write to %v failed: %v", peer, err)
+		s.log.Errorf("UDP write to %v failed: %v", peer, err)
 	}
+}
+
+func (s *PXEServer) Serve(ctx context.Context) error {
+	listener := &net.UDPAddr{
+		IP:   s.ListenAddress,
+		Port: s.Port,
+	}
+
+	srv, err := server4.NewServer("", listener, s.pxeHandler4)
+	if err != nil {
+		return err
+	}
+
+	s.srv = srv
+
+	go func() {
+		<-ctx.Done()
+
+		s.log.Info("Shutting down PXE server...")
+		ctxShutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		if err := s.Shutdown(ctxShutdown); err != nil {
+			s.log.Errorf("Failed shutting down PXE server: %v", err)
+		}
+	}()
+
+	s.log.Infof("Server listening on: %s:%d", s.ListenAddress, s.Port)
+	if err := s.srv.Serve(); err != nil {
+		s.log.Debugf("Error serving PXE: %v", err)
+	}
+
+	return nil
+}
+
+func (s *PXEServer) Shutdown(ctx context.Context) error {
+	errs := make(chan error, 1)
+	defer close(errs)
+
+	go func() {
+		errs <- s.srv.Close()
+	}()
+
+	var ctxErr error
+	select {
+	case err := <-errs:
+		ctxErr = err
+	case <-ctx.Done():
+		ctxErr = ctx.Err()
+	}
+
+	return ctxErr
 }

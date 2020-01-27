@@ -28,7 +28,6 @@ type Server struct {
 	PXEPort          int
 	MTU              int
 	ProxyOnly        bool
-	ServePXE         bool
 	DB               model.Datastore
 	DNSServers       []net.IP
 	DomainSearchList []string
@@ -38,7 +37,7 @@ type Server struct {
 }
 
 func NewServer(db model.Datastore, address string, proxyOnly bool) (*Server, error) {
-	s := &Server{DB: db, ProxyOnly: proxyOnly, ServePXE: true}
+	s := &Server{DB: db, ProxyOnly: proxyOnly}
 
 	if proxyOnly {
 		log.Debugf("Running in ProxyOnly mode")
@@ -224,44 +223,12 @@ func (s *Server) Serve() error {
 
 	log.Debugf("Server Address: %s", s.ServerAddress.String())
 
-	if !s.ServePXE {
-		return s.srv.Serve()
-	}
-
-	pxeListener := &net.UDPAddr{
-		IP:   s.ListenAddress,
-		Port: s.PXEPort,
-	}
-
-	srvPXE, err := server4.NewServer("", pxeListener, s.pxeHandler4)
-	if err != nil {
-		return err
-	}
-
-	s.srvPXE = srvPXE
-
-	errs := make(chan error, 2)
-
-	go func() { errs <- s.srv.Serve() }()
-	go func() { errs <- s.srvPXE.Serve() }()
-
-	err = <-errs
-	s.Shutdown()
-
-	return err
+	return s.srv.Serve()
 }
 
 func (s *Server) Shutdown() {
 	err := s.srv.Close()
 	if err != nil {
 		log.Errorf("Failed to close dhcp server: %s", err)
-	}
-	if !s.ServePXE {
-		return
-	}
-
-	err = s.srvPXE.Close()
-	if err != nil {
-		log.Errorf("Failed to close pxe server: %s", err)
 	}
 }
