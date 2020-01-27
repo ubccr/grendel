@@ -17,7 +17,7 @@ import (
 
 const (
 	HostKeyPrefix      = "host"
-	BootImageKeyPrefix = "host"
+	BootImageKeyPrefix = "image"
 )
 
 // BuntStore implements a Grendel Datastore using BuntDB
