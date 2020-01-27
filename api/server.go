@@ -36,6 +36,10 @@ type Server struct {
 func NewServer(db model.Datastore, socket, address string) (*Server, error) {
 	s := &Server{DB: db, SocketPath: socket}
 
+	if socket != "" {
+		return s, nil
+	}
+
 	shost, sport, err := net.SplitHostPort(address)
 	if err != nil {
 		return nil, err
@@ -152,9 +156,11 @@ func (s *Server) Serve(ctx context.Context) error {
 		}
 
 		s.Scheme = "https"
+		log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
 	} else {
 		s.Scheme = "http"
 		httpServer.Addr = fmt.Sprintf("%s:%d", s.ListenAddress, s.Port)
+		log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
 	}
 
 	go func() {
@@ -169,7 +175,6 @@ func (s *Server) Serve(ctx context.Context) error {
 		}
 	}()
 
-	log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
 	if err := e.StartServer(httpServer); err != nil && err != http.ErrServerClosed {
 		return err
 	}
