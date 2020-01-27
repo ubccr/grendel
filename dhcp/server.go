@@ -170,10 +170,6 @@ func (s *Server) Serve(ctx context.Context) error {
 		s.HTTPScheme = "http"
 	}
 
-	if s.ProxyOnly {
-		log.Infof("Running in ProxyOnly mode")
-	}
-
 	listener := &net.UDPAddr{
 		IP:   s.ListenAddress,
 		Port: s.Port,
