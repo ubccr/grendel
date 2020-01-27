@@ -6,18 +6,23 @@ import (
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/insomniacslk/dhcp/rfc1035label"
+	"github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/model"
 )
 
 func (s *Server) staticHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) error {
 	nic := host.Interface(req.ClientHWAddr)
 	if nic == nil {
-		log.Warnf("StaticHandler4 invalid mac address for host: %s", req.ClientHWAddr)
+		log.Warnf("invalid mac address for host: %s", req.ClientHWAddr)
 		return nil
 	}
 
 	resp.YourIPAddr = nic.IP
-	log.Infof("StaticHandler4 found IP address %s for MAC %s", nic.IP, req.ClientHWAddr.String())
+	log.WithFields(logrus.Fields{
+		"ip":   nic.IP.String(),
+		"mac":  req.ClientHWAddr.String(),
+		"name": host.Name,
+	}).Info("Found host")
 	log.Debugf(req.Summary())
 
 	// TODO make this configurable
