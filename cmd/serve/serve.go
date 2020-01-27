@@ -27,8 +27,8 @@ var (
 			ctx, cancel := NewInterruptContext()
 
 			var wg sync.WaitGroup
-			wg.Add(4)
-			errs := make(chan error, 4)
+			wg.Add(6)
+			errs := make(chan error, 6)
 
 			go func() {
 				errs <- serveAPI(ctx)
@@ -44,6 +44,14 @@ var (
 			}()
 			go func() {
 				errs <- serveProvision(ctx)
+				wg.Done()
+			}()
+			go func() {
+				errs <- serveDHCP(ctx)
+				wg.Done()
+			}()
+			go func() {
+				errs <- servePXE(ctx)
 				wg.Done()
 			}()
 

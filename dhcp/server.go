@@ -1,6 +1,7 @@
 package dhcp
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net"
@@ -9,10 +10,10 @@ import (
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/insomniacslk/dhcp/dhcpv4/server4"
-	"github.com/insomniacslk/dhcp/interfaces"
 	"github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
+	"github.com/ubccr/grendel/util"
 )
 
 var log = logger.GetLogger("DHCP")
@@ -20,12 +21,10 @@ var log = logger.GetLogger("DHCP")
 type Server struct {
 	ListenAddress    net.IP
 	ServerAddress    net.IP
-	IfIndex          int
 	Hostname         string
 	HTTPScheme       string
 	Port             int
 	HTTPPort         int
-	PXEPort          int
 	MTU              int
 	ProxyOnly        bool
 	DB               model.Datastore
@@ -33,15 +32,10 @@ type Server struct {
 	DomainSearchList []string
 	LeaseTime        time.Duration
 	srv              *server4.Server
-	srvPXE           *server4.Server
 }
 
-func NewServer(db model.Datastore, address string, proxyOnly bool) (*Server, error) {
-	s := &Server{DB: db, ProxyOnly: proxyOnly}
-
-	if proxyOnly {
-		log.Debugf("Running in ProxyOnly mode")
-	}
+func NewServer(db model.Datastore, address string) (*Server, error) {
+	s := &Server{DB: db}
 
 	if address == "" {
 		address = fmt.Sprintf("%s:%d", net.IPv4zero.String(), dhcpv4.ServerPort)
@@ -64,51 +58,19 @@ func NewServer(db model.Datastore, address string, proxyOnly bool) (*Server, err
 		return nil, fmt.Errorf("Invalid IPv4 address: %s", ipStr)
 	}
 
+	s.ListenAddress = ip
+
 	if !ip.To4().Equal(net.IPv4zero) {
-		s.ListenAddress = ip
 		s.ServerAddress = ip
 		return s, nil
 	}
 
-	// Attempt to discover server ip from interfaces
-
-	intfs, err := interfaces.GetNonLoopbackInterfaces()
+	ipaddr, err := util.GetInterfaceIP()
 	if err != nil {
 		return nil, err
 	}
 
-	serverIps := make([]net.IP, 0)
-
-	for _, intf := range intfs {
-		addrs, err := intf.Addrs()
-		if err != nil {
-			return nil, err
-		}
-
-		ips, err := dhcpv4.GetExternalIPv4Addrs(addrs)
-		if err != nil {
-			return nil, err
-		}
-
-		if len(ips) == 0 {
-			continue
-		}
-
-		log.Debugf("Found IP(s) for interface %s: %v", intf.Name, ips)
-		serverIps = append(serverIps, ips...)
-		s.IfIndex = intf.Index
-	}
-
-	if len(serverIps) == 0 {
-		return nil, errors.New("Failed to find server ip address from configured interfaces")
-	}
-	if len(serverIps) != 1 {
-		//TODO add support for multiple interfaces
-		return nil, fmt.Errorf("Multiple interfaces not supported yet: %#v", serverIps)
-	}
-
-	s.ServerAddress = serverIps[0]
-	s.ListenAddress = ip
+	s.ServerAddress = ipaddr
 
 	return s, nil
 }
@@ -199,21 +161,24 @@ func (s *Server) mainHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DH
 	}
 }
 
-func (s *Server) Serve() error {
+func (s *Server) Serve(ctx context.Context) error {
 	if s.HTTPPort == 0 {
 		s.HTTPPort = 80
 	}
+
 	if s.HTTPScheme == "" {
 		s.HTTPScheme = "http"
 	}
-	if s.PXEPort == 0 {
-		s.PXEPort = 4011
+
+	if s.ProxyOnly {
+		log.Infof("Running in ProxyOnly mode")
 	}
 
 	listener := &net.UDPAddr{
 		IP:   s.ListenAddress,
 		Port: s.Port,
 	}
+
 	srv, err := server4.NewServer("", listener, s.mainHandler4)
 	if err != nil {
 		return err
@@ -221,14 +186,42 @@ func (s *Server) Serve() error {
 
 	s.srv = srv
 
-	log.Debugf("Server Address: %s", s.ServerAddress.String())
+	go func() {
+		<-ctx.Done()
 
-	return s.srv.Serve()
+		log.Info("Shutting down DHCP server...")
+		ctxShutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		if err := s.Shutdown(ctxShutdown); err != nil {
+			log.Errorf("Failed shutting down DHCP server: %v", err)
+		}
+	}()
+
+	log.Infof("Server listening on: %s:%d", s.ListenAddress, s.Port)
+
+	if err := s.srv.Serve(); err != nil {
+		log.Debugf("Error serving DHCP: %v", err)
+	}
+
+	return nil
 }
 
-func (s *Server) Shutdown() {
-	err := s.srv.Close()
-	if err != nil {
-		log.Errorf("Failed to close dhcp server: %s", err)
+func (s *Server) Shutdown(ctx context.Context) error {
+	errs := make(chan error, 1)
+	defer close(errs)
+
+	go func() {
+		errs <- s.srv.Close()
+	}()
+
+	var ctxErr error
+	select {
+	case err := <-errs:
+		ctxErr = err
+	case <-ctx.Done():
+		ctxErr = ctx.Err()
 	}
+
+	return ctxErr
 }
