@@ -2,16 +2,12 @@ package bmc
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 
-	"github.com/korovkin/limiter"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/client"
-	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/nodeset"
 )
 
@@ -58,49 +54,13 @@ func runNetboot(ns *nodeset.NodeSet) error {
 	}
 
 	delay := viper.GetInt("bmc.delay")
-	limit := limiter.NewConcurrencyLimiter(viper.GetInt("bmc.fanout"))
+	runner := NewJobRunner(viper.GetInt("bmc.fanout"))
 	for _, host := range hostList {
-		limit.Execute(func() {
-			sysmgr, err := systemMgr(host)
-			if err != nil {
-				cmd.Log.WithFields(logrus.Fields{
-					"err":  err,
-					"name": host.Name,
-					"ID":   host.ID,
-				}).Error("Failed to connect to BMC")
-				return
-			}
-			defer sysmgr.Logout()
-
-			err = sysmgr.EnablePXE()
-			if err != nil {
-				cmd.Log.WithFields(logrus.Fields{
-					"err":  err,
-					"name": host.Name,
-					"ID":   host.ID,
-				}).Error("Failed to enabel PXE on next boot")
-				return
-			}
-
-			if reboot {
-				err = sysmgr.PowerCycle()
-				if err != nil {
-					cmd.Log.WithFields(logrus.Fields{
-						"err":  err,
-						"name": host.Name,
-						"ID":   host.ID,
-					}).Error("Failed to power cycle node")
-					return
-				}
-			}
-
-			fmt.Printf("%s: OK\n", host.Name)
-		})
-
+		runner.RunNetBoot(host, reboot)
 		time.Sleep(time.Duration(delay) * time.Second)
 	}
 
-	limit.Wait()
+	runner.Wait()
 
 	return nil
 }
