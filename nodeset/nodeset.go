@@ -17,8 +17,13 @@ var (
 	rangeSetRegexp    = regexp.MustCompile(`(\[[^\[\]]+\])`)
 )
 
+type Pattern struct {
+	format string
+	set    *RangeSetND
+}
+
 type NodeSet struct {
-	pat map[string]*RangeSetND
+	pat []*Pattern
 }
 
 func NewNodeSet(nodestr string) (*NodeSet, error) {
@@ -37,7 +42,7 @@ func NewNodeSet(nodestr string) (*NodeSet, error) {
 		return nil, fmt.Errorf("unbalanced ']' found while parsing %s - %w", nodestr, ErrParseNodeSet)
 	}
 
-	ns := &NodeSet{pat: make(map[string]*RangeSetND, 0)}
+	ns := &NodeSet{pat: make([]*Pattern, 0)}
 
 	ridx := 0
 	for _, pattern := range strings.Split(patterns, ",") {
@@ -52,10 +57,10 @@ func NewNodeSet(nodestr string) (*NodeSet, error) {
 			if err != nil {
 				return nil, fmt.Errorf("%w", err)
 			}
-			ns.pat[pattern] = rsnd
+			ns.pat = append(ns.pat, &Pattern{format: pattern, set: rsnd})
 			ridx += rangeSetCount
 		} else {
-			ns.pat[pattern] = nil
+			ns.pat = append(ns.pat, &Pattern{format: pattern, set: nil})
 		}
 	}
 
@@ -64,13 +69,13 @@ func NewNodeSet(nodestr string) (*NodeSet, error) {
 
 func (ns *NodeSet) Len() int {
 	size := 0
-	for _, rs := range ns.pat {
-		if rs == nil {
+	for _, p := range ns.pat {
+		if p.set == nil {
 			size++
 			continue
 		}
 
-		size += rs.Len()
+		size += p.set.Len()
 	}
 
 	return size
@@ -84,16 +89,16 @@ func (ns *NodeSet) String() string {
 func (ns *NodeSet) toStringList() []string {
 	list := make([]string, 0)
 
-	for pat, rs := range ns.pat {
-		if rs == nil {
-			list = append(list, pat)
+	for _, p := range ns.pat {
+		if p.set == nil {
+			list = append(list, p.format)
 		} else {
-			ranges := rs.Ranges()
+			ranges := p.set.Ranges()
 			params := make([]interface{}, 0, len(ranges))
 			for _, r := range ranges {
 				params = append(params, fmt.Sprintf("[%s]", r.String()))
 			}
-			list = append(list, fmt.Sprintf(pat, params...))
+			list = append(list, fmt.Sprintf(p.format, params...))
 		}
 	}
 
@@ -124,22 +129,22 @@ func (ns *NodeSet) UnmarshalJSON(data []byte) error {
 func (ns *NodeSet) Iterator() *NodeSetIterator {
 	nodes := make([]string, 0, ns.Len())
 
-	for pat, rsnd := range ns.pat {
-		if rsnd == nil || rsnd.Len() == 0 {
-			nodes = append(nodes, pat)
+	for _, p := range ns.pat {
+		if p.set == nil || p.set.Len() == 0 {
+			nodes = append(nodes, p.format)
 			continue
 		}
 
-		ranges := rsnd.Ranges()
-		slices := make([][]interface{}, rsnd.Dim())
-		for i := 0; i < rsnd.Dim(); i++ {
+		ranges := p.set.Ranges()
+		slices := make([][]interface{}, p.set.Dim())
+		for i := 0; i < p.set.Dim(); i++ {
 			strings := ranges[i].Strings()
 			slices[i] = toIface(strings)
 		}
 
 		c := cartesian.Iter(slices...)
 		for rec := range c {
-			nodes = append(nodes, fmt.Sprintf(pat, rec...))
+			nodes = append(nodes, fmt.Sprintf(p.format, rec...))
 		}
 	}
 
