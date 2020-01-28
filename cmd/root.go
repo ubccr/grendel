@@ -78,7 +78,7 @@ func initConfig() {
 
 		viper.AddConfigPath("/etc/grendel/")
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".grendel")
+		viper.SetConfigName("grendel")
 		viper.SetConfigType("toml")
 	}
 
