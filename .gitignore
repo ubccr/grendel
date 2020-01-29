@@ -6,3 +6,4 @@ out/
 firmware/bin
 api/rice-box.go
 provision/rice-box.go
+*.swp

@@ -1,6 +1,7 @@
 package tors
 
 import (
+	"encoding/json"
 	"net"
 
 	"github.com/ubccr/grendel/logger"
@@ -31,4 +32,9 @@ func (mt MACTable) Port(port int) []*MACTableEntry {
 	}
 
 	return entries
+}
+
+func (mt MACTable) String() string {
+	data, _ := json.MarshalIndent(mt, "", "    ")
+	return string(data)
 }

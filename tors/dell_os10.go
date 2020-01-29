@@ -89,7 +89,10 @@ func (d *DellOS10) getRequest(url string) (*http.Request, error) {
 }
 
 func (d *DellOS10) GetMACTable() (MACTable, error) {
-	req, err := d.getRequest(d.URL(DELLOS10_RESTCONF_MACTABLE))
+	url := d.URL(DELLOS10_RESTCONF_MACTABLE)
+	log.Infof("Requesting MAC table: %s", url)
+
+	req, err := d.getRequest(url)
 	if err != nil {
 		return nil, err
 	}
@@ -150,6 +153,7 @@ func (d *DellOS10) GetMACTable() (MACTable, error) {
 			}
 		}
 
+		log.Infof("Received %d entries", len(macTable))
 		return macTable, nil
 	}
 
