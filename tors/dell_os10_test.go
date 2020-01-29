@@ -1,6 +1,7 @@
 package tors
 
 import (
+	//"fmt"
 	"os"
 	"testing"
 )
@@ -27,4 +28,8 @@ func TestDellOS10(t *testing.T) {
 	if len(macTable) == 0 {
 		t.Errorf("No mac table entries returned from api")
 	}
+
+	//	for _, entry := range macTable {
+	//	fmt.Printf("%s - %d\n", entry.MAC, entry.Port)
+	//	}
 }

@@ -140,7 +140,7 @@ func (d *DellOS10) GetMACTable() (MACTable, error) {
 
 			mac, err := net.ParseMAC(entry.MAC)
 			if err != nil {
-				log.Errorf("Invalid mac address entry %s: ", entry.MAC, err)
+				log.Errorf("Invalid mac address entry %s: %v", entry.MAC, err)
 				continue
 			}
 

@@ -31,7 +31,16 @@ var (
 				return fmt.Errorf("Please provide a least one subnet (--subnet and/or --bmc-subnet)")
 			}
 
-			switchClient, err := tors.NewDellOS10(viper.GetString("discovery.endpoint"), viper.GetString("discovery.user"), viper.GetString("discovery.password"), "", true)
+			endpoint := viper.GetString("discovery.endpoint")
+
+			var switchClient tors.NetworkSwitch
+			var err error
+			if strings.HasPrefix(endpoint, "http") {
+				switchClient, err = tors.NewDellOS10(endpoint, viper.GetString("discovery.user"), viper.GetString("discovery.password"), "", true)
+			} else {
+				switchClient, err = tors.NewGeneric(endpoint, "public")
+			}
+
 			if err != nil {
 				return err
 			}
@@ -187,16 +196,18 @@ func discoverFromFile(file, domain string, subnet, bmcSubnet net.IP, netmask net
 
 			ip := subnet.Mask(netmask)
 			isBMC := false
+			fqdn := fmt.Sprintf("%s.%s", hostName, domain)
 
 			if (subnet.To4().Equal(net.IPv4zero) && !bmcSubnet.To4().Equal(net.IPv4zero)) ||
 				(!subnet.To4().Equal(net.IPv4zero) && !bmcSubnet.To4().Equal(net.IPv4zero) && vlanClass == 3000) {
 				ip = bmcSubnet.Mask(netmask)
 				isBMC = true
+				fqdn = strings.Replace(fqdn, "cpn", "bmc", -1)
 			}
 
 			ip[2] += uint8(switchID)
 			ip[3] += uint8(port)
-			addNic(hostName, fmt.Sprintf("%s.%s", hostName, domain), entry.MAC, ip, isBMC)
+			addNic(hostName, fqdn, entry.MAC, ip, isBMC)
 			continue
 
 		}
