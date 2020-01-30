@@ -122,3 +122,30 @@ func (j *JobRunner) RunNetBoot(host *model.Host, reboot bool) {
 		fmt.Printf("%s: OK\n", host.Name)
 	})
 }
+
+func (j *JobRunner) RunReboot(host *model.Host) {
+	j.limit.Execute(func() {
+		sysmgr, err := systemMgr(host)
+		if err != nil {
+			cmd.Log.WithFields(logrus.Fields{
+				"err":  err,
+				"name": host.Name,
+				"ID":   host.ID,
+			}).Error("Failed to connect to BMC")
+			return
+		}
+		defer sysmgr.Logout()
+
+		err = sysmgr.PowerCycle()
+		if err != nil {
+			cmd.Log.WithFields(logrus.Fields{
+				"err":  err,
+				"name": host.Name,
+				"ID":   host.ID,
+			}).Error("Failed to power cycle node")
+			return
+		}
+
+		fmt.Printf("%s: OK\n", host.Name)
+	})
+}
