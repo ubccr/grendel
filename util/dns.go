@@ -1,3 +1,7 @@
+// Adopted from coredns
+// https://github.com/coredns/coredns/blob/master/plugin/pkg/dnsutil/reverse.go
+// Copyright coredns authors Apache License
+
 package util
 
 import (
@@ -11,10 +15,6 @@ func Normalize(name string) string {
 	return strings.ToLower(dns.Fqdn(name))
 }
 
-// Copied from coredns
-// https://github.com/coredns/coredns/blob/master/plugin/pkg/dnsutil/reverse.go
-// Copyright coredns authors Apache License
-//
 // ExtractAddressFromReverse turns a standard PTR reverse record name
 // into an IP address. This works for ipv4 or ipv6.
 //

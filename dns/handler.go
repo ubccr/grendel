@@ -1,3 +1,20 @@
+// Copyright 2019 Grendel Authors. All rights reserved.
+//
+// This file is part of Grendel.
+//
+// Grendel is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Grendel is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Grendel. If not, see <https://www.gnu.org/licenses/>.
+
 package dns
 
 import (
@@ -9,9 +26,6 @@ import (
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/util"
 )
-
-// This code is based of the hosts plugin from coredns
-// https://github.com/coredns/coredns/tree/master/plugin/hosts
 
 type handler struct {
 	db  model.DataStore
@@ -65,6 +79,10 @@ func (h *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 
 	w.WriteMsg(m)
 }
+
+// The code below was adopted from the hosts plugin from coredns
+// https://github.com/coredns/coredns/tree/master/plugin/hosts
+// Copyright coredns authors Apache License
 
 // a takes a slice of net.IPs and returns a slice of A RRs.
 func a(zone string, ttl uint32, ips []net.IP) []dns.RR {

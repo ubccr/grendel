@@ -1,4 +1,4 @@
-// This code was adoped from https://github.com/coredhcp/coredhcp/blob/master/logger/logger.go
+// This code was adopted from https://github.com/coredhcp/coredhcp/blob/master/logger/logger.go
 //
 // MIT License
 //

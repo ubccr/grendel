@@ -1,3 +1,20 @@
+// Copyright 2019 Grendel Authors. All rights reserved.
+//
+// This file is part of Grendel.
+//
+// Grendel is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Grendel is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Grendel. If not, see <https://www.gnu.org/licenses/>.
+
 package dhcp
 
 import (
@@ -34,6 +51,8 @@ func NewSnooper(address string, handler func(req *dhcpv4.DHCPv4)) (*Snooper, err
 }
 
 func (s *Snooper) Snoop() error {
+	// Adopted from https://github.com/danderson/netboot/blob/master/dhcp4/conn_linux.go
+	// Written by @danderson
 	filter, err := bpf.Assemble([]bpf.Instruction{
 		// Load IPv4 packet length
 		bpf.LoadMemShift{Off: 0},

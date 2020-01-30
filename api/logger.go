@@ -1,5 +1,3 @@
-package api
-
 // This code was adopted from https://github.com/neko-neko/echo-logrus
 //
 // The MIT License (MIT)
@@ -23,6 +21,8 @@ package api
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+package api
 
 import (
 	"encoding/json"
