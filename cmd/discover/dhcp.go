@@ -11,6 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/dhcp"
 	"github.com/ubccr/grendel/nodeset"
 )
@@ -32,6 +33,7 @@ var (
 		Long:  `Auto-discover hosts from DHCP`,
 		RunE: func(command *cobra.Command, args []string) error {
 			if trace {
+				cmd.Log.Logger.SetLevel(logrus.DebugLevel)
 				log.Infof("Tracing DHCP packets on %s", viper.GetString("discovery.listen"))
 				snooper, err := dhcp.NewSnooper(viper.GetString("discovery.listen"), traceDHCP)
 				if err != nil {
@@ -40,6 +42,7 @@ var (
 
 				return snooper.Snoop()
 			} else if snoop {
+				cmd.Log.Logger.SetLevel(logrus.DebugLevel)
 				log.Infof("Snooping DHCP packets on %s", viper.GetString("discovery.listen"))
 				snooper, err := dhcp.NewSnooper(viper.GetString("discovery.listen"), snoopDHCP)
 				if err != nil {
