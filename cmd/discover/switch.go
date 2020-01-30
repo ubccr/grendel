@@ -12,7 +12,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/tors"
 )
@@ -144,7 +143,6 @@ func loadHosts(path string) error {
 }
 
 func discoverFromFile(file, domain string, subnet, bmcSubnet net.IP, netmask net.IPMask, switchClient tors.NetworkSwitch) error {
-	log := logger.GetLogger("DISCOVER")
 
 	reader, err := os.Open(file)
 	if err != nil {

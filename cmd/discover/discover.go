@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/firmware"
+	"github.com/ubccr/grendel/logger"
 )
 
 var (
@@ -15,6 +16,7 @@ var (
 	noProvision   bool
 	subnet        net.IP
 	firmwareBuild firmware.Build
+	log           = logger.GetLogger("DISCOVER")
 	discoverCmd   = &cobra.Command{
 		Use:   "discover",
 		Short: "Auto-discover commands",

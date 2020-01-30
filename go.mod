@@ -16,7 +16,6 @@ require (
 	github.com/insomniacslk/dhcp v0.0.0-20191120203056-ec0e0154d15c
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/korovkin/limiter v0.0.0-20190919045942-dac5a6b2a536
-	github.com/kr/pretty v0.1.0 // indirect
 	github.com/labstack/echo/v4 v4.1.11
 	github.com/labstack/gommon v0.3.0
 	github.com/mdlayher/ethernet v0.0.0-20190606142754-0394541c37b7 // indirect
@@ -26,14 +25,18 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/onsi/ginkgo v1.10.3 // indirect
 	github.com/onsi/gomega v1.7.1 // indirect
+	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/pin/tftp v2.1.0+incompatible
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/schwarmco/go-cartesian-product v0.0.0-20180515110546-d5ee747a6dc9
 	github.com/segmentio/ksuid v1.0.2
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/afero v1.2.2 // indirect
+	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/cobra v0.0.5
-	github.com/spf13/viper v1.3.2
+	github.com/spf13/jwalterweatherman v1.1.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/viper v1.6.2
 	github.com/stmcginnis/gofish v0.2.0
 	github.com/stretchr/testify v1.4.0
 	github.com/tidwall/buntdb v1.1.2
@@ -44,10 +47,11 @@ require (
 	github.com/vmware/goipmi v0.0.0-20181114221114-2333cd82d702
 	github.com/willf/bitset v1.1.10
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
-	golang.org/x/crypto v0.0.0-20191117063200-497ca9f6d64f // indirect
-	golang.org/x/net v0.0.0-20191003171128-d98b1b443823 // indirect
-	golang.org/x/sys v0.0.0-20191119060738-e882bf8e40c2 // indirect
-	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
+	golang.org/x/crypto v0.0.0-20200117160349-530e935923ad // indirect
+	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa
+	golang.org/x/sys v0.0.0-20200124204421-9fbb57f87de9 // indirect
+	gopkg.in/ini.v1 v1.51.1 // indirect
+	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
 
 replace github.com/square/certstrap => github.com/ubccr/certstrap v1.2.1-0.20200115142812-0c31c5e59383
