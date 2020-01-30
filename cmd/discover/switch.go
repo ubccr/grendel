@@ -169,7 +169,7 @@ func discoverFromFile(file, domain string, subnet, bmcSubnet net.IP, netmask net
 
 		entries := macTable.Port(port)
 		if len(entries) == 0 {
-			log.Errorf("No port entries found on switch for node: %s port: %d", hostName, port)
+			log.Warnf("No port entries found on switch for node: %s port: %d", hostName, port)
 			continue
 		}
 
