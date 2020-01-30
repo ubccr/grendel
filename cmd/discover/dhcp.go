@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/dhcp"
@@ -23,6 +24,7 @@ type discoveryDHCP struct {
 
 var (
 	trace            bool
+	snoop            bool
 	nodeNumberRegexp = regexp.MustCompile(`(\d+)$`)
 	dhcpCmd          = &cobra.Command{
 		Use:   "dhcp",
@@ -32,6 +34,14 @@ var (
 			if trace {
 				log.Infof("Tracing DHCP packets on %s", viper.GetString("discovery.listen"))
 				snooper, err := dhcp.NewSnooper(viper.GetString("discovery.listen"), traceDHCP)
+				if err != nil {
+					return err
+				}
+
+				return snooper.Snoop()
+			} else if snoop {
+				log.Infof("Snooping DHCP packets on %s", viper.GetString("discovery.listen"))
+				snooper, err := dhcp.NewSnooper(viper.GetString("discovery.listen"), snoopDHCP)
 				if err != nil {
 					return err
 				}
@@ -79,9 +89,34 @@ func init() {
 	dhcpCmd.Flags().StringP("listen", "l", "0.0.0.0:67", "address to run discovery DHCP server")
 	viper.BindPFlag("discovery.listen", dhcpCmd.Flags().Lookup("listen"))
 
-	dhcpCmd.Flags().BoolVar(&trace, "trace", false, "Print DHCP packets only")
+	dhcpCmd.Flags().BoolVar(&trace, "trace", false, "Trace DHCP packets only")
+	dhcpCmd.Flags().BoolVar(&snoop, "snoop", false, "Snoop DHCP packets only")
 
 	discoverCmd.AddCommand(dhcpCmd)
+}
+
+func snoopDHCP(req *dhcpv4.DHCPv4) {
+	userClass := ""
+	if req.Options.Has(dhcpv4.OptionUserClassInformation) {
+		userClass = string(req.Options.Get(dhcpv4.OptionUserClassInformation))
+	}
+	archType := ""
+	if req.Options.Has(dhcpv4.OptionClientSystemArchitectureType) {
+		archType = string(req.Options.Get(dhcpv4.OptionClientSystemArchitectureType))
+	}
+	hostName := ""
+	if req.Options.Has(dhcpv4.OptionHostName) {
+		hostName = string(req.Options.Get(dhcpv4.OptionHostName))
+	}
+
+	log.WithFields(logrus.Fields{
+		"mac":       req.ClientHWAddr.String(),
+		"type":      req.MessageType(),
+		"opcode":    req.OpCode,
+		"userClass": userClass,
+		"hostname":  hostName,
+		"arch":      archType,
+	}).Debug()
 }
 
 func traceDHCP(req *dhcpv4.DHCPv4) {
