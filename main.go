@@ -1,4 +1,4 @@
-// Copyright 2015 Grendel Authors. All rights reserved.
+// Copyright 2019 Grendel Authors. All rights reserved.
 //
 // This file is part of Grendel.
 //
