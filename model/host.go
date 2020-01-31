@@ -30,7 +30,7 @@ import (
 )
 
 type Host struct {
-	ID         ksuid.KSUID     `json:"id"`
+	ID         ksuid.KSUID     `json:"id,omitempty"`
 	Name       string          `json:"name" validate:"required,hostname"`
 	Interfaces []*NetInterface `json:"interfaces"`
 	Provision  bool            `json:"provision"`
@@ -79,9 +79,11 @@ func (h *Host) FromJSON(hostJSON string) {
 }
 
 func (h *Host) ToJSON() string {
-	hostJSON := `{"id": "", "firmware": "", "interfaces": [], "name": "", "provision": false, "boot_image": ""}`
+	hostJSON := `{"firmware": "", "interfaces": [], "name": "", "provision": false, "boot_image": ""}`
 
-	hostJSON, _ = sjson.Set(hostJSON, "id", h.ID.String())
+	if !h.ID.IsNil() {
+		hostJSON, _ = sjson.Set(hostJSON, "id", h.ID.String())
+	}
 	hostJSON, _ = sjson.Set(hostJSON, "name", h.Name)
 	hostJSON, _ = sjson.Set(hostJSON, "boot_image", h.BootImage)
 	hostJSON, _ = sjson.Set(hostJSON, "firmware", h.Firmware.String())
@@ -103,13 +105,27 @@ func (h *Host) ToJSON() string {
 
 func (h *Host) MarshalJSON() ([]byte, error) {
 	type Alias Host
-	return json.Marshal(&struct {
+	aux := &struct {
+		ID       string `json:"id,omitempty"`
 		Firmware string `json:"firmware"`
 		*Alias
 	}{
 		Firmware: h.Firmware.String(),
 		Alias:    (*Alias)(h),
-	})
+	}
+
+	if h.ID.IsNil() {
+		aux.ID = ""
+	} else {
+		aux.ID = h.ID.String()
+	}
+
+	data, err := json.Marshal(&aux)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
 func (h *Host) UnmarshalJSON(data []byte) error {
