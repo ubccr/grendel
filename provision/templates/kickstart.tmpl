@@ -9,17 +9,9 @@ skipx
 
 network --bootproto dhcp --hostname {{ .nic.FQDN }} --device={{ .nic.MAC }}
 
-zerombr
-clearpart --all --initlabel --disklabel=gpt
-
-part swap --ondisk=sda --asprimary --size=8192
-part /boot --ondisk=sda --asprimary --fstype="xfs" --size=1024
-part /boot/efi --ondisk=sda --fstype=efi --size=200
-part / --ondisk=sda --asprimary --fstype="xfs" --size=51200
-part /scratch --ondisk=sda --asprimary --fstype="xfs" --size=2048 --grow
-
 
 bootloader --timeout=10
+%include /tmp/diskpart.cfg
 text
 
 {{ with .rootpw }}
@@ -27,6 +19,38 @@ rootpw --iscrypted {{ . }}
 {{ end }}
 
 reboot
+
+%pre
+DIR="/sys/block"
+MINSIZE=60
+DNUM=0
+ROOTDRIVE=""
+
+for DEV in sda sdb sdc sdd hda hdb; do
+  if [ -d $DIR/$DEV ]; then
+    DNUM=$((DNUM+1))
+    SIZE=`cat $DIR/$DEV/size`
+    GB=$(($SIZE/2**21))
+    if [ $GB -gt $MINSIZE ]; then
+      if [ -z $ROOTDRIVE ]; then
+        ROOTDRIVE=$DEV
+      fi
+    fi
+  fi
+done
+
+cat <<EOF > /tmp/diskpart.cfg
+zerombr
+clearpart --all --initlabel --disklabel=gpt
+
+part swap --ondisk=$ROOTDRIVE --asprimary --size=8192
+part /boot --ondisk=$ROOTDRIVE --asprimary --fstype="xfs" --size=1024
+part /boot/efi --ondisk=$ROOTDRIVE --fstype=efi --size=200
+part / --ondisk=$ROOTDRIVE --asprimary --fstype="xfs" --size=51200
+part /scratch --ondisk=$ROOTDRIVE --asprimary --fstype="xfs" --size=2048 --grow
+EOF
+%end
+
 
 %post
 
