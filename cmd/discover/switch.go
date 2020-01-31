@@ -81,7 +81,7 @@ var (
 			// TODO make this configurable?
 			netmask := net.IPv4Mask(255, 255, 0, 0)
 
-			return discoverFromFile(mappingFile, viper.GetString("discovery.domain"), subnet, bmcSubnet, netmask, switchClient)
+			return discoverFromSwitch(mappingFile, viper.GetString("discovery.domain"), subnet, bmcSubnet, netmask, switchClient)
 		},
 	}
 )
@@ -159,7 +159,7 @@ func loadHosts(path string) error {
 	return nil
 }
 
-func discoverFromFile(file, domain string, subnet, bmcSubnet net.IP, netmask net.IPMask, switchClient tors.NetworkSwitch) error {
+func discoverFromSwitch(file, domain string, subnet, bmcSubnet net.IP, netmask net.IPMask, switchClient tors.NetworkSwitch) error {
 
 	reader, err := os.Open(file)
 	if err != nil {
