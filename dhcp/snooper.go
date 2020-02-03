@@ -18,9 +18,11 @@
 package dhcp
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"strconv"
+	"sync"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"golang.org/x/net/bpf"
@@ -30,6 +32,9 @@ import (
 type Snooper struct {
 	Port    int
 	Handler func(req *dhcpv4.DHCPv4)
+	conn    *ipv4.RawConn
+	quit    chan interface{}
+	wg      sync.WaitGroup
 }
 
 func NewSnooper(address string, handler func(req *dhcpv4.DHCPv4)) (*Snooper, error) {
@@ -47,7 +52,13 @@ func NewSnooper(address string, handler func(req *dhcpv4.DHCPv4)) (*Snooper, err
 		return nil, err
 	}
 
-	return &Snooper{Port: port, Handler: handler}, nil
+	s := &Snooper{
+		Port:    port,
+		Handler: handler,
+		quit:    make(chan interface{}),
+	}
+
+	return s, nil
 }
 
 func (s *Snooper) Snoop() error {
@@ -86,24 +97,62 @@ func (s *Snooper) Snoop() error {
 		return fmt.Errorf("Failed setting BFP filter: %w", err)
 	}
 
+	s.conn = rconn
+	return s.serve()
+}
+
+func (s *Snooper) serve() error {
 	var buf [1500]byte
 	for {
-		_, p, _, err := rconn.ReadFrom(buf[:])
+		_, p, _, err := s.conn.ReadFrom(buf[:])
 		if err != nil {
-			log.Errorf("Failed to read packet: %s", err)
-			continue
-		}
-		if len(p) < 8 {
-			log.Errorf("Invalid UDP packet too short")
-			continue
-		}
+			select {
+			case <-s.quit:
+				return nil
+			default:
+				log.Errorf("Failed to read packet: %s", err)
+			}
+		} else {
+			if len(p) < 8 {
+				log.Errorf("Invalid UDP packet too short")
+				continue
+			}
 
-		m, err := dhcpv4.FromBytes(p[8:])
-		if err != nil {
-			log.Printf("Error parsing DHCPv4 request: %v", err)
-			continue
-		}
+			m, err := dhcpv4.FromBytes(p[8:])
+			if err != nil {
+				log.Errorf("Error parsing DHCPv4 request: %v", err)
+				continue
+			}
 
-		go s.Handler(m)
+			s.wg.Add(1)
+			go func() {
+				s.Handler(m)
+				s.wg.Done()
+			}()
+		}
 	}
+
+	return nil
+}
+
+func (s *Snooper) Shutdown(ctx context.Context) error {
+	close(s.quit)
+	s.conn.Close()
+
+	done := make(chan struct{})
+	go func() {
+		s.wg.Wait()
+		close(done)
+	}()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-done:
+			return nil
+		}
+	}
+
+	return nil
 }
