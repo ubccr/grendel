@@ -19,18 +19,22 @@ package discover
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"net"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/ubccr/go-dhcpd-leases"
 	"github.com/ubccr/grendel/cmd"
 )
 
 var (
-	fileCmd = &cobra.Command{
+	fileType string
+	fileCmd  = &cobra.Command{
 		Use:   "file",
 		Short: "Discover hosts from file",
 		Long:  `Discover hosts from file`,
@@ -43,7 +47,13 @@ var (
 				defer file.Close()
 
 				cmd.Log.Infof("Processing file: %s", name)
-				err = discoverFromTSV(file)
+				if ".leases" == filepath.Ext(name) || "leases" == strings.ToLower(fileType) {
+					err = discoverFromLeases(file)
+				} else {
+					// Default to parsing TSV?
+					err = discoverFromTSV(file)
+				}
+
 				if err != nil {
 					return err
 				}
@@ -57,6 +67,7 @@ var (
 )
 
 func init() {
+	fileCmd.Flags().StringVar(&fileType, "type", "", "file type to parse")
 	discoverCmd.AddCommand(fileCmd)
 }
 
@@ -88,6 +99,20 @@ func discoverFromTSV(reader io.Reader) error {
 
 	if err := scanner.Err(); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func discoverFromLeases(reader io.Reader) error {
+	hosts := leases.Parse(reader)
+	if hosts == nil {
+		return errors.New("No hosts found. Is this a dhcpd.leases file?")
+	}
+
+	for _, h := range hosts {
+		names := strings.Split(h.ClientHostname, ".")
+		addNic(names[0], h.ClientHostname, h.Hardware.MACAddr, h.IP, false)
 	}
 
 	return nil
