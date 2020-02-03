@@ -18,11 +18,16 @@
 package discover
 
 import (
+	"context"
 	"fmt"
 	"net"
+	"os"
+	"os/signal"
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/sirupsen/logrus"
@@ -38,6 +43,8 @@ type discoveryDHCP struct {
 	seen    map[string]bool
 	subnet  net.IP
 	netmask net.IPMask
+	domain  string
+	mu      sync.Mutex
 }
 
 var (
@@ -57,7 +64,7 @@ var (
 					return err
 				}
 
-				return snooper.Snoop()
+				return runSnoop(snooper)
 			} else if snoop {
 				cmd.Log.Logger.SetLevel(logrus.DebugLevel)
 				log.Infof("Snooping DHCP packets on %s", viper.GetString("discovery.listen"))
@@ -66,7 +73,7 @@ var (
 					return err
 				}
 
-				return snooper.Snoop()
+				return runSnoop(snooper)
 			}
 
 			if subnetStr == "" {
@@ -93,6 +100,7 @@ var (
 				seen:    make(map[string]bool),
 				subnet:  subnet,
 				netmask: netmask,
+				domain:  viper.GetString("discovery.domain"),
 			}
 
 			snooper, err := dhcp.NewSnooper(viper.GetString("discovery.listen"), d.handler)
@@ -100,7 +108,12 @@ var (
 				return err
 			}
 
-			return snooper.Snoop()
+			err = runSnoop(snooper)
+			if err != nil {
+				cmd.Log.Errorf("Shutting down snooper: %s", err)
+			}
+
+			return nil
 		},
 	}
 )
@@ -113,6 +126,29 @@ func init() {
 	dhcpCmd.Flags().BoolVar(&snoop, "snoop", false, "Snoop DHCP packets only")
 
 	discoverCmd.AddCommand(dhcpCmd)
+}
+
+func runSnoop(snooper *dhcp.Snooper) error {
+	idleConnsClosed := make(chan struct{})
+	go func() {
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, os.Interrupt)
+		<-sigint
+
+		log.Infof("Shutting down Snoooper")
+		ctxShutdown, cancelShutdown := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancelShutdown()
+		if err := snooper.Shutdown(ctxShutdown); err != nil {
+			log.Errorf("Failed shutting down DHCP snooper: %v", err)
+		}
+		close(idleConnsClosed)
+	}()
+
+	err := snooper.Snoop()
+
+	<-idleConnsClosed
+
+	return err
 }
 
 func snoopDHCP(req *dhcpv4.DHCPv4) {
@@ -158,6 +194,9 @@ func (d *discoveryDHCP) handler(req *dhcpv4.DHCPv4) {
 		return
 	}
 
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
 	if _, ok := d.seen[req.ClientHWAddr.String()]; ok {
 		log.Infof("Already seen mac address. skipping: %s", req.ClientHWAddr)
 		return
@@ -179,5 +218,9 @@ func (d *discoveryDHCP) handler(req *dhcpv4.DHCPv4) {
 	num, _ := strconv.Atoi(matches[1])
 	ip[3] += uint8(num)
 
-	fmt.Printf("%s\t%s\t%s\n", d.nodeset.Value(), req.ClientHWAddr, ip.String())
+	hostName := d.nodeset.Value()
+	fqdn := fmt.Sprintf("%s.%s", hostName, d.domain)
+
+	addNic(hostName, fqdn, req.ClientHWAddr, ip, false)
+	cmd.Log.Infof("%s\t%s\t%s\n", d.nodeset.Value(), req.ClientHWAddr, ip.String())
 }

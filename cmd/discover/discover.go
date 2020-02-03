@@ -18,14 +18,18 @@
 package discover
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net"
+	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/firmware"
 	"github.com/ubccr/grendel/logger"
+	"github.com/ubccr/grendel/model"
 )
 
 var (
@@ -33,6 +37,8 @@ var (
 	noProvision   bool
 	subnet        net.IP
 	firmwareBuild firmware.Build
+	hostFile      string
+	hosts         map[string]*model.Host
 	log           = logger.GetLogger("DISCOVER")
 	discoverCmd   = &cobra.Command{
 		Use:   "discover",
@@ -47,9 +53,27 @@ func init() {
 	discoverCmd.PersistentFlags().String("firmware", "", "firmware")
 	viper.BindPFlag("discovery.firmware", discoverCmd.PersistentFlags().Lookup("firmware"))
 
+	discoverCmd.PersistentFlags().StringVar(&hostFile, "hosts", "", "existing hosts file to add to")
 	discoverCmd.PersistentFlags().BoolVar(&noProvision, "disable-provision", false, "don't set host to provision")
 	discoverCmd.PersistentFlags().StringVarP(&subnetStr, "subnet", "s", "", "subnet to use for auto ip assignment (/24)")
 	discoverCmd.MarkFlagRequired("subnet")
+
+	discoverCmd.PersistentPostRunE = func(command *cobra.Command, args []string) error {
+		hostList := make(model.HostList, 0)
+		for _, host := range hosts {
+			hostList = append(hostList, host)
+		}
+
+		if len(hostList) > 0 {
+			enc := json.NewEncoder(os.Stdout)
+			enc.SetIndent("", "    ")
+			if err := enc.Encode(hostList); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
 
 	discoverCmd.PersistentPreRunE = func(command *cobra.Command, args []string) error {
 		err := cmd.SetupLogging()
@@ -73,8 +97,72 @@ func init() {
 			}
 		}
 
+		hosts = make(map[string]*model.Host)
+
+		if hostFile != "" {
+			err := loadHosts(hostFile)
+			if err != nil {
+				return fmt.Errorf("Invalid host file %s: %w", hostFile, err)
+			}
+		}
+
 		return nil
 	}
 
 	cmd.Root.AddCommand(discoverCmd)
+}
+
+func addNic(name, fqdn string, mac net.HardwareAddr, ip net.IP, isBMC bool) {
+	host, ok := hosts[name]
+	if !ok {
+		host = &model.Host{
+			Name:       name,
+			Provision:  !noProvision,
+			Firmware:   firmwareBuild,
+			Interfaces: make([]*model.NetInterface, 0),
+		}
+	}
+
+	nic := host.Interface(mac)
+	if nic == nil {
+		nic = &model.NetInterface{
+			MAC:  mac,
+			IP:   ip,
+			FQDN: fqdn,
+			BMC:  isBMC,
+		}
+
+		host.Interfaces = append(host.Interfaces, nic)
+	} else {
+		nic.IP = ip
+		nic.FQDN = fqdn
+		nic.BMC = isBMC
+	}
+
+	hosts[name] = host
+}
+
+func loadHosts(path string) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	jsonBytes, err := ioutil.ReadAll(file)
+	if err != nil {
+		return err
+	}
+
+	var hostList model.HostList
+	err = json.Unmarshal(jsonBytes, &hostList)
+	if err != nil {
+		return err
+	}
+
+	for _, host := range hostList {
+		hosts[host.Name] = host
+	}
+
+	return nil
 }

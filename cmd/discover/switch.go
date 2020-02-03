@@ -19,9 +19,7 @@ package discover
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 	"strconv"
@@ -29,15 +27,12 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/tors"
 )
 
 var (
 	mappingFile  string
-	hostFile     string
 	bmcSubnetStr string
-	hosts        map[string]*model.Host
 	switchCmd    = &cobra.Command{
 		Use:   "switch",
 		Short: "Auto-discover hosts from switch",
@@ -69,15 +64,6 @@ var (
 				}
 			}
 
-			hosts = make(map[string]*model.Host)
-
-			if hostFile != "" {
-				err := loadHosts(hostFile)
-				if err != nil {
-					return fmt.Errorf("Invalid host file %s: %w", hostFile, err)
-				}
-			}
-
 			// TODO make this configurable?
 			netmask := net.IPv4Mask(255, 255, 0, 0)
 
@@ -95,68 +81,12 @@ func init() {
 	viper.BindPFlag("discovery.endpoint", switchCmd.Flags().Lookup("endpoint"))
 
 	switchCmd.Flags().StringVarP(&mappingFile, "mapping", "m", "", "hostname to portnumber mapping file")
-	switchCmd.Flags().StringVar(&hostFile, "hosts", "", "hosts file")
 	switchCmd.Flags().StringVarP(&bmcSubnetStr, "bmc-subnet", "b", "", "subnet for bmc")
 
 	switchCmd.MarkFlagRequired("endpoint")
 	switchCmd.MarkFlagRequired("mapping")
 
 	discoverCmd.AddCommand(switchCmd)
-}
-
-func addNic(name, fqdn string, mac net.HardwareAddr, ip net.IP, isBMC bool) {
-	host, ok := hosts[name]
-	if !ok {
-		host = &model.Host{
-			Name:       name,
-			Provision:  !noProvision,
-			Firmware:   firmwareBuild,
-			Interfaces: make([]*model.NetInterface, 0),
-		}
-	}
-
-	nic := host.Interface(mac)
-	if nic == nil {
-		nic = &model.NetInterface{
-			MAC:  mac,
-			IP:   ip,
-			FQDN: fqdn,
-			BMC:  isBMC,
-		}
-
-		host.Interfaces = append(host.Interfaces, nic)
-	} else {
-		nic.IP = ip
-		nic.FQDN = fqdn
-		nic.BMC = isBMC
-	}
-
-	hosts[name] = host
-}
-
-func loadHosts(path string) error {
-	file, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	jsonBytes, err := ioutil.ReadAll(file)
-	if err != nil {
-		return err
-	}
-
-	var hostList model.HostList
-	err = json.Unmarshal(jsonBytes, &hostList)
-	if err != nil {
-		return err
-	}
-
-	for _, host := range hostList {
-		hosts[host.Name] = host
-	}
-
-	return nil
 }
 
 func discoverFromSwitch(file, domain string, subnet, bmcSubnet net.IP, netmask net.IPMask, switchClient tors.NetworkSwitch) error {
@@ -226,17 +156,6 @@ func discoverFromSwitch(file, domain string, subnet, bmcSubnet net.IP, netmask n
 			continue
 
 		}
-	}
-
-	var hostList model.HostList
-	for _, host := range hosts {
-		hostList = append(hostList, host)
-	}
-
-	enc := json.NewEncoder(os.Stdout)
-	enc.SetIndent("", "    ")
-	if err := enc.Encode(hostList); err != nil {
-		return err
 	}
 
 	return nil

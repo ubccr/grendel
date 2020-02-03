@@ -19,7 +19,6 @@ package discover
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net"
@@ -28,7 +27,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd"
-	"github.com/ubccr/grendel/model"
 )
 
 var (
@@ -38,7 +36,6 @@ var (
 		Long:  `Discover hosts from file`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			hostList := make(model.HostList, 0)
 			for _, name := range args {
 				file, err := os.Open(name)
 				if err != nil {
@@ -46,20 +43,12 @@ var (
 				defer file.Close()
 
 				cmd.Log.Infof("Processing file: %s", name)
-				hosts, err := discoverFromTSV(file)
+				err = discoverFromTSV(file)
 				if err != nil {
 					return err
 				}
 
-				hostList = append(hostList, hosts...)
-
-				cmd.Log.Infof("Successfully imported hosts from: %s", name)
-			}
-
-			enc := json.NewEncoder(os.Stdout)
-			enc.SetIndent("", "    ")
-			if err := enc.Encode(hostList); err != nil {
-				return err
+				cmd.Log.Infof("Successfully processed hosts from: %s", name)
 			}
 
 			return nil
@@ -71,46 +60,35 @@ func init() {
 	discoverCmd.AddCommand(fileCmd)
 }
 
-func discoverFromTSV(reader io.Reader) (model.HostList, error) {
-	hostList := make(model.HostList, 0)
-
+func discoverFromTSV(reader io.Reader) error {
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
 		line := scanner.Text()
 		cols := strings.Split(scanner.Text(), "\t")
 		if len(cols) < 3 {
-			return nil, fmt.Errorf("Invalid record format. Must be at least 3 cols name|mac|ip: %s", line)
+			return fmt.Errorf("Invalid record format. Must be at least 3 cols name|mac|ip: %s", line)
 		}
-
-		host := &model.Host{Name: cols[0]}
 
 		hwaddr, err := net.ParseMAC(cols[1])
 		if err != nil {
-			return nil, fmt.Errorf("Malformed hardware address: %s", cols[0])
+			return fmt.Errorf("Malformed hardware address: %s", cols[0])
 		}
 		ipaddr := net.ParseIP(cols[2])
 		if ipaddr.To4() == nil {
-			return nil, fmt.Errorf("Invalid IPv4 address: %v", cols[1])
+			return fmt.Errorf("Invalid IPv4 address: %v", cols[1])
 		}
 
-		nic := &model.NetInterface{MAC: hwaddr, IP: ipaddr}
-
+		fqdn := ""
 		if len(cols) > 3 {
-			nic.FQDN = cols[3]
+			fqdn = cols[3]
 		}
 
-		host.Interfaces = []*model.NetInterface{nic}
-
-		if len(cols) > 4 && strings.ToLower(cols[4]) == "yes" {
-			host.Provision = true
-		}
-
-		hostList = append(hostList, host)
+		addNic(cols[0], fqdn, hwaddr, ipaddr, false)
 	}
 
 	if err := scanner.Err(); err != nil {
-		return nil, err
+		return err
 	}
 
-	return hostList, nil
+	return nil
 }
