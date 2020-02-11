@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
@@ -48,11 +49,13 @@ type Server struct {
 	DNSServers        []net.IP
 	DomainSearchList  []string
 	LeaseTime         time.Duration
-	srv               *server4.Server
+	conn              net.PacketConn
+	quit              chan interface{}
+	wg                sync.WaitGroup
 }
 
 func NewServer(db model.DataStore, address string) (*Server, error) {
-	s := &Server{DB: db}
+	s := &Server{DB: db, quit: make(chan interface{})}
 
 	if address == "" {
 		address = fmt.Sprintf("%s:%d", net.IPv4zero.String(), dhcpv4.ServerPort)
@@ -92,7 +95,7 @@ func NewServer(db model.DataStore, address string) (*Server, error) {
 	return s, nil
 }
 
-func (s *Server) mainHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DHCPv4) {
+func (s *Server) mainHandler4(peer net.Addr, req *dhcpv4.DHCPv4) {
 	if req.OpCode != dhcpv4.OpcodeBootRequest {
 		log.Debugf("Ignoring not a BootRequest")
 		return
@@ -173,8 +176,8 @@ func (s *Server) mainHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DH
 	log.Debugf("Sending DHCPv4 packet response")
 	log.Debugf(resp.Summary())
 
-	if _, err := conn.WriteTo(resp.ToBytes(), peer); err != nil {
-		log.Printf("DHCP conn.Write to %v failed: %v", peer, err)
+	if _, err := s.conn.WriteTo(resp.ToBytes(), peer); err != nil {
+		log.Printf("DHCP write to %v failed: %v", peer, err)
 	}
 }
 
@@ -192,12 +195,12 @@ func (s *Server) Serve(ctx context.Context) error {
 		Port: s.Port,
 	}
 
-	srv, err := server4.NewServer("", listener, s.mainHandler4)
+	conn, err := server4.NewIPv4UDPConn("", listener)
 	if err != nil {
 		return err
 	}
 
-	s.srv = srv
+	s.conn = conn
 
 	go func() {
 		<-ctx.Done()
@@ -213,28 +216,69 @@ func (s *Server) Serve(ctx context.Context) error {
 
 	log.Infof("Server listening on: %s:%d", s.ListenAddress, s.Port)
 
-	if err := s.srv.Serve(); err != nil {
-		log.Debugf("Error serving DHCP: %v", err)
+	return s.serve()
+}
+
+func (s *Server) serve() error {
+	var buf [1500]byte
+	for {
+		n, peer, err := s.conn.ReadFrom(buf[:])
+		if err != nil {
+			select {
+			case <-s.quit:
+				return nil
+			default:
+				log.Errorf("Failed to read packet: %s", err)
+			}
+		} else {
+			log.Printf("Handling request from %v", peer)
+
+			m, err := dhcpv4.FromBytes(buf[:n])
+			if err != nil {
+				log.Printf("Error parsing DHCPv4 request: %v", err)
+				continue
+			}
+
+			upeer, ok := peer.(*net.UDPAddr)
+			if !ok {
+				log.Printf("Not a UDP connection? Peer is %s", peer)
+				continue
+			}
+			// Set peer to broadcast if the client did not have an IP.
+			if upeer.IP == nil || upeer.IP.To4().Equal(net.IPv4zero) {
+				upeer = &net.UDPAddr{
+					IP:   net.IPv4bcast,
+					Port: upeer.Port,
+				}
+			}
+
+			s.wg.Add(1)
+			go func() {
+				s.mainHandler4(upeer, m)
+				s.wg.Done()
+			}()
+		}
 	}
 
 	return nil
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {
-	errs := make(chan error, 1)
-	defer close(errs)
+	close(s.quit)
+	s.conn.Close()
 
+	done := make(chan struct{})
 	go func() {
-		errs <- s.srv.Close()
+		s.wg.Wait()
+		close(done)
 	}()
 
-	var ctxErr error
-	select {
-	case err := <-errs:
-		ctxErr = err
-	case <-ctx.Done():
-		ctxErr = ctx.Err()
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-done:
+			return nil
+		}
 	}
-
-	return ctxErr
 }

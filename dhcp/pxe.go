@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
@@ -45,10 +46,13 @@ type PXEServer struct {
 	Port          int
 	srv           *server4.Server
 	log           *logrus.Entry
+	conn          net.PacketConn
+	quit          chan interface{}
+	wg            sync.WaitGroup
 }
 
 func NewPXEServer(db model.DataStore, address string) (*PXEServer, error) {
-	s := &PXEServer{DB: db, log: logger.GetLogger("PXE")}
+	s := &PXEServer{DB: db, log: logger.GetLogger("PXE"), quit: make(chan interface{})}
 
 	if address == "" {
 		address = fmt.Sprintf("%s:%d", net.IPv4zero.String(), DefaultPXEPort)
@@ -88,7 +92,7 @@ func NewPXEServer(db model.DataStore, address string) (*PXEServer, error) {
 	return s, nil
 }
 
-func (s *PXEServer) pxeHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.DHCPv4) {
+func (s *PXEServer) pxeHandler4(peer net.Addr, req *dhcpv4.DHCPv4) {
 	host, err := s.DB.LoadHostFromMAC(req.ClientHWAddr.String())
 	if err != nil {
 		if !errors.Is(err, model.ErrNotFound) {
@@ -154,7 +158,7 @@ func (s *PXEServer) pxeHandler4(conn net.PacketConn, peer net.Addr, req *dhcpv4.
 	s.log.Debugf("Sending response")
 	s.log.Debugf(resp.Summary())
 
-	if _, err := conn.WriteTo(resp.ToBytes(), peer); err != nil {
+	if _, err := s.conn.WriteTo(resp.ToBytes(), peer); err != nil {
 		s.log.Errorf("UDP write to %v failed: %v", peer, err)
 	}
 }
@@ -165,12 +169,12 @@ func (s *PXEServer) Serve(ctx context.Context) error {
 		Port: s.Port,
 	}
 
-	srv, err := server4.NewServer("", listener, s.pxeHandler4)
+	conn, err := server4.NewIPv4UDPConn("", listener)
 	if err != nil {
 		return err
 	}
 
-	s.srv = srv
+	s.conn = conn
 
 	go func() {
 		<-ctx.Done()
@@ -185,28 +189,70 @@ func (s *PXEServer) Serve(ctx context.Context) error {
 	}()
 
 	s.log.Infof("Server listening on: %s:%d", s.ListenAddress, s.Port)
-	if err := s.srv.Serve(); err != nil {
-		s.log.Debugf("Error serving PXE: %v", err)
+
+	return s.serve()
+}
+
+func (s *PXEServer) serve() error {
+	var buf [1500]byte
+	for {
+		n, peer, err := s.conn.ReadFrom(buf[:])
+		if err != nil {
+			select {
+			case <-s.quit:
+				return nil
+			default:
+				log.Errorf("Failed to read packet: %s", err)
+			}
+		} else {
+			log.Printf("Handling request from %v", peer)
+
+			m, err := dhcpv4.FromBytes(buf[:n])
+			if err != nil {
+				log.Printf("Error parsing DHCPv4 request: %v", err)
+				continue
+			}
+
+			upeer, ok := peer.(*net.UDPAddr)
+			if !ok {
+				log.Printf("Not a UDP connection? Peer is %s", peer)
+				continue
+			}
+			// Set peer to broadcast if the client did not have an IP.
+			if upeer.IP == nil || upeer.IP.To4().Equal(net.IPv4zero) {
+				upeer = &net.UDPAddr{
+					IP:   net.IPv4bcast,
+					Port: upeer.Port,
+				}
+			}
+
+			s.wg.Add(1)
+			go func() {
+				s.pxeHandler4(upeer, m)
+				s.wg.Done()
+			}()
+		}
 	}
 
 	return nil
 }
 
 func (s *PXEServer) Shutdown(ctx context.Context) error {
-	errs := make(chan error, 1)
-	defer close(errs)
+	close(s.quit)
+	s.conn.Close()
 
+	done := make(chan struct{})
 	go func() {
-		errs <- s.srv.Close()
+		s.wg.Wait()
+		close(done)
 	}()
 
-	var ctxErr error
-	select {
-	case err := <-errs:
-		ctxErr = err
-	case <-ctx.Done():
-		ctxErr = ctx.Err()
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-done:
+			return nil
+		}
 	}
-
-	return ctxErr
 }
