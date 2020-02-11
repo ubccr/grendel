@@ -63,23 +63,19 @@ func (s *Server) Serve(ctx context.Context) error {
 
 }
 
-func (s *Server) shutdown() chan error {
-	err := make(chan error, 1)
-	defer close(err)
-	err <- nil
-	s.srv.Shutdown()
-
-	return err
-}
-
 func (s *Server) Shutdown(ctx context.Context) error {
-	var ctxErr error
-	select {
-	case err := <-s.shutdown():
-		ctxErr = err
-	case <-ctx.Done():
-		ctxErr = ctx.Err()
-	}
+	done := make(chan struct{})
+	go func() {
+		s.srv.Shutdown()
+		close(done)
+	}()
 
-	return ctxErr
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-done:
+			return nil
+		}
+	}
 }
