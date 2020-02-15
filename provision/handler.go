@@ -46,10 +46,12 @@ func NewHandler(db model.DataStore, defaultImageName string) (*Handler, error) {
 		DefaultImageName: defaultImageName,
 	}
 
-	_, err := h.DB.LoadBootImage(defaultImageName)
-	if err != nil {
-		return nil, err
+	if defaultImageName != "" {
+		_, err := h.DB.LoadBootImage(defaultImageName)
+		if err != nil {
+			return nil, err
 
+		}
 	}
 
 	return h, nil
