@@ -1,0 +1,120 @@
+#------------------------------------------------------------------------------
+# Sample Grendel Config
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# General
+#------------------------------------------------------------------------------
+
+#
+# Path database file. Defaults to ":memory:" which uses in-memory store. Change
+# this to a filepath for persisent storage.
+#
+dbpath = ":memory:"
+
+#------------------------------------------------------------------------------
+# HTTP Provision Server
+#------------------------------------------------------------------------------
+[provision]
+listen = "0.0.0.0:80"
+
+# HTTP protocol used for provisioning (http or https)
+scheme = "http"
+
+# Use signed JWT tokens for authenticating TFTP and HTTP requests
+jwt_tokens = true
+
+# Can generate secret with `openssl rand -hex 32`
+secret = ""
+
+# Hashed root password used in kickstart template
+root_password = ""
+
+# Verify ssl in kickstart? true = no false = yes
+noverifyssl = true
+
+# Default OS image name
+default_image = ""
+
+# Path to ssl cert 
+cert = ""
+
+# Path to ssl key 
+key = ""
+
+#------------------------------------------------------------------------------
+# DHCP Server
+#------------------------------------------------------------------------------
+[dhcp]
+listen = "0.0.0.0:67"
+
+# Default lease time
+lease_time = "24h"
+
+# List of DNS servers
+dns_servers = []
+
+# List of DNS search domains
+domain_search = []
+
+# Default MTU
+mtu = 1500
+
+# Only run DHCP Proxy server
+proxy_only = false
+
+#------------------------------------------------------------------------------
+# DNS Server
+#------------------------------------------------------------------------------
+[dns]
+listen = "0.0.0.0:53"
+
+# Default TTL for dns responses
+ttl = 86400
+
+#------------------------------------------------------------------------------
+# TFTP Server
+#------------------------------------------------------------------------------
+[tftp]
+listen = "0.0.0.0:69"
+
+#------------------------------------------------------------------------------
+# PXE Server
+#------------------------------------------------------------------------------
+[pxe]
+listen = "0.0.0.0:4011"
+
+#------------------------------------------------------------------------------
+# API Server
+#------------------------------------------------------------------------------
+[api]
+# Can generate secret with `openssl rand -hex 32`
+secret = ""
+
+# Path to unix socket
+socket_path = "grendel-api.socket"
+
+#------------------------------------------------------------------------------
+# API Client Config
+#------------------------------------------------------------------------------
+[client]
+# Grendel API endpoint
+api_endpoint = "grendel-api.socket"
+
+# Verify ssl certs? false (yes) true (no)
+insecure = false
+
+#------------------------------------------------------------------------------
+# Global BMC Config
+#------------------------------------------------------------------------------
+[bmc]
+user = ""
+password = ""
+
+#------------------------------------------------------------------------------
+# Automatic Host Discovery Config
+#------------------------------------------------------------------------------
+[discovery]
+user = ""
+password = ""
+domain = ""
