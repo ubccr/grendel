@@ -145,10 +145,13 @@ func runSnoop(snooper *dhcp.Snooper) error {
 	}()
 
 	err := snooper.Snoop()
+	if err != nil {
+		return err
+	}
 
 	<-idleConnsClosed
 
-	return err
+	return nil
 }
 
 func snoopDHCP(req *dhcpv4.DHCPv4) {
