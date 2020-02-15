@@ -181,7 +181,7 @@ func (s *Server) mainHandler4(peer net.Addr, req *dhcpv4.DHCPv4) {
 	}
 }
 
-func (s *Server) Serve(ctx context.Context) error {
+func (s *Server) Serve() error {
 	if s.ProvisionPort == 0 {
 		s.ProvisionPort = 80
 	}
@@ -213,21 +213,7 @@ func (s *Server) Serve(ctx context.Context) error {
 	}
 
 	s.conn = conn
-
-	go func() {
-		<-ctx.Done()
-
-		log.Info("Shutting down DHCP server...")
-		ctxShutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-
-		if err := s.Shutdown(ctxShutdown); err != nil {
-			log.Errorf("Failed shutting down DHCP server: %v", err)
-		}
-	}()
-
 	log.Infof("Server listening on: %s:%d", s.ListenAddress, s.Port)
-
 	return s.serve()
 }
 
@@ -277,7 +263,12 @@ func (s *Server) serve() error {
 
 func (s *Server) Shutdown(ctx context.Context) error {
 	close(s.quit)
-	s.conn.Close()
+	if s.conn == nil {
+		return nil
+	}
+
+	defer s.conn.Close()
+	s.conn.SetReadDeadline(CancelTime)
 
 	done := make(chan struct{})
 	go func() {

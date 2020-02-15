@@ -144,8 +144,7 @@ func runSnoop(snooper *dhcp.Snooper) error {
 		close(idleConnsClosed)
 	}()
 
-	err := snooper.Snoop()
-	if err != nil {
+	if err := snooper.Snoop(); err != nil {
 		return err
 	}
 

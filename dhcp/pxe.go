@@ -24,7 +24,6 @@ import (
 	"net"
 	"strconv"
 	"sync"
-	"time"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/insomniacslk/dhcp/dhcpv4/server4"
@@ -163,7 +162,7 @@ func (s *PXEServer) pxeHandler4(peer net.Addr, req *dhcpv4.DHCPv4) {
 	}
 }
 
-func (s *PXEServer) Serve(ctx context.Context) error {
+func (s *PXEServer) Serve() error {
 	listener := &net.UDPAddr{
 		IP:   s.ListenAddress,
 		Port: s.Port,
@@ -187,21 +186,7 @@ func (s *PXEServer) Serve(ctx context.Context) error {
 	}
 
 	s.conn = conn
-
-	go func() {
-		<-ctx.Done()
-
-		s.log.Info("Shutting down PXE server...")
-		ctxShutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-
-		if err := s.Shutdown(ctxShutdown); err != nil {
-			s.log.Errorf("Failed shutting down PXE server: %v", err)
-		}
-	}()
-
 	s.log.Infof("Server listening on: %s:%d", s.ListenAddress, s.Port)
-
 	return s.serve()
 }
 
@@ -251,7 +236,12 @@ func (s *PXEServer) serve() error {
 
 func (s *PXEServer) Shutdown(ctx context.Context) error {
 	close(s.quit)
-	s.conn.Close()
+	if s.conn == nil {
+		return nil
+	}
+
+	defer s.conn.Close()
+	s.conn.SetReadDeadline(CancelTime)
 
 	done := make(chan struct{})
 	go func() {

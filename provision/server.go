@@ -49,6 +49,7 @@ type Server struct {
 	CertFile      string
 	RepoDir       string
 	DB            model.DataStore
+	httpServer    *http.Server
 }
 
 func NewServer(db model.DataStore, address string) (*Server, error) {
@@ -113,7 +114,7 @@ func HTTPErrorHandler(err error, c echo.Context) {
 	c.Logger().Error(err)
 }
 
-func (s *Server) Serve(ctx context.Context, defaultImageName string) error {
+func (s *Server) Serve(defaultImageName string) error {
 	e := echo.New()
 	e.HTTPErrorHandler = HTTPErrorHandler
 	e.HideBanner = true
@@ -184,22 +185,19 @@ func (s *Server) Serve(ctx context.Context, defaultImageName string) error {
 		s.Scheme = "http"
 	}
 
-	go func() {
-		<-ctx.Done()
-
-		log.Info("Shutting down Provision server...")
-		ctxShutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-
-		if err := httpServer.Shutdown(ctxShutdown); err != nil && err != http.ErrServerClosed {
-			log.Errorf("Failed shutting down Provision server: %v", err)
-		}
-	}()
-
+	s.httpServer = httpServer
 	log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
 	if err := e.StartServer(httpServer); err != nil && err != http.ErrServerClosed {
 		return err
 	}
 
 	return nil
+}
+
+func (s *Server) Shutdown(ctx context.Context) error {
+	if s.httpServer == nil {
+		return nil
+	}
+
+	return s.httpServer.Shutdown(ctx)
 }

@@ -19,10 +19,13 @@ package serve
 
 import (
 	"context"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/tftp"
+	"gopkg.in/tomb.v2"
 )
 
 func init() {
@@ -38,21 +41,35 @@ var (
 		Short: "Run TFTP server",
 		Long:  `Run TFTP server`,
 		RunE: func(command *cobra.Command, args []string) error {
-			ctx, _ := NewInterruptContext()
-			return serveTFTP(ctx)
+			t := NewInterruptTomb()
+			t.Go(func() error { return serveTFTP(t) })
+			return t.Wait()
 		},
 	}
 )
 
-func serveTFTP(ctx context.Context) error {
+func serveTFTP(t *tomb.Tomb) error {
 	tftpServer, err := tftp.NewServer(viper.GetString("tftp.listen"))
 	if err != nil {
 		return err
 	}
 
-	if err := tftpServer.Serve(ctx); err != nil {
-		return err
-	}
+	t.Go(tftpServer.Serve)
+
+	t.Go(func() error {
+		time.Sleep(1 * time.Second)
+		<-t.Dying()
+		cmd.Log.Info("Shutting down TFTP server...")
+		ctxShutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		if err := tftpServer.Shutdown(ctxShutdown); err != nil {
+			cmd.Log.Errorf("Failed shutting down TFTP server: %s", err)
+			return err
+		}
+
+		return nil
+	})
 
 	return nil
 }

@@ -23,13 +23,12 @@ import (
 	"io/ioutil"
 	"os"
 	"os/signal"
-	"sync"
-	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/model"
+	"gopkg.in/tomb.v2"
 )
 
 var (
@@ -153,61 +152,33 @@ func loadImageJSON() error {
 }
 
 func runServices() error {
-	ctx, cancel := NewInterruptContext()
+	t := NewInterruptTomb()
+	t.Go(func() error {
+		t.Go(func() error { return serveTFTP(t) })
+		t.Go(func() error { return serveDNS(t) })
+		t.Go(func() error { return serveDHCP(t) })
+		t.Go(func() error { return servePXE(t) })
+		t.Go(func() error { return serveAPI(t) })
+		t.Go(func() error { return serveProvision(t) })
+		return nil
+	})
+	return t.Wait()
+}
 
-	var wg sync.WaitGroup
-	wg.Add(6)
-	errs := make(chan error, 6)
-
+func NewInterruptTomb() *tomb.Tomb {
+	t := &tomb.Tomb{}
 	go func() {
-		errs <- serveAPI(ctx)
-		wg.Done()
-	}()
-	go func() {
-		errs <- serveTFTP(ctx)
-		wg.Done()
-	}()
-	go func() {
-		errs <- serveDNS(ctx)
-		wg.Done()
-	}()
-	go func() {
-		errs <- serveProvision(ctx)
-		wg.Done()
-	}()
-	go func() {
-		errs <- serveDHCP(ctx)
-		wg.Done()
-	}()
-	go func() {
-		errs <- servePXE(ctx)
-		wg.Done()
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, os.Interrupt)
+		select {
+		case <-t.Dying():
+		case <-sigint:
+			cmd.Log.Debug("Caught interrupt signal")
+			t.Kill(nil)
+		}
 	}()
 
-	// Fail if any servers error out
-	err := <-errs
-
-	cmd.Log.Infof("Waiting for all services to shutdown...")
-
-	ctxShutdown, cancelShutdown := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancelShutdown()
-
-	cancel()
-
-	done := make(chan struct{})
-	go func() {
-		wg.Wait()
-		close(done)
-	}()
-
-	select {
-	case <-done:
-		cmd.Log.Info("All services shutdown")
-	case <-ctxShutdown.Done():
-		cmd.Log.Warning("Timeout reached")
-	}
-
-	return err
+	return t
 }
 
 func NewInterruptContext() (context.Context, context.CancelFunc) {

@@ -19,7 +19,6 @@ package dns
 
 import (
 	"context"
-	"time"
 
 	"github.com/miekg/dns"
 	"github.com/ubccr/grendel/logger"
@@ -48,25 +47,9 @@ func NewServer(db model.DataStore, address string, ttl int) (*Server, error) {
 	return s, nil
 }
 
-func (s *Server) Serve(ctx context.Context) error {
-	go func() {
-		<-ctx.Done()
-
-		log.Info("Shutting down DNS server...")
-		ctxShutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-
-		if err := s.Shutdown(ctxShutdown); err != nil {
-			log.Errorf("Failed shutting down DNS server: %v", err)
-		}
-	}()
-
+func (s *Server) Serve() error {
 	log.Infof("Server listening on: %s", s.Address)
-	if err := s.srv.ListenAndServe(); err != nil {
-		return err
-	}
-
-	return nil
+	return s.srv.ListenAndServe()
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {

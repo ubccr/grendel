@@ -48,10 +48,12 @@ require (
 	github.com/willf/bitset v1.1.10
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 	golang.org/x/crypto v0.0.0-20200117160349-530e935923ad // indirect
-	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa // indirect
 	golang.org/x/sys v0.0.0-20200124204421-9fbb57f87de9 // indirect
 	gopkg.in/ini.v1 v1.51.1 // indirect
+	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
 
 replace github.com/square/certstrap => github.com/ubccr/certstrap v1.2.1-0.20200115142812-0c31c5e59383
+
+replace github.com/pin/tftp => github.com/ubccr/tftp v0.0.0-20200215220641-2b5a116e0866

@@ -29,6 +29,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/dhcp"
 	"github.com/ubccr/grendel/logger"
+	"gopkg.in/tomb.v2"
 )
 
 func init() {
@@ -55,13 +56,14 @@ var (
 		Short: "Run DHCP server",
 		Long:  `Run DHCP server`,
 		RunE: func(command *cobra.Command, args []string) error {
-			ctx, _ := NewInterruptContext()
-			return serveDHCP(ctx)
+			t := NewInterruptTomb()
+			t.Go(func() error { return serveDHCP(t) })
+			return t.Wait()
 		},
 	}
 )
 
-func serveDHCP(ctx context.Context) error {
+func serveDHCP(t *tomb.Tomb) error {
 	srv, err := dhcp.NewServer(DB, viper.GetString("dhcp.listen"))
 	if err != nil {
 		return err
@@ -142,9 +144,21 @@ func serveDHCP(ctx context.Context) error {
 		dhcpLog.Infof("Running in ProxyOnly mode")
 	}
 
-	if err := srv.Serve(ctx); err != nil {
-		return err
-	}
+	t.Go(srv.Serve)
+	t.Go(func() error {
+		time.Sleep(1 * time.Second)
+		<-t.Dying()
+		dhcpLog.Info("Shutting down DHCP server...")
+		ctxShutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		if err := srv.Shutdown(ctxShutdown); err != nil {
+			dhcpLog.Errorf("Failed shutting down DHCP server: %s", err)
+			return err
+		}
+
+		return nil
+	})
 
 	return nil
 }

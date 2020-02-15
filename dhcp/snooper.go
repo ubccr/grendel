@@ -127,7 +127,12 @@ func (s *Snooper) serve() error {
 
 func (s *Snooper) Shutdown(ctx context.Context) error {
 	close(s.quit)
-	s.conn.Close()
+	if s.conn == nil {
+		return nil
+	}
+
+	defer s.conn.Close()
+	s.conn.SetReadDeadline(CancelTime)
 
 	done := make(chan struct{})
 	go func() {

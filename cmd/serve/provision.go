@@ -19,10 +19,13 @@ package serve
 
 import (
 	"context"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/provision"
+	"gopkg.in/tomb.v2"
 )
 
 func init() {
@@ -46,13 +49,14 @@ var (
 		Short: "Run Provision server",
 		Long:  `Run Provision server`,
 		RunE: func(command *cobra.Command, args []string) error {
-			ctx, _ := NewInterruptContext()
-			return serveProvision(ctx)
+			t := NewInterruptTomb()
+			t.Go(func() error { return serveProvision(t) })
+			return t.Wait()
 		},
 	}
 )
 
-func serveProvision(ctx context.Context) error {
+func serveProvision(t *tomb.Tomb) error {
 	srv, err := provision.NewServer(DB, viper.GetString("provision.listen"))
 	if err != nil {
 		return err
@@ -62,9 +66,20 @@ func serveProvision(ctx context.Context) error {
 	srv.CertFile = viper.GetString("provision.cert")
 	srv.RepoDir = viper.GetString("provision.repo_dir")
 
-	if err := srv.Serve(ctx, viper.GetString("provision.default_image")); err != nil {
-		return err
-	}
+	t.Go(func() error {
+		time.Sleep(1 * time.Second)
+		<-t.Dying()
+		cmd.Log.Info("Shutting down Provision server...")
+		ctxShutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
 
-	return nil
+		if err := srv.Shutdown(ctxShutdown); err != nil {
+			cmd.Log.Errorf("Failed shutting down Provision server: %s", err)
+			return err
+		}
+
+		return nil
+	})
+
+	return srv.Serve(viper.GetString("provision.default_image"))
 }

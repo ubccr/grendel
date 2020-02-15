@@ -19,10 +19,13 @@ package serve
 
 import (
 	"context"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/dhcp"
+	"gopkg.in/tomb.v2"
 )
 
 func init() {
@@ -38,21 +41,33 @@ var (
 		Short: "Run DHCP PXE Boot server",
 		Long:  `Run DHCP PXE Boot server`,
 		RunE: func(command *cobra.Command, args []string) error {
-			ctx, _ := NewInterruptContext()
-			return servePXE(ctx)
+			t := NewInterruptTomb()
+			t.Go(func() error { return servePXE(t) })
+			return t.Wait()
 		},
 	}
 )
 
-func servePXE(ctx context.Context) error {
+func servePXE(t *tomb.Tomb) error {
 	srv, err := dhcp.NewPXEServer(DB, viper.GetString("pxe.listen"))
 	if err != nil {
 		return err
 	}
 
-	if err := srv.Serve(ctx); err != nil {
-		return err
-	}
+	t.Go(func() error {
+		time.Sleep(1 * time.Second)
+		<-t.Dying()
+		cmd.Log.Info("Shutting down PXE server...")
+		ctxShutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
 
-	return nil
+		if err := srv.Shutdown(ctxShutdown); err != nil {
+			cmd.Log.Errorf("Failed shutting down PXE server: %s", err)
+			return err
+		}
+
+		return nil
+	})
+
+	return srv.Serve()
 }

@@ -19,10 +19,13 @@ package serve
 
 import (
 	"context"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/dns"
+	"gopkg.in/tomb.v2"
 )
 
 func init() {
@@ -40,21 +43,33 @@ var (
 		Short: "Run DNS server",
 		Long:  `Run DNS server`,
 		RunE: func(command *cobra.Command, args []string) error {
-			ctx, _ := NewInterruptContext()
-			return serveDNS(ctx)
+			t := NewInterruptTomb()
+			t.Go(func() error { return serveDNS(t) })
+			return t.Wait()
 		},
 	}
 )
 
-func serveDNS(ctx context.Context) error {
+func serveDNS(t *tomb.Tomb) error {
 	dnsServer, err := dns.NewServer(DB, viper.GetString("dns.listen"), viper.GetInt("dns.ttl"))
 	if err != nil {
 		return err
 	}
 
-	if err := dnsServer.Serve(ctx); err != nil {
-		return err
-	}
+	t.Go(func() error {
+		time.Sleep(1 * time.Second)
+		<-t.Dying()
+		cmd.Log.Info("Shutting down DNS server...")
+		ctxShutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
 
-	return nil
+		if err := dnsServer.Shutdown(ctxShutdown); err != nil {
+			cmd.Log.Errorf("Failed shutting down DNS server: %s", err)
+			return err
+		}
+
+		return nil
+	})
+
+	return dnsServer.Serve()
 }
