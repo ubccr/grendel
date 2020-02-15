@@ -41,7 +41,7 @@ var (
 	Root = &cobra.Command{
 		Use:     "grendel",
 		Version: api.Version,
-		Short:   "Provisioning system for high-performance Linux clusters",
+		Short:   "Bare Metal Provisioning for HPC",
 		Long:    ``,
 	}
 )
