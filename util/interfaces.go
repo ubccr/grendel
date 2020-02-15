@@ -57,11 +57,8 @@ func GetFirstExternalIPFromInterfaces() (net.IP, error) {
 		return nil, errors.New("Failed to find server ip address from configured interfaces")
 	}
 
-	if len(serverIps) != 1 {
-		//TODO add support for multiple interfaces
-		return nil, fmt.Errorf("Multiple interfaces not supported yet: %#v", serverIps)
-	}
-
+	// Multiple interfaces found. Using first one?
+	// This is used for setting the ServerIP in dhcp responses etc.
 	return serverIps[0], nil
 }
 
