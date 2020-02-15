@@ -26,7 +26,7 @@ import (
 	"github.com/insomniacslk/dhcp/interfaces"
 )
 
-func GetInterfaceIP() (net.IP, error) {
+func GetFirstExternalIPFromInterfaces() (net.IP, error) {
 	// Attempt to discover IP from interfaces
 	intfs, err := interfaces.GetNonLoopbackInterfaces()
 	if err != nil {
@@ -63,4 +63,36 @@ func GetInterfaceIP() (net.IP, error) {
 	}
 
 	return serverIps[0], nil
+}
+
+func GetInterfaceFromIP(ip net.IP) (string, error) {
+	// Attempt to discover interface from IP
+	intfs, err := interfaces.GetNonLoopbackInterfaces()
+	if err != nil {
+		return "", err
+	}
+
+	for _, intf := range intfs {
+		addrs, err := intf.Addrs()
+		if err != nil {
+			return "", err
+		}
+
+		ips, err := dhcpv4.GetExternalIPv4Addrs(addrs)
+		if err != nil {
+			return "", err
+		}
+
+		if len(ips) == 0 {
+			continue
+		}
+
+		for _, i := range ips {
+			if i.To4() != nil && i.To4().Equal(ip) {
+				return intf.Name, nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("Interface not found with ip: %s", ip)
 }

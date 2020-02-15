@@ -89,7 +89,7 @@ func NewServer(db model.DataStore, socket, address string) (*Server, error) {
 		return s, nil
 	}
 
-	ipaddr, err := util.GetInterfaceIP()
+	ipaddr, err := util.GetFirstExternalIPFromInterfaces()
 	if err != nil {
 		return nil, err
 	}

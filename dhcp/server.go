@@ -85,7 +85,7 @@ func NewServer(db model.DataStore, address string) (*Server, error) {
 		return s, nil
 	}
 
-	ipaddr, err := util.GetInterfaceIP()
+	ipaddr, err := util.GetFirstExternalIPFromInterfaces()
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +195,19 @@ func (s *Server) Serve(ctx context.Context) error {
 		Port: s.Port,
 	}
 
-	conn, err := server4.NewIPv4UDPConn("", listener)
+	intf := ""
+	if !s.ListenAddress.To4().Equal(net.IPv4zero) {
+		var err error
+		intf, err = util.GetInterfaceFromIP(s.ListenAddress)
+		if err != nil {
+			return err
+		}
+
+		listener = &net.UDPAddr{Port: s.Port}
+		log.Printf("Binding to interface: %s", intf)
+	}
+
+	conn, err := server4.NewIPv4UDPConn(intf, listener)
 	if err != nil {
 		return err
 	}

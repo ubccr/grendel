@@ -25,16 +25,17 @@ import (
 	"sync"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
-	"golang.org/x/net/bpf"
-	"golang.org/x/net/ipv4"
+	"github.com/insomniacslk/dhcp/dhcpv4/server4"
+	"github.com/ubccr/grendel/util"
 )
 
 type Snooper struct {
-	Port    int
-	Handler func(req *dhcpv4.DHCPv4)
-	conn    *ipv4.RawConn
-	quit    chan interface{}
-	wg      sync.WaitGroup
+	ListenAddress net.IP
+	Port          int
+	Handler       func(req *dhcpv4.DHCPv4)
+	conn          net.PacketConn
+	quit          chan interface{}
+	wg            sync.WaitGroup
 }
 
 func NewSnooper(address string, handler func(req *dhcpv4.DHCPv4)) (*Snooper, error) {
@@ -42,7 +43,7 @@ func NewSnooper(address string, handler func(req *dhcpv4.DHCPv4)) (*Snooper, err
 		address = fmt.Sprintf("%s:%d", net.IPv4zero.String(), dhcpv4.ServerPort)
 	}
 
-	_, portStr, err := net.SplitHostPort(address)
+	ipStr, portStr, err := net.SplitHostPort(address)
 	if err != nil {
 		return nil, err
 	}
@@ -52,59 +53,51 @@ func NewSnooper(address string, handler func(req *dhcpv4.DHCPv4)) (*Snooper, err
 		return nil, err
 	}
 
+	ip := net.ParseIP(ipStr)
+	if ip == nil || ip.To4() == nil {
+		return nil, fmt.Errorf("Invalid IPv4 address: %s", ipStr)
+	}
+
 	s := &Snooper{
-		Port:    port,
-		Handler: handler,
-		quit:    make(chan interface{}),
+		Port:          port,
+		ListenAddress: ip,
+		Handler:       handler,
+		quit:          make(chan interface{}),
 	}
 
 	return s, nil
 }
 
 func (s *Snooper) Snoop() error {
-	// Adopted from https://github.com/danderson/netboot/blob/master/dhcp4/conn_linux.go
-	// Written by @danderson
-	filter, err := bpf.Assemble([]bpf.Instruction{
-		// Load IPv4 packet length
-		bpf.LoadMemShift{Off: 0},
-		// Get UDP dport
-		bpf.LoadIndirect{Off: 2, Size: 2},
-		// Correct dport?
-		bpf.JumpIf{Cond: bpf.JumpEqual, Val: uint32(s.Port), SkipFalse: 1},
-		// Accept
-		bpf.RetConstant{Val: 1500},
-		// Ignore
-		bpf.RetConstant{Val: 0},
-	})
+	listener := &net.UDPAddr{
+		IP:   s.ListenAddress,
+		Port: s.Port,
+	}
+
+	intf := ""
+	if !s.ListenAddress.To4().Equal(net.IPv4zero) {
+		var err error
+		intf, err = util.GetInterfaceFromIP(s.ListenAddress)
+		if err != nil {
+			return err
+		}
+
+		listener = &net.UDPAddr{Port: s.Port}
+		log.Printf("Binding to interface: %s", intf)
+	}
+
+	conn, err := server4.NewIPv4UDPConn(intf, listener)
 	if err != nil {
 		return err
 	}
-
-	conn, err := net.ListenPacket("ip4:17", "0.0.0.0")
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	rconn, err := ipv4.NewRawConn(conn)
-	if err != nil {
-		return err
-	}
-	if err = rconn.SetControlMessage(ipv4.FlagInterface, true); err != nil {
-		return fmt.Errorf("Failed setting control message: %w", err)
-	}
-	if err = rconn.SetBPF(filter); err != nil {
-		return fmt.Errorf("Failed setting BFP filter: %w", err)
-	}
-
-	s.conn = rconn
+	s.conn = conn
 	return s.serve()
 }
 
 func (s *Snooper) serve() error {
 	var buf [1500]byte
 	for {
-		_, p, _, err := s.conn.ReadFrom(buf[:])
+		n, peer, err := s.conn.ReadFrom(buf[:])
 		if err != nil {
 			select {
 			case <-s.quit:
@@ -113,12 +106,9 @@ func (s *Snooper) serve() error {
 				log.Errorf("Failed to read packet: %s", err)
 			}
 		} else {
-			if len(p) < 8 {
-				log.Errorf("Invalid UDP packet too short")
-				continue
-			}
+			log.Printf("Snooping request from %v", peer)
 
-			m, err := dhcpv4.FromBytes(p[8:])
+			m, err := dhcpv4.FromBytes(buf[:n])
 			if err != nil {
 				log.Errorf("Error parsing DHCPv4 request: %v", err)
 				continue

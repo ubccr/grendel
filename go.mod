@@ -26,7 +26,7 @@ require (
 	github.com/onsi/ginkgo v1.10.3 // indirect
 	github.com/onsi/gomega v1.7.1 // indirect
 	github.com/pelletier/go-toml v1.6.0 // indirect
-	github.com/pin/tftp v2.1.0+incompatible
+	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/schwarmco/go-cartesian-product v0.0.0-20180515110546-d5ee747a6dc9
 	github.com/segmentio/ksuid v1.0.2
@@ -48,7 +48,7 @@ require (
 	github.com/willf/bitset v1.1.10
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 	golang.org/x/crypto v0.0.0-20200117160349-530e935923ad // indirect
-	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa
+	golang.org/x/net v0.0.0-20200114155413-6afb5195e5aa // indirect
 	golang.org/x/sys v0.0.0-20200124204421-9fbb57f87de9 // indirect
 	gopkg.in/ini.v1 v1.51.1 // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
