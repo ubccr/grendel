@@ -64,12 +64,21 @@ var (
 )
 
 func serveDHCP(t *tomb.Tomb) error {
-	srv, err := dhcp.NewServer(DB, viper.GetString("dhcp.listen"))
+	dhcpListen, err := GetListenAddress(viper.GetString("dhcp.listen"))
 	if err != nil {
 		return err
 	}
 
-	address := viper.GetString("provision.listen")
+	srv, err := dhcp.NewServer(DB, dhcpListen)
+	if err != nil {
+		return err
+	}
+
+	address, err := GetListenAddress(viper.GetString("provision.listen"))
+	if err != nil {
+		return err
+	}
+
 	ipStr, portStr, err := net.SplitHostPort(address)
 	if err != nil {
 		return err

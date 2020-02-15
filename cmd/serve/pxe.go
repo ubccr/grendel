@@ -49,7 +49,12 @@ var (
 )
 
 func servePXE(t *tomb.Tomb) error {
-	srv, err := dhcp.NewPXEServer(DB, viper.GetString("pxe.listen"))
+	pxeListen, err := GetListenAddress(viper.GetString("pxe.listen"))
+	if err != nil {
+		return err
+	}
+
+	srv, err := dhcp.NewPXEServer(DB, pxeListen)
 	if err != nil {
 		return err
 	}

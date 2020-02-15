@@ -49,7 +49,12 @@ var (
 )
 
 func serveTFTP(t *tomb.Tomb) error {
-	tftpServer, err := tftp.NewServer(viper.GetString("tftp.listen"))
+	tftpListen, err := GetListenAddress(viper.GetString("tftp.listen"))
+	if err != nil {
+		return err
+	}
+
+	tftpServer, err := tftp.NewServer(tftpListen)
 	if err != nil {
 		return err
 	}

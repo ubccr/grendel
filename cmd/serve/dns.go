@@ -51,7 +51,12 @@ var (
 )
 
 func serveDNS(t *tomb.Tomb) error {
-	dnsServer, err := dns.NewServer(DB, viper.GetString("dns.listen"), viper.GetInt("dns.ttl"))
+	dnsListen, err := GetListenAddress(viper.GetString("dns.listen"))
+	if err != nil {
+		return err
+	}
+
+	dnsServer, err := dns.NewServer(DB, dnsListen, viper.GetInt("dns.ttl"))
 	if err != nil {
 		return err
 	}

@@ -20,7 +20,9 @@ package serve
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"net"
 	"os"
 	"os/signal"
 
@@ -32,10 +34,11 @@ import (
 )
 
 var (
-	DB         model.DataStore
-	hostsFile  string
-	imagesFile string
-	serveCmd   = &cobra.Command{
+	DB            model.DataStore
+	hostsFile     string
+	imagesFile    string
+	listenAddress string
+	serveCmd      = &cobra.Command{
 		Use:   "serve",
 		Short: "Run services",
 		Long:  `Run grendel services`,
@@ -64,6 +67,7 @@ func init() {
 	serveCmd.PersistentFlags().StringVar(&hostsFile, "hosts", "", "path to hosts file")
 	serveCmd.PersistentFlags().StringVar(&imagesFile, "images", "", "path to boot images file")
 	serveCmd.PersistentFlags().StringSlice("services", []string{}, "enabled services")
+	serveCmd.PersistentFlags().StringVar(&listenAddress, "listen", "", "listen address")
 	viper.BindPFlag("services", serveCmd.PersistentFlags().Lookup("services"))
 
 	serveCmd.PersistentPreRunE = func(command *cobra.Command, args []string) error {
@@ -179,6 +183,19 @@ func NewInterruptTomb() *tomb.Tomb {
 	}()
 
 	return t
+}
+
+func GetListenAddress(address string) (string, error) {
+	if listenAddress == "" {
+		return address, nil
+	}
+
+	_, port, err := net.SplitHostPort(address)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s:%s", listenAddress, port), nil
 }
 
 func NewInterruptContext() (context.Context, context.CancelFunc) {

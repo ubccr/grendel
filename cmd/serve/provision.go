@@ -57,7 +57,12 @@ var (
 )
 
 func serveProvision(t *tomb.Tomb) error {
-	srv, err := provision.NewServer(DB, viper.GetString("provision.listen"))
+	pListen, err := GetListenAddress(viper.GetString("provision.listen"))
+	if err != nil {
+		return err
+	}
+
+	srv, err := provision.NewServer(DB, pListen)
 	if err != nil {
 		return err
 	}
