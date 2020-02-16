@@ -48,7 +48,7 @@ func (s *Server) staticHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) erro
 
 	var router net.IP
 	if s.RouterOctet4 > 0 {
-		router := nic.IP.Mask(s.Netmask)
+		router = nic.IP.Mask(s.Netmask)
 		router[3] += byte(s.RouterOctet4)
 	} else if s.RouterIP != nil {
 		router = make(net.IP, len(s.RouterIP))
