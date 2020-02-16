@@ -1,5 +1,7 @@
 # Grendel - Bare Metal Provisioning for HPC
 
+![Grendel](docs/pages/images/logo-lg.png){:class="img-responsive"}
+
 Grendel is a fast, easy to use bare metal provisioning system for High
 Performance Computing (HPC) Linux clusters. Grendel simplifies the deployment
 and administration of physical compute clusters both large and small. It's
@@ -18,6 +20,80 @@ to 1500 nodes.
 * Authorized provisioning using JWT tokens
 * Rest API
 * Easy installation (single binary with no deps)
+
+## Quickstart with QEMU/KVM
+
+The following steps will show how to PXE boot a linux virtual machine using
+QEMU/KVM and install Flatcar linux using Grendel.
+
+### Installation
+
+To install Grendel download a copy of the binary here.
+
+```
+$ ./grendel --version
+```
+
+### Create a TAP device
+
+```
+$ sudo ip tuntap add name tap0 mode tap `whoami`
+$ sudo ip link set tap0 up
+$ sudo ip addr add 192.168.10.254/24 dev tap0
+```
+
+### Create a Boot Image file
+
+```
+$ wget http://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_production_pxe_image.cpio.gz
+$ wget http://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_production_pxe.vmlinuz
+```
+
+Create the following JSON file `image.json`:
+
+```json
+[{
+    "name": "flatcar",
+    "kernel": "flatcar_production_pxe.vmlinuz",
+    "initrd": [
+        "flatcar_production_pxe_image.cpio.gz"
+    ],
+    "cmdline": "flatcar.autologin"
+}]
+```
+
+### Create a host file
+
+Create the following JSON file `host.json`:
+
+```json
+[{
+    "name": "tux01",
+    "provision": true,
+    "boot_image": "flatcar",
+    "interfaces": [
+        {
+            "fqdn": "tux01.localhost",
+            "ip": "192.168.10.12",
+            "mac": "DE:AD:BE:EF:12:8C"
+        }
+    ]
+}]
+```
+
+### Start Grendel services
+
+```
+$ sudo ./grendel --verbose serve --hosts host.json --images image.json --listen 192.168.10.254
+```
+
+### PXE Boot the linux virtual machine
+
+In another terminal window run the following commands:
+
+```
+$ qemu-system-x86_64 -nographic -serial mon:stdio -m 2048 -boot n -device e1000,netdev=net0,mac=DE:AD:BE:EF:12:8C -netdev tap,id=net0,ifname=tap0,script=/bin/true
+```
 
 ## Hacking
 
