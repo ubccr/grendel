@@ -1,6 +1,6 @@
 # Grendel - Bare Metal Provisioning for HPC
 
-![Grendel](docs/pages/images/logo-lg.png){:class="img-responsive"}
+![Grendel](docs/pages/images/logo-lg.png)
 
 Grendel is a fast, easy to use bare metal provisioning system for High
 Performance Computing (HPC) Linux clusters. Grendel simplifies the deployment
