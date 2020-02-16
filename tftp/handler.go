@@ -28,13 +28,13 @@ import (
 )
 
 func (s *Server) ReadHandler(token string, rf io.ReaderFrom) error {
-	log.Infof("Got read request with token: %s", token)
-
 	fwtype, err := model.ParseFirmwareToken(token)
 	if err != nil {
 		log.Errorf("failed to parse token: %s", err)
 		return err
 	}
+
+	log.Infof("Got read request for firmware type: %d", fwtype)
 
 	bs := fwtype.ToBytes()
 	if bs == nil {

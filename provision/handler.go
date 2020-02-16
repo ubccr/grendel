@@ -96,7 +96,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 	bootToken := c.Get(ContextKeyJWT).(*jwt.Token)
 	claims := bootToken.Claims.(*model.BootClaims)
 
-	log.Debugf("iPXE Got valid boot claims %s: %v", c.QueryParam("token"), claims)
+	log.Debugf("iPXE Got valid boot claims: %v", claims)
 
 	host, err := h.DB.LoadHostFromID(claims.ID)
 	if err != nil {
@@ -142,7 +142,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot image")
 	}
 
-	log.Infof("IPXE booting host %s with image %s", host.Name, bootImage.Name)
+	log.Infof("Sending iPXE script to boot host %s with image %s", host.Name, bootImage.Name)
 	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
 	commandLine := bootImage.CommandLine
 
@@ -174,7 +174,7 @@ func (h *Handler) File(c echo.Context) error {
 	bootToken := c.Get(ContextKeyJWT).(*jwt.Token)
 	claims := bootToken.Claims.(*model.BootClaims)
 
-	log.Infof("FILE Got valid boot claims: %v", claims)
+	log.Debugf("File handler Got valid boot claims: %v", claims)
 
 	macStr := claims.MAC
 	if macStr == "" {
@@ -208,7 +208,7 @@ func (h *Handler) File(c echo.Context) error {
 
 	_, fileType := path.Split(c.Request().URL.Path)
 
-	log.Infof("Got request for file %q to %s", fileType, c.RealIP())
+	log.Infof("Got request for file %q from host %s %s", fileType, host.Name, c.RealIP())
 
 	switch {
 	case fileType == "kernel":

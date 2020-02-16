@@ -47,6 +47,8 @@ func (h *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 
 	qname := h.Name(r)
 	answers := []dns.RR{}
+
+	log.Infof("Got query %s", qname)
 	switch h.QType(r) {
 	case dns.TypePTR:
 		names, err := h.db.ReverseResolve(util.ExtractAddressFromReverse(qname))

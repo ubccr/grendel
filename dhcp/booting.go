@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
+	"github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/firmware"
 	"github.com/ubccr/grendel/model"
 )
@@ -32,7 +33,7 @@ func (s *Server) bootingHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) err
 	}
 
 	if !req.Options.Has(dhcpv4.OptionClientSystemArchitectureType) {
-		log.Debugf("BootHandler4 ignoring packet - missing client system architecture type")
+		log.Debugf("Ignoring packet - missing client system architecture type")
 		return nil
 	}
 
@@ -46,7 +47,11 @@ func (s *Server) bootingHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) err
 		return fmt.Errorf("Failed to get PXE firmware from DHCP: %s", err)
 	}
 
-	log.Infof("BootHandler4 got valid request to boot %s %d", req.ClientIPAddr, fwtype)
+	log.WithFields(logrus.Fields{
+		"mac":      req.ClientHWAddr.String(),
+		"name":     host.Name,
+		"firmware": fwtype.String(),
+	}).Info("Got valid PXE boot request")
 	log.Debugf(req.Summary())
 
 	// This logic was adopted from pixiecore
@@ -114,7 +119,7 @@ func (s *Server) bootingHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) err
 		}
 
 		ipxeUrl := fmt.Sprintf("%s://%s:%d/_/ipxe?token=%s", s.ProvisionScheme, hostName, s.ProvisionPort, token)
-		log.Printf("Sending URL to iPXE script: %s", ipxeUrl)
+		log.Printf("BootFile iPXE script: %s", ipxeUrl)
 		resp.UpdateOption(dhcpv4.OptBootFileName(ipxeUrl))
 
 	default:

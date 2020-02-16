@@ -181,7 +181,6 @@ func (s *Server) Serve(defaultImageName string) error {
 		s.Scheme = "https"
 		httpServer.Addr = fmt.Sprintf("%s:%d", s.ListenAddress, s.Port)
 	} else {
-		log.Warn("**WARNING*** SSL/TLS not enabled. HTTP communication will not be encrypted and vulnerable to snooping.")
 		s.Scheme = "http"
 	}
 
