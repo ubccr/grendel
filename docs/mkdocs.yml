@@ -1,0 +1,46 @@
+site_name: Grendel
+docs_dir: 'pages'
+site_description: 'Bare metal provision system for high performance Linux clusters'
+site_url: 'https://github.com/ubccr/grendel'
+copyright: 'Copyright &copy; 2019 Center for Computational Research, University at Buffalo'
+repo_name: 'ubccr/grendel'
+repo_url: 'https://github.com/ubccr/grendel'
+edit_uri: ''
+
+theme:
+  name: 'material'
+  palette:
+    primary: 'black'
+  logo: 'images/logo.png'
+  favicon: 'images/favicon.png'
+
+markdown_extensions:
+  - footnotes
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+nav:
+    - What is Grendel?: index.md
+    - Introduction: intro.md
+    - Quick Start: quickstart.md
+    - Background: background.md
+
