@@ -48,6 +48,9 @@ type Server struct {
 	DB                model.DataStore
 	DNSServers        []net.IP
 	DomainSearchList  []string
+	Netmask           net.IPMask
+	RouterOctet4      int
+	RouterIP          net.IP
 	LeaseTime         time.Duration
 	conn              net.PacketConn
 	quit              chan interface{}
@@ -197,14 +200,18 @@ func (s *Server) Serve() error {
 
 	intf := ""
 	if !s.ListenAddress.To4().Equal(net.IPv4zero) {
-		var err error
-		intf, err = util.GetInterfaceFromIP(s.ListenAddress)
+		iface, mask, err := util.GetInterfaceFromIP(s.ListenAddress)
 		if err != nil {
 			return err
 		}
-
+		intf = iface
 		listener = &net.UDPAddr{Port: s.Port}
 		log.Printf("Binding to interface: %s", intf)
+
+		if s.Netmask == nil && mask != nil {
+			s.Netmask = mask
+			log.Printf("Using netmask from interface: %s", s.Netmask)
+		}
 	}
 
 	conn, err := server4.NewIPv4UDPConn(intf, listener)

@@ -171,7 +171,7 @@ func (s *PXEServer) Serve() error {
 	intf := ""
 	if !s.ListenAddress.To4().Equal(net.IPv4zero) {
 		var err error
-		intf, err = util.GetInterfaceFromIP(s.ListenAddress)
+		intf, _, err = util.GetInterfaceFromIP(s.ListenAddress)
 		if err != nil {
 			return err
 		}

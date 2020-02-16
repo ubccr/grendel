@@ -42,16 +42,23 @@ func (s *Server) staticHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) erro
 	}).Info("Found host")
 	log.Debugf(req.Summary())
 
-	// TODO make this configurable
-	netmask := net.IPv4Mask(255, 255, 255, 0)
-	resp.Options.Update(dhcpv4.OptSubnetMask(netmask))
+	if s.Netmask != nil {
+		resp.Options.Update(dhcpv4.OptSubnetMask(s.Netmask))
+	}
 
-	// Use 10.x.x.254 as the router
-	router := nic.IP.Mask(netmask)
-	router[3] += 254
+	var router net.IP
+	if s.RouterOctet4 > 0 {
+		router := nic.IP.Mask(s.Netmask)
+		router[3] += byte(s.RouterOctet4)
+	} else if s.RouterIP != nil {
+		router = make(net.IP, len(s.RouterIP))
+		copy(router, s.RouterIP)
+	}
 
-	routers := []net.IP{router}
-	resp.Options.Update(dhcpv4.OptRouter(routers...))
+	if router != nil {
+		routers := []net.IP{router}
+		resp.Options.Update(dhcpv4.OptRouter(routers...))
+	}
 
 	resp.Options.Update(dhcpv4.OptIPAddressLeaseTime(s.LeaseTime))
 

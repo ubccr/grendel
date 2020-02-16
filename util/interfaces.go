@@ -62,34 +62,36 @@ func GetFirstExternalIPFromInterfaces() (net.IP, error) {
 	return serverIps[0], nil
 }
 
-func GetInterfaceFromIP(ip net.IP) (string, error) {
+func GetInterfaceFromIP(ip net.IP) (string, net.IPMask, error) {
 	// Attempt to discover interface from IP
 	intfs, err := interfaces.GetNonLoopbackInterfaces()
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	for _, intf := range intfs {
 		addrs, err := intf.Addrs()
 		if err != nil {
-			return "", err
+			return "", nil, err
 		}
 
-		ips, err := dhcpv4.GetExternalIPv4Addrs(addrs)
-		if err != nil {
-			return "", err
-		}
+		for _, addr := range addrs {
+			var i net.IP
+			var mask net.IPMask
+			switch v := addr.(type) {
+			case *net.IPAddr:
+				i = v.IP
+			case *net.IPNet:
+				i = v.IP
+				mask = v.Mask
+			}
 
-		if len(ips) == 0 {
-			continue
-		}
-
-		for _, i := range ips {
 			if i.To4() != nil && i.To4().Equal(ip) {
-				return intf.Name, nil
+				return intf.Name, mask, nil
 			}
 		}
+
 	}
 
-	return "", fmt.Errorf("Interface not found with ip: %s", ip)
+	return "", nil, fmt.Errorf("Interface not found with ip: %s", ip)
 }

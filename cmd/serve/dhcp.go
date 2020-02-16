@@ -45,6 +45,12 @@ func init() {
 	viper.BindPFlag("dhcp.mtu", dhcpCmd.PersistentFlags().Lookup("dhcp-mtu"))
 	dhcpCmd.PersistentFlags().Bool("dhcp-proxy-only", false, "only run boot proxy")
 	viper.BindPFlag("dhcp.proxy_only", dhcpCmd.PersistentFlags().Lookup("dhcp-proxy-only"))
+	dhcpCmd.PersistentFlags().Int("dhcp-router-octet4", 0, "automatic router configuration")
+	viper.BindPFlag("dhcp.router_octet4", dhcpCmd.PersistentFlags().Lookup("dhcp-router-octet4"))
+	dhcpCmd.PersistentFlags().String("dhcp-router", "", "static router address")
+	viper.BindPFlag("dhcp.router", dhcpCmd.PersistentFlags().Lookup("dhcp-router"))
+	dhcpCmd.PersistentFlags().Int("dhcp-netmask", 0, "subnet mask")
+	viper.BindPFlag("dhcp.netmask", dhcpCmd.PersistentFlags().Lookup("dhcp-netmask"))
 
 	serveCmd.AddCommand(dhcpCmd)
 }
@@ -126,7 +132,7 @@ func serveDHCP(t *tomb.Tomb) error {
 		srv.DNSServers = make([]net.IP, 0)
 		for _, arg := range viper.GetStringSlice("dhcp.dns_servers") {
 			dnsip := net.ParseIP(arg)
-			if dnsip.To4() == nil {
+			if dnsip == nil || dnsip.To4() == nil {
 				return fmt.Errorf("Invalid dns server ip address: %s", arg)
 			}
 			srv.DNSServers = append(srv.DNSServers, dnsip)
@@ -139,14 +145,37 @@ func serveDHCP(t *tomb.Tomb) error {
 		dhcpLog.Infof("Using Domain Search List: %v", srv.DomainSearchList)
 	}
 
+	if viper.IsSet("dhcp.router") {
+		routerIP := net.ParseIP(viper.GetString("dhcp.router"))
+		if routerIP != nil || routerIP.To4() == nil {
+			return fmt.Errorf("Invalid router ip address: %s", viper.GetString("dhcp.router"))
+		}
+
+		srv.RouterIP = routerIP
+		dhcpLog.Infof("Static router: %s", srv.RouterIP)
+	}
+
 	leaseTime, err := time.ParseDuration(viper.GetString("dhcp.lease_time"))
 	if err != nil {
 		return err
 	}
+
 	srv.LeaseTime = leaseTime
-	srv.MTU = viper.GetInt("dhcp.mtu")
 	dhcpLog.Infof("Default lease time: %s", srv.LeaseTime)
+
+	srv.MTU = viper.GetInt("dhcp.mtu")
 	dhcpLog.Infof("Default mtu: %d", srv.MTU)
+
+	srv.RouterOctet4 = viper.GetInt("dhcp.router_octet4")
+	if srv.RouterOctet4 > 0 {
+		srv.Netmask = net.CIDRMask(24, 32)
+		dhcpLog.Infof("Using automatic router configuration")
+		dhcpLog.Infof("Netmask: %s", srv.Netmask)
+		dhcpLog.Infof("Router Octet4: %d", srv.RouterOctet4)
+	} else if viper.GetInt("dhcp.netmask") > 0 {
+		srv.Netmask = net.CIDRMask(viper.GetInt("dhcp.netmask"), 32)
+		dhcpLog.Infof("Netmask: %s", srv.Netmask)
+	}
 
 	srv.ProxyOnly = viper.GetBool("dhcp.proxy_only")
 	if srv.ProxyOnly {
