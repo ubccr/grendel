@@ -18,6 +18,8 @@
 package model
 
 import (
+	"os"
+
 	"github.com/segmentio/ksuid"
 )
 
@@ -35,4 +37,30 @@ type BootImage struct {
 
 func NewBootImageList() BootImageList {
 	return make(BootImageList, 0)
+}
+
+func (b *BootImage) CheckPathsExist() error {
+	if _, err := os.Stat(b.KernelPath); err != nil {
+		return err
+	}
+
+	for _, i := range b.InitrdPaths {
+		if _, err := os.Stat(i); err != nil {
+			return err
+		}
+	}
+
+	if b.LiveImage != "" {
+		if _, err := os.Stat(b.LiveImage); err != nil {
+			return err
+		}
+	}
+
+	if b.InstallRepo != "" {
+		if _, err := os.Stat(b.InstallRepo); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

@@ -146,6 +146,13 @@ func loadImageJSON() error {
 		return err
 	}
 
+	for _, i := range imageList {
+		err = i.CheckPathsExist()
+		if err != nil {
+			return err
+		}
+	}
+
 	err = DB.StoreBootImages(imageList)
 	if err != nil {
 		return err
