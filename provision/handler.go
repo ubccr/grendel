@@ -68,7 +68,7 @@ func (h *Handler) LoadBootImageWithDefault(name string) (*model.BootImage, error
 func (h *Handler) SetupRoutes(e *echo.Echo) {
 	e.GET("/", h.Index).Name = "index"
 
-	boot := e.Group("/_/")
+	boot := e.Group("/boot/")
 
 	config := middleware.JWTConfig{
 		Claims:      &model.BootClaims{},
@@ -146,13 +146,13 @@ func (h *Handler) Ipxe(c echo.Context) error {
 	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
 	commandLine := bootImage.CommandLine
 
-	if host.Provision {
+	if host.Kickstart {
 		commandLine += fmt.Sprintf(" ks=%s/_/kickstart?token=%s network ksdevice=bootif ks.device=bootif inst.stage2=%s/repo/%s ", baseURI, c.QueryParam("token"), baseURI, bootImage.InstallRepo)
 		if viper.GetBool("provision.noverifyssl") {
 			commandLine += " rd.noverifyssl noverifyssl inst.noverifyssl"
 		}
 	} else if len(bootImage.LiveImage) > 0 && !strings.Contains(bootImage.CommandLine, "live") {
-		commandLine += fmt.Sprintf(" root=live:%s/_/file/liveimg?token=%s", baseURI, c.QueryParam("token"))
+		commandLine += fmt.Sprintf(" root=live:%s/boot/file/liveimg?token=%s", baseURI, c.QueryParam("token"))
 		if viper.GetBool("provision.noverifyssl") {
 			commandLine += " rd.noverifyssl"
 		}
