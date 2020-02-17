@@ -147,7 +147,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 	commandLine := bootImage.CommandLine
 
 	if host.Kickstart {
-		commandLine += fmt.Sprintf(" ks=%s/_/kickstart?token=%s network ksdevice=bootif ks.device=bootif inst.stage2=%s/repo/%s ", baseURI, c.QueryParam("token"), baseURI, bootImage.InstallRepo)
+		commandLine += fmt.Sprintf(" ks=%s/boot/kickstart?token=%s network ksdevice=bootif ks.device=bootif inst.stage2=%s/repo/%s ", baseURI, c.QueryParam("token"), baseURI, bootImage.InstallRepo)
 		if viper.GetBool("provision.noverifyssl") {
 			commandLine += " rd.noverifyssl noverifyssl inst.noverifyssl"
 		}
