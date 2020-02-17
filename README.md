@@ -39,12 +39,12 @@ $ ./grendel --version
 ### Create a TAP device
 
 ```
-$ sudo ip tuntap add name tap0 mode tap `whoami`
+$ sudo ip tuntap add name tap0 mode tap user `whoami`
 $ sudo ip link set tap0 up
 $ sudo ip addr add 192.168.10.254/24 dev tap0
 ```
 
-### Create a Boot Image file
+### Create a boot Image file
 
 ```
 $ wget http://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_production_pxe_image.cpio.gz
@@ -94,7 +94,7 @@ $ sudo ./grendel --verbose serve --hosts host.json --images image.json --listen 
 In another terminal window run the following commands:
 
 ```
-$ qemu-system-x86_64 -nographic -serial mon:stdio -m 2048 -boot n -device e1000,netdev=net0,mac=DE:AD:BE:EF:12:8C -netdev tap,id=net0,ifname=tap0,script=/bin/true
+$ qemu-system-x86_64 -m 2048 -boot n -device e1000,netdev=net0,mac=DE:AD:BE:EF:12:8C -netdev tap,id=net0,ifname=tap0,script=no
 ```
 
 ## Hacking
