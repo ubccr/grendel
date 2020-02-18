@@ -40,8 +40,8 @@ $ ./grendel --version
 
 ```
 $ sudo ip tuntap add name tap0 mode tap user `whoami`
-$ sudo ip link set tap0 up
 $ sudo ip addr add 192.168.10.254/24 dev tap0
+$ sudo ip link set up dev tap0
 ```
 
 ### Create a boot Image file
