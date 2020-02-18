@@ -127,6 +127,13 @@ Flags:
 Use "grendel [command] --help" for more information about a command.
 ```
 
+## Acknowledgments
+
+PXE booting is based on [Pixiecore](https://github.com/danderson/netboot/tree/master/pixiecore) by Dave
+Anderson. DHCP implementation makes heavy use if this excellent [packet library](https://github.com/insomniacslk/dhcp). 
+DNS implementation uses [this library](https://github.com/miekg/dns). TFTP implementation uses [this
+library](https://github.com/pin/tftp). Backend database runs [BuntDB](https://github.com/tidwall/buntdb). 
+
 ## License
 
 Grendel is released under the GPLv3 license. See the LICENSE file.
