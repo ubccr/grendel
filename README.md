@@ -30,10 +30,12 @@ QEMU/KVM and install Flatcar linux using Grendel.
 
 ### Installation
 
-To install Grendel download a copy of the binary here.
+To install Grendel download a copy of the binary [here](https://github.com/ubccr/grendel/releases).
 
 ```
-$ ./grendel --version
+$ tar xvzf grendel-0.x.x-linux-amd64.tar.gz
+$ cd grendel-0.x.x-linux-amd64/
+$ ./grendel --help
 ```
 
 ### Create a TAP device
