@@ -23,6 +23,12 @@ to 1500 nodes.
 * Rest API
 * Easy installation (single binary with no deps)
 
+## Project status
+
+Grendel is under heavy development and any API's will likely change
+considerably before a more stable release is available. Use at your own risk.
+Feedback and pull requests are more than welcome!
+
 ## Quickstart with QEMU/KVM
 
 The following steps will show how to PXE boot a linux virtual machine using
