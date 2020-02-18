@@ -97,6 +97,14 @@ Create the following JSON file `host.json`:
 $ sudo ./grendel --verbose serve --hosts host.json --images image.json --listen 192.168.10.254
 ```
 
+Note: The serve command requires root privileges to bind to lower level ports.
+If you don't want to run as root you can allow Grendel to bind to privileged
+with the following command:
+
+```
+$ sudo setcap CAP_NET_BIND_SERVICE=+eip /path/to/grendel
+```
+
 ### PXE Boot the linux virtual machine
 
 In another terminal window run the following commands:
