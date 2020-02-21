@@ -57,7 +57,7 @@ build-with-ca:
 		bin-x86_64-efi/ipxe.efi \
 		bin-x86_64-efi/snponly.efi \
 		bin-i386-efi/ipxe.efi \
-		CERT=../../../out/CA.crt TRUST=../../../out/CA.crt \
+		CERT=../../../out/GrendelCA.crt TRUST=../../../out/GrendelCA.crt \
 		EMBED=../../boot.ipxe)
 
 .PHONY: bindata
