@@ -1,6 +1,15 @@
 #!ipxe
+{{ if .bootimage.Verify }}
+imgtrust --permanent
+{{ end -}}
 kernel --name kernel {{ .baseuri }}/boot/file/kernel?token={{.token}}
+{{ if .bootimage.Verify }}
+imgverify kernel {{ .baseuri }}/boot/file/kernel.sig?token={{.token}}
+{{ end -}}
 {{- range $i, $initrd := .bootimage.InitrdPaths }}
 initrd --name initrd{{$i}} {{ $.baseuri }}/boot/file/initrd-{{$i}}?token={{$.token}}
+{{ if $.bootimage.Verify }}
+imgverify initrd{{$i}} {{ $.baseuri }}/boot/file/initrd-{{$i}}.sig?token={{$.token}}
+{{ end -}}
 {{ end -}}
 boot kernel initrd=initrd0 {{ .commandLine }}

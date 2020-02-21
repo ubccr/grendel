@@ -79,7 +79,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	boot.Use(middleware.JWTWithConfig(config))
 	boot.GET("ipxe", h.Ipxe)
 	boot.GET("kickstart", h.Kickstart)
-	boot.GET("file/kernel", h.File)
+	boot.GET("file/kernel*", h.File)
 	boot.GET("file/liveimg", h.File)
 	boot.GET("file/rootfs", h.File)
 	boot.GET("file/initrd-*", h.File)
@@ -213,16 +213,23 @@ func (h *Handler) File(c echo.Context) error {
 	switch {
 	case fileType == "kernel":
 		return c.File(bootImage.KernelPath)
+	case fileType == "kernel.sig":
+		return c.File(bootImage.KernelPath + ".sig")
 
 	case fileType == "liveimg":
 		return c.File(bootImage.LiveImage)
 
 	case strings.HasPrefix(fileType, "initrd-"):
-		i, err := strconv.Atoi(fileType[7:])
+		initrdBaseName := strings.TrimSuffix(fileType, ".sig")
+		i, err := strconv.Atoi(initrdBaseName[7:])
 		if err != nil || i < 0 || i >= len(bootImage.InitrdPaths) {
 			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("no initrd with ID %q", i))
 		}
-		return c.File(bootImage.InitrdPaths[i])
+		initrd := bootImage.InitrdPaths[i]
+		if strings.HasSuffix(fileType, ".sig") {
+			initrd += ".sig"
+		}
+		return c.File(initrd)
 	}
 
 	return echo.NewHTTPError(http.StatusNotFound, "")

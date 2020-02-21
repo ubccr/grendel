@@ -1,8 +1,9 @@
-# Setting up HTTPS
+# Trusted HTTPS and Code signing
 
 Grendel can be setup to provision over HTTPS. This document will describe the
 process of setting up a custom certificate authority (CA), rebuilding iPXE to
-embed the CA.crt file, and running Grendel provisioning server over HTTPS. 
+embed the CA.crt file, running Grendel provisioning server over HTTPS, and code
+signing boot images.
 
 !!! note
     These steps require building Grendel from source.
@@ -25,7 +26,7 @@ $ cd grendel
 ## Custom CA
 
 Any method for obtaining SSL certificates is supported in Grendel. If you
-already have an organizational wide CA or use a commercial CA, all Grednel needs
+already have an organizational wide CA or use a commercial CA, all Grendel needs
 is the private key and signed certificates. This section will describe setting up
 your own custom CA used for signing SSL certificates. Here we use a tool called
 [certstrap](https://github.com/square/certstrap). These steps are also outlined
@@ -109,7 +110,7 @@ dns_servers = ["192.168.10.254"]
     resovlable via dns. You must also set the `dns_servers` in the `dhcp`
     section to the IP address of your DNS server(s). 
 
-For tesing with qemu, you can set the DNS server to be the IP address of the
+For testing with qemu, you can set the DNS server to be the IP address of the
 `tap0` device Grendel is listening on (as shown above). Then in the `hosts.json`
 file just include a host for Grendel so it will resolve itself like so:
 
@@ -138,9 +139,9 @@ file just include a host for Grendel so it will resolve itself like so:
 }]
 ```
 
-## Start services
+### Start services
 
-Now when you run Grendel it should be listenting on port 443:
+Now when you run Grendel it should be listening on port 443:
 
 ```
 sudo ./grendel --verbose -c grendel.toml serve  --hosts hosts.json --images images.json --listen 192.168.10.254
@@ -179,3 +180,83 @@ Configuring (net0 de:ad:be:ef:12:8c)... ok
 https://grendel.local:443/boot/ipxe... ok
 https://grendel.local:443/boot/file/kernel... ok 
 ```
+
+## Code Signing Boot Images
+
+Grendel (via iPXE) supports code signing, which allows you to verify the
+authenticity and integrity of boot images. For more information see the iPXE
+docs [here](https://ipxe.org/crypto). Using the custom CA we created in the
+previous section we create a new codesigning certificate that's used to
+digitally sign and verify boot images.
+
+### Create code signing certificate
+
+```
+$ certstrap request-cert --common-name codesigner.local
+```
+
+### Sign and generate the certificate
+
+```
+$ certstrap sign --codesigning --CA GrendelCA codesigner.local
+```
+
+!!! note
+    certstrap doesn't currently support codesigning. There's an open PR
+    [here](https://github.com/square/certstrap/pull/90). In order to use the
+    command above you can build the code from this branch
+    [here](https://github.com/ubccr/certstrap/tree/add-code-signing).
+
+You should now have 2 files in the out directory that we will use to sign boot
+images:
+
+```
+out/codesigner.local.crt
+out/codesigner.local.key
+```
+
+### Sign Boot Image
+
+We can now sign the boot image files using the code signing cert we created
+above. For example, to sign the flatcar kernel and initrd:
+
+```
+$ openssl cms -sign -binary -noattr -in flatcar_production_pxe.vmlinuz -signer out/codesinger.local.crt -inkey out/codesigner.local.key -certfile out/GrendelCA.crt -outform DER -out flatcar_production_pxe.vmlinuz.sig
+
+$ openssl cms -sign -binary -noattr -in flatcar_production_pxe_image.cpio.gz -signer codesigner.local.crt -inkey out/codesigner.local.key -certfile out/GrendelCA.crt -outform DER -out flatcar_production_pxe_image.cpio.gz.sig
+```
+
+### Create the Boot Image JSON
+
+Add the "Verify" key to the Grendel boot image JSON:
+
+```json
+[{
+    "name": "flatcar",
+    "verify": true,
+    "kernel": "flatcar_production_pxe.vmlinuz",
+    "initrd": [
+        "flatcar_production_pxe_image.cpio.gz"
+    ],
+    "cmdline": "flatcar.autologin"
+}]
+```
+
+If you followed the quickstart and are testing with qemu you can test PXE
+booting a vm and should now see iPXE verifying the flatcar kernel and initrd
+images:
+
+```
+iPXE 1.0.0+ (3fe68) -- Open Source Network Boot Firmware -- http://ipxe.org
+Features: DNS HTTP HTTPS iSCSI TFTP SRP VLAN AoE ELF MBOOT PXE bzImage
+Configuring (net0 de:ad:be:ef:12:8c)... ok
+http://192.168.10.254:80/boot/ipxe... ok
+http://192.168.10.254:80/boot/file/kernel... ok
+http://192.168.10.254:80/boot/file/kernel.sig... ok
+http://192.168.10.254:80/boot/file/initrd-0... ok
+http://192.168.10.254:80/boot/file/initrd-0.sig... ok
+```
+
+!!! tip
+    You do not need to enable HTTPS with codesigning. They can be used
+    seperately or together depending on your requirements.

@@ -33,6 +33,7 @@ type BootImage struct {
 	LiveImage   string      `json:"liveimg"`
 	InstallRepo string      `json:"install_repo"`
 	CommandLine string      `json:"cmdline"`
+	Verify      bool        `json:"verify"`
 }
 
 func NewBootImageList() BootImageList {
