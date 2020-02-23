@@ -15,8 +15,19 @@
 // You should have received a copy of the GNU General Public License
 // along with Grendel. If not, see <https://www.gnu.org/licenses/>.
 
-package provision
+package util
 
-const (
-	ContextKeyToken = "grendeltoken"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
+
+func TestRand(t *testing.T) {
+	assert := assert.New(t)
+
+	secret, err := GenerateSecret(32)
+	if assert.NoError(err) {
+		assert.Equal(len(secret), 64)
+	}
+}

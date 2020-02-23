@@ -18,44 +18,29 @@
 package model
 
 import (
-	"fmt"
-	"net"
-	"strconv"
-	"strings"
-	"time"
+	"encoding/json"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/hako/branca"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/firmware"
+	"github.com/ubccr/grendel/util"
 )
-
-type FirmwareClaims struct {
-	ExpiresAt int64          `json:"exp"`
-	Firmware  firmware.Build `json:"fw"`
-}
 
 type BootClaims struct {
 	ID  string `json:"id"`
 	MAC string `json:"mac"`
-	jwt.StandardClaims
 }
 
 func init() {
-	viper.SetDefault("provision.jwt_tokens", true)
-}
+	viper.SetDefault("provision.token_ttl", 60*60)
 
-func (p *FirmwareClaims) Valid() error {
-	now := time.Now().Unix()
-	if now <= p.ExpiresAt {
-		return nil
+	if !viper.IsSet("provision.secret") {
+		secret, err := util.GenerateSecret(16)
+		if err != nil {
+			panic(err)
+		}
+		viper.SetDefault("provision.secret", secret)
 	}
-
-	vErr := new(jwt.ValidationError)
-	delta := time.Unix(now, 0).Sub(time.Unix(p.ExpiresAt, 0))
-	vErr.Inner = fmt.Errorf("token is expired by %v", delta)
-	vErr.Errors = jwt.ValidationErrorExpired
-
-	return vErr
 }
 
 func NewBootToken(id, mac string) (string, error) {
@@ -63,76 +48,61 @@ func NewBootToken(id, mac string) (string, error) {
 		ID:  id,
 		MAC: mac,
 	}
-	claims.ExpiresAt = time.Now().Add(time.Second * 60 * 60).Unix()
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	t, err := token.SignedString([]byte(viper.GetString("provision.secret")))
+	jsonBytes, err := json.Marshal(claims)
 	if err != nil {
 		return "", err
 	}
 
-	return t, nil
+	b := branca.NewBranca(viper.GetString("provision.secret"))
+	b.SetTTL(viper.GetUint32("provision.token_ttl"))
+
+	token, err := b.EncodeToString(string(jsonBytes))
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
+}
+
+func ParseBootToken(token string) (*BootClaims, error) {
+	b := branca.NewBranca(viper.GetString("provision.secret"))
+	b.SetTTL(viper.GetUint32("provision.token_ttl"))
+
+	message, err := b.DecodeToString(token)
+	if err != nil {
+		return nil, err
+	}
+
+	var claims BootClaims
+	err = json.Unmarshal([]byte(message), &claims)
+	if err != nil {
+		return nil, err
+	}
+
+	return &claims, nil
 }
 
 func NewFirmwareToken(mac string, fwtype firmware.Build) (string, error) {
-	if !viper.GetBool("provision.jwt_tokens") {
-		return fmt.Sprintf("%s/%d", mac, fwtype), nil
-	}
+	b := branca.NewBranca(viper.GetString("provision.secret"))
+	b.SetTTL(viper.GetUint32("provision.token_ttl"))
 
-	claims := &FirmwareClaims{
-		Firmware:  fwtype,
-		ExpiresAt: time.Now().Add(time.Second * 60 * 60).Unix(),
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	t, err := token.SignedString([]byte(viper.GetString("provision.secret")))
+	token, err := b.EncodeToString(fwtype.String())
 	if err != nil {
 		return "", err
 	}
 
-	return t, nil
+	return token, nil
 }
 
-func ParseFirmwareToken(tokenString string) (firmware.Build, error) {
-	if !viper.GetBool("provision.jwt_tokens") {
-		pathElements := strings.Split(tokenString, "/")
-		if len(pathElements) != 2 {
-			return 0, fmt.Errorf("Invalid tftp file path: %s", tokenString)
-		}
+func ParseFirmwareToken(token string) (firmware.Build, error) {
+	b := branca.NewBranca(viper.GetString("provision.secret"))
+	b.SetTTL(viper.GetUint32("provision.token_ttl"))
 
-		_, err := net.ParseMAC(pathElements[0])
-		if err != nil {
-			return 0, fmt.Errorf("Invalid MAC address: %s", pathElements[0])
-		}
-
-		i, err := strconv.Atoi(pathElements[1])
-		if err != nil {
-			return 0, fmt.Errorf("Invalid firmware type: %s", pathElements[1])
-		}
-
-		return firmware.Build(i), nil
+	message, err := b.DecodeToString(token)
+	if err != nil {
+		return 0, err
 	}
 
-	token, err := jwt.ParseWithClaims(tokenString, &FirmwareClaims{}, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-		}
-
-		return []byte(viper.GetString("provision.secret")), nil
-	})
-
-	if claims, ok := token.Claims.(*FirmwareClaims); ok && token.Valid {
-		return claims.Firmware, nil
-	} else if ve, ok := err.(*jwt.ValidationError); ok {
-		if ve.Errors&jwt.ValidationErrorMalformed != 0 {
-			return 0, fmt.Errorf("Token is malformed")
-		} else if ve.Errors&(jwt.ValidationErrorExpired|jwt.ValidationErrorNotValidYet) != 0 {
-			return 0, fmt.Errorf("Token is expired")
-		} else {
-			return 0, fmt.Errorf("Error parsing token: %s", err)
-		}
-	}
-
-	return 0, fmt.Errorf("Failed to parsetoken: %s", err)
+	return firmware.NewFromString(message), nil
 }

@@ -27,9 +27,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/model"
@@ -69,14 +67,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	e.GET("/", h.Index).Name = "index"
 
 	boot := e.Group("/boot/")
-
-	config := middleware.JWTConfig{
-		Claims:      &model.BootClaims{},
-		ContextKey:  ContextKeyJWT,
-		SigningKey:  []byte(viper.GetString("provision.secret")),
-		TokenLookup: "query:token",
-	}
-	boot.Use(middleware.JWTWithConfig(config))
+	boot.Use(TokenRequired)
 	boot.GET("ipxe", h.Ipxe)
 	boot.GET("kickstart", h.Kickstart)
 	boot.GET("file/kernel*", h.File)
@@ -93,8 +84,7 @@ func (h *Handler) Index(c echo.Context) error {
 }
 
 func (h *Handler) Ipxe(c echo.Context) error {
-	bootToken := c.Get(ContextKeyJWT).(*jwt.Token)
-	claims := bootToken.Claims.(*model.BootClaims)
+	claims := c.Get(ContextKeyToken).(*model.BootClaims)
 
 	log.Debugf("iPXE Got valid boot claims: %v", claims)
 
@@ -171,8 +161,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 }
 
 func (h *Handler) File(c echo.Context) error {
-	bootToken := c.Get(ContextKeyJWT).(*jwt.Token)
-	claims := bootToken.Claims.(*model.BootClaims)
+	claims := c.Get(ContextKeyToken).(*model.BootClaims)
 
 	log.Debugf("File handler Got valid boot claims: %v", claims)
 
@@ -241,8 +230,7 @@ func (h *Handler) serveBlob(c echo.Context, name string, data []byte) error {
 }
 
 func (h *Handler) Kickstart(c echo.Context) error {
-	bootToken := c.Get(ContextKeyJWT).(*jwt.Token)
-	claims := bootToken.Claims.(*model.BootClaims)
+	claims := c.Get(ContextKeyToken).(*model.BootClaims)
 
 	log.Infof("Kickstart got valid boot claims: %v", claims)
 

@@ -107,15 +107,6 @@ func initConfig() {
 		cfgFileUsed = viper.ConfigFileUsed()
 	}
 
-	if !viper.IsSet("provision.secret") {
-		secret, err := util.GenerateSecret(32)
-		if err != nil {
-			Log.Fatal(err)
-		}
-
-		viper.Set("provision.secret", secret)
-	}
-
 	if !viper.IsSet("api.secret") {
 		secret, err := util.GenerateSecret(32)
 		if err != nil {

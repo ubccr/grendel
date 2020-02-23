@@ -31,5 +31,22 @@ func TestToken(t *testing.T) {
 	token, err := NewFirmwareToken(host.Interfaces[0].MAC.String(), firmware.SNPONLY)
 	if assert.NoError(err) {
 		assert.Less(len(token), 128)
+		assert.Greater(len(token), 0)
+	}
+
+	build, err := ParseFirmwareToken(token)
+	if assert.NoError(err) {
+		assert.Equal(build, firmware.SNPONLY)
+	}
+
+	token, err = NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
+	if assert.NoError(err) {
+		assert.Greater(len(token), 0)
+	}
+
+	claims, err := ParseBootToken(token)
+	if assert.NoError(err) {
+		assert.Equal(claims.ID, host.ID.String())
+		assert.Equal(claims.MAC, host.Interfaces[0].MAC.String())
 	}
 }

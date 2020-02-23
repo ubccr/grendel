@@ -21,8 +21,8 @@ listen = "0.0.0.0:80"
 # HTTP protocol used for provisioning (http or https)
 scheme = "http"
 
-# Use signed JWT tokens for authenticating TFTP and HTTP requests
-jwt_tokens = true
+# TTL in seconds for provision tokens. Defaults to 1 hour
+token_ttl = 3600
 
 # Can generate secret with `openssl rand -hex 32`
 secret = ""
