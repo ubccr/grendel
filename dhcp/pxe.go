@@ -149,7 +149,7 @@ func (s *PXEServer) pxeHandler4(peer net.Addr, req *dhcpv4.DHCPv4) {
 
 	token, err := model.NewFirmwareToken(req.ClientHWAddr.String(), fwtype)
 	if err != nil {
-		s.log.Errorf("Failed to generated signed firmware token")
+		s.log.Errorf("Failed to generated signed firmware token: %v", err)
 		return
 	}
 	resp.BootFileName = token
