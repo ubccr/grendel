@@ -19,6 +19,7 @@ package firmware
 
 import (
 	"fmt"
+
 	"github.com/insomniacslk/dhcp/iana"
 )
 
