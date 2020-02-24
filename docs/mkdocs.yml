@@ -36,5 +36,6 @@ nav:
     - What is Grendel?: index.md
     - Introduction: intro.md
     - Quick Start: quickstart.md
-    - HTTPS and Code Signing: https.md
+    - Advanced:
+        - HTTPS and Code Signing: advanced/https.md
 #    - Background: background.md
