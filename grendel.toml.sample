@@ -60,7 +60,7 @@ domain_search = []
 # Default MTU
 mtu = 1500
 
-# Automactic router configuration. Grendel will generate the router option for
+# Dynamic router configuration. Grendel will generate the router option 3 for
 # DHCP responses based on the hosts IP address, netmask, and router_octet4. For
 # example, if all subnets in your data center have routers 10.x.x.254 you can
 # set router_octet4 = 254. If a host ip address is 10.104.13.10, Grendel will

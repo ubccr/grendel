@@ -37,5 +37,6 @@ nav:
     - Introduction: intro.md
     - Quick Start: quickstart.md
     - Advanced:
+        - Dynamic DHCP Router: advanced/router.md
         - HTTPS and Code Signing: advanced/https.md
 #    - Background: background.md
