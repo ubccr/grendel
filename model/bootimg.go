@@ -31,7 +31,6 @@ type BootImage struct {
 	KernelPath  string      `json:"kernel"`
 	InitrdPaths []string    `json:"initrd"`
 	LiveImage   string      `json:"liveimg"`
-	InstallRepo string      `json:"install_repo"`
 	CommandLine string      `json:"cmdline"`
 	Verify      bool        `json:"verify"`
 }

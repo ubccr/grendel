@@ -136,7 +136,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
 
 	kickstart := fmt.Sprintf("%s/boot/kickstart?token=%s", baseURI, c.QueryParam("token"))
-	repo := fmt.Sprintf("%s/repo/%s", baseURI, bootImage.InstallRepo)
+	repo := fmt.Sprintf("%s/repo", baseURI)
 	liveimg := fmt.Sprintf("%s/boot/file/liveimg?token=%s", baseURI, c.QueryParam("token"))
 
 	data := map[string]interface{}{
