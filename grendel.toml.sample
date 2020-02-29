@@ -30,9 +30,6 @@ secret = ""
 # Hashed root password used in kickstart template
 root_password = ""
 
-# Verify ssl in kickstart? true = no false = yes
-noverifyssl = true
-
 # Default OS image name
 default_image = ""
 

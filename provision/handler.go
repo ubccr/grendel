@@ -134,28 +134,29 @@ func (h *Handler) Ipxe(c echo.Context) error {
 
 	log.Infof("Sending iPXE script to boot host %s with image %s", host.Name, bootImage.Name)
 	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
-	commandLine := bootImage.CommandLine
 
-	if host.Kickstart {
-		commandLine += fmt.Sprintf(" ks=%s/boot/kickstart?token=%s network ksdevice=bootif ks.device=bootif inst.stage2=%s/repo/%s ", baseURI, c.QueryParam("token"), baseURI, bootImage.InstallRepo)
-		if viper.GetBool("provision.noverifyssl") {
-			commandLine += " rd.noverifyssl noverifyssl inst.noverifyssl"
-		}
-	} else if len(bootImage.LiveImage) > 0 && !strings.Contains(bootImage.CommandLine, "live") {
-		commandLine += fmt.Sprintf(" root=live:%s/boot/file/liveimg?token=%s", baseURI, c.QueryParam("token"))
-		if viper.GetBool("provision.noverifyssl") {
-			commandLine += " rd.noverifyssl"
-		}
-	}
+	kickstart := fmt.Sprintf("%s/boot/kickstart?token=%s", baseURI, c.QueryParam("token"))
+	repo := fmt.Sprintf("%s/repo/%s", baseURI, bootImage.InstallRepo)
+	liveimg := fmt.Sprintf("%s/boot/file/liveimg?token=%s", baseURI, c.QueryParam("token"))
 
 	data := map[string]interface{}{
-		"token":       c.QueryParam("token"),
-		"bootimage":   bootImage,
-		"commandLine": commandLine,
-		"nic":         nic,
-		"host":        host,
-		"baseuri":     baseURI,
+		"token":     c.QueryParam("token"),
+		"bootimage": bootImage,
+		"nic":       nic,
+		"host":      host,
+		"baseuri":   baseURI,
+		"kickstart": kickstart,
+		"repo":      repo,
+		"liveimg":   liveimg,
 	}
+
+	commandLine := bootImage.CommandLine
+
+	commandLine = strings.ReplaceAll(commandLine, "$kickstart", kickstart)
+	commandLine = strings.ReplaceAll(commandLine, "$repo", repo)
+	commandLine = strings.ReplaceAll(commandLine, "$liveimg", liveimg)
+
+	data["commandLine"] = commandLine
 
 	return c.Render(http.StatusOK, "ipxe.tmpl", data)
 }
