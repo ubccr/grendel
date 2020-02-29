@@ -57,11 +57,5 @@ func (b *BootImage) CheckPathsExist() error {
 		}
 	}
 
-	if b.InstallRepo != "" {
-		if _, err := os.Stat(b.InstallRepo); err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
