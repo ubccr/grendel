@@ -155,6 +155,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 	commandLine = strings.ReplaceAll(commandLine, "$kickstart", kickstart)
 	commandLine = strings.ReplaceAll(commandLine, "$repo", repo)
 	commandLine = strings.ReplaceAll(commandLine, "$liveimg", liveimg)
+	commandLine = strings.ReplaceAll(commandLine, "$mac", nic.MAC.String())
 
 	data["commandLine"] = commandLine
 

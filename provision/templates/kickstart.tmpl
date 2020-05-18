@@ -8,6 +8,7 @@ timezone --utc America/New_York
 skipx
 
 network --bootproto dhcp --hostname {{ .nic.FQDN }} --device={{ .nic.MAC }}
+firewall --disabled
 
 
 bootloader --timeout=10
@@ -45,7 +46,7 @@ clearpart --all --initlabel --disklabel=gpt
 
 part swap --ondisk=$ROOTDRIVE --asprimary --size=8192
 part /boot --ondisk=$ROOTDRIVE --asprimary --fstype="xfs" --size=1024
-part /boot/efi --ondisk=$ROOTDRIVE --fstype=efi --size=200
+part /boot/efi --ondisk=$ROOTDRIVE --fstype=efi --size=256
 part / --ondisk=$ROOTDRIVE --asprimary --fstype="xfs" --size=51200
 part /scratch --ondisk=$ROOTDRIVE --asprimary --fstype="xfs" --size=2048 --grow
 EOF
