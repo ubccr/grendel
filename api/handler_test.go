@@ -45,7 +45,7 @@ func TestCreateUser(t *testing.T) {
 	h := &Handler{newTestDB(t)}
 
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
