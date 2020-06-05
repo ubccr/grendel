@@ -82,7 +82,7 @@ func (g *Generic) GetMACTable() (MACTable, error) {
 		}
 
 		macTable[macStr] = &MACTableEntry{
-			Port: rec.Value.(int),
+			Port: rec.Value.(int)-1,
 			VLAN: key[0],
 			MAC:  mac,
 		}
