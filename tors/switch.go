@@ -51,6 +51,17 @@ func (mt MACTable) Port(port int) []*MACTableEntry {
 	return entries
 }
 
+func (m *MACTableEntry) MarshalJSON() ([]byte, error) {
+	type Alias MACTableEntry
+	return json.Marshal(&struct {
+		MAC string `json:"mac-addr"`
+		*Alias
+	}{
+		MAC:   m.MAC.String(),
+		Alias: (*Alias)(m),
+	})
+}
+
 func (mt MACTable) String() string {
 	data, _ := json.MarshalIndent(mt, "", "    ")
 	return string(data)
