@@ -136,6 +136,51 @@ func TestIpxe(t *testing.T) {
 	}
 }
 
+func TestHostNotProvision(t *testing.T) {
+	assert := assert.New(t)
+
+	h := &Handler{DB: newTestDB(t)}
+
+	paths := map[string]echo.HandlerFunc{
+		"/boot/ipxe":      h.Ipxe,
+		"/boot/kickstart": h.Kickstart,
+	}
+
+	image := tests.BootImageFactory.MustCreate().(*model.BootImage)
+	err := h.DB.StoreBootImage(image)
+	assert.NoError(err)
+
+	host := tests.HostFactory.MustCreate().(*model.Host)
+	host.BootImage = image.Name
+	host.Provision = false
+	err = h.DB.StoreHost(host)
+	assert.NoError(err)
+
+	token, err := model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
+	assert.NoError(err)
+
+	q := make(url.Values)
+	q.Set("token", token)
+
+	for path, handler := range paths {
+		e := newTestEcho(t)
+		req := httptest.NewRequest(http.MethodGet, path+"?"+q.Encode(), nil)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		err = TokenRequired(handler)(c)
+		if assert.Errorf(err, "no error for %s", path) {
+			he, ok := err.(*echo.HTTPError)
+			if ok {
+				assert.Equalf(http.StatusBadRequest, he.Code, "bad http error code for %s", path)
+			}
+			e.HTTPErrorHandler(err, c)
+			assert.Equalf(http.StatusBadRequest, rec.Code, "bad error code for %s", path)
+			assert.Equalf("host not set to provision", gjson.Get(rec.Body.String(), "message").String(), "bad message for %s", path)
+		}
+	}
+}
+
 func TestIpxeWrongHost(t *testing.T) {
 	assert := assert.New(t)
 
