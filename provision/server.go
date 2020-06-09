@@ -97,29 +97,55 @@ func NewServer(db model.DataStore, address string) (*Server, error) {
 	return s, nil
 }
 
-func HTTPErrorHandler(err error, c echo.Context) {
-	code := http.StatusInternalServerError
-	if he, ok := err.(*echo.HTTPError); ok {
-		code = he.Code
-	}
-
-	if code == http.StatusNotFound {
-		log.WithFields(logrus.Fields{
-			"path": c.Request().URL,
-			"ip":   c.RealIP(),
-		}).Error("Requested path not found")
-	}
-
-	c.String(code, "")
-	c.Logger().Error(err)
-}
-
-func (s *Server) Serve(defaultImageName string) error {
+func newEcho() (*echo.Echo, error) {
 	e := echo.New()
 	e.HTTPErrorHandler = HTTPErrorHandler
 	e.HideBanner = true
 	e.Use(middleware.Recover())
 	e.Logger = EchoLogger()
+
+	renderer, err := NewTemplateRenderer()
+	if err != nil {
+		return nil, err
+	}
+
+	e.Renderer = renderer
+
+	return e, nil
+}
+
+func HTTPErrorHandler(err error, c echo.Context) {
+	path := c.Request().URL.Path
+	if he, ok := err.(*echo.HTTPError); ok {
+		if he.Code == http.StatusNotFound {
+			log.WithFields(logrus.Fields{
+				"path": path,
+				"ip":   c.RealIP(),
+			}).Warn("Requested path not found")
+		} else {
+			log.WithFields(logrus.Fields{
+				"code": he.Code,
+				"err":  he.Internal,
+				"path": path,
+				"ip":   c.RealIP(),
+			}).Error(he.Message)
+		}
+	} else {
+		log.WithFields(logrus.Fields{
+			"err":  err,
+			"path": path,
+			"ip":   c.RealIP(),
+		}).Error("HTTP Error")
+	}
+
+	c.Echo().DefaultHTTPErrorHandler(err, c)
+}
+
+func (s *Server) Serve(defaultImageName string) error {
+	e, err := newEcho()
+	if err != nil {
+		return err
+	}
 
 	if len(s.RepoDir) > 0 {
 		log.Infof("Using repo dir: %s", s.RepoDir)
@@ -127,13 +153,6 @@ func (s *Server) Serve(defaultImageName string) error {
 		//fs := http.FileServer(http.Dir(s.RepoDir))
 		//e.GET("/repo/*", echo.WrapHandler(http.StripPrefix("/repo/", fs)))
 	}
-
-	renderer, err := NewTemplateRenderer()
-	if err != nil {
-		return err
-	}
-
-	e.Renderer = renderer
 
 	h, err := NewHandler(s.DB, defaultImageName)
 	if err != nil {

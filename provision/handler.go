@@ -91,45 +91,37 @@ func (h *Handler) Ipxe(c echo.Context) error {
 	host, err := h.DB.LoadHostFromID(claims.ID)
 	if err != nil {
 		log.WithFields(logrus.Fields{
-			"ip":      c.RealIP(),
 			"host_id": claims.ID,
 			"mac":     claims.MAC,
-			"err":     err,
 		}).Error("iPXE failed to find host")
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid host")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid host").SetInternal(err)
 	}
 
 	mac, err := net.ParseMAC(claims.MAC)
 	if err != nil {
 		log.WithFields(logrus.Fields{
-			"ip":      c.RealIP(),
 			"host_id": claims.ID,
 			"mac":     claims.MAC,
-			"err":     err,
 		}).Error("iPXE got invalid mac address")
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid mac address")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid mac address").SetInternal(err)
 	}
 
 	nic := host.Interface(mac)
 	if nic == nil {
 		log.WithFields(logrus.Fields{
-			"ip":      c.RealIP(),
 			"host_id": claims.ID,
 			"mac":     claims.MAC,
-			"err":     err,
 		}).Error("iPXE got invalid boot interface for host")
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot interface")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot interface").SetInternal(err)
 	}
 
 	bootImage, err := h.LoadBootImageWithDefault(host.BootImage)
 	if err != nil {
 		log.WithFields(logrus.Fields{
-			"ip":      c.RealIP(),
 			"host_id": claims.ID,
 			"mac":     claims.MAC,
-			"err":     err,
 		}).Error("iPXE failed to find boot image for host")
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot image")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid boot image").SetInternal(err)
 	}
 
 	log.Infof("Sending iPXE script to boot host %s with image %s", host.Name, bootImage.Name)

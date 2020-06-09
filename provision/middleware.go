@@ -33,7 +33,7 @@ func TokenRequired(next echo.HandlerFunc) echo.HandlerFunc {
 
 		claims, err := model.ParseBootToken(token)
 		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, "invalid token")
+			return echo.NewHTTPError(http.StatusBadRequest, "invalid token").SetInternal(err)
 		}
 
 		c.Set(ContextKeyToken, claims)
