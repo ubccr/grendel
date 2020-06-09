@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Grendel. If not, see <https://www.gnu.org/licenses/>.
 
-package model
+package model_test
 
 import (
 	"errors"
@@ -27,6 +27,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/ubccr/grendel/internal/tests"
+	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
 )
 
@@ -41,11 +43,11 @@ func tempfile() string {
 func TestBuntStoreHost(t *testing.T) {
 	assert := assert.New(t)
 
-	store, err := NewBuntStore(":memory:")
+	store, err := model.NewBuntStore(":memory:")
 	defer store.Close()
 	assert.NoError(err)
 
-	host := HostFactory.MustCreate().(*Host)
+	host := tests.HostFactory.MustCreate().(*model.Host)
 
 	err = store.StoreHost(host)
 	assert.NoError(err)
@@ -81,38 +83,38 @@ func TestBuntStoreHost(t *testing.T) {
 		}
 	}
 
-	badhost := &Host{}
+	badhost := &model.Host{}
 	err = store.StoreHost(badhost)
 	if assert.Error(err) {
-		assert.True(errors.Is(err, ErrInvalidData))
+		assert.True(errors.Is(err, model.ErrInvalidData))
 	}
 
 	_, err = store.LoadHostFromID("notfound")
 	if assert.Error(err) {
-		assert.True(errors.Is(err, ErrNotFound))
+		assert.True(errors.Is(err, model.ErrNotFound))
 	}
 
 	_, err = store.LoadHostFromName("notfound")
 	if assert.Error(err) {
-		assert.True(errors.Is(err, ErrNotFound))
+		assert.True(errors.Is(err, model.ErrNotFound))
 	}
 
 	_, err = store.LoadHostFromMAC("notfound")
 	if assert.Error(err) {
-		assert.True(errors.Is(err, ErrNotFound))
+		assert.True(errors.Is(err, model.ErrNotFound))
 	}
 }
 
 func TestBuntStoreHostList(t *testing.T) {
 	assert := assert.New(t)
 
-	store, err := NewBuntStore(":memory:")
+	store, err := model.NewBuntStore(":memory:")
 	defer store.Close()
 	assert.NoError(err)
 
 	size := 10
 	for i := 0; i < size; i++ {
-		host := HostFactory.MustCreate().(*Host)
+		host := tests.HostFactory.MustCreate().(*model.Host)
 		err := store.StoreHost(host)
 		assert.NoError(err)
 	}
@@ -125,13 +127,13 @@ func TestBuntStoreHostList(t *testing.T) {
 func TestBuntStoreHostFind(t *testing.T) {
 	assert := assert.New(t)
 
-	store, err := NewBuntStore(":memory:")
+	store, err := model.NewBuntStore(":memory:")
 	defer store.Close()
 	assert.NoError(err)
 
 	size := 20
 	for i := 0; i < size; i++ {
-		host := HostFactory.MustCreate().(*Host)
+		host := tests.HostFactory.MustCreate().(*model.Host)
 		host.Name = fmt.Sprintf("tux-%02d", i)
 		err := store.StoreHost(host)
 		assert.NoError(err)
@@ -148,13 +150,13 @@ func TestBuntStoreHostFind(t *testing.T) {
 func TestBuntStoreProvision(t *testing.T) {
 	assert := assert.New(t)
 
-	store, err := NewBuntStore(":memory:")
+	store, err := model.NewBuntStore(":memory:")
 	defer store.Close()
 	assert.NoError(err)
 
 	size := 20
 	for i := 0; i < size; i++ {
-		host := HostFactory.MustCreate().(*Host)
+		host := tests.HostFactory.MustCreate().(*model.Host)
 		host.Name = fmt.Sprintf("tux-%02d", i)
 		err := store.StoreHost(host)
 		assert.NoError(err)
@@ -184,13 +186,13 @@ func TestBuntStoreProvision(t *testing.T) {
 func TestBuntStoreSetBootImage(t *testing.T) {
 	assert := assert.New(t)
 
-	store, err := NewBuntStore(":memory:")
+	store, err := model.NewBuntStore(":memory:")
 	defer store.Close()
 	assert.NoError(err)
 
 	size := 20
 	for i := 0; i < size; i++ {
-		host := HostFactory.MustCreate().(*Host)
+		host := tests.HostFactory.MustCreate().(*model.Host)
 		host.Name = fmt.Sprintf("tux-%02d", i)
 		err := store.StoreHost(host)
 		assert.NoError(err)
@@ -220,11 +222,11 @@ func TestBuntStoreSetBootImage(t *testing.T) {
 func TestBuntStoreBootImage(t *testing.T) {
 	assert := assert.New(t)
 
-	store, err := NewBuntStore(":memory:")
+	store, err := model.NewBuntStore(":memory:")
 	defer store.Close()
 	assert.NoError(err)
 
-	image := BootImageFactory.MustCreate().(*BootImage)
+	image := tests.BootImageFactory.MustCreate().(*model.BootImage)
 
 	err = store.StoreBootImage(image)
 	assert.NoError(err)
@@ -234,19 +236,19 @@ func TestBuntStoreBootImage(t *testing.T) {
 		assert.Equal(image.Name, testImage.Name)
 	}
 
-	badimage := &BootImage{}
+	badimage := &model.BootImage{}
 	err = store.StoreBootImage(badimage)
 	if assert.Error(err) {
-		assert.True(errors.Is(err, ErrInvalidData))
+		assert.True(errors.Is(err, model.ErrInvalidData))
 	}
 
 	_, err = store.LoadBootImage("notfound")
 	if assert.Error(err) {
-		assert.True(errors.Is(err, ErrNotFound))
+		assert.True(errors.Is(err, model.ErrNotFound))
 	}
 
 	for i := 0; i < 5; i++ {
-		image := BootImageFactory.MustCreate().(*BootImage)
+		image := tests.BootImageFactory.MustCreate().(*model.BootImage)
 		err := store.StoreBootImage(image)
 		assert.NoError(err)
 	}
@@ -261,16 +263,16 @@ func BenchmarkBuntStoreWriteHosts(b *testing.B) {
 	file := tempfile()
 	defer os.Remove(file)
 
-	store, err := NewBuntStore(file)
+	store, err := model.NewBuntStore(file)
 	defer store.Close()
 	if err != nil {
 		b.Fatal(err)
 	}
 
 	size := 5000
-	hosts := make(HostList, size)
+	hosts := make(model.HostList, size)
 	for i := 0; i < size; i++ {
-		host := HostFactory.MustCreate().(*Host)
+		host := tests.HostFactory.MustCreate().(*model.Host)
 		hosts[i] = host
 	}
 	b.ResetTimer()
@@ -286,16 +288,16 @@ func BenchmarkBuntStoreWriteSingleHost(b *testing.B) {
 	file := tempfile()
 	defer os.Remove(file)
 
-	store, err := NewBuntStore(file)
+	store, err := model.NewBuntStore(file)
 	defer store.Close()
 	if err != nil {
 		b.Fatal(err)
 	}
 
 	size := 5000
-	hosts := make(HostList, size)
+	hosts := make(model.HostList, size)
 	for i := 0; i < size; i++ {
-		host := HostFactory.MustCreate().(*Host)
+		host := tests.HostFactory.MustCreate().(*model.Host)
 		hosts[i] = host
 	}
 	b.ResetTimer()
@@ -313,7 +315,7 @@ func BenchmarkBuntStoreReadAll(b *testing.B) {
 	file := tempfile()
 	defer os.Remove(file)
 
-	store, err := NewBuntStore(file)
+	store, err := model.NewBuntStore(file)
 	defer store.Close()
 	if err != nil {
 		b.Fatal(err)
@@ -321,9 +323,9 @@ func BenchmarkBuntStoreReadAll(b *testing.B) {
 
 	size := 5000
 	rand.Seed(time.Now().UnixNano())
-	hosts := make(HostList, size)
+	hosts := make(model.HostList, size)
 	for i := 0; i < size; i++ {
-		host := HostFactory.MustCreate().(*Host)
+		host := tests.HostFactory.MustCreate().(*model.Host)
 		hosts[i] = host
 	}
 
@@ -348,7 +350,7 @@ func BenchmarkBuntStoreParallelFind(b *testing.B) {
 	file := tempfile()
 	defer os.Remove(file)
 
-	store, err := NewBuntStore(file)
+	store, err := model.NewBuntStore(file)
 	defer store.Close()
 	if err != nil {
 		b.Fatal(err)
@@ -356,9 +358,9 @@ func BenchmarkBuntStoreParallelFind(b *testing.B) {
 
 	size := 5000
 	rand.Seed(time.Now().UnixNano())
-	hosts := make(HostList, size)
+	hosts := make(model.HostList, size)
 	for i := 0; i < size; i++ {
-		host := HostFactory.MustCreate().(*Host)
+		host := tests.HostFactory.MustCreate().(*model.Host)
 		host.Name = fmt.Sprintf("tux-%04d", i)
 		hosts[i] = host
 	}
@@ -404,7 +406,7 @@ func BenchmarkBuntStoreRandomParallelReads(b *testing.B) {
 	file := tempfile()
 	defer os.Remove(file)
 
-	store, err := NewBuntStore(file)
+	store, err := model.NewBuntStore(file)
 	defer store.Close()
 	if err != nil {
 		b.Fatal(err)
@@ -412,9 +414,9 @@ func BenchmarkBuntStoreRandomParallelReads(b *testing.B) {
 
 	size := 5000
 	rand.Seed(time.Now().UnixNano())
-	hosts := make(HostList, size)
+	hosts := make(model.HostList, size)
 	for i := 0; i < size; i++ {
-		host := HostFactory.MustCreate().(*Host)
+		host := tests.HostFactory.MustCreate().(*model.Host)
 		hosts[i] = host
 	}
 
@@ -453,7 +455,7 @@ func BenchmarkBuntStoreResolveIPv4(b *testing.B) {
 	file := tempfile()
 	defer os.Remove(file)
 
-	store, err := NewBuntStore(file)
+	store, err := model.NewBuntStore(file)
 	defer store.Close()
 	if err != nil {
 		b.Fatal(err)
@@ -461,9 +463,9 @@ func BenchmarkBuntStoreResolveIPv4(b *testing.B) {
 
 	size := 5000
 	rand.Seed(time.Now().UnixNano())
-	hosts := make(HostList, size)
+	hosts := make(model.HostList, size)
 	for i := 0; i < size; i++ {
-		host := HostFactory.MustCreate().(*Host)
+		host := tests.HostFactory.MustCreate().(*model.Host)
 		hosts[i] = host
 	}
 
@@ -489,7 +491,7 @@ func BenchmarkBuntStoreReverseResolve(b *testing.B) {
 	file := tempfile()
 	defer os.Remove(file)
 
-	store, err := NewBuntStore(file)
+	store, err := model.NewBuntStore(file)
 	defer store.Close()
 	if err != nil {
 		b.Fatal(err)
@@ -497,9 +499,9 @@ func BenchmarkBuntStoreReverseResolve(b *testing.B) {
 
 	size := 5000
 	rand.Seed(time.Now().UnixNano())
-	hosts := make(HostList, size)
+	hosts := make(model.HostList, size)
 	for i := 0; i < size; i++ {
-		host := HostFactory.MustCreate().(*Host)
+		host := tests.HostFactory.MustCreate().(*model.Host)
 		hosts[i] = host
 	}
 

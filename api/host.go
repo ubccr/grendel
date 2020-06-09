@@ -22,7 +22,6 @@ import (
 	"path"
 
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
 )
@@ -31,11 +30,7 @@ func (h *Handler) HostAdd(c echo.Context) error {
 	var hosts model.HostList
 
 	if err := c.Bind(&hosts); err != nil {
-		log.WithFields(logrus.Fields{
-			"ip":  c.RealIP(),
-			"err": err,
-		}).Warn("Add host malformed data")
-		return echo.NewHTTPError(http.StatusBadRequest, "malformed input data")
+		return err
 	}
 
 	log.Infof("Attempting to add %d hosts", len(hosts))
@@ -43,21 +38,13 @@ func (h *Handler) HostAdd(c echo.Context) error {
 	for _, host := range hosts {
 		err := c.Validate(host)
 		if err != nil {
-			log.WithFields(logrus.Fields{
-				"ip":  c.RealIP(),
-				"err": err,
-			}).Warn("Add host invalid data")
-			return echo.NewHTTPError(http.StatusBadRequest, "invalid data")
+			return echo.NewHTTPError(http.StatusBadRequest, "invalid data").SetInternal(err)
 		}
 	}
 
 	err := h.DB.StoreHosts(hosts)
 	if err != nil {
-		log.WithFields(logrus.Fields{
-			"ip":  c.RealIP(),
-			"err": err,
-		}).Error("Failed to save hosts to datastore")
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to save hosts")
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to save hosts").SetInternal(err)
 	}
 
 	log.Infof("Added %d hosts successfully", len(hosts))
@@ -71,11 +58,7 @@ func (h *Handler) HostAdd(c echo.Context) error {
 func (h *Handler) HostList(c echo.Context) error {
 	hostList, err := h.DB.Hosts()
 	if err != nil {
-		log.WithFields(logrus.Fields{
-			"ip":  c.RealIP(),
-			"err": err,
-		}).Error("Failed to fetch host list from datastore")
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fetch hosts")
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fetch hosts").SetInternal(err)
 	}
 	return c.JSON(http.StatusOK, hostList)
 }
@@ -85,20 +68,14 @@ func (h *Handler) HostFind(c echo.Context) error {
 
 	nodeset, err := nodeset.NewNodeSet(nodesetString)
 	if err != nil {
-		log.WithFields(logrus.Fields{
-			"err": err,
-		}).Warn("Invalid nodeset")
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid data")
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid nodeset").SetInternal(err)
 	}
 
 	log.Infof("Got nodeset: %s", nodeset.String())
 
 	hostList, err := h.DB.FindHosts(nodeset)
 	if err != nil {
-		log.WithFields(logrus.Fields{
-			"err": err,
-		}).Error("Failed to find hosts from datastore")
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to find hosts")
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to find hosts").SetInternal(err)
 	}
 	return c.JSON(http.StatusOK, hostList)
 }

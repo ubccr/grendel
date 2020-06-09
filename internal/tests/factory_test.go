@@ -15,39 +15,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Grendel. If not, see <https://www.gnu.org/licenses/>.
 
-package api
+package tests
 
 import (
-	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/tidwall/gjson"
 	"github.com/ubccr/grendel/model"
 )
 
-func newTestDB(t *testing.T) model.DataStore {
-	db, err := model.NewDataStore(":memory:")
-	if err != nil {
-		assert.Fail(t, err.Error())
-	}
-
-	return db
-}
-
-func TestStatus(t *testing.T) {
+func TestFactory(t *testing.T) {
 	assert := assert.New(t)
 
-	h := &Handler{newTestDB(t)}
+	for i := 0; i < 3; i++ {
+		host := HostFactory.MustCreate().(*model.Host)
+		assert.Greater(len(host.Name), 1)
+		assert.Equal(2, len(host.Interfaces))
+		assert.False(host.ID.IsNil())
 
-	e := newEcho()
-	req := httptest.NewRequest(http.MethodGet, "/", nil)
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
-
-	if assert.NoError(h.Index(c)) {
-		assert.Equal(http.StatusOK, rec.Code)
-		assert.Equal("up", gjson.Get(rec.Body.String(), "status").String())
+		image := BootImageFactory.MustCreate().(*model.BootImage)
+		assert.Greater(len(image.Name), 1)
 	}
 }

@@ -15,36 +15,38 @@
 // You should have received a copy of the GNU General Public License
 // along with Grendel. If not, see <https://www.gnu.org/licenses/>.
 
-package model
+package model_test
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/ubccr/grendel/firmware"
+	"github.com/ubccr/grendel/internal/tests"
+	"github.com/ubccr/grendel/model"
 )
 
 func TestToken(t *testing.T) {
 	assert := assert.New(t)
 
-	host := HostFactory.MustCreate().(*Host)
-	token, err := NewFirmwareToken(host.Interfaces[0].MAC.String(), firmware.SNPONLY)
+	host := tests.HostFactory.MustCreate().(*model.Host)
+	token, err := model.NewFirmwareToken(host.Interfaces[0].MAC.String(), firmware.SNPONLY)
 	if assert.NoError(err) {
 		assert.Less(len(token), 128)
 		assert.Greater(len(token), 0)
 	}
 
-	build, err := ParseFirmwareToken(token)
+	build, err := model.ParseFirmwareToken(token)
 	if assert.NoError(err) {
 		assert.Equal(build, firmware.SNPONLY)
 	}
 
-	token, err = NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
+	token, err = model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
 	if assert.NoError(err) {
 		assert.Greater(len(token), 0)
 	}
 
-	claims, err := ParseBootToken(token)
+	claims, err := model.ParseBootToken(token)
 	if assert.NoError(err) {
 		assert.Equal(claims.ID, host.ID.String())
 		assert.Equal(claims.MAC, host.Interfaces[0].MAC.String())

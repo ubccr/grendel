@@ -51,6 +51,18 @@ type Server struct {
 	httpServer    *http.Server
 }
 
+func newEcho() *echo.Echo {
+	e := echo.New()
+	e.HTTPErrorHandler = HTTPErrorHandler
+	e.HideBanner = true
+	e.Use(middleware.Recover())
+	e.Logger = EchoLogger()
+	e.Validator = &CustomValidator{validator: validator.New()}
+
+	return e
+
+}
+
 func NewServer(db model.DataStore, socket, address string) (*Server, error) {
 	s := &Server{DB: db, SocketPath: socket}
 
@@ -101,29 +113,33 @@ func NewServer(db model.DataStore, socket, address string) (*Server, error) {
 }
 
 func HTTPErrorHandler(err error, c echo.Context) {
-	code := http.StatusInternalServerError
 	if he, ok := err.(*echo.HTTPError); ok {
-		code = he.Code
-	}
-
-	if code == http.StatusNotFound {
+		if he.Code == http.StatusNotFound {
+			log.WithFields(logrus.Fields{
+				"path": c.Request().URL,
+				"ip":   c.RealIP(),
+			}).Warn("Requested path not found")
+		} else {
+			log.WithFields(logrus.Fields{
+				"code": he.Code,
+				"err":  he.Internal,
+				"path": c.Request().URL,
+				"ip":   c.RealIP(),
+			}).Error(he.Message)
+		}
+	} else {
 		log.WithFields(logrus.Fields{
+			"err":  err,
 			"path": c.Request().URL,
 			"ip":   c.RealIP(),
-		}).Error("Requested path not found")
+		}).Error("HTTP Error")
 	}
 
-	c.String(code, "")
-	c.Logger().Error(err)
+	c.Echo().DefaultHTTPErrorHandler(err, c)
 }
 
 func (s *Server) Serve() error {
-	e := echo.New()
-	e.HTTPErrorHandler = HTTPErrorHandler
-	e.HideBanner = true
-	e.Use(middleware.Recover())
-	e.Logger = EchoLogger()
-	e.Validator = &CustomValidator{validator: validator.New()}
+	e := newEcho()
 
 	h, err := NewHandler(s.DB)
 	if err != nil {
