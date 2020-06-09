@@ -34,7 +34,6 @@ type Host struct {
 	Name       string          `json:"name" validate:"required,hostname"`
 	Interfaces []*NetInterface `json:"interfaces"`
 	Provision  bool            `json:"provision"`
-	Kickstart  bool            `json:"kickstart"`
 	Firmware   firmware.Build  `json:"firmware"`
 	BootImage  string          `json:"boot_image"`
 }
@@ -63,7 +62,6 @@ func (h *Host) FromJSON(hostJSON string) {
 	h.Name = gjson.Get(hostJSON, "name").String()
 	h.BootImage = gjson.Get(hostJSON, "boot_image").String()
 	h.Provision = gjson.Get(hostJSON, "provision").Bool()
-	h.Kickstart = gjson.Get(hostJSON, "kickstart").Bool()
 	h.ID, _ = ksuid.Parse(gjson.Get(hostJSON, "id").String())
 	h.Firmware = firmware.NewFromString(gjson.Get(hostJSON, "firmware").String())
 
@@ -90,7 +88,6 @@ func (h *Host) ToJSON() string {
 	hostJSON, _ = sjson.Set(hostJSON, "boot_image", h.BootImage)
 	hostJSON, _ = sjson.Set(hostJSON, "firmware", h.Firmware.String())
 	hostJSON, _ = sjson.Set(hostJSON, "provision", h.Provision)
-	hostJSON, _ = sjson.Set(hostJSON, "kickstart", h.Kickstart)
 
 	for _, nic := range h.Interfaces {
 		n := map[string]interface{}{

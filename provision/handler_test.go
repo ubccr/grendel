@@ -116,7 +116,6 @@ func TestIpxe(t *testing.T) {
 	host := tests.HostFactory.MustCreate().(*model.Host)
 	host.BootImage = image.Name
 	host.Provision = true
-	host.Kickstart = true
 	err = h.DB.StoreHost(host)
 	assert.NoError(err)
 
@@ -149,7 +148,6 @@ func TestIpxeWrongHost(t *testing.T) {
 	host := tests.HostFactory.MustCreate().(*model.Host)
 	host.BootImage = image.Name
 	host.Provision = true
-	host.Kickstart = true
 	err = h.DB.StoreHost(host)
 	assert.NoError(err)
 
@@ -190,7 +188,6 @@ func TestKickstart(t *testing.T) {
 	host := tests.HostFactory.MustCreate().(*model.Host)
 	host.BootImage = image.Name
 	host.Provision = true
-	host.Kickstart = true
 	err = h.DB.StoreHost(host)
 	assert.NoError(err)
 
