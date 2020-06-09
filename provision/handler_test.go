@@ -21,7 +21,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"strings"
 	"testing"
 
 	"github.com/labstack/echo/v4"
@@ -67,7 +66,7 @@ func TestStatus(t *testing.T) {
 	}
 }
 
-func TestIpxeInvalidToken(t *testing.T) {
+func TestInvalidBootToken(t *testing.T) {
 	assert := assert.New(t)
 
 	host := tests.HostFactory.MustCreate().(*model.Host)
@@ -134,7 +133,7 @@ func TestIpxe(t *testing.T) {
 
 	if assert.NoError(TokenRequired(h.Ipxe)(c)) {
 		assert.Equal(http.StatusOK, rec.Code)
-		assert.True(strings.HasPrefix(rec.Body.String(), "#!ipxe"))
+		assert.Contains(rec.Body.String(), "#!ipxe")
 	}
 }
 
@@ -176,5 +175,39 @@ func TestIpxeWrongHost(t *testing.T) {
 		e.HTTPErrorHandler(err, c)
 		assert.Equal(http.StatusBadRequest, rec.Code)
 		assert.Equal("invalid host", gjson.Get(rec.Body.String(), "message").String())
+	}
+}
+
+func TestKickstart(t *testing.T) {
+	assert := assert.New(t)
+
+	h := &Handler{DB: newTestDB(t)}
+
+	image := tests.BootImageFactory.MustCreate().(*model.BootImage)
+	err := h.DB.StoreBootImage(image)
+	assert.NoError(err)
+
+	host := tests.HostFactory.MustCreate().(*model.Host)
+	host.BootImage = image.Name
+	host.Provision = true
+	host.Kickstart = true
+	err = h.DB.StoreHost(host)
+	assert.NoError(err)
+
+	token, err := model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
+	assert.NoError(err)
+
+	q := make(url.Values)
+	q.Set("token", token)
+
+	e := newTestEcho(t)
+	req := httptest.NewRequest(http.MethodGet, "/boot/kickstart?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	if assert.NoError(TokenRequired(h.Kickstart)(c)) {
+		assert.Equal(http.StatusOK, rec.Code)
+		assert.Contains(rec.Body.String(), "install")
+		assert.Contains(rec.Body.String(), "liveimg --url=")
 	}
 }
