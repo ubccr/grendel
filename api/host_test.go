@@ -41,7 +41,7 @@ func TestHostAdd(t *testing.T) {
 
 	addHostJSON := "[" + string(tests.TestHostJSON) + "]"
 
-	req := httptest.NewRequest(http.MethodPost, "/host/add", strings.NewReader(addHostJSON))
+	req := httptest.NewRequest(http.MethodPost, "/host", strings.NewReader(addHostJSON))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -73,7 +73,7 @@ func TestHostAddInvalid(t *testing.T) {
 	e := newEcho()
 
 	for _, test := range badData {
-		req := httptest.NewRequest(http.MethodPost, "/host/add", strings.NewReader(test))
+		req := httptest.NewRequest(http.MethodPost, "/host", strings.NewReader(test))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)

@@ -40,7 +40,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	e.GET("/", h.Index).Name = "index"
 
 	v1 := e.Group("/v1/")
-	v1.POST("host/add", h.HostAdd)
+	v1.POST("host", h.HostAdd)
 	v1.GET("host/list", h.HostList)
 	v1.GET("host/find/*", h.HostFind)
 }
