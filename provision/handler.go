@@ -68,6 +68,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 
 	boot := e.Group("/boot/")
 	boot.Use(TokenRequired)
+	boot.POST("complete", h.Unprovision)
 	boot.GET("ipxe", h.Ipxe)
 	boot.GET("kickstart", h.Kickstart)
 	boot.GET("file/kernel*", h.File)
@@ -229,4 +230,29 @@ func (h *Handler) Kickstart(c echo.Context) error {
 	}
 
 	return c.Render(http.StatusOK, "kickstart.tmpl", data)
+}
+
+func (h *Handler) Unprovision(c echo.Context) error {
+	_, host, _, err := h.verifyClaims(c)
+	if err != nil {
+		return err
+	}
+
+	log.Infof("Unprovisioning host %s", host.Name)
+
+	host.Provision = false
+
+	err = h.DB.StoreHost(host)
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"id":   host.ID,
+			"name": host.Name,
+		}).Error("failed to unprovision host")
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to unprovision host").SetInternal(err)
+	}
+
+	resp := map[string]interface{}{
+		"status": "ok",
+	}
+	return c.JSON(http.StatusOK, resp)
 }

@@ -55,6 +55,8 @@ EOF
 
 %post
 
+curl -X POST {{ .baseuri }}/boot/complete?token={{.token}}
+
 exit 0
 
 %end

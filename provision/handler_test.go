@@ -253,3 +253,40 @@ func TestKickstart(t *testing.T) {
 		assert.Contains(rec.Body.String(), "liveimg --url=")
 	}
 }
+
+func TestUnprovision(t *testing.T) {
+	assert := assert.New(t)
+
+	h := &Handler{DB: newTestDB(t)}
+
+	image := tests.BootImageFactory.MustCreate().(*model.BootImage)
+	err := h.DB.StoreBootImage(image)
+	assert.NoError(err)
+
+	host := tests.HostFactory.MustCreate().(*model.Host)
+	host.BootImage = image.Name
+	host.Provision = true
+	err = h.DB.StoreHost(host)
+	assert.NoError(err)
+
+	token, err := model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
+	assert.NoError(err)
+
+	q := make(url.Values)
+	q.Set("token", token)
+
+	e := newTestEcho(t)
+	req := httptest.NewRequest(http.MethodGet, "/boot/complete?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	if assert.NoError(TokenRequired(h.Unprovision)(c)) {
+		assert.Equal(http.StatusOK, rec.Code)
+		assert.Equal("ok", gjson.Get(rec.Body.String(), "status").String())
+	}
+
+	hostTest, err := h.DB.LoadHostFromID(host.ID.String())
+	if assert.NoError(err) {
+		assert.False(hostTest.Provision)
+	}
+}
