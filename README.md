@@ -115,7 +115,7 @@ If you don't want to run as root you can allow Grendel to bind to privileged
 with the following command:
 
 ```
-$ sudo setcap CAP_NET_BIND_SERVICE=+eip /path/to/grendel
+$ sudo setcap CAP_NET_BIND_SERVICE,CAP_NET_RAW=+eip /path/to/grendel
 ```
 
 ### PXE Boot the linux virtual machine
