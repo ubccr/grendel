@@ -1,0 +1,202 @@
+openapi: 3.0.1
+info:
+  contact:
+    email: aebruno2@buffalo.edu
+  description: Bare Metal Provisioning system for HPC Linux clusters. Find out more
+    about Grendel at [https://github.com/ubccr/grendel](https://github.com/ubccr/grendel)
+  license:
+    name: GPLv3
+    url: https://www.gnu.org/licenses/gpl-3.0.en.html
+  title: Grendel API
+  version: 1.0.0
+externalDocs:
+  description: https://grendel.readthedocs.io/en/latest/
+  url: https://grendel.readthedocs.io/en/latest/
+servers:
+- url: http://localhost/v1
+tags:
+- description: Host API Service
+  externalDocs:
+    description: Operations for grendel hosts
+    url: https://grendel.readthedocs.io/en/latest/
+  name: host
+paths:
+  /host/list:
+    get:
+      description: Returns all host stored in Grendel
+      operationId: hostList
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Host'
+                type: array
+          description: successful operation
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Failed to fetch hosts from database
+      summary: List all hosts
+      tags:
+      - host
+  /host/find/{nodeSet}:
+    get:
+      description: Returns a list of hosts in the given nodeset
+      operationId: hostFind
+      parameters:
+      - description: 'nodeset syntax. Example: cpn-d13-[01-100]'
+        explode: false
+        in: path
+        name: nodeSet
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Host'
+                type: array
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid nodeset supplied
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Failed to fetch hosts from database
+      summary: Find hosts by name or nodeset
+      tags:
+      - host
+  /host:
+    post:
+      operationId: storeHosts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/Host'
+              type: array
+        description: Add/Update one or more hosts to Grendel
+        required: true
+      responses:
+        "201":
+          content: {}
+          description: successfully stored hosts
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid host input supplied
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Failed to store hosts in database
+      summary: Add or update hosts in Grendel
+      tags:
+      - host
+      x-codegen-request-body-name: body
+components:
+  schemas:
+    Host:
+      example:
+        interfaces:
+        - fqdn: fqdn
+          ip: ip
+          name: name
+          bmc: true
+          mac: mac
+        - fqdn: fqdn
+          ip: ip
+          name: name
+          bmc: true
+          mac: mac
+        provision: true
+        name: name
+        id: id
+        boot_image: boot_image
+        firmware: firmware
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        provision:
+          type: boolean
+        firmware:
+          type: string
+        boot_image:
+          type: string
+        interfaces:
+          items:
+            $ref: '#/components/schemas/NetInterface'
+          type: array
+      required:
+      - name
+      type: object
+    NetInterface:
+      example:
+        fqdn: fqdn
+        ip: ip
+        name: name
+        bmc: true
+        mac: mac
+      properties:
+        mac:
+          type: string
+        name:
+          type: string
+        ip:
+          type: string
+        fqdn:
+          type: string
+        bmc:
+          type: boolean
+      type: object
+    BootImage:
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        kernel:
+          type: string
+        initrd:
+          items:
+            type: string
+          type: array
+        liveimg:
+          type: string
+        cmdline:
+          type: string
+        verify:
+          type: boolean
+      required:
+      - name
+      type: object
+    ErrorResponse:
+      properties:
+        message:
+          type: string
+      type: object
+  securitySchemes:
+    api_key:
+      in: header
+      name: api_key
+      type: apiKey

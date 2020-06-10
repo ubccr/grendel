@@ -18,14 +18,14 @@
 package host
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/ubccr/grendel/client"
+	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/model"
-	"github.com/ubccr/grendel/nodeset"
 )
 
 var (
@@ -35,23 +35,18 @@ var (
 		Long:  `Generate boot token for hosts`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := client.NewClient()
+			gc, err := cmd.NewClient()
 			if err != nil {
 				return err
 			}
 
-			ns, err := nodeset.NewNodeSet(strings.Join(args, ","))
+			hostList, _, err := gc.HostApi.HostFind(context.Background(), strings.Join(args, ","))
 			if err != nil {
-				return err
+				return cmd.NewApiError("Failed to find hosts for boot token generation", err)
 			}
 
-			if ns.Len() == 0 {
-				return errors.New("Node nodes in nodeset")
-			}
-
-			hostList, err := gc.FindHosts(ns)
-			if err != nil {
-				return err
+			if len(hostList) == 0 {
+				return errors.New("No hosts found")
 			}
 
 			for _, host := range hostList {

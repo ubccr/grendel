@@ -18,11 +18,13 @@
 package host
 
 import (
+	"context"
+	"encoding/json"
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/ubccr/grendel/client"
 	"github.com/ubccr/grendel/cmd"
+	"github.com/ubccr/grendel/model"
 )
 
 var (
@@ -32,7 +34,7 @@ var (
 		Long:  `import hosts`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := client.NewClient()
+			gc, err := cmd.NewClient()
 			if err != nil {
 				return err
 			}
@@ -44,12 +46,18 @@ var (
 				defer file.Close()
 
 				cmd.Log.Infof("Processing file: %s", name)
-				err = gc.StoreHostsReader(file)
-				if err != nil {
+
+				var hosts model.HostList
+				if err := json.NewDecoder(file).Decode(&hosts); err != nil {
 					return err
 				}
 
-				cmd.Log.Infof("Successfully imported hosts from: %s", name)
+				_, err = gc.HostApi.StoreHosts(context.Background(), hosts)
+				if err != nil {
+					return cmd.NewApiError("Failed to store hosts", err)
+				}
+
+				cmd.Log.Infof("Successfully imported %d hosts from: %s", len(hosts), name)
 			}
 			return nil
 

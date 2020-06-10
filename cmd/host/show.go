@@ -18,15 +18,14 @@
 package host
 
 import (
+	"context"
 	"encoding/json"
-	"errors"
 	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/ubccr/grendel/client"
+	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/model"
-	"github.com/ubccr/grendel/nodeset"
 )
 
 var (
@@ -36,7 +35,7 @@ var (
 		Long:  `Show hosts`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := client.NewClient()
+			gc, err := cmd.NewClient()
 			if err != nil {
 				return err
 			}
@@ -44,23 +43,15 @@ var (
 			var hostList model.HostList
 
 			if len(args) == 1 && strings.ToLower(args[0]) == "all" {
-				hostList, err = gc.Hosts()
+				hostList, _, err = gc.HostApi.HostList(context.Background())
 				if err != nil {
-					return err
+					return cmd.NewApiError("Failed to list hosts", err)
 				}
 			} else {
-				ns, err := nodeset.NewNodeSet(strings.Join(args, ","))
+				nodes := strings.Join(args, ",")
+				hostList, _, err = gc.HostApi.HostFind(context.Background(), nodes)
 				if err != nil {
-					return err
-				}
-
-				if ns.Len() == 0 {
-					return errors.New("Node nodes in nodeset")
-				}
-
-				hostList, err = gc.FindHosts(ns)
-				if err != nil {
-					return err
+					return cmd.NewApiError("Failed to find hosts", err)
 				}
 			}
 

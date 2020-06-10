@@ -18,14 +18,14 @@
 package bmc
 
 import (
+	"context"
 	"errors"
 	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/client"
-	"github.com/ubccr/grendel/nodeset"
+	"github.com/ubccr/grendel/cmd"
 )
 
 var (
@@ -36,16 +36,7 @@ var (
 		Long:  `Set hosts to PXE netboot`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			ns, err := nodeset.NewNodeSet(strings.Join(args, ","))
-			if err != nil {
-				return err
-			}
-
-			if ns.Len() == 0 {
-				return errors.New("Node nodes in nodeset")
-			}
-
-			return runNetboot(ns)
+			return runNetboot(strings.Join(args, ","))
 		},
 	}
 )
@@ -55,15 +46,15 @@ func init() {
 	bmcCmd.AddCommand(netbootCmd)
 }
 
-func runNetboot(ns *nodeset.NodeSet) error {
-	gc, err := client.NewClient()
+func runNetboot(ns string) error {
+	gc, err := cmd.NewClient()
 	if err != nil {
 		return err
 	}
 
-	hostList, err := gc.FindHosts(ns)
+	hostList, _, err := gc.HostApi.HostFind(context.Background(), ns)
 	if err != nil {
-		return err
+		return cmd.NewApiError("Failed to find hosts to netboot", err)
 	}
 
 	if len(hostList) == 0 {

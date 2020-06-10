@@ -11,7 +11,7 @@ require (
 	github.com/go-playground/validator/v10 v10.0.1
 	github.com/golang/protobuf v1.3.2 // indirect
 	github.com/hako/branca v0.0.0-20191227164554-3b9970524189
-	github.com/hashicorp/go-retryablehttp v0.6.4
+	github.com/hashicorp/go-retryablehttp v0.6.6
 	github.com/hugelgupf/socketpair v0.0.0-20190730060125-05d35a94e714 // indirect
 	github.com/insomniacslk/dhcp v0.0.0-20191120203056-ec0e0154d15c
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
@@ -48,6 +48,7 @@ require (
 	github.com/willf/bitset v1.1.10
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 	golang.org/x/crypto v0.0.0-20200117160349-530e935923ad // indirect
+	golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
 	golang.org/x/sys v0.0.0-20200124204421-9fbb57f87de9 // indirect
 	gopkg.in/ini.v1 v1.51.1 // indirect
 	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637

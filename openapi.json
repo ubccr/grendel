@@ -1,0 +1,277 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Grendel API",
+    "description": "Bare Metal Provisioning system for HPC Linux clusters. Find out more about Grendel at [https://github.com/ubccr/grendel](https://github.com/ubccr/grendel)",
+    "contact": {
+      "email": "aebruno2@buffalo.edu"
+    },
+    "license": {
+      "name": "GPLv3",
+      "url": "https://www.gnu.org/licenses/gpl-3.0.en.html"
+    },
+    "version": "1.0.0"
+  },
+  "externalDocs": {
+    "description": "https://grendel.readthedocs.io/en/latest/",
+    "url": "https://grendel.readthedocs.io/en/latest/"
+  },
+  "servers": [
+    {
+      "url": "http://localhost/v1"
+    }
+  ],
+  "tags": [
+    {
+      "name": "host",
+      "description": "Host API Service",
+      "externalDocs": {
+        "description": "Operations for grendel hosts",
+        "url": "https://grendel.readthedocs.io/en/latest/"
+      }
+    }
+  ],
+  "paths": {
+    "/host/list": {
+      "get": {
+        "tags": [
+          "host"
+        ],
+        "summary": "List all hosts",
+        "description": "Returns all host stored in Grendel",
+        "operationId": "hostList",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Host"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to fetch hosts from database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/host/find/{nodeSet}": {
+      "get": {
+        "tags": [
+          "host"
+        ],
+        "summary": "Find hosts by name or nodeset",
+        "description": "Returns a list of hosts in the given nodeset",
+        "operationId": "hostFind",
+        "parameters": [
+          {
+            "name": "nodeSet",
+            "in": "path",
+            "description": "nodeset syntax. Example: cpn-d13-[01-100]",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Host"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid nodeset supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to fetch hosts from database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/host": {
+      "post": {
+        "tags": [
+          "host"
+        ],
+        "summary": "Add or update hosts in Grendel",
+        "operationId": "storeHosts",
+        "requestBody": {
+          "description": "Add/Update one or more hosts to Grendel",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Host"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successfully stored hosts",
+            "content": { }
+          },
+          "400": {
+            "description": "Invalid host input supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to store hosts in database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Host": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "provision": {
+            "type": "boolean"
+          },
+          "firmware": {
+            "type": "string"
+          },
+          "boot_image": {
+            "type": "string"
+          },
+          "interfaces": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NetInterface"
+            }
+          }
+        }
+      },
+      "NetInterface": {
+        "type": "object",
+        "properties": {
+          "mac": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "ip": {
+            "type": "string"
+          },
+          "fqdn": {
+            "type": "string"
+          },
+          "bmc": {
+            "type": "boolean"
+          }
+        }
+      },
+      "BootImage": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kernel": {
+            "type": "string"
+          },
+          "initrd": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "liveimg": {
+            "type": "string"
+          },
+          "cmdline": {
+            "type": "string"
+          },
+          "verify": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "api_key": {
+        "type": "apiKey",
+        "name": "api_key",
+        "in": "header"
+      }
+    }
+  }
+}

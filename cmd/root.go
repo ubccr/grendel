@@ -18,15 +18,25 @@
 package cmd
 
 import (
+	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	golog "log"
+	"net"
+	"net/http"
 	"strings"
+	"time"
 
+	"github.com/hashicorp/go-retryablehttp"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/api"
+	"github.com/ubccr/grendel/client"
 	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/util"
 )
@@ -62,6 +72,56 @@ func init() {
 	Root.PersistentPreRunE = func(command *cobra.Command, args []string) error {
 		return SetupLogging()
 	}
+}
+
+func NewClient() (*client.APIClient, error) {
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: viper.GetBool("api.insecure")}}
+
+	cacert := viper.GetString("client.cacert")
+	pem, err := ioutil.ReadFile(cacert)
+	if err == nil {
+		certPool := x509.NewCertPool()
+		if !certPool.AppendCertsFromPEM(pem) {
+			return nil, fmt.Errorf("Failed to read cacert: %s", cacert)
+		}
+
+		tr = &http.Transport{TLSClientConfig: &tls.Config{RootCAs: certPool, InsecureSkipVerify: false}}
+	}
+
+	endpoint := viper.GetString("client.api_endpoint")
+
+	// Is endpoint a path to a unix domain socket?
+	if !strings.HasPrefix(endpoint, "http://") && !strings.HasPrefix(endpoint, "https://") {
+		tr = &http.Transport{
+			DialContext: func(ctx context.Context, _, addr string) (net.Conn, error) {
+				dialer := net.Dialer{}
+				return dialer.DialContext(ctx, "unix", endpoint)
+			},
+		}
+	}
+
+	rclient := retryablehttp.NewClient()
+	rclient.HTTPClient = &http.Client{Timeout: time.Second * 3600, Transport: tr}
+	rclient.Logger = Log
+
+	cfg := client.NewConfiguration()
+	cfg.HTTPClient = rclient.StandardClient()
+
+	client := client.NewAPIClient(cfg)
+
+	return client, nil
+}
+
+func NewApiError(msg string, err error) error {
+	var ge client.GenericOpenAPIError
+	if errors.As(err, &ge) {
+		apiErr := ge.Model()
+		if apiErr != nil {
+			return fmt.Errorf("%s: %s - %w", msg, apiErr.(client.ErrorResponse).Message, ge)
+		}
+	}
+
+	return err
 }
 
 func SetupLogging() error {

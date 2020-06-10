@@ -18,16 +18,14 @@
 package host
 
 import (
-	"bytes"
+	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/ubccr/grendel/client"
+	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/model"
-	"github.com/ubccr/grendel/nodeset"
 	"github.com/ubccr/grendel/util"
 )
 
@@ -38,23 +36,14 @@ var (
 		Long:  `edit hosts`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			ns, err := nodeset.NewNodeSet(strings.Join(args, ","))
+			gc, err := cmd.NewClient()
 			if err != nil {
 				return err
 			}
 
-			if ns.Len() == 0 {
-				return errors.New("Node nodes in nodeset")
-			}
-
-			gc, err := client.NewClient()
+			hostList, _, err := gc.HostApi.HostFind(context.Background(), strings.Join(args, ","))
 			if err != nil {
-				return err
-			}
-
-			hostList, err := gc.FindHosts(ns)
-			if err != nil {
-				return err
+				return cmd.NewApiError("Failed to find hosts to edit", err)
 			}
 
 			data, err := json.MarshalIndent(hostList, "", "    ")
@@ -73,9 +62,9 @@ var (
 				return fmt.Errorf("Invalid JSON. Not saving changes: %w", err)
 			}
 
-			err = gc.StoreHostsReader(bytes.NewReader(newData))
+			_, err = gc.HostApi.StoreHosts(context.Background(), check)
 			if err != nil {
-				return err
+				return cmd.NewApiError("Failed to store hosts", err)
 			}
 
 			fmt.Printf("Successfully saved %d hosts\n", len(check))
