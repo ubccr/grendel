@@ -47,10 +47,23 @@ $ ./grendel --help
 ### Create a TAP device
 
 ```
-$ sudo ip tuntap add name tap0 mode tap user `whoami`
+$ sudo ip tuntap add name tap0 mode tap user ${LOGNAME}
 $ sudo ip addr add 192.168.10.254/24 dev tap0
 $ sudo ip link set up dev tap0
 ```
+
+For RedHat/CentOS
+
+```
+$ sudo firewall-cmd --zone=trusted --change-interface=tap0
+```
+
+For Debian/Ubuntu
+
+```
+$ sudo ufw allow in on tap0
+```
+
 
 ### Create a boot Image file
 
