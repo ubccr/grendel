@@ -27,8 +27,8 @@ type BootImageList []*BootImage
 
 type BootImage struct {
 	ID          ksuid.KSUID `json:"id"`
-	Name        string      `json:"name"`
-	KernelPath  string      `json:"kernel"`
+	Name        string      `json:"name" validate:"required"`
+	KernelPath  string      `json:"kernel" validate:"required"`
 	InitrdPaths []string    `json:"initrd"`
 	LiveImage   string      `json:"liveimg"`
 	CommandLine string      `json:"cmdline"`

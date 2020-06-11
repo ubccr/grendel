@@ -43,6 +43,10 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	v1.POST("host", h.HostAdd)
 	v1.GET("host/list", h.HostList)
 	v1.GET("host/find/*", h.HostFind)
+
+	v1.POST("bootimage", h.BootImageAdd)
+	v1.GET("bootimage/:name", h.BootImageFind)
+	v1.GET("bootimage/list", h.BootImageList)
 }
 
 func (h *Handler) Index(c echo.Context) error {

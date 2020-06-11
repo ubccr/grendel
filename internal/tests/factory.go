@@ -27,6 +27,15 @@ import (
 )
 
 var TestHostJSON = []byte(`{"firmware": "","id": "1VCnR6qevU5BbihTIvZEhX002CI","interfaces": [{"bmc": false,"fqdn": "tux01.compute.local", "ifname": "", "ip": "10.10.1.2", "mac": "d0:93:ae:e1:b5:2e" } ], "name": "tux01", "boot_image": "centos6", "provision": true }`)
+var TestBootImageJSON = []byte(`{
+	"name": "compute",
+	"kernel": "/var/grendel/images/centos7/vmlinuz",
+	"initrd": [
+		"/var/grendel/images/centos7/ccr-initrd.img"
+	],
+	"liveimg": "/var/grendel/images/compute-node/compute-node-squashfs.img",
+	"cmdline": "console=tty0 console=ttyS0 BOOTIF=$mac rd.neednet=1 ip=dhcp ks=$kickstart network ksdevice=bootif ks.device=bootif inst.stage2=$repo/centos7"
+}`)
 
 var NetInterfaceFactory = factory.NewFactory(
 	&model.NetInterface{},
