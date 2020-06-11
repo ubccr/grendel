@@ -20,6 +20,7 @@ package api
 import (
 	"net/http"
 	"path"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/ubccr/grendel/model"
@@ -28,6 +29,10 @@ import (
 
 func (h *Handler) HostAdd(c echo.Context) error {
 	var hosts model.HostList
+
+	if !strings.HasPrefix(c.Request().Header.Get(echo.HeaderContentType), echo.MIMEApplicationJSON) {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid content type")
+	}
 
 	if err := c.Bind(&hosts); err != nil {
 		return err

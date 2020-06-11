@@ -53,6 +53,32 @@ func TestHostAdd(t *testing.T) {
 	}
 }
 
+func TestHostAddWrongContentType(t *testing.T) {
+	assert := assert.New(t)
+
+	h := &Handler{newTestDB(t)}
+
+	e := newEcho()
+
+	addHostJSON := "this is not json"
+
+	req := httptest.NewRequest(http.MethodPost, "/host", strings.NewReader(addHostJSON))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	err := h.HostAdd(c)
+	if assert.Error(err) {
+		he, ok := err.(*echo.HTTPError)
+		if ok {
+			assert.Equal(http.StatusBadRequest, he.Code)
+		}
+		e.HTTPErrorHandler(err, c)
+		assert.Equal(http.StatusBadRequest, rec.Code)
+		assert.True(gjson.Get(rec.Body.String(), "message").Exists())
+	}
+}
+
 func TestHostAddInvalid(t *testing.T) {
 	assert := assert.New(t)
 
