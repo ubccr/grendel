@@ -20,24 +20,32 @@ listen = "0.0.0.0:80"
 
 # HTTP protocol used for provisioning (http or https)
 scheme = "http"
+#
+# For https also set the SSL Certificate:
+#
+#scheme = "https"
+#
+# hostname for grendel, should also be the hostname for the SSL certificate
+#hostname = "my.host.name"
+#
+# Path to ssl cert (.crt file)
+#cert = "/path/to/cert/file/hostname.crt"
+#
+# Path to ssl key (.key file)
+#key = "/path/to/cert/file/hostname.key"
+#
 
 # TTL in seconds for provision tokens. Defaults to 1 hour
 token_ttl = 3600
 
 # Can generate secret with `openssl rand -hex 32`
-secret = ""
+#secret = "_provisioning_secret_here_"
 
 # Hashed root password used in kickstart template
 root_password = ""
 
 # Default OS image name
 default_image = ""
-
-# Path to ssl cert 
-cert = ""
-
-# Path to ssl key 
-key = ""
 
 # Path to repo directory
 repo_dir = ""
@@ -69,7 +77,7 @@ mtu = 1500
 router_octet4 = 0
 
 # Hard code a static router. Not set by default.
-router = ""
+#router = ""
 
 # Default netmask example: 8, 16, 24, etc.
 netmask = 24
@@ -103,7 +111,7 @@ listen = "0.0.0.0:4011"
 #------------------------------------------------------------------------------
 [api]
 # Can generate secret with `openssl rand -hex 32`
-secret = ""
+#secret = "_api_secret_here_"
 
 # Path to unix socket
 socket_path = "grendel-api.socket"
