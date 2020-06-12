@@ -16,12 +16,14 @@ dbpath = ":memory:"
 # HTTP Provision Server
 #------------------------------------------------------------------------------
 [provision]
-listen = "0.0.0.0:80"
 
-# HTTP protocol used for provisioning (http or https)
+# For provisioning with http
+listen = "0.0.0.0:80"
 scheme = "http"
+
+# For provisioning with https
 #
-# For https also set the SSL Certificate:
+#listen = "0.0.0.0:443"
 #
 #scheme = "https"
 #
