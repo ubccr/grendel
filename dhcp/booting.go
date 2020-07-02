@@ -119,7 +119,7 @@ func (s *Server) bootingHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) err
 		}
 
 		ipxeUrl := fmt.Sprintf("%s://%s:%d/boot/ipxe?token=%s", s.ProvisionScheme, hostName, s.ProvisionPort, token)
-		log.Printf("BootFile iPXE script: %s", ipxeUrl)
+		log.Debugf("BootFile iPXE script: %s", ipxeUrl)
 		resp.UpdateOption(dhcpv4.OptBootFileName(ipxeUrl))
 
 	default:
