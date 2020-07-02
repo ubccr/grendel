@@ -1,13 +1,14 @@
 #!/bin/bash
 
 GRENDEL_DIR='./.grendel-release'
-VERSION=`grep Version api/version.go | egrep -o '[0-9]\.[0-9]\.[0-9]'`
+VERSION=`git describe --long --tags --dirty --always | sed -e 's/^v//'`
 NAME=grendel-${VERSION}-linux-amd64
 REL_DIR=${GRENDEL_DIR}/${NAME}
 
 rm -Rf ${GRENDEL_DIR}
 mkdir -p ${REL_DIR}
 
+go build -ldflags "-X github.com/ubccr/grendel/api.Version=$VERSION" .
 cp ./grendel ${REL_DIR}/ 
 cp ./grendel.toml.sample ${REL_DIR}/ 
 cp ./README.md ${REL_DIR}/ 
