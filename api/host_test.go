@@ -217,3 +217,51 @@ func TestHostFindInvalidNodeSet(t *testing.T) {
 		assert.True(gjson.Get(rec.Body.String(), "message").Exists())
 	}
 }
+
+func TestHostProvision(t *testing.T) {
+	assert := assert.New(t)
+
+	h := &Handler{newTestDB(t)}
+
+	size := 20
+	for i := 0; i < size; i++ {
+		host := tests.HostFactory.MustCreate().(*model.Host)
+		host.Provision = false
+		host.Name = fmt.Sprintf("tux-%02d", i)
+		err := h.DB.StoreHost(host)
+		assert.NoError(err)
+	}
+
+	hostList, err := h.DB.Hosts()
+	if assert.NoError(err) {
+		count := 0
+		for _, host := range hostList {
+			if host.Provision {
+				count++
+			}
+		}
+		assert.Equal(0, count)
+	}
+
+	e := newEcho()
+
+	req := httptest.NewRequest(http.MethodPut, "/host/provision/tux-[05-14]", nil)
+	req.Header.Set(echo.HeaderAccept, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	if assert.NoError(h.HostProvision(c)) {
+		assert.Equal(http.StatusOK, rec.Code)
+	}
+
+	hostList, err = h.DB.Hosts()
+	if assert.NoError(err) {
+		count := 0
+		for _, host := range hostList {
+			if host.Provision {
+				count++
+			}
+		}
+		assert.Equal(10, count)
+	}
+}

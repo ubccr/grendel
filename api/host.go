@@ -20,6 +20,7 @@ package api
 import (
 	"net/http"
 	"path"
+	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -83,4 +84,36 @@ func (h *Handler) HostFind(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to find hosts").SetInternal(err)
 	}
 	return c.JSON(http.StatusOK, hostList)
+}
+
+func (h *Handler) hostSetProvision(c echo.Context, provision bool) error {
+	_, nodesetString := path.Split(c.Request().URL.Path)
+
+	nodeset, err := nodeset.NewNodeSet(nodesetString)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid nodeset").SetInternal(err)
+	}
+
+	log.Infof("Got nodeset: %s", nodeset.String())
+
+	err = h.DB.ProvisionHosts(nodeset, provision)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to update hosts provision property").SetInternal(err)
+	}
+
+	log.Infof("Set %d hosts provision=%s", nodeset.Len(), strconv.FormatBool(provision))
+
+	res := map[string]interface{}{
+		"hosts": nodeset.Len(),
+	}
+
+	return c.JSON(http.StatusOK, res)
+}
+
+func (h *Handler) HostProvision(c echo.Context) error {
+	return h.hostSetProvision(c, true)
+}
+
+func (h *Handler) HostUnprovision(c echo.Context) error {
+	return h.hostSetProvision(c, false)
 }
