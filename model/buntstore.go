@@ -320,6 +320,7 @@ func (s *BuntStore) FindHosts(ns *nodeset.NodeSet) (HostList, error) {
 // ProvisionHosts sets all hosts in the given NodeSet to provision (true) or unprovision (false)
 func (s *BuntStore) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
 	it := ns.Iterator()
+	count := 0
 
 	err := s.db.Update(func(tx *buntdb.Tx) error {
 		for it.Next() {
@@ -341,12 +342,18 @@ func (s *BuntStore) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
 			if err != nil {
 				return err
 			}
+
+			count++
 		}
 		return nil
 	})
 
 	if err != nil {
 		return err
+	}
+
+	if count == 0 {
+		return fmt.Errorf("no hosts found with nodeset %s:  %w", ns.String(), ErrNotFound)
 	}
 
 	return nil
