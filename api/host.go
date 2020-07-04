@@ -18,6 +18,7 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 	"path"
 	"strconv"
@@ -98,6 +99,10 @@ func (h *Handler) hostSetProvision(c echo.Context, provision bool) error {
 
 	err = h.DB.ProvisionHosts(nodeset, provision)
 	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return echo.NewHTTPError(http.StatusBadRequest, "No hosts found in nodeset").SetInternal(err)
+		}
+
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to update hosts provision property").SetInternal(err)
 	}
 

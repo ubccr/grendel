@@ -85,6 +85,70 @@ paths:
       summary: Find hosts by name or nodeset
       tags:
       - host
+  /host/provision/{nodeSet}:
+    put:
+      description: Sets hosts to to provision in the given nodeset
+      operationId: hostProvision
+      parameters:
+      - description: 'nodeset syntax. Example: cpn-d13-[01-100]'
+        explode: false
+        in: path
+        name: nodeSet
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content: {}
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid nodeset supplied
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Failed to fetch hosts from database
+      summary: Set hosts to provision by name or nodeset
+      tags:
+      - host
+  /host/unprovision/{nodeSet}:
+    put:
+      description: Sets hosts to to unprovision in the given nodeset
+      operationId: hostUnprovision
+      parameters:
+      - description: 'nodeset syntax. Example: cpn-d13-[01-100]'
+        explode: false
+        in: path
+        name: nodeSet
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content: {}
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid nodeset supplied
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Failed to fetch hosts from database
+      summary: Set hosts to unprovision by name or nodeset
+      tags:
+      - host
   /host:
     post:
       operationId: storeHosts

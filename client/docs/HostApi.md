@@ -6,6 +6,8 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**HostFind**](HostApi.md#HostFind) | **Get** /host/find/{nodeSet} | Find hosts by name or nodeset
 [**HostList**](HostApi.md#HostList) | **Get** /host/list | List all hosts
+[**HostProvision**](HostApi.md#HostProvision) | **Put** /host/provision/{nodeSet} | Set hosts to provision by name or nodeset
+[**HostUnprovision**](HostApi.md#HostUnprovision) | **Put** /host/unprovision/{nodeSet} | Set hosts to unprovision by name or nodeset
 [**StoreHosts**](HostApi.md#StoreHosts) | **Post** /host | Add or update hosts in Grendel
 
 
@@ -59,6 +61,74 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**[]Host**](Host.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## HostProvision
+
+> HostProvision(ctx, nodeSet)
+
+Set hosts to provision by name or nodeset
+
+Sets hosts to to provision in the given nodeset
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**nodeSet** | **string**| nodeset syntax. Example: cpn-d13-[01-100] | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## HostUnprovision
+
+> HostUnprovision(ctx, nodeSet)
+
+Set hosts to unprovision by name or nodeset
+
+Sets hosts to to unprovision in the given nodeset
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**nodeSet** | **string**| nodeset syntax. Example: cpn-d13-[01-100] | 
+
+### Return type
+
+ (empty response body)
 
 ### Authorization
 
