@@ -69,6 +69,7 @@ func (h *Handler) BootImageList(c echo.Context) error {
 
 func (h *Handler) BootImageFind(c echo.Context) error {
 	name := c.Param("name")
+	imageList := make(model.BootImageList, 0)
 
 	image, err := h.DB.LoadBootImage(name)
 	if err != nil {
@@ -78,5 +79,7 @@ func (h *Handler) BootImageFind(c echo.Context) error {
 
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fetch image").SetInternal(err)
 	}
-	return c.JSON(http.StatusOK, image)
+
+	imageList = append(imageList, image)
+	return c.JSON(http.StatusOK, imageList)
 }

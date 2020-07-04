@@ -45,7 +45,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	v1.GET("host/find/*", h.HostFind)
 
 	v1.POST("bootimage", h.BootImageAdd)
-	v1.GET("bootimage/:name", h.BootImageFind)
+	v1.GET("bootimage/find/:name", h.BootImageFind)
 	v1.GET("bootimage/list", h.BootImageList)
 }
 

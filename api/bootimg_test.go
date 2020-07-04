@@ -157,17 +157,17 @@ func TestBootImageFind(t *testing.T) {
 
 	e := newEcho()
 
-	req := httptest.NewRequest(http.MethodGet, "/bootimage/centos14", nil)
+	req := httptest.NewRequest(http.MethodGet, "/bootimage/find/centos14", nil)
 	req.Header.Set(echo.HeaderAccept, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	c.SetPath("/bootimage/:name")
+	c.SetPath("/bootimage/find/:name")
 	c.SetParamNames("name")
 	c.SetParamValues("centos14")
 
 	if assert.NoError(h.BootImageFind(c)) {
 		assert.Equal(http.StatusOK, rec.Code)
-		assert.Equal("centos14", gjson.Get(rec.Body.String(), "name").String())
+		assert.Equal(1, len(gjson.Parse(rec.Body.String()).Array()))
 	}
 }
 
@@ -186,11 +186,11 @@ func TestBootImageFindNone(t *testing.T) {
 
 	e := newEcho()
 
-	req := httptest.NewRequest(http.MethodGet, "/bootimage/centos50", nil)
+	req := httptest.NewRequest(http.MethodGet, "/bootimage/find/centos50", nil)
 	req.Header.Set(echo.HeaderAccept, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	c.SetPath("/bootimage/:name")
+	c.SetPath("/bootimage/find/:name")
 	c.SetParamNames("name")
 	c.SetParamValues("centos50")
 
