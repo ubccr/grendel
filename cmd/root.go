@@ -44,6 +44,7 @@ import (
 var (
 	cfgFile     string
 	cfgFileUsed string
+	apiEndPoint string
 	debug       bool
 	verbose     bool
 
@@ -68,6 +69,8 @@ func init() {
 	Root.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file")
 	Root.PersistentFlags().BoolVar(&debug, "debug", false, "Enable debug messages")
 	Root.PersistentFlags().BoolVar(&verbose, "verbose", false, "Enable verbose messages")
+	Root.PersistentFlags().String("endpoint", "grendel-api.socket", "Grendel API endpoint")
+	viper.BindPFlag("client.api_endpoint", Root.PersistentFlags().Lookup("endpoint"))
 
 	Root.PersistentPreRunE = func(command *cobra.Command, args []string) error {
 		return SetupLogging()
