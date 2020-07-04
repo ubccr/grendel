@@ -1,5 +1,9 @@
 # Grendel Changelog
 
+## [Unreleased]
+
+- Add boot image cli commands
+
 ## [0.0.2] - 2020-07-02
 
 - Allow variable interpolation in image command line
@@ -14,5 +18,6 @@
 
 - Initial release
 
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.2...HEAD
 [0.0.1]: https://github.com/ubccr/grendel/releases/tag/v0.0.1
 [0.0.2]: https://github.com/ubccr/grendel/releases/tag/v0.0.2

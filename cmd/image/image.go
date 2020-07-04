@@ -15,13 +15,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Grendel. If not, see <https://www.gnu.org/licenses/>.
 
-package all
+package image
 
 import (
-	_ "github.com/ubccr/grendel/cmd"
-	_ "github.com/ubccr/grendel/cmd/bmc"
-	_ "github.com/ubccr/grendel/cmd/discover"
-	_ "github.com/ubccr/grendel/cmd/host"
-	_ "github.com/ubccr/grendel/cmd/image"
-	_ "github.com/ubccr/grendel/cmd/serve"
+	"github.com/spf13/cobra"
+	"github.com/ubccr/grendel/cmd"
 )
+
+var (
+	imageCmd = &cobra.Command{
+		Use:   "image",
+		Short: "Boot Image commands",
+		Long:  `Boot Image commands`,
+	}
+)
+
+func init() {
+	cmd.Root.AddCommand(imageCmd)
+}

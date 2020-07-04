@@ -20,6 +20,11 @@ tags:
     description: Operations for grendel hosts
     url: https://grendel.readthedocs.io/en/latest/
   name: host
+- description: Boot Image API Service
+  externalDocs:
+    description: Operations for grendel boot images
+    url: https://grendel.readthedocs.io/en/latest/
+  name: image
 paths:
   /host/list:
     get:
@@ -112,6 +117,97 @@ paths:
       tags:
       - host
       x-codegen-request-body-name: body
+  /bootimage/list:
+    get:
+      description: Returns all images stored in Grendel
+      operationId: imageList
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/BootImage'
+                type: array
+          description: successful operation
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Failed to fetch images from database
+      summary: List all images
+      tags:
+      - image
+  /bootimage/find/{name}:
+    get:
+      description: Returns image with the given name
+      operationId: imageFind
+      parameters:
+      - description: Name of image
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/BootImage'
+                type: array
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid name supplied
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Failed to fetch image from database
+      summary: Find image by name
+      tags:
+      - image
+  /bootimage:
+    post:
+      operationId: storeImages
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/BootImage'
+              type: array
+        description: Add/Update one or more images to Grendel
+        required: true
+      responses:
+        "201":
+          content: {}
+          description: successfully stored images
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid boot image input supplied
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Failed to store images in database
+      summary: Add or update images in Grendel
+      tags:
+      - image
+      x-codegen-request-body-name: body
 components:
   schemas:
     Host:
@@ -170,6 +266,16 @@ components:
           type: boolean
       type: object
     BootImage:
+      example:
+        cmdline: cmdline
+        kernel: kernel
+        name: name
+        verify: true
+        id: id
+        liveimg: liveimg
+        initrd:
+        - initrd
+        - initrd
       properties:
         id:
           type: string

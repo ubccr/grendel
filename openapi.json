@@ -29,6 +29,14 @@
         "description": "Operations for grendel hosts",
         "url": "https://grendel.readthedocs.io/en/latest/"
       }
+    },
+    {
+      "name": "image",
+      "description": "Boot Image API Service",
+      "externalDocs": {
+        "description": "Operations for grendel boot images",
+        "url": "https://grendel.readthedocs.io/en/latest/"
+      }
     }
   ],
   "paths": {
@@ -161,6 +169,147 @@
           },
           "500": {
             "description": "Failed to store hosts in database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/bootimage/list": {
+      "get": {
+        "tags": [
+          "image"
+        ],
+        "summary": "List all images",
+        "description": "Returns all images stored in Grendel",
+        "operationId": "imageList",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BootImage"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to fetch images from database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bootimage/find/{name}": {
+      "get": {
+        "tags": [
+          "image"
+        ],
+        "summary": "Find image by name",
+        "description": "Returns image with the given name",
+        "operationId": "imageFind",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of image",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BootImage"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid name supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to fetch image from database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bootimage": {
+      "post": {
+        "tags": [
+          "image"
+        ],
+        "summary": "Add or update images in Grendel",
+        "operationId": "storeImages",
+        "requestBody": {
+          "description": "Add/Update one or more images to Grendel",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/BootImage"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successfully stored images",
+            "content": { }
+          },
+          "400": {
+            "description": "Invalid boot image input supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to store images in database",
             "content": {
               "application/json": {
                 "schema": {

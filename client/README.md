@@ -35,6 +35,9 @@ Class | Method | HTTP request | Description
 *HostApi* | [**HostFind**](docs/HostApi.md#hostfind) | **Get** /host/find/{nodeSet} | Find hosts by name or nodeset
 *HostApi* | [**HostList**](docs/HostApi.md#hostlist) | **Get** /host/list | List all hosts
 *HostApi* | [**StoreHosts**](docs/HostApi.md#storehosts) | **Post** /host | Add or update hosts in Grendel
+*ImageApi* | [**ImageFind**](docs/ImageApi.md#imagefind) | **Get** /bootimage/find/{name} | Find image by name
+*ImageApi* | [**ImageList**](docs/ImageApi.md#imagelist) | **Get** /bootimage/list | List all images
+*ImageApi* | [**StoreImages**](docs/ImageApi.md#storeimages) | **Post** /bootimage | Add or update images in Grendel
 
 
 ## Documentation For Models

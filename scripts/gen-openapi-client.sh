@@ -16,6 +16,9 @@ java -jar $OPENAPI_CLI_JAR generate \
 sed -i 's/(\[\]Host,/(model\.HostList,/g' $OUT/api_host.go
 sed -i 's/localVarReturnValue  \[\]Host/localVarReturnValue  model\.HostList/g' $OUT/api_host.go
 sed -i 's/body \[\]Host/body model\.HostList/g' $OUT/api_host.go
+sed -i 's/(\[\]BootImage,/(model\.BootImageList,/g' $OUT/api_image.go
+sed -i 's/localVarReturnValue  \[\]BootImage/localVarReturnValue  model\.BootImageList/g' $OUT/api_image.go
+sed -i 's/body \[\]BootImage/body model\.BootImageList/g' $OUT/api_image.go
 
 # TODO Again, figure out how to disable generating these. Wasn't obvious how to
 # do this
