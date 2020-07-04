@@ -8,6 +8,9 @@ REL_DIR=${GRENDEL_DIR}/${NAME}
 rm -Rf ${GRENDEL_DIR}
 mkdir -p ${REL_DIR}
 
+pushd provision
+rice embed-go
+popd
 go build -ldflags "-X github.com/ubccr/grendel/api.Version=$VERSION" .
 cp ./grendel ${REL_DIR}/ 
 cp ./grendel.toml.sample ${REL_DIR}/ 
