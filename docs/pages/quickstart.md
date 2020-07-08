@@ -8,7 +8,7 @@ Grendel server.
 
 !!! note
     This guide shows how to get up and running with Grendel quickly. For
-    notes on production deployments please see [here](/production).
+    notes on production deployments please see [here](production.md).
 
 ## Installation
 
