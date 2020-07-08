@@ -20,21 +20,24 @@ $ ./grendel --version
 
 ## Configuration
 
-Grendel can be configured using a `TOML` file. 
+Grendel can be configured using a `TOML` file. See
+[here](https://github.com/ubccr/grendel/blob/master/grendel.toml.sample) for a
+sample.
 
 ## Assemble the Boot Image
 
 A boot image defines the Linux Kernel, Initrd files and optionally any command
-line arguments. Boot images are defined using a simple JSON format. For this
-tutorial we'll be using Flatcar container linux. To grab a copy of the Flatcar
-kernel and initrd run the following commands:
+line arguments. Boot images are defined using a simple JSON format. Grendel can
+boot any Linux kernel and initrd, for example [Flatcar](https://www.flatcar-linux.org/) 
+Linux is a distro specifically designed for running containers (fork of
+CoreOS). Grab a copy of the Flatcar kernel and initrd here:
 
 ```
 $ wget http://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_production_pxe_image.cpio.gz
 $ wget http://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_production_pxe.vmlinuz
 ```
 
-The create the following JSON file `boot-image.json`:
+The corresponding boot image config for Grendel would look like this:
 
 ```json
 [{
@@ -47,15 +50,48 @@ The create the following JSON file `boot-image.json`:
 }]
 ```
 
-## Importing Nodes
+Grendel also supports booting LiveOS images. These are Linux kernel/initrd
+images built with [Dracut live](https://mirrors.edge.kernel.org/pub/linux/utils/boot/dracut/dracut.html#_booting_live_images) 
+support. For more details on building custom Linux images see our [Grendel Images](https://github.com/ubccr/grendel-images)
+project. We also provide pre-built images for use in testing Grendel. You can
+download them [here](https://github.com/ubccr/grendel-images/releases). 
 
-Nodes can be imported into Grendel from a file in a simple JSON format. At
-minimum a node requires a name, MAC address, IP address and FQDN:
+For this tutorial, we'll be using the pre-built Ubuntu 20.04 image. First,
+download the kernel, initramfs, and squashfs files:
+
+```
+$ wget https://github.com/ubccr/grendel-images/releases/download/build-2020-07-04/ubuntu-focal-vmlinuz
+$ wget https://github.com/ubccr/grendel-images/releases/download/build-2020-07-04/ubuntu-focal-initramfs.img
+$ wget https://github.com/ubccr/grendel-images/releases/download/build-2020-07-04/ubuntu-focal-squashfs.img
+```
+
+Then create the following JSON file `boot-image.json`:
 
 ```json
-{
+[{
+    "name": "ubuntu-focal-live",
+    "kernel": "ubuntu-focal-vmlinuz",
+    "initrd": [
+        "ubuntu-focal-initramfs.img"
+    ],
+    "liveimg": "ubuntu-focal-squashfs.img",
+    "cmdline": "root=live:$liveimg BOOTIF=$mac rd.neednet=1 ip=dhcp"
+}]
+```
+
+!!! warning
+    Do not use these pre-built images in production. They are for testing purposes only.
+    Default root password is: `ilovelinux`
+
+## Importing Nodes
+
+Nodes can be imported into Grendel from a file in a simple JSON format:
+
+```json
+[{
     "name": "cpn-d13-18",
     "provision": true,
+    "boot_image": "ubuntu-focal-live",
     "interfaces": [
         {
             "fqdn": "cpn-d13-18.compute.ccr.buffalo.edu",
@@ -63,7 +99,7 @@ minimum a node requires a name, MAC address, IP address and FQDN:
             "mac": "41:69:AE:E6:61:06"
         }
     ]
-}
+}]
 ```
 
 You can use any process you wish for assembling your nodes into this format. To
@@ -94,7 +130,7 @@ necessary to netboot the nodes by running Grendel:
 
 !!! warning
     If your nodes are actively sending DHCP PXE boot requests these nodes will
-    be booted into Flatcar
+    be booted into Ubuntu
 
 ```
 sudo ./grendel --verbose serve --hosts hosts.json --images boot-image.json

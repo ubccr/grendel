@@ -40,4 +40,5 @@ nav:
         - Dynamic DHCP Router: advanced/router.md
         - HTTPS and Code Signing: advanced/https.md
         - Kickstarting Live Images: advanced/kslive.md
+    - Production Deployment: production.md
 #    - Background: background.md
