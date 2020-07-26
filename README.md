@@ -32,7 +32,8 @@ Feedback and pull requests are more than welcome!
 ## Quickstart with QEMU/KVM
 
 The following steps will show how to PXE boot a linux virtual machine using
-QEMU/KVM and install Flatcar linux using Grendel.
+QEMU/KVM and install Flatcar linux using Grendel. A demo of installing and using 
+Grendel can be found [here](https://asciinema.org/a/b17YFY2uTpRotvUnXx8TVXx39).
 
 ### Installation
 
