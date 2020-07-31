@@ -138,20 +138,11 @@ $ grendel discover dhcp --subnet 10.64.0.0 --nodeset tux-[01-100]
 ### Discover hosts using a file
 
 If you have an existing DHCP server you can load hosts into Grendel using a
-`dhcpd.leases` file. An example `dhcpd.leases` file looks like this:
-
-```
-TODO
-```
-
-### Discover hosts using a file
-
-Grendel also supports loading hosts via a simple text file. You can use this
-method if you have obtained the host names, IP, and MAC addresses via other
-means and simply want to load these into Grendel.
+`dhcpd.leases` file. Grendel also supports loading hosts via a simple tab
+delimited text file. You can use this method if you have obtained the host
+names, IP, and MAC addresses via other means and simply want to load these into
+Grendel.
 
 ```
 $ grendel discover file --input hosts.txt
 ```
-
-## Network OS Install

@@ -36,9 +36,10 @@ nav:
     - What is Grendel?: index.md
     - Introduction: intro.md
     - Quick Start: quickstart.md
+    - Background: background.md
+    - Production Deployment: production.md
+    - Publications: publications.md
     - Advanced:
         - Dynamic DHCP Router: advanced/router.md
         - HTTPS and Code Signing: advanced/https.md
         - Kickstarting Live Images: advanced/kslive.md
-    - Production Deployment: production.md
-#    - Background: background.md
