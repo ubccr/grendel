@@ -147,7 +147,7 @@ func serveDHCP(t *tomb.Tomb) error {
 
 	if viper.IsSet("dhcp.router") {
 		routerIP := net.ParseIP(viper.GetString("dhcp.router"))
-		if routerIP != nil || routerIP.To4() == nil {
+		if routerIP == nil || routerIP.To4() == nil {
 			return fmt.Errorf("Invalid router ip address: %s", viper.GetString("dhcp.router"))
 		}
 
