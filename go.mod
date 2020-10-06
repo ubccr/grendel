@@ -13,13 +13,12 @@ require (
 	github.com/hako/branca v0.0.0-20191227164554-3b9970524189
 	github.com/hashicorp/go-retryablehttp v0.6.6
 	github.com/hugelgupf/socketpair v0.0.0-20190730060125-05d35a94e714 // indirect
-	github.com/insomniacslk/dhcp v0.0.0-20191120203056-ec0e0154d15c
+	github.com/insomniacslk/dhcp v0.0.0-20200922210017-67c425063dca
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/korovkin/limiter v0.0.0-20190919045942-dac5a6b2a536
 	github.com/labstack/echo/v4 v4.1.11
 	github.com/labstack/gommon v0.3.0
 	github.com/mdlayher/ethernet v0.0.0-20190606142754-0394541c37b7 // indirect
-	github.com/mdlayher/raw v0.0.0-20190606144222-a54781e5f38f // indirect
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b // indirect
 	github.com/miekg/dns v1.1.24
 	github.com/mitchellh/go-homedir v1.1.0
@@ -38,18 +37,16 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.6.2
 	github.com/stmcginnis/gofish v0.2.0
-	github.com/stretchr/testify v1.4.0
+	github.com/stretchr/testify v1.6.1
 	github.com/tidwall/buntdb v1.1.2
 	github.com/tidwall/gjson v1.3.4
 	github.com/tidwall/sjson v1.0.4
-	github.com/u-root/u-root v5.0.0+incompatible // indirect
 	github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb
 	github.com/vmware/goipmi v0.0.0-20181114221114-2333cd82d702
 	github.com/willf/bitset v1.1.10
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 	golang.org/x/crypto v0.0.0-20200117160349-530e935923ad // indirect
 	golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
-	golang.org/x/sys v0.0.0-20200124204421-9fbb57f87de9 // indirect
 	gopkg.in/ini.v1 v1.51.1 // indirect
 	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637
 	gopkg.in/yaml.v2 v2.2.8 // indirect

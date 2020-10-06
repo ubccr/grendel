@@ -202,7 +202,7 @@ func (s *PXEServer) serve() error {
 				log.Errorf("Failed to read packet: %s", err)
 			}
 		} else {
-			log.Printf("Handling request from %v", peer)
+			log.Debugf("Handling request from %v", peer)
 
 			m, err := dhcpv4.FromBytes(buf[:n])
 			if err != nil {

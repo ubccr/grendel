@@ -43,7 +43,7 @@ func (s *Server) staticHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) erro
 	log.Debugf(req.Summary())
 
 	if s.Netmask != nil {
-		resp.Options.Update(dhcpv4.OptSubnetMask(s.Netmask))
+		resp.UpdateOption(dhcpv4.OptSubnetMask(s.Netmask))
 	}
 
 	var router net.IP
@@ -57,13 +57,13 @@ func (s *Server) staticHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) erro
 
 	if router != nil {
 		routers := []net.IP{router}
-		resp.Options.Update(dhcpv4.OptRouter(routers...))
+		resp.UpdateOption(dhcpv4.OptRouter(routers...))
 	}
 
-	resp.Options.Update(dhcpv4.OptIPAddressLeaseTime(s.LeaseTime))
+	resp.UpdateOption(dhcpv4.OptIPAddressLeaseTime(s.LeaseTime))
 
 	if len(s.DNSServers) > 0 && req.IsOptionRequested(dhcpv4.OptionDomainNameServer) {
-		resp.Options.Update(dhcpv4.OptDNS(s.DNSServers...))
+		resp.UpdateOption(dhcpv4.OptDNS(s.DNSServers...))
 	}
 
 	if req.IsOptionRequested(dhcpv4.OptionInterfaceMTU) {
@@ -71,11 +71,11 @@ func (s *Server) staticHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) erro
 	}
 
 	if len(nic.FQDN) > 0 {
-		resp.Options.Update(dhcpv4.OptHostName(nic.FQDN))
+		resp.UpdateOption(dhcpv4.OptHostName(nic.FQDN))
 	}
 
 	if len(s.DomainSearchList) > 0 {
-		resp.Options.Update(dhcpv4.OptDomainSearch(&rfc1035label.Labels{
+		resp.UpdateOption(dhcpv4.OptDomainSearch(&rfc1035label.Labels{
 			Labels: s.DomainSearchList,
 		}))
 	}
@@ -103,8 +103,13 @@ func (s *Server) staticAckHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) e
 
 	nic := host.Interface(req.ClientHWAddr)
 	if !nic.IP.Equal(requestedIP) {
-		// TODO Need to return NACK here
-		return fmt.Errorf("Requested IP address does not match this hardware address. Got %v, want %v", requestedIP, nic.IP)
+		// Need to return NACK here. The client is asking for a different IP
+		// address than what's configured in Grendel.
+		msg := fmt.Sprintf("Requested IP address %v does not match address configured in Grendel: %v", requestedIP, nic.IP)
+		log.Info(msg)
+		resp.UpdateOption(dhcpv4.OptMessage(msg))
+		resp.UpdateOption(dhcpv4.OptMessageType(dhcpv4.MessageTypeNak))
+		return nil
 	}
 
 	if req.ClientIPAddr != nil && !req.ClientIPAddr.Equal(net.IPv4zero) {
