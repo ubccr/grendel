@@ -116,7 +116,6 @@ func (s *Server) mainHandler4(peer net.Addr, req *dhcpv4.DHCPv4) {
 	}
 
 	resp, err := dhcpv4.NewReplyFromRequest(req,
-		//dhcpv4.WithBroadcast(true),
 		dhcpv4.WithServerIP(s.ServerAddress),
 		dhcpv4.WithMessageType(dhcpv4.MessageTypeOffer),
 		dhcpv4.WithOption(dhcpv4.OptClassIdentifier("PXEClient")),
@@ -149,10 +148,11 @@ func (s *Server) mainHandler4(peer net.Addr, req *dhcpv4.DHCPv4) {
 		if !s.ProxyOnly {
 			err := s.staticHandler4(host, req, resp)
 			if err != nil {
+				log.Errorf("Failed to add client ip to DHCP DISCOVER: %s", err)
 				return
 			}
 		}
-	case dhcpv4.MessageTypeRequest:
+	case dhcpv4.MessageTypeRequest, dhcpv4.MessageTypeInform:
 		if s.ProxyOnly {
 			return
 		}

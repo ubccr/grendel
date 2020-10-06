@@ -36,9 +36,10 @@ func (s *Server) staticHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) erro
 
 	resp.YourIPAddr = nic.IP
 	log.WithFields(logrus.Fields{
-		"ip":   nic.IP.String(),
-		"mac":  req.ClientHWAddr.String(),
-		"name": host.Name,
+		"ip":           nic.IP.String(),
+		"mac":          req.ClientHWAddr.String(),
+		"name":         host.Name,
+		"dhcp_message": req.MessageType().String(),
 	}).Info("Found host")
 	log.Debugf(req.Summary())
 
