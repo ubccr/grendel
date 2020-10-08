@@ -29,7 +29,6 @@ import (
 
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
-	log_prefixed "github.com/x-cray/logrus-prefixed-formatter"
 )
 
 var (
@@ -46,7 +45,7 @@ func GetLogger(prefix string) *logrus.Entry {
 		getLoggerMutex.Lock()
 		defer getLoggerMutex.Unlock()
 		logger := logrus.New()
-		logger.SetFormatter(&log_prefixed.TextFormatter{
+		logger.SetFormatter(&TextFormatter{
 			FullTimestamp: true,
 		})
 		globalLogger = logger

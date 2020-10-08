@@ -12,6 +12,12 @@
 #
 dbpath = ":memory:"
 
+#
+# By default, all loggers are on. You can turn off logging for specific
+# services here.
+#
+loggers = {cli="on", tftp="off", dhcp="on", dns="off", provision="on", api="on", pxe="off"}
+
 #------------------------------------------------------------------------------
 # HTTP Provision Server
 #------------------------------------------------------------------------------
