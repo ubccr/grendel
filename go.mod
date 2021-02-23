@@ -1,9 +1,8 @@
 module github.com/ubccr/grendel
 
-go 1.13
+go 1.16
 
 require (
-	github.com/GeertJohan/go.rice v1.0.0
 	github.com/Pallinder/go-randomdata v1.2.0
 	github.com/alouca/gologger v0.0.0-20120904114645-7d4b7291de9c // indirect
 	github.com/alouca/gosnmp v0.0.0-20170620005048-04d83944c9ab

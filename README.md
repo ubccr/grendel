@@ -129,7 +129,7 @@ $ qemu-system-x86_64 -m 2048 -boot n -device e1000,netdev=net0,mac=DE:AD:BE:EF:1
 
 ## Hacking
 
-Building Grendel requires Go v1.13 or greater:
+Building Grendel requires Go v1.16 or greater:
 
 ```
 $ git clone https://github.com/ubccr/grendel

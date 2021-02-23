@@ -18,41 +18,47 @@
 package provision
 
 import (
+	_ "embed"
 	"io"
+	"path/filepath"
 	"text/template"
 
-	"github.com/GeertJohan/go.rice"
 	"github.com/labstack/echo/v4"
 )
+
+const defaultTemplateGlob = "/usr/share/grendel/templates/*.tmpl"
+
+//go:embed templates/ipxe.tmpl
+var ipxeTmpl string
+
+//go:embed templates/kickstart.tmpl
+var kickstartTmpl string
 
 type TemplateRenderer struct {
 	templates *template.Template
 }
 
 func NewTemplateRenderer() (*TemplateRenderer, error) {
-	templateBox, err := rice.FindBox("templates")
+	tmpl, err := template.New("ipxe.tmpl").Parse(ipxeTmpl)
 	if err != nil {
 		return nil, err
 	}
 
-	ipxeString, err := templateBox.String("ipxe.tmpl")
+	tmpl, err = tmpl.New("kickstart.tmpl").Parse(kickstartTmpl)
 	if err != nil {
 		return nil, err
 	}
 
-	tmpl, err := template.New("ipxe.tmpl").Parse(ipxeString)
+	matches, err := filepath.Glob(defaultTemplateGlob)
 	if err != nil {
 		return nil, err
 	}
 
-	kickstartString, err := templateBox.String("kickstart.tmpl")
-	if err != nil {
-		return nil, err
-	}
-
-	tmpl, err = tmpl.New("kickstart.tmpl").Parse(kickstartString)
-	if err != nil {
-		return nil, err
+	if len(matches) > 0 {
+		tmpl, err = tmpl.ParseGlob(defaultTemplateGlob)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	t := &TemplateRenderer{
