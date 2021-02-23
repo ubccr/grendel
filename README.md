@@ -129,11 +129,15 @@ $ qemu-system-x86_64 -m 2048 -boot n -device e1000,netdev=net0,mac=DE:AD:BE:EF:1
 
 ## Hacking
 
-Building Grendel requires Go v1.16 or greater:
+Building Grendel requires Go v1.16 or greater. Building iPXE requires packages
+lzma-sdk-devel and xz-devel:
 
 ```
-$ git clone https://github.com/ubccr/grendel
-$ cd grendel
+$ git clone --recursive https://github.com/ubccr/grendel
+$ cd grendel/firmware
+$ make build
+$ make bindata
+$ cd ..
 $ go build .
 $ ./grendel help
 Bare Metal Provisioning for HPC
@@ -146,13 +150,15 @@ Available Commands:
   discover    Auto-discover commands
   help        Help about any command
   host        Host commands
+  image       Boot Image commands
   serve       Run services
 
 Flags:
-  -c, --config string   config file
-      --debug           Enable debug messages
-  -h, --help            help for grendel
-      --verbose         Enable verbose messages
+  -c, --config string     config file
+      --debug             Enable debug messages
+      --endpoint string   Grendel API endpoint (default "grendel-api.socket")
+  -h, --help              help for grendel
+      --verbose           Enable verbose messages
 
 Use "grendel [command] --help" for more information about a command.
 ```

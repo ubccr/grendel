@@ -8,10 +8,8 @@
 # 
 # - lzma-sdk-devel
 # - xz-devel
-# - go-bindata
 #
 # $ yum install lzma-sdk-devel xz-devel
-# $ go get -u github.com/go-bindata/go-bindata/...
 #
 #
 # Credits:
@@ -68,8 +66,6 @@ bindata:
 	mv -f ipxe/src/bin-x86_64-efi/ipxe.efi bin/ipxe-x86_64.efi
 	mv -f ipxe/src/bin-x86_64-efi/snponly.efi bin/snponly-x86_64.efi
 	mv -f ipxe/src/bin-i386-efi/ipxe.efi bin/ipxe-i386.efi
-	go-bindata -o ipxe-bin.go -pkg firmware -nometadata -nomemcopy -prefix bin/ bin/
-	gofmt -s -w ipxe-bin.go
 
 .PHONY: clean
 clean:

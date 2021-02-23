@@ -18,6 +18,7 @@
 package firmware
 
 import (
+	_ "embed"
 	"fmt"
 
 	"github.com/insomniacslk/dhcp/iana"
@@ -34,8 +35,20 @@ const (
 	GRENDEL
 )
 
-// buildToBinary maps a Build to the raw bytes of the binary build
-var buildToBinary map[Build][]byte
+//go:embed bin/ipxe.pxe
+var ipxeBin []byte
+
+//go:embed bin/ipxe-i386.efi
+var efi386Bin []byte
+
+//go:embed bin/ipxe-x86_64.efi
+var efi64Bin []byte
+
+//go:embed bin/snponly-x86_64.efi
+var snpBin []byte
+
+//go:embed bin/undionly.kpxe
+var undiBin []byte
 
 // buildToStringMap maps a Build to a binary build name
 var buildToStringMap = map[Build]string{
@@ -69,19 +82,20 @@ func (b Build) IsNil() bool {
 }
 
 func (b Build) ToBytes() []byte {
-	if bt, ok := buildToBinary[b]; ok {
-		return bt
+	switch b {
+	case IPXE:
+		return ipxeBin
+	case EFI386:
+		return efi386Bin
+	case EFI64:
+		return efi64Bin
+	case SNPONLY:
+		return snpBin
+	case UNDI:
+		return undiBin
 	}
-	return nil
-}
 
-func init() {
-	buildToBinary = make(map[Build][]byte, 0)
-	buildToBinary[IPXE] = MustAsset(IPXE.String())
-	buildToBinary[EFI386] = MustAsset(EFI386.String())
-	buildToBinary[EFI64] = MustAsset(EFI64.String())
-	buildToBinary[SNPONLY] = MustAsset(SNPONLY.String())
-	buildToBinary[UNDI] = MustAsset(UNDI.String())
+	return nil
 }
 
 func DetectBuild(archs iana.Archs, userClass string) (Build, error) {
