@@ -163,8 +163,8 @@ func (s *Server) Serve(defaultImageName string) error {
 
 	httpServer := &http.Server{
 		Addr:         fmt.Sprintf("%s:%d", s.ListenAddress, s.Port),
-		ReadTimeout:  5 * time.Minute,
-		WriteTimeout: 5 * time.Minute,
+		ReadTimeout:  15 * time.Minute,
+		WriteTimeout: 15 * time.Minute,
 		IdleTimeout:  120 * time.Second,
 	}
 
