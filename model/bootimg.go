@@ -19,6 +19,7 @@ package model
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/segmentio/ksuid"
 )
@@ -26,13 +27,14 @@ import (
 type BootImageList []*BootImage
 
 type BootImage struct {
-	ID          ksuid.KSUID `json:"id"`
-	Name        string      `json:"name" validate:"required"`
-	KernelPath  string      `json:"kernel" validate:"required"`
-	InitrdPaths []string    `json:"initrd"`
-	LiveImage   string      `json:"liveimg"`
-	CommandLine string      `json:"cmdline"`
-	Verify      bool        `json:"verify"`
+	ID                ksuid.KSUID `json:"id"`
+	Name              string      `json:"name" validate:"required"`
+	KernelPath        string      `json:"kernel" validate:"required"`
+	InitrdPaths       []string    `json:"initrd"`
+	LiveImage         string      `json:"liveimg"`
+	CommandLine       string      `json:"cmdline"`
+	Verify            bool        `json:"verify"`
+	ProvisionTemplate string      `json:"provision_template"`
 }
 
 func NewBootImageList() BootImageList {
@@ -52,6 +54,12 @@ func (b *BootImage) CheckPathsExist() error {
 
 	if b.LiveImage != "" {
 		if _, err := os.Stat(b.LiveImage); err != nil {
+			return err
+		}
+	}
+
+	if b.ProvisionTemplate != "" {
+		if _, err := os.Stat(filepath.Join("/usr/share/grendel/templates", b.ProvisionTemplate)); err != nil {
 			return err
 		}
 	}

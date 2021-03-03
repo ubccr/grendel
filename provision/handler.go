@@ -229,7 +229,12 @@ func (h *Handler) Kickstart(c echo.Context) error {
 		"rootpw":    viper.GetString("provision.root_password"),
 	}
 
-	return c.Render(http.StatusOK, "kickstart.tmpl", data)
+	tmplName := "kickstart.tmpl"
+	if bootImage.ProvisionTemplate != "" {
+		tmplName = bootImage.ProvisionTemplate
+	}
+
+	return c.Render(http.StatusOK, tmplName, data)
 }
 
 func (h *Handler) Unprovision(c echo.Context) error {
