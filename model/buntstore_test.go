@@ -147,6 +147,69 @@ func TestBuntStoreHostFind(t *testing.T) {
 	}
 }
 
+func TestBuntStoreFindTags(t *testing.T) {
+	assert := assert.New(t)
+
+	store, err := model.NewBuntStore(":memory:")
+	defer store.Close()
+	assert.NoError(err)
+
+	size := 10
+	for i := 0; i < size; i++ {
+		host := tests.HostFactory.MustCreate().(*model.Host)
+		host.Name = fmt.Sprintf("tux-%02d", i)
+		if (i % 2) == 0 {
+			host.Tags = []string{"k11", "wanda"}
+		} else if (i % 2) != 0 {
+			host.Tags = []string{"k16", "vision"}
+		}
+		err := store.StoreHost(host)
+		assert.NoError(err)
+	}
+
+	ns, err := store.FindTags([]string{"k16"})
+	if assert.NoError(err) {
+		assert.Equal(5, ns.Len())
+	}
+
+	ns, err = store.FindTags([]string{"vision"})
+	if assert.NoError(err) {
+		assert.Equal(5, ns.Len())
+	}
+
+	ns, err = store.FindTags([]string{"vision", "k11"})
+	if assert.NoError(err) {
+		assert.Equal(10, ns.Len())
+	}
+
+	ns, err = store.FindTags([]string{"harkness", "rambeau"})
+	if assert.Error(err) {
+		assert.True(errors.Is(err, model.ErrNotFound))
+	}
+
+	ns, err = nodeset.NewNodeSet("tux-[05-08]")
+	if assert.NoError(err) {
+		err := store.TagHosts(ns, []string{"harkness"})
+		assert.NoError(err)
+	}
+
+	ns, err = store.FindTags([]string{"harkness"})
+	if assert.NoError(err) {
+		assert.Equal(4, ns.Len())
+	}
+
+	ns, err = nodeset.NewNodeSet("tux-[00-10]")
+	if assert.NoError(err) {
+		err := store.UntagHosts(ns, []string{"vision"})
+		assert.NoError(err)
+	}
+
+	ns, err = store.FindTags([]string{"vision"})
+	if assert.Error(err) {
+		assert.True(errors.Is(err, model.ErrNotFound))
+	}
+}
+
 func TestBuntStoreProvision(t *testing.T) {
 	assert := assert.New(t)
 

@@ -317,6 +317,41 @@ func (s *BuntStore) FindHosts(ns *nodeset.NodeSet) (HostList, error) {
 	return hosts, nil
 }
 
+// FindTags returns a nodeset.NodeSet of all the hosts with the given tags
+func (s *BuntStore) FindTags(tags []string) (*nodeset.NodeSet, error) {
+	nodes := []string{}
+
+	tagMap := make(map[string]struct{})
+	for _, t := range tags {
+		tagMap[t] = struct{}{}
+	}
+
+	err := s.db.View(func(tx *buntdb.Tx) error {
+		err := tx.AscendKeys(HostKeyPrefix+":*", func(key, value string) bool {
+			res := gjson.Get(value, "tags")
+			for _, i := range res.Array() {
+				if _, ok := tagMap[i.String()]; ok {
+					nodes = append(nodes, gjson.Get(value, "name").String())
+				}
+			}
+
+			return true
+		})
+
+		return err
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(nodes) == 0 {
+		return nil, fmt.Errorf("no hosts found with tags %#v:  %w", tags, ErrNotFound)
+	}
+
+	return nodeset.NewNodeSet(strings.Join(nodes, ","))
+}
+
 // ProvisionHosts sets all hosts in the given NodeSet to provision (true) or unprovision (false)
 func (s *BuntStore) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
 	it := ns.Iterator()
@@ -334,6 +369,121 @@ func (s *BuntStore) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
 			}
 
 			val, err = sjson.Set(val, "provision", provision)
+			if err != nil {
+				return err
+			}
+
+			_, _, err = tx.Set(key, val, nil)
+			if err != nil {
+				return err
+			}
+
+			count++
+		}
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if count == 0 {
+		return fmt.Errorf("no hosts found with nodeset %s:  %w", ns.String(), ErrNotFound)
+	}
+
+	return nil
+}
+
+// TagHosts adds tags to all hosts in the given NodeSet
+func (s *BuntStore) TagHosts(ns *nodeset.NodeSet, tags []string) error {
+	it := ns.Iterator()
+	count := 0
+
+	err := s.db.Update(func(tx *buntdb.Tx) error {
+		for it.Next() {
+			key := HostKeyPrefix + ":" + it.Value()
+			val, err := tx.Get(key, false)
+			if err != nil {
+				if err != buntdb.ErrNotFound {
+					return err
+				}
+				continue
+			}
+
+			uniqTags := make(map[string]struct{})
+			res := gjson.Get(val, "tags")
+
+			// Add existing  tags
+			for _, i := range res.Array() {
+				uniqTags[i.String()] = struct{}{}
+			}
+
+			// Add new tags
+			for _, t := range tags {
+				uniqTags[t] = struct{}{}
+			}
+
+			tagSlice := make([]string, 0, len(uniqTags))
+			for v := range uniqTags {
+				tagSlice = append(tagSlice, v)
+			}
+
+			val, err = sjson.Set(val, "tags", tagSlice)
+			if err != nil {
+				return err
+			}
+
+			_, _, err = tx.Set(key, val, nil)
+			if err != nil {
+				return err
+			}
+
+			count++
+		}
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if count == 0 {
+		return fmt.Errorf("no hosts found with nodeset %s:  %w", ns.String(), ErrNotFound)
+	}
+
+	return nil
+}
+
+// UntagHosts removes tags from all hosts in the given NodeSet
+func (s *BuntStore) UntagHosts(ns *nodeset.NodeSet, tags []string) error {
+	it := ns.Iterator()
+	count := 0
+
+	removeTags := make(map[string]struct{})
+	for _, t := range tags {
+		removeTags[t] = struct{}{}
+	}
+
+	err := s.db.Update(func(tx *buntdb.Tx) error {
+		for it.Next() {
+			key := HostKeyPrefix + ":" + it.Value()
+			val, err := tx.Get(key, false)
+			if err != nil {
+				if err != buntdb.ErrNotFound {
+					return err
+				}
+				continue
+			}
+
+			tagSlice := []string{}
+			res := gjson.Get(val, "tags")
+			for _, i := range res.Array() {
+				if _, ok := removeTags[i.String()]; !ok {
+					tagSlice = append(tagSlice, i.String())
+				}
+			}
+
+			val, err = sjson.Set(val, "tags", tagSlice)
 			if err != nil {
 				return err
 			}
