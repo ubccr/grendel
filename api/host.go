@@ -87,6 +87,35 @@ func (h *Handler) HostFind(c echo.Context) error {
 	return c.JSON(http.StatusOK, hostList)
 }
 
+func (h *Handler) HostFindByTags(c echo.Context) error {
+	_, tagStr := path.Split(c.Request().URL.Path)
+	if tagStr == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid list of tags")
+	}
+
+	tags := strings.Split(tagStr, ",")
+	if len(tags) == 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid list of tags")
+	}
+
+	log.Infof("Got tags: %s", tags)
+
+	ns, err := h.DB.FindTags(tags)
+	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return c.JSON(http.StatusOK, model.HostList{})
+		}
+
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to find nodeset with tags").SetInternal(err)
+	}
+
+	hostList, err := h.DB.FindHosts(ns)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fetch hosts by tag").SetInternal(err)
+	}
+	return c.JSON(http.StatusOK, hostList)
+}
+
 func (h *Handler) hostSetProvision(c echo.Context, provision bool) error {
 	_, nodesetString := path.Split(c.Request().URL.Path)
 
@@ -121,4 +150,63 @@ func (h *Handler) HostProvision(c echo.Context) error {
 
 func (h *Handler) HostUnprovision(c echo.Context) error {
 	return h.hostSetProvision(c, false)
+}
+
+func (h *Handler) hostSetTags(c echo.Context, remove bool) error {
+	_, nodesetString := path.Split(c.Request().URL.Path)
+
+	nodeset, err := nodeset.NewNodeSet(nodesetString)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid nodeset").SetInternal(err)
+	}
+
+	tagStr := c.QueryParam("tags")
+	if tagStr == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid list of tags")
+	}
+
+	tags := strings.Split(tagStr, ",")
+	if len(tags) == 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid list of tags")
+	}
+
+	log.Infof("Got tags: %s", tags)
+	log.Infof("Got nodeset: %s", nodeset.String())
+
+	if remove {
+		err = h.DB.UntagHosts(nodeset, tags)
+	} else {
+		err = h.DB.TagHosts(nodeset, tags)
+	}
+
+	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			return echo.NewHTTPError(http.StatusBadRequest, "No hosts found in nodeset").SetInternal(err)
+		}
+
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to update hosts tag property").SetInternal(err)
+	}
+
+	verb := "add"
+	if remove {
+		verb = "remove"
+	}
+
+	log.Infof("Set %d hosts %s tags=%s", nodeset.Len(), verb, tags)
+
+	res := map[string]interface{}{
+		"hosts":  nodeset.Len(),
+		"tags":   tags,
+		"action": verb,
+	}
+
+	return c.JSON(http.StatusOK, res)
+}
+
+func (h *Handler) HostTag(c echo.Context) error {
+	return h.hostSetTags(c, false)
+}
+
+func (h *Handler) HostUntag(c echo.Context) error {
+	return h.hostSetTags(c, true)
 }

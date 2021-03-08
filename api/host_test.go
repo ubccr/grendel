@@ -168,6 +168,61 @@ func TestHostFind(t *testing.T) {
 	}
 }
 
+func TestHostFindByTags(t *testing.T) {
+	assert := assert.New(t)
+
+	h := &Handler{newTestDB(t)}
+
+	size := 10
+	for i := 0; i < size; i++ {
+		host := tests.HostFactory.MustCreate().(*model.Host)
+		host.Name = fmt.Sprintf("tux-%02d", i)
+		if (i % 2) == 0 {
+			host.Tags = []string{"d13", "ib"}
+		} else if (i % 2) != 0 {
+			host.Tags = []string{"d16", "noib"}
+		}
+		err := h.DB.StoreHost(host)
+		assert.NoError(err)
+	}
+
+	testResults := map[string]int{
+		"/host/tags/ib":           5,
+		"/host/tags/ib,noib":      10,
+		"/host/tags/doesnotexist": 0,
+	}
+
+	e := newEcho()
+
+	for path, count := range testResults {
+		req := httptest.NewRequest(http.MethodGet, path, nil)
+		req.Header.Set(echo.HeaderAccept, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		if assert.NoError(h.HostFindByTags(c)) {
+			assert.Equal(http.StatusOK, rec.Code)
+			assert.Equal(count, len(gjson.Parse(rec.Body.String()).Array()))
+		}
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/host/tags/", nil)
+	req.Header.Set(echo.HeaderAccept, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	err := h.HostFindByTags(c)
+	if assert.Error(err) {
+		he, ok := err.(*echo.HTTPError)
+		if ok {
+			assert.Equal(http.StatusBadRequest, he.Code)
+		}
+		e.HTTPErrorHandler(err, c)
+		assert.Equal(http.StatusBadRequest, rec.Code)
+		assert.True(gjson.Get(rec.Body.String(), "message").Exists())
+	}
+}
+
 func TestHostFindNone(t *testing.T) {
 	assert := assert.New(t)
 
@@ -263,5 +318,51 @@ func TestHostProvision(t *testing.T) {
 			}
 		}
 		assert.Equal(10, count)
+	}
+}
+
+func TestHostTag(t *testing.T) {
+	assert := assert.New(t)
+
+	h := &Handler{newTestDB(t)}
+
+	size := 20
+	for i := 0; i < size; i++ {
+		host := tests.HostFactory.MustCreate().(*model.Host)
+		host.Provision = false
+		host.Name = fmt.Sprintf("tux-%02d", i)
+		err := h.DB.StoreHost(host)
+		assert.NoError(err)
+	}
+
+	hostList, err := h.DB.Hosts()
+	if assert.NoError(err) {
+		count := 0
+		for _, host := range hostList {
+			if len(host.Tags) > 0 {
+				count++
+			}
+		}
+		assert.Equal(0, count)
+	}
+
+	e := newEcho()
+
+	req := httptest.NewRequest(http.MethodPut, "/host/tag/tux-[05-14]", nil)
+	params := req.URL.Query()
+	params.Add("tags", "ib")
+	req.URL.RawQuery = params.Encode()
+
+	req.Header.Set(echo.HeaderAccept, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	if assert.NoError(h.HostTag(c)) {
+		assert.Equal(http.StatusOK, rec.Code)
+	}
+
+	ns, err := h.DB.FindTags([]string{"ib"})
+	if assert.NoError(err) {
+		assert.Equal(10, ns.Len())
 	}
 }
