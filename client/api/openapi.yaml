@@ -85,9 +85,46 @@ paths:
       summary: Find hosts by name or nodeset
       tags:
       - host
+  /host/tags/{tags}:
+    get:
+      description: Returns a list of hosts with the given tags
+      operationId: hostTags
+      parameters:
+      - description: 'comman separated list of tags. Example: ib,noib,k16'
+        explode: false
+        in: path
+        name: tags
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Host'
+                type: array
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid tags supplied
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Failed to fetch hosts by tag from database
+      summary: Find hosts by tags
+      tags:
+      - host
   /host/provision/{nodeSet}:
     put:
-      description: Sets hosts to to provision in the given nodeset
+      description: Sets hosts to provision in the given nodeset
       operationId: hostProvision
       parameters:
       - description: 'nodeset syntax. Example: cpn-d13-[01-100]'
@@ -119,7 +156,7 @@ paths:
       - host
   /host/unprovision/{nodeSet}:
     put:
-      description: Sets hosts to to unprovision in the given nodeset
+      description: Sets hosts to unprovision in the given nodeset
       operationId: hostUnprovision
       parameters:
       - description: 'nodeset syntax. Example: cpn-d13-[01-100]'
@@ -147,6 +184,86 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
           description: Failed to fetch hosts from database
       summary: Set hosts to unprovision by name or nodeset
+      tags:
+      - host
+  /host/tag/{nodeSet}:
+    put:
+      description: Tag hosts in the given nodeset
+      operationId: hostTag
+      parameters:
+      - description: 'nodeset syntax. Example: cpn-d13-[01-100]'
+        explode: false
+        in: path
+        name: nodeSet
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: 'list of tags. Example: ib,noib,k16'
+        explode: true
+        in: query
+        name: tags
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content: {}
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid nodeset supplied
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Failed to fetch hosts from database
+      summary: Tag hosts by name or nodeset
+      tags:
+      - host
+  /host/untag/{nodeSet}:
+    put:
+      description: Untag hosts the given nodeset
+      operationId: hostUntag
+      parameters:
+      - description: 'nodeset syntax. Example: cpn-d13-[01-100]'
+        explode: false
+        in: path
+        name: nodeSet
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: 'list of tags. Example: ib,noib,k16'
+        explode: true
+        in: query
+        name: tags
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content: {}
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid nodeset supplied
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Failed to fetch hosts from database
+      summary: Untag hosts name or nodeset
       tags:
       - host
   /host:
