@@ -20,9 +20,12 @@ package host
 import (
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd"
+	"github.com/ubccr/grendel/logger"
 )
 
 var (
+	tags    []string
+	log     = logger.GetLogger("HOST")
 	hostCmd = &cobra.Command{
 		Use:   "host",
 		Short: "Host commands",
@@ -31,5 +34,6 @@ var (
 )
 
 func init() {
+	hostCmd.PersistentFlags().StringSliceVarP(&tags, "tags", "t", []string{}, "filter by tags")
 	cmd.Root.AddCommand(hostCmd)
 }

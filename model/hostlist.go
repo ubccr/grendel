@@ -19,6 +19,8 @@ package model
 
 import (
 	"strings"
+
+	"github.com/ubccr/grendel/nodeset"
 )
 
 type HostList []*Host
@@ -33,6 +35,15 @@ func (hl HostList) FilterPrefix(prefix string) HostList {
 	}
 
 	return hl[:n]
+}
+
+func (hl HostList) ToNodeSet() (*nodeset.NodeSet, error) {
+	nodes := []string{}
+	for _, host := range hl {
+		nodes = append(nodes, host.Name)
+	}
+
+	return nodeset.NewNodeSet(strings.Join(nodes, ","))
 }
 
 func NewHostList() HostList {
