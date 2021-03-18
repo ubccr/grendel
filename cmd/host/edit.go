@@ -34,16 +34,39 @@ var (
 		Use:   "edit",
 		Short: "edit hosts",
 		Long:  `edit hosts`,
-		Args:  cobra.MinimumNArgs(1),
+		Args:  cobra.MinimumNArgs(0),
 		RunE: func(command *cobra.Command, args []string) error {
+			if len(args) == 0 && len(tags) == 0 {
+				return fmt.Errorf("Please provide tags (--tags) or a nodeset")
+			}
+
+			if len(args) > 0 && len(tags) > 0 {
+				log.Warn("Using both tags (--tags) and a nodeset is not supported yet. Only nodeset is used.")
+			}
+
 			gc, err := cmd.NewClient()
 			if err != nil {
 				return err
 			}
 
-			hostList, _, err := gc.HostApi.HostFind(context.Background(), strings.Join(args, ","))
-			if err != nil {
-				return cmd.NewApiError("Failed to find hosts to edit", err)
+			var hostList model.HostList
+
+			if len(args) == 1 && strings.ToLower(args[0]) == "all" {
+				hostList, _, err = gc.HostApi.HostList(context.Background())
+				if err != nil {
+					return cmd.NewApiError("Failed to fetch all hosts", err)
+				}
+			} else if len(tags) > 0 && len(args) == 0 {
+				hostList, _, err = gc.HostApi.HostTags(context.Background(), strings.Join(tags, ","))
+				if err != nil {
+					return cmd.NewApiError("Failed to fetch hosts by tag", err)
+				}
+			} else {
+				nodes := strings.Join(args, ",")
+				hostList, _, err = gc.HostApi.HostFind(context.Background(), nodes)
+				if err != nil {
+					return cmd.NewApiError("Failed to fetch hosts", err)
+				}
 			}
 
 			data, err := json.MarshalIndent(hostList, "", "    ")

@@ -43,6 +43,9 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	v1.POST("host", h.HostAdd)
 	v1.GET("host/list", h.HostList)
 	v1.GET("host/find/*", h.HostFind)
+	v1.GET("host/tags/*", h.HostFindByTags)
+	v1.PUT("host/tag/*", h.HostTag)
+	v1.PUT("host/untag/*", h.HostUntag)
 	v1.PUT("host/provision/*", h.HostProvision)
 	v1.PUT("host/unprovision/*", h.HostUnprovision)
 

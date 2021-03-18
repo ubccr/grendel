@@ -131,13 +131,69 @@
         }
       }
     },
+    "/host/tags/{tags}": {
+      "get": {
+        "tags": [
+          "host"
+        ],
+        "summary": "Find hosts by tags",
+        "description": "Returns a list of hosts with the given tags",
+        "operationId": "hostTags",
+        "parameters": [
+          {
+            "name": "tags",
+            "in": "path",
+            "description": "comman separated list of tags. Example: ib,noib,k16",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Host"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid tags supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to fetch hosts by tag from database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/host/provision/{nodeSet}": {
       "put": {
         "tags": [
           "host"
         ],
         "summary": "Set hosts to provision by name or nodeset",
-        "description": "Sets hosts to to provision in the given nodeset",
+        "description": "Sets hosts to provision in the given nodeset",
         "operationId": "hostProvision",
         "parameters": [
           {
@@ -184,13 +240,125 @@
           "host"
         ],
         "summary": "Set hosts to unprovision by name or nodeset",
-        "description": "Sets hosts to to unprovision in the given nodeset",
+        "description": "Sets hosts to unprovision in the given nodeset",
         "operationId": "hostUnprovision",
         "parameters": [
           {
             "name": "nodeSet",
             "in": "path",
             "description": "nodeset syntax. Example: cpn-d13-[01-100]",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": { }
+          },
+          "400": {
+            "description": "Invalid nodeset supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to fetch hosts from database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/host/tag/{nodeSet}": {
+      "put": {
+        "tags": [
+          "host"
+        ],
+        "summary": "Tag hosts by name or nodeset",
+        "description": "Tag hosts in the given nodeset",
+        "operationId": "hostTag",
+        "parameters": [
+          {
+            "name": "nodeSet",
+            "in": "path",
+            "description": "nodeset syntax. Example: cpn-d13-[01-100]",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "description": "list of tags. Example: ib,noib,k16",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": { }
+          },
+          "400": {
+            "description": "Invalid nodeset supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to fetch hosts from database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/host/untag/{nodeSet}": {
+      "put": {
+        "tags": [
+          "host"
+        ],
+        "summary": "Untag hosts name or nodeset",
+        "description": "Untag hosts the given nodeset",
+        "operationId": "hostUntag",
+        "parameters": [
+          {
+            "name": "nodeSet",
+            "in": "path",
+            "description": "nodeset syntax. Example: cpn-d13-[01-100]",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "description": "list of tags. Example: ib,noib,k16",
             "required": true,
             "schema": {
               "type": "string"

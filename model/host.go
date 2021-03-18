@@ -36,6 +36,7 @@ type Host struct {
 	Provision  bool            `json:"provision"`
 	Firmware   firmware.Build  `json:"firmware"`
 	BootImage  string          `json:"boot_image"`
+	Tags       []string        `json:"tags"`
 }
 
 func (h *Host) Interface(mac net.HardwareAddr) *NetInterface {
@@ -76,10 +77,15 @@ func (h *Host) FromJSON(hostJSON string) {
 		nic.MAC, _ = net.ParseMAC(i.Get("mac").String())
 		h.Interfaces = append(h.Interfaces, nic)
 	}
+
+	tres := gjson.Get(hostJSON, "tags")
+	for _, i := range tres.Array() {
+		h.Tags = append(h.Tags, i.String())
+	}
 }
 
 func (h *Host) ToJSON() string {
-	hostJSON := `{"firmware": "", "interfaces": [], "name": "", "provision": false, "kickstart": false, "boot_image": ""}`
+	hostJSON := `{"firmware": "", "interfaces": [], "name": "", "provision": false, "kickstart": false, "boot_image": "", "tags": []}`
 
 	if !h.ID.IsNil() {
 		hostJSON, _ = sjson.Set(hostJSON, "id", h.ID.String())
@@ -98,6 +104,10 @@ func (h *Host) ToJSON() string {
 			"bmc":    nic.BMC,
 		}
 		hostJSON, _ = sjson.Set(hostJSON, "interfaces.-1", n)
+	}
+
+	for _, t := range h.Tags {
+		hostJSON, _ = sjson.Set(hostJSON, "tags.-1", t)
 	}
 
 	return hostJSON
