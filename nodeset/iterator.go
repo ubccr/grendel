@@ -17,6 +17,12 @@
 
 package nodeset
 
+import (
+	"sort"
+
+	"github.com/segmentio/fasthash/fnv1a"
+)
+
 type NodeSetIterator struct {
 	nodes   []string
 	current int
@@ -38,4 +44,69 @@ func (i *NodeSetIterator) Len() int {
 
 func (i *NodeSetIterator) Value() string {
 	return i.nodes[i.current]
+}
+
+type RangeSetNDIterator struct {
+	vects   [][]int
+	seen    map[uint64]struct{}
+	current int
+}
+
+func NewRangeSetNDIterator() *RangeSetNDIterator {
+	return &RangeSetNDIterator{
+		vects:   make([][]int, 0),
+		seen:    make(map[uint64]struct{}),
+		current: -1,
+	}
+}
+
+func (i *RangeSetNDIterator) Next() bool {
+	i.current++
+
+	if i.current < len(i.vects) {
+		return true
+	}
+
+	return false
+}
+
+func (i *RangeSetNDIterator) Len() int {
+	return len(i.vects)
+}
+
+func (i *RangeSetNDIterator) Value() []int {
+	return i.vects[i.current]
+}
+
+func (it *RangeSetNDIterator) Sort() {
+	sort.SliceStable(it.vects, func(i, j int) bool {
+		for x := range it.vects[i] {
+			if it.vects[i][x] != it.vects[j][x] {
+				return it.vects[i][x] < it.vects[j][x]
+			}
+		}
+		return false
+	})
+}
+
+func (it *RangeSetNDIterator) product(result []int, params ...[]int) {
+	if len(params) == 0 {
+		hash := fnv1a.Init64
+		for _, i := range result {
+			hash = fnv1a.AddUint64(hash, uint64(i))
+		}
+
+		if _, ok := it.seen[hash]; !ok {
+			it.seen[hash] = struct{}{}
+			it.vects = append(it.vects, result)
+		}
+
+		return
+	}
+
+	p, params := params[0], params[1:]
+	for i := 0; i < len(p); i++ {
+		resultCopy := append([]int{}, result...)
+		it.product(append(resultCopy, p[i]), params...)
+	}
 }
