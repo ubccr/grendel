@@ -42,22 +42,30 @@ type NodeSet struct {
 }
 
 func NewNodeSet(nodestr string) (*NodeSet, error) {
+	ns := &NodeSet{patterns: make(map[string]*RangeSetND, 0)}
+	err := ns.Add(nodestr)
+	if err != nil {
+		return nil, err
+	}
+
+	return ns, nil
+}
+
+func (ns *NodeSet) Add(nodestr string) error {
 	nodestr = strings.ReplaceAll(nodestr, " ", "")
 	if nodestr == "" {
-		return nil, fmt.Errorf("empty nodeset - %w", ErrParseNodeSet)
+		return fmt.Errorf("empty nodeset - %w", ErrParseNodeSet)
 	}
 
 	ranges := rangeSetRegexp.FindAllStringSubmatch(nodestr, -1)
 	patterns := rangeSetRegexp.ReplaceAllString(nodestr, "%s")
 
 	if strings.Index(patterns, "[") != -1 {
-		return nil, fmt.Errorf("unbalanced '[' found while parsing %s - %w", nodestr, ErrParseNodeSet)
+		return fmt.Errorf("unbalanced '[' found while parsing %s - %w", nodestr, ErrParseNodeSet)
 	}
 	if strings.Index(patterns, "]") != -1 {
-		return nil, fmt.Errorf("unbalanced ']' found while parsing %s - %w", nodestr, ErrParseNodeSet)
+		return fmt.Errorf("unbalanced ']' found while parsing %s - %w", nodestr, ErrParseNodeSet)
 	}
-
-	ns := &NodeSet{patterns: make(map[string]*RangeSetND, 0)}
 
 	ridx := 0
 	for _, pattern := range strings.Split(patterns, ",") {
@@ -74,7 +82,7 @@ func NewNodeSet(nodestr string) (*NodeSet, error) {
 
 		rs, err := NewRangeSetND([][]string{rangeSets})
 		if err != nil {
-			return nil, err
+			return err
 		}
 
 		if _, ok := ns.patterns[pattern]; !ok {
@@ -82,14 +90,14 @@ func NewNodeSet(nodestr string) (*NodeSet, error) {
 		} else {
 			err = ns.patterns[pattern].Update(rs)
 			if err != nil {
-				return nil, err
+				return err
 			}
 		}
 
 		ridx += rangeSetCount
 	}
 
-	return ns, nil
+	return nil
 }
 
 func (ns *NodeSet) Len() int {
