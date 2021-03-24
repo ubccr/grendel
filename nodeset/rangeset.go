@@ -31,9 +31,10 @@ import (
 )
 
 var (
-	ErrInvalidRangeSet = errors.New("invalid range set")
-	ErrParseRangeSet   = errors.New("rangeset parse error")
-	ErrInvalidPadding  = errors.New("invalid padding")
+	ErrInvalidRangeSet      = errors.New("invalid range set")
+	ErrMismatchedDimensions = errors.New("mismatched dimensions")
+	ErrParseRangeSet        = errors.New("rangeset parse error")
+	ErrInvalidPadding       = errors.New("invalid padding")
 )
 
 type RangeSet struct {
@@ -279,6 +280,17 @@ func (rs *RangeSet) Ints() []int {
 	return ints
 }
 
+func (rs *RangeSet) Items() []*RangeSetItem {
+	items := make([]*RangeSetItem, 0)
+	for _, sli := range rs.Slices() {
+		for i := sli.start; i < sli.stop; i += sli.step {
+			items = append(items, &RangeSetItem{value: i, padding: rs.padding})
+		}
+	}
+
+	return items
+}
+
 func (rs *RangeSet) update(slice *Slice) {
 	for i := slice.start; i < slice.stop; i += slice.step {
 		rs.bits.Set(uint(i))
@@ -329,13 +341,15 @@ func NewRangeSetND(args [][]string) (nd *RangeSetND, err error) {
 	return nd, nil
 }
 
-func (rs *RangeSetND) Update(rset *RangeSetND) {
-	if rs.Dim() == 1 {
-		rs.ranges[0][0].AddString(rset.ranges[0][0].String())
-		return
+func (rs *RangeSetND) Update(other *RangeSetND) error {
+	if rs.Dim() != other.Dim() {
+		return fmt.Errorf("mismatched dimensions %d != %d - %w", rs.Dim(), other.Dim(), ErrInvalidRangeSet)
 	}
-	rs.ranges = append(rs.ranges, rset.ranges...)
+
+	rs.ranges = append(rs.ranges, other.ranges...)
 	rs.dirty = true
+
+	return nil
 }
 
 func (nd *RangeSetND) Dim() int {
@@ -376,7 +390,7 @@ func (rs *RangeSetND) Fold() {
 	}
 	if dim == 1 || dimdiff == 1 {
 		for _, set := range rs.ranges[1:] {
-			rs.ranges[0][vardim].AddString(set[vardim].String())
+			rs.ranges[0][vardim].InPlaceUnion(set[vardim])
 		}
 		rs.ranges = [][]*RangeSet{rs.ranges[0]}
 	} else {
@@ -549,6 +563,25 @@ func (nd *RangeSetND) Dump() []string {
 	return out
 }
 
+func (nd *RangeSetND) FormatList() [][]interface{} {
+	nd.Fold()
+	results := make([][]interface{}, 0, len(nd.ranges))
+	for _, rgvec := range nd.ranges {
+		rsets := make([]interface{}, 0, nd.Dim())
+		for _, rs := range rgvec {
+			if rs.Len() > 1 {
+				rsets = append(rsets, fmt.Sprintf("[%s]", rs.String()))
+			} else {
+				rsets = append(rsets, fmt.Sprintf("%s", rs.String()))
+
+			}
+		}
+		results = append(results, rsets)
+	}
+
+	return results
+}
+
 func (nd *RangeSetND) String() string {
 	nd.Fold()
 	var buffer bytes.Buffer
@@ -605,12 +638,12 @@ func (nd *RangeSetND) Iterator() *RangeSetNDIterator {
 	it := NewRangeSetNDIterator()
 
 	for _, rgvec := range nd.ranges {
-		slices := make([][]int, nd.Dim())
+		slices := make([][]*RangeSetItem, nd.Dim())
 		for i, rs := range rgvec {
-			slices[i] = rs.Ints()
+			slices[i] = rs.Items()
 		}
 
-		it.product([]int{}, slices...)
+		it.product([]*RangeSetItem{}, slices...)
 	}
 
 	return it

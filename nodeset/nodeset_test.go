@@ -35,11 +35,23 @@ type testNodeSet struct {
 func TestNodeSetSimple(t *testing.T) {
 	tests := []testNodeSet{
 		testNodeSet{"cws-machin", "cws-machin", 1},
+		testNodeSet{"supercluster0", "supercluster0", 1},
+		testNodeSet{"0cluster", "0cluster", 1},
+		testNodeSet{"[0]cluster", "0cluster", 1},
 		testNodeSet{"cpn-d13-01", "cpn-d13-01", 1},
-		testNodeSet{"cpn-d13-[01]", "cpn-d13-[01]", 1},
+		testNodeSet{"cpn-d13-[01]", "cpn-d13-01", 1},
 		testNodeSet{"cpn-d13-[01-10]", "cpn-d13-[01-10]", 10},
 		testNodeSet{"cpn-k[08-09]-[02-24/2]-[01-02]", "cpn-k[08-09]-[02,04,06,08,10,12,14,16,18,20,22,24]-[01-02]", 48},
-		testNodeSet{"cpn-q[06-09]-[36,35,32,31,28,27,17,16,13,12,09,08,05,04]-[01-02],cpn-q[06-09]-[20,23],cpn-q[07-08]-[39,40]-[01-02]", "cpn-q[06-09]-[04-05,08-09,12-13,16-17,27-28,31-32,35-36]-[01-02],cpn-q[06-09]-[20,23],cpn-q[07-08]-[39-40]-[01-02]", 128},
+		testNodeSet{"cpn-q[06-09]-[36,35,32,31,28,27,17,16,13,12,09,08,05,04]-[01-02],cpn-q[06-09]-[20,23],cpn-q[07-08]-[39,40]-[01-02]", "cpn-q[06-09]-[04-05,08-09,12-13,16-17,27-28,31-32,35-36]-[01-02],cpn-q[07-08]-[39-40]-[01-02],cpn-q[06-09]-[20,23]", 128},
+		testNodeSet{" tigrou2 , tigrou7 , tigrou[5,9-11] ", "tigrou[2,5,7,9-11]", 6},
+		testNodeSet{"clu-0-3", "clu-0-3", 1},
+		testNodeSet{"clu-0-[3-23]", "clu-0-[3-23]", 21},
+		testNodeSet{"cluster[0001-0100]", "cluster[0001-0100]", 100},
+		testNodeSet{"cluster[0034-8127]", "cluster[0034-8127]", 8094},
+		testNodeSet{"cluster[0001,0002,1555-1559]-ipmi", "cluster[0001-0002,1555-1559]-ipmi", 7},
+		testNodeSet{"cluster115,cluster116,cluster117,cluster130,cluster166", "cluster[115-117,130,166]", 5},
+		testNodeSet{"cluster115,cluster116,cluster117,cluster130,cluster[166-169],cluster170", "cluster[115-117,130,166-170]", 9},
+		testNodeSet{"a3b2c0,a2b3c1,a2b4c1,a1b2c0,a1b2c1,a3b2c1,a2b5c1", "a[1,3]b2c[0-1],a2b[3-5]c1", 7},
 	}
 
 	for _, nstest := range tests {

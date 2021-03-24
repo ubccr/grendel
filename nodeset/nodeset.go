@@ -24,27 +24,25 @@ import (
 	"regexp"
 	"sort"
 	"strings"
-
-	"github.com/schwarmco/go-cartesian-product"
 )
 
 var (
 	ErrInvalidNodeSet = errors.New("invalid nodeset")
 	ErrParseNodeSet   = errors.New("nodeset parse error")
-	rangeSetRegexp    = regexp.MustCompile(`(\[[^\[\]]+\])`)
+	rangeSetRegexp    = regexp.MustCompile(`(\[[^\[\]]+\]|[0-9]+)`)
 )
 
 type Pattern struct {
-	format string
-	set    *RangeSetND
+	format   string
+	rangeSet *RangeSetND
 }
 
 type NodeSet struct {
-	pat []*Pattern
+	patterns map[string]*RangeSetND
 }
 
 func NewNodeSet(nodestr string) (*NodeSet, error) {
-	nodestr = strings.TrimSpace(nodestr)
+	nodestr = strings.ReplaceAll(nodestr, " ", "")
 	if nodestr == "" {
 		return nil, fmt.Errorf("empty nodeset - %w", ErrParseNodeSet)
 	}
@@ -59,26 +57,36 @@ func NewNodeSet(nodestr string) (*NodeSet, error) {
 		return nil, fmt.Errorf("unbalanced ']' found while parsing %s - %w", nodestr, ErrParseNodeSet)
 	}
 
-	ns := &NodeSet{pat: make([]*Pattern, 0)}
+	ns := &NodeSet{patterns: make(map[string]*RangeSetND, 0)}
 
 	ridx := 0
 	for _, pattern := range strings.Split(patterns, ",") {
 		rangeSetCount := strings.Count(pattern, "%s")
-		if rangeSetCount > 0 {
-			rangeSets := make([]string, 0)
-			for i := ridx; i < ridx+rangeSetCount; i++ {
-				rangeSets = append(rangeSets, strings.Trim(ranges[i][1], "[]"))
-			}
-
-			rsnd, err := NewRangeSetND(rangeSets)
-			if err != nil {
-				return nil, fmt.Errorf("%w", err)
-			}
-			ns.pat = append(ns.pat, &Pattern{format: pattern, set: rsnd})
-			ridx += rangeSetCount
-		} else {
-			ns.pat = append(ns.pat, &Pattern{format: pattern, set: nil})
+		if rangeSetCount == 0 {
+			ns.patterns[pattern] = nil
+			continue
 		}
+
+		rangeSets := make([]string, 0)
+		for i := ridx; i < ridx+rangeSetCount; i++ {
+			rangeSets = append(rangeSets, strings.Trim(ranges[i][1], "[]"))
+		}
+
+		rs, err := NewRangeSetND([][]string{rangeSets})
+		if err != nil {
+			return nil, err
+		}
+
+		if _, ok := ns.patterns[pattern]; !ok {
+			ns.patterns[pattern] = rs
+		} else {
+			err = ns.patterns[pattern].Update(rs)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		ridx += rangeSetCount
 	}
 
 	return ns, nil
@@ -86,13 +94,13 @@ func NewNodeSet(nodestr string) (*NodeSet, error) {
 
 func (ns *NodeSet) Len() int {
 	size := 0
-	for _, p := range ns.pat {
-		if p.set == nil {
-			size++
-			continue
-		}
 
-		size += p.set.Len()
+	for _, rs := range ns.patterns {
+		if rs == nil {
+			size++
+		} else {
+			size += rs.Len()
+		}
 	}
 
 	return size
@@ -106,17 +114,25 @@ func (ns *NodeSet) String() string {
 func (ns *NodeSet) toStringList() []string {
 	list := make([]string, 0)
 
-	for _, p := range ns.pat {
-		if p.set == nil {
-			list = append(list, p.format)
-		} else {
-			ranges := p.set.Ranges()
-			params := make([]interface{}, 0, len(ranges))
-			for _, r := range ranges {
-				params = append(params, fmt.Sprintf("[%s]", r.String()))
-			}
-			list = append(list, fmt.Sprintf(p.format, params...))
+	items := make([]*Pattern, 0, len(ns.patterns))
+	for pattern, rs := range ns.patterns {
+		items = append(items, &Pattern{format: pattern, rangeSet: rs})
+	}
+
+	sort.SliceStable(items, func(i, j int) bool {
+		return items[i].rangeSet.Len() > items[j].rangeSet.Len()
+	})
+
+	for _, pattern := range items {
+		if pattern.rangeSet == nil {
+			list = append(list, pattern.format)
+			continue
 		}
+
+		for _, params := range pattern.rangeSet.FormatList() {
+			list = append(list, fmt.Sprintf(pattern.format, params...))
+		}
+
 	}
 
 	return list
@@ -146,34 +162,28 @@ func (ns *NodeSet) UnmarshalJSON(data []byte) error {
 func (ns *NodeSet) Iterator() *NodeSetIterator {
 	nodes := make([]string, 0, ns.Len())
 
-	for _, p := range ns.pat {
-		if p.set == nil || p.set.Len() == 0 {
-			nodes = append(nodes, p.format)
+	items := make([]*Pattern, 0, len(ns.patterns))
+	for pattern, rs := range ns.patterns {
+		items = append(items, &Pattern{format: pattern, rangeSet: rs})
+	}
+
+	sort.SliceStable(items, func(i, j int) bool {
+		return items[i].rangeSet.Len() > items[j].rangeSet.Len()
+	})
+
+	for _, pattern := range items {
+		if pattern.rangeSet == nil {
+			nodes = append(nodes, pattern.format)
 			continue
 		}
 
-		ranges := p.set.Ranges()
-		slices := make([][]interface{}, p.set.Dim())
-		for i := 0; i < p.set.Dim(); i++ {
-			strings := ranges[i].Strings()
-			slices[i] = toIface(strings)
+		it := pattern.rangeSet.Iterator()
+		for it.Next() {
+			params := it.FormatList()
+			nodes = append(nodes, fmt.Sprintf(pattern.format, params...))
 		}
 
-		c := cartesian.Iter(slices...)
-		for rec := range c {
-			nodes = append(nodes, fmt.Sprintf(p.format, rec...))
-		}
 	}
-
-	sort.Strings(nodes)
 
 	return &NodeSetIterator{nodes: nodes, current: -1}
-}
-
-func toIface(list []string) []interface{} {
-	vals := make([]interface{}, len(list))
-	for i, v := range list {
-		vals[i] = v
-	}
-	return vals
 }
