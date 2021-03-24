@@ -43,6 +43,12 @@ type NodeSet struct {
 
 func NewNodeSet(nodestr string) (*NodeSet, error) {
 	ns := &NodeSet{patterns: make(map[string]*RangeSetND, 0)}
+
+	if nodestr == "" {
+		// Empty nodeset
+		return ns, nil
+	}
+
 	err := ns.Add(nodestr)
 	if err != nil {
 		return nil, err
