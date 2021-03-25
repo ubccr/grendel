@@ -182,6 +182,7 @@ PXE booting is based on [Pixiecore](https://github.com/danderson/netboot/tree/ma
 Anderson. DHCP implementation makes heavy use of this excellent [packet library](https://github.com/insomniacslk/dhcp). 
 DNS implementation uses [this library](https://github.com/miekg/dns). TFTP implementation uses [this
 library](https://github.com/pin/tftp). Backend database runs [BuntDB](https://github.com/tidwall/buntdb). 
+NodeSet/RangeSet algorithms ported from [ClusterShell](https://github.com/cea-hpc/clustershell)
 
 ## License
 

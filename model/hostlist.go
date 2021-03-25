@@ -38,12 +38,19 @@ func (hl HostList) FilterPrefix(prefix string) HostList {
 }
 
 func (hl HostList) ToNodeSet() (*nodeset.NodeSet, error) {
-	nodes := []string{}
-	for _, host := range hl {
-		nodes = append(nodes, host.Name)
+	ns, err := nodeset.NewNodeSet("")
+	if err != nil {
+		return nil, err
 	}
 
-	return nodeset.NewNodeSet(strings.Join(nodes, ","))
+	for _, host := range hl {
+		err := ns.Add(host.Name)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return ns, nil
 }
 
 func NewHostList() HostList {

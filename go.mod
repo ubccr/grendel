@@ -22,7 +22,7 @@ require (
 	github.com/pelletier/go-toml v1.6.0 // indirect
 	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
-	github.com/schwarmco/go-cartesian-product v0.0.0-20180515110546-d5ee747a6dc9
+	github.com/segmentio/fasthash v1.0.3
 	github.com/segmentio/ksuid v1.0.2
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/afero v1.2.2 // indirect
