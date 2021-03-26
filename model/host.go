@@ -59,6 +59,16 @@ func (h *Host) InterfaceBMC() *NetInterface {
 	return nil
 }
 
+func (h *Host) BootInterface() *NetInterface {
+	for _, nic := range h.Interfaces {
+		if !nic.BMC {
+			return nic
+		}
+	}
+
+	return nil
+}
+
 func (h *Host) FromJSON(hostJSON string) {
 	h.Name = gjson.Get(hostJSON, "name").String()
 	h.BootImage = gjson.Get(hostJSON, "boot_image").String()
