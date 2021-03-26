@@ -26,6 +26,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/api"
 	"github.com/ubccr/grendel/cmd"
+	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
 )
 
@@ -40,16 +41,23 @@ var (
 		Use:   "tags",
 		Short: "Status by tag",
 		Long:  `Status by tag`,
-		Args:  cobra.MinimumNArgs(1),
+		Args:  cobra.MinimumNArgs(0),
 		RunE: func(command *cobra.Command, args []string) error {
 			gc, err := cmd.NewClient()
 			if err != nil {
 				return err
 			}
 
-			hostList, _, err := gc.HostApi.HostTags(context.Background(), strings.Join(args, ","))
+			var hostList model.HostList
+
+			if len(args) == 0 {
+				hostList, _, err = gc.HostApi.HostList(context.Background())
+			} else {
+				hostList, _, err = gc.HostApi.HostTags(context.Background(), strings.Join(args, ","))
+			}
+
 			if err != nil {
-				return cmd.NewApiError("Failed to list hosts by tags", err)
+				return cmd.NewApiError("Failed to list hosts", err)
 			}
 
 			stats := make(map[string]*StatTag)
@@ -68,14 +76,26 @@ var (
 					}
 				}
 
+				if len(host.Tags) == 0 {
+					if _, ok := stats[""]; !ok {
+						stats[""] = &StatTag{provision: nodeset.EmptyNodeSet(), unprovision: nodeset.EmptyNodeSet()}
+					}
+
+					if host.Provision {
+						stats[""].provision.Add(host.Name)
+					} else {
+						stats[""].unprovision.Add(host.Name)
+					}
+				}
+
 				nodes++
 			}
 
 			fmt.Printf("Grendel version %s\n\n", api.Version)
-			yellow.Printf("Nodes: %s\n\n", humanize.Comma(int64(nodes)))
+			fmt.Printf("Nodes: %s\n\n", humanize.Comma(int64(nodes)))
 
 			if tagLong {
-				fmt.Printf("%-30s%-19s%-17s%-10s%-25s\n", "Name", "MAC", "IP", "Provision", "Tags")
+				fmt.Printf("%-20s%-19s%-17s%-11s%-25s\n", "Name", "MAC", "IP", "Provision", "Tags")
 				for _, host := range hostList {
 					ipAddr := ""
 					macAddr := ""
@@ -84,7 +104,13 @@ var (
 						ipAddr = bootNic.IP.String()
 						macAddr = bootNic.MAC.String()
 					}
-					cyan.Printf("%-30s%-19s%-17s%-11s%-25s\n",
+
+					printer := cyan
+					if host.Provision {
+						printer = yellow
+					}
+
+					printer.Printf("%-20s%-19s%-17s%-11s%-25s\n",
 						host.Name,
 						macAddr,
 						ipAddr,
@@ -96,7 +122,11 @@ var (
 			}
 
 			for tag, stat := range stats {
-				cyan.Printf("Tag: %s\n", tag)
+				if tag == "" {
+					red.Printf("Tag: (none)\n")
+				} else {
+					cyan.Printf("Tag: %s\n", tag)
+				}
 				fmt.Printf("Provision: %s\n", stat.provision.String())
 				fmt.Printf("Unprovision: %s\n", stat.unprovision.String())
 				fmt.Println()
