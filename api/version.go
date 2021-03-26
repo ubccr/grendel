@@ -18,4 +18,4 @@
 package api
 
 // Version of Grendel
-var Version = "v0.0.1-DEV"
+var Version = "v0.0.5-DEV"

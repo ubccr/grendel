@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+## [0.0.5] - 2021-03-26
+
+- Handle DHCPINFORM
+- Add support for turning on/off logging for specific services
+- Switch to using native go embed support in v1.16 for assets
+- Add feature to allow boot images to set custom provision templates
+- Add support for tagging hosts
+- Refactor NodeSet api to support N-dim folding
+- Add new status cli command for displaying basic status of nodes
+
 ## [0.0.4] - 2020-07-04
 
 - Add boot image cli commands
@@ -22,7 +32,8 @@
 
 - Initial release
 
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.4...HEAD
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.5...HEAD
 [0.0.1]: https://github.com/ubccr/grendel/releases/tag/v0.0.1
 [0.0.2]: https://github.com/ubccr/grendel/releases/tag/v0.0.2
 [0.0.4]: https://github.com/ubccr/grendel/releases/tag/v0.0.4
+[0.0.5]: https://github.com/ubccr/grendel/releases/tag/v0.0.5
