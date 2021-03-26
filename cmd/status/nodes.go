@@ -36,11 +36,11 @@ type StatTag struct {
 }
 
 var (
-	tagLong bool
-	tagCmd  = &cobra.Command{
-		Use:   "tags",
-		Short: "Status by tag",
-		Long:  `Status by tag`,
+	nodeLong bool
+	nodesCmd = &cobra.Command{
+		Use:   "nodes",
+		Short: "Detailed node status",
+		Long:  `Detailed node status`,
 		Args:  cobra.MinimumNArgs(0),
 		RunE: func(command *cobra.Command, args []string) error {
 			gc, err := cmd.NewClient()
@@ -94,7 +94,7 @@ var (
 			fmt.Printf("Grendel version %s\n\n", api.Version)
 			fmt.Printf("Nodes: %s\n\n", humanize.Comma(int64(nodes)))
 
-			if tagLong {
+			if nodeLong {
 				fmt.Printf("%-20s%-19s%-17s%-11s%-25s\n", "Name", "MAC", "IP", "Provision", "Tags")
 				for _, host := range hostList {
 					ipAddr := ""
@@ -138,6 +138,6 @@ var (
 )
 
 func init() {
-	tagCmd.Flags().BoolVar(&tagLong, "long", false, "Display long format")
-	statusCmd.AddCommand(tagCmd)
+	nodesCmd.Flags().BoolVar(&nodeLong, "long", false, "Display long format")
+	statusCmd.AddCommand(nodesCmd)
 }
