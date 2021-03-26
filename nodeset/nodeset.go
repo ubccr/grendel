@@ -41,6 +41,10 @@ type NodeSet struct {
 	patterns map[string]*RangeSetND
 }
 
+func EmptyNodeSet() *NodeSet {
+	return &NodeSet{patterns: make(map[string]*RangeSetND, 0)}
+}
+
 func NewNodeSet(nodestr string) (*NodeSet, error) {
 	ns := &NodeSet{patterns: make(map[string]*RangeSetND, 0)}
 
