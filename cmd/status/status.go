@@ -106,6 +106,18 @@ var (
 					}
 				}
 
+				if len(host.Tags) == 0 {
+					if _, ok := stats.tags[""]; !ok {
+						stats.tags[""] = &StatProvision{}
+					}
+
+					if host.Provision {
+						stats.tags[""].provision++
+					} else {
+						stats.tags[""].unprovision++
+					}
+				}
+
 				nodes++
 			}
 
@@ -124,6 +136,15 @@ var (
 
 			fmt.Printf("%-30s%15s%15s%15s\n", fmt.Sprintf("Tags (%d)", len(stats.tags)), "Provision", "Unprovision", "Total")
 			for tag, stat := range stats.tags {
+				if tag == "" {
+					red.Printf("%-30s%15s%15s%15s\n",
+						"(none)",
+						humanize.Comma(int64(stat.provision)),
+						humanize.Comma(int64(stat.unprovision)),
+						humanize.Comma(int64(stat.provision+stat.unprovision)))
+					continue
+				}
+
 				cyan.Printf("%-30s%15s%15s%15s\n",
 					tag,
 					humanize.Comma(int64(stat.provision)),
