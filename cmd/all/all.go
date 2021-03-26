@@ -24,4 +24,5 @@ import (
 	_ "github.com/ubccr/grendel/cmd/host"
 	_ "github.com/ubccr/grendel/cmd/image"
 	_ "github.com/ubccr/grendel/cmd/serve"
+	_ "github.com/ubccr/grendel/cmd/status"
 )
