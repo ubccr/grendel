@@ -1,0 +1,7 @@
+#cloud-config
+
+phone_home:
+  url: {{ .baseuri }}/boot/complete?token={{.token}}
+  post: [ instance_id ]
+
+final_message: "The system is finally up, after $UPTIME seconds"

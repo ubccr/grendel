@@ -35,6 +35,7 @@ type BootImage struct {
 	CommandLine       string      `json:"cmdline"`
 	Verify            bool        `json:"verify"`
 	ProvisionTemplate string      `json:"provision_template"`
+	UserData          string      `json:"user_data"`
 }
 
 func NewBootImageList() BootImageList {
@@ -60,6 +61,12 @@ func (b *BootImage) CheckPathsExist() error {
 
 	if b.ProvisionTemplate != "" {
 		if _, err := os.Stat(filepath.Join("/usr/share/grendel/templates", b.ProvisionTemplate)); err != nil {
+			return err
+		}
+	}
+
+	if b.UserData != "" {
+		if _, err := os.Stat(filepath.Join("/usr/share/grendel/templates", b.UserData)); err != nil {
 			return err
 		}
 	}

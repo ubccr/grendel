@@ -18,6 +18,7 @@
 package provision
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -288,5 +289,71 @@ func TestUnprovision(t *testing.T) {
 	hostTest, err := h.DB.LoadHostFromID(host.ID.String())
 	if assert.NoError(err) {
 		assert.False(hostTest.Provision)
+	}
+}
+
+func TestUserData(t *testing.T) {
+	assert := assert.New(t)
+
+	h := &Handler{DB: newTestDB(t)}
+
+	image := tests.BootImageFactory.MustCreate().(*model.BootImage)
+	err := h.DB.StoreBootImage(image)
+	assert.NoError(err)
+
+	host := tests.HostFactory.MustCreate().(*model.Host)
+	host.BootImage = image.Name
+	host.Provision = true
+	err = h.DB.StoreHost(host)
+	assert.NoError(err)
+
+	token, err := model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
+	assert.NoError(err)
+
+	e := newTestEcho(t)
+	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/cloud-init/%s/user-data", token), nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/cloud-init/:token/user-data")
+	c.SetParamNames("token")
+	c.SetParamValues(token)
+
+	if assert.NoError(h.UserData(c)) {
+		assert.Equal(http.StatusOK, rec.Code)
+		assert.Contains(rec.Body.String(), "phone_home")
+		assert.Contains(rec.Body.String(), "final_message")
+	}
+}
+
+func TestMetaData(t *testing.T) {
+	assert := assert.New(t)
+
+	h := &Handler{DB: newTestDB(t)}
+
+	image := tests.BootImageFactory.MustCreate().(*model.BootImage)
+	err := h.DB.StoreBootImage(image)
+	assert.NoError(err)
+
+	host := tests.HostFactory.MustCreate().(*model.Host)
+	host.BootImage = image.Name
+	host.Provision = true
+	err = h.DB.StoreHost(host)
+	assert.NoError(err)
+
+	token, err := model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
+	assert.NoError(err)
+
+	e := newTestEcho(t)
+	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/cloud-init/%s/meta-data", token), nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/cloud-init/:token/meta-data")
+	c.SetParamNames("token")
+	c.SetParamValues(token)
+
+	if assert.NoError(h.MetaData(c)) {
+		assert.Equal(http.StatusOK, rec.Code)
+		assert.Contains(rec.Body.String(), "instance-id")
+		assert.Contains(rec.Body.String(), host.ID.String())
 	}
 }

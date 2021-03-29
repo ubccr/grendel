@@ -34,6 +34,12 @@ var ipxeTmpl string
 //go:embed templates/kickstart.tmpl
 var kickstartTmpl string
 
+//go:embed templates/user-data.tmpl
+var userDataTmpl string
+
+//go:embed templates/meta-data.tmpl
+var metaDataTmpl string
+
 type TemplateRenderer struct {
 	templates *template.Template
 }
@@ -45,6 +51,16 @@ func NewTemplateRenderer() (*TemplateRenderer, error) {
 	}
 
 	tmpl, err = tmpl.New("kickstart.tmpl").Parse(kickstartTmpl)
+	if err != nil {
+		return nil, err
+	}
+
+	tmpl, err = tmpl.New("user-data.tmpl").Parse(userDataTmpl)
+	if err != nil {
+		return nil, err
+	}
+
+	tmpl, err = tmpl.New("meta-data.tmpl").Parse(metaDataTmpl)
 	if err != nil {
 		return nil, err
 	}

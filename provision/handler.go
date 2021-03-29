@@ -66,6 +66,9 @@ func (h *Handler) LoadBootImageWithDefault(name string) (*model.BootImage, error
 func (h *Handler) SetupRoutes(e *echo.Echo) {
 	e.GET("/", h.Index).Name = "index"
 
+	e.GET("/cloud-init/:token/user-data", h.UserData).Name = "user-data"
+	e.GET("/cloud-init/:token/meta-data", h.MetaData).Name = "meta-data"
+
 	boot := e.Group("/boot/")
 	boot.Use(TokenRequired)
 	boot.POST("complete", h.Unprovision)
@@ -148,6 +151,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 	kickstart := fmt.Sprintf("%s/boot/kickstart?token=%s", baseURI, c.QueryParam("token"))
 	repo := fmt.Sprintf("%s/repo", baseURI)
 	liveimg := fmt.Sprintf("%s/boot/file/liveimg?token=%s", baseURI, c.QueryParam("token"))
+	cloudInit := fmt.Sprintf("%s/cloud-init/%s/", baseURI, c.QueryParam("token"))
 
 	data := map[string]interface{}{
 		"token":     c.QueryParam("token"),
@@ -158,6 +162,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 		"kickstart": kickstart,
 		"repo":      repo,
 		"liveimg":   liveimg,
+		"cloudinit": cloudInit,
 	}
 
 	commandLine := bootImage.CommandLine
@@ -166,6 +171,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 	commandLine = strings.ReplaceAll(commandLine, "$repo", repo)
 	commandLine = strings.ReplaceAll(commandLine, "$liveimg", liveimg)
 	commandLine = strings.ReplaceAll(commandLine, "$mac", nic.MAC.String())
+	commandLine = strings.ReplaceAll(commandLine, "$cloudinit", cloudInit)
 
 	data["commandLine"] = commandLine
 
@@ -260,4 +266,75 @@ func (h *Handler) Unprovision(c echo.Context) error {
 		"status": "ok",
 	}
 	return c.JSON(http.StatusOK, resp)
+}
+
+func (h *Handler) UserData(c echo.Context) error {
+	token := c.Param("token")
+	if token == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "missing token")
+	}
+
+	claims, err := model.ParseBootToken(token)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid token").SetInternal(err)
+	}
+
+	c.Set(ContextKeyToken, claims)
+
+	bootImage, host, nic, err := h.verifyClaims(c)
+	if err != nil {
+		return err
+	}
+
+	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
+
+	data := map[string]interface{}{
+		"token":     token,
+		"bootimage": bootImage,
+		"baseuri":   baseURI,
+		"host":      host,
+		"nic":       nic,
+		"rootpw":    viper.GetString("provision.root_password"),
+	}
+
+	tmplName := "user-data.tmpl"
+	if bootImage.UserData != "" {
+		tmplName = bootImage.UserData
+	}
+
+	log.Infof("Sending cloud-init user-data to host %s", host.Name)
+	return c.Render(http.StatusOK, tmplName, data)
+}
+
+func (h *Handler) MetaData(c echo.Context) error {
+	token := c.Param("token")
+	if token == "" {
+		return echo.NewHTTPError(http.StatusBadRequest, "missing token")
+	}
+
+	claims, err := model.ParseBootToken(token)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid token").SetInternal(err)
+	}
+
+	c.Set(ContextKeyToken, claims)
+
+	bootImage, host, nic, err := h.verifyClaims(c)
+	if err != nil {
+		return err
+	}
+
+	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
+
+	data := map[string]interface{}{
+		"token":     token,
+		"bootimage": bootImage,
+		"baseuri":   baseURI,
+		"host":      host,
+		"nic":       nic,
+		"rootpw":    viper.GetString("provision.root_password"),
+	}
+
+	log.Infof("Sending cloud-init meta-data to host %s", host.Name)
+	return c.Render(http.StatusOK, "meta-data.tmpl", data)
 }
