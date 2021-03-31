@@ -19,6 +19,8 @@ package bmc
 
 type SystemManager interface {
 	PowerCycle() error
+	PowerOn() error
+	PowerOff() error
 	EnablePXE() error
 	Logout()
 	GetSystem() (*System, error)

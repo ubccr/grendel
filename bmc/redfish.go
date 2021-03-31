@@ -29,11 +29,21 @@ type Redfish struct {
 	client *gofish.APIClient
 }
 
-var resetTypeOrder = []string{
-	"PowerCycle",
-	"GracefulRestart",
-	"ForceRestart",
-}
+var (
+	powerCycleTypeOrder = []string{
+		"PowerCycle",
+		"GracefulRestart",
+		"ForceRestart",
+	}
+	powerOnTypeOrder = []string{
+		"On",
+		"ForceOn",
+	}
+	powerOffTypeOrder = []string{
+		"ForceOff",
+		"GracefulShutdown",
+	}
+)
 
 func NewRedfish(endpoint, user, pass string, insecure bool) (*Redfish, error) {
 	config := gofish.ClientConfig{
@@ -55,7 +65,7 @@ func (r *Redfish) Logout() {
 	r.client.Logout()
 }
 
-func (r *Redfish) PowerCycle() error {
+func (r *Redfish) powerReset(resetTypeOrder []string) error {
 	service := r.client.Service
 	ss, err := service.Systems()
 	if err != nil {
@@ -78,6 +88,18 @@ func (r *Redfish) PowerCycle() error {
 	}
 
 	return errors.New("Failed to find a supported reset type")
+}
+
+func (r *Redfish) PowerCycle() error {
+	return r.powerReset(powerCycleTypeOrder)
+}
+
+func (r *Redfish) PowerOn() error {
+	return r.powerReset(powerOnTypeOrder)
+}
+
+func (r *Redfish) PowerOff() error {
+	return r.powerReset(powerOffTypeOrder)
 }
 
 func (r *Redfish) EnablePXE() error {

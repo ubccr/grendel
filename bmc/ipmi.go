@@ -47,13 +47,13 @@ func (i *IPMI) Logout() {
 	i.client.Close()
 }
 
-func (i *IPMI) PowerCycle() error {
+func (i *IPMI) powerControl(ctl ipmi.ChassisControl) error {
 	err := i.client.Open()
 	if err != nil {
 		return err
 	}
 
-	err = i.client.Control(ipmi.ControlPowerCycle)
+	err = i.client.Control(ctl)
 	if err != nil {
 		return err
 	}
@@ -64,6 +64,19 @@ func (i *IPMI) PowerCycle() error {
 	}
 
 	return nil
+
+}
+
+func (i *IPMI) PowerCycle() error {
+	return i.powerControl(ipmi.ControlPowerCycle)
+}
+
+func (i *IPMI) PowerOn() error {
+	return i.powerControl(ipmi.ControlPowerUp)
+}
+
+func (i *IPMI) PowerOff() error {
+	return i.powerControl(ipmi.ControlPowerDown)
 }
 
 func (i *IPMI) EnablePXE() error {
