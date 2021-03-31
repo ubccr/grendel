@@ -18,14 +18,10 @@
 package bmc
 
 import (
-	"context"
-	"errors"
-	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/cmd"
 )
 
 var (
@@ -34,9 +30,8 @@ var (
 		Use:   "netboot",
 		Short: "Set hosts to PXE netboot",
 		Long:  `Set hosts to PXE netboot`,
-		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			return runNetboot(strings.Join(args, ","))
+			return runNetboot()
 		},
 	}
 )
@@ -46,21 +41,7 @@ func init() {
 	bmcCmd.AddCommand(netbootCmd)
 }
 
-func runNetboot(ns string) error {
-	gc, err := cmd.NewClient()
-	if err != nil {
-		return err
-	}
-
-	hostList, _, err := gc.HostApi.HostFind(context.Background(), ns)
-	if err != nil {
-		return cmd.NewApiError("Failed to find hosts to netboot", err)
-	}
-
-	if len(hostList) == 0 {
-		return errors.New("No hosts found")
-	}
-
+func runNetboot() error {
 	delay := viper.GetInt("bmc.delay")
 	runner := NewJobRunner(viper.GetInt("bmc.fanout"))
 	for _, host := range hostList {

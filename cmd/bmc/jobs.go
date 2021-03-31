@@ -68,6 +68,15 @@ func (j *JobRunner) RunStatus(host *model.Host) {
 			system.Name = host.Name
 		}
 
+		if !statusLong {
+			fmt.Printf("%s\t%s\t%s\n",
+				host.Name,
+				system.PowerStatus,
+				system.BIOSVersion)
+
+			return
+		}
+
 		rec := make(map[string]*bmc.System, 1)
 		rec[host.Name] = system
 
@@ -123,7 +132,7 @@ func (j *JobRunner) RunNetBoot(host *model.Host, reboot bool) {
 	})
 }
 
-func (j *JobRunner) RunReboot(host *model.Host) {
+func (j *JobRunner) RunPower(host *model.Host, powerType int) {
 	j.limit.Execute(func() {
 		sysmgr, err := systemMgr(host)
 		if err != nil {
@@ -136,7 +145,17 @@ func (j *JobRunner) RunReboot(host *model.Host) {
 		}
 		defer sysmgr.Logout()
 
-		err = sysmgr.PowerCycle()
+		switch powerType {
+		case PowerCycle:
+			err = sysmgr.PowerCycle()
+		case PowerOn:
+			err = sysmgr.PowerOn()
+		case PowerOff:
+			err = sysmgr.PowerOn()
+		default:
+			err = fmt.Errorf("Invalid power type provided: %d", powerType)
+		}
+
 		if err != nil {
 			cmd.Log.WithFields(logrus.Fields{
 				"err":  err,

@@ -18,47 +18,30 @@
 package bmc
 
 import (
-	"context"
-	"errors"
-	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/cmd"
 )
 
 var (
-	statusCmd = &cobra.Command{
+	statusLong bool
+	statusCmd  = &cobra.Command{
 		Use:   "status",
 		Short: "Check BMC status",
 		Long:  `Check BMC status`,
-		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			return runStatus(strings.Join(args, ","))
+			return runStatus()
 		},
 	}
 )
 
 func init() {
+	statusCmd.Flags().BoolVar(&statusLong, "long", false, "Display long format")
 	bmcCmd.AddCommand(statusCmd)
 }
 
-func runStatus(ns string) error {
-	gc, err := cmd.NewClient()
-	if err != nil {
-		return err
-	}
-
-	hostList, _, err := gc.HostApi.HostFind(context.Background(), ns)
-	if err != nil {
-		return cmd.NewApiError("Failed to find hosts for bmc status", err)
-	}
-
-	if len(hostList) == 0 {
-		return errors.New("No hosts found")
-	}
-
+func runStatus() error {
 	delay := viper.GetInt("bmc.delay")
 	runner := NewJobRunner(viper.GetInt("bmc.fanout"))
 	for _, host := range hostList {

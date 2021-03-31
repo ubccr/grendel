@@ -18,14 +18,26 @@
 package bmc
 
 import (
+	"context"
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/cmd"
+	"github.com/ubccr/grendel/model"
+)
+
+const (
+	PowerOn int = iota
+	PowerOff
+	PowerCycle
 )
 
 var (
+	hostList    model.HostList
+	tags        []string
 	bmcUser     string
 	bmcPassword string
 	useIPMI     bool
@@ -50,6 +62,8 @@ func init() {
 	bmcCmd.PersistentFlags().Bool("ipmi", false, "Use ipmi instead of redfish")
 	viper.BindPFlag("bmc.ipmi", bmcCmd.PersistentFlags().Lookup("ipmi"))
 
+	bmcCmd.PersistentFlags().StringSliceVarP(&tags, "tags", "t", []string{}, "select nodes by tags")
+
 	bmcCmd.PersistentPreRunE = func(command *cobra.Command, args []string) error {
 		err := cmd.SetupLogging()
 		if err != nil {
@@ -68,6 +82,36 @@ func init() {
 		useIPMI = viper.GetBool("bmc.ipmi")
 		delay = viper.GetInt("bmc.delay")
 		fanout = viper.GetInt("bmc.fanout")
+
+		if len(args) == 0 && len(tags) == 0 {
+			return fmt.Errorf("Please provide tags (--tags) or a nodeset")
+		}
+
+		if len(args) > 0 && len(tags) > 0 {
+			cmd.Log.Warn("Using both tags (--tags) and a nodeset is not supported yet. Only nodeset is used.")
+		}
+
+		gc, err := cmd.NewClient()
+		if err != nil {
+			return err
+		}
+
+		if len(tags) > 0 && len(args) == 0 {
+			hostList, _, err = gc.HostApi.HostTags(context.Background(), strings.Join(tags, ","))
+			if err != nil {
+				return cmd.NewApiError("Failed to find hosts by tag", err)
+			}
+		} else {
+			nodes := strings.Join(args, ",")
+			hostList, _, err = gc.HostApi.HostFind(context.Background(), nodes)
+			if err != nil {
+				return cmd.NewApiError("Failed to find hosts", err)
+			}
+		}
+
+		if len(hostList) == 0 {
+			return errors.New("No hosts found")
+		}
 
 		return nil
 	}

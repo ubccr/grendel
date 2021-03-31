@@ -18,14 +18,10 @@
 package bmc
 
 import (
-	"context"
-	"errors"
-	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/cmd"
 )
 
 var (
@@ -33,36 +29,39 @@ var (
 		Use:   "reboot",
 		Short: "Reboot hosts",
 		Long:  `Reboot hosts`,
-		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			return runReboot(strings.Join(args, ","))
+			return runPower(PowerCycle)
+		},
+	}
+	powerOnCmd = &cobra.Command{
+		Use:   "poweron",
+		Short: "Power On hosts",
+		Long:  `Power On hosts`,
+		RunE: func(command *cobra.Command, args []string) error {
+			return runPower(PowerOn)
+		},
+	}
+	powerOffCmd = &cobra.Command{
+		Use:   "poweroff",
+		Short: "Power Off hosts",
+		Long:  `Power Off hosts`,
+		RunE: func(command *cobra.Command, args []string) error {
+			return runPower(PowerOff)
 		},
 	}
 )
 
 func init() {
 	bmcCmd.AddCommand(rebootCmd)
+	bmcCmd.AddCommand(powerOnCmd)
+	bmcCmd.AddCommand(powerOffCmd)
 }
 
-func runReboot(ns string) error {
-	gc, err := cmd.NewClient()
-	if err != nil {
-		return err
-	}
-
-	hostList, _, err := gc.HostApi.HostFind(context.Background(), ns)
-	if err != nil {
-		return cmd.NewApiError("Failed to find hosts to reboot", err)
-	}
-
-	if len(hostList) == 0 {
-		return errors.New("No hosts found")
-	}
-
+func runPower(powerType int) error {
 	delay := viper.GetInt("bmc.delay")
 	runner := NewJobRunner(viper.GetInt("bmc.fanout"))
 	for _, host := range hostList {
-		runner.RunReboot(host)
+		runner.RunPower(host, powerType)
 		time.Sleep(time.Duration(delay) * time.Second)
 	}
 
