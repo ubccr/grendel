@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"testing"
 
 	"github.com/labstack/echo/v4"
@@ -84,13 +83,13 @@ func TestInvalidBootToken(t *testing.T) {
 	h := &Handler{DB: newTestDB(t)}
 
 	for _, test := range badData {
-		q := make(url.Values)
-		q.Set("token", test)
-
 		e := newTestEcho(t)
-		req := httptest.NewRequest(http.MethodGet, "/boot/ipxe?"+q.Encode(), nil)
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
+		c.SetPath("/boot/:token/ipxe")
+		c.SetParamNames("token")
+		c.SetParamValues(test)
 
 		err := TokenRequired(h.Ipxe)(c)
 		if assert.Error(err) {
@@ -123,13 +122,13 @@ func TestIpxe(t *testing.T) {
 	token, err := model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
 	assert.NoError(err)
 
-	q := make(url.Values)
-	q.Set("token", token)
-
 	e := newTestEcho(t)
-	req := httptest.NewRequest(http.MethodGet, "/boot/ipxe?"+q.Encode(), nil)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
+	c.SetPath("/boot/:token/ipxe")
+	c.SetParamNames("token")
+	c.SetParamValues(token)
 
 	if assert.NoError(TokenRequired(h.Ipxe)(c)) {
 		assert.Equal(http.StatusOK, rec.Code)
@@ -143,8 +142,8 @@ func TestHostNotProvision(t *testing.T) {
 	h := &Handler{DB: newTestDB(t)}
 
 	paths := map[string]echo.HandlerFunc{
-		"/boot/ipxe":      h.Ipxe,
-		"/boot/kickstart": h.Kickstart,
+		"ipxe":      h.Ipxe,
+		"kickstart": h.Kickstart,
 	}
 
 	image := tests.BootImageFactory.MustCreate().(*model.BootImage)
@@ -160,14 +159,14 @@ func TestHostNotProvision(t *testing.T) {
 	token, err := model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
 	assert.NoError(err)
 
-	q := make(url.Values)
-	q.Set("token", token)
-
 	for path, handler := range paths {
 		e := newTestEcho(t)
-		req := httptest.NewRequest(http.MethodGet, path+"?"+q.Encode(), nil)
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
+		c.SetPath(fmt.Sprintf("/boot/:token/%s", path))
+		c.SetParamNames("token")
+		c.SetParamValues(token)
 
 		err = TokenRequired(handler)(c)
 		if assert.Errorf(err, "no error for %s", path) {
@@ -202,13 +201,13 @@ func TestIpxeWrongHost(t *testing.T) {
 	token, err := model.NewBootToken(hostBad.ID.String(), hostBad.Interfaces[0].MAC.String())
 	assert.NoError(err)
 
-	q := make(url.Values)
-	q.Set("token", token)
-
 	e := newTestEcho(t)
-	req := httptest.NewRequest(http.MethodGet, "/boot/ipxe?"+q.Encode(), nil)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
+	c.SetPath("/boot/:token/ipxe")
+	c.SetParamNames("token")
+	c.SetParamValues(token)
 
 	err = TokenRequired(h.Ipxe)(c)
 	if assert.Error(err) {
@@ -240,13 +239,13 @@ func TestKickstart(t *testing.T) {
 	token, err := model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
 	assert.NoError(err)
 
-	q := make(url.Values)
-	q.Set("token", token)
-
 	e := newTestEcho(t)
-	req := httptest.NewRequest(http.MethodGet, "/boot/kickstart?"+q.Encode(), nil)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
+	c.SetPath("/boot/:token/kickstart")
+	c.SetParamNames("token")
+	c.SetParamValues(token)
 
 	if assert.NoError(TokenRequired(h.Kickstart)(c)) {
 		assert.Equal(http.StatusOK, rec.Code)
@@ -273,13 +272,13 @@ func TestUnprovision(t *testing.T) {
 	token, err := model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
 	assert.NoError(err)
 
-	q := make(url.Values)
-	q.Set("token", token)
-
 	e := newTestEcho(t)
-	req := httptest.NewRequest(http.MethodGet, "/boot/complete?"+q.Encode(), nil)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
+	c.SetPath("/boot/:token/complete")
+	c.SetParamNames("token")
+	c.SetParamValues(token)
 
 	if assert.NoError(TokenRequired(h.Unprovision)(c)) {
 		assert.Equal(http.StatusOK, rec.Code)
@@ -311,14 +310,14 @@ func TestUserData(t *testing.T) {
 	assert.NoError(err)
 
 	e := newTestEcho(t)
-	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/cloud-init/%s/user-data", token), nil)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	c.SetPath("/cloud-init/:token/user-data")
+	c.SetPath("/boot/:token/cloud-init/user-data")
 	c.SetParamNames("token")
 	c.SetParamValues(token)
 
-	if assert.NoError(h.UserData(c)) {
+	if assert.NoError(TokenRequired(h.UserData)(c)) {
 		assert.Equal(http.StatusOK, rec.Code)
 		assert.Contains(rec.Body.String(), "phone_home")
 		assert.Contains(rec.Body.String(), "final_message")
@@ -344,14 +343,14 @@ func TestMetaData(t *testing.T) {
 	assert.NoError(err)
 
 	e := newTestEcho(t)
-	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/cloud-init/%s/meta-data", token), nil)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	c.SetPath("/cloud-init/:token/meta-data")
+	c.SetPath("/boot/:token/cloud-init/meta-data")
 	c.SetParamNames("token")
 	c.SetParamValues(token)
 
-	if assert.NoError(h.MetaData(c)) {
+	if assert.NoError(TokenRequired(h.MetaData)(c)) {
 		assert.Equal(http.StatusOK, rec.Code)
 		assert.Contains(rec.Body.String(), "instance-id")
 		assert.Contains(rec.Body.String(), host.ID.String())

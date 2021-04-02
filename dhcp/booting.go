@@ -118,7 +118,7 @@ func (s *Server) bootingHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) err
 			return fmt.Errorf("Failed to generate signed boot token: %s", err)
 		}
 
-		ipxeUrl := fmt.Sprintf("%s://%s:%d/boot/ipxe?token=%s", s.ProvisionScheme, hostName, s.ProvisionPort, token)
+		ipxeUrl := fmt.Sprintf("%s://%s:%d/boot/%s/ipxe", s.ProvisionScheme, hostName, s.ProvisionPort, token)
 		log.Debugf("BootFile iPXE script: %s", ipxeUrl)
 		resp.UpdateOption(dhcpv4.OptBootFileName(ipxeUrl))
 

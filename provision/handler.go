@@ -66,10 +66,7 @@ func (h *Handler) LoadBootImageWithDefault(name string) (*model.BootImage, error
 func (h *Handler) SetupRoutes(e *echo.Echo) {
 	e.GET("/", h.Index).Name = "index"
 
-	e.GET("/cloud-init/:token/user-data", h.UserData).Name = "user-data"
-	e.GET("/cloud-init/:token/meta-data", h.MetaData).Name = "meta-data"
-
-	boot := e.Group("/boot/")
+	boot := e.Group("/boot/:token/")
 	boot.Use(TokenRequired)
 	boot.POST("complete", h.Unprovision)
 	boot.GET("ipxe", h.Ipxe)
@@ -78,6 +75,9 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	boot.GET("file/liveimg", h.File)
 	boot.GET("file/rootfs", h.File)
 	boot.GET("file/initrd-*", h.File)
+	boot.GET("cloud-init/user-data", h.UserData)
+	boot.GET("cloud-init/meta-data", h.MetaData)
+	boot.GET("cloud-init/vendor-data", h.VendorData)
 }
 
 func (h *Handler) Index(c echo.Context) error {
@@ -139,6 +139,27 @@ func (h *Handler) verifyClaims(c echo.Context) (*model.BootImage, *model.Host, *
 	return bootImage, host, nic, nil
 }
 
+func (h *Handler) newTemplateParams(c echo.Context) map[string]interface{} {
+	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
+	kickstart := fmt.Sprintf("%s/boot/%s/kickstart", baseURI, c.Param("token"))
+	repo := fmt.Sprintf("%s/repo", baseURI)
+	liveimg := fmt.Sprintf("%s/boot/%s/file/liveimg", baseURI, c.Param("token"))
+	cloudInit := fmt.Sprintf("%s/boot/%s/cloud-init/", baseURI, c.Param("token"))
+	complete := fmt.Sprintf("%s/boot/%s/complete", baseURI, c.Param("token"))
+
+	data := map[string]interface{}{
+		"token":     c.Param("token"),
+		"baseuri":   baseURI,
+		"kickstart": kickstart,
+		"repo":      repo,
+		"liveimg":   liveimg,
+		"cloudinit": cloudInit,
+		"complete":  complete,
+	}
+
+	return data
+}
+
 func (h *Handler) Ipxe(c echo.Context) error {
 	bootImage, host, nic, err := h.verifyClaims(c)
 	if err != nil {
@@ -146,32 +167,20 @@ func (h *Handler) Ipxe(c echo.Context) error {
 	}
 
 	log.Infof("Sending iPXE script to boot host %s with image %s", host.Name, bootImage.Name)
-	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
 
-	kickstart := fmt.Sprintf("%s/boot/kickstart?token=%s", baseURI, c.QueryParam("token"))
-	repo := fmt.Sprintf("%s/repo", baseURI)
-	liveimg := fmt.Sprintf("%s/boot/file/liveimg?token=%s", baseURI, c.QueryParam("token"))
-	cloudInit := fmt.Sprintf("%s/cloud-init/%s/", baseURI, c.QueryParam("token"))
+	data := h.newTemplateParams(c)
 
-	data := map[string]interface{}{
-		"token":     c.QueryParam("token"),
-		"bootimage": bootImage,
-		"nic":       nic,
-		"host":      host,
-		"baseuri":   baseURI,
-		"kickstart": kickstart,
-		"repo":      repo,
-		"liveimg":   liveimg,
-		"cloudinit": cloudInit,
-	}
+	data["bootimage"] = bootImage
+	data["nic"] = nic
+	data["host"] = host
 
 	commandLine := bootImage.CommandLine
 
-	commandLine = strings.ReplaceAll(commandLine, "$kickstart", kickstart)
-	commandLine = strings.ReplaceAll(commandLine, "$repo", repo)
-	commandLine = strings.ReplaceAll(commandLine, "$liveimg", liveimg)
+	commandLine = strings.ReplaceAll(commandLine, "$kickstart", data["kickstart"].(string))
+	commandLine = strings.ReplaceAll(commandLine, "$repo", data["repo"].(string))
+	commandLine = strings.ReplaceAll(commandLine, "$liveimg", data["liveimg"].(string))
 	commandLine = strings.ReplaceAll(commandLine, "$mac", nic.MAC.String())
-	commandLine = strings.ReplaceAll(commandLine, "$cloudinit", cloudInit)
+	commandLine = strings.ReplaceAll(commandLine, "$cloudinit", data["cloudinit"].(string))
 
 	data["commandLine"] = commandLine
 
@@ -224,16 +233,11 @@ func (h *Handler) Kickstart(c echo.Context) error {
 		return err
 	}
 
-	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
-
-	data := map[string]interface{}{
-		"token":     c.QueryParam("token"),
-		"bootimage": bootImage,
-		"baseuri":   baseURI,
-		"host":      host,
-		"nic":       nic,
-		"rootpw":    viper.GetString("provision.root_password"),
-	}
+	data := h.newTemplateParams(c)
+	data["bootimage"] = bootImage
+	data["nic"] = nic
+	data["host"] = host
+	data["rootpw"] = viper.GetString("provision.root_password")
 
 	tmplName := "kickstart.tmpl"
 	if bootImage.ProvisionTemplate != "" {
@@ -269,33 +273,16 @@ func (h *Handler) Unprovision(c echo.Context) error {
 }
 
 func (h *Handler) UserData(c echo.Context) error {
-	token := c.Param("token")
-	if token == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "missing token")
-	}
-
-	claims, err := model.ParseBootToken(token)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid token").SetInternal(err)
-	}
-
-	c.Set(ContextKeyToken, claims)
-
 	bootImage, host, nic, err := h.verifyClaims(c)
 	if err != nil {
 		return err
 	}
 
-	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
-
-	data := map[string]interface{}{
-		"token":     token,
-		"bootimage": bootImage,
-		"baseuri":   baseURI,
-		"host":      host,
-		"nic":       nic,
-		"rootpw":    viper.GetString("provision.root_password"),
-	}
+	data := h.newTemplateParams(c)
+	data["bootimage"] = bootImage
+	data["nic"] = nic
+	data["host"] = host
+	data["rootpw"] = viper.GetString("provision.root_password")
 
 	tmplName := "user-data.tmpl"
 	if bootImage.UserData != "" {
@@ -307,34 +294,21 @@ func (h *Handler) UserData(c echo.Context) error {
 }
 
 func (h *Handler) MetaData(c echo.Context) error {
-	token := c.Param("token")
-	if token == "" {
-		return echo.NewHTTPError(http.StatusBadRequest, "missing token")
-	}
-
-	claims, err := model.ParseBootToken(token)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid token").SetInternal(err)
-	}
-
-	c.Set(ContextKeyToken, claims)
-
 	bootImage, host, nic, err := h.verifyClaims(c)
 	if err != nil {
 		return err
 	}
 
-	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
-
-	data := map[string]interface{}{
-		"token":     token,
-		"bootimage": bootImage,
-		"baseuri":   baseURI,
-		"host":      host,
-		"nic":       nic,
-		"rootpw":    viper.GetString("provision.root_password"),
-	}
+	data := h.newTemplateParams(c)
+	data["bootimage"] = bootImage
+	data["nic"] = nic
+	data["host"] = host
+	data["rootpw"] = viper.GetString("provision.root_password")
 
 	log.Infof("Sending cloud-init meta-data to host %s", host.Name)
 	return c.Render(http.StatusOK, "meta-data.tmpl", data)
+}
+
+func (h *Handler) VendorData(c echo.Context) error {
+	return c.String(http.StatusOK, "")
 }

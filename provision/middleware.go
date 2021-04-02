@@ -26,7 +26,7 @@ import (
 
 func TokenRequired(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		token := c.QueryParam("token")
+		token := c.Param("token")
 		if token == "" {
 			return echo.NewHTTPError(http.StatusBadRequest, "missing token")
 		}

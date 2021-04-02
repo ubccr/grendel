@@ -1,5 +1,5 @@
 install
-liveimg --url="{{ .baseuri }}/boot/file/liveimg?token={{.token}}"
+liveimg --url="{{ .liveimg }}"
 
 lang en_US.UTF-8
 selinux --disabled
@@ -55,7 +55,7 @@ EOF
 
 %post
 
-curl -X POST {{ .baseuri }}/boot/complete?token={{.token}}
+curl -X POST {{ .complete }}
 
 exit 0
 
