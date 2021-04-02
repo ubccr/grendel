@@ -1,0 +1,54 @@
+#cloud-config
+autoinstall:
+  version: 1
+  keyboard:
+    layout: us
+  locale: en_US.UTF-8
+  ssh:
+    allow-pw: no
+    install-server: yes
+  storage:
+    grub:
+      reorder_uefi: False
+    swap:
+      size: 0
+    config:
+    - type: disk
+      id: root-disk
+      ptable: gpt
+      wipe: superblock
+      preserve: false
+      grub_device: false
+      match:
+        size: largest
+    - {device: root-disk, size: 512MB, wipe: superblock, flag: boot, number: 1, preserve: false, grub_device: true, type: partition, id: partition-0}
+    - {fstype: fat32, volume: partition-0, preserve: false, type: format, id: format-1}
+    - {device: root-disk, size: 2GB, wipe: superblock, flag: '', number: 2, preserve: false, type: partition, id: partition-1}
+    - {fstype: ext4, volume: partition-1, preserve: false, type: format, id: format-2}
+    - {device: root-disk, size: 8GB, wipe: superblock, flag: swap, number: 3, preserve: false, type: partition, id: partition-2}
+    - {fstype: swap, volume: partition-2, preserve: false, type: format, id: format-3}
+    - {device: format-3, path: '', type: mount, id: mount-2}
+    - {device: root-disk, size: -1, wipe: superblock, flag: '', number: 4, preserve: false, type: partition, id: partition-3}
+    - {fstype: ext4, volume: partition-3, preserve: false, type: format, id: format-4}
+    - {device: format-4, path: /, type: mount, id: mount-3}
+    - {device: format-2, path: /boot, type: mount, id: mount-1}
+    - {device: format-1, path: /boot/efi, type: mount, id: mount-0}
+  refresh-installer:
+    channel: edge
+    update: yes
+  late-commands:
+    - curl -X POST {{ .complete }}
+  user-data:
+    disable_root: false
+    users:
+{{- with .rootpw }}
+      - name: root
+        hashed_passwd: '{{ . }}'
+{{ end -}}
+#      - name: ubuntu
+#        gecos: Ubuntu User
+#        primary_group: ubuntu
+#        groups: users, admin
+#        shell: /bin/bash
+#        ssh_import_id: gh:YOURGITHUBIDHERE
+#        sudo: ALL=(ALL) NOPASSWD:ALL
