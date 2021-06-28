@@ -45,7 +45,7 @@ func runNetboot() error {
 	delay := viper.GetInt("bmc.delay")
 	fanout := viper.GetInt("bmc.fanout")
 	runner := NewJobRunner(fanout)
-	for _, host := range hostList {
+	for i, host := range hostList {
 		runner.RunNetBoot(host, reboot)
 		if (i+1)%fanout == 0 {
 			time.Sleep(time.Duration(delay) * time.Second)
