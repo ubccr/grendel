@@ -24,6 +24,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/api"
 	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/model"
@@ -47,6 +48,8 @@ var (
 			if err != nil {
 				return err
 			}
+
+			defaultImage := viper.GetString("provision.default_image")
 
 			var hostList model.HostList
 
@@ -95,7 +98,7 @@ var (
 			fmt.Printf("Nodes: %s\n\n", humanize.Comma(int64(nodes)))
 
 			if nodeLong {
-				fmt.Printf("%-20s%-19s%-17s%-11s%-25s\n", "Name", "MAC", "IP", "Provision", "Tags")
+				fmt.Printf("%-20s%-19s%-17s%-11s%-20s%-25s\n", "Name", "MAC", "IP", "Provision", "Image", "Tags")
 				for _, host := range hostList {
 					ipAddr := ""
 					macAddr := ""
@@ -105,16 +108,23 @@ var (
 						macAddr = bootNic.MAC.String()
 					}
 
+					bi := host.BootImage
+
+					if bi == "" {
+						bi = defaultImage
+					}
+
 					printer := cyan
 					if host.Provision {
 						printer = yellow
 					}
 
-					printer.Printf("%-20s%-19s%-17s%-11s%-25s\n",
+					printer.Printf("%-20s%-19s%-17s%-11s%-20s%-25s\n",
 						host.Name,
 						macAddr,
 						ipAddr,
 						fmt.Sprintf("%#v", host.Provision),
+						bi,
 						strings.Join(host.Tags, ","))
 
 				}
