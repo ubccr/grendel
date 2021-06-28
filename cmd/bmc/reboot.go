@@ -59,10 +59,13 @@ func init() {
 
 func runPower(powerType int) error {
 	delay := viper.GetInt("bmc.delay")
-	runner := NewJobRunner(viper.GetInt("bmc.fanout"))
+	fanout := viper.GetInt("bmc.fanout")
+	runner := NewJobRunner(fanout)
 	for _, host := range hostList {
 		runner.RunPower(host, powerType)
-		time.Sleep(time.Duration(delay) * time.Second)
+		if (i+1)%fanout == 0 {
+			time.Sleep(time.Duration(delay) * time.Second)
+		}
 	}
 
 	runner.Wait()

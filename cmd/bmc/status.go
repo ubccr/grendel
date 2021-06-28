@@ -43,10 +43,13 @@ func init() {
 
 func runStatus() error {
 	delay := viper.GetInt("bmc.delay")
-	runner := NewJobRunner(viper.GetInt("bmc.fanout"))
-	for _, host := range hostList {
+	fanout := viper.GetInt("bmc.fanout")
+	runner := NewJobRunner(fanout)
+	for i, host := range hostList {
 		runner.RunStatus(host)
-		time.Sleep(time.Duration(delay) * time.Second)
+		if (i+1)%fanout == 0 {
+			time.Sleep(time.Duration(delay) * time.Second)
+		}
 	}
 
 	runner.Wait()
