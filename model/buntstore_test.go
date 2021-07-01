@@ -322,6 +322,32 @@ func TestBuntStoreBootImage(t *testing.T) {
 	}
 }
 
+func TestBuntStoreDuplicate(t *testing.T) {
+	assert := assert.New(t)
+
+	store, err := model.NewBuntStore(":memory:")
+	defer store.Close()
+	assert.NoError(err)
+
+	host := tests.HostFactory.MustCreate().(*model.Host)
+
+	err = store.StoreHost(host)
+	assert.NoError(err)
+
+	testHost, err := store.LoadHostFromID(host.ID.String())
+	if assert.NoError(err) {
+		assert.Equal(2, len(testHost.Interfaces))
+	}
+
+	// Can't store host with same ID
+	hostDup := tests.HostFactory.MustCreate().(*model.Host)
+	hostDup.ID = host.ID
+	err = store.StoreHost(hostDup)
+	if assert.Error(err) {
+		assert.True(errors.Is(err, model.ErrDuplicateEntry))
+	}
+}
+
 func BenchmarkBuntStoreWriteHosts(b *testing.B) {
 	file := tempfile()
 	defer os.Remove(file)

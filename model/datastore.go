@@ -35,6 +35,9 @@ var (
 
 	// ErrInvalidData is returned when a model is is missing required data
 	ErrInvalidData = errors.New("invalid data")
+
+	// ErrDuplicateEntry is returned when attempting to store a model with the same ID or Name
+	ErrDuplicateEntry = errors.New("duplicate entry")
 )
 
 // DataStore

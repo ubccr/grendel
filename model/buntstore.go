@@ -19,6 +19,7 @@ package model
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -78,7 +79,6 @@ func (s *BuntStore) StoreHosts(hosts HostList) error {
 		// Keys are case-insensitive
 		host.Name = strings.ToLower(host.Name)
 
-		// XXX need to check for dups?
 		if host.ID.IsNil() {
 			uuid, err := ksuid.NewRandom()
 			if err != nil {
@@ -86,6 +86,18 @@ func (s *BuntStore) StoreHosts(hosts HostList) error {
 			}
 
 			host.ID = uuid
+		} else {
+			_, err := s.LoadHostFromID(host.ID.String())
+			if errors.Is(err, ErrNotFound) {
+				// ID is unique. All is good
+				continue
+			}
+
+			if err != nil {
+				return fmt.Errorf("Failed to check host with name %s for duplicates:  %w", host.Name, err)
+			}
+
+			return fmt.Errorf("duplicate host found with name %s and id %s:  %w", host.Name, host.ID, ErrDuplicateEntry)
 		}
 	}
 
