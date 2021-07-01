@@ -83,3 +83,19 @@ func (h *Handler) BootImageFind(c echo.Context) error {
 	imageList = append(imageList, image)
 	return c.JSON(http.StatusOK, imageList)
 }
+
+func (h *Handler) BootImageDelete(c echo.Context) error {
+	name := c.Param("name")
+
+	// TODO add support for deleting more than one image
+	err := h.DB.DeleteBootImages([]string{name})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to delete image").SetInternal(err)
+	}
+
+	res := map[string]interface{}{
+		"images": 1,
+	}
+
+	return c.JSON(http.StatusOK, res)
+}

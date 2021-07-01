@@ -129,6 +129,51 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "host"
+        ],
+        "summary": "Delete hosts by name or nodeset",
+        "description": "Delete hosts in the given nodeset",
+        "operationId": "hostDelete",
+        "parameters": [
+          {
+            "name": "nodeSet",
+            "in": "path",
+            "description": "nodeset syntax. Example: cpn-d13-[01-100]",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": { }
+          },
+          "400": {
+            "description": "Invalid nodeset supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to delete hosts from database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/host/tags/{tags}": {
@@ -523,6 +568,51 @@
           },
           "500": {
             "description": "Failed to fetch image from database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "image"
+        ],
+        "summary": "Delete boot images by name",
+        "description": "Delete boot images with the given name",
+        "operationId": "imageDelete",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of boot image to delete",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": { }
+          },
+          "400": {
+            "description": "Invalid name supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to delete boot images from database",
             "content": {
               "application/json": {
                 "schema": {

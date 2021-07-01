@@ -366,3 +366,34 @@ func TestHostTag(t *testing.T) {
 		assert.Equal(10, ns.Len())
 	}
 }
+
+func TestHostDelete(t *testing.T) {
+	assert := assert.New(t)
+
+	h := &Handler{newTestDB(t)}
+
+	size := 20
+	for i := 0; i < size; i++ {
+		host := tests.HostFactory.MustCreate().(*model.Host)
+		host.Provision = false
+		host.Name = fmt.Sprintf("tux-%02d", i)
+		err := h.DB.StoreHost(host)
+		assert.NoError(err)
+	}
+
+	e := newEcho()
+
+	req := httptest.NewRequest(http.MethodDelete, "/host/find/tux-[05-09]", nil)
+	req.Header.Set(echo.HeaderAccept, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	if assert.NoError(h.HostDelete(c)) {
+		assert.Equal(http.StatusOK, rec.Code)
+	}
+
+	hostList, err := h.DB.Hosts()
+	if assert.NoError(err) {
+		assert.Equal(15, len(hostList))
+	}
+}

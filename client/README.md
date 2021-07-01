@@ -32,6 +32,7 @@ All URIs are relative to *http://localhost/v1*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*HostApi* | [**HostDelete**](docs/HostApi.md#hostdelete) | **Delete** /host/find/{nodeSet} | Delete hosts by name or nodeset
 *HostApi* | [**HostFind**](docs/HostApi.md#hostfind) | **Get** /host/find/{nodeSet} | Find hosts by name or nodeset
 *HostApi* | [**HostList**](docs/HostApi.md#hostlist) | **Get** /host/list | List all hosts
 *HostApi* | [**HostProvision**](docs/HostApi.md#hostprovision) | **Put** /host/provision/{nodeSet} | Set hosts to provision by name or nodeset
@@ -40,6 +41,7 @@ Class | Method | HTTP request | Description
 *HostApi* | [**HostUnprovision**](docs/HostApi.md#hostunprovision) | **Put** /host/unprovision/{nodeSet} | Set hosts to unprovision by name or nodeset
 *HostApi* | [**HostUntag**](docs/HostApi.md#hostuntag) | **Put** /host/untag/{nodeSet} | Untag hosts name or nodeset
 *HostApi* | [**StoreHosts**](docs/HostApi.md#storehosts) | **Post** /host | Add or update hosts in Grendel
+*ImageApi* | [**ImageDelete**](docs/ImageApi.md#imagedelete) | **Delete** /bootimage/find/{name} | Delete boot images by name
 *ImageApi* | [**ImageFind**](docs/ImageApi.md#imagefind) | **Get** /bootimage/find/{name} | Find image by name
 *ImageApi* | [**ImageList**](docs/ImageApi.md#imagelist) | **Get** /bootimage/list | List all images
 *ImageApi* | [**StoreImages**](docs/ImageApi.md#storeimages) | **Post** /bootimage | Add or update images in Grendel

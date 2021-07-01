@@ -49,6 +49,37 @@ paths:
       tags:
       - host
   /host/find/{nodeSet}:
+    delete:
+      description: Delete hosts in the given nodeset
+      operationId: hostDelete
+      parameters:
+      - description: 'nodeset syntax. Example: cpn-d13-[01-100]'
+        explode: false
+        in: path
+        name: nodeSet
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content: {}
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid nodeset supplied
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Failed to delete hosts from database
+      summary: Delete hosts by name or nodeset
+      tags:
+      - host
     get:
       description: Returns a list of hosts in the given nodeset
       operationId: hostFind
@@ -321,6 +352,37 @@ paths:
       tags:
       - image
   /bootimage/find/{name}:
+    delete:
+      description: Delete boot images with the given name
+      operationId: imageDelete
+      parameters:
+      - description: Name of boot image to delete
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content: {}
+          description: successful operation
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid name supplied
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Failed to delete boot images from database
+      summary: Delete boot images by name
+      tags:
+      - image
     get:
       description: Returns image with the given name
       operationId: imageFind

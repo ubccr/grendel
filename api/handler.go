@@ -43,6 +43,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	v1.POST("host", h.HostAdd)
 	v1.GET("host/list", h.HostList)
 	v1.GET("host/find/*", h.HostFind)
+	v1.DELETE("host/find/*", h.HostDelete)
 	v1.GET("host/tags/*", h.HostFindByTags)
 	v1.PUT("host/tag/*", h.HostTag)
 	v1.PUT("host/untag/*", h.HostUntag)
@@ -51,6 +52,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 
 	v1.POST("bootimage", h.BootImageAdd)
 	v1.GET("bootimage/find/:name", h.BootImageFind)
+	v1.DELETE("bootimage/find/:name", h.BootImageDelete)
 	v1.GET("bootimage/list", h.BootImageList)
 }
 

@@ -4,6 +4,7 @@ All URIs are relative to *http://localhost/v1*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**HostDelete**](HostApi.md#HostDelete) | **Delete** /host/find/{nodeSet} | Delete hosts by name or nodeset
 [**HostFind**](HostApi.md#HostFind) | **Get** /host/find/{nodeSet} | Find hosts by name or nodeset
 [**HostList**](HostApi.md#HostList) | **Get** /host/list | List all hosts
 [**HostProvision**](HostApi.md#HostProvision) | **Put** /host/provision/{nodeSet} | Set hosts to provision by name or nodeset
@@ -13,6 +14,40 @@ Method | HTTP request | Description
 [**HostUntag**](HostApi.md#HostUntag) | **Put** /host/untag/{nodeSet} | Untag hosts name or nodeset
 [**StoreHosts**](HostApi.md#StoreHosts) | **Post** /host | Add or update hosts in Grendel
 
+
+
+## HostDelete
+
+> HostDelete(ctx, nodeSet)
+
+Delete hosts by name or nodeset
+
+Delete hosts in the given nodeset
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**nodeSet** | **string**| nodeset syntax. Example: cpn-d13-[01-100] | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
 
 
 ## HostFind

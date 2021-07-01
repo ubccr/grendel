@@ -87,6 +87,27 @@ func (h *Handler) HostFind(c echo.Context) error {
 	return c.JSON(http.StatusOK, hostList)
 }
 
+func (h *Handler) HostDelete(c echo.Context) error {
+	_, nodesetString := path.Split(c.Request().URL.Path)
+
+	nodeset, err := nodeset.NewNodeSet(nodesetString)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid nodeset").SetInternal(err)
+	}
+
+	log.Infof("Got nodeset to delete: %s", nodeset.String())
+
+	err = h.DB.DeleteHosts(nodeset)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to delete hosts").SetInternal(err)
+	}
+
+	res := map[string]interface{}{
+		"hosts": nodeset.Len(),
+	}
+	return c.JSON(http.StatusOK, res)
+}
+
 func (h *Handler) HostFindByTags(c echo.Context) error {
 	_, tagStr := path.Split(c.Request().URL.Path)
 	if tagStr == "" {

@@ -204,3 +204,36 @@ func TestBootImageFindNone(t *testing.T) {
 		assert.Equal(http.StatusNotFound, rec.Code)
 	}
 }
+
+func TestBootImageDelete(t *testing.T) {
+	assert := assert.New(t)
+
+	h := &Handler{newTestDB(t)}
+
+	size := 20
+	for i := 0; i < size; i++ {
+		image := tests.BootImageFactory.MustCreate().(*model.BootImage)
+		image.Name = fmt.Sprintf("centos%02d", i)
+		err := h.DB.StoreBootImage(image)
+		assert.NoError(err)
+	}
+
+	e := newEcho()
+
+	req := httptest.NewRequest(http.MethodDelete, "/bootimage/find/centos14", nil)
+	req.Header.Set(echo.HeaderAccept, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/bootimage/find/:name")
+	c.SetParamNames("name")
+	c.SetParamValues("centos14")
+
+	if assert.NoError(h.BootImageDelete(c)) {
+		assert.Equal(http.StatusOK, rec.Code)
+	}
+
+	bootImages, err := h.DB.BootImages()
+	if assert.NoError(err) {
+		assert.Equal(19, len(bootImages))
+	}
+}
