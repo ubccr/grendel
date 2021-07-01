@@ -54,6 +54,9 @@ type DataStore interface {
 	// StoreBootImages stores a list of BootImages in the data store
 	StoreBootImages(images BootImageList) error
 
+	// DeleteBootImages delete BootImages from the data store
+	DeleteBootImages(names []string) error
+
 	// SetBootImage sets all hosts to use the BootImage with the given name
 	SetBootImage(ns *nodeset.NodeSet, name string) error
 
@@ -75,11 +78,14 @@ type DataStore interface {
 	// UntagHosts removes tags from all hosts in the given NodeSet
 	UntagHosts(ns *nodeset.NodeSet, tags []string) error
 
-	// StoreHosts stores a hosts in the data store. If the host exists it is overwritten
+	// StoreHosts stores a host in the data store. If the host exists it is overwritten
 	StoreHost(host *Host) error
 
 	// StoreHosts stores a list of hosts in the data store. If the host exists it is overwritten
 	StoreHosts(hosts HostList) error
+
+	// DeleteHosts deletes all hosts in the given nodeset.NodeSet from the data store.
+	DeleteHosts(ns *nodeset.NodeSet) error
 
 	// LoadHostFromID returns the Host with the given ID
 	LoadHostFromID(id string) (*Host, error)

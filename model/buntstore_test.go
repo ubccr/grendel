@@ -322,6 +322,32 @@ func TestBuntStoreBootImage(t *testing.T) {
 	}
 }
 
+func TestBuntStoreBootImageDelete(t *testing.T) {
+	assert := assert.New(t)
+
+	store, err := model.NewBuntStore(":memory:")
+	defer store.Close()
+	assert.NoError(err)
+
+	image := tests.BootImageFactory.MustCreate().(*model.BootImage)
+
+	err = store.StoreBootImage(image)
+	assert.NoError(err)
+
+	testImage, err := store.LoadBootImage(image.Name)
+	if assert.NoError(err) {
+		assert.Equal(image.Name, testImage.Name)
+	}
+
+	err = store.DeleteBootImages([]string{testImage.Name})
+	if assert.NoError(err) {
+		_, err = store.LoadBootImage(testImage.Name)
+		if assert.Error(err) {
+			assert.True(errors.Is(err, model.ErrNotFound))
+		}
+	}
+}
+
 func TestBuntStoreDuplicate(t *testing.T) {
 	assert := assert.New(t)
 
@@ -345,6 +371,35 @@ func TestBuntStoreDuplicate(t *testing.T) {
 	err = store.StoreHost(hostDup)
 	if assert.Error(err) {
 		assert.True(errors.Is(err, model.ErrDuplicateEntry))
+	}
+}
+
+func TestBuntStoreHostDelete(t *testing.T) {
+	assert := assert.New(t)
+
+	store, err := model.NewBuntStore(":memory:")
+	defer store.Close()
+	assert.NoError(err)
+
+	host := tests.HostFactory.MustCreate().(*model.Host)
+
+	err = store.StoreHost(host)
+	assert.NoError(err)
+
+	testHost, err := store.LoadHostFromID(host.ID.String())
+	if assert.NoError(err) {
+		assert.Equal(2, len(testHost.Interfaces))
+	}
+
+	ns, err := nodeset.NewNodeSet(testHost.Name)
+	if assert.NoError(err) {
+		err := store.DeleteHosts(ns)
+		assert.NoError(err)
+
+		_, err = store.LoadHostFromID(host.ID.String())
+		if assert.Error(err) {
+			assert.True(errors.Is(err, model.ErrNotFound))
+		}
 	}
 }
 

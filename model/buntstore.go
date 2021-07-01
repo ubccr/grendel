@@ -120,6 +120,24 @@ func (s *BuntStore) StoreHosts(hosts HostList) error {
 	return err
 }
 
+// DeleteHosts deletes all hosts in the given nodeset.NodeSet from the data store.
+func (s *BuntStore) DeleteHosts(ns *nodeset.NodeSet) error {
+	it := ns.Iterator()
+
+	err := s.db.Update(func(tx *buntdb.Tx) error {
+		for it.Next() {
+			_, err := tx.Delete(HostKeyPrefix + ":" + it.Value())
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	return err
+}
+
 // LoadHostFromName returns the Host with the given name
 func (s *BuntStore) LoadHostFromName(name string) (*Host, error) {
 	var host *Host
@@ -591,6 +609,22 @@ func (s *BuntStore) StoreBootImages(images BootImageList) error {
 			}
 
 			_, _, err = tx.Set(BootImageKeyPrefix+":"+image.Name, string(val), nil)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	return err
+}
+
+// DeleteBootImages deletes boot images from the data store.
+func (s *BuntStore) DeleteBootImages(names []string) error {
+	err := s.db.Update(func(tx *buntdb.Tx) error {
+		for _, name := range names {
+			_, err := tx.Delete(BootImageKeyPrefix + ":" + name)
 			if err != nil {
 				return err
 			}
