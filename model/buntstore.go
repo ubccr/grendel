@@ -79,26 +79,22 @@ func (s *BuntStore) StoreHosts(hosts HostList) error {
 		// Keys are case-insensitive
 		host.Name = strings.ToLower(host.Name)
 
-		if host.ID.IsNil() {
+		checkHost, err := s.LoadHostFromName(host.Name)
+		if errors.Is(err, ErrNotFound) {
 			uuid, err := ksuid.NewRandom()
 			if err != nil {
 				return err
 			}
 
 			host.ID = uuid
-		} else {
-			_, err := s.LoadHostFromID(host.ID.String())
-			if errors.Is(err, ErrNotFound) {
-				// ID is unique. All is good
-				continue
-			}
-
-			if err != nil {
-				return fmt.Errorf("Failed to check host with name %s for duplicates:  %w", host.Name, err)
-			}
-
-			return fmt.Errorf("duplicate host found with name %s and id %s:  %w", host.Name, host.ID, ErrDuplicateEntry)
+			continue
 		}
+
+		if err != nil {
+			return fmt.Errorf("Failed to check host with name %s for duplicates:  %w", host.Name, err)
+		}
+
+		host.ID = checkHost.ID
 	}
 
 	err := s.db.Update(func(tx *buntdb.Tx) error {

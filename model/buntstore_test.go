@@ -348,7 +348,7 @@ func TestBuntStoreBootImageDelete(t *testing.T) {
 	}
 }
 
-func TestBuntStoreDuplicate(t *testing.T) {
+func TestBuntStoreUpdate(t *testing.T) {
 	assert := assert.New(t)
 
 	store, err := model.NewBuntStore(":memory:")
@@ -365,12 +365,31 @@ func TestBuntStoreDuplicate(t *testing.T) {
 		assert.Equal(2, len(testHost.Interfaces))
 	}
 
-	// Can't store host with same ID
+	// Store host with same name is update
 	hostDup := tests.HostFactory.MustCreate().(*model.Host)
 	hostDup.ID = host.ID
+	hostDup.Name = host.Name
 	err = store.StoreHost(hostDup)
-	if assert.Error(err) {
-		assert.True(errors.Is(err, model.ErrDuplicateEntry))
+	if assert.NoError(err) {
+		hosts, err := store.Hosts()
+		assert.NoError(err)
+		assert.Equal(1, len(hosts))
+	}
+
+	// Store host with different name gets new ID
+	hostDup = tests.HostFactory.MustCreate().(*model.Host)
+	hostDup.ID = host.ID
+	hostDup.Name = "cpn-new"
+	err = store.StoreHost(hostDup)
+	if assert.NoError(err) {
+		hosts, err := store.Hosts()
+		assert.NoError(err)
+		assert.Equal(2, len(hosts))
+		idCheck := ""
+		for _, h := range hosts {
+			assert.NotEqual(idCheck, h.ID.String())
+			idCheck = h.ID.String()
+		}
 	}
 }
 
