@@ -107,6 +107,11 @@ func discoverFromSwitch(file, domain string, subnet, bmcSubnet net.IP, netmask n
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
 		cols := strings.Split(scanner.Text(), "\t")
+		if len(cols) != 2 {
+			log.Warnf("Invalid mapping format")
+			break
+		}
+
 		hostName := cols[0]
 
 		port, err := strconv.Atoi(cols[1])
