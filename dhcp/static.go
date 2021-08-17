@@ -19,7 +19,9 @@ package dhcp
 
 import (
 	"fmt"
+	"math/rand"
 	"net"
+	"time"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/insomniacslk/dhcp/rfc1035label"
@@ -63,8 +65,15 @@ func (s *Server) staticHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) erro
 
 	resp.UpdateOption(dhcpv4.OptIPAddressLeaseTime(s.LeaseTime))
 
-	if len(s.DNSServers) > 0 && req.IsOptionRequested(dhcpv4.OptionDomainNameServer) {
+	if len(s.DNSServers) == 1 && req.IsOptionRequested(dhcpv4.OptionDomainNameServer) {
 		resp.UpdateOption(dhcpv4.OptDNS(s.DNSServers...))
+	} else if len(s.DNSServers) > 1 && req.IsOptionRequested(dhcpv4.OptionDomainNameServer) {
+		// Randomize DNS servers to distribute load
+		// TODO: add option to turn this off
+		dnsServers := append([]net.IP(nil), s.DNSServers...)
+		rand.Seed(time.Now().UnixNano())
+		rand.Shuffle(len(dnsServers), func(i, j int) { dnsServers[i], dnsServers[j] = dnsServers[j], dnsServers[i] })
+		resp.UpdateOption(dhcpv4.OptDNS(dnsServers...))
 	}
 
 	if req.IsOptionRequested(dhcpv4.OptionInterfaceMTU) {
