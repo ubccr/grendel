@@ -36,7 +36,7 @@ require (
 	github.com/stmcginnis/gofish v0.2.0
 	github.com/stretchr/testify v1.6.1
 	github.com/tidwall/buntdb v1.1.2
-	github.com/tidwall/gjson v1.8.1
+	github.com/tidwall/gjson v1.10.2
 	github.com/tidwall/sjson v1.1.7
 	github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb
 	github.com/vmware/goipmi v0.0.0-20181114221114-2333cd82d702
