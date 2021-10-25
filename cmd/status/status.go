@@ -20,6 +20,7 @@ package status
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/dustin/go-humanize"
 	"github.com/fatih/color"
@@ -28,6 +29,7 @@ import (
 	"github.com/ubccr/grendel/api"
 	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/logger"
+	"github.com/ubccr/grendel/model"
 )
 
 type StatProvision struct {
@@ -59,6 +61,7 @@ var (
 			}
 
 			defaultImage := viper.GetString("provision.default_image")
+			inputTags := strings.Join(args, ",")
 
 			imageList, _, err := gc.ImageApi.ImageList(context.Background())
 			if err != nil {
@@ -71,7 +74,14 @@ var (
 				stats.images[img.Name] = &StatProvision{}
 			}
 
-			hostList, _, err := gc.HostApi.HostList(context.Background())
+			var hostList model.HostList
+
+			if inputTags == "" {
+				hostList, _, err = gc.HostApi.HostList(context.Background())
+			} else {
+				hostList, _, err = gc.HostApi.HostTags(context.Background(), inputTags)
+			}
+
 			if err != nil {
 				return cmd.NewApiError("Failed to list hosts", err)
 			}
@@ -95,6 +105,10 @@ var (
 				}
 
 				for _, tag := range host.Tags {
+					if inputTags != "" && !strings.Contains(inputTags, tag) {
+						continue
+					}
+
 					if _, ok := stats.tags[tag]; !ok {
 						stats.tags[tag] = &StatProvision{}
 					}
@@ -123,16 +137,20 @@ var (
 
 			fmt.Printf("Grendel version %s\n\n", api.Version)
 			yellow.Printf("Nodes: %s\n\n", humanize.Comma(int64(nodes)))
-			fmt.Printf("%-30s%15s%15s%15s\n", fmt.Sprintf("Boot Images (%d)", len(imageList)), "Provision", "Unprovision", "Total")
-			for img, stat := range stats.images {
-				cyan.Printf("%-30s%15s%15s%15s\n",
-					img,
-					humanize.Comma(int64(stat.provision)),
-					humanize.Comma(int64(stat.unprovision)),
-					humanize.Comma(int64(stat.provision+stat.unprovision)))
-			}
 
-			fmt.Println()
+			if inputTags == "" {
+				fmt.Printf("%-30s%15s%15s%15s\n", fmt.Sprintf("Boot Images (%d)", len(imageList)), "Provision", "Unprovision", "Total")
+				for img, stat := range stats.images {
+					cyan.Printf("%-30s%15s%15s%15s\n",
+						img,
+						humanize.Comma(int64(stat.provision)),
+						humanize.Comma(int64(stat.unprovision)),
+						humanize.Comma(int64(stat.provision+stat.unprovision)))
+				}
+
+				fmt.Println()
+				return nil
+			}
 
 			fmt.Printf("%-30s%15s%15s%15s\n", fmt.Sprintf("Tags (%d)", len(stats.tags)), "Provision", "Unprovision", "Total")
 			for tag, stat := range stats.tags {
