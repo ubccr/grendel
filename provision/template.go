@@ -24,6 +24,7 @@ import (
 	"text/template"
 
 	"github.com/labstack/echo/v4"
+	"github.com/ubccr/grendel/model"
 )
 
 const defaultTemplateGlob = "/usr/share/grendel/templates/*.tmpl"
@@ -40,27 +41,32 @@ var userDataTmpl string
 //go:embed templates/meta-data.tmpl
 var metaDataTmpl string
 
+// Template functions
+var funcMap = template.FuncMap{
+	"hasTag": hasTag,
+}
+
 type TemplateRenderer struct {
 	templates *template.Template
 }
 
 func NewTemplateRenderer() (*TemplateRenderer, error) {
-	tmpl, err := template.New("ipxe.tmpl").Parse(ipxeTmpl)
+	tmpl, err := template.New("ipxe.tmpl").Funcs(funcMap).Parse(ipxeTmpl)
 	if err != nil {
 		return nil, err
 	}
 
-	tmpl, err = tmpl.New("kickstart.tmpl").Parse(kickstartTmpl)
+	tmpl, err = tmpl.New("kickstart.tmpl").Funcs(funcMap).Parse(kickstartTmpl)
 	if err != nil {
 		return nil, err
 	}
 
-	tmpl, err = tmpl.New("user-data.tmpl").Parse(userDataTmpl)
+	tmpl, err = tmpl.New("user-data.tmpl").Funcs(funcMap).Parse(userDataTmpl)
 	if err != nil {
 		return nil, err
 	}
 
-	tmpl, err = tmpl.New("meta-data.tmpl").Parse(metaDataTmpl)
+	tmpl, err = tmpl.New("meta-data.tmpl").Funcs(funcMap).Parse(metaDataTmpl)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +77,7 @@ func NewTemplateRenderer() (*TemplateRenderer, error) {
 	}
 
 	if len(matches) > 0 {
-		tmpl, err = tmpl.ParseGlob(defaultTemplateGlob)
+		tmpl, err = tmpl.Funcs(funcMap).ParseGlob(defaultTemplateGlob)
 		if err != nil {
 			return nil, err
 		}
@@ -92,4 +98,14 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 	c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
 
 	return t.templates.ExecuteTemplate(w, name, data)
+}
+
+func hasTag(host model.Host, tag string) bool {
+	for _, t := range host.Tags {
+		if tag == t {
+			return true
+		}
+	}
+
+	return false
 }
