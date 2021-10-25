@@ -50,13 +50,14 @@ var (
 			}
 
 			defaultImage := viper.GetString("provision.default_image")
+			inputTags := strings.Join(args, ",")
 
 			var hostList model.HostList
 
-			if len(args) == 0 {
+			if inputTags == "" {
 				hostList, _, err = gc.HostApi.HostList(context.Background())
 			} else {
-				hostList, _, err = gc.HostApi.HostTags(context.Background(), strings.Join(args, ","))
+				hostList, _, err = gc.HostApi.HostTags(context.Background(), inputTags)
 			}
 
 			if err != nil {
@@ -68,6 +69,10 @@ var (
 			nodes := 0
 			for _, host := range hostList {
 				for _, tag := range host.Tags {
+					if inputTags != "" && !strings.Contains(inputTags, tag) {
+						continue
+					}
+
 					if _, ok := stats[tag]; !ok {
 						stats[tag] = &StatTag{provision: nodeset.EmptyNodeSet(), unprovision: nodeset.EmptyNodeSet()}
 					}
