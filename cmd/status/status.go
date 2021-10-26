@@ -154,6 +154,10 @@ var (
 
 			fmt.Printf("%-30s%15s%15s%15s\n", fmt.Sprintf("Tags (%d)", len(stats.tags)), "Provision", "Unprovision", "Total")
 			for _, tag := range strings.Split(inputTags, ",") {
+				if _, ok := stats.tags[tag]; !ok {
+					continue
+				}
+
 				stat := stats.tags[tag]
 
 				cyan.Printf("%-30s%15s%15s%15s\n",
