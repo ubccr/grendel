@@ -6,6 +6,7 @@ require (
 	github.com/Pallinder/go-randomdata v1.2.0
 	github.com/alouca/gologger v0.0.0-20120904114645-7d4b7291de9c // indirect
 	github.com/alouca/gosnmp v0.0.0-20170620005048-04d83944c9ab
+	github.com/bits-and-blooms/bitset v1.2.1
 	github.com/bluele/factory-go v0.0.0-20181130035244-e6e8633dd3fe
 	github.com/dustin/go-humanize v1.0.0
 	github.com/fatih/color v1.10.0
@@ -40,7 +41,6 @@ require (
 	github.com/tidwall/sjson v1.1.7
 	github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb
 	github.com/vmware/goipmi v0.0.0-20181114221114-2333cd82d702
-	github.com/willf/bitset v1.1.10
 	golang.org/x/crypto v0.0.0-20200117160349-530e935923ad
 	golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
 	gopkg.in/ini.v1 v1.51.1 // indirect
