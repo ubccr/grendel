@@ -33,22 +33,25 @@ autoinstall:
     - {device: format-4, path: /, type: mount, id: mount-3}
     - {device: format-2, path: /boot, type: mount, id: mount-1}
     - {device: format-1, path: /boot/efi, type: mount, id: mount-0}
-  refresh-installer:
-    channel: edge
-    update: yes
-  late-commands:
-    - curl -X POST {{ .complete }}
+  network:
+    network:
+      version: 2
+      ethernets:
+        {{ .nic.Name }}:
+          match:
+            macaddress: {{ .nic.MAC }}
+          dhcp4: yes
   user-data:
     disable_root: false
     users:
-{{- with .rootpw }}
-      - name: root
-        hashed_passwd: '{{ . }}'
-{{ end -}}
-#      - name: ubuntu
-#        gecos: Ubuntu User
-#        primary_group: ubuntu
-#        groups: users, admin
-#        shell: /bin/bash
+      - name: ubuntu
+        primary_group: ubuntu
+        groups: users, admin
+        shell: /bin/bash
 #        ssh_import_id: gh:YOURGITHUBIDHERE
-#        sudo: ALL=(ALL) NOPASSWD:ALL
+        sudo: ALL=(ALL) NOPASSWD:ALL
+  late-commands:
+    - curl -X POST {{ .complete }}
+{{- with .rootpw }}
+    - curtin in-target --target=/target -- usermod -p '{{ . }}' root
+{{ end }}
