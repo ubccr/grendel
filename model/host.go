@@ -80,7 +80,7 @@ func (h *Host) FromJSON(hostJSON string) {
 	res := gjson.Get(hostJSON, "interfaces")
 	for _, i := range res.Array() {
 		nic := &NetInterface{}
-		nic.Name = i.Get("name").String()
+		nic.Name = i.Get("ifname").String()
 		nic.FQDN = i.Get("fqdn").String()
 		nic.BMC = i.Get("bmc").Bool()
 		nic.IP = net.ParseIP(i.Get("ip").String())
