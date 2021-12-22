@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+## [0.0.6] - 2021-10-25
+
+- Add support for kickstarting both uefi and legacy bios nodes from the same
+  kickstart template based on tags
+- Clean up status command
+- Randomize DNS server list in DHCP responses to distribute load
+- Fix duplicate checking. Properly update hosts with same name
+- Add delete host/image API and CLI
+- Add check for duplicate host IDs
+- Fix bug in delay and fanout
+- Add support for cloud-init and Ubuntu autoinstall
+- Add support for power/on off in CLI
+
+
 ## [0.0.5] - 2021-03-26
 
 - Handle DHCPINFORM
@@ -32,8 +46,9 @@
 
 - Initial release
 
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.5...HEAD
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.6...HEAD
 [0.0.1]: https://github.com/ubccr/grendel/releases/tag/v0.0.1
 [0.0.2]: https://github.com/ubccr/grendel/releases/tag/v0.0.2
 [0.0.4]: https://github.com/ubccr/grendel/releases/tag/v0.0.4
 [0.0.5]: https://github.com/ubccr/grendel/releases/tag/v0.0.5
+[0.0.6]: https://github.com/ubccr/grendel/releases/tag/v0.0.6

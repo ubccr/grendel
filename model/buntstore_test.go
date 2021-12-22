@@ -105,6 +105,24 @@ func TestBuntStoreHost(t *testing.T) {
 	}
 }
 
+func TestBuntStoreIfname(t *testing.T) {
+	assert := assert.New(t)
+
+	store, err := model.NewBuntStore(":memory:")
+	defer store.Close()
+	assert.NoError(err)
+
+	host := tests.HostFactory.MustCreate().(*model.Host)
+
+	err = store.StoreHost(host)
+	assert.NoError(err)
+
+	testHost, err := store.LoadHostFromName(host.Name)
+	if assert.NoError(err) {
+		assert.Equal(host.Interfaces[0].Name, testHost.Interfaces[0].Name)
+	}
+}
+
 func TestBuntStoreHostList(t *testing.T) {
 	assert := assert.New(t)
 

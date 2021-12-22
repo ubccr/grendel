@@ -151,7 +151,7 @@ func (j *JobRunner) RunPower(host *model.Host, powerType int) {
 		case PowerOn:
 			err = sysmgr.PowerOn()
 		case PowerOff:
-			err = sysmgr.PowerOn()
+			err = sysmgr.PowerOff()
 		default:
 			err = fmt.Errorf("Invalid power type provided: %d", powerType)
 		}

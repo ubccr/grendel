@@ -42,11 +42,13 @@ done
 
 cat <<EOF > /tmp/diskpart.cfg
 zerombr
-clearpart --all --initlabel --disklabel=gpt
+clearpart --all --initlabel {{if not (hasTag .host "legacy")}}--disklabel=gpt{{end}}
 
 part swap --ondisk=$ROOTDRIVE --asprimary --size=8192
 part /boot --ondisk=$ROOTDRIVE --asprimary --fstype="xfs" --size=1024
+{{ if not (hasTag .host "legacy") -}}
 part /boot/efi --ondisk=$ROOTDRIVE --fstype=efi --size=256
+{{ end -}}
 part / --ondisk=$ROOTDRIVE --asprimary --fstype="xfs" --size=51200
 part /scratch --ondisk=$ROOTDRIVE --asprimary --fstype="xfs" --size=2048 --grow
 EOF
