@@ -25,12 +25,14 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/model"
+	"github.com/ubccr/grendel/util"
 )
 
 type Handler struct {
@@ -173,14 +175,24 @@ func (h *Handler) Ipxe(c echo.Context) error {
 	data["bootimage"] = bootImage
 	data["nic"] = nic
 	data["host"] = host
+	data["gateway"] = util.DefaultGateway(nic.IP)
+	data["dns"] = viper.GetStringSlice("dhcp.dns_servers")
 
 	commandLine := bootImage.CommandLine
 
-	commandLine = strings.ReplaceAll(commandLine, "$kickstart", data["kickstart"].(string))
-	commandLine = strings.ReplaceAll(commandLine, "$repo", data["repo"].(string))
-	commandLine = strings.ReplaceAll(commandLine, "$liveimg", data["liveimg"].(string))
-	commandLine = strings.ReplaceAll(commandLine, "$mac", nic.MAC.String())
-	commandLine = strings.ReplaceAll(commandLine, "$cloudinit", data["cloudinit"].(string))
+	if commandLine != "" {
+		cmdTmpl, err := template.New("cmd").Parse(commandLine)
+		if err != nil {
+			return err
+		}
+
+		var buf bytes.Buffer
+		err = cmdTmpl.Execute(&buf, data)
+		if err != nil {
+			return err
+		}
+		commandLine = buf.String()
+	}
 
 	data["commandLine"] = commandLine
 
@@ -283,6 +295,8 @@ func (h *Handler) UserData(c echo.Context) error {
 	data["nic"] = nic
 	data["host"] = host
 	data["rootpw"] = viper.GetString("provision.root_password")
+	data["gateway"] = util.DefaultGateway(nic.IP)
+	data["dns"] = viper.GetStringSlice("dhcp.dns_servers")
 
 	tmplName := "user-data.tmpl"
 	if bootImage.UserData != "" {
