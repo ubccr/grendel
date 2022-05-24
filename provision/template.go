@@ -18,11 +18,15 @@
 package provision
 
 import (
+	"bytes"
 	_ "embed"
 	"io"
 	"path/filepath"
+	"strings"
 	"text/template"
 
+	"github.com/coreos/butane/config"
+	"github.com/coreos/butane/config/common"
 	"github.com/labstack/echo/v4"
 	"github.com/ubccr/grendel/model"
 )
@@ -41,9 +45,13 @@ var userDataTmpl string
 //go:embed templates/meta-data.tmpl
 var metaDataTmpl string
 
+//go:embed templates/butane.tmpl
+var butaneTmpl string
+
 // Template functions
 var funcMap = template.FuncMap{
 	"hasTag": hasTag,
+	"Split":  split,
 }
 
 type TemplateRenderer struct {
@@ -67,6 +75,11 @@ func NewTemplateRenderer() (*TemplateRenderer, error) {
 	}
 
 	tmpl, err = tmpl.New("meta-data.tmpl").Funcs(funcMap).Parse(metaDataTmpl)
+	if err != nil {
+		return nil, err
+	}
+
+	tmpl, err = tmpl.New("butane.tmpl").Funcs(funcMap).Parse(butaneTmpl)
 	if err != nil {
 		return nil, err
 	}
@@ -100,6 +113,26 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
+func (t *TemplateRenderer) RenderIgnition(code int, name string, data interface{}, c echo.Context) error {
+	buf := new(bytes.Buffer)
+	err := t.Render(buf, name, data, c)
+	if err != nil {
+		return err
+	}
+
+	options := common.TranslateBytesOptions{
+		Pretty: false,
+	}
+
+	// TODO: how should we handle warnings in the translation?
+	dataOut, _, err := config.TranslateBytes(buf.Bytes(), options)
+	if err != nil {
+		return err
+	}
+
+	return c.HTMLBlob(code, dataOut)
+}
+
 func hasTag(host model.Host, tag string) bool {
 	for _, t := range host.Tags {
 		if tag == t {
@@ -108,4 +141,8 @@ func hasTag(host model.Host, tag string) bool {
 	}
 
 	return false
+}
+
+func split(s, sep string) []string {
+	return strings.Split(s, sep)
 }

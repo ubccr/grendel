@@ -80,6 +80,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	boot.GET("cloud-init/user-data", h.UserData)
 	boot.GET("cloud-init/meta-data", h.MetaData)
 	boot.GET("cloud-init/vendor-data", h.VendorData)
+	boot.GET("pxe-config.ign", h.Ignition)
 }
 
 func (h *Handler) Index(c echo.Context) error {
@@ -148,6 +149,7 @@ func (h *Handler) newTemplateParams(c echo.Context) map[string]interface{} {
 	liveimg := fmt.Sprintf("%s/boot/%s/file/liveimg", baseURI, c.Param("token"))
 	cloudInit := fmt.Sprintf("%s/boot/%s/cloud-init/", baseURI, c.Param("token"))
 	complete := fmt.Sprintf("%s/boot/%s/complete", baseURI, c.Param("token"))
+	ignition := fmt.Sprintf("%s/boot/%s/pxe-config.ign", baseURI, c.Param("token"))
 
 	data := map[string]interface{}{
 		"token":     c.Param("token"),
@@ -156,6 +158,7 @@ func (h *Handler) newTemplateParams(c echo.Context) map[string]interface{} {
 		"repo":      repo,
 		"liveimg":   liveimg,
 		"cloudinit": cloudInit,
+		"ignition":  ignition,
 		"complete":  complete,
 	}
 
@@ -325,4 +328,28 @@ func (h *Handler) MetaData(c echo.Context) error {
 
 func (h *Handler) VendorData(c echo.Context) error {
 	return c.String(http.StatusOK, "")
+}
+
+func (h *Handler) Ignition(c echo.Context) error {
+	bootImage, host, nic, err := h.verifyClaims(c)
+	if err != nil {
+		return err
+	}
+
+	data := h.newTemplateParams(c)
+	data["bootimage"] = bootImage
+	data["nic"] = nic
+	data["host"] = host
+	data["rootpw"] = viper.GetString("provision.root_password")
+	data["gateway"] = util.DefaultGateway(nic.IP)
+	data["dns"] = viper.GetStringSlice("dhcp.dns_servers")
+
+	tmplName := "butane.tmpl"
+	if bootImage.Butane != "" {
+		tmplName = bootImage.Butane
+	}
+
+	log.Infof("Sending ignition config to host %s", host.Name)
+	renderer := c.Echo().Renderer.(*TemplateRenderer)
+	return renderer.RenderIgnition(http.StatusOK, tmplName, data, c)
 }

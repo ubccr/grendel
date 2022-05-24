@@ -36,6 +36,7 @@ type BootImage struct {
 	Verify            bool        `json:"verify"`
 	ProvisionTemplate string      `json:"provision_template"`
 	UserData          string      `json:"user_data"`
+	Butane            string      `json:"butane"`
 }
 
 func NewBootImageList() BootImageList {

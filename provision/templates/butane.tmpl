@@ -1,0 +1,8 @@
+variant: flatcar
+version: 1.0.0
+passwd:
+  users:
+{{- with .rootpw }}
+    - name: root
+      password_hash: {{ . }} 
+{{ end }}
