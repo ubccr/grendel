@@ -7,5 +7,6 @@ firmware/bin
 *.swp
 grendel-*.tar.gz
 scripts/openapi-generator-cli.jar
+key.gpg
 
 dist/

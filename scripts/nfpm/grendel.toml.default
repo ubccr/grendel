@@ -1,0 +1,150 @@
+#------------------------------------------------------------------------------
+# Grendel Config
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# General
+#------------------------------------------------------------------------------
+
+#
+# Path database file. Defaults to ":memory:" which uses in-memory store. Change
+# this to a filepath for persisent storage.
+#
+dbpath = "/var/lib/grendel/grendel.db"
+
+#
+# By default, all loggers are on. You can turn off logging for specific
+# services here.
+#
+loggers = {cli="on", tftp="off", dhcp="on", dns="off", provision="on", api="on", pxe="off"}
+
+#------------------------------------------------------------------------------
+# HTTP Provision Server
+#------------------------------------------------------------------------------
+[provision]
+
+# For provisioning with http
+listen = "0.0.0.0:80"
+scheme = "http"
+
+# For provisioning with https
+#
+#listen = "0.0.0.0:443"
+#
+#scheme = "https"
+#
+# hostname for grendel, should also be the hostname for the SSL certificate
+#hostname = "my.host.name"
+#
+# Path to ssl cert (.crt file)
+#cert = "/path/to/cert/file/hostname.crt"
+#
+# Path to ssl key (.key file)
+#key = "/path/to/cert/file/hostname.key"
+#
+
+# TTL in seconds for provision tokens. Defaults to 1 hour
+token_ttl = 3600
+
+# Can generate secret with `openssl rand -hex 32`
+#secret = "_provisioning_secret_here_"
+
+# Hashed root password used in kickstart template
+root_password = ""
+
+# Default OS image name
+default_image = ""
+
+# Path to repo directory
+repo_dir = "/var/lib/grendel/repo"
+
+#------------------------------------------------------------------------------
+# DHCP Server
+#------------------------------------------------------------------------------
+[dhcp]
+listen = "0.0.0.0:67"
+
+# Default lease time
+lease_time = "24h"
+
+# List of DNS servers
+dns_servers = []
+
+# List of DNS search domains
+domain_search = []
+
+# Default MTU
+mtu = 1500
+
+# Dynamic router configuration. Grendel will generate the router option 3 for
+# DHCP responses based on the hosts IP address, netmask, and router_octet4. For
+# example, if all subnets in your data center have routers 10.x.x.254 you can
+# set router_octet4 = 254. If a host ip address is 10.104.13.10, Grendel will
+# set the router option in the dhcp response to 10.104.13.254.  Note setting
+# this option will set the netmask to 24. Off by default.
+router_octet4 = 0
+
+# Hard code a static router. Not set by default.
+#router = ""
+
+# Default netmask example: 8, 16, 24, etc.
+netmask = 24
+
+# Only run DHCP Proxy server
+proxy_only = false
+
+#------------------------------------------------------------------------------
+# DNS Server
+#------------------------------------------------------------------------------
+[dns]
+listen = "0.0.0.0:8553"
+
+# Default TTL for dns responses
+ttl = 86400
+
+#------------------------------------------------------------------------------
+# TFTP Server
+#------------------------------------------------------------------------------
+[tftp]
+listen = "0.0.0.0:69"
+
+#------------------------------------------------------------------------------
+# PXE Server
+#------------------------------------------------------------------------------
+[pxe]
+listen = "0.0.0.0:4011"
+
+#------------------------------------------------------------------------------
+# API Server
+#------------------------------------------------------------------------------
+[api]
+# Can generate secret with `openssl rand -hex 32`
+#secret = "_api_secret_here_"
+
+# Path to unix socket
+socket_path = "grendel-api.socket"
+
+#------------------------------------------------------------------------------
+# API Client Config
+#------------------------------------------------------------------------------
+[client]
+# Grendel API endpoint
+api_endpoint = "grendel-api.socket"
+
+# Verify ssl certs? false (yes) true (no)
+insecure = false
+
+#------------------------------------------------------------------------------
+# Global BMC Config
+#------------------------------------------------------------------------------
+[bmc]
+user = ""
+password = ""
+
+#------------------------------------------------------------------------------
+# Automatic Host Discovery Config
+#------------------------------------------------------------------------------
+[discovery]
+user = ""
+password = ""
+domain = ""

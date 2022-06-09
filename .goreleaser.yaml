@@ -6,13 +6,59 @@ before:
 builds:
   - env:
       - CGO_ENABLED=0
+    goarch:
+      - amd64
     goos:
       - linux
+    ldflags:
+      - -s -w -X github.com/ubccr/grendel/api.Version={{.Version}}
 archives:
   - replacements:
-      linux: Linux
-      386: i386
+      linux: linux
       amd64: x86_64
+    wrap_in_directory: true
+    name_template: "{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
+    files:
+      - LICENSE
+      - NOTICE
+      - README.md
+      - CHANGELOG.md
+      - grendel.toml.sample
+nfpms:
+  - vendor: University at Buffalo
+    homepage: https://github.com/ubccr/grendel
+    maintainer: Andrew E. Bruno <aebruno2@buffalo.edu>
+    license: GPLv3
+    description: |-
+      Bare Metal Provisioning for HPC
+    formats:
+      - deb
+      - rpm    
+    overrides:
+      deb:
+        file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Arch }}"
+        scripts:
+          postinstall: ./scripts/nfpm/install.sh
+      rpm:
+        file_name_template: "{{ .ProjectName }}-{{ .Version }}-{{ .Arch }}"
+        scripts:
+          preinstall: ./scripts/nfpm/install.sh
+    rpm:
+      signature:
+        key_file: key.gpg
+    deb:
+      signature:
+        key_file: key.gpg
+    contents:
+      - src: ./scripts/nfpm/grendel.toml.default
+        dst: /etc/grendel/grendel.toml
+        type: "config|noreplace"
+        file_info:
+          mode: 0600
+          owner: grendel
+          group: grendel
+      - src: ./scripts/nfpm/grendel.service
+        dst: /usr/lib/systemd/system/grendel.service
 checksum:
   name_template: 'checksums.txt'
 snapshot:
