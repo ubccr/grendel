@@ -46,7 +46,7 @@ scheme = "http"
 # TTL in seconds for provision tokens. Defaults to 1 hour
 token_ttl = 3600
 
-# Can generate secret with `openssl rand -hex 32`
+# Can generate secret with `openssl rand -hex 16`
 #secret = "_provisioning_secret_here_"
 
 # Hashed root password used in kickstart template
@@ -118,7 +118,7 @@ listen = "0.0.0.0:4011"
 # API Server
 #------------------------------------------------------------------------------
 [api]
-# Can generate secret with `openssl rand -hex 32`
+# Can generate secret with `openssl rand -hex 16`
 #secret = "_api_secret_here_"
 
 # Path to unix socket

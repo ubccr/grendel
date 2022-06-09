@@ -4,10 +4,11 @@ The following are tips for deploying Grendel in a production environment.
 
 ## Database settings
 
-By default, Grendel's database is stored entirely in memory and is not written
-to disk. This means any changes to the Grendel database will be lost next time
-Grendel is restarted. If you manage all your boot images and compute nodes via
-JSON files, simply make sure Grendel is started with the following options:
+Unless you installed an rpm or deb package, Grendel's database is stored
+entirely in memory by default and is not written to disk. This means any
+changes to the Grendel database will be lost next time Grendel is restarted. If
+you manage all your boot images and compute nodes via JSON files, simply make
+sure Grendel is started with the following options:
 
 ```
 grendel serve --hosts /path/to/hosts.json --images /path/to/images.json
@@ -25,7 +26,7 @@ setting this config param:
 # Path database file. Defaults to ":memory:" which uses in-memory store. Change
 # this to a filepath for persisent storage.
 #
-dbpath = "/var/grendel/grendel.db"
+dbpath = "/var/lib/grendel/grendel.db"
 ```
 
 Any changes to the Grendel database will be persisted between restarts.
@@ -83,7 +84,7 @@ part of the stub-zone like so:
 ## Systemd unit file
 
 In production it's recommended to setup Grendel in systemd. Here's an example
-systemd unit file:
+systemd unit file that is shipped with the rpm and deb packages:
 
 ```ini
 [Unit]
@@ -94,16 +95,14 @@ After=syslog.target network.target
 Type=simple
 User=grendel
 Group=grendel
-WorkingDirectory=/usr/share/grendel
-ExecStart=/usr/local/bin/grendel serve --verbose -c /etc/grendel/grendel.toml
+WorkingDirectory=/var/lib/grendel
+ExecStart=/usr/bin/grendel serve --verbose -c /etc/grendel/grendel.toml
 Restart=on-abort
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE CAP_NET_RAW
+AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_NET_RAW
+StateDirectory=grendel
+ConfigurationDirectory=grendel
 
 [Install]
 WantedBy=multi-user.target
-```
-
-To allow binding to lower ports run:
-
-```
-sudo setcap CAP_NET_BIND_SERVICE,CAP_NET_RAW=+eip /usr/local/bin/grendel
 ```

@@ -46,7 +46,7 @@ scheme = "http"
 # TTL in seconds for provision tokens. Defaults to 1 hour
 token_ttl = 3600
 
-# Can generate secret with `openssl rand -hex 32`
+# Can generate secret with `openssl rand -hex 16`
 #secret = "_provisioning_secret_here_"
 
 # Hashed root password used in kickstart template
@@ -97,6 +97,7 @@ proxy_only = false
 # DNS Server
 #------------------------------------------------------------------------------
 [dns]
+# Change this to 0.0.0.0:53 for production deployments
 listen = "0.0.0.0:8553"
 
 # Default TTL for dns responses
@@ -118,18 +119,18 @@ listen = "0.0.0.0:4011"
 # API Server
 #------------------------------------------------------------------------------
 [api]
-# Can generate secret with `openssl rand -hex 32`
+# Can generate secret with `openssl rand -hex 16`
 #secret = "_api_secret_here_"
 
 # Path to unix socket
-socket_path = "grendel-api.socket"
+socket_path = "/var/lib/grendel/grendel-api.socket"
 
 #------------------------------------------------------------------------------
 # API Client Config
 #------------------------------------------------------------------------------
 [client]
 # Grendel API endpoint
-api_endpoint = "grendel-api.socket"
+api_endpoint = "/var/lib/grendel/grendel-api.socket"
 
 # Verify ssl certs? false (yes) true (no)
 insecure = false

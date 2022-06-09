@@ -8,5 +8,6 @@ firmware/bin
 grendel-*.tar.gz
 scripts/openapi-generator-cli.jar
 key.gpg
+venv/
 
 dist/

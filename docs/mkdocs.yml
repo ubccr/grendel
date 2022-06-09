@@ -34,10 +34,10 @@ markdown_extensions:
 
 nav:
     - What is Grendel?: index.md
-    - Introduction: intro.md
+    - Installation: install.md
     - Quick Start: quickstart.md
     - Background: background.md
-    - Production Deployment: production.md
+    - Production Deployments: production.md
     - Publications: publications.md
     - Advanced:
         - Dynamic DHCP Router: advanced/router.md

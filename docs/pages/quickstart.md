@@ -10,14 +10,6 @@ Grendel server.
     This guide shows how to get up and running with Grendel quickly. For
     notes on production deployments please see [here](production.md).
 
-## Installation
-
-To install Grendel download a copy of the binary here.
-
-```
-$ ./grendel --version
-```
-
 ## Configuration
 
 Grendel can be configured using a `TOML` file. See
