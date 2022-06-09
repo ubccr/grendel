@@ -31,9 +31,7 @@ cleanInstall() {
 
 upgrade() {
     printf "\033[32m Upgrading grendel\033[0m\n"
-    if [ -x "/usr/bin/deb-systemd-helper" ]; then
-        deb-systemd-helper restart grendel.service >/dev/null
-    elif [ -x "/usr/bin/systemctl" ]; then
+    if [ -x "/usr/bin/systemctl" ]; then
         systemctl restart grendel.service ||:
     fi
 }
@@ -53,7 +51,6 @@ case "$action" in
     cleanInstall
     ;;
   "2" | "upgrade")
-    printf "\033[32m Post Install of an upgrade\033[0m\n"
     upgrade
     ;;
   *)
