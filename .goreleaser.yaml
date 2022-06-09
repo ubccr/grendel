@@ -33,7 +33,7 @@ nfpms:
       Bare Metal Provisioning for HPC
     formats:
       - deb
-      - rpm    
+      - rpm
     overrides:
       deb:
         file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Arch }}"
@@ -62,9 +62,19 @@ nfpms:
 checksum:
   name_template: 'checksums.txt'
 snapshot:
-  name_template: "{{ incpatch .Version }}-next"
+  name_template: "{{ incpatch .Version }}-SNAPSHOT-{{.ShortCommit}}"
 changelog:
-  sort: asc
+  sort: desc
+  groups:
+    - title: Features
+      regexp: "^.*feat[(\\w)]*:+.*$"
+      order: 0
+    - title: 'Bug fixes'
+      regexp: "^.*fix[(\\w)]*:+.*$"
+      order: 1
+    - title: Other
+      order: 999
   filters:
     exclude:
       - '^docs:'
+      - 'typo'
