@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+## [0.0.7] - 2022-06-09
+
+- Fix bug in marshalling interface names 
+- Fix ubuntu autoinstall template
+    - Set root password in Ubuntu autoinstall template
+    - Add dhcp4 network configs for default nic
+- Templatize the kernel command line for images
+- Add support for translating butane configs to ignition
+- Update ipxe to latest release
+- Add rpm/deb package building
+
 ## [0.0.6] - 2021-10-25
 
 - Add support for kickstarting both uefi and legacy bios nodes from the same
@@ -52,3 +63,4 @@
 [0.0.4]: https://github.com/ubccr/grendel/releases/tag/v0.0.4
 [0.0.5]: https://github.com/ubccr/grendel/releases/tag/v0.0.5
 [0.0.6]: https://github.com/ubccr/grendel/releases/tag/v0.0.6
+[0.0.7]: https://github.com/ubccr/grendel/releases/tag/v0.0.7
