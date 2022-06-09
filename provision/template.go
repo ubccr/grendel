@@ -31,7 +31,7 @@ import (
 	"github.com/ubccr/grendel/model"
 )
 
-const defaultTemplateGlob = "/usr/share/grendel/templates/*.tmpl"
+const defaultTemplateGlob = "/var/lib/grendel/templates/*.tmpl"
 
 //go:embed templates/ipxe.tmpl
 var ipxeTmpl string

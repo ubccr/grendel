@@ -61,13 +61,19 @@ func (b *BootImage) CheckPathsExist() error {
 	}
 
 	if b.ProvisionTemplate != "" {
-		if _, err := os.Stat(filepath.Join("/usr/share/grendel/templates", b.ProvisionTemplate)); err != nil {
+		if _, err := os.Stat(filepath.Join("/var/lib/grendel/templates", b.ProvisionTemplate)); err != nil {
 			return err
 		}
 	}
 
 	if b.UserData != "" {
-		if _, err := os.Stat(filepath.Join("/usr/share/grendel/templates", b.UserData)); err != nil {
+		if _, err := os.Stat(filepath.Join("/var/lib/grendel/templates", b.UserData)); err != nil {
+			return err
+		}
+	}
+
+	if b.Butane != "" {
+		if _, err := os.Stat(filepath.Join("/var/lib/grendel/templates", b.Butane)); err != nil {
 			return err
 		}
 	}
