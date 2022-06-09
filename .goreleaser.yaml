@@ -38,11 +38,11 @@ nfpms:
       deb:
         file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Arch }}"
         scripts:
-          postinstall: ./scripts/nfpm/install.sh
+          postinstall: ./scripts/nfpm/postinstall.sh
       rpm:
         file_name_template: "{{ .ProjectName }}-{{ .Version }}-{{ .Arch }}"
         scripts:
-          preinstall: ./scripts/nfpm/install.sh
+          postinstall: ./scripts/nfpm/postinstall.sh
     rpm:
       signature:
         key_file: key.gpg
@@ -53,10 +53,6 @@ nfpms:
       - src: ./scripts/nfpm/grendel.toml.default
         dst: /etc/grendel/grendel.toml
         type: "config|noreplace"
-        file_info:
-          mode: 0600
-          owner: grendel
-          group: grendel
       - src: ./scripts/nfpm/grendel.service
         dst: /usr/lib/systemd/system/grendel.service
 checksum:
