@@ -12,6 +12,10 @@ cleanInstall() {
     chown grendel:grendel /var/lib/grendel /var/lib/grendel/images /var/lib/grendel/repo /var/lib/grendel/templates
     chmod 755 /var/lib/grendel
 
+    if [ -f "/etc/grendel/grendel.toml" ]; then
+        chown grendel:grendel /etc/grendel/grendel.toml
+    fi
+
     if [ -x "/usr/bin/deb-systemd-helper" ]; then
         printf "\033[32m Installing grendel.service systemd using deb\033[0m\n"
         deb-systemd-helper purge grendel.service >/dev/null
