@@ -11,27 +11,31 @@ cleanInstall() {
     mkdir -p /var/lib/grendel/images /var/lib/grendel/repo /var/lib/grendel/templates
     chown grendel:grendel /var/lib/grendel /var/lib/grendel/images /var/lib/grendel/repo /var/lib/grendel/templates
     chmod 755 /var/lib/grendel
+    chmod 775 /var/lib/grendel/images /var/lib/grendel/repo /var/lib/grendel/templates
 
     if [ -f "/etc/grendel/grendel.toml" ]; then
+        chmod 660 /etc/grendel/grendel.toml
         chown grendel:grendel /etc/grendel/grendel.toml
     fi
 
     if [ -x "/usr/bin/deb-systemd-helper" ]; then
-        printf "\033[32m Installing grendel.service systemd using deb\033[0m\n"
         deb-systemd-helper purge grendel.service >/dev/null
         deb-systemd-helper unmask grendel.service >/dev/null
     elif [ -x "/usr/bin/systemctl" ]; then
-        printf "\033[32m Enable grendel.service in systemd\033[0m\n"
         systemctl daemon-reload ||:
         systemctl unmask grendel.service ||:
         systemctl preset grendel.service ||:
         systemctl enable grendel.service ||:
-        systemctl restart grendel.service ||:
     fi
 }
 
 upgrade() {
     printf "\033[32m Upgrading grendel\033[0m\n"
+    if [ -x "/usr/bin/deb-systemd-helper" ]; then
+        deb-systemd-helper restart grendel.service >/dev/null
+    elif [ -x "/usr/bin/systemctl" ]; then
+        systemctl restart grendel.service ||:
+    fi
 }
 
 # Step 2, check if this is a clean install or an upgrade

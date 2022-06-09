@@ -160,6 +160,9 @@ func (s *Server) Serve() error {
 		if err != nil {
 			return err
 		}
+		if err := os.Chmod(s.SocketPath, 0770); err != nil {
+			return err
+		}
 		e.Listener = unixListener
 		s.Scheme = "http"
 		log.Printf("Listening on unix domain socket: %s", s.SocketPath)
