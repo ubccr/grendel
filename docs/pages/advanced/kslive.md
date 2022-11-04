@@ -39,8 +39,8 @@ INFO PROVISION: Using repo dir: /repo
 
 Add the path to the live image and the kernel command line arguments for
 kickstarting. The example below uses Grendel to serve all the provision assets.
-Grendel will substitute `$kickstart` with the full URL to the kickstart file
-served by Grendel. `$repo` will be the base url of the `repo_dir` defined above
+Grendel will substitute `$.kickstart` with the full URL to the kickstart file
+served by Grendel. `$.repo` will be the base url of the `repo_dir` defined above
 and served by Grendel. You don't have to use Grendel to serve the provision
 assets and can simply adjust the kernel command line arguments to the
 appropriate URLs for your situation.
@@ -52,7 +52,7 @@ appropriate URLs for your situation.
     "initrd": [
         "/repo/centos/7.7.1908/os/x86_64/images/pxeboot/initrd.img"
     ],
-    "cmdline": "ks=$kickstart network ksdevice=bootif ks.device=bootif inst.stage2=$repo/centos/7.7.1908/os/x86_64",
+    "cmdline": "ks={{ $.kickstart }} network ksdevice=bootif ks.device=bootif inst.stage2={{ $.repo }}/centos/7.7.1908/os/x86_64",
     "liveimg": "/images/compute-node.squashfs"
 }]
 ```
