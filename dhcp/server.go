@@ -32,6 +32,7 @@ import (
 	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/util"
+	"golang.org/x/net/ipv4"
 )
 
 var log = logger.GetLogger("DHCP")
@@ -39,6 +40,7 @@ var log = logger.GetLogger("DHCP")
 type Server struct {
 	ListenAddress     net.IP
 	ServerAddress     net.IP
+	InterfaceIPMap    map[int]net.IP
 	Port              int
 	ProvisionHostname string
 	ProvisionScheme   string
@@ -52,7 +54,7 @@ type Server struct {
 	RouterOctet4      int
 	RouterIP          net.IP
 	LeaseTime         time.Duration
-	conn              net.PacketConn
+	conn              *ipv4.PacketConn
 	quit              chan interface{}
 	wg                sync.WaitGroup
 }
@@ -93,13 +95,20 @@ func NewServer(db model.DataStore, address string) (*Server, error) {
 		return nil, err
 	}
 
-	log.Infof("Using ServerAddress: %s", ipaddr)
+	log.Infof("Using default ServerAddress: %s", ipaddr)
 	s.ServerAddress = ipaddr
+
+	intfMap, err := util.GetInterfaceIPMap()
+	if err != nil {
+		return nil, err
+	}
+
+	s.InterfaceIPMap = intfMap
 
 	return s, nil
 }
 
-func (s *Server) mainHandler4(peer net.Addr, req *dhcpv4.DHCPv4) {
+func (s *Server) mainHandler4(peer *net.UDPAddr, req *dhcpv4.DHCPv4, oob *ipv4.ControlMessage) {
 	if req.OpCode != dhcpv4.OpcodeBootRequest {
 		log.Debugf("Ignoring not a BootRequest")
 		return
@@ -115,11 +124,18 @@ func (s *Server) mainHandler4(peer net.Addr, req *dhcpv4.DHCPv4) {
 		return
 	}
 
+	serverIP := s.ServerAddress
+	// Use the IP address of the interface the request came in on for the
+	// ServerIP if available.
+	if intfIP, ok := s.InterfaceIPMap[oob.IfIndex]; ok {
+		serverIP = intfIP
+	}
+
 	resp, err := dhcpv4.NewReplyFromRequest(req,
-		dhcpv4.WithServerIP(s.ServerAddress),
+		dhcpv4.WithServerIP(serverIP),
 		dhcpv4.WithMessageType(dhcpv4.MessageTypeOffer),
 		dhcpv4.WithOption(dhcpv4.OptClassIdentifier("PXEClient")),
-		dhcpv4.WithOption(dhcpv4.OptServerIdentifier(s.ServerAddress)),
+		dhcpv4.WithOption(dhcpv4.OptServerIdentifier(serverIP)),
 	)
 	if err != nil {
 		log.Printf("DHCP failed to build reply: %v", err)
@@ -157,7 +173,7 @@ func (s *Server) mainHandler4(peer net.Addr, req *dhcpv4.DHCPv4) {
 			return
 		}
 
-		err := s.staticAckHandler4(host, req, resp)
+		err := s.staticAckHandler4(host, serverIP, req, resp)
 		if err != nil {
 			log.Errorf("Failed to ack DHCP REQUEST: %s", err)
 			return
@@ -177,10 +193,20 @@ func (s *Server) mainHandler4(peer net.Addr, req *dhcpv4.DHCPv4) {
 		resp.SetUnicast()
 	}
 
+	var woob *ipv4.ControlMessage
+	if peer.IP.Equal(net.IPv4bcast) || peer.IP.IsLinkLocalUnicast() {
+		switch {
+		case oob != nil && oob.IfIndex != 0:
+			woob = &ipv4.ControlMessage{IfIndex: oob.IfIndex}
+		default:
+			log.Errorf("mainHandler4: Did not receive interface information")
+		}
+	}
+
 	log.Debugf("Sending DHCPv4 packet response")
 	log.Debugf(resp.Summary())
 
-	if _, err := s.conn.WriteTo(resp.ToBytes(), peer); err != nil {
+	if _, err := s.conn.WriteTo(resp.ToBytes(), woob, peer); err != nil {
 		log.Printf("DHCP write to %v failed: %v", peer, err)
 	}
 }
@@ -215,12 +241,17 @@ func (s *Server) Serve() error {
 		}
 	}
 
-	conn, err := server4.NewIPv4UDPConn(intf, listener)
+	udpConn, err := server4.NewIPv4UDPConn(intf, listener)
 	if err != nil {
 		return err
 	}
 
-	s.conn = conn
+	s.conn = ipv4.NewPacketConn(udpConn)
+	err = s.conn.SetControlMessage(ipv4.FlagInterface, true)
+	if err != nil {
+		return err
+	}
+
 	log.Infof("Server listening on: %s:%d", s.ListenAddress, s.Port)
 	return s.serve()
 }
@@ -228,7 +259,7 @@ func (s *Server) Serve() error {
 func (s *Server) serve() error {
 	var buf [1500]byte
 	for {
-		n, peer, err := s.conn.ReadFrom(buf[:])
+		n, oob, peer, err := s.conn.ReadFrom(buf[:])
 		if err != nil {
 			select {
 			case <-s.quit:
@@ -260,7 +291,7 @@ func (s *Server) serve() error {
 
 			s.wg.Add(1)
 			go func() {
-				s.mainHandler4(upeer, m)
+				s.mainHandler4(upeer, m, oob)
 				s.wg.Done()
 			}()
 		}

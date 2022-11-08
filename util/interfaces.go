@@ -27,7 +27,6 @@ import (
 )
 
 func GetFirstExternalIPFromInterfaces() (net.IP, error) {
-	// Attempt to discover IP from interfaces
 	intfs, err := interfaces.GetNonLoopbackInterfaces()
 	if err != nil {
 		return nil, err
@@ -62,8 +61,39 @@ func GetFirstExternalIPFromInterfaces() (net.IP, error) {
 	return serverIps[0], nil
 }
 
+func GetInterfaceIPMap() (map[int]net.IP, error) {
+	intfs, err := interfaces.GetNonLoopbackInterfaces()
+	if err != nil {
+		return nil, err
+	}
+
+	intfIps := make(map[int]net.IP, 0)
+
+	for _, intf := range intfs {
+		addrs, err := intf.Addrs()
+		if err != nil {
+			return nil, err
+		}
+
+		ips, err := dhcpv4.GetExternalIPv4Addrs(addrs)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(ips) == 0 {
+			continue
+		}
+
+		// XXX support interfaces with multiple IPs?
+		// This is used for setting the ServerIP in dhcp responses so we just
+		// use the first one for now.
+		intfIps[intf.Index] = ips[0]
+	}
+
+	return intfIps, nil
+}
+
 func GetInterfaceFromIP(ip net.IP) (string, net.IPMask, error) {
-	// Attempt to discover interface from IP
 	intfs, err := interfaces.GetNonLoopbackInterfaces()
 	if err != nil {
 		return "", nil, err
