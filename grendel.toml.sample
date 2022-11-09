@@ -90,10 +90,12 @@ router_octet4 = 0
 # Default netmask example: 8, 16, 24, etc.
 netmask = 24
 
-# Hard code a static router. Not set by default.
-#router = ""
+# Hard code a static default router. (Not set by default)
+router = ""
 
 # Define routers for each subnet. Format is {"router IP": "subnet"}
+# If a hosts IP address is contained inside the subnet, the static dhcp
+# response will contain the router IP address for the given subnet.
 # subnets = {"10.65.3.254" = "10.65.0.0/22", "10.128.17.254" = "10.128.17.0/24"}
 
 #------------------------------------------------------------------------------
