@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/netip"
 	"strconv"
 	"sync"
 	"time"
@@ -32,6 +33,7 @@ import (
 	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/util"
+	"go4.org/netipx"
 	"golang.org/x/net/ipv4"
 )
 
@@ -53,6 +55,7 @@ type Server struct {
 	Netmask           net.IPMask
 	RouterOctet4      int
 	RouterIP          net.IP
+	Subnets           map[netip.Addr]*netipx.IPSet
 	LeaseTime         time.Duration
 	conn              *ipv4.PacketConn
 	quit              chan interface{}

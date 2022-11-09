@@ -46,6 +46,7 @@ require (
 	github.com/tidwall/sjson v1.1.7
 	github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb
 	github.com/vmware/goipmi v0.0.0-20181114221114-2333cd82d702
+	go4.org/netipx v0.0.0-20220925034521-797b0c90d8ab // indirect
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	golang.org/x/net v0.1.0
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d

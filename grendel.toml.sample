@@ -76,6 +76,9 @@ domain_search = []
 # Default MTU
 mtu = 1500
 
+# Only run DHCP Proxy server
+proxy_only = false
+
 # Dynamic router configuration. Grendel will generate the router option 3 for
 # DHCP responses based on the hosts IP address, netmask, and router_octet4. For
 # example, if all subnets in your data center have routers 10.x.x.254 you can
@@ -84,14 +87,14 @@ mtu = 1500
 # this option will set the netmask to 24. Off by default.
 router_octet4 = 0
 
-# Hard code a static router. Not set by default.
-#router = ""
-
 # Default netmask example: 8, 16, 24, etc.
 netmask = 24
 
-# Only run DHCP Proxy server
-proxy_only = false
+# Hard code a static router. Not set by default.
+#router = ""
+
+# Define routers for each subnet. Format is {"router IP": "subnet"}
+# subnets = {"10.65.3.254" = "10.65.0.0/22", "10.128.17.254" = "10.128.17.0/24"}
 
 #------------------------------------------------------------------------------
 # DNS Server
