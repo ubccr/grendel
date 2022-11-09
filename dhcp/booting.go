@@ -19,6 +19,7 @@ package dhcp
 
 import (
 	"fmt"
+	"net"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/sirupsen/logrus"
@@ -26,7 +27,7 @@ import (
 	"github.com/ubccr/grendel/model"
 )
 
-func (s *Server) bootingHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) error {
+func (s *Server) bootingHandler4(host *model.Host, serverIP net.IP, req, resp *dhcpv4.DHCPv4) error {
 	if !host.Provision {
 		log.Infof("Host not set to provision: %s", req.ClientHWAddr.String())
 		return nil
@@ -110,7 +111,7 @@ func (s *Server) bootingHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) err
 		// Chainload to HTTP
 		hostName := s.ProvisionHostname
 		if hostName == "" {
-			hostName = s.ServerAddress.String()
+			hostName = serverIP.String()
 		}
 
 		token, err := model.NewBootToken(host.ID.String(), req.ClientHWAddr.String())

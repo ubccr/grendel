@@ -32,6 +32,7 @@ import (
 	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/util"
+	"golang.org/x/net/ipv4"
 )
 
 const (
@@ -39,15 +40,16 @@ const (
 )
 
 type PXEServer struct {
-	DB            model.DataStore
-	ListenAddress net.IP
-	ServerAddress net.IP
-	Port          int
-	srv           *server4.Server
-	log           *logrus.Entry
-	conn          net.PacketConn
-	quit          chan interface{}
-	wg            sync.WaitGroup
+	DB             model.DataStore
+	ListenAddress  net.IP
+	ServerAddress  net.IP
+	InterfaceIPMap map[int]net.IP
+	Port           int
+	srv            *server4.Server
+	log            *logrus.Entry
+	conn           *ipv4.PacketConn
+	quit           chan interface{}
+	wg             sync.WaitGroup
 }
 
 func NewPXEServer(db model.DataStore, address string) (*PXEServer, error) {
@@ -88,10 +90,17 @@ func NewPXEServer(db model.DataStore, address string) (*PXEServer, error) {
 
 	s.ServerAddress = ipaddr
 
+	intfMap, err := util.GetInterfaceIPMap()
+	if err != nil {
+		return nil, err
+	}
+
+	s.InterfaceIPMap = intfMap
+
 	return s, nil
 }
 
-func (s *PXEServer) pxeHandler4(peer net.Addr, req *dhcpv4.DHCPv4) {
+func (s *PXEServer) pxeHandler4(peer *net.UDPAddr, req *dhcpv4.DHCPv4, oob *ipv4.ControlMessage) {
 	host, err := s.DB.LoadHostFromMAC(req.ClientHWAddr.String())
 	if err != nil {
 		if !errors.Is(err, model.ErrNotFound) {
@@ -128,15 +137,22 @@ func (s *PXEServer) pxeHandler4(peer net.Addr, req *dhcpv4.DHCPv4) {
 		fwtype = host.Firmware
 	}
 
+	serverIP := s.ServerAddress
+	// Use the IP address of the interface the request came in on for the
+	// ServerIP if available.
+	if intfIP, ok := s.InterfaceIPMap[oob.IfIndex]; ok {
+		serverIP = intfIP
+	}
+
 	s.log.Infof("Received valid request %s - %d", req.ClientHWAddr, fwtype)
 
 	resp, err := dhcpv4.NewReplyFromRequest(req,
 		dhcpv4.WithBroadcast(false),
-		dhcpv4.WithServerIP(s.ServerAddress),
+		dhcpv4.WithServerIP(serverIP),
 		dhcpv4.WithClientIP(req.ClientIPAddr),
 		dhcpv4.WithMessageType(dhcpv4.MessageTypeAck),
 		dhcpv4.WithOption(dhcpv4.OptClassIdentifier("PXEClient")),
-		dhcpv4.WithOption(dhcpv4.OptServerIdentifier(s.ServerAddress)),
+		dhcpv4.WithOption(dhcpv4.OptServerIdentifier(serverIP)),
 	)
 	if err != nil {
 		s.log.Errorf("failed to build reply: %v", err)
@@ -154,10 +170,20 @@ func (s *PXEServer) pxeHandler4(peer net.Addr, req *dhcpv4.DHCPv4) {
 	}
 	resp.BootFileName = token
 
+	var woob *ipv4.ControlMessage
+	if peer.IP.Equal(net.IPv4bcast) || peer.IP.IsLinkLocalUnicast() {
+		switch {
+		case oob != nil && oob.IfIndex != 0:
+			woob = &ipv4.ControlMessage{IfIndex: oob.IfIndex}
+		default:
+			log.Errorf("pxeHandler4: Did not receive interface information")
+		}
+	}
+
 	s.log.Debugf("Sending response")
 	s.log.Debugf(resp.Summary())
 
-	if _, err := s.conn.WriteTo(resp.ToBytes(), peer); err != nil {
+	if _, err := s.conn.WriteTo(resp.ToBytes(), woob, peer); err != nil {
 		s.log.Errorf("UDP write to %v failed: %v", peer, err)
 	}
 }
@@ -180,12 +206,17 @@ func (s *PXEServer) Serve() error {
 		log.Printf("Binding to interface: %s", intf)
 	}
 
-	conn, err := server4.NewIPv4UDPConn(intf, listener)
+	udpConn, err := server4.NewIPv4UDPConn(intf, listener)
 	if err != nil {
 		return err
 	}
 
-	s.conn = conn
+	s.conn = ipv4.NewPacketConn(udpConn)
+	err = s.conn.SetControlMessage(ipv4.FlagInterface, true)
+	if err != nil {
+		return err
+	}
+
 	s.log.Infof("Server listening on: %s:%d", s.ListenAddress, s.Port)
 	return s.serve()
 }
@@ -193,7 +224,7 @@ func (s *PXEServer) Serve() error {
 func (s *PXEServer) serve() error {
 	var buf [1500]byte
 	for {
-		n, peer, err := s.conn.ReadFrom(buf[:])
+		n, oob, peer, err := s.conn.ReadFrom(buf[:])
 		if err != nil {
 			select {
 			case <-s.quit:
@@ -225,7 +256,7 @@ func (s *PXEServer) serve() error {
 
 			s.wg.Add(1)
 			go func() {
-				s.pxeHandler4(upeer, m)
+				s.pxeHandler4(upeer, m, oob)
 				s.wg.Done()
 			}()
 		}

@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net"
+	"net/netip"
 	"time"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
@@ -29,21 +30,20 @@ import (
 	"github.com/ubccr/grendel/model"
 )
 
-func (s *Server) staticHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) error {
-	nic := host.Interface(req.ClientHWAddr)
-	if nic == nil {
-		log.Warnf("invalid mac address for host: %s", req.ClientHWAddr)
-		return nil
-	}
+func (s *Server) setRouter(nic *model.NetInterface, resp *dhcpv4.DHCPv4) {
 
-	resp.YourIPAddr = nic.IP
-	log.WithFields(logrus.Fields{
-		"ip":           nic.IP.String(),
-		"mac":          req.ClientHWAddr.String(),
-		"name":         host.Name,
-		"dhcp_message": req.MessageType().String(),
-	}).Info("Found host")
-	log.Debugf(req.Summary())
+	ipx, _ := netip.AddrFromSlice(nic.IP)
+	for routerIP, subnet := range s.Subnets {
+		if subnet.Contains(ipx.Unmap()) {
+			router := routerIP.As4()
+			routers := []net.IP{net.IPv4(router[0], router[1], router[2], router[3])}
+			resp.UpdateOption(dhcpv4.OptRouter(routers...))
+
+			prefixes := subnet.Prefixes()
+			resp.UpdateOption(dhcpv4.OptSubnetMask(net.CIDRMask(prefixes[0].Bits(), 32)))
+			return
+		}
+	}
 
 	if s.Netmask != nil {
 		resp.UpdateOption(dhcpv4.OptSubnetMask(s.Netmask))
@@ -62,6 +62,25 @@ func (s *Server) staticHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) erro
 		routers := []net.IP{router}
 		resp.UpdateOption(dhcpv4.OptRouter(routers...))
 	}
+}
+
+func (s *Server) staticHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) error {
+	nic := host.Interface(req.ClientHWAddr)
+	if nic == nil {
+		log.Warnf("invalid mac address for host: %s", req.ClientHWAddr)
+		return nil
+	}
+
+	resp.YourIPAddr = nic.IP
+	log.WithFields(logrus.Fields{
+		"ip":           nic.IP.String(),
+		"mac":          req.ClientHWAddr.String(),
+		"name":         host.Name,
+		"dhcp_message": req.MessageType().String(),
+	}).Info("Found host")
+	log.Debugf(req.Summary())
+
+	s.setRouter(nic, resp)
 
 	resp.UpdateOption(dhcpv4.OptIPAddressLeaseTime(s.LeaseTime))
 
@@ -93,17 +112,17 @@ func (s *Server) staticHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) erro
 	return nil
 }
 
-func (s *Server) staticAckHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) error {
+func (s *Server) staticAckHandler4(host *model.Host, serverIP net.IP, req, resp *dhcpv4.DHCPv4) error {
 	if req.ServerIPAddr != nil &&
 		!req.ServerIPAddr.Equal(net.IPv4zero) &&
-		!req.ServerIPAddr.Equal(s.ServerAddress) {
-		return fmt.Errorf("requested ServerID does not match. Got %v, want %v", req.ServerIPAddr, s.ServerAddress)
+		!req.ServerIPAddr.Equal(serverIP) {
+		return fmt.Errorf("requested ServerID does not match. Got %v, want %v", req.ServerIPAddr, serverIP)
 	}
 
 	if req.ServerIdentifier() != nil &&
 		!req.ServerIdentifier().Equal(net.IPv4zero) &&
-		!req.ServerIdentifier().Equal(s.ServerAddress) {
-		return fmt.Errorf("requested Server Identifier does not match. Got %v, want %v", req.ServerIdentifier(), s.ServerAddress)
+		!req.ServerIdentifier().Equal(serverIP) {
+		return fmt.Errorf("requested Server Identifier does not match. Got %v, want %v", req.ServerIdentifier(), serverIP)
 	}
 
 	requestedIP := req.RequestedIPAddress()

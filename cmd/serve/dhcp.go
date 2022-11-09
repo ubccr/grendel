@@ -21,6 +21,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"net/netip"
 	"strconv"
 	"strings"
 	"time"
@@ -29,6 +30,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/dhcp"
 	"github.com/ubccr/grendel/logger"
+	"go4.org/netipx"
 	"gopkg.in/tomb.v2"
 )
 
@@ -153,6 +155,33 @@ func serveDHCP(t *tomb.Tomb) error {
 
 		srv.RouterIP = routerIP
 		dhcpLog.Infof("Static router: %s", srv.RouterIP)
+	}
+
+	if viper.IsSet("dhcp.subnets") {
+		subnets := viper.GetStringMapString("dhcp.subnets")
+
+		srv.Subnets = make(map[netip.Addr]*netipx.IPSet)
+		for routerIP, sub := range subnets {
+			ripx, err := netip.ParseAddr(routerIP)
+			if err != nil {
+				return fmt.Errorf("Invalid router ip address: %s", routerIP)
+			}
+
+			var b netipx.IPSetBuilder
+			prefix, err := netip.ParsePrefix(sub)
+			if err != nil {
+				return fmt.Errorf("Invalid subnet: %s", sub)
+			}
+			b.AddPrefix(prefix)
+
+			ipset, err := b.IPSet()
+			if err != nil {
+				return fmt.Errorf("Failed to create IPSet: %w", err)
+			}
+
+			srv.Subnets[ripx] = ipset
+		}
+
 	}
 
 	leaseTime, err := time.ParseDuration(viper.GetString("dhcp.lease_time"))
