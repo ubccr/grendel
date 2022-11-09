@@ -23,8 +23,9 @@ require (
 	github.com/insomniacslk/dhcp v0.0.0-20200922210017-67c425063dca
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/korovkin/limiter v0.0.0-20190919045942-dac5a6b2a536
-	github.com/labstack/echo/v4 v4.1.11
-	github.com/labstack/gommon v0.3.0
+	github.com/labstack/echo/v4 v4.9.1
+	github.com/labstack/gommon v0.4.0
+	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b
 	github.com/miekg/dns v1.1.43
 	github.com/mitchellh/go-homedir v1.1.0
@@ -45,10 +46,11 @@ require (
 	github.com/tidwall/gjson v1.10.2
 	github.com/tidwall/sjson v1.1.7
 	github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb
+	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/vmware/goipmi v0.0.0-20181114221114-2333cd82d702
-	go4.org/netipx v0.0.0-20220925034521-797b0c90d8ab // indirect
-	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
-	golang.org/x/net v0.1.0
+	go4.org/netipx v0.0.0-20220925034521-797b0c90d8ab
+	golang.org/x/crypto v0.1.0
+	golang.org/x/net v0.2.0
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	gopkg.in/ini.v1 v1.51.1 // indirect
 	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637
