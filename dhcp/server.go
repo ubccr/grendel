@@ -165,7 +165,7 @@ func (s *Server) mainHandler4(peer *net.UDPAddr, req *dhcpv4.DHCPv4, oob *ipv4.C
 		}
 
 		if !s.ProxyOnly {
-			err := s.staticHandler4(host, req, resp)
+			err := s.staticHandler4(host, serverIP, req, resp)
 			if err != nil {
 				log.Errorf("Failed to add client ip to DHCP DISCOVER: %s", err)
 				return
