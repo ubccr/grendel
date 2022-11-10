@@ -54,10 +54,10 @@ func (h *Host) HasTags(tags ...string) bool {
 		}
 	}
 
-	return true
+	return len(tags) > 0
 }
 
-func (h *Host) HasAnyTag(tags ...string) bool {
+func (h *Host) HasAnyTags(tags ...string) bool {
 	for _, a := range h.Tags {
 		for _, b := range tags {
 			if a == b {
