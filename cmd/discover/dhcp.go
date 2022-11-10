@@ -158,6 +158,11 @@ func snoopDHCP(req *dhcpv4.DHCPv4) {
 	if req.Options.Has(dhcpv4.OptionUserClassInformation) {
 		userClass = string(req.Options.Get(dhcpv4.OptionUserClassInformation))
 	}
+	classID := req.ClassIdentifier()
+	clientID := ""
+	if req.Options.Has(dhcpv4.OptionClientIdentifier) {
+		clientID = dhcpv4.GetString(dhcpv4.OptionClientIdentifier, req.Options)
+	}
 	archType := ""
 	if req.Options.Has(dhcpv4.OptionClientSystemArchitectureType) {
 		archType = string(req.Options.Get(dhcpv4.OptionClientSystemArchitectureType))
@@ -174,6 +179,8 @@ func snoopDHCP(req *dhcpv4.DHCPv4) {
 		"userClass": userClass,
 		"hostname":  hostName,
 		"arch":      archType,
+		"clientID":  clientID,
+		"classID":   classID,
 	}).Debug()
 }
 

@@ -39,6 +39,36 @@ type Host struct {
 	Tags       []string        `json:"tags"`
 }
 
+func (h *Host) HasTags(tags ...string) bool {
+	for _, a := range tags {
+		found := false
+		for _, b := range h.Tags {
+			if a == b {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			return false
+		}
+	}
+
+	return len(tags) > 0
+}
+
+func (h *Host) HasAnyTags(tags ...string) bool {
+	for _, a := range h.Tags {
+		for _, b := range tags {
+			if a == b {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 func (h *Host) Interface(mac net.HardwareAddr) *NetInterface {
 	for _, nic := range h.Interfaces {
 		if bytes.Compare(nic.MAC, mac) == 0 {

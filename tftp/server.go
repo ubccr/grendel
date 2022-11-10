@@ -23,17 +23,19 @@ import (
 
 	"github.com/pin/tftp"
 	"github.com/ubccr/grendel/logger"
+	"github.com/ubccr/grendel/model"
 )
 
 var log = logger.GetLogger("TFTP")
 
 type Server struct {
 	Address string
+	DB      model.DataStore
 	srv     *tftp.Server
 }
 
-func NewServer(address string) (*Server, error) {
-	s := &Server{Address: address}
+func NewServer(db model.DataStore, address string) (*Server, error) {
+	s := &Server{DB: db, Address: address}
 
 	s.srv = tftp.NewServer(s.ReadHandler, nil)
 	s.srv.SetTimeout(2 * time.Second)

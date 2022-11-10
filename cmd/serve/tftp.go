@@ -54,7 +54,7 @@ func serveTFTP(t *tomb.Tomb) error {
 		return err
 	}
 
-	tftpServer, err := tftp.NewServer(tftpListen)
+	tftpServer, err := tftp.NewServer(DB, tftpListen)
 	if err != nil {
 		return err
 	}

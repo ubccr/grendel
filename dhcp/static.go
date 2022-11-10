@@ -64,7 +64,48 @@ func (s *Server) setRouter(nic *model.NetInterface, resp *dhcpv4.DHCPv4) {
 	}
 }
 
-func (s *Server) staticHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) error {
+func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.IP, resp *dhcpv4.DHCPv4) {
+	if !host.Provision {
+		// Skip if host not set to provision
+		return
+	}
+
+	if host.HasTags("dellbmp") {
+		// Dell Bare Metal Provisioning (BMP) for FTOS
+		// See: https://i.dell.com/sites/doccontent/shared-content/Documents/Bare_Metal_Provisioning.pdf
+
+		log.WithFields(logrus.Fields{
+			"ip":   nic.IP.String(),
+			"name": host.Name,
+		}).Info("Host tagged with Dell BMP. Setting FTOS image URL and config dhcp options")
+
+		token, _ := model.NewBootToken(host.ID.String(), nic.MAC.String())
+		imageURL := fmt.Sprintf("%s://%s:%d/boot/%s/file/kernel", s.ProvisionScheme, serverIP.String(), s.ProvisionPort, token)
+		log.Debugf("Dell FTOS - image URL: %s", imageURL)
+		resp.UpdateOption(dhcpv4.OptBootFileName(imageURL))
+
+		configURL := fmt.Sprintf("%s://%s:%d/boot/%s/kickstart", s.ProvisionScheme, serverIP.String(), s.ProvisionPort, token)
+		log.Debugf("Dell FTOS - PXELinuxConfigFile: %s", configURL)
+		resp.UpdateOption(dhcpv4.Option{Code: dhcpv4.OptionPXELinuxConfigFile, Value: dhcpv4.String(configURL)})
+	}
+
+	if host.HasTags("dellztd") {
+		// Dell Zero-touch deployment (ZTD) for DellOS10
+		// See: https://www.dell.com/support/manuals/en-in/networking-mx7116n/smartfabric-os-user-guide-10-5-0/dell-emc-smartfabric-os10-zero-touch-deployment?guid=guid-95ca07a2-2bcb-4ea2-84ef-ef9d11a4fa0e&lang=en-us
+
+		log.WithFields(logrus.Fields{
+			"ip":   nic.IP.String(),
+			"name": host.Name,
+		}).Info("Host tagged with Dell ZTD. Setting ZTD provision URL dhcp option")
+
+		token, _ := model.NewBootToken(host.ID.String(), nic.MAC.String())
+		provisionURL := fmt.Sprintf("%s://%s:%d/boot/%s/kickstart", s.ProvisionScheme, serverIP.String(), s.ProvisionPort, token)
+		log.Debugf("Dell ZTD provision-url: %s", provisionURL)
+		resp.UpdateOption(dhcpv4.Option{Code: dhcpv4.GenericOptionCode(240), Value: dhcpv4.String(provisionURL)})
+	}
+}
+
+func (s *Server) staticHandler4(host *model.Host, serverIP net.IP, req, resp *dhcpv4.DHCPv4) error {
 	nic := host.Interface(req.ClientHWAddr)
 	if nic == nil {
 		log.Warnf("invalid mac address for host: %s", req.ClientHWAddr)
@@ -81,6 +122,7 @@ func (s *Server) staticHandler4(host *model.Host, req, resp *dhcpv4.DHCPv4) erro
 	log.Debugf(req.Summary())
 
 	s.setRouter(nic, resp)
+	s.setZTD(host, nic, serverIP, resp)
 
 	resp.UpdateOption(dhcpv4.OptIPAddressLeaseTime(s.LeaseTime))
 
@@ -146,5 +188,5 @@ func (s *Server) staticAckHandler4(host *model.Host, serverIP net.IP, req, resp 
 	}
 
 	resp.UpdateOption(dhcpv4.OptMessageType(dhcpv4.MessageTypeAck))
-	return s.staticHandler4(host, req, resp)
+	return s.staticHandler4(host, serverIP, req, resp)
 }
