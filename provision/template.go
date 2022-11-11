@@ -19,7 +19,9 @@ package provision
 
 import (
 	"bytes"
+	"crypto/sha256"
 	_ "embed"
+	"fmt"
 	"io"
 	"path/filepath"
 	"strings"
@@ -28,6 +30,7 @@ import (
 	"github.com/coreos/butane/config"
 	"github.com/coreos/butane/config/common"
 	"github.com/labstack/echo/v4"
+	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/model"
 )
 
@@ -50,8 +53,11 @@ var butaneTmpl string
 
 // Template functions
 var funcMap = template.FuncMap{
-	"hasTag": hasTag,
-	"Split":  split,
+	"hasTag":            hasTag,
+	"Split":             split,
+	"ConfigValueHashed": ConfigValueHashed,
+	"ConfigValueString": ConfigValueString,
+	"ConfigValueBool":   ConfigValueBool,
 }
 
 type TemplateRenderer struct {
@@ -134,15 +140,28 @@ func (t *TemplateRenderer) RenderIgnition(code int, name string, data interface{
 }
 
 func hasTag(host model.Host, tag string) bool {
-	for _, t := range host.Tags {
-		if tag == t {
-			return true
-		}
-	}
-
-	return false
+	return host.HasTags(tag)
 }
 
 func split(s, sep string) []string {
 	return strings.Split(s, sep)
+}
+
+func ConfigValueString(key string) string {
+	return viper.GetString(key)
+}
+
+func ConfigValueBool(key string) bool {
+	return viper.GetBool(key)
+}
+
+func ConfigValueHashed(key string) string {
+	val := viper.GetString(key)
+	if val == "" {
+		return ""
+	}
+
+	h := sha256.New()
+	h.Write([]byte(val))
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
