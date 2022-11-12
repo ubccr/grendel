@@ -43,8 +43,8 @@ func init() {
 	viper.BindPFlag("dhcp.proxy_only", dhcpCmd.PersistentFlags().Lookup("dhcp-proxy-only"))
 	dhcpCmd.PersistentFlags().Int("dhcp-router-octet4", 0, "automatic router configuration")
 	viper.BindPFlag("dhcp.router_octet4", dhcpCmd.PersistentFlags().Lookup("dhcp-router-octet4"))
-	dhcpCmd.PersistentFlags().String("dhcp-router", "", "static router address")
-	viper.BindPFlag("dhcp.router", dhcpCmd.PersistentFlags().Lookup("dhcp-router"))
+	dhcpCmd.PersistentFlags().String("dhcp-gateway", "", "static gateway address")
+	viper.BindPFlag("dhcp.gateway", dhcpCmd.PersistentFlags().Lookup("dhcp-gateway"))
 	dhcpCmd.PersistentFlags().Int("dhcp-netmask", 0, "subnet mask")
 	viper.BindPFlag("dhcp.netmask", dhcpCmd.PersistentFlags().Lookup("dhcp-netmask"))
 
