@@ -37,9 +37,9 @@ autoinstall:
     network:
       version: 2
       ethernets:
-        {{ .nic.Name }}:
+        {{ $.nic.Name }}:
           match:
-            macaddress: {{ .nic.MAC }}
+            macaddress: {{ $.nic.MAC }}
           dhcp4: yes
   user-data:
     disable_root: false
@@ -51,7 +51,7 @@ autoinstall:
 #        ssh_import_id: gh:YOURGITHUBIDHERE
         sudo: ALL=(ALL) NOPASSWD:ALL
   late-commands:
-    - curl -X POST {{ .complete }}
+    - curl -X POST {{ $.endpoints.CompleteURL }}
 {{- with .rootpw }}
     - curtin in-target --target=/target -- usermod -p '{{ . }}' root
 {{ end }}

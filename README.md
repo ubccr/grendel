@@ -98,7 +98,7 @@ Create the following JSON file `host.json`:
     "interfaces": [
         {
             "fqdn": "tux01.localhost",
-            "ip": "192.168.10.12",
+            "ip": "192.168.10.12/24",
             "mac": "DE:AD:BE:EF:12:8C"
         }
     ]

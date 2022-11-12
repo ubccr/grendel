@@ -87,7 +87,7 @@ Nodes can be imported into Grendel from a file in a simple JSON format:
     "interfaces": [
         {
             "fqdn": "cpn-d13-18.compute.ccr.buffalo.edu",
-            "ip": "10.64.25.36",
+            "ip": "10.64.25.36/24",
             "mac": "41:69:AE:E6:61:06"
         }
     ]

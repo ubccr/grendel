@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net"
+	"net/netip"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -112,7 +113,10 @@ func init() {
 	cmd.Root.AddCommand(discoverCmd)
 }
 
-func addNic(name, fqdn string, mac net.HardwareAddr, ip net.IP, isBMC bool) {
+func addNic(name, fqdn string, mac net.HardwareAddr, stdIP net.IP, isBMC bool) {
+	// TODO: fix me
+	ip, _ := netip.ParsePrefix(stdIP.String() + "/24")
+
 	host, ok := hosts[name]
 	if !ok {
 		host = &model.Host{

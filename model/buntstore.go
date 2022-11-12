@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/netip"
 	"strings"
 
 	"github.com/segmentio/ksuid"
@@ -203,9 +204,9 @@ func (s *BuntStore) ResolveIPv4(fqdn string) ([]net.IP, error) {
 			res := gjson.Get(value, "interfaces")
 			for _, i := range res.Array() {
 				if util.Normalize(i.Get("fqdn").String()) == fqdn {
-					ip := net.ParseIP(i.Get("ip").String())
-					if ip != nil && ip.To4() != nil {
-						ips = append(ips, ip)
+					ip, _ := netip.ParsePrefix(i.Get("ip").String())
+					if ip.IsValid() {
+						ips = append(ips, net.IP(ip.Addr().AsSlice()))
 					}
 
 					// XXX stop after first match. consider changing this
@@ -234,7 +235,7 @@ func (s *BuntStore) ReverseResolve(ip string) ([]string, error) {
 		err := tx.AscendKeys(HostKeyPrefix+":*", func(key, value string) bool {
 			res := gjson.Get(value, "interfaces")
 			for _, i := range res.Array() {
-				if i.Get("ip").String() == ip {
+				if strings.Contains(i.Get("ip").String(), ip) {
 					name := i.Get("fqdn").String()
 					if name != "" {
 						fqdn = append(fqdn, name)

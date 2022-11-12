@@ -1,7 +1,7 @@
 #cloud-config
 
 phone_home:
-  url: {{ .complete }}
+  url: {{ $.endpoints.CompleteURL }}
   post: [ instance_id ]
 
 final_message: "The system is finally up, after $UPTIME seconds"

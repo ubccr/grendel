@@ -18,5 +18,8 @@
 package provision
 
 const (
-	ContextKeyToken = "grendeltoken"
+	ContextKeyToken     = "token"
+	ContextKeyBootImage = "bootimage"
+	ContextKeyHost      = "host"
+	ContextKeyNIC       = "nic"
 )

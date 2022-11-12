@@ -68,12 +68,12 @@ part of the stub-zone like so:
     "interfaces": [
         {
             "fqdn": "bmc-d13-08.compute.ccr.buffalo.edu",
-            "ip": "10.129.24.8",
+            "ip": "10.129.24.8/24",
             "bmc": true
         },
         {
             "fqdn": "cpn-d13-08.compute.ccr.buffalo.edu",
-            "ip": "10.65.24.8",
+            "ip": "10.65.24.8/24",
             "bmc": false
         }
     ],
