@@ -19,7 +19,7 @@ package provision
 
 import (
 	"bytes"
-	"crypto/sha256"
+	"crypto/md5"
 	_ "embed"
 	"fmt"
 	"io"
@@ -161,7 +161,5 @@ func ConfigValueHashed(key string) string {
 		return ""
 	}
 
-	h := sha256.New()
-	h.Write([]byte(val))
-	return fmt.Sprintf("%x", h.Sum(nil))
+	return fmt.Sprintf("%x", md5.Sum([]byte(val)))
 }
