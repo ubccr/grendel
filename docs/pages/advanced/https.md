@@ -96,7 +96,6 @@ the following:
 [provision]
 listen = "0.0.0.0:443"
 hostname = "grendel.local"
-scheme = "https"
 cert = "out/grendel.local.crt"
 key = "out/grendel.local.key"
 

@@ -20,6 +20,7 @@
   x.x.x.x/xx. This is a breaking change and will require a dump/restore of the
   grendel database.
 - Rename "dhcp.router" config option to "dhcp.gateway"
+- Remove unused "provision.scheme" config option
 
 ## [0.0.7] - 2022-06-09
 
