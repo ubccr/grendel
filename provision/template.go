@@ -19,9 +19,7 @@ package provision
 
 import (
 	"bytes"
-	"crypto/md5"
 	_ "embed"
-	"fmt"
 	"io"
 	"path/filepath"
 	"strings"
@@ -55,7 +53,6 @@ var butaneTmpl string
 var funcMap = template.FuncMap{
 	"hasTag":            hasTag,
 	"Split":             split,
-	"ConfigValueHashed": ConfigValueHashed,
 	"ConfigValueString": ConfigValueString,
 	"ConfigValueBool":   ConfigValueBool,
 }
@@ -153,13 +150,4 @@ func ConfigValueString(key string) string {
 
 func ConfigValueBool(key string) bool {
 	return viper.GetBool(key)
-}
-
-func ConfigValueHashed(key string) string {
-	val := viper.GetString(key)
-	if val == "" {
-		return ""
-	}
-
-	return fmt.Sprintf("%x", md5.Sum([]byte(val)))
 }
