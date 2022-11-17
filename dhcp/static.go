@@ -27,7 +27,7 @@ import (
 	"github.com/ubccr/grendel/model"
 )
 
-func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.IP, resp *dhcpv4.DHCPv4) {
+func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.IP, req, resp *dhcpv4.DHCPv4) {
 	if !host.Provision {
 		// Skip if host not set to provision
 		return
@@ -47,11 +47,16 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 
 		imageURL := endpoints.KernelURL()
 		log.Debugf("Dell FTOS - image URL: %s", imageURL)
-		resp.UpdateOption(dhcpv4.OptBootFileName(imageURL))
+
+		if req.IsOptionRequested(dhcpv4.OptionBootfileName) {
+			resp.UpdateOption(dhcpv4.OptBootFileName(imageURL))
+		}
 
 		configURL := endpoints.KickstartURL()
 		log.Debugf("Dell FTOS - PXELinuxConfigFile: %s", configURL)
-		resp.UpdateOption(dhcpv4.Option{Code: dhcpv4.OptionPXELinuxConfigFile, Value: dhcpv4.String(configURL)})
+		if req.IsOptionRequested(dhcpv4.OptionPXELinuxConfigFile) {
+			resp.UpdateOption(dhcpv4.Option{Code: dhcpv4.OptionPXELinuxConfigFile, Value: dhcpv4.String(configURL)})
+		}
 	}
 
 	if host.HasTags("dellztd") {
@@ -89,8 +94,11 @@ func (s *Server) staticHandler4(host *model.Host, serverIP net.IP, req, resp *dh
 
 	resp.YourIPAddr = nic.ToStdAddr()
 	resp.UpdateOption(dhcpv4.OptSubnetMask(nic.Netmask()))
-	resp.UpdateOption(dhcpv4.OptGeneric(dhcpv4.OptionInterfaceMTU, dhcpv4.Uint16(nic.InterfaceMTU()).ToBytes()))
 	resp.UpdateOption(dhcpv4.OptIPAddressLeaseTime(s.LeaseTime))
+
+	if req.IsOptionRequested(dhcpv4.OptionInterfaceMTU) {
+		resp.UpdateOption(dhcpv4.OptGeneric(dhcpv4.OptionInterfaceMTU, dhcpv4.Uint16(nic.InterfaceMTU()).ToBytes()))
+	}
 
 	routerIP := nic.Gateway()
 	if routerIP.IsValid() {
@@ -99,7 +107,7 @@ func (s *Server) staticHandler4(host *model.Host, serverIP net.IP, req, resp *dh
 	}
 
 	dnsServers := nic.DNS()
-	if len(dnsServers) > 0 {
+	if len(dnsServers) > 0 && req.IsOptionRequested(dhcpv4.OptionDomainNameServer) {
 		resp.UpdateOption(dhcpv4.OptDNS(dnsServers...))
 	}
 
@@ -114,7 +122,7 @@ func (s *Server) staticHandler4(host *model.Host, serverIP net.IP, req, resp *dh
 		}))
 	}
 
-	s.setZTD(host, nic, serverIP, resp)
+	s.setZTD(host, nic, serverIP, req, resp)
 
 	return nil
 }
@@ -152,6 +160,7 @@ func (s *Server) staticAckHandler4(host *model.Host, serverIP net.IP, req, resp 
 		resp.ClientIPAddr = req.ClientIPAddr
 	}
 
+	s.setZTD(host, nic, serverIP, req, resp)
 	resp.UpdateOption(dhcpv4.OptMessageType(dhcpv4.MessageTypeAck))
 	return s.staticHandler4(host, serverIP, req, resp)
 }
