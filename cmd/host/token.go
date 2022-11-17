@@ -56,7 +56,7 @@ var (
 
 				nic := host.BootInterface()
 				if nic == nil {
-					return fmt.Errorf("Host does not have a boot interface: %s", host.Name)
+					nic = host.Interfaces[0]
 				}
 
 				token, err := model.NewBootToken(host.ID.String(), nic.MAC.String())
