@@ -29,6 +29,7 @@ import (
 )
 
 var (
+	bmc      bool
 	tokenCmd = &cobra.Command{
 		Use:   "token",
 		Short: "Generate boot token for hosts",
@@ -55,6 +56,10 @@ var (
 				}
 
 				nic := host.BootInterface()
+				if bmc {
+					nic = host.InterfaceBMC()
+				}
+
 				if nic == nil {
 					nic = host.Interfaces[0]
 				}
@@ -74,5 +79,6 @@ var (
 )
 
 func init() {
+	tokenCmd.Flags().BoolVar(&bmc, "bmc", false, "Generate token for BMC interface")
 	hostCmd.AddCommand(tokenCmd)
 }
