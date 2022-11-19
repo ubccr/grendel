@@ -55,6 +55,7 @@ var funcMap = template.FuncMap{
 	"Split":             split,
 	"ConfigValueString": ConfigValueString,
 	"ConfigValueBool":   ConfigValueBool,
+	"Add":               Add,
 }
 
 type TemplateRenderer struct {
@@ -142,6 +143,10 @@ func hasTag(host model.Host, tag string) bool {
 
 func split(s, sep string) []string {
 	return strings.Split(s, sep)
+}
+
+func Add(a, b int) int {
+	return a + b
 }
 
 func ConfigValueString(key string) string {
