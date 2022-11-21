@@ -145,7 +145,7 @@ func split(s, sep string) []string {
 	return strings.Split(s, sep)
 }
 
-func Add(a, b int) int {
+func Add(a, b uint16) uint16 {
 	return a + b
 }
 
