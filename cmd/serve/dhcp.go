@@ -97,11 +97,6 @@ func serveDHCP(t *tomb.Tomb) error {
 		return fmt.Errorf("Invalid Provision IPv4 address: %s", ipStr)
 	}
 
-	if provisionIP.To4().Equal(net.IPv4zero) {
-		// Assume we're running on same server as provision?
-		provisionIP = srv.ServerAddress
-	}
-
 	srv.ProvisionPort, err = strconv.Atoi(portStr)
 	if err != nil {
 		return err
