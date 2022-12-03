@@ -309,12 +309,19 @@ func TestBuntStoreBootImage(t *testing.T) {
 
 	image := tests.BootImageFactory.MustCreate().(*model.BootImage)
 
+	image.ProvisionTemplates = map[string]string{
+		"kickstart":    "kickstart.tmpl",
+		"post-install": "post-install.tmpl",
+	}
+
 	err = store.StoreBootImage(image)
 	assert.NoError(err)
 
 	testImage, err := store.LoadBootImage(image.Name)
 	if assert.NoError(err) {
 		assert.Equal(image.Name, testImage.Name)
+		assert.Contains(testImage.ProvisionTemplates, "post-install")
+		assert.Contains(testImage.ProvisionTemplates, "kickstart")
 	}
 
 	badimage := &model.BootImage{}

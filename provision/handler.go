@@ -69,7 +69,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 
 	boot := e.Group("/boot/:token/")
 	boot.Use(TokenRequired)
-	boot.POST("complete", h.Unprovision)
+	boot.POST("complete", h.Complete)
 	boot.GET("ipxe", h.Ipxe)
 	boot.GET("kickstart", h.Kickstart)
 	boot.GET("file/kernel*", h.File)
@@ -80,6 +80,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	boot.GET("cloud-init/meta-data", h.MetaData)
 	boot.GET("cloud-init/vendor-data", h.VendorData)
 	boot.GET("pxe-config.ign", h.Ignition)
+	boot.GET("provision/:name", h.ProvisionTemplate)
 }
 
 func (h *Handler) Index(c echo.Context) error {
@@ -237,7 +238,7 @@ func (h *Handler) Kickstart(c echo.Context) error {
 	return c.Render(http.StatusOK, tmplName, data)
 }
 
-func (h *Handler) Unprovision(c echo.Context) error {
+func (h *Handler) Complete(c echo.Context) error {
 	_, host, _, _, err := h.verifyClaims(c)
 	if err != nil {
 		return err
@@ -305,4 +306,23 @@ func (h *Handler) Ignition(c echo.Context) error {
 	log.Infof("Sending ignition config to host %s", host.Name)
 	renderer := c.Echo().Renderer.(*TemplateRenderer)
 	return renderer.RenderIgnition(http.StatusOK, tmplName, data, c)
+}
+
+func (h *Handler) ProvisionTemplate(c echo.Context) error {
+	bootImage, host, _, data, err := h.verifyClaims(c)
+	if err != nil {
+		return err
+	}
+
+	if bootImage.ProvisionTemplates == nil {
+		return echo.NewHTTPError(http.StatusNotFound, "")
+	}
+
+	tmplName, ok := bootImage.ProvisionTemplates[c.Param("name")]
+	if !ok {
+		return echo.NewHTTPError(http.StatusNotFound, "")
+	}
+
+	log.Infof("Sending provision template %s to host %s", c.Param("name"), host.Name)
+	return c.Render(http.StatusOK, tmplName, data)
 }

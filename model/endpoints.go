@@ -19,6 +19,7 @@ const (
 	endpointMetaData          = "cloud-init/meta-data"
 	endpointVendorData        = "cloud-init/vendor-data"
 	endpointIgnition          = "pxe-config.ign"
+	endpointProvision         = "provision/"
 )
 
 type Endpoints struct {
@@ -102,4 +103,8 @@ func (e *Endpoints) VendorDataURL() string {
 
 func (e *Endpoints) IgnitionURL() string {
 	return e.provisionURL(endpointIgnition)
+}
+
+func (e *Endpoints) ProvisionURL(name string) string {
+	return e.provisionURL(endpointProvision + name)
 }
