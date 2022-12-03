@@ -57,7 +57,7 @@ EOF
 
 %post
 
-curl -X POST {{ $.complete }}
+curl -X POST {{ $.endpoints.CompleteURL }}
 
 exit 0
 
