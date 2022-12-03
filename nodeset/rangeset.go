@@ -175,6 +175,9 @@ func (rs *RangeSet) Intersection(other *RangeSet) *RangeSet {
 
 func (rs *RangeSet) InPlaceIntersection(other *RangeSet) {
 	rs.bits.InPlaceIntersection(&other.bits)
+	if rs.padding < other.padding {
+		rs.padding = other.padding
+	}
 }
 
 func (rs *RangeSet) Union(other *RangeSet) *RangeSet {
@@ -184,6 +187,9 @@ func (rs *RangeSet) Union(other *RangeSet) *RangeSet {
 
 func (rs *RangeSet) InPlaceUnion(other *RangeSet) {
 	rs.bits.InPlaceUnion(&other.bits)
+	if rs.padding < other.padding {
+		rs.padding = other.padding
+	}
 }
 
 func (rs *RangeSet) Difference(other *RangeSet) *RangeSet {
@@ -193,6 +199,9 @@ func (rs *RangeSet) Difference(other *RangeSet) *RangeSet {
 
 func (rs *RangeSet) InPlaceDifference(other *RangeSet) {
 	rs.bits.InPlaceDifference(&other.bits)
+	if rs.padding < other.padding {
+		rs.padding = other.padding
+	}
 }
 
 func (rs *RangeSet) SymmetricDifference(other *RangeSet) *RangeSet {
@@ -202,6 +211,9 @@ func (rs *RangeSet) SymmetricDifference(other *RangeSet) *RangeSet {
 
 func (rs *RangeSet) InPlaceSymmetricDifference(other *RangeSet) {
 	rs.bits.InPlaceSymmetricDifference(&other.bits)
+	if rs.padding < other.padding {
+		rs.padding = other.padding
+	}
 }
 
 func (rs *RangeSet) Superset(other *RangeSet) bool {
