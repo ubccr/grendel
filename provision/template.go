@@ -52,7 +52,9 @@ var butaneTmpl string
 // Template functions
 var funcMap = template.FuncMap{
 	"hasTag":            hasTag,
-	"Split":             split,
+	"Split":             Split,
+	"Join":              Join,
+	"Contains":          Contains,
 	"ConfigValueString": ConfigValueString,
 	"ConfigValueBool":   ConfigValueBool,
 	"Add":               Add,
@@ -141,8 +143,16 @@ func hasTag(host model.Host, tag string) bool {
 	return host.HasTags(tag)
 }
 
-func split(s, sep string) []string {
+func Split(s, sep string) []string {
 	return strings.Split(s, sep)
+}
+
+func Join(s []string, sep string) string {
+	return strings.Join(s, sep)
+}
+
+func Contains(s, substr string) bool {
+	return strings.Contains(s, substr)
 }
 
 func Add(a, b uint16) uint16 {

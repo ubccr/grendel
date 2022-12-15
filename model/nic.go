@@ -212,3 +212,14 @@ func (n *NetInterface) DomainSearch() []string {
 
 	return DefaultDomainSearch
 }
+
+func (n *NetInterface) DNSList() []string {
+	dnsServers := n.DNS()
+	dnsList := make([]string, len(dnsServers))
+
+	for i, dip := range dnsServers {
+		dnsList[i] = dip.String()
+	}
+
+	return dnsList
+}
