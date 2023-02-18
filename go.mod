@@ -50,7 +50,7 @@ require (
 	github.com/vmware/goipmi v0.0.0-20181114221114-2333cd82d702
 	go4.org/netipx v0.0.0-20220925034521-797b0c90d8ab
 	golang.org/x/crypto v0.1.0
-	golang.org/x/net v0.2.0
+	golang.org/x/net v0.7.0
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	gopkg.in/ini.v1 v1.51.1 // indirect
 	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637
