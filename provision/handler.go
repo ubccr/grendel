@@ -74,6 +74,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	boot.GET("ipxe", h.Ipxe)
 	boot.GET("kickstart", h.Kickstart)
 	boot.GET("file/kernel*", h.File)
+	boot.HEAD("file/liveimg", h.File)
 	boot.GET("file/liveimg", h.File)
 	boot.GET("file/rootfs", h.File)
 	boot.GET("file/initrd-*", h.File)
