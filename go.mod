@@ -29,9 +29,9 @@ require (
 	github.com/spf13/viper v1.14.0
 	github.com/stmcginnis/gofish v0.2.0
 	github.com/stretchr/testify v1.8.1
-	github.com/tidwall/buntdb v1.1.2
-	github.com/tidwall/gjson v1.10.2
-	github.com/tidwall/sjson v1.1.7
+	github.com/tidwall/buntdb v1.2.10
+	github.com/tidwall/gjson v1.14.4
+	github.com/tidwall/sjson v1.2.5
 	github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb
 	github.com/vmware/goipmi v0.0.0-20181114221114-2333cd82d702
 	go4.org/netipx v0.0.0-20220925034521-797b0c90d8ab
@@ -75,12 +75,13 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.6-0.20210604193023-d5e0c0615ace // indirect
 	github.com/subosito/gotenv v1.4.1 // indirect
-	github.com/tidwall/btree v0.0.0-20191029221954-400434d76274 // indirect
-	github.com/tidwall/grect v0.0.0-20161006141115-ba9a043346eb // indirect
+	github.com/tidwall/btree v1.6.0 // indirect
+	github.com/tidwall/grect v0.1.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
-	github.com/tidwall/pretty v1.2.0 // indirect
+	github.com/tidwall/pretty v1.2.1 // indirect
+	github.com/tidwall/rtred v0.1.2 // indirect
 	github.com/tidwall/rtree v0.0.0-20180113144539-6cd427091e0e // indirect
-	github.com/tidwall/tinyqueue v0.0.0-20180302190814-1e39f5511563 // indirect
+	github.com/tidwall/tinyqueue v0.1.1 // indirect
 	github.com/u-root/u-root v7.0.0+incompatible // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
