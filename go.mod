@@ -27,7 +27,8 @@ require (
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b
 	github.com/miekg/dns v1.1.43
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible
+	github.com/pin/tftp v2.1.1-0.20200117065540-2f79be2dba4e+incompatible // indirect
+	github.com/pin/tftp/v3 v3.0.0
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/segmentio/fasthash v1.0.3
 	github.com/segmentio/ksuid v1.0.2

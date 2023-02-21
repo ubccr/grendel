@@ -26,7 +26,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pin/tftp"
+	"github.com/pin/tftp/v3"
 	"github.com/ubccr/grendel/model"
 )
 
