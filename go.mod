@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/Pallinder/go-randomdata v1.2.0
 	github.com/alouca/gosnmp v0.0.0-20170620005048-04d83944c9ab
-	github.com/bits-and-blooms/bitset v1.2.1
+	github.com/bits-and-blooms/bitset v1.5.0
 	github.com/bluele/factory-go v0.0.0-20181130035244-e6e8633dd3fe
 	github.com/coreos/butane v0.14.1-0.20220513204719-6cd92788076e
 	github.com/dustin/go-humanize v1.0.0
