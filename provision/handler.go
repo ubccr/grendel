@@ -275,6 +275,7 @@ func (h *Handler) UserData(c echo.Context) error {
 	}
 
 	log.Infof("Sending cloud-init user-data to host %s", host.Name)
+	c.Response().Header().Set(echo.HeaderContentType, "application/yaml; charset=utf-8")
 	return c.Render(http.StatusOK, tmplName, data)
 }
 
@@ -285,10 +286,12 @@ func (h *Handler) MetaData(c echo.Context) error {
 	}
 
 	log.Infof("Sending cloud-init meta-data to host %s", host.Name)
+	c.Response().Header().Set(echo.HeaderContentType, "application/yaml; charset=utf-8")
 	return c.Render(http.StatusOK, "meta-data.tmpl", data)
 }
 
 func (h *Handler) VendorData(c echo.Context) error {
+	c.Response().Header().Set(echo.HeaderContentType, "application/yaml; charset=utf-8")
 	return c.String(http.StatusOK, "")
 }
 

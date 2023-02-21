@@ -114,7 +114,10 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 		viewContext["reverse"] = c.Echo().Reverse
 	}
 
-	c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
+	ct := c.Response().Header().Get(echo.HeaderContentType)
+	if ct == "" {
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
+	}
 
 	return t.templates.ExecuteTemplate(w, name, data)
 }
