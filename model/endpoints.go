@@ -85,7 +85,7 @@ func (e *Endpoints) InitrdURL(index int) string {
 	return e.provisionURL(fmt.Sprintf("%s-%d", endpointInitrd, index))
 }
 
-func (e *Endpoints) CloudInit() string {
+func (e *Endpoints) CloudInitURL() string {
 	return e.provisionURL(endpointCloudInit)
 }
 
