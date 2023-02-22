@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-- Add DHCP multi-interfacace support [#12](https://github.com/ubccr/grendel/issues/12)
+- Add DHCP multi-interface support [#12](https://github.com/ubccr/grendel/issues/12)
 - Add support for Dell Zero-touch deployment (ZTD) of switches. The necessary
   DHCP options are added if a host is tagged with "dellztd" or "dellbmp" (to
   support older FTOS switches).
@@ -11,16 +11,18 @@
   a host IP falls in the subnet grendel will inherit these settings when
   offering dhcp leases.
 - Add MTU and VLAN parameters to network interface json definitions.
+- Fix incorrect padding in nodesets [#20](https://github.com/ubccr/grendel/issues/20)
+- Add support for custom named provision templates
 
 ### BREAKING CHANGES
 
-- Add netmask prefix to IPs. Changes the NetInterface.IP type from net.IP to
-  netip.Prefix which allows us to capture both the IP address and the network
-  prefix. The raw IP stored in the json now has the following format:
-  x.x.x.x/xx. This is a breaking change and will require a dump/restore of the
-  grendel database.
-- Rename "dhcp.router" config option to "dhcp.gateway"
-- Remove unused "provision.scheme" config option
+- Add netmask prefix to IPs in json definitions. Changes the `NetInterface.IP`
+  type from `net.IP` to `netip.Prefix` which allows us to capture both the IP
+  address and the network prefix. The raw IP stored in the json now has the
+  following format: `x.x.x.x/xx`. This is a breaking change and will require a
+  dump/restore of the grendel database.
+- Rename `dhcp.router` config option to `dhcp.gateway`
+- Remove unused `provision.scheme` config option
 
 ## [0.0.7] - 2022-06-09
 
