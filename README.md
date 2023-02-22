@@ -22,6 +22,7 @@ to 1500 nodes.
 * Authorized provisioning using [Branca](https://branca.io/) tokens
 * Rest API
 * Easy installation (single binary with no deps)
+* [Heorot Web GUI](https://github.com/ubccr/heorot)
 
 ## Project status
 
