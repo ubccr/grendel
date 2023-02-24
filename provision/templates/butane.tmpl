@@ -26,6 +26,6 @@ passwd:
 
           [Network]
           DNS={{ index $.nic.DNS 0 }}
-          Domains={{ Join (ConfigValueStringSlice "dhcp.domain_search") " " }}
+          Domains={{ Join $.nic.DomainSearch " " }}
           Address={{ $.nic.IP }}
           Gateway={{ $.nic.Gateway }}

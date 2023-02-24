@@ -47,7 +47,7 @@ autoinstall:
               via: {{$.nic.Gateway}}
           mtu: {{ or $.nic.MTU 1500 }}
           nameservers:
-            search: [{{ Join (ConfigValueStringSlice "dhcp.domain_search") ", " }}]
+            search: [{{ Join $.nic.DomainSearch ", " }}]
             addresses: [{{ Join $.nic.DNSList ", " }}]
           dhcp4: no
   user-data:
