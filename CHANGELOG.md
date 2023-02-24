@@ -13,6 +13,7 @@
 - Add MTU and VLAN parameters to network interface json definitions.
 - Fix incorrect padding in nodesets [#20](https://github.com/ubccr/grendel/issues/20)
 - Add support for custom named provision templates
+- Add `admin_ssh_pubkeys` config option
 
 ### BREAKING CHANGES
 

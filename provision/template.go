@@ -51,13 +51,14 @@ var butaneTmpl string
 
 // Template functions
 var funcMap = template.FuncMap{
-	"hasTag":            hasTag,
-	"Split":             Split,
-	"Join":              Join,
-	"Contains":          Contains,
-	"ConfigValueString": ConfigValueString,
-	"ConfigValueBool":   ConfigValueBool,
-	"Add":               Add,
+	"hasTag":                 hasTag,
+	"Split":                  Split,
+	"Join":                   Join,
+	"Contains":               Contains,
+	"ConfigValueStringSlice": ConfigValueStringSlice,
+	"ConfigValueString":      ConfigValueString,
+	"ConfigValueBool":        ConfigValueBool,
+	"Add":                    Add,
 }
 
 type TemplateRenderer struct {
@@ -164,6 +165,10 @@ func Add(a, b uint16) uint16 {
 
 func ConfigValueString(key string) string {
 	return viper.GetString(key)
+}
+
+func ConfigValueStringSlice(key string) []string {
+	return viper.GetStringSlice(key)
 }
 
 func ConfigValueBool(key string) bool {

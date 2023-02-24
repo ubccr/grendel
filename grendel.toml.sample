@@ -18,6 +18,12 @@ dbpath = ":memory:"
 #
 loggers = {cli="on", tftp="off", dhcp="on", dns="off", provision="on", api="on", pxe="off"}
 
+#
+# Admin ssh public keys. These are used in provision templates and elsewhere for
+# administrative ssh access
+#
+admin_ssh_pubkeys = []
+
 #------------------------------------------------------------------------------
 # HTTP Provision Server
 #------------------------------------------------------------------------------
