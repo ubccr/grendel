@@ -37,19 +37,36 @@ autoinstall:
     network:
       version: 2
       ethernets:
-        {{ $.nic.Name }}:
+        {{ or $.nic.Name "eno1" }}:
           match:
             macaddress: {{ $.nic.MAC }}
-          dhcp4: yes
+          addresses:
+            - {{ $.nic.IP }}
+          routes:
+            - to: default
+              via: {{$.nic.Gateway}}
+          mtu: {{ or $.nic.MTU 1500 }}
+          nameservers:
+            search: [{{ Join (ConfigValueStringSlice "dhcp.domain_search") ", " }}]
+            addresses: [{{ Join $.nic.DNSList ", " }}]
+          dhcp4: no
   user-data:
     disable_root: false
+    hostname: {{ $.host.Name }}
+    fqdn: {{ $.nic.FQDN }}
+    prefer_fqdn_over_hostname: true
     users:
       - name: ubuntu
         primary_group: ubuntu
         groups: users, admin
         shell: /bin/bash
-#        ssh_import_id: gh:YOURGITHUBIDHERE
         sudo: ALL=(ALL) NOPASSWD:ALL
+{{- with $.adminSSHPubKeys }}
+        ssh_authorized_keys:
+       {{- range $i, $key := $.adminSSHPubKeys }}
+          - {{ $key }}
+       {{- end }}
+{{ end }}
   late-commands:
     - curl -X POST {{ $.endpoints.CompleteURL }}
 {{- with .rootpw }}

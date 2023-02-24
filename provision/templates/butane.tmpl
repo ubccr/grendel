@@ -8,10 +8,11 @@ passwd:
 {{- with $.adminSSHPubKeys }}
     - name: core
       ssh_authorized_keys:
-       {{- range $i, $key := $.adminSSHPubKeys }}
-         - "{{ $key }}"
-       {{ end }}
+      {{- range $i, $key := $.adminSSHPubKeys }}
+        - "{{ $key }}"
+      {{- end }}
 {{ end }}
+
   files:
     - path: /etc/systemd/network/10-static.network
       mode: 0644

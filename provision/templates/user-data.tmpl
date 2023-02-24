@@ -1,5 +1,18 @@
 #cloud-config
 
+users:
+  - name: grendeladmin
+    primary_group: grendeladmin
+    groups: users, admin
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+{{- with $.adminSSHPubKeys }}
+    ssh_authorized_keys:
+   {{- range $i, $key := $.adminSSHPubKeys }}
+      - {{ $key }}
+   {{- end }}
+{{ end }}
+
 phone_home:
   url: {{ $.endpoints.CompleteURL }}
   post: [ instance_id ]
