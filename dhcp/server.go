@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"net/netip"
 	"strconv"
 	"sync"
 	"time"
@@ -33,33 +32,22 @@ import (
 	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/util"
-	"go4.org/netipx"
 	"golang.org/x/net/ipv4"
 )
 
 var log = logger.GetLogger("DHCP")
 
 type Server struct {
-	ListenAddress     net.IP
-	ServerAddress     net.IP
-	InterfaceIPMap    map[int]net.IP
-	Port              int
-	ProvisionHostname string
-	ProvisionScheme   string
-	ProvisionPort     int
-	MTU               int
-	ProxyOnly         bool
-	DB                model.DataStore
-	DNSServers        []net.IP
-	DomainSearchList  []string
-	Netmask           net.IPMask
-	RouterOctet4      int
-	RouterIP          net.IP
-	Subnets           map[netip.Addr]*netipx.IPSet
-	LeaseTime         time.Duration
-	conn              *ipv4.PacketConn
-	quit              chan interface{}
-	wg                sync.WaitGroup
+	ListenAddress  net.IP
+	ServerAddress  net.IP
+	InterfaceIPMap map[int]net.IP
+	Port           int
+	ProxyOnly      bool
+	DB             model.DataStore
+	LeaseTime      time.Duration
+	conn           *ipv4.PacketConn
+	quit           chan interface{}
+	wg             sync.WaitGroup
 }
 
 func NewServer(db model.DataStore, address string) (*Server, error) {
@@ -215,14 +203,6 @@ func (s *Server) mainHandler4(peer *net.UDPAddr, req *dhcpv4.DHCPv4, oob *ipv4.C
 }
 
 func (s *Server) Serve() error {
-	if s.ProvisionPort == 0 {
-		s.ProvisionPort = 80
-	}
-
-	if s.ProvisionScheme == "" {
-		s.ProvisionScheme = "http"
-	}
-
 	listener := &net.UDPAddr{
 		IP:   s.ListenAddress,
 		Port: s.Port,
@@ -230,18 +210,13 @@ func (s *Server) Serve() error {
 
 	intf := ""
 	if !s.ListenAddress.To4().Equal(net.IPv4zero) {
-		iface, mask, err := util.GetInterfaceFromIP(s.ListenAddress)
+		iface, _, err := util.GetInterfaceFromIP(s.ListenAddress)
 		if err != nil {
 			return err
 		}
 		intf = iface
 		listener = &net.UDPAddr{Port: s.Port}
 		log.Printf("Binding to interface: %s", intf)
-
-		if s.Netmask == nil && mask != nil {
-			s.Netmask = mask
-			log.Printf("Using netmask from interface: %s", s.Netmask)
-		}
 	}
 
 	udpConn, err := server4.NewIPv4UDPConn(intf, listener)

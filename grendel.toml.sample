@@ -18,30 +18,28 @@ dbpath = ":memory:"
 #
 loggers = {cli="on", tftp="off", dhcp="on", dns="off", provision="on", api="on", pxe="off"}
 
+#
+# Admin ssh public keys. These are used in provision templates and elsewhere for
+# administrative ssh access
+#
+admin_ssh_pubkeys = []
+
 #------------------------------------------------------------------------------
 # HTTP Provision Server
 #------------------------------------------------------------------------------
 [provision]
 
-# For provisioning with http
+# Listen address for provision server
 listen = "0.0.0.0:80"
-scheme = "http"
 
-# For provisioning with https
-#
-#listen = "0.0.0.0:443"
-#
-#scheme = "https"
-#
-# hostname for grendel, should also be the hostname for the SSL certificate
+# Set static hostname for grendel (should match SSL certificate and resolve in DNS)
 #hostname = "my.host.name"
-#
+ 
 # Path to ssl cert (.crt file)
 #cert = "/path/to/cert/file/hostname.crt"
-#
+ 
 # Path to ssl key (.key file)
 #key = "/path/to/cert/file/hostname.key"
-#
 
 # TTL in seconds for provision tokens. Defaults to 1 hour
 token_ttl = 3600
@@ -67,10 +65,10 @@ listen = "0.0.0.0:67"
 # Default lease time
 lease_time = "24h"
 
-# List of DNS servers
+# List of default DNS servers
 dns_servers = []
 
-# List of DNS search domains
+# List of default DNS search domains
 domain_search = []
 
 # Default MTU
@@ -83,20 +81,23 @@ proxy_only = false
 # DHCP responses based on the hosts IP address, netmask, and router_octet4. For
 # example, if all subnets in your data center have routers 10.x.x.254 you can
 # set router_octet4 = 254. If a host ip address is 10.104.13.10, Grendel will
-# set the router option in the dhcp response to 10.104.13.254.  Note setting
-# this option will set the netmask to 24. Off by default.
+# set the router option in the dhcp response to 10.104.13.254. This setting is
+# off by default.
 router_octet4 = 0
 
-# Default netmask example: 8, 16, 24, etc.
-netmask = 24
+# Hard code a static default gateway. (Not set by default)
+gateway = ""
 
-# Hard code a static default router. (Not set by default)
-router = ""
-
-# Define routers for each subnet. Format is {"router IP": "subnet"}
-# If a hosts IP address is contained inside the subnet, the static dhcp
-# response will contain the router IP address for the given subnet.
-# subnets = {"10.65.3.254" = "10.65.0.0/22", "10.128.17.254" = "10.128.17.0/24"}
+# Configure settings for specific subnets. If a hosts IP address is contained
+# inside the subnet, the static dhcp response will contain the gateway IP
+# address, dns, and MTU settings for the given subnet. The gateway defines both
+# the gateway IP and the netmask prefix for the subnet. For example, gateway =
+# "10.17.41.254/23" will check if host IP falls in the network prefix
+# 10.17.40.0/23 and if so set the dhcp gateway/router to 10.17.41.254.
+#
+#subnets = [ 
+#    {gateway = "10.17.41.254/23",  dns = "10.17.40.248", mtu="1500"}
+# ]
 
 #------------------------------------------------------------------------------
 # DNS Server

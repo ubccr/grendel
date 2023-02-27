@@ -1,5 +1,5 @@
 install
-liveimg --url="{{ .liveimg }}"
+liveimg --url="{{ $.endpoints.LiveImageURL }}"
 
 lang en_US.UTF-8
 selinux --disabled
@@ -7,7 +7,7 @@ keyboard us
 timezone --utc America/New_York
 skipx
 
-network --bootproto dhcp --hostname {{ .nic.FQDN }} --device={{ .nic.MAC }}
+network --bootproto dhcp --hostname {{ $.nic.FQDN }} --device={{ $.nic.MAC }}
 firewall --disabled
 
 
@@ -15,7 +15,7 @@ bootloader --timeout=10
 %include /tmp/diskpart.cfg
 text
 
-{{ with .rootpw }}
+{{ with $.rootpw }}
 rootpw --iscrypted {{ . }}
 {{ end }}
 
@@ -42,11 +42,11 @@ done
 
 cat <<EOF > /tmp/diskpart.cfg
 zerombr
-clearpart --all --initlabel {{if not (hasTag .host "legacy")}}--disklabel=gpt{{end}}
+clearpart --all --initlabel {{if not ($.host.HasTags "legacy")}}--disklabel=gpt{{end}}
 
 part swap --ondisk=$ROOTDRIVE --asprimary --size=8192
 part /boot --ondisk=$ROOTDRIVE --asprimary --fstype="xfs" --size=1024
-{{ if not (hasTag .host "legacy") -}}
+{{ if not ($.host.HasTags "legacy") -}}
 part /boot/efi --ondisk=$ROOTDRIVE --fstype=efi --size=256
 {{ end -}}
 part / --ondisk=$ROOTDRIVE --asprimary --fstype="xfs" --size=51200
@@ -57,7 +57,7 @@ EOF
 
 %post
 
-curl -X POST {{ .complete }}
+curl -X POST {{ $.endpoints.CompleteURL }}
 
 exit 0
 

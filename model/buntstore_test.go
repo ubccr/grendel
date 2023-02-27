@@ -60,7 +60,7 @@ func TestBuntStoreHost(t *testing.T) {
 	testHost2, err := store.LoadHostFromName(host.Name)
 	if assert.NoError(err) {
 		assert.Equal(host.Name, testHost2.Name)
-		assert.True(host.Interfaces[0].IP.Equal(testHost2.Interfaces[0].IP))
+		assert.Equal(0, host.Interfaces[0].Addr().Compare(testHost2.Interfaces[0].Addr()))
 	}
 
 	testHost3, err := store.LoadHostFromMAC(host.Interfaces[0].MAC.String())
@@ -72,11 +72,11 @@ func TestBuntStoreHost(t *testing.T) {
 	testIPs, err := store.ResolveIPv4(host.Interfaces[0].FQDN)
 	if assert.NoError(err) {
 		if assert.Equal(1, len(testIPs)) {
-			assert.Equal(host.Interfaces[0].IP.String(), testIPs[0].String())
+			assert.Equal(host.Interfaces[0].AddrString(), testIPs[0].String())
 		}
 	}
 
-	testNames, err := store.ReverseResolve(host.Interfaces[0].IP.String())
+	testNames, err := store.ReverseResolve(host.Interfaces[0].AddrString())
 	if assert.NoError(err) {
 		if assert.Equal(1, len(testNames)) {
 			assert.Equal(host.Interfaces[0].FQDN, testNames[0])
@@ -309,12 +309,19 @@ func TestBuntStoreBootImage(t *testing.T) {
 
 	image := tests.BootImageFactory.MustCreate().(*model.BootImage)
 
+	image.ProvisionTemplates = map[string]string{
+		"kickstart":    "kickstart.tmpl",
+		"post-install": "post-install.tmpl",
+	}
+
 	err = store.StoreBootImage(image)
 	assert.NoError(err)
 
 	testImage, err := store.LoadBootImage(image.Name)
 	if assert.NoError(err) {
 		assert.Equal(image.Name, testImage.Name)
+		assert.Contains(testImage.ProvisionTemplates, "post-install")
+		assert.Contains(testImage.ProvisionTemplates, "kickstart")
 	}
 
 	badimage := &model.BootImage{}

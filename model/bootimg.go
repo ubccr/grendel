@@ -27,16 +27,17 @@ import (
 type BootImageList []*BootImage
 
 type BootImage struct {
-	ID                ksuid.KSUID `json:"id"`
-	Name              string      `json:"name" validate:"required"`
-	KernelPath        string      `json:"kernel" validate:"required"`
-	InitrdPaths       []string    `json:"initrd"`
-	LiveImage         string      `json:"liveimg"`
-	CommandLine       string      `json:"cmdline"`
-	Verify            bool        `json:"verify"`
-	ProvisionTemplate string      `json:"provision_template"`
-	UserData          string      `json:"user_data"`
-	Butane            string      `json:"butane"`
+	ID                 ksuid.KSUID       `json:"id"`
+	Name               string            `json:"name" validate:"required"`
+	KernelPath         string            `json:"kernel" validate:"required"`
+	InitrdPaths        []string          `json:"initrd"`
+	LiveImage          string            `json:"liveimg"`
+	CommandLine        string            `json:"cmdline"`
+	Verify             bool              `json:"verify"`
+	ProvisionTemplate  string            `json:"provision_template"`
+	ProvisionTemplates map[string]string `json:"provision_templates"`
+	UserData           string            `json:"user_data"`
+	Butane             string            `json:"butane"`
 }
 
 func NewBootImageList() BootImageList {
@@ -63,6 +64,14 @@ func (b *BootImage) CheckPathsExist() error {
 	if b.ProvisionTemplate != "" {
 		if _, err := os.Stat(filepath.Join("/var/lib/grendel/templates", b.ProvisionTemplate)); err != nil {
 			return err
+		}
+	}
+
+	if b.ProvisionTemplates != nil {
+		for _, tmpl := range b.ProvisionTemplates {
+			if _, err := os.Stat(filepath.Join("/var/lib/grendel/templates", tmpl)); err != nil {
+				return err
+			}
 		}
 	}
 

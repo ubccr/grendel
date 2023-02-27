@@ -22,6 +22,7 @@ to 1500 nodes.
 * Authorized provisioning using [Branca](https://branca.io/) tokens
 * Rest API
 * Easy installation (single binary with no deps)
+* [Heorot Web GUI](https://github.com/ubccr/heorot)
 
 ## Project status
 
@@ -98,7 +99,7 @@ Create the following JSON file `host.json`:
     "interfaces": [
         {
             "fqdn": "tux01.localhost",
-            "ip": "192.168.10.12",
+            "ip": "192.168.10.12/24",
             "mac": "DE:AD:BE:EF:12:8C"
         }
     ]
@@ -129,7 +130,7 @@ $ qemu-system-x86_64 -m 2048 -boot n -device e1000,netdev=net0,mac=DE:AD:BE:EF:1
 
 ## Hacking
 
-Building Grendel requires Go v1.16 or greater. Building iPXE requires packages
+Building Grendel requires Go v1.20 or greater. Building iPXE requires packages
 lzma-sdk-devel and xz-devel:
 
 ```

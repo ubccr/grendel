@@ -32,7 +32,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/model"
-	"github.com/ubccr/grendel/util"
 )
 
 type Handler struct {
@@ -70,7 +69,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 
 	boot := e.Group("/boot/:token/")
 	boot.Use(TokenRequired)
-	boot.POST("complete", h.Unprovision)
+	boot.POST("complete", h.Complete)
 	boot.GET("ipxe", h.Ipxe)
 	boot.GET("kickstart", h.Kickstart)
 	boot.GET("file/kernel*", h.File)
@@ -82,6 +81,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	boot.GET("cloud-init/meta-data", h.MetaData)
 	boot.GET("cloud-init/vendor-data", h.VendorData)
 	boot.GET("pxe-config.ign", h.Ignition)
+	boot.GET("provision/:name", h.ProvisionTemplate)
 }
 
 func (h *Handler) Index(c echo.Context) error {
@@ -91,7 +91,7 @@ func (h *Handler) Index(c echo.Context) error {
 	return c.JSON(http.StatusOK, resp)
 }
 
-func (h *Handler) verifyClaims(c echo.Context) (*model.BootImage, *model.Host, *model.NetInterface, error) {
+func (h *Handler) verifyClaims(c echo.Context) (*model.BootImage, *model.Host, *model.NetInterface, map[string]interface{}, error) {
 	claims := c.Get(ContextKeyToken).(*model.BootClaims)
 
 	log.Debugf("Got valid boot claims: %v", claims)
@@ -102,7 +102,7 @@ func (h *Handler) verifyClaims(c echo.Context) (*model.BootImage, *model.Host, *
 			"host_id": claims.ID,
 			"mac":     claims.MAC,
 		}).Error("failed to find host")
-		return nil, nil, nil, echo.NewHTTPError(http.StatusBadRequest, "invalid host").SetInternal(err)
+		return nil, nil, nil, nil, echo.NewHTTPError(http.StatusBadRequest, "invalid host").SetInternal(err)
 	}
 
 	if !host.Provision {
@@ -110,7 +110,7 @@ func (h *Handler) verifyClaims(c echo.Context) (*model.BootImage, *model.Host, *
 			"host_id": claims.ID,
 			"mac":     claims.MAC,
 		}).Error("host is not set to provision")
-		return nil, nil, nil, echo.NewHTTPError(http.StatusBadRequest, "host not set to provision")
+		return nil, nil, nil, nil, echo.NewHTTPError(http.StatusBadRequest, "host not set to provision")
 	}
 
 	mac, err := net.ParseMAC(claims.MAC)
@@ -119,7 +119,7 @@ func (h *Handler) verifyClaims(c echo.Context) (*model.BootImage, *model.Host, *
 			"host_id": claims.ID,
 			"mac":     claims.MAC,
 		}).Error("got invalid mac address")
-		return nil, nil, nil, echo.NewHTTPError(http.StatusBadRequest, "invalid mac address").SetInternal(err)
+		return nil, nil, nil, nil, echo.NewHTTPError(http.StatusBadRequest, "invalid mac address").SetInternal(err)
 	}
 
 	nic := host.Interface(mac)
@@ -128,7 +128,7 @@ func (h *Handler) verifyClaims(c echo.Context) (*model.BootImage, *model.Host, *
 			"host_id": claims.ID,
 			"mac":     claims.MAC,
 		}).Error("got invalid boot interface for host")
-		return nil, nil, nil, echo.NewHTTPError(http.StatusBadRequest, "invalid boot interface").SetInternal(err)
+		return nil, nil, nil, nil, echo.NewHTTPError(http.StatusBadRequest, "invalid boot interface").SetInternal(err)
 	}
 
 	bootImage, err := h.LoadBootImageWithDefault(host.BootImage)
@@ -137,50 +137,33 @@ func (h *Handler) verifyClaims(c echo.Context) (*model.BootImage, *model.Host, *
 			"host_id": claims.ID,
 			"mac":     claims.MAC,
 		}).Error("failed to find boot image for host")
-		return nil, nil, nil, echo.NewHTTPError(http.StatusBadRequest, "invalid boot image").SetInternal(err)
+		return nil, nil, nil, nil, echo.NewHTTPError(http.StatusBadRequest, "invalid boot image").SetInternal(err)
 	}
 
-	return bootImage, host, nic, nil
-}
-
-func (h *Handler) newTemplateParams(c echo.Context) map[string]interface{} {
-	baseURI := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
-	kickstart := fmt.Sprintf("%s/boot/%s/kickstart", baseURI, c.Param("token"))
-	repo := fmt.Sprintf("%s/repo", baseURI)
-	liveimg := fmt.Sprintf("%s/boot/%s/file/liveimg", baseURI, c.Param("token"))
-	cloudInit := fmt.Sprintf("%s/boot/%s/cloud-init/", baseURI, c.Param("token"))
-	complete := fmt.Sprintf("%s/boot/%s/complete", baseURI, c.Param("token"))
-	ignition := fmt.Sprintf("%s/boot/%s/pxe-config.ign", baseURI, c.Param("token"))
+	token := c.Param("token")
+	serverHost := c.Request().Host
+	endpoints := model.NewEndpoints(serverHost, token)
 
 	data := map[string]interface{}{
-		"token":     c.Param("token"),
-		"baseuri":   baseURI,
-		"kickstart": kickstart,
-		"repo":      repo,
-		"liveimg":   liveimg,
-		"cloudinit": cloudInit,
-		"ignition":  ignition,
-		"complete":  complete,
+		"token":           c.Param("token"),
+		"endpoints":       endpoints,
+		"bootimage":       bootImage,
+		"nic":             nic,
+		"host":            host,
+		"rootpw":          viper.GetString("provision.root_password"),
+		"adminSSHPubKeys": viper.GetStringSlice("admin_ssh_pubkeys"),
 	}
 
-	return data
+	return bootImage, host, nic, data, nil
 }
 
 func (h *Handler) Ipxe(c echo.Context) error {
-	bootImage, host, nic, err := h.verifyClaims(c)
+	bootImage, host, _, data, err := h.verifyClaims(c)
 	if err != nil {
 		return err
 	}
 
 	log.Infof("Sending iPXE script to boot host %s with image %s", host.Name, bootImage.Name)
-
-	data := h.newTemplateParams(c)
-
-	data["bootimage"] = bootImage
-	data["nic"] = nic
-	data["host"] = host
-	data["gateway"] = util.DefaultGateway(nic.IP)
-	data["dns"] = viper.GetStringSlice("dhcp.dns_servers")
 
 	commandLine := bootImage.CommandLine
 
@@ -204,7 +187,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 }
 
 func (h *Handler) File(c echo.Context) error {
-	bootImage, host, _, err := h.verifyClaims(c)
+	bootImage, host, _, _, err := h.verifyClaims(c)
 	if err != nil {
 		return err
 	}
@@ -244,16 +227,10 @@ func (h *Handler) serveBlob(c echo.Context, name string, data []byte) error {
 }
 
 func (h *Handler) Kickstart(c echo.Context) error {
-	bootImage, host, nic, err := h.verifyClaims(c)
+	bootImage, _, _, data, err := h.verifyClaims(c)
 	if err != nil {
 		return err
 	}
-
-	data := h.newTemplateParams(c)
-	data["bootimage"] = bootImage
-	data["nic"] = nic
-	data["host"] = host
-	data["rootpw"] = viper.GetString("provision.root_password")
 
 	tmplName := "kickstart.tmpl"
 	if bootImage.ProvisionTemplate != "" {
@@ -263,8 +240,8 @@ func (h *Handler) Kickstart(c echo.Context) error {
 	return c.Render(http.StatusOK, tmplName, data)
 }
 
-func (h *Handler) Unprovision(c echo.Context) error {
-	_, host, _, err := h.verifyClaims(c)
+func (h *Handler) Complete(c echo.Context) error {
+	_, host, _, _, err := h.verifyClaims(c)
 	if err != nil {
 		return err
 	}
@@ -289,18 +266,10 @@ func (h *Handler) Unprovision(c echo.Context) error {
 }
 
 func (h *Handler) UserData(c echo.Context) error {
-	bootImage, host, nic, err := h.verifyClaims(c)
+	bootImage, host, _, data, err := h.verifyClaims(c)
 	if err != nil {
 		return err
 	}
-
-	data := h.newTemplateParams(c)
-	data["bootimage"] = bootImage
-	data["nic"] = nic
-	data["host"] = host
-	data["rootpw"] = viper.GetString("provision.root_password")
-	data["gateway"] = util.DefaultGateway(nic.IP)
-	data["dns"] = viper.GetStringSlice("dhcp.dns_servers")
 
 	tmplName := "user-data.tmpl"
 	if bootImage.UserData != "" {
@@ -308,42 +277,31 @@ func (h *Handler) UserData(c echo.Context) error {
 	}
 
 	log.Infof("Sending cloud-init user-data to host %s", host.Name)
+	c.Response().Header().Set(echo.HeaderContentType, "application/yaml; charset=utf-8")
 	return c.Render(http.StatusOK, tmplName, data)
 }
 
 func (h *Handler) MetaData(c echo.Context) error {
-	bootImage, host, nic, err := h.verifyClaims(c)
+	_, host, _, data, err := h.verifyClaims(c)
 	if err != nil {
 		return err
 	}
 
-	data := h.newTemplateParams(c)
-	data["bootimage"] = bootImage
-	data["nic"] = nic
-	data["host"] = host
-	data["rootpw"] = viper.GetString("provision.root_password")
-
 	log.Infof("Sending cloud-init meta-data to host %s", host.Name)
+	c.Response().Header().Set(echo.HeaderContentType, "application/yaml; charset=utf-8")
 	return c.Render(http.StatusOK, "meta-data.tmpl", data)
 }
 
 func (h *Handler) VendorData(c echo.Context) error {
+	c.Response().Header().Set(echo.HeaderContentType, "application/yaml; charset=utf-8")
 	return c.String(http.StatusOK, "")
 }
 
 func (h *Handler) Ignition(c echo.Context) error {
-	bootImage, host, nic, err := h.verifyClaims(c)
+	bootImage, host, _, data, err := h.verifyClaims(c)
 	if err != nil {
 		return err
 	}
-
-	data := h.newTemplateParams(c)
-	data["bootimage"] = bootImage
-	data["nic"] = nic
-	data["host"] = host
-	data["rootpw"] = viper.GetString("provision.root_password")
-	data["gateway"] = util.DefaultGateway(nic.IP)
-	data["dns"] = viper.GetStringSlice("dhcp.dns_servers")
 
 	tmplName := "butane.tmpl"
 	if bootImage.Butane != "" {
@@ -353,4 +311,23 @@ func (h *Handler) Ignition(c echo.Context) error {
 	log.Infof("Sending ignition config to host %s", host.Name)
 	renderer := c.Echo().Renderer.(*TemplateRenderer)
 	return renderer.RenderIgnition(http.StatusOK, tmplName, data, c)
+}
+
+func (h *Handler) ProvisionTemplate(c echo.Context) error {
+	bootImage, host, _, data, err := h.verifyClaims(c)
+	if err != nil {
+		return err
+	}
+
+	if bootImage.ProvisionTemplates == nil {
+		return echo.NewHTTPError(http.StatusNotFound, "")
+	}
+
+	tmplName, ok := bootImage.ProvisionTemplates[c.Param("name")]
+	if !ok {
+		return echo.NewHTTPError(http.StatusNotFound, "")
+	}
+
+	log.Infof("Sending provision template %s to host %s", c.Param("name"), host.Name)
+	return c.Render(http.StatusOK, tmplName, data)
 }

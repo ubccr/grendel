@@ -1,15 +1,15 @@
 #!ipxe
-{{ if .bootimage.Verify }}
+{{ if $.bootimage.Verify }}
 imgtrust --permanent
 {{ end -}}
-kernel --name kernel {{ .baseuri }}/boot/{{.token}}/file/kernel
+kernel --name kernel {{ $.endpoints.KernelURL }}
 {{ if .bootimage.Verify }}
-imgverify kernel {{ .baseuri }}/boot/{{.token}}/file/kernel.sig
+imgverify kernel {{ $.endpoints.KernelURL }}.sig
 {{ end -}}
-{{- range $i, $initrd := .bootimage.InitrdPaths }}
-initrd --name initrd{{$i}} {{ $.baseuri }}/boot/{{$.token}}/file/initrd-{{$i}}
+{{- range $i, $initrd := $.bootimage.InitrdPaths }}
+initrd --name initrd{{$i}} {{ $.endpoints.InitrdURL $i }}
 {{ if $.bootimage.Verify }}
-imgverify initrd{{$i}} {{ $.baseuri }}/boot/{{$.token}}/file/initrd-{{$i}}.sig
+imgverify initrd{{$i}} {{ $.endpoints.InitrdURL $i }}.sig
 {{ end -}}
 {{ end -}}
-boot kernel initrd=initrd0 {{ .commandLine }}
+boot kernel initrd=initrd0 {{ $.commandLine }}

@@ -1,8 +1,31 @@
 variant: flatcar
 version: 1.0.0
 passwd:
-  users:
-{{- with .rootpw }}
+{{- with $.rootpw }}
     - name: root
-      password_hash: {{ . }} 
+      password_hash: {{ . }}
 {{ end }}
+{{- with $.adminSSHPubKeys }}
+    - name: core
+      ssh_authorized_keys:
+      {{- range $i, $key := $.adminSSHPubKeys }}
+        - "{{ $key }}"
+      {{- end }}
+{{ end }}
+
+  files:
+    - path: /etc/systemd/network/10-static.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          MACAddress={{ $.nic.MAC }}
+
+          [Link]
+          MTUBytes={{ or $.nic.MTU 1500 }}
+
+          [Network]
+          DNS={{ index $.nic.DNS 0 }}
+          Domains={{ Join $.nic.DomainSearch " " }}
+          Address={{ $.nic.IP }}
+          Gateway={{ $.nic.Gateway }}

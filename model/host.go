@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"net/netip"
 
 	"github.com/segmentio/ksuid"
 	"github.com/tidwall/gjson"
@@ -113,7 +114,9 @@ func (h *Host) FromJSON(hostJSON string) {
 		nic.Name = i.Get("ifname").String()
 		nic.FQDN = i.Get("fqdn").String()
 		nic.BMC = i.Get("bmc").Bool()
-		nic.IP = net.ParseIP(i.Get("ip").String())
+		nic.VLAN = i.Get("vlan").String()
+		nic.MTU = uint16(i.Get("mtu").Int())
+		nic.IP, _ = netip.ParsePrefix(i.Get("ip").String())
 		nic.MAC, _ = net.ParseMAC(i.Get("mac").String())
 		h.Interfaces = append(h.Interfaces, nic)
 	}
@@ -138,10 +141,12 @@ func (h *Host) ToJSON() string {
 	for _, nic := range h.Interfaces {
 		n := map[string]interface{}{
 			"mac":    nic.MAC.String(),
-			"ip":     nic.IP.String(),
+			"ip":     nic.CIDR(),
 			"ifname": nic.Name,
 			"fqdn":   nic.FQDN,
 			"bmc":    nic.BMC,
+			"vlan":   nic.VLAN,
+			"mtu":    nic.MTU,
 		}
 		hostJSON, _ = sjson.Set(hostJSON, "interfaces.-1", n)
 	}

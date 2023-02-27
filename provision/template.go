@@ -19,9 +19,7 @@ package provision
 
 import (
 	"bytes"
-	"crypto/sha256"
 	_ "embed"
-	"fmt"
 	"io"
 	"path/filepath"
 	"strings"
@@ -53,11 +51,14 @@ var butaneTmpl string
 
 // Template functions
 var funcMap = template.FuncMap{
-	"hasTag":            hasTag,
-	"Split":             split,
-	"ConfigValueHashed": ConfigValueHashed,
-	"ConfigValueString": ConfigValueString,
-	"ConfigValueBool":   ConfigValueBool,
+	"hasTag":                 hasTag,
+	"Split":                  Split,
+	"Join":                   Join,
+	"Contains":               Contains,
+	"ConfigValueStringSlice": ConfigValueStringSlice,
+	"ConfigValueString":      ConfigValueString,
+	"ConfigValueBool":        ConfigValueBool,
+	"Add":                    Add,
 }
 
 type TemplateRenderer struct {
@@ -114,7 +115,10 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 		viewContext["reverse"] = c.Echo().Reverse
 	}
 
-	c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
+	ct := c.Response().Header().Get(echo.HeaderContentType)
+	if ct == "" {
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
+	}
 
 	return t.templates.ExecuteTemplate(w, name, data)
 }
@@ -143,25 +147,30 @@ func hasTag(host model.Host, tag string) bool {
 	return host.HasTags(tag)
 }
 
-func split(s, sep string) []string {
+func Split(s, sep string) []string {
 	return strings.Split(s, sep)
+}
+
+func Join(s []string, sep string) string {
+	return strings.Join(s, sep)
+}
+
+func Contains(s, substr string) bool {
+	return strings.Contains(s, substr)
+}
+
+func Add(a, b uint16) uint16 {
+	return a + b
 }
 
 func ConfigValueString(key string) string {
 	return viper.GetString(key)
 }
 
-func ConfigValueBool(key string) bool {
-	return viper.GetBool(key)
+func ConfigValueStringSlice(key string) []string {
+	return viper.GetStringSlice(key)
 }
 
-func ConfigValueHashed(key string) string {
-	val := viper.GetString(key)
-	if val == "" {
-		return ""
-	}
-
-	h := sha256.New()
-	h.Write([]byte(val))
-	return fmt.Sprintf("%x", h.Sum(nil))
+func ConfigValueBool(key string) bool {
+	return viper.GetBool(key)
 }

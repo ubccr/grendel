@@ -109,7 +109,7 @@ var (
 					macAddr := ""
 					bootNic := host.BootInterface()
 					if bootNic != nil {
-						ipAddr = bootNic.IP.String()
+						ipAddr = bootNic.CIDR()
 						macAddr = bootNic.MAC.String()
 					}
 

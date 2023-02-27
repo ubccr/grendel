@@ -38,6 +38,7 @@ import (
 	"github.com/ubccr/grendel/api"
 	"github.com/ubccr/grendel/client"
 	"github.com/ubccr/grendel/logger"
+	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/util"
 )
 
@@ -177,5 +178,10 @@ func initConfig() {
 		}
 
 		viper.Set("api.secret", secret)
+	}
+
+	err := model.ParseConfigs()
+	if err != nil {
+		Log.Fatal(err)
 	}
 }

@@ -72,7 +72,7 @@ func (s *Server) bootingHandler4(host *model.Host, serverIP net.IP, req, resp *d
 		pxe := dhcpv4.OptionsFromList(dhcpv4.OptGeneric(dhcpv4.GenericOptionCode(6), []byte{8}))
 		resp.UpdateOption(dhcpv4.OptGeneric(dhcpv4.OptionVendorSpecificInformation, pxe.ToBytes()))
 
-		resp.UpdateOption(dhcpv4.OptTFTPServerName(s.ServerAddress.String()))
+		resp.UpdateOption(dhcpv4.OptTFTPServerName(serverIP.String()))
 
 		token, err := model.NewFirmwareToken(req.ClientHWAddr.String(), fwtype)
 		if err != nil {
@@ -85,13 +85,14 @@ func (s *Server) bootingHandler4(host *model.Host, serverIP net.IP, req, resp *d
 		pxe := dhcpv4.OptionsFromList(dhcpv4.OptGeneric(dhcpv4.GenericOptionCode(6), []byte{8}))
 		resp.UpdateOption(dhcpv4.OptGeneric(dhcpv4.OptionVendorSpecificInformation, pxe.ToBytes()))
 
-		resp.UpdateOption(dhcpv4.OptTFTPServerName(s.ServerAddress.String()))
+		resp.UpdateOption(dhcpv4.OptTFTPServerName(serverIP.String()))
 
 		token, err := model.NewFirmwareToken(req.ClientHWAddr.String(), fwtype)
 		if err != nil {
 			return fmt.Errorf("iPXE firmware - failed to generated signed Firmware token")
 		}
-		resp.UpdateOption(dhcpv4.OptBootFileName(fmt.Sprintf("tftp://%s/%s", s.ServerAddress, token)))
+		endpoints := model.NewEndpoints(serverIP.String(), token)
+		resp.UpdateOption(dhcpv4.OptBootFileName(endpoints.BootFileURL()))
 
 	case firmware.EFI386, firmware.EFI64:
 		log.Printf("EFI boot PXE client")
@@ -99,7 +100,7 @@ func (s *Server) bootingHandler4(host *model.Host, serverIP net.IP, req, resp *d
 			log.Infof("Overriding firmware for host: %s", req.ClientHWAddr.String())
 			fwtype = host.Firmware
 		}
-		resp.UpdateOption(dhcpv4.OptTFTPServerName(s.ServerAddress.String()))
+		resp.UpdateOption(dhcpv4.OptTFTPServerName(serverIP.String()))
 
 		token, err := model.NewFirmwareToken(req.ClientHWAddr.String(), fwtype)
 		if err != nil {
@@ -109,17 +110,13 @@ func (s *Server) bootingHandler4(host *model.Host, serverIP net.IP, req, resp *d
 
 	case firmware.GRENDEL:
 		// Chainload to HTTP
-		hostName := s.ProvisionHostname
-		if hostName == "" {
-			hostName = serverIP.String()
-		}
-
 		token, err := model.NewBootToken(host.ID.String(), req.ClientHWAddr.String())
 		if err != nil {
 			return fmt.Errorf("Failed to generate signed boot token: %s", err)
 		}
 
-		ipxeUrl := fmt.Sprintf("%s://%s:%d/boot/%s/ipxe", s.ProvisionScheme, hostName, s.ProvisionPort, token)
+		endpoints := model.NewEndpoints(serverIP.String(), token)
+		ipxeUrl := endpoints.IpxeURL()
 		log.Debugf("BootFile iPXE script: %s", ipxeUrl)
 		resp.UpdateOption(dhcpv4.OptBootFileName(ipxeUrl))
 

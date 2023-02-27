@@ -96,7 +96,6 @@ the following:
 [provision]
 listen = "0.0.0.0:443"
 hostname = "grendel.local"
-scheme = "https"
 cert = "out/grendel.local.crt"
 key = "out/grendel.local.key"
 
@@ -122,7 +121,7 @@ file just include a host for Grendel so it will resolve itself like so:
     "interfaces": [
         {
             "fqdn": "tux01.local",
-            "ip": "192.168.10.12",
+            "ip": "192.168.10.12/24",
             "mac": "DE:AD:BE:EF:12:8C"
         }
     ]
@@ -133,7 +132,7 @@ file just include a host for Grendel so it will resolve itself like so:
     "interfaces": [
         {
             "fqdn": "grendel.local",
-            "ip": "192.168.10.254"
+            "ip": "192.168.10.254/24"
         }
     ]
 }]

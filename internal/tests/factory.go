@@ -19,6 +19,7 @@ package tests
 
 import (
 	"net"
+	"net/netip"
 
 	"github.com/Pallinder/go-randomdata"
 	"github.com/bluele/factory-go/factory"
@@ -26,7 +27,7 @@ import (
 	"github.com/ubccr/grendel/model"
 )
 
-var TestHostJSON = []byte(`{"firmware": "","id": "1VCnR6qevU5BbihTIvZEhX002CI","interfaces": [{"bmc": false,"fqdn": "tux01.compute.local", "ifname": "", "ip": "10.10.1.2", "mac": "d0:93:ae:e1:b5:2e" } ], "name": "tux01", "boot_image": "centos6", "provision": true }`)
+var TestHostJSON = []byte(`{"firmware": "","id": "1VCnR6qevU5BbihTIvZEhX002CI","interfaces": [{"bmc": false,"fqdn": "tux01.compute.local", "ifname": "", "ip": "10.10.1.2/24", "mac": "d0:93:ae:e1:b5:2e" } ], "name": "tux01", "boot_image": "centos6", "provision": true }`)
 var TestBootImageJSON = []byte(`{
 	"name": "compute",
 	"kernel": "/var/grendel/images/centos7/vmlinuz",
@@ -46,7 +47,7 @@ var NetInterfaceFactory = factory.NewFactory(
 }).Attr("MAC", func(args factory.Args) (interface{}, error) {
 	return net.ParseMAC(randomdata.MacAddress())
 }).Attr("IP", func(args factory.Args) (interface{}, error) {
-	return net.ParseIP(randomdata.IpV4Address()), nil
+	return netip.MustParsePrefix(randomdata.IpV4Address() + "/24"), nil
 })
 
 var HostFactory = factory.NewFactory(
