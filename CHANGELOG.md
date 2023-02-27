@@ -1,6 +1,6 @@
 # Grendel Changelog
 
-## [Unreleased]
+## [0.0.8] - 2023-02-27
 
 - Add DHCP multi-interface support [#12](https://github.com/ubccr/grendel/issues/12)
 - Add support for Dell Zero-touch deployment (ZTD) of switches. The necessary
@@ -21,7 +21,7 @@
   type from `net.IP` to `netip.Prefix` which allows us to capture both the IP
   address and the network prefix. The raw IP stored in the json now has the
   following format: `x.x.x.x/xx`. This is a breaking change and will require a
-  dump/restore of the grendel database.
+  manual dump/restore of the grendel database.
 - Rename `dhcp.router` config option to `dhcp.gateway`
 - Remove unused `provision.scheme` config option
 
@@ -80,10 +80,11 @@
 
 - Initial release
 
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.6...HEAD
 [0.0.1]: https://github.com/ubccr/grendel/releases/tag/v0.0.1
 [0.0.2]: https://github.com/ubccr/grendel/releases/tag/v0.0.2
 [0.0.4]: https://github.com/ubccr/grendel/releases/tag/v0.0.4
 [0.0.5]: https://github.com/ubccr/grendel/releases/tag/v0.0.5
 [0.0.6]: https://github.com/ubccr/grendel/releases/tag/v0.0.6
 [0.0.7]: https://github.com/ubccr/grendel/releases/tag/v0.0.7
+[0.0.8]: https://github.com/ubccr/grendel/releases/tag/v0.0.8
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.8...HEAD
