@@ -54,6 +54,7 @@ func TestNodeSetSimple(t *testing.T) {
 		testNodeSet{"a3b2c0,a2b3c1,a2b4c1,a1b2c0,a1b2c1,a3b2c1,a2b5c1", "a[1,3]b2c[0-1],a2b[3-5]c1", 7},
 		testNodeSet{"srv-p24-09,srv-p24-12", "srv-p24-[09,12]", 2},
 		testNodeSet{"srv-p24-10,srv-p24-09", "srv-p24-[09-10]", 2},
+		testNodeSet{"node,cpn-v14-[05,10,13-18]", "cpn-v14-[05,10,13-18],node", 9},
 	}
 
 	for _, nstest := range tests {
