@@ -138,7 +138,15 @@ func (ns *NodeSet) toStringList() []string {
 	}
 
 	sort.SliceStable(items, func(i, j int) bool {
-		return items[i].rangeSet.Len() > items[j].rangeSet.Len()
+		ilen := 1
+		if items[i].rangeSet != nil {
+			ilen = items[i].rangeSet.Len()
+		}
+		jlen := 1
+		if items[j].rangeSet != nil {
+			jlen = items[j].rangeSet.Len()
+		}
+		return ilen > jlen
 	})
 
 	for _, pattern := range items {
