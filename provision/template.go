@@ -25,6 +25,8 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/GehirnInc/crypt"
+	_ "github.com/GehirnInc/crypt/sha512_crypt"
 	"github.com/coreos/butane/config"
 	"github.com/coreos/butane/config/common"
 	"github.com/labstack/echo/v4"
@@ -59,6 +61,7 @@ var funcMap = template.FuncMap{
 	"ConfigValueString":      ConfigValueString,
 	"ConfigValueBool":        ConfigValueBool,
 	"Add":                    Add,
+	"CryptSHA512":            CryptSHA512,
 }
 
 type TemplateRenderer struct {
@@ -173,4 +176,10 @@ func ConfigValueStringSlice(key string) []string {
 
 func ConfigValueBool(key string) bool {
 	return viper.GetBool(key)
+}
+
+func CryptSHA512(pass, salt string) string {
+	crypt := crypt.SHA512.New()
+	hash512, _ := crypt.Generate([]byte(pass), []byte("$6$"+salt))
+	return hash512
 }
