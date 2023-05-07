@@ -79,7 +79,7 @@ func init() {
 }
 
 func NewClient() (*client.APIClient, error) {
-	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: viper.GetBool("api.insecure")}}
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: viper.GetBool("client.insecure")}}
 
 	cacert := viper.GetString("client.cacert")
 	pem, err := ioutil.ReadFile(cacert)
@@ -92,10 +92,12 @@ func NewClient() (*client.APIClient, error) {
 		tr = &http.Transport{TLSClientConfig: &tls.Config{RootCAs: certPool, InsecureSkipVerify: false}}
 	}
 
-	endpoint := viper.GetString("client.api_endpoint")
+	cfg := client.NewConfiguration()
 
-	// Is endpoint a path to a unix domain socket?
-	if !strings.HasPrefix(endpoint, "http://") && !strings.HasPrefix(endpoint, "https://") {
+	endpoint := viper.GetString("client.api_endpoint")
+	if strings.HasPrefix(endpoint, "http") {
+		cfg.BasePath = endpoint
+	} else {
 		tr = &http.Transport{
 			DialContext: func(ctx context.Context, _, addr string) (net.Conn, error) {
 				dialer := net.Dialer{}
@@ -107,8 +109,6 @@ func NewClient() (*client.APIClient, error) {
 	rclient := retryablehttp.NewClient()
 	rclient.HTTPClient = &http.Client{Timeout: time.Second * 3600, Transport: tr}
 	rclient.Logger = Log
-
-	cfg := client.NewConfiguration()
 	cfg.HTTPClient = rclient.StandardClient()
 
 	client := client.NewAPIClient(cfg)
