@@ -30,9 +30,9 @@ import (
 )
 
 func init() {
-	apiCmd.PersistentFlags().String("api-listen", fmt.Sprintf("0.0.0.0:%d", api.DefaultPort), "address to listen on")
+	apiCmd.PersistentFlags().String("api-listen", fmt.Sprintf("127.0.0.1:%d", api.DefaultPort), "address to listen on")
 	viper.BindPFlag("api.listen", apiCmd.PersistentFlags().Lookup("api-listen"))
-	apiCmd.PersistentFlags().String("api-socket", "grendel-api.socket", "path to unix socket")
+	apiCmd.PersistentFlags().String("api-socket", "", "path to unix socket")
 	viper.BindPFlag("api.socket_path", apiCmd.PersistentFlags().Lookup("api-socket"))
 	apiCmd.PersistentFlags().String("api-cert", "", "path to ssl cert")
 	viper.BindPFlag("api.cert", apiCmd.PersistentFlags().Lookup("api-cert"))

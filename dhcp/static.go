@@ -33,6 +33,24 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 		return
 	}
 
+	if host.HasTags("arista") {
+		// Arista ZTP
+		// See: https://www.arista.com/en/cg-cv/cv-dhcp-service-for-zero-touch-provisioning-ztp-setup
+
+		log.WithFields(logrus.Fields{
+			"ip":   nic.AddrString(),
+			"name": host.Name,
+		}).Info("Host tagged with Arista ZTP. Setting bootfile URL and config dhcp options")
+
+		token, _ := model.NewBootToken(host.ID.String(), nic.MAC.String())
+		endpoints := model.NewEndpoints(serverIP.String(), token)
+
+		configURL := endpoints.KickstartURL()
+		log.Debugf("Arista provision script URL: %s", configURL)
+
+		resp.UpdateOption(dhcpv4.OptBootFileName(configURL))
+	}
+
 	if host.HasTags("dellbmp") {
 		// Dell Bare Metal Provisioning (BMP) for FTOS
 		// See: https://i.dell.com/sites/doccontent/shared-content/Documents/Bare_Metal_Provisioning.pdf
