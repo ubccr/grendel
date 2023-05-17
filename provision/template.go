@@ -19,13 +19,16 @@ package provision
 
 import (
 	"bytes"
+	"crypto/sha256"
 	_ "embed"
+	"fmt"
 	"io"
 	"path/filepath"
 	"strings"
 	"text/template"
 
 	"github.com/GehirnInc/crypt"
+	_ "github.com/GehirnInc/crypt/sha256_crypt"
 	_ "github.com/GehirnInc/crypt/sha512_crypt"
 	"github.com/coreos/butane/config"
 	"github.com/coreos/butane/config/common"
@@ -62,6 +65,8 @@ var funcMap = template.FuncMap{
 	"ConfigValueBool":        ConfigValueBool,
 	"Add":                    Add,
 	"CryptSHA512":            CryptSHA512,
+	"CryptSHA256":            CryptSHA256,
+	"DellSHA256Password":     DellSHA256Password,
 }
 
 type TemplateRenderer struct {
@@ -182,4 +187,17 @@ func CryptSHA512(pass, salt string) string {
 	crypt := crypt.SHA512.New()
 	hash512, _ := crypt.Generate([]byte(pass), []byte("$6$"+salt))
 	return hash512
+}
+
+func CryptSHA256(pass, salt string) string {
+	crypt := crypt.SHA256.New()
+	hash256, _ := crypt.Generate([]byte(pass), []byte("$5$"+salt))
+	return hash256
+}
+
+func DellSHA256Password(pass, salt string) string {
+	h := sha256.New()
+	payload := pass + salt
+	h.Write([]byte(payload))
+	return fmt.Sprintf("%x%x", h.Sum(nil), salt)
 }
