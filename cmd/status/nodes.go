@@ -107,10 +107,9 @@ var (
 				for _, host := range hostList {
 					ipAddr := ""
 					macAddr := ""
-					bootNic := host.BootInterface()
-					if bootNic != nil {
-						ipAddr = bootNic.CIDR()
-						macAddr = bootNic.MAC.String()
+					if len(host.Interfaces) > 0 {
+						ipAddr = host.Interfaces[0].CIDR()
+						macAddr = host.Interfaces[0].MAC.String()
 					}
 
 					bi := host.BootImage
