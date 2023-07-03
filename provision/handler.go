@@ -19,6 +19,7 @@ package provision
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -66,6 +67,8 @@ func (h *Handler) LoadBootImageWithDefault(name string) (*model.BootImage, error
 
 func (h *Handler) SetupRoutes(e *echo.Echo) {
 	e.GET("/", h.Index).Name = "index"
+	e.GET("/onie-installer*", h.Onie).Name = "onie"
+	e.GET("/onie-updater*", h.Onie).Name = "onie"
 
 	boot := e.Group("/boot/:token/")
 	boot.Use(TokenRequired)
@@ -330,4 +333,59 @@ func (h *Handler) ProvisionTemplate(c echo.Context) error {
 
 	log.Infof("Sending provision template %s to host %s", c.Param("name"), host.Name)
 	return c.Render(http.StatusOK, tmplName, data)
+}
+
+func (h *Handler) Onie(c echo.Context) error {
+
+	onie, err := NewOnieFromHeaders(c.Request().Header)
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"msg": err,
+		}).Error("Failed to parse ONIE headers")
+		return echo.NewHTTPError(http.StatusNotFound, "")
+	}
+
+	host, err := h.DB.LoadHostFromMAC(onie.MAC.String())
+	if err != nil {
+		if errors.Is(err, model.ErrNotFound) {
+			log.Debugf("Ignoring unknown host mac address: %s", onie.MAC)
+		} else {
+			log.Errorf("ONIE handler failed to fetch host from database for mac %s: %s", onie.MAC, err)
+		}
+		return echo.NewHTTPError(http.StatusNotFound, "")
+	}
+
+	if !host.Provision {
+		return echo.NewHTTPError(http.StatusNotFound, "ONIE install requested but host not set to provision")
+	}
+
+	bootImage, err := h.LoadBootImageWithDefault(host.BootImage)
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"host": host.Name,
+			"mac":  onie.MAC.String(),
+		}).Error("failed to find boot image for host")
+		return echo.NewHTTPError(http.StatusNotFound, "")
+	}
+
+	log.WithFields(logrus.Fields{
+		"host":                host.Name,
+		"mac":                 onie.MAC.String(),
+		"bootimage":           bootImage.Name,
+		"onieOp":              onie.Operation,
+		"onieVendor":          onie.VendorID,
+		"onieMachine":         onie.Machine,
+		"onieRev":             onie.MachineRev,
+		"onieArch":            onie.Arch,
+		"onieUpdaterFilePath": onie.UpdaterFilePath(),
+	}).Info("ONIE Request Data")
+
+	switch onie.Operation {
+	case OnieUpdate:
+		return c.File(onie.UpdaterFilePath())
+	case OnieInstall:
+		return c.File(bootImage.KernelPath)
+	}
+
+	return echo.NewHTTPError(http.StatusBadRequest, "Invalid ONIE operation")
 }
