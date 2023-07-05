@@ -22,6 +22,7 @@ import (
 	"math/rand"
 	"net"
 	"net/netip"
+	"strings"
 	"time"
 
 	"github.com/spf13/viper"
@@ -222,4 +223,23 @@ func (n *NetInterface) DNSList() []string {
 	}
 
 	return dnsList
+}
+
+func (n *NetInterface) HostName() string {
+	names := strings.Split(n.FQDN, ",")
+	return names[0]
+}
+
+func (n *NetInterface) ShortName() string {
+	parts := strings.Split(n.HostName(), ".")
+	return parts[0]
+}
+
+func (n *NetInterface) Domain() string {
+	parts := strings.Split(n.HostName(), ".")
+	if len(parts) > 1 {
+		return strings.Join(parts[1:], ".")
+	}
+
+	return parts[0]
 }
