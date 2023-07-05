@@ -203,14 +203,17 @@ func (s *BuntStore) ResolveIPv4(fqdn string) ([]net.IP, error) {
 		err := tx.AscendKeys(HostKeyPrefix+":*", func(key, value string) bool {
 			res := gjson.Get(value, "interfaces")
 			for _, i := range res.Array() {
-				if util.Normalize(i.Get("fqdn").String()) == fqdn {
-					ip, _ := netip.ParsePrefix(i.Get("ip").String())
-					if ip.IsValid() {
-						ips = append(ips, net.IP(ip.Addr().AsSlice()))
-					}
+				names := strings.Split(i.Get("fqdn").String(), ",")
+				for _, name := range names {
+					if util.Normalize(name) == fqdn {
+						ip, _ := netip.ParsePrefix(i.Get("ip").String())
+						if ip.IsValid() {
+							ips = append(ips, net.IP(ip.Addr().AsSlice()))
+						}
 
-					// XXX stop after first match. consider changing this
-					return false
+						// XXX stop after first match. consider changing this
+						return false
+					}
 				}
 			}
 
