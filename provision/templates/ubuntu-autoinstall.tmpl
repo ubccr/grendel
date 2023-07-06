@@ -53,7 +53,7 @@ autoinstall:
   user-data:
     disable_root: false
     hostname: {{ $.host.Name }}
-    fqdn: {{ $.nic.FQDN }}
+    fqdn: {{ $.nic.HostName }}
     prefer_fqdn_over_hostname: true
     users:
       - name: ubuntu

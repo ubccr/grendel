@@ -20,6 +20,7 @@ package provision
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -147,6 +148,14 @@ func (s *Server) Serve(defaultImageName string) error {
 		return err
 	}
 
+	routeList, err := json.MarshalIndent(e.Routes(), "", "  ")
+	if err != nil {
+		return err
+	}
+	log.Infof("Routes in order: %s", routeList)
+
+	log.Infof("Using repo dir: %s", s.RepoDir)
+
 	if len(s.RepoDir) > 0 {
 		log.Infof("Using repo dir: %s", s.RepoDir)
 		e.Static("/repo", s.RepoDir)
@@ -163,8 +172,8 @@ func (s *Server) Serve(defaultImageName string) error {
 
 	httpServer := &http.Server{
 		Addr:         fmt.Sprintf("%s:%d", s.ListenAddress, s.Port),
-		ReadTimeout:  15 * time.Minute,
-		WriteTimeout: 15 * time.Minute,
+		ReadTimeout:  60 * time.Minute,
+		WriteTimeout: 60 * time.Minute,
 		IdleTimeout:  120 * time.Second,
 	}
 

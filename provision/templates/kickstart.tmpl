@@ -7,7 +7,7 @@ keyboard us
 timezone --utc America/New_York
 skipx
 
-network --bootproto dhcp --hostname {{ $.nic.FQDN }} --device={{ $.nic.MAC }}
+network --bootproto dhcp --hostname {{ $.nic.HostName }} --device={{ $.nic.MAC }}
 firewall --disabled
 
 
