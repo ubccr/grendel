@@ -142,7 +142,7 @@ func (s *Server) staticHandler4(host *model.Host, serverIP net.IP, req, resp *dh
 
 	s.setZTD(host, nic, serverIP, req, resp)
 
-	if req.ClassIdentifier() == "iDRAC" && host.Provision {
+	if req.ClassIdentifier() == "iDRAC" {
 		token, _ := model.NewBootToken(host.ID.String(), nic.MAC.String())
 		scpFileLocation := fmt.Sprintf("-f idrac-config.json -i %s -s 5 -n boot/%s/provision", serverIP.String(), token)
 		log.Debugf("Dell iDRAC Auto Config SCP location: %s", scpFileLocation)
