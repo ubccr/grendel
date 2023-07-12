@@ -239,9 +239,10 @@ func (s *BuntStore) ReverseResolve(ip string) ([]string, error) {
 			res := gjson.Get(value, "interfaces")
 			for _, i := range res.Array() {
 				if strings.Contains(i.Get("ip").String(), ip) {
-					name := i.Get("fqdn").String()
-					if name != "" {
+					names := strings.Split(i.Get("fqdn").String(), ",")
+					for _, name := range names {
 						fqdn = append(fqdn, name)
+						break
 					}
 
 					// XXX stop after first match. consider changing this
