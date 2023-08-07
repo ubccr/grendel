@@ -2,6 +2,7 @@ grendel
 grendel.yaml
 grendel.yml
 grendel.toml
+grendel.db
 out/
 firmware/bin
 *.swp

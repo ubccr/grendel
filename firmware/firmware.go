@@ -51,7 +51,7 @@ var snpBin []byte
 var undiBin []byte
 
 // buildToStringMap maps a Build to a binary build name
-var buildToStringMap = map[Build]string{
+var BuildToStringMap = map[Build]string{
 	IPXE:    "ipxe.pxe",
 	EFI386:  "ipxe-i386.efi",
 	EFI64:   "ipxe-x86_64.efi",
@@ -60,7 +60,7 @@ var buildToStringMap = map[Build]string{
 }
 
 func NewFromString(b string) Build {
-	for k, v := range buildToStringMap {
+	for k, v := range BuildToStringMap {
 		if v == b {
 			return k
 		}
@@ -71,7 +71,7 @@ func NewFromString(b string) Build {
 
 // String returns a name for a given build.
 func (b Build) String() string {
-	if bt, ok := buildToStringMap[b]; ok {
+	if bt, ok := BuildToStringMap[b]; ok {
 		return bt
 	}
 	return ""

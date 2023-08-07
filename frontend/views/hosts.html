@@ -1,0 +1,11 @@
+{{ define "title" }} Grendel - Nodes {{ end }}
+{{ define "body" }}
+<h1 class="text-3xl mb-3">Grendel - Nodes</h1>
+<div class="grid grid-cols-5 gap-3">
+  {{ range . }}
+  <div class="border border-neutral-400 rounded-lg p-2">
+      <a href="/host/{{ .Name }}">{{ .Name }}</a>
+  </div>
+  {{ end }}
+</div>
+{{ end }}

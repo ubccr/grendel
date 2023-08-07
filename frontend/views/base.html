@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+    <title>{{ template "title" .}}</title>
+    <script src="/tailwind.config.js"></script>
+  </head>
+  <body>
+    <div class="min-h-screen bg-large-triangles-ub dark:bg-large-triangles-dark">
+      <nav class="bg-white px-8 sm:max-lg:px-4 relative flex h-16 items-center justify-between">
+        <div class="flex flex-1 items-center sm:items-stretch sm:justify-start">
+          <div className="flex flex-shrink-0 items-center">
+            <img
+              src="/favicon.ico"
+              alt="UBCCR"
+              width={36}
+              height={36}
+            />
+          </div>
+          <div class="hidden sm:ml-6 sm:block">
+            <div class="flex space-x-4">
+              {{ $linkClasses := "rounded-md px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-200 dark:text-neutral-300 dark:hover:bg-neutral-700 dark:hover:text-white" }}
+              <a class="{{ $linkClasses }}" href="/">Home</a>
+              <a class="{{ $linkClasses }}" href="/floorplan">Floorplan</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div class="flex justify-center dark:text-white">
+        <div class="w-5/6 mt-4 rounded-lg border border-white bg-white p-3 text-center shadow-xl dark:bg-neutral-800">
+          {{ template "body" .}}
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
