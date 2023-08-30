@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+        <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+        <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+        <script src="https://unpkg.com/htmx.org/dist/ext/loading-states.js"></script>
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css" />
+        <link rel="stylesheet" href="/tailwind.css" />
+        <title>{{ template "title" . }}</title>
+        <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+    </head>
+
+    <body>
+        <div class="min-h-screen bg-large-triangles-ub">
+            <nav class="bg-white p-4 xl:px-12">
+                {{ define "nav" }}
+                    {{ $linkClasses := "rounded-md px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-200" }}
+                    <a
+                        class="{{ $linkClasses }}
+                        {{ if eq . "mobile" }}
+                            block
+                        {{ end }}"
+                        href="/">
+                        Home
+                    </a>
+                    <a
+                        class="{{ $linkClasses }}
+                        {{ if eq . "mobile" }}
+                            block
+                        {{ end }}"
+                        href="/floorplan">
+                        Floorplan
+                    </a>
+                    <a
+                        class="{{ $linkClasses }}
+                        {{ if eq . "mobile" }}
+                            block
+                        {{ end }}"
+                        href="/grendel/add">
+                        Add
+                    </a>
+                {{ end }}
+                <div class="flex justify-between">
+                    <button
+                        class="border-netural-400 block rounded-lg border p-1 px-2 hover:text-neutral-700 sm:hidden"
+                        onclick="showMobile()">
+                        <span id="icon-bars" class="">
+                            {{ template "icon-bars-3" }}
+                        </span>
+                        <span id="icon-x" class="" hidden>
+                            {{ template "icon-x-mark" }}
+                        </span>
+                    </button>
+                    <div class="flex">
+                        <img
+                            src="/favicon.ico"
+                            alt="UBCCR"
+                            width="{36}"
+                            height="{36}" />
+                        <div
+                            class="ml-2 mt-2 hidden space-y-1 sm:my-auto sm:ml-4 sm:block"
+                            hidden>
+                            {{ template "nav" "desktop" }}
+                        </div>
+                    </div>
+                    <div class="my-auto">
+                        <a href="/login" id="login">Login</a>
+                        <button
+                            hx-post="/api/auth/logout"
+                            hx-target="#toast"
+                            hx-swap="innerHTML"
+                            id="logout"
+                            hidden>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+                <div id="mobile-menu" class="ml-2 mt-2 space-y-1" hidden>
+                    {{ template "nav" "mobile" }}
+                </div>
+            </nav>
+            <div class="flex justify-center px-2 py-4 text-center">
+                <div class="w-full rounded-lg bg-white p-3 shadow-xl md:w-5/6">
+                    {{ template "body" . }}
+                </div>
+            </div>
+            <div class="absolute bottom-4 ml-4" id="toast"></div>
+        </div>
+    </body>
+
+    <script>
+        var notyf = new Notyf();
+        // document.body.addEventListener("toast", function(evt){
+        //     console.log("blash")
+        //     const data = evt.detail.value
+        //     if (data.type === "success")
+        //     notyf.success(data.msg);
+        //     else notyf.error(data.msg)
+        // })
+        if (document.cookie.includes("User")) {
+            document.getElementById("login").hidden = true;
+            document.getElementById("logout").hidden = false;
+        }
+        function showMobile() {
+            const m = document.getElementById("mobile-menu").hidden;
+            document.getElementById("mobile-menu").hidden = !m;
+            document.getElementById("icon-bars").hidden = m;
+            document.getElementById("icon-x").hidden = !m;
+        }
+    </script>
+</html>
+
+{{/* Icons */}}
+
+{{ define "icon-adjustments-horizontal" }}
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        class="h-5 w-5">
+        <path
+            d="M10 3.75a2 2 0 10-4 0 2 2 0 004 0zM17.25 4.5a.75.75 0 000-1.5h-5.5a.75.75 0 000 1.5h5.5zM5 3.75a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5a.75.75 0 01.75.75zM4.25 17a.75.75 0 000-1.5h-1.5a.75.75 0 000 1.5h1.5zM17.25 17a.75.75 0 000-1.5h-5.5a.75.75 0 000 1.5h5.5zM9 10a.75.75 0 01-.75.75h-5.5a.75.75 0 010-1.5h5.5A.75.75 0 019 10zM17.25 10.75a.75.75 0 000-1.5h-1.5a.75.75 0 000 1.5h1.5zM14 10a2 2 0 10-4 0 2 2 0 004 0zM10 16.25a2 2 0 10-4 0 2 2 0 004 0z" />
+    </svg>
+{{ end }}
+
+{{ define "icon-power" }}
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        class="h-5 w-5">
+        <path
+            fill-rule="evenodd"
+            d="M10 2a.75.75 0 01.75.75v7.5a.75.75 0 01-1.5 0v-7.5A.75.75 0 0110 2zM5.404 4.343a.75.75 0 010 1.06 6.5 6.5 0 109.192 0 .75.75 0 111.06-1.06 8 8 0 11-11.313 0 .75.75 0 011.06 0z"
+            clip-rule="evenodd" />
+    </svg>
+{{ end }}
+
+{{ define "icon-arrow-left-on-rectangle" }}
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="h-6 w-6">
+        <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+    </svg>
+{{ end }}
+
+{{ define "icon-spinner" }}
+    <svg
+        class="animate-spin"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24">
+        <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"></circle>
+        <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+{{ end }}
+
+{{ define "icon-bars-3" }}
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="h-6 w-6">
+        <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+    </svg>
+{{ end }}
+
+{{ define "icon-x-mark" }}
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="h-6 w-6">
+        <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M6 18L18 6M6 6l12 12" />
+    </svg>
+{{ end }}

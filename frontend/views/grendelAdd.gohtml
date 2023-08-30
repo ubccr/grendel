@@ -1,0 +1,68 @@
+{{ define "title" }}Grendel - Add{{ end }}
+{{ define "body" }}
+    <form>
+        <div class="grid grid-cols-1 gap-2">
+            <div class="my-1">
+                <label
+                    class="absolute ml-3 -translate-y-[9px] bg-white text-xs"
+                    for="name">
+                    Name:
+                </label>
+                <input
+                    class="rounded-lg border border-neutral-400"
+                    type="text"
+                    id="name"
+                    name="name" />
+            </div>
+
+            <div class="my-1">
+                <label
+                    class="absolute ml-3 -translate-y-[9px] bg-white text-xs"
+                    for="firmware">
+                    Firmware:
+                </label>
+                <input
+                    class="rounded-lg border border-neutral-400"
+                    type="text"
+                    id="firmware"
+                    name="firmware" />
+            </div>
+
+            <div>
+                <label for="provision">Provision:</label>
+                <input
+                    class="rounded-lg border border-neutral-400"
+                    type="checkbox"
+                    id="provision"
+                    name="provision"
+                    checked />
+            </div>
+
+            <div class="my-1">
+                <label
+                    class="absolute ml-3 -translate-y-[9px] bg-white text-xs"
+                    for="boot_image">
+                    Boot Image:
+                </label>
+                <input
+                    class="rounded-lg border border-neutral-400"
+                    type="text"
+                    id="boot_image"
+                    name="boot_image" />
+            </div>
+
+            <div class="my-1">
+                <label
+                    class="absolute ml-3 -translate-y-[9px] bg-white text-xs"
+                    for="tags">
+                    Tags:
+                </label>
+                <input
+                    class="rounded-lg border border-neutral-400"
+                    type="text"
+                    id="tags"
+                    name="tags" />
+            </div>
+        </div>
+    </form>
+{{ end }}

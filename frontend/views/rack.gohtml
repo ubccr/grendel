@@ -1,0 +1,103 @@
+{{ define "title" }}Grendel - {{ .Rack }}{{ end }}
+{{ define "body" }}
+    {{ $tdClasses := "border border-neutral-400 px-2 py-1" }}
+
+
+    <form>
+        <div class="mb-3">
+            <button
+                class="rounded-lg border border-neutral-400 p-1"
+                type="button"
+                hx-post="/api/bmc/reboot"
+                hx-target="#replace-me"
+                hx-vals="js:{hosts: HostMap()}"
+                hx-confirm="Are you sure you want to reboot these nodes?">
+                Reboot
+            </button>
+            <button
+                class="rounded-lg border border-neutral-400 p-1"
+                type="button"
+                hx-post="/api/bmc/configure"
+                hx-target="#replace-me"
+                hx-vals="js:{hosts: HostMap()}">
+                Auto Configure
+            </button>
+            <button
+                class="rounded-lg border border-neutral-400 p-1"
+                type="button"
+                onclick="SelectAll()">
+                Select All
+            </button>
+            <button
+                class="rounded-lg border border-neutral-400 p-1"
+                type="button"
+                onclick="Clear()">
+                Clear
+            </button>
+        </div>
+        <div id="replace-me"></div>
+        <table class="w-full table-fixed">
+            <thead>
+                <tr>
+                    <th class="{{ $tdClasses }} w-14">u</th>
+                    <th class="{{ $tdClasses }}">{{ .Rack }}</th>
+                    <th class="{{ $tdClasses }} w-14"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range $u := .u }}
+                    {{ $hostName := "" }}
+                    {{ $hostType := "" }}
+                    {{ range $host := $.Hosts }}
+                        {{ $s := Split $host.Name "-" }}
+                        {{ $hostU := index $s 2 }}
+                        {{ if eq $hostU $u }}
+                            {{ $hostName = $host.Name }}
+                            {{ $hostType = $host.HostType }}
+                        {{ end }}
+                    {{ end }}
+                    <tr>
+                        <td class="{{ $tdClasses }}">{{ $u }}</td>
+                        <td class="{{ $tdClasses }} hover:bg-neutral-50">
+                            <a
+                                href="/host/{{ $hostName }}"
+                                class="hover:font-medium">
+                                {{ $hostName }}
+                            </a>
+                        </td>
+                        <td class="{{ $tdClasses }}">
+                            {{ if and (ne $hostName "") (eq $hostType "server") }}
+                                <input
+                                    type="checkbox"
+                                    name="{{ $hostName }}"
+                                    id="{{ $u }}" />
+                            {{ end }}
+                        </td>
+                    </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </form>
+    <script>
+        function SelectAll() {
+            var c = document.querySelectorAll('input[type="checkbox"]');
+            for (var i = 0; i < c.length; i++) {
+                c[i].checked = true;
+            }
+        }
+        function Clear() {
+            var c = document.querySelectorAll('input[type="checkbox"]');
+            for (var i = 0; i < c.length; i++) {
+                c[i].checked = false;
+            }
+        }
+        function HostMap() {
+            var h = [];
+            var c = document.querySelectorAll('input[type="checkbox"]');
+            for (var i = 0; i < c.length; i++) {
+                if (c[i].checked === true) h.push(c[i].name);
+            }
+            return h.join(",");
+        }
+    </script>
+{{ end }}

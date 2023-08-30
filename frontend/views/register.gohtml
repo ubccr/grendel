@@ -1,0 +1,43 @@
+{{ define "title" }}Grendel - Register{{ end }}
+{{ define "body" }}
+    <h1 class="mb-6 text-3xl">Register</h1>
+    <form
+        class="grid grid-cols-1 gap-3"
+        hx-post="/api/auth/register"
+        hx-target="#replace-me">
+        <div>
+            <label for="username">Username:</label>
+        </div>
+        <div>
+            <input
+                type="text"
+                name="username"
+                id="username"
+                required
+                class="rounded-lg border border-neutral-400 p-1"
+                autocomplete="username" />
+        </div>
+
+        <div>
+            <label for="password">Password:</label>
+        </div>
+        <div>
+            <input
+                type="password"
+                name="password"
+                id="password"
+                required
+                class="rounded-lg border border-neutral-400 p-1"
+                autocomplete="new-password" />
+        </div>
+
+        <div>
+            <button
+                type="submit"
+                class="rounded-lg border border-neutral-400 p-1">
+                Submit
+            </button>
+        </div>
+    </form>
+    <div id="replace-me"></div>
+{{ end }}
