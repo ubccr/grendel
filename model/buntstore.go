@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	"net"
 	"net/netip"
 	"strings"
@@ -37,6 +38,7 @@ import (
 const (
 	HostKeyPrefix      = "host"
 	BootImageKeyPrefix = "image"
+	UserKeyPrefix      = "user"
 )
 
 // BuntStore implements a Grendel Datastore using BuntDB
@@ -62,6 +64,61 @@ func NewBuntStore(filename string) (*BuntStore, error) {
 // Close closes the BuntStore database
 func (s *BuntStore) Close() error {
 	return s.db.Close()
+}
+
+func (s *BuntStore) StoreUser(username, password string) error {
+	d := true
+
+	err := s.db.View(func(tx *buntdb.Tx) error {
+		_, err := tx.Get(UserKeyPrefix + ":" + username)
+
+		if err != nil && err == buntdb.ErrNotFound {
+			d = false
+		} else {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	if !d {
+		hashed, _ := bcrypt.GenerateFromPassword([]byte(password), 8)
+		return s.db.Update(func(tx *buntdb.Tx) error {
+			// need to hash pass
+			_, _, err := tx.Set(UserKeyPrefix+":"+username, string(hashed), nil)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		})
+	}
+	return fmt.Errorf("user %s already exists", username)
+}
+
+func (s *BuntStore) VerifyUser(username, password string) (bool, error) {
+	var hash string
+	err := s.db.View(func(tx *buntdb.Tx) error {
+		val, err := tx.Get(UserKeyPrefix + ":" + username)
+		if err != nil {
+			return err
+		}
+		hash = val
+		return nil
+	})
+
+	if err != nil {
+		return false, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 // StoreHost stores a host in the data store. If the host exists it is overwritten
