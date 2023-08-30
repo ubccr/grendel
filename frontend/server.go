@@ -128,7 +128,7 @@ type Template struct {
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates[name].ExecuteTemplate(w, "base.html", data)
+	return t.templates[name].ExecuteTemplate(w, "base.gohtml", data)
 }
 
 func (s *Server) Serve() error {
@@ -147,16 +147,19 @@ func (s *Server) Serve() error {
 		},
 	}
 	templates := make(map[string]*template.Template)
-	templates["index.html"] = template.Must(template.ParseFiles("frontend/views/index.html", "frontend/views/base.html"))
-	templates["host.html"] = template.Must(template.New("host.html").Funcs(funcMap).ParseFiles("frontend/views/host.html", "frontend/views/base.html"))
-	templates["floorplan.html"] = template.Must(template.New("floorplan.html").Funcs(funcMap).ParseFiles("frontend/views/floorplan.html", "frontend/views/base.html"))
-	templates["rack.html"] = template.Must(template.New("rack.html").Funcs(funcMap).ParseFiles("frontend/views/rack.html", "frontend/views/base.html"))
+	templates["index.gohtml"] = template.Must(template.ParseFiles("frontend/views/index.gohtml", "frontend/views/base.gohtml"))
+	templates["error.gohtml"] = template.Must(template.ParseFiles("frontend/views/error.gohtml", "frontend/views/base.gohtml"))
+	templates["register.gohtml"] = template.Must(template.ParseFiles("frontend/views/register.gohtml", "frontend/views/base.gohtml"))
+	templates["login.gohtml"] = template.Must(template.ParseFiles("frontend/views/login.gohtml", "frontend/views/base.gohtml"))
+	templates["host.gohtml"] = template.Must(template.New("host.gohtml").Funcs(funcMap).ParseFiles("frontend/views/host.gohtml", "frontend/views/base.gohtml"))
+	templates["floorplan.gohtml"] = template.Must(template.New("floorplan.gohtml").Funcs(funcMap).ParseFiles("frontend/views/floorplan.gohtml", "frontend/views/base.gohtml"))
+	templates["rack.gohtml"] = template.Must(template.New("rack.gohtml").Funcs(funcMap).ParseFiles("frontend/views/rack.gohtml", "frontend/views/base.gohtml"))
+	templates["grendelAdd.gohtml"] = template.Must(template.New("grendelAdd.gohtml").Funcs(funcMap).ParseFiles("frontend/views/grendelAdd.gohtml", "frontend/views/base.gohtml"))
 
 	e := newEcho()
 	e.Renderer = &Template{
 		templates: templates,
 	}
-
 	h.SetupRoutes(e)
 
 	httpServer := &http.Server{
