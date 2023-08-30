@@ -3,6 +3,7 @@ module github.com/ubccr/grendel
 go 1.20
 
 require (
+	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
 	github.com/Pallinder/go-randomdata v1.2.0
 	github.com/alouca/gosnmp v0.0.0-20170620005048-04d83944c9ab
 	github.com/bits-and-blooms/bitset v1.5.0
@@ -11,9 +12,11 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/fatih/color v1.13.0
 	github.com/go-playground/validator/v10 v10.0.1
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/hako/branca v0.0.0-20191227164554-3b9970524189
 	github.com/hashicorp/go-retryablehttp v0.6.6
 	github.com/insomniacslk/dhcp v0.0.0-20200922210017-67c425063dca
+	github.com/kgrvamsi/redfishapi v0.0.0-20220606190352-bd0f6a9f3c58
 	github.com/korovkin/limiter v0.0.0-20190919045942-dac5a6b2a536
 	github.com/labstack/echo/v4 v4.10.1
 	github.com/labstack/gommon v0.4.0
@@ -42,7 +45,6 @@ require (
 )
 
 require (
-	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5 // indirect
 	github.com/alouca/gologger v0.0.0-20120904114645-7d4b7291de9c // indirect
 	github.com/aws/aws-sdk-go v1.44.19 // indirect
 	github.com/clarketm/json v1.17.1 // indirect
@@ -60,6 +62,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
+	github.com/hashicorp/go-version v1.2.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
