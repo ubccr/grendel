@@ -18,8 +18,11 @@
 package bmc
 
 import (
+	"encoding/json"
 	"errors"
-
+	"fmt"
+	"github.com/kgrvamsi/redfishapi"
+	"github.com/spf13/viper"
 	"github.com/stmcginnis/gofish"
 	"github.com/stmcginnis/gofish/redfish"
 )
@@ -63,6 +66,62 @@ func NewRedfish(endpoint, user, pass string, insecure bool) (*Redfish, error) {
 
 func (r *Redfish) Logout() {
 	r.client.Logout()
+}
+func ConfigureIdrac(ip string) error {
+
+	user := viper.GetString("bmc.user")
+	pass := viper.GetString("bmc.password")
+
+	c := redfishapi.NewIloClient(fmt.Sprintf("https://%s", ip), user, pass)
+
+	type attributes struct {
+		NIC1AutoConfig string `json:"NIC.1.AutoConfig"`
+	}
+	type body struct {
+		Attributes attributes `json:"Attributes"`
+	}
+	b, _ := json.Marshal(body{
+		Attributes: attributes{
+			NIC1AutoConfig: "Enable Once",
+		},
+	})
+
+	_, err := c.SetAttributesDell("idrac", b)
+	return err
+
+}
+func RebootHost(ip string) error {
+	config := gofish.ClientConfig{
+		Endpoint: fmt.Sprintf("https://%s", ip),
+		Username: viper.GetString("bmc.user"),
+		Password: viper.GetString("bmc.password"),
+		Insecure: true,
+	}
+
+	c, err := gofish.Connect(config)
+	if err != nil {
+		return err
+	}
+	defer c.Logout()
+
+	// Attached the client to service root
+	service := c.Service
+	ss, err := service.Systems()
+	if err != nil {
+		return err
+	}
+
+	for _, system := range ss {
+		//err := system.SetBoot(bootOverride)
+		//if err != nil {
+		//	panic(err)
+		//}
+		err = system.Reset(redfish.ForceRestartResetType)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (r *Redfish) powerReset(resetTypeOrder []string) error {
