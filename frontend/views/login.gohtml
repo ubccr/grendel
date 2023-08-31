@@ -1,11 +1,7 @@
 {{ define "title" }}Grendel - Login{{ end }}
 {{ define "body" }}
     <h1 class="mb-6 text-3xl">Login</h1>
-    <form
-        class="grid grid-cols-1 gap-3"
-        hx-post="/api/auth/login"
-        hx-target="#toast"
-        hx-ext="loading-states">
+    <form class="grid grid-cols-1 gap-3" hx-post="/api/auth/login" hx-target="#toast" hx-ext="loading-states">
         <div>
             <label for="username">Username:</label>
         </div>
@@ -33,14 +29,9 @@
         </div>
 
         <div>
-            <button
-                type="submit"
-                class="rounded-lg border border-neutral-400 p-1"
-                data-loading-disable>
+            <button type="submit" class="rounded-lg border border-neutral-400 p-1" data-loading-disable>
                 <span data-loading-class="hidden">Submit</span>
-                <span
-                    data-loading-class-remove="hidden"
-                    class="mx-auto block hidden h-5 w-5">
+                <span data-loading-class-remove="hidden" data-loading-class="block" class="mx-auto hidden h-5 w-5">
                     {{ template "icon-spinner" }}
                 </span>
             </button>

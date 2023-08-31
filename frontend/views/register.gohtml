@@ -1,10 +1,7 @@
 {{ define "title" }}Grendel - Register{{ end }}
 {{ define "body" }}
     <h1 class="mb-6 text-3xl">Register</h1>
-    <form
-        class="grid grid-cols-1 gap-3"
-        hx-post="/api/auth/register"
-        hx-target="#replace-me">
+    <form class="grid grid-cols-1 gap-3" hx-post="/api/auth/register" hx-target="#replace-me">
         <div>
             <label for="username">Username:</label>
         </div>
@@ -32,11 +29,7 @@
         </div>
 
         <div>
-            <button
-                type="submit"
-                class="rounded-lg border border-neutral-400 p-1">
-                Submit
-            </button>
+            <button type="submit" class="rounded-lg border border-neutral-400 p-1">Submit</button>
         </div>
     </form>
     <div id="replace-me"></div>

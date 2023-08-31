@@ -22,18 +22,10 @@
                 hx-vals="js:{hosts: HostMap()}">
                 Auto Configure
             </button>
-            <button
-                class="rounded-lg border border-neutral-400 p-1"
-                type="button"
-                onclick="SelectAll()">
+            <button class="rounded-lg border border-neutral-400 p-1" type="button" onclick="SelectAll()">
                 Select All
             </button>
-            <button
-                class="rounded-lg border border-neutral-400 p-1"
-                type="button"
-                onclick="Clear()">
-                Clear
-            </button>
+            <button class="rounded-lg border border-neutral-400 p-1" type="button" onclick="Clear()">Clear</button>
         </div>
         <div id="replace-me"></div>
         <table class="w-full table-fixed">
@@ -59,18 +51,13 @@
                     <tr>
                         <td class="{{ $tdClasses }}">{{ $u }}</td>
                         <td class="{{ $tdClasses }} hover:bg-neutral-50">
-                            <a
-                                href="/host/{{ $hostName }}"
-                                class="hover:font-medium">
+                            <a href="/host/{{ $hostName }}" class="hover:font-medium">
                                 {{ $hostName }}
                             </a>
                         </td>
                         <td class="{{ $tdClasses }}">
                             {{ if and (ne $hostName "") (eq $hostType "server") }}
-                                <input
-                                    type="checkbox"
-                                    name="{{ $hostName }}"
-                                    id="{{ $u }}" />
+                                <input type="checkbox" name="{{ $hostName }}" id="{{ $u }}" />
                             {{ end }}
                         </td>
                     </tr>

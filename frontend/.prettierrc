@@ -6,5 +6,6 @@
         "/usr/lib/node_modules/prettier-plugin-tailwindcss/dist/index.mjs"
     ],
     "goTemplateBracketSpacing": true,
-    "tabWidth": 4
+    "tabWidth": 4,
+    "printWidth": 120
 }
