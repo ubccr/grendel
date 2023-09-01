@@ -3,7 +3,6 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <!-- <script src="https://cdn.tailwindcss.com"></script> -->
         <script src="https://unpkg.com/htmx.org@1.9.4"></script>
         <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
         <script src="https://unpkg.com/htmx.org/dist/ext/loading-states.js"></script>
@@ -18,9 +17,16 @@
             <nav class="bg-white p-4 xl:px-12">
                 {{ define "nav" }}
                     {{ $linkClasses := "rounded-md px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-200" }}
-                    <a class="{{ $linkClasses }}{{ if eq . "mobile" }}block{{ end }}" href="/">Home</a>
-                    <a class="{{ $linkClasses }}{{ if eq . "mobile" }}block{{ end }}" href="/floorplan">Floorplan</a>
-                    <a class="{{ $linkClasses }}{{ if eq . "mobile" }}block{{ end }}" href="/grendel/add">Add</a>
+                    <a class="{{ $linkClasses }}{{ if eq . "mobile" }}block{{ end }}" href="/" hx-boost="true">Home</a>
+                    <a class="{{ $linkClasses }}{{ if eq . "mobile" }}block{{ end }}" href="/floorplan" hx-boost="true">
+                        Floorplan
+                    </a>
+                    <a
+                        class="{{ $linkClasses }}{{ if eq . "mobile" }}block{{ end }}"
+                        href="/grendel/add"
+                        hx-boost="true">
+                        Add
+                    </a>
                 {{ end }}
                 <div class="flex justify-between">
                     <button
@@ -41,9 +47,7 @@
                     </div>
                     <div class="my-auto">
                         <a href="/login" id="login">Login</a>
-                        <button hx-post="/api/auth/logout" hx-target="#toast" hx-swap="innerHTML" id="logout" hidden>
-                            Logout
-                        </button>
+                        <button hx-post="/api/auth/logout" hx-swap="none" id="logout" hidden>Logout</button>
                     </div>
                 </div>
                 <div id="mobile-menu" class="ml-2 mt-2 space-y-1" hidden>

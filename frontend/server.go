@@ -140,7 +140,6 @@ func (s *Server) Serve() error {
 		"Split":     strings.Split,
 		"Join":      strings.Join,
 		"Sprintf":   fmt.Sprintf,
-		"Provision": h.DB.ProvisionHosts,
 		"Stringify": func(v interface{}) string {
 			b, _ := json.MarshalIndent(v, "", "    ")
 			return string(b)

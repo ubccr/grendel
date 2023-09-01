@@ -45,11 +45,6 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	e.HTTPErrorHandler = customHTTPErrorHandler
 }
 
-type HttpErrorPage struct {
-	err     string
-	message string
-}
-
 func customHTTPErrorHandler(err error, c echo.Context) {
 	code := http.StatusInternalServerError
 	if he, ok := err.(*echo.HTTPError); ok {
