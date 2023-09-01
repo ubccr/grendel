@@ -1,7 +1,7 @@
 {{ define "title" }}Grendel - Login{{ end }}
 {{ define "body" }}
     <h1 class="mb-6 text-3xl">Login</h1>
-    <form class="grid grid-cols-1 gap-3" hx-post="/api/auth/login" hx-target="#toast" hx-ext="loading-states">
+    <form class="grid grid-cols-1 gap-3" hx-post="/api/auth/login" hx-swap="none" hx-ext="loading-states">
         <div>
             <label for="username">Username:</label>
         </div>

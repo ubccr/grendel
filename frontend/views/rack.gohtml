@@ -9,7 +9,6 @@
                 class="rounded-lg border border-neutral-400 p-1"
                 type="button"
                 hx-post="/api/bmc/reboot"
-                hx-target="#replace-me"
                 hx-vals="js:{hosts: HostMap()}"
                 hx-confirm="Are you sure you want to reboot these nodes?">
                 Reboot
@@ -18,12 +17,11 @@
                 class="rounded-lg border border-neutral-400 p-1"
                 type="button"
                 hx-post="/api/bmc/configure"
-                hx-target="#replace-me"
                 hx-vals="js:{hosts: HostMap()}">
                 Auto Configure
             </button>
-            <button class="rounded-lg border border-neutral-400 p-1" type="button" onclick="SelectAll()">
-                Select All
+            <button class="rounded-lg border border-neutral-400 p-1" type="button" onclick="SelectAllNodes()">
+                Select Nodes
             </button>
             <button class="rounded-lg border border-neutral-400 p-1" type="button" onclick="Clear()">Clear</button>
         </div>
@@ -56,9 +54,7 @@
                             </a>
                         </td>
                         <td class="{{ $tdClasses }}">
-                            {{ if and (ne $hostName "") (eq $hostType "server") }}
-                                <input type="checkbox" name="{{ $hostName }}" id="{{ $u }}" />
-                            {{ end }}
+                            <input type="checkbox" name="{{ $u }}:{{ $hostName }}:{{ $hostType }}" />
                         </td>
                     </tr>
                 {{ end }}
@@ -66,24 +62,25 @@
         </table>
     </form>
     <script>
-        function SelectAll() {
-            var c = document.querySelectorAll('input[type="checkbox"]');
-            for (var i = 0; i < c.length; i++) {
-                c[i].checked = true;
-            }
+        function SelectAllNodes() {
+            var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
+                var n = val.name.split(":");
+                if (n[2] === "server") val.checked = true;
+            });
         }
         function Clear() {
-            var c = document.querySelectorAll('input[type="checkbox"]');
-            for (var i = 0; i < c.length; i++) {
-                c[i].checked = false;
-            }
+            var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
+                val.checked = false;
+            });
         }
         function HostMap() {
             var h = [];
-            var c = document.querySelectorAll('input[type="checkbox"]');
-            for (var i = 0; i < c.length; i++) {
-                if (c[i].checked === true) h.push(c[i].name);
-            }
+            var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
+                if (val.checked === true) {
+                    var n = val.name.split(":");
+                    h.push(n[1]);
+                }
+            });
             return h.join(",");
         }
     </script>

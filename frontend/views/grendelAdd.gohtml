@@ -1,7 +1,17 @@
 {{ define "title" }}Grendel - Add{{ end }}
 {{ define "body" }}
-    <form>
+    <!-- <form>
         <div class="grid grid-cols-1 gap-2">
+            <div>
+                <label for="provision">Provision:</label>
+                <input
+                    class="rounded-lg border border-neutral-400"
+                    type="checkbox"
+                    id="provision"
+                    name="provision"
+                    checked />
+            </div>
+
             <div class="my-1">
                 <label
                     class="absolute ml-3 -translate-y-[9px] bg-white text-xs"
@@ -26,16 +36,6 @@
                     type="text"
                     id="firmware"
                     name="firmware" />
-            </div>
-
-            <div>
-                <label for="provision">Provision:</label>
-                <input
-                    class="rounded-lg border border-neutral-400"
-                    type="checkbox"
-                    id="provision"
-                    name="provision"
-                    checked />
             </div>
 
             <div class="my-1">
@@ -64,5 +64,5 @@
                     name="tags" />
             </div>
         </div>
-    </form>
+    </form> -->
 {{ end }}

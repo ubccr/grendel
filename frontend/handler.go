@@ -38,7 +38,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	api.POST("/auth/logout", h.LogoutUser)
 	api.POST("/auth/register", h.RegisterUser)
 	api.POST("/host", h.EditHost, AuthMiddleware())
-	api.PATCH("/provision/:nodeset", h.Provision, AuthMiddleware())
+	// api.PATCH("/provision/:nodeset", h.Provision, AuthMiddleware())
 	api.POST("/bmc/reboot", h.RebootHost, AuthMiddleware())
 	api.POST("/bmc/configure", h.BmcConfigure, AuthMiddleware())
 

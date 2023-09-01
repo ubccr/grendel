@@ -18,30 +18,9 @@
             <nav class="bg-white p-4 xl:px-12">
                 {{ define "nav" }}
                     {{ $linkClasses := "rounded-md px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-200" }}
-                    <a
-                        class="{{ $linkClasses }}
-                        {{ if eq . "mobile" }}
-                            block
-                        {{ end }}"
-                        href="/">
-                        Home
-                    </a>
-                    <a
-                        class="{{ $linkClasses }}
-                        {{ if eq . "mobile" }}
-                            block
-                        {{ end }}"
-                        href="/floorplan">
-                        Floorplan
-                    </a>
-                    <a
-                        class="{{ $linkClasses }}
-                        {{ if eq . "mobile" }}
-                            block
-                        {{ end }}"
-                        href="/grendel/add">
-                        Add
-                    </a>
+                    <a class="{{ $linkClasses }}{{ if eq . "mobile" }}block{{ end }}" href="/">Home</a>
+                    <a class="{{ $linkClasses }}{{ if eq . "mobile" }}block{{ end }}" href="/floorplan">Floorplan</a>
+                    <a class="{{ $linkClasses }}{{ if eq . "mobile" }}block{{ end }}" href="/grendel/add">Add</a>
                 {{ end }}
                 <div class="flex justify-between">
                     <button
@@ -72,23 +51,23 @@
                 </div>
             </nav>
             <div class="flex justify-center px-2 py-4 text-center">
-                <div class="w-full rounded-lg bg-white p-3 shadow-xl md:w-5/6">
+                <div class="w-full rounded-lg bg-white p-3 shadow-xl md:w-5/6" id="body">
                     {{ template "body" . }}
                 </div>
             </div>
-            <div class="absolute bottom-4 ml-4" id="toast"></div>
+            <div class="fixed bottom-4 ml-4" id="toast"></div>
         </div>
     </body>
 
     <script>
         var notyf = new Notyf();
-        // document.body.addEventListener("toast", function(evt){
-        //     console.log("blash")
-        //     const data = evt.detail.value
-        //     if (data.type === "success")
-        //     notyf.success(data.msg);
-        //     else notyf.error(data.msg)
-        // })
+        document.body.addEventListener("toast-error", function (e) {
+            notyf.error(e.detail.value);
+        });
+        document.body.addEventListener("toast-success", function (e) {
+            notyf.success(e.detail.value);
+        });
+
         if (document.cookie.includes("User")) {
             document.getElementById("login").hidden = true;
             document.getElementById("logout").hidden = false;
