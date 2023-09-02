@@ -4,18 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"html/template"
-	"io"
 	"net"
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
-	"github.com/go-playground/validator/v10"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/sirupsen/logrus"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/template/html/v2"
 	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/util"
@@ -37,18 +32,6 @@ type Server struct {
 	// RepoDir       string
 	DB         model.DataStore
 	httpServer *http.Server
-}
-
-// init http server (e)
-func newEcho() *echo.Echo {
-	e := echo.New()
-	e.HTTPErrorHandler = HTTPErrorHandler
-	e.HideBanner = true
-	e.Use(middleware.Recover())
-	e.Logger = EchoLogger()
-	e.Validator = &CustomValidator{validator: validator.New()}
-
-	return e
 }
 
 func NewServer(db model.DataStore, address string) (*Server, error) {
@@ -96,47 +79,13 @@ func NewServer(db model.DataStore, address string) (*Server, error) {
 	return s, nil
 }
 
-func HTTPErrorHandler(err error, c echo.Context) {
-	path := c.Request().URL.Path
-	if he, ok := err.(*echo.HTTPError); ok {
-		if he.Code == http.StatusNotFound {
-			log.WithFields(logrus.Fields{
-				"path": path,
-				"ip":   c.RealIP(),
-			}).Warn("Requested path not found")
-		} else {
-			log.WithFields(logrus.Fields{
-				"code": he.Code,
-				"err":  he.Internal,
-				"path": path,
-				"ip":   c.RealIP(),
-			}).Error(he.Message)
-		}
-	} else {
-		log.WithFields(logrus.Fields{
-			"err":  err,
-			"path": path,
-			"ip":   c.RealIP(),
-		}).Error("HTTP Error")
-	}
-
-	c.Echo().DefaultHTTPErrorHandler(err, c)
-}
-
-type Template struct {
-	templates map[string]*template.Template
-}
-
-func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	return t.templates[name].ExecuteTemplate(w, "base.gohtml", data)
-}
 
 func (s *Server) Serve() error {
 	h, err := NewHandler(s.DB)
 	if err != nil {
 		return err
 	}
-	var funcMap = template.FuncMap{
+	var funcMap = fiber.Map{
 		"Split":     strings.Split,
 		"Join":      strings.Join,
 		"Sprintf":   fmt.Sprintf,
@@ -145,35 +94,18 @@ func (s *Server) Serve() error {
 			return string(b)
 		},
 	}
-	templates := make(map[string]*template.Template)
-	templates["index.gohtml"] = template.Must(template.ParseFiles("frontend/views/index.gohtml", "frontend/views/base.gohtml"))
-	templates["error.gohtml"] = template.Must(template.ParseFiles("frontend/views/error.gohtml", "frontend/views/base.gohtml"))
-	templates["register.gohtml"] = template.Must(template.ParseFiles("frontend/views/register.gohtml", "frontend/views/base.gohtml"))
-	templates["login.gohtml"] = template.Must(template.ParseFiles("frontend/views/login.gohtml", "frontend/views/base.gohtml"))
-	templates["host.gohtml"] = template.Must(template.New("host.gohtml").Funcs(funcMap).ParseFiles("frontend/views/host.gohtml", "frontend/views/base.gohtml"))
-	templates["floorplan.gohtml"] = template.Must(template.New("floorplan.gohtml").Funcs(funcMap).ParseFiles("frontend/views/floorplan.gohtml", "frontend/views/base.gohtml"))
-	templates["rack.gohtml"] = template.Must(template.New("rack.gohtml").Funcs(funcMap).ParseFiles("frontend/views/rack.gohtml", "frontend/views/base.gohtml"))
-	templates["grendelAdd.gohtml"] = template.Must(template.New("grendelAdd.gohtml").Funcs(funcMap).ParseFiles("frontend/views/grendelAdd.gohtml", "frontend/views/base.gohtml"))
 
-	e := newEcho()
-	e.Renderer = &Template{
-		templates: templates,
-	}
-	h.SetupRoutes(e)
+	engine := html.New("./frontend/views/", ".gohtml")
+	engine.AddFuncMap(funcMap)
 
-	httpServer := &http.Server{
-		Addr:         fmt.Sprintf("%s:%d", s.ListenAddress, s.Port),
-		ReadTimeout:  60 * time.Minute,
-		WriteTimeout: 60 * time.Minute,
-		IdleTimeout:  120 * time.Second,
-	}
+	app := fiber.New(fiber.Config{
+		Views: engine,
+		ViewsLayout: "base",
+	})
 
-	s.Scheme = "http"
-	s.httpServer = httpServer
-	log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
-	if err := e.StartServer(httpServer); err != nil && err != http.ErrServerClosed {
-		return err
-	}
+	h.SetupRoutes(app)
+
+	app.Listen(fmt.Sprintf("%s:%d", s.ListenAddress, s.Port))
 
 	return nil
 }

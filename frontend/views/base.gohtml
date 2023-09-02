@@ -8,7 +8,7 @@
         <script src="https://unpkg.com/htmx.org/dist/ext/loading-states.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css" />
         <link rel="stylesheet" href="/tailwind.css" />
-        <title>{{ template "title" . }}</title>
+        <title>Grendel</title>
         <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
     </head>
 
@@ -21,12 +21,13 @@
                     <a class="{{ $linkClasses }}{{ if eq . "mobile" }}block{{ end }}" href="/floorplan" hx-boost="true">
                         Floorplan
                     </a>
-                    <a
+                    <!-- <a
                         class="{{ $linkClasses }}{{ if eq . "mobile" }}block{{ end }}"
                         href="/grendel/add"
-                        hx-boost="true">
+                        hx-boost="true"
+                        >
                         Add
-                    </a>
+                    </a> -->
                 {{ end }}
                 <div class="flex justify-between">
                     <button
@@ -46,7 +47,7 @@
                         </div>
                     </div>
                     <div class="my-auto">
-                        <a href="/login" id="login">Login</a>
+                        <a href="/login" id="login" hx-boost="true">Login</a>
                         <button hx-post="/api/auth/logout" hx-swap="none" id="logout" hidden>Logout</button>
                     </div>
                 </div>
@@ -56,7 +57,7 @@
             </nav>
             <div class="flex justify-center px-2 py-4 text-center">
                 <div class="w-full rounded-lg bg-white p-3 shadow-xl md:w-5/6" id="body">
-                    {{ template "body" . }}
+                    {{ embed }}
                 </div>
             </div>
             <div class="fixed bottom-4 ml-4" id="toast"></div>

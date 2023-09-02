@@ -2,9 +2,8 @@ package frontend
 
 import (
 	"fmt"
-	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/gofiber/fiber/v2"
 )
 
 func ToastHtml(m, t string) string {
@@ -15,12 +14,12 @@ func ToastHtml(m, t string) string {
 	}
 }
 
-func ToastSuccess(context echo.Context, msg string) error {
-	context.Response().Header().Add("HX-Trigger", fmt.Sprintf(`{"toast-success": "%s"}`, msg))
-	return context.NoContent(http.StatusNoContent)
+func ToastSuccess(context *fiber.Ctx, msg string) error {
+	context.Response().Header.Add("HX-Trigger", fmt.Sprintf(`{"toast-success": "%s"}`, msg))
+	return context.Send(nil)
 }
-func ToastError(context echo.Context, err error, msg string) error {
+func ToastError(context *fiber.Ctx, err error, msg string) error {
 	log.Error(err)
-	context.Response().Header().Add("HX-Trigger", fmt.Sprintf(`{"toast-error": "%s"}`, msg))
-	return context.String(http.StatusBadRequest, msg)
+	context.Response().Header.Add("HX-Trigger", fmt.Sprintf(`{"toast-error": "%s"}`, msg))
+	return context.SendString(msg)
 }

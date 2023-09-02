@@ -1,103 +1,102 @@
-{{ define "title" }}Grendel - {{ .Host.Name }}{{ end }}
-{{ define "body" }}
-    {{ $tdClasses := "border border-neutral-400 px-2 py-1" }}
-    <div class="flex justify-center">
-        <div class="mb-3 flex justify-center gap-2 rounded-xl border border-neutral-200 p-2 text-center shadow-lg">
-            <div class="group z-50 my-auto flex justify-center">
-                <button
-                    hx-post="/api/bmc/reboot"
-                    hx-vals='{"hosts": "{{ .Host.Name }}"}'
-                    hx-target="#replace-me"
-                    hx-confirm="Are you sure you want to reboot {{ .Host.Name }}?"
-                    class="rounded-lg border border-neutral-400 p-1 text-sm hover:bg-neutral-50">
-                    {{ template "icon-power" }}
-                </button>
-                <span
-                    class="z-100 absolute mt-9 rounded-lg bg-gray-800 px-2 py-1 text-sm text-gray-100 opacity-0 transition-opacity group-hover:opacity-100">
-                    Reboot
-                </span>
-            </div>
-            <h1 class="text-3xl">{{ .Host.Name }}</h1>
-            <div class="group z-50 my-auto flex justify-center">
-                <button
-                    hx-post="/api/bmc/configure"
-                    hx-vals='{"hosts": "{{ .Host.Name }}"}'
-                    hx-target="#toast"
-                    class="rounded-lg border border-neutral-400 p-1 text-sm">
-                    {{ template "icon-adjustments-horizontal" }}
-                </button>
-                <span
-                    class="z-100 absolute mt-9 rounded-lg bg-gray-800 px-2 py-1 text-sm text-gray-100 opacity-0 transition-opacity group-hover:opacity-100">
-                    Auto Configure
-                </span>
-            </div>
+{{ $tdClasses := "border border-neutral-400 px-2 py-1" }}
+
+
+<div class="flex justify-center">
+    <div class="mb-3 flex justify-center gap-2 rounded-xl border border-neutral-200 p-2 text-center shadow-lg">
+        <div class="group z-50 my-auto flex justify-center">
+            <button
+                hx-post="/api/bmc/reboot"
+                hx-vals='{"hosts": "{{ .Host.Name }}"}'
+                hx-target="#replace-me"
+                hx-confirm="Are you sure you want to reboot {{ .Host.Name }}?"
+                class="rounded-lg border border-neutral-400 p-1 text-sm hover:bg-neutral-50">
+                {{ template "icon-power" }}
+            </button>
+            <span
+                class="z-100 absolute mt-9 rounded-lg bg-gray-800 px-2 py-1 text-sm text-gray-100 opacity-0 transition-opacity group-hover:opacity-100">
+                Reboot
+            </span>
+        </div>
+        <h1 class="text-3xl">{{ .Host.Name }}</h1>
+        <div class="group z-50 my-auto flex justify-center">
+            <button
+                hx-post="/api/bmc/configure"
+                hx-vals='{"hosts": "{{ .Host.Name }}"}'
+                hx-target="#toast"
+                class="rounded-lg border border-neutral-400 p-1 text-sm">
+                {{ template "icon-adjustments-horizontal" }}
+            </button>
+            <span
+                class="z-100 absolute mt-9 rounded-lg bg-gray-800 px-2 py-1 text-sm text-gray-100 opacity-0 transition-opacity group-hover:opacity-100">
+                Auto Configure
+            </span>
         </div>
     </div>
-    <div id="replace-me"></div>
-    <form class="flex justify-center" hx-post="/api/host" hx-ext="json-enc" hx-target="#update-message">
-        <input type="hidden" name="ID" value="{{ .Host.ID }}" />
-        <input type="hidden" name="Name" value="{{ .Host.Name }}" />
-        <div class="grid w-full grid-cols-1 gap-1 sm:w-2/3 lg:w-1/2 xl:w-2/5">
-            <div>
-                <label for="Provision">Provision:</label>
-                <input type="checkbox" name="Provision" id="Provision" {{ if .Host.Provision }}checked{{ end }} />
-            </div>
+</div>
+<div id="replace-me"></div>
+<form class="flex justify-center" hx-post="/api/host" hx-ext="json-enc" hx-target="#update-message">
+    <input type="hidden" name="ID" value="{{ .Host.ID }}" />
+    <input type="hidden" name="Name" value="{{ .Host.Name }}" />
+    <div class="grid w-full grid-cols-1 gap-1 sm:w-2/3 lg:w-1/2 xl:w-2/5">
+        <div>
+            <label for="Provision">Provision:</label>
+            <input type="checkbox" name="Provision" id="Provision" {{ if .Host.Provision }}checked{{ end }} />
+        </div>
 
-            <div class="my-1">
-                <label for="Firmware" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Firmware:</label>
-                <select class="w-full rounded-lg border border-neutral-400 p-1" name="Firmware" id="Firmware">
-                    <option value="" class="italic">None</option>
-                    {{ $fw := Sprintf "%s" $.Host.Firmware }}
-                    {{ range .Firmware }}
-                        <option
-                            {{ if eq . $fw }}selected{{ end }}
-                            value="{{ . }}">
-                            {{ . }}
-                        </option>
-                    {{ end }}
-                </select>
-            </div>
+        <div class="my-1">
+            <label for="Firmware" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Firmware:</label>
+            <select class="w-full rounded-lg border border-neutral-400 p-1" name="Firmware" id="Firmware">
+                <option value="" class="italic">None</option>
+                {{ $fw := Sprintf "%s" $.Host.Firmware }}
+                {{ range .Firmware }}
+                    <option
+                        {{ if eq . $fw }}selected{{ end }}
+                        value="{{ . }}">
+                        {{ . }}
+                    </option>
+                {{ end }}
+            </select>
+        </div>
 
-            <div class="my-1">
-                <label for="BootImage" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Boot Image:</label>
-                <select class="w-full rounded-lg border border-neutral-400 p-1" name="BootImage" id="BootImage">
-                    <option value="" class="italic">None</option>
-                    {{ range .BootImages }}
-                        <option
-                            {{ if eq .Name $.Host.BootImage }}selected{{ end }}
-                            value="{{ .Name }}">
-                            {{ .Name }}
-                        </option>
-                    {{ end }}
-                </select>
-            </div>
+        <div class="my-1">
+            <label for="BootImage" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Boot Image:</label>
+            <select class="w-full rounded-lg border border-neutral-400 p-1" name="BootImage" id="BootImage">
+                <option value="" class="italic">None</option>
+                {{ range .BootImages }}
+                    <option
+                        {{ if eq .Name $.Host.BootImage }}selected{{ end }}
+                        value="{{ .Name }}">
+                        {{ .Name }}
+                    </option>
+                {{ end }}
+            </select>
+        </div>
 
-            <div class="my-1">
-                <label for="Tags" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Tags:</label>
-                <input
-                    name="Tags"
-                    id="Tags"
-                    value="{{ Join .Host.Tags "," }}"
-                    class="w-full rounded-lg border border-neutral-400 p-1 px-2" />
-            </div>
+        <div class="my-1">
+            <label for="Tags" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Tags:</label>
+            <input
+                name="Tags"
+                id="Tags"
+                value="{{ Join .Host.Tags "," }}"
+                class="w-full rounded-lg border border-neutral-400 p-1 px-2" />
+        </div>
 
-            <div class="my-1">
-                <label for="Interfaces" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Interfaces:</label>
-                <textarea
-                    name="Interfaces"
-                    id="Interfaces"
-                    rows="13"
-                    class="w-full rounded-lg border border-neutral-400 p-2">
+        <div class="my-1">
+            <label for="Interfaces" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Interfaces:</label>
+            <textarea
+                name="Interfaces"
+                id="Interfaces"
+                rows="13"
+                class="w-full rounded-lg border border-neutral-400 p-2">
                     {{ Stringify .Host.Interfaces }}
                 </textarea
-                >
-            </div>
-
-            <div>
-                <button type="submit" class="rounded-lg border border-neutral-400 p-1">Submit</button>
-            </div>
+            >
         </div>
-    </form>
-    <div id="update-message"></div>
-    <br />
-{{ end }}
+
+        <div>
+            <button type="submit" class="rounded-lg border border-neutral-400 p-1">Submit</button>
+        </div>
+    </div>
+</form>
+<div id="update-message"></div>
+<br />

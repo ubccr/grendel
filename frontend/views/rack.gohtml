@@ -1,87 +1,84 @@
-{{ define "title" }}Grendel - {{ .Rack }}{{ end }}
-{{ define "body" }}
-    {{ $tdClasses := "border border-neutral-400 px-2 py-1" }}
+{{ $tdClasses := "border border-neutral-400 px-2 py-1" }}
 
 
-    <form>
-        <div class="mb-3">
-            <button
-                class="rounded-lg border border-neutral-400 p-1"
-                type="button"
-                hx-post="/api/bmc/reboot"
-                hx-vals="js:{hosts: HostMap()}"
-                hx-confirm="Are you sure you want to reboot these nodes?">
-                Reboot
-            </button>
-            <button
-                class="rounded-lg border border-neutral-400 p-1"
-                type="button"
-                hx-post="/api/bmc/configure"
-                hx-vals="js:{hosts: HostMap()}">
-                Auto Configure
-            </button>
-            <button class="rounded-lg border border-neutral-400 p-1" type="button" onclick="SelectAllNodes()">
-                Select Nodes
-            </button>
-            <button class="rounded-lg border border-neutral-400 p-1" type="button" onclick="Clear()">Clear</button>
-        </div>
-        <div id="replace-me"></div>
-        <table class="w-full table-fixed">
-            <thead>
-                <tr>
-                    <th class="{{ $tdClasses }} w-14">u</th>
-                    <th class="{{ $tdClasses }}">{{ .Rack }}</th>
-                    <th class="{{ $tdClasses }} w-14"></th>
-                </tr>
-            </thead>
-            <tbody>
-                {{ range $u := .u }}
-                    {{ $hostName := "" }}
-                    {{ $hostType := "" }}
-                    {{ range $host := $.Hosts }}
-                        {{ $s := Split $host.Name "-" }}
-                        {{ $hostU := index $s 2 }}
-                        {{ if eq $hostU $u }}
-                            {{ $hostName = $host.Name }}
-                            {{ $hostType = $host.HostType }}
-                        {{ end }}
+<form>
+    <div class="mb-3">
+        <button
+            class="rounded-lg border border-neutral-400 p-1"
+            type="button"
+            hx-post="/api/bmc/reboot"
+            hx-vals="js:{hosts: HostMap()}"
+            hx-confirm="Are you sure you want to reboot these nodes?">
+            Reboot
+        </button>
+        <button
+            class="rounded-lg border border-neutral-400 p-1"
+            type="button"
+            hx-post="/api/bmc/configure"
+            hx-vals="js:{hosts: HostMap()}">
+            Auto Configure
+        </button>
+        <button class="rounded-lg border border-neutral-400 p-1" type="button" onclick="SelectAllNodes()">
+            Select Nodes
+        </button>
+        <button class="rounded-lg border border-neutral-400 p-1" type="button" onclick="Clear()">Clear</button>
+    </div>
+    <div id="replace-me"></div>
+    <table class="w-full table-fixed">
+        <thead>
+            <tr>
+                <th class="{{ $tdClasses }} w-14">u</th>
+                <th class="{{ $tdClasses }}">{{ .Rack }}</th>
+                <th class="{{ $tdClasses }} w-14"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range $u := .u }}
+                {{ $hostName := "" }}
+                {{ $hostType := "" }}
+                {{ range $host := $.Hosts }}
+                    {{ $s := Split $host.Name "-" }}
+                    {{ $hostU := index $s 2 }}
+                    {{ if eq $hostU $u }}
+                        {{ $hostName = $host.Name }}
+                        {{ $hostType = $host.HostType }}
                     {{ end }}
-                    <tr>
-                        <td class="{{ $tdClasses }}">{{ $u }}</td>
-                        <td class="{{ $tdClasses }} hover:bg-neutral-50">
-                            <a href="/host/{{ $hostName }}" class="hover:font-medium">
-                                {{ $hostName }}
-                            </a>
-                        </td>
-                        <td class="{{ $tdClasses }}">
-                            <input type="checkbox" name="{{ $u }}:{{ $hostName }}:{{ $hostType }}" />
-                        </td>
-                    </tr>
                 {{ end }}
-            </tbody>
-        </table>
-    </form>
-    <script>
-        function SelectAllNodes() {
-            var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
+                <tr>
+                    <td class="{{ $tdClasses }}">{{ $u }}</td>
+                    <td class="{{ $tdClasses }} hover:bg-neutral-50">
+                        <a class="hover:font-medium" href="/host/{{ $hostName }}" hx-boost="true">
+                            {{ $hostName }}
+                        </a>
+                    </td>
+                    <td class="{{ $tdClasses }}">
+                        <input type="checkbox" name="{{ $u }}:{{ $hostName }}:{{ $hostType }}" />
+                    </td>
+                </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</form>
+<script>
+    function SelectAllNodes() {
+        var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
+            var n = val.name.split(":");
+            if (n[2] === "server") val.checked = true;
+        });
+    }
+    function Clear() {
+        var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
+            val.checked = false;
+        });
+    }
+    function HostMap() {
+        var h = [];
+        var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
+            if (val.checked === true) {
                 var n = val.name.split(":");
-                if (n[2] === "server") val.checked = true;
-            });
-        }
-        function Clear() {
-            var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
-                val.checked = false;
-            });
-        }
-        function HostMap() {
-            var h = [];
-            var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
-                if (val.checked === true) {
-                    var n = val.name.split(":");
-                    h.push(n[1]);
-                }
-            });
-            return h.join(",");
-        }
-    </script>
-{{ end }}
+                h.push(n[1]);
+            }
+        });
+        return h.join(",");
+    }
+</script>

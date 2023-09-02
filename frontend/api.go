@@ -2,12 +2,10 @@ package frontend
 
 import (
 	"encoding/json"
-	"fmt"
-	"net/http"
 	"strings"
 	"time"
 
-	"github.com/labstack/echo/v4"
+	"github.com/gofiber/fiber/v2"
 	"github.com/segmentio/ksuid"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/firmware"
@@ -15,9 +13,9 @@ import (
 	"github.com/ubccr/grendel/nodeset"
 )
 
-func (h *Handler) LoginUser(c echo.Context) error {
-	user := c.FormValue("username")
-	pass := c.FormValue("password")
+func (h *Handler) LoginUser(f *fiber.Ctx) error {
+	user := f.FormValue("username")
+	pass := f.FormValue("password")
 
 	val, err := h.DB.VerifyUser(user, pass)
 	if err != nil || !val {
@@ -28,87 +26,85 @@ func (h *Handler) LoginUser(c echo.Context) error {
 			msg = ToastHtml("Failed to login: Username not found.", "error")
 		}
 
-		return ToastError(c, err, msg)
+		return ToastError(f, err, msg)
 	}
 	if val {
-		tCookie := new(http.Cookie)
-		uCookie := new(http.Cookie)
+		tCookie := new(fiber.Cookie)
+		uCookie := new(fiber.Cookie)
 
 		t, e, err := Sign(user, "user")
 		if err != nil {
-			return ToastError(c, err, "Internal server error")
+			return ToastError(f, err, "Internal server error")
 		}
 		tCookie.Name = "Authorization"
-		tCookie.Value = fmt.Sprintf("Bearer %s", t)
-		tCookie.HttpOnly = true
+		tCookie.Value = t
+		tCookie.HTTPOnly = true
 		tCookie.Secure = true
 		tCookie.Expires = e
 		tCookie.Path = "/"
-		c.SetCookie(tCookie)
+		f.Cookie(tCookie)
 
 		uCookie.Name = "User"
 		uCookie.Value = user
 		uCookie.Expires = e
 		uCookie.Path = "/"
-		c.SetCookie(uCookie)
+		f.Cookie(uCookie)
 
-		c.Response().Header().Add("HX-Redirect", "/")
+		f.Response().Header.Add("HX-Redirect", "/")
 	}
 
-	return ToastSuccess(c, "Successfully logged in")
+	return ToastSuccess(f, "Successfully logged in")
 }
 
-func (h *Handler) LogoutUser(c echo.Context) error {
-	t := new(http.Cookie)
-	u := new(http.Cookie)
+func (h *Handler) LogoutUser(f *fiber.Ctx) error {
+	t := new(fiber.Cookie)
+	u := new(fiber.Cookie)
 
 	t.Name = "Authorization"
 	t.Value = ""
 	t.Expires = time.Now()
 	t.Path = "/"
-	c.SetCookie(t)
+	f.Cookie(t)
 
 	u.Name = "User"
 	u.Value = ""
 	u.Expires = time.Now()
 	u.Path = "/"
-	c.SetCookie(u)
+	f.Cookie(u)
 
-	c.Response().Header().Add("HX-Redirect", "/")
+	f.Response().Header.Add("HX-Redirect", "/")
 
-	return ToastSuccess(c, "Successfully logged out")
+	return ToastSuccess(f, "Successfully logged out")
 }
 
-func (h *Handler) RegisterUser(c echo.Context) error {
-	u := c.FormValue("username")
-	p := c.FormValue("password")
+func (h *Handler) RegisterUser(f *fiber.Ctx) error {
+	u := f.FormValue("username")
+	p := f.FormValue("password")
 
 	err := h.DB.StoreUser(u, p)
 	if err != nil {
-		return ToastError(c, err, "Failed to register user")
+		return ToastError(f, err, "Failed to register user")
 	}
 
-	return ToastSuccess(c, "Successfully registered user")
+	return ToastSuccess(f, "Successfully registered user")
 }
 
 type FormData struct {
-	ID         string
-	Name       string
-	Provision  string
-	Firmware   string
-	BootImage  string
-	Tags       string
-	Interfaces string
+	ID         string `form:"ID"`
+	Name       string `form:"Name"`
+	Provision  string `form:"Provision"`
+	Firmware   string `form:"Firmware"`
+	BootImage  string `form:"BootImage"`
+	Tags       string `form:"Tags"`
+	Interfaces string `form:"Interfaces"`
 }
 
-func (h *Handler) EditHost(c echo.Context) error {
+func (h *Handler) EditHost(f *fiber.Ctx) error {
 	formHost := new(FormData)
 
-	if err := c.Bind(formHost); err != nil {
-		return ToastError(c, err, "Failed to bind type to request body")
-	}
-	if err := c.Validate(formHost); err != nil {
-		return ToastError(c, err, "Failed to bind type to request body")
+	err := f.BodyParser(formHost)
+	if err != nil {
+		return ToastError(f, err, "Failed to bind type to request body")
 	}
 
 	id, _ := ksuid.Parse(formHost.ID)
@@ -130,40 +126,31 @@ func (h *Handler) EditHost(c echo.Context) error {
 		Interfaces: ifaces,
 	}
 
-	err := h.DB.StoreHost(&newHost)
+	err = h.DB.StoreHost(&newHost)
 	if err != nil {
-		return ToastError(c, err, "Failed to update host")
+		return ToastError(f, err, "Failed to update host")
 	}
 
-	return ToastSuccess(c, "Successfully updated host")
+	return ToastSuccess(f, "Successfully updated host")
 }
-
-// func (h *Handler) Provision(c echo.Context) error {
-// 	reqHost, _ := nodeset.NewNodeSet(c.Param("nodeset"))
-// 	host, _ := h.DB.FindHosts(reqHost)
-// 	h.DB.ProvisionHosts(reqHost, !host[0].Provision)
-
-// 	return c.HTML(http.StatusOK, fmt.Sprintf("%t", !host[0].Provision))
-// }
-
 
 type RebootData struct {
 	Host string
 }
 
-func (h *Handler) RebootHost(c echo.Context) error {
+func (h *Handler) RebootHost(f *fiber.Ctx) error {
 	delay := viper.GetInt("bmc.delay")
 	fanout := viper.GetInt("bmc.fanout")
 
-	hosts := c.FormValue("hosts")
+	hosts := f.FormValue("hosts")
 	ns, err := nodeset.NewNodeSet(hosts)
 	if err != nil {
-		return ToastError(c, err, "Failed to parse node set")
+		return ToastError(f, err, "Failed to parse node set")
 	}
 
 	hostList, err := h.DB.FindHosts(ns)
 	if err != nil {
-		return ToastError(c, err, "Failed to find nodes")
+		return ToastError(f, err, "Failed to find nodes")
 	}
 
 	runner := NewJobRunner(fanout)
@@ -177,22 +164,22 @@ func (h *Handler) RebootHost(c echo.Context) error {
 	runner.Wait()
 
 	// TODO: add channel to get status of each job
-	return ToastSuccess(c, "Successfully Rebooted node(s)")
+	return ToastSuccess(f, "Successfully Rebooted node(s)")
 }
 
-func (h *Handler) BmcConfigure(c echo.Context) error {
+func (h *Handler) BmcConfigure(f *fiber.Ctx) error {
 	delay := viper.GetInt("bmc.delay")
 	fanout := viper.GetInt("bmc.fanout")
 
-	hosts := c.FormValue("hosts")
+	hosts := f.FormValue("hosts")
 	ns, err := nodeset.NewNodeSet(hosts)
- 	if err != nil {
-	 return ToastError(c, err, "Failed to parse node set")
+	if err != nil {
+		return ToastError(f, err, "Failed to parse node set")
 	}
 
 	hostList, _ := h.DB.FindHosts(ns)
 	if err != nil {
-		return ToastError(c, err, "Failed to find nodes")
+		return ToastError(f, err, "Failed to find nodes")
 	}
 
 	runner := NewJobRunner(fanout)
@@ -206,5 +193,5 @@ func (h *Handler) BmcConfigure(c echo.Context) error {
 	runner.Wait()
 
 	// TODO: add channel to get status of each job
-	return ToastSuccess(c, "Successfully sent Auto Configure node(s)")
+	return ToastSuccess(f, "Successfully sent Auto Configure node(s)")
 }

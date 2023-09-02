@@ -605,6 +605,14 @@ video {
   display: block;
 }
 
+.inline-block {
+  display: inline-block;
+}
+
+.inline {
+  display: inline;
+}
+
 .flex {
   display: flex;
 }
@@ -712,6 +720,10 @@ video {
 
 .overflow-auto {
   overflow: auto;
+}
+
+.whitespace-nowrap {
+  white-space: nowrap;
 }
 
 .rounded-lg {

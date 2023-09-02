@@ -1,27 +1,25 @@
 package frontend
 
 import (
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"strings"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/keyauth"
 )
 
-func AuthMiddleware() echo.MiddlewareFunc {
-	return middleware.KeyAuthWithConfig(middleware.KeyAuthConfig{
+func AuthMiddleware() func(f *fiber.Ctx) error {
+	return keyauth.New(keyauth.Config{
 		KeyLookup: "cookie:Authorization",
-		Validator: func(key string, c echo.Context) (bool, error) {
-			keySplice := strings.Split(key, " ")
-			token := keySplice[1]
-
-			_, r, err := Verify(token)
-
-			if err != nil {
-				return false, err
-			} else if r == "disabled" {
-				return false, nil
-			}
-
-			return true, nil
-		},
+		Validator: validateKey,
 	})
+}
+
+func validateKey(c *fiber.Ctx, key string) (bool, error) {
+	_, r, err := Verify(key)
+
+	if err != nil {
+		return false, err
+	} else if r == "disabled" {
+		return false, nil
+	}
+
+	return true, nil
 }

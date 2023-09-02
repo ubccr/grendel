@@ -1,9 +1,7 @@
 package frontend
 
 import (
-	"net/http"
-
-	"github.com/labstack/echo/v4"
+	"github.com/gofiber/fiber/v2"
 	"github.com/ubccr/grendel/model"
 )
 
@@ -19,45 +17,28 @@ func NewHandler(db model.DataStore) (*Handler, error) {
 	return h, nil
 }
 
-func (h *Handler) SetupRoutes(e *echo.Echo) {
+func (h *Handler) SetupRoutes(app *fiber.App) {
 
-	e.File("/favicon.ico", "frontend/public/favicon.ico")
-	e.File("/backgrounds/large-triangles-ub.svg", "frontend/public/backgrounds/large-triangles-ub.svg")
-	e.File("/tailwind.css", "frontend/public/tailwind.css")
+	keyAuth := AuthMiddleware()
 
-	e.GET("/", h.Index)
-	e.GET("/login", h.Login)
-	e.GET("/register", h.Register)
-	e.GET("/host/:host", h.Host, AuthMiddleware())
-	e.GET("/floorplan", h.Floorplan, AuthMiddleware())
-	e.GET("/rack/:rack", h.Rack, AuthMiddleware())
-	e.GET("/grendel/add", h.GrendelAdd, AuthMiddleware())
+	app.Static("/favicon.ico", "frontend/public/favicon.ico")
+	app.Static("/backgrounds/large-triangles-ub.svg", "frontend/public/backgrounds/large-triangles-ub.svg")
+	app.Static("/tailwind.css", "frontend/public/tailwind.css")
 
-	api := e.Group("/api")
-	api.POST("/auth/login", h.LoginUser)
-	api.POST("/auth/logout", h.LogoutUser)
-	api.POST("/auth/register", h.RegisterUser)
-	api.POST("/host", h.EditHost, AuthMiddleware())
-	// api.PATCH("/provision/:nodeset", h.Provision, AuthMiddleware())
-	api.POST("/bmc/reboot", h.RebootHost, AuthMiddleware())
-	api.POST("/bmc/configure", h.BmcConfigure, AuthMiddleware())
+	app.Get("/", h.Index)
+	app.Get("/login", h.Login)
+	app.Get("/register", h.Register)
+	app.Get("/host/:host", keyAuth, h.Host)
+	app.Get("/floorplan", keyAuth, h.Floorplan)
+	app.Get("/rack/:rack", keyAuth, h.Rack)
+	app.Get("/grendel/add", keyAuth, h.GrendelAdd)
 
-	e.HTTPErrorHandler = customHTTPErrorHandler
-}
+	api := app.Group("/api")
+	api.Post("/auth/login", h.LoginUser)
+	api.Post("/auth/logout", h.LogoutUser)
+	api.Post("/auth/register", h.RegisterUser)
+	api.Post("/host", keyAuth, h.EditHost)
+	api.Post("/bmc/reboot", keyAuth, h.RebootHost)
+	api.Post("/bmc/configure", keyAuth, h.BmcConfigure)
 
-func customHTTPErrorHandler(err error, c echo.Context) {
-	code := http.StatusInternalServerError
-	if he, ok := err.(*echo.HTTPError); ok {
-		code = he.Code
-	}
-	log.Error(err)
-	message := err.Error()
-
-	if message == "code=400, message=missing key in cookies" {
-		message = "Authentication failed! Please login."
-	}
-
-	if err := c.Render(code, "error.gohtml", message); err != nil {
-		log.Error(err)
-	}
 }

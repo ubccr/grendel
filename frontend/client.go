@@ -2,25 +2,24 @@ package frontend
 
 import (
 	"fmt"
-	"net/http"
 	"strings"
 
-	"github.com/labstack/echo/v4"
+	"github.com/gofiber/fiber/v2"
 	"github.com/ubccr/grendel/firmware"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
 )
 
-func (h *Handler) Index(c echo.Context) error {
-	return c.Render(http.StatusOK, "index.gohtml", nil)
+func (h *Handler) Index(f *fiber.Ctx) error {
+	return f.Render("index", nil)
 }
 
-func (h *Handler) Register(c echo.Context) error {
-	return c.Render(http.StatusOK, "register.gohtml", nil)
+func (h *Handler) Register(f *fiber.Ctx) error {
+	return f.Render("register", nil)
 }
 
-func (h *Handler) Login(c echo.Context) error {
-	return c.Render(http.StatusOK, "login.gohtml", nil)
+func (h *Handler) Login(f *fiber.Ctx) error {
+	return f.Render("login", nil)
 }
 
 type HostPageData struct {
@@ -29,8 +28,11 @@ type HostPageData struct {
 	Firmware   []string
 }
 
-func (h *Handler) Host(c echo.Context) error {
-	reqHost, _ := nodeset.NewNodeSet(c.Param("host"))
+func (h *Handler) Host(f *fiber.Ctx) error {
+	reqHost, err := nodeset.NewNodeSet(f.Params("host"))
+	if err != nil {
+		return ToastError(f, fmt.Errorf("invalid host"), "Invalid host")
+	}
 
 	host, _ := h.DB.FindHosts(reqHost)
 	bootImages, _ := h.DB.BootImages()
@@ -45,9 +47,9 @@ func (h *Handler) Host(c echo.Context) error {
 		BootImages: bootImages,
 		Firmware:   fw,
 	}
-	return c.Render(http.StatusOK, "host.gohtml", data)
+	return f.Render("host", data)
 }
-func (h *Handler) Floorplan(c echo.Context) error {
+func (h *Handler) Floorplan(f *fiber.Ctx) error {
 	hosts, _ := h.DB.Hosts()
 	racks := map[string]int{}
 	for _, host := range hosts {
@@ -70,12 +72,19 @@ func (h *Handler) Floorplan(c echo.Context) error {
 		"Cols":  cols,
 		"Racks": racks,
 	}
-	return c.Render(http.StatusOK, "floorplan.gohtml", data)
+	return f.Render("floorplan", data)
 }
 
-func (h *Handler) Rack(c echo.Context) error {
-	n, _ := h.DB.FindTags([]string{c.Param("rack")})
-	hosts, _ := h.DB.FindHosts(n)
+func (h *Handler) Rack(f *fiber.Ctx) error {
+	n, err := h.DB.FindTags([]string{f.Params("rack")})
+	if err != nil {
+		return ToastError(f, err, "Failed to find hosts tagged with rack")
+	}
+
+	hosts, err := h.DB.FindHosts(n)
+	if err != nil {
+		return ToastError(f, err, "Failed to find hosts")
+	}
 
 	u := make([]string, 0)
 	// TODO: move min and max rack u to grendel.toml
@@ -85,14 +94,13 @@ func (h *Handler) Rack(c echo.Context) error {
 	data := map[string]interface{}{
 		"u":     u,
 		"Hosts": hosts,
-		"Rack":  c.Param("rack"),
+		"Rack":  f.FormValue("rack"),
 	}
 
-	return c.Render(http.StatusOK, "rack.gohtml", data)
+	return f.Render("rack", data)
 }
 
-func (h *Handler) GrendelAdd(c echo.Context) error {
-	
+func (h *Handler) GrendelAdd(f *fiber.Ctx) error {
 
-	return c.Render(http.StatusOK, "grendelAdd.gohtml", nil)
+	return f.Render("grendelAdd", nil)
 }
