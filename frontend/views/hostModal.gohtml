@@ -1,0 +1,82 @@
+<div class="m-2">
+    <form hx-post="/api/host/add" hx-swap="none" id="modalForm">
+        <input type="hidden" name="Rack" id="Rack" value="{{ .Rack }}" />
+        <input type="hidden" name="Us" id="Us" value="{{ .HostUs }}" />
+
+        <div class="grid grid-cols-1 gap-2">
+            <div class="my-1">
+                <label for="Prefix" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Prefix:</label>
+                <input
+                    name="Prefix"
+                    type="text"
+                    id="Prefix"
+                    value="cpn"
+                    class="w-full rounded-lg border border-neutral-400 p-1 px-2" />
+            </div>
+
+            <div>
+                <label for="Provision">Provision:</label>
+                <input type="checkbox" name="Provision" id="Provision" {{ if .Host.Provision }}checked{{ end }} />
+            </div>
+
+            <div class="my-1">
+                <label for="Firmware" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Firmware:</label>
+                <select class="w-full rounded-lg border border-neutral-400 p-1" name="Firmware" id="Firmware">
+                    <option value="" class="italic">None</option>
+                    {{ range .Firmwares }}
+                        <option value="{{ . }}">
+                            {{ . }}
+                        </option>
+                    {{ end }}
+                </select>
+            </div>
+
+            <div class="my-1">
+                <label for="BootImage" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Boot Image:</label>
+                <select class="w-full rounded-lg border border-neutral-400 p-1" name="BootImage" id="BootImage">
+                    <option value="" class="italic">None</option>
+                    {{ range .BootImages }}
+                        <option value="{{ .Name }}">
+                            {{ .Name }}
+                        </option>
+                    {{ end }}
+                </select>
+            </div>
+
+            <div>
+                <label for="Tags" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Tags:</label>
+                <input
+                    type="text"
+                    name="Tags"
+                    id="Tags"
+                    value="{{ .Rack }}"
+                    class="w-full rounded-lg border border-neutral-400 p-1 px-2" />
+            </div>
+            <div
+                hx-put="/fragment/hostAddModalList"
+                hx-trigger="load, change from:#Prefix"
+                hx-include="#modalForm"
+                hx-swap="innerHTML"
+                id="hostList"></div>
+        </div>
+        <div>
+            <button
+                type="button"
+                hx-post="/api/switch/mac"
+                hx-swap="innerHTML"
+                hx-target="#hostList"
+                hx-include="#modalForm">
+                Query Switches
+            </button>
+        </div>
+    </form>
+</div>
+<div class="flex justify-between border-t border-neutral-400 bg-neutral-50 p-3">
+    <button type="submit" form="modalForm" class="rounded-lg border border-neutral-400 bg-white p-1">Submit</button>
+    <button
+        type="button"
+        onclick="document.getElementById('hostModal').close()"
+        class="rounded-lg border border-neutral-400 bg-white p-1">
+        Close
+    </button>
+</div>

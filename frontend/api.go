@@ -2,6 +2,9 @@ package frontend
 
 import (
 	"encoding/json"
+	"fmt"
+	"net"
+	"strconv"
 	"strings"
 	"time"
 
@@ -21,9 +24,9 @@ func (h *Handler) LoginUser(f *fiber.Ctx) error {
 	if err != nil || !val {
 		msg := "Internal server error"
 		if err.Error() == "crypto/bcrypt: hashedPassword is not the hash of the given password" {
-			msg = ToastHtml("Failed to login: Password is incorrect", "error")
+			msg = "Failed to login: Password is incorrect"
 		} else if err.Error() == "not found" {
-			msg = ToastHtml("Failed to login: Username not found.", "error")
+			msg = "Failed to login: Username not found."
 		}
 
 		return ToastError(f, err, msg)
@@ -194,4 +197,96 @@ func (h *Handler) BmcConfigure(f *fiber.Ctx) error {
 
 	// TODO: add channel to get status of each job
 	return ToastSuccess(f, "Successfully sent Auto Configure node(s)")
+}
+
+func (h *Handler) HostAdd(f *fiber.Ctx) error {
+	fw := f.FormValue("Firmware")
+	p := f.FormValue("Provision")
+	bootImage := f.FormValue("BootImage")
+	tags := f.FormValue("Tags")
+
+	provision, _ := strconv.ParseBool(p)
+	hostList := strings.Split(f.FormValue("HostList"), ",")
+
+	for _, v := range hostList {
+		mgmtMac, err := net.ParseMAC(f.FormValue(fmt.Sprintf("%s:MgmtMac", v)))
+		if err != nil {
+			return ToastError(f, err, "Failed to parse MAC address")
+		}
+		coreMac, err := net.ParseMAC(f.FormValue(fmt.Sprintf("%s:CoreMac", v)))
+		if err != nil {
+			return ToastError(f, err, "Failed to parse MAC address")
+		}
+
+		ifaces := make([]*model.NetInterface, 0)
+		ifaces = append(ifaces, &model.NetInterface{
+			Name: "",
+			FQDN: "",
+			MAC:  mgmtMac,
+			BMC:  true,
+			VLAN: "",
+			MTU:  1500,
+		})
+		ifaces = append(ifaces, &model.NetInterface{
+			Name: "",
+			FQDN: fmt.Sprintf("%s.core.ccr.buffalo.edu", v),
+			MAC:  coreMac,
+			BMC:  false,
+			VLAN: "",
+			MTU:  9000,
+		})
+		newHost := model.Host{
+			ID:        ksuid.New(),
+			Name:      v,
+			Provision: provision,
+			BootImage: bootImage,
+			Firmware:  firmware.NewFromString(fw),
+			Tags:      strings.Split(tags, ","),
+		}
+		err = h.DB.StoreHost(&newHost)
+		if err != nil {
+			return ToastError(f, err, "Failed to add host(s)")
+		}
+
+	}
+
+	f.Response().Header.Add("HX-Refresh", "true")
+	return ToastSuccess(f, "Successfully added host(s)")
+}
+
+func (h *Handler) SwitchMac(f *fiber.Ctx) error {
+	rack := f.FormValue("Rack")
+	hosts := strings.Split(f.FormValue("HostList"), ",")
+	mgmtMacList, err := GetMacAddress(h, f, rack, "Mgmt", hosts)
+	if err != nil {
+		return ToastError(f, err, "Failed to get MAC address")
+	}
+	coreMacList, err := GetMacAddress(h, f, rack, "Core", hosts)
+	if err != nil {
+		return ToastError(f, err, "Failed to get MAC address")
+	}
+
+	type hostStruct struct {
+		Host     string
+		MgmtPort string
+		CorePort string
+		MgmtMac  string
+		CoreMac  string
+	}
+	hostList := make([]hostStruct, len(hosts))
+
+	for i, host := range hosts {
+		hostList[i] = hostStruct{
+			Host:     host,
+			MgmtPort: f.FormValue(fmt.Sprintf("%s:Mgmt", host), ""),
+			CorePort: f.FormValue(fmt.Sprintf("%s:Core", host), ""),
+			MgmtMac:  mgmtMacList[host],
+			CoreMac:  coreMacList[host],
+		}
+	}
+
+	return f.Render("fragments/hostAddModalList", fiber.Map{
+		"Hosts":    hostList,
+		"HostList": strings.Join(hosts, ","),
+	}, "")
 }

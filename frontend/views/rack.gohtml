@@ -18,6 +18,15 @@
             hx-vals="js:{hosts: HostMap()}">
             Auto Configure
         </button>
+        <button
+            class="rounded-lg border border-neutral-400 p-1"
+            type="button"
+            hx-get="/fragment/hostAddModal"
+            hx-target="#hostModal"
+            hx-vals='js:{hosts: HostMap("u"), rack: "{{ .Rack }}"}'
+            onclick="document.getElementById('hostModal').showModal()">
+            Add Hosts
+        </button>
         <button class="rounded-lg border border-neutral-400 p-1" type="button" onclick="SelectAllNodes()">
             Select Nodes
         </button>
@@ -47,7 +56,7 @@
                 <tr>
                     <td class="{{ $tdClasses }}">{{ $u }}</td>
                     <td class="{{ $tdClasses }} hover:bg-neutral-50">
-                        <a class="hover:font-medium" href="/host/{{ $hostName }}" hx-boost="true">
+                        <a class="hover:font-medium" href="/host/{{ $hostName }}" hx-boost="false">
                             {{ $hostName }}
                         </a>
                     </td>
@@ -59,6 +68,9 @@
         </tbody>
     </table>
 </form>
+
+<dialog id="hostModal" class="rounded-lg shadow-md transition-all duration-300 ease-in"></dialog>
+
 <script>
     function SelectAllNodes() {
         var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
@@ -71,12 +83,13 @@
             val.checked = false;
         });
     }
-    function HostMap() {
+    function HostMap(type = "hostname") {
         var h = [];
         var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
             if (val.checked === true) {
                 var n = val.name.split(":");
-                h.push(n[1]);
+                if (type === "hostname") h.push(n[1]);
+                else if (type === "u") h.push(n[0]);
             }
         });
         return h.join(",");

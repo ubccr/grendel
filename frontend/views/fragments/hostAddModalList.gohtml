@@ -1,0 +1,42 @@
+<table class="table-fixed">
+    <thead>
+        <tr>
+            <th class="border border-neutral-400">Node</th>
+            <th class="border border-neutral-400">Mgmt</th>
+            <th class="border border-neutral-400">Core</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range .Hosts }}
+            {{ $tdClasses := "border border-neutral-400 p-1 px-2" }}
+            <tr>
+                <td class="{{ $tdClasses }}">{{ .Host }}</td>
+                <td class="{{ $tdClasses }}">
+                    <input
+                        class="w-10 rounded-lg border border-neutral-400 p-1 px-2"
+                        name="{{ .Host }}:Mgmt"
+                        value="{{ .MgmtPort }}"
+                        type="text" />
+                    <input
+                        class="w-36 rounded-lg border border-neutral-400 p-1 px-2"
+                        name="{{ .Host }}:MgmtMac"
+                        placeholder="mac"
+                        value="{{ .MgmtMac }}" />
+                </td>
+                <td class="{{ $tdClasses }}">
+                    <input
+                        class="w-10 rounded-lg border border-neutral-400 p-1 px-2"
+                        name="{{ .Host }}:Core"
+                        value="{{ .CorePort }}"
+                        type="text" />
+                    <input
+                        class="w-36 rounded-lg border border-neutral-400 p-1 px-2"
+                        name="{{ .Host }}:CoreMac"
+                        placeholder="mac"
+                        value="{{ .CoreMac }}" />
+                </td>
+            </tr>
+        {{ end }}
+    </tbody>
+</table>
+<input type="hidden" name="HostList" value="{{ .HostList }}" />
