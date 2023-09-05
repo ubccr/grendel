@@ -75,6 +75,9 @@ type DataStore interface {
 	// FindTags returns a nodeset.NodeSet of all the hosts with the given tags
 	FindTags(tags []string) (*nodeset.NodeSet, error)
 
+	// MatchTags returns a nodeset.NodeSet of all the hosts with the all given tags
+	MatchTags(tags []string) (*nodeset.NodeSet, error)
+
 	// ProvisionHosts sets all hosts in the given NodeSet to provision (true) or unprovision (false)
 	ProvisionHosts(ns *nodeset.NodeSet, provision bool) error
 

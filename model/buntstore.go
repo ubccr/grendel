@@ -21,10 +21,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"golang.org/x/crypto/bcrypt"
 	"net"
 	"net/netip"
 	"strings"
+
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/segmentio/ksuid"
 	"github.com/sirupsen/logrus"
@@ -421,6 +422,42 @@ func (s *BuntStore) FindTags(tags []string) (*nodeset.NodeSet, error) {
 				if _, ok := tagMap[i.String()]; ok {
 					nodes = append(nodes, gjson.Get(value, "name").String())
 				}
+			}
+
+			return true
+		})
+
+		return err
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(nodes) == 0 {
+		return nil, fmt.Errorf("no hosts found with tags %#v:  %w", tags, ErrNotFound)
+	}
+
+	return nodeset.NewNodeSet(strings.Join(nodes, ","))
+}
+
+// MatchTags returns a nodeset.NodeSet of all the hosts with the all given tags
+func (s *BuntStore) MatchTags(tags []string) (*nodeset.NodeSet, error) {
+	nodes := []string{}
+
+	err := s.db.View(func(tx *buntdb.Tx) error {
+		err := tx.AscendKeys(HostKeyPrefix+":*", func(key, value string) bool {
+			res := gjson.Get(value, "tags")
+			match := 0
+			for _, v := range tags {
+				for _, i := range res.Array() {
+					if v == i.String() {
+						match++
+					}
+				}
+			}
+			if match == len(tags) {
+				nodes = append(nodes, gjson.Get(value, "name").String())
 			}
 
 			return true
