@@ -1,36 +1,36 @@
 <table class="table-fixed">
     <thead>
         <tr>
-            <th class="border border-neutral-400">Node</th>
-            <th class="border border-neutral-400">Mgmt</th>
-            <th class="border border-neutral-400">Core</th>
+            <th class="border border-neutral-300">Node</th>
+            <th class="border border-neutral-300">Mgmt</th>
+            <th class="border border-neutral-300">Core</th>
         </tr>
     </thead>
     <tbody>
         {{ range .Hosts }}
-            {{ $tdClasses := "border border-neutral-400 p-1 px-2" }}
+            {{ $tdClasses := "border border-neutral-300 p-1 px-2" }}
             <tr>
                 <td class="{{ $tdClasses }}">{{ .Host }}</td>
                 <td class="{{ $tdClasses }}">
                     <input
-                        class="w-10 rounded-lg border border-neutral-400 p-1 px-2"
+                        class="w-10 rounded-lg border border-blue-500 p-1 px-2"
                         name="{{ .Host }}:Mgmt"
                         value="{{ .MgmtPort }}"
                         type="text" />
                     <input
-                        class="w-36 rounded-lg border border-neutral-400 p-1 px-2"
+                        class="w-36 rounded-lg border border-blue-500 p-1 px-2"
                         name="{{ .Host }}:MgmtMac"
                         placeholder="mac"
                         value="{{ .MgmtMac }}" />
                 </td>
                 <td class="{{ $tdClasses }}">
                     <input
-                        class="w-10 rounded-lg border border-neutral-400 p-1 px-2"
+                        class="w-10 rounded-lg border border-blue-500 p-1 px-2"
                         name="{{ .Host }}:Core"
                         value="{{ .CorePort }}"
                         type="text" />
                     <input
-                        class="w-36 rounded-lg border border-neutral-400 p-1 px-2"
+                        class="w-36 rounded-lg border border-blue-500 p-1 px-2"
                         name="{{ .Host }}:CoreMac"
                         placeholder="mac"
                         value="{{ .CoreMac }}" />

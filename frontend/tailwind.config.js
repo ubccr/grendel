@@ -31,15 +31,11 @@ module.exports = {
                 loading: "loading 2s linear infinite",
             },
             backgroundImage: {
-                "large-triangles-ub":
-                    "url('/backgrounds/large-triangles-ub.svg')",
-                "large-triangles-dark":
-                    "url('/backgrounds/large-triangles-dark.svg')",
+                "large-triangles-ub": "url('/backgrounds/large-triangles-ub.svg')",
+                "large-triangles-dark": "url('/backgrounds/large-triangles-dark.svg')",
                 "large-triangles": "url('/backgrounds/large-triangles.svg')",
-                "protruding-squares-ub":
-                    "url('/backgrounds/protruding-squares-ub.svg')",
-                "protruding-squares":
-                    "url('/backgrounds/protruding-squares.svg')",
+                "protruding-squares-ub": "url('/backgrounds/protruding-squares-ub.svg')",
+                "protruding-squares": "url('/backgrounds/protruding-squares.svg')",
             },
         },
     },
