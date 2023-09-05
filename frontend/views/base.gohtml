@@ -8,7 +8,7 @@
         <script src="https://unpkg.com/htmx.org/dist/ext/loading-states.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css" />
         <link rel="stylesheet" href="/tailwind.css" />
-        <title>Grendel</title>
+        <title>{{ .Title }}</title>
         <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
     </head>
 
@@ -17,17 +17,21 @@
             <nav class="bg-white p-4 xl:px-12">
                 {{ define "nav" }}
                     {{ $linkClasses := "rounded-md px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-200" }}
-                    <a class="{{ $linkClasses }}{{ if eq . "mobile" }}block{{ end }}" href="/" hx-boost="true">Home</a>
-                    <a class="{{ $linkClasses }}{{ if eq . "mobile" }}block{{ end }}" href="/floorplan" hx-boost="true">
+                    <a class="{{ $linkClasses }} {{ if eq . "mobile" }}block{{ end }}" href="/" hx-boost="false">
+                        Home
+                    </a>
+                    <a
+                        class="{{ $linkClasses }} {{ if eq . "mobile" }}block{{ end }}"
+                        href="/floorplan"
+                        hx-boost="false">
                         Floorplan
                     </a>
-                    <!-- <a
-                        class="{{ $linkClasses }}{{ if eq . "mobile" }}block{{ end }}"
+                    <a
+                        class="{{ $linkClasses }} {{ if eq . "mobile" }}block{{ end }}"
                         href="/grendel/add"
-                        hx-boost="true"
-                        >
+                        hx-boost="false">
                         Add
-                    </a> -->
+                    </a>
                 {{ end }}
                 <div class="flex justify-between">
                     <button
@@ -47,7 +51,7 @@
                         </div>
                     </div>
                     <div class="my-auto">
-                        <a href="/login" id="login" hx-boost="true">Login</a>
+                        <a href="/login" id="login" hx-boost="false">Login</a>
                         <button hx-post="/api/auth/logout" hx-swap="none" id="logout" hidden>Logout</button>
                     </div>
                 </div>

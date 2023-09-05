@@ -6,26 +6,25 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/ubccr/grendel/firmware"
-	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
 )
 
 func (h *Handler) Index(f *fiber.Ctx) error {
-	return f.Render("index", nil)
+	return f.Render("index", fiber.Map{
+		"Title": "Grendel",
+	})
 }
 
 func (h *Handler) Register(f *fiber.Ctx) error {
-	return f.Render("register", nil)
+	return f.Render("register", fiber.Map{
+		"Title": "Grendel - Register",
+	})
 }
 
 func (h *Handler) Login(f *fiber.Ctx) error {
-	return f.Render("login", nil)
-}
-
-type HostPageData struct {
-	Host       *model.Host
-	BootImages model.BootImageList
-	Firmware   []string
+	return f.Render("login", fiber.Map{
+		"Title": "Grendel - Login",
+	})
 }
 
 func (h *Handler) Host(f *fiber.Ctx) error {
@@ -42,13 +41,14 @@ func (h *Handler) Host(f *fiber.Ctx) error {
 		fw = append(fw, i)
 	}
 
-	data := HostPageData{
-		Host:       host[0],
-		BootImages: bootImages,
-		Firmware:   fw,
-	}
-	return f.Render("host", data)
+	return f.Render("host", fiber.Map{
+		"Title":      fmt.Sprintf("Grendel - %s", host[0].Name),
+		"Host":       host[0],
+		"BootImages": bootImages,
+		"Firmware":   fw,
+	})
 }
+
 func (h *Handler) Floorplan(f *fiber.Ctx) error {
 	hosts, _ := h.DB.Hosts()
 	racks := map[string]int{}
@@ -67,16 +67,18 @@ func (h *Handler) Floorplan(f *fiber.Ctx) error {
 		cols = append(cols, fmt.Sprintf("%02d", i))
 	}
 
-	data := map[string]interface{}{
+	return f.Render("floorplan", fiber.Map{
+		"Title": "Grendel - Floorplan",
 		"Rows":  rows,
 		"Cols":  cols,
 		"Racks": racks,
-	}
-	return f.Render("floorplan", data)
+	})
 }
 
 func (h *Handler) Rack(f *fiber.Ctx) error {
-	n, err := h.DB.FindTags([]string{f.Params("rack")})
+	rack := f.Params("rack")
+
+	n, err := h.DB.FindTags([]string{rack})
 	if err != nil {
 		return ToastError(f, err, "Failed to find hosts tagged with rack")
 	}
@@ -91,16 +93,11 @@ func (h *Handler) Rack(f *fiber.Ctx) error {
 	for i := 42; i >= 3; i-- {
 		u = append(u, fmt.Sprintf("%02d", i))
 	}
-	data := map[string]interface{}{
+
+	return f.Render("rack", fiber.Map{
+		"Title": fmt.Sprintf("Grendel - %s", rack),
 		"u":     u,
 		"Hosts": hosts,
-		"Rack":  f.FormValue("rack"),
-	}
-
-	return f.Render("rack", data)
-}
-
-func (h *Handler) GrendelAdd(f *fiber.Ctx) error {
-
-	return f.Render("grendelAdd", nil)
+		"Rack":  rack,
+	})
 }

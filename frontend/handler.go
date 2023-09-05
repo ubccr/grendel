@@ -21,9 +21,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 
 	keyAuth := AuthMiddleware()
 
-	app.Static("/favicon.ico", "frontend/public/favicon.ico")
-	app.Static("/backgrounds/large-triangles-ub.svg", "frontend/public/backgrounds/large-triangles-ub.svg")
-	app.Static("/tailwind.css", "frontend/public/tailwind.css")
+	app.Static("/", "frontend/public")
 
 	app.Get("/", h.Index)
 	app.Get("/login", h.Login)
@@ -31,14 +29,18 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	app.Get("/host/:host", keyAuth, h.Host)
 	app.Get("/floorplan", keyAuth, h.Floorplan)
 	app.Get("/rack/:rack", keyAuth, h.Rack)
-	app.Get("/grendel/add", keyAuth, h.GrendelAdd)
+
+	fragment := app.Group("/fragment")
+	fragment.Get("/hostAddModal", keyAuth, h.HostAddModal)
+	fragment.Put("/hostAddModalList", keyAuth, h.HostAddModalList)
 
 	api := app.Group("/api")
 	api.Post("/auth/login", h.LoginUser)
 	api.Post("/auth/logout", h.LogoutUser)
 	api.Post("/auth/register", h.RegisterUser)
 	api.Post("/host", keyAuth, h.EditHost)
+	api.Post("/host/add", keyAuth, h.HostAdd)
 	api.Post("/bmc/reboot", keyAuth, h.RebootHost)
 	api.Post("/bmc/configure", keyAuth, h.BmcConfigure)
-
+	api.Post("/switch/mac", keyAuth, h.SwitchMac)
 }
