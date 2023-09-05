@@ -21,13 +21,30 @@ func (h *Handler) HostAddModal(f *fiber.Ctx) error {
 		"HostUs":     f.FormValue("hosts"),
 		"Firmwares":  fw,
 		"BootImages": bootImages,
+		"Defaults": fiber.Map{
+			"Core": fiber.Map{
+				"Ifname": "eno12399",
+				"Domain": "core.ccr.buffalo.edu",
+				"Mtu":    9000,
+			},
+			"Mgmt": fiber.Map{
+				"Ifname": "",
+				"Domain": "mgmt.ccr.buffalo.edu",
+				"Mtu":    1500,
+			},
+		},
 	}, "")
 }
 
 func (h *Handler) HostAddModalList(f *fiber.Ctx) error {
 	rack := f.FormValue("Rack")
 	prefix := f.FormValue("Prefix")
-	uArr := strings.Split(f.FormValue("Us"), ",")
+	Us := f.FormValue("Us")
+	var uArr []string
+
+	if Us != "" {
+		uArr = strings.Split(Us, ",")
+	}
 
 	type hostStruct struct {
 		Host     string
@@ -55,4 +72,45 @@ func (h *Handler) HostAddModalList(f *fiber.Ctx) error {
 		"Hosts":    hostArr,
 		"HostList": strings.Join(hostList, ","),
 	}, "")
+}
+
+func (h *Handler) HostAddModalInterfaces(f *fiber.Ctx) error {
+	mgmtSubnet := f.FormValue("Mgmt:Subnet")
+	coreSubnet := f.FormValue("Core:Subnet")
+	hostList := f.FormValue("HostList")
+	hostArr := strings.Split(hostList, ",")
+
+	if mgmtSubnet == "" || coreSubnet == "" {
+		return ToastError(f, nil, "Missing subnet")
+	}
+
+	mgmtRange, err := h.newHostIPs(mgmtSubnet)
+	if err != nil {
+		return ToastError(f, err, "Failed to generate IP range for management network")
+	}
+
+	coreRange, err := h.newHostIPs(coreSubnet)
+	if err != nil {
+		return ToastError(f, err, "Failed to generate IP range for core network")
+	}
+
+	type hostStruct struct {
+		Host   string
+		MgmtIp string
+		CoreIp string
+	}
+	hosts := make([]hostStruct, len(hostArr))
+
+	for i, host := range hostArr {
+		hosts[i] = hostStruct{
+			Host:   host,
+			MgmtIp: mgmtRange[i],
+			CoreIp: coreRange[i],
+		}
+	}
+
+	return f.Render("fragments/hostAddModalInterfaces", fiber.Map{
+		"Hosts": hosts,
+	}, "")
+
 }

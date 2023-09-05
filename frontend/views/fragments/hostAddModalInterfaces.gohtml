@@ -1,0 +1,35 @@
+{{ $tdClasses := "border border-neutral-300 p-1 px-2" }}
+
+
+<div class="overflow-x-auto pb-3">
+    <table class="table-fixed">
+        <thead>
+            <tr>
+                <td class="{{ $tdClasses }}">Host</td>
+                <td class="{{ $tdClasses }}">Mgmt IP</td>
+                <td class="{{ $tdClasses }}">Core IP</td>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Hosts }}
+                <tr>
+                    <td class="{{ $tdClasses }}">
+                        <input class="border border-neutral-300 px-2 py-1" value="{{ .Host }}" />
+                    </td>
+                    <td class="{{ $tdClasses }}">
+                        <input
+                            class="border border-neutral-300 px-2 py-1"
+                            name="{{ .Host }}:MgmtIp"
+                            value="{{ .MgmtIp }}" />
+                    </td>
+                    <td class="{{ $tdClasses }}">
+                        <input
+                            class="border border-neutral-300 px-2 py-1"
+                            name="{{ .Host }}:CoreIp"
+                            value="{{ .CoreIp }}" />
+                    </td>
+                </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</div>

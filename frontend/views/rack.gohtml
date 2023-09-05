@@ -7,6 +7,7 @@
             class="rounded-lg border border-blue-500 p-1"
             type="button"
             hx-post="/api/bmc/reboot"
+            hx-swap="none"
             hx-vals="js:{hosts: HostMap()}"
             hx-confirm="Are you sure you want to reboot these nodes?">
             Reboot
@@ -15,16 +16,18 @@
             class="rounded-lg border border-blue-500 p-1"
             type="button"
             hx-post="/api/bmc/configure"
+            hx-swap="none"
             hx-vals="js:{hosts: HostMap()}">
             Auto Configure
         </button>
         <button
             class="rounded-lg border border-blue-500 p-1"
             type="button"
-            hx-get="/fragment/hostAddModal"
+            hx-get="/fragments/hostAddModal"
             hx-target="#hostModal"
+            hx-swap="innerHTML transition:true"
             hx-vals='js:{hosts: HostMap("u"), rack: "{{ .Rack }}"}'
-            onclick="document.getElementById('hostModal').showModal()">
+            onclick="document.startViewTransition(() => document.getElementById('hostModal').showModal()) ">
             Add Hosts
         </button>
         <button
@@ -32,6 +35,7 @@
             type="button"
             hx-delete="/api/host"
             hx-vals='js:{hosts: HostMap("hostname")}'
+            hx-swap="none"
             hx-confirm="Are you sure you want to delete the selected hosts?">
             Delete Hosts
         </button>
@@ -80,7 +84,7 @@
     </table>
 </form>
 
-<dialog id="hostModal" class="rounded-lg shadow-md transition-all duration-300 ease-in"></dialog>
+<dialog id="hostModal" class="h-5/6 w-full rounded-lg shadow-md md:w-2/3 lg:w-3/4"></dialog>
 
 <script>
     function SelectAllNodes() {

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"net/netip"
 	"strconv"
 	"strings"
 	"time"
@@ -217,11 +218,25 @@ func (h *Handler) HostAdd(f *fiber.Ctx) error {
 	p := f.FormValue("Provision")
 	bootImage := f.FormValue("BootImage")
 	tags := f.FormValue("Tags")
+	mgmtDomain := f.FormValue("Mgmt:Domain")
+	coreDomain := f.FormValue("Core:Domain")
+
+	mgmtMtu, err := strconv.Atoi(f.FormValue("Mgmt:Mtu"))
+	if err != nil {
+		return ToastError(f, err, "Failed to parse MTU")
+	}
+	coreMtu, err := strconv.Atoi(f.FormValue("Core:Mtu"))
+	if err != nil {
+		return ToastError(f, err, "Failed to parse MTU")
+	}
 
 	provision, _ := strconv.ParseBool(p)
 	hostList := strings.Split(f.FormValue("HostList"), ",")
 
 	for _, v := range hostList {
+		hostArr := strings.Split(v, "-")
+		noPrefix := strings.Join(hostArr[1:], "-")
+		bmcHost := fmt.Sprintf("bmc-%s", noPrefix)
 		mgmtMac, err := net.ParseMAC(f.FormValue(fmt.Sprintf("%s:MgmtMac", v)))
 		if err != nil {
 			return ToastError(f, err, "Failed to parse MAC address")
@@ -231,30 +246,42 @@ func (h *Handler) HostAdd(f *fiber.Ctx) error {
 			return ToastError(f, err, "Failed to parse MAC address")
 		}
 
-		ifaces := make([]*model.NetInterface, 0)
-		ifaces = append(ifaces, &model.NetInterface{
-			Name: "",
-			FQDN: "",
+		mgmtIp, err := netip.ParsePrefix(f.FormValue(fmt.Sprintf("%s:MgmtIp", v)))
+		if err != nil {
+			return ToastError(f, err, "Failed to parse IP address")
+		}
+		coreIp, err := netip.ParsePrefix(f.FormValue(fmt.Sprintf("%s:CoreIp", v)))
+		if err != nil {
+			return ToastError(f, err, "Failed to parse IP address")
+		}
+
+		ifaces := make([]*model.NetInterface, 2)
+		ifaces[0] = &model.NetInterface{
+			Name: f.FormValue("Mgmt:Ifname"),
+			FQDN: fmt.Sprintf("%s.%s", bmcHost, mgmtDomain),
+			IP:   mgmtIp,
 			MAC:  mgmtMac,
 			BMC:  true,
-			VLAN: "",
-			MTU:  1500,
-		})
-		ifaces = append(ifaces, &model.NetInterface{
-			Name: "",
-			FQDN: fmt.Sprintf("%s.core.ccr.buffalo.edu", v),
+			VLAN: f.FormValue("Mgmt:Vlan"),
+			MTU:  uint16(mgmtMtu),
+		}
+		ifaces[1] = &model.NetInterface{
+			Name: f.FormValue("Core:Ifname"),
+			FQDN: fmt.Sprintf("%s.%s", v, coreDomain),
+			IP:   coreIp,
 			MAC:  coreMac,
 			BMC:  false,
-			VLAN: "",
-			MTU:  9000,
-		})
+			VLAN: f.FormValue("Core:Vlan"),
+			MTU:  uint16(coreMtu),
+		}
 		newHost := model.Host{
-			ID:        ksuid.New(),
-			Name:      v,
-			Provision: provision,
-			BootImage: bootImage,
-			Firmware:  firmware.NewFromString(fw),
-			Tags:      strings.Split(tags, ","),
+			ID:         ksuid.New(),
+			Name:       v,
+			Provision:  provision,
+			BootImage:  bootImage,
+			Firmware:   firmware.NewFromString(fw),
+			Tags:       strings.Split(tags, ","),
+			Interfaces: ifaces,
 		}
 		err = h.DB.StoreHost(&newHost)
 		if err != nil {

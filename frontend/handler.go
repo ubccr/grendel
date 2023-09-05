@@ -30,9 +30,10 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	app.Get("/floorplan", keyAuth, h.Floorplan)
 	app.Get("/rack/:rack", keyAuth, h.Rack)
 
-	fragment := app.Group("/fragment")
+	fragment := app.Group("/fragments")
 	fragment.Get("/hostAddModal", keyAuth, h.HostAddModal)
 	fragment.Put("/hostAddModalList", keyAuth, h.HostAddModalList)
+	fragment.Put("/hostAddModalInterfaces", keyAuth, h.HostAddModalInterfaces)
 
 	api := app.Group("/api")
 	api.Post("/auth/login", h.LoginUser)
