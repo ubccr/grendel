@@ -16,8 +16,7 @@ func (h *Handler) HostAddModal(f *fiber.Ctx) error {
 		fw = append(fw, i)
 	}
 
-	return f.Render("hostModal", fiber.Map{
-		"Title":      "Add Host",
+	return f.Render("fragments/hostModal", fiber.Map{
 		"Rack":       f.FormValue("rack"),
 		"HostUs":     f.FormValue("hosts"),
 		"Firmwares":  fw,
