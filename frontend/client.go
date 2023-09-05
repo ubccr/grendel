@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/ubccr/grendel/firmware"
+	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
 )
 
@@ -88,6 +89,15 @@ func (h *Handler) Rack(f *fiber.Ctx) error {
 		return ToastError(f, err, "Failed to find hosts")
 	}
 
+	var filtered model.HostList
+	for _, v := range hosts {
+		if v.HostType() == "power" && !v.HasAnyTags("1u", "2u") {
+			continue
+		}
+
+		filtered = append(filtered, v)
+	}
+
 	u := make([]string, 0)
 	// TODO: move min and max rack u to grendel.toml
 	for i := 42; i >= 3; i-- {
@@ -97,7 +107,7 @@ func (h *Handler) Rack(f *fiber.Ctx) error {
 	return f.Render("rack", fiber.Map{
 		"Title": fmt.Sprintf("Grendel - %s", rack),
 		"u":     u,
-		"Hosts": hosts,
+		"Hosts": filtered,
 		"Rack":  rack,
 	})
 }
