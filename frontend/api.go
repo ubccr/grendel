@@ -137,6 +137,19 @@ func (h *Handler) EditHost(f *fiber.Ctx) error {
 	return ToastSuccess(f, "Successfully updated host")
 }
 
+func (h *Handler) DeleteHost(f *fiber.Ctx) error {
+	hosts := f.FormValue("hosts")
+	ns, err := nodeset.NewNodeSet(hosts)
+	if err != nil {
+		return ToastError(f, err, "Failed to parse node set")
+	}
+
+	h.DB.DeleteHosts(ns)
+
+	f.Response().Header.Add("HX-Refresh", "true")
+	return ToastSuccess(f, "Successfully deleted host(s)")
+}
+
 type RebootData struct {
 	Host string
 }

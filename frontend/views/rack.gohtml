@@ -27,6 +27,14 @@
             onclick="document.getElementById('hostModal').showModal()">
             Add Hosts
         </button>
+        <button
+            class="rounded-lg border border-neutral-400 p-1"
+            type="button"
+            hx-delete="/api/host"
+            hx-vals='js:{hosts: HostMap("hostname")}'
+            hx-confirm="Are you sure you want to delete the selected hosts?">
+            Delete Hosts
+        </button>
         <button class="rounded-lg border border-neutral-400 p-1" type="button" onclick="SelectAllNodes()">
             Select Nodes
         </button>

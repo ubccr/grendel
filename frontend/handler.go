@@ -39,6 +39,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	api.Post("/auth/logout", h.LogoutUser)
 	api.Post("/auth/register", h.RegisterUser)
 	api.Post("/host", keyAuth, h.EditHost)
+	api.Delete("/host", keyAuth, h.DeleteHost)
 	api.Post("/host/add", keyAuth, h.HostAdd)
 	api.Post("/bmc/reboot", keyAuth, h.RebootHost)
 	api.Post("/bmc/configure", keyAuth, h.BmcConfigure)
