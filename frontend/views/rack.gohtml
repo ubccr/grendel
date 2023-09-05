@@ -55,7 +55,10 @@
                 {{ end }}
                 <tr>
                     <td class="{{ $tdClasses }}">{{ $u }}</td>
-                    <td class="{{ $tdClasses }} hover:bg-neutral-50">
+                    <td
+                        class="{{ $tdClasses }} {{ if eq $hostType "switch" }}
+                            text-red-700
+                        {{ end }} hover:bg-neutral-50">
                         <a class="hover:font-medium" href="/host/{{ $hostName }}" hx-boost="false">
                             {{ $hostName }}
                         </a>
@@ -78,11 +81,13 @@
             if (n[2] === "server") val.checked = true;
         });
     }
+
     function Clear() {
         var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
             val.checked = false;
         });
     }
+
     function HostMap(type = "hostname") {
         var h = [];
         var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
@@ -94,4 +99,24 @@
         });
         return h.join(",");
     }
+
+    var lastChecked = null;
+    checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"]'));
+    checkboxes.forEach((val) => {
+        val.addEventListener("click", function (e) {
+            if (lastChecked !== null && e.shiftKey) {
+                var start = checkboxes.indexOf(lastChecked);
+                var end = checkboxes.indexOf(this);
+
+                // reverse in case of selecting from bottom to top
+                var first = start < end ? start : end;
+                var last = start < end ? end : start;
+
+                for (let i = first; i <= last; i++) {
+                    checkboxes[i].checked = this.checked;
+                }
+            }
+            lastChecked = this;
+        });
+    });
 </script>
