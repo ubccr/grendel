@@ -45,7 +45,7 @@
 
         <div class="my-1">
             <label for="Firmware" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Firmware:</label>
-            <select class="w-full rounded-lg border border-blue-500 p-1" name="Firmware" id="Firmware">
+            <select class="w-full rounded-lg border border-blue-500 bg-white px-2 py-1" name="Firmware" id="Firmware">
                 <option value="" class="italic">None</option>
                 {{ $fw := Sprintf "%s" $.Host.Firmware }}
                 {{ range .Firmware }}
@@ -60,7 +60,7 @@
 
         <div class="my-1">
             <label for="BootImage" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Boot Image:</label>
-            <select class="w-full rounded-lg border border-blue-500 p-1" name="BootImage" id="BootImage">
+            <select class="w-full rounded-lg border border-blue-500 bg-white px-2 py-1" name="BootImage" id="BootImage">
                 <option value="" class="italic">None</option>
                 {{ range .BootImages }}
                     <option

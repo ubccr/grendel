@@ -27,7 +27,7 @@
             hx-target="#hostModal"
             hx-swap="innerHTML transition:true"
             hx-vals='js:{hosts: HostMap("u"), rack: "{{ .Rack }}"}'
-            onclick="document.startViewTransition(() => document.getElementById('hostModal').showModal()) ">
+            onclick="useTransition(() => document.getElementById('hostModal').showModal())">
             Add Hosts
         </button>
         <button

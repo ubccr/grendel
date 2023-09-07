@@ -87,6 +87,13 @@
             document.getElementById("icon-bars").hidden = m;
             document.getElementById("icon-x").hidden = !m;
         }
+        function useTransition(func) {
+            if (!document.startViewTransition) {
+                return func();
+            } else {
+                document.startViewTransition(func());
+            }
+        }
     </script>
 </html>
 
