@@ -34,8 +34,14 @@ func (h *Handler) Host(f *fiber.Ctx) error {
 		return ToastError(f, fmt.Errorf("invalid host"), "Invalid host")
 	}
 
-	host, _ := h.DB.FindHosts(reqHost)
-	bootImages, _ := h.DB.BootImages()
+	host, err := h.DB.FindHosts(reqHost)
+	if err != nil || len(host) == 0 {
+		return ToastError(f, err, "Failed to find host")
+	}
+	bootImages, err := h.DB.BootImages()
+	if err != nil {
+		return ToastError(f, err, "Failed to load boot images")
+	}
 
 	fw := make([]string, 0)
 	for _, i := range firmware.BuildToStringMap {
