@@ -4,6 +4,10 @@ go 1.21
 
 toolchain go1.21.0
 
+require github.com/gofiber/storage/buntstore/v2 v2.0.0
+
+replace github.com/gofiber/storage/buntstore/v2 v2.0.0 => github.com/jafurlan/storage/buntstore/v2 v2.0.0-20230908033914-7daaa7ff133f
+
 require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
 	github.com/Pallinder/go-randomdata v1.2.0
@@ -33,8 +37,8 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.15.0
 	github.com/stmcginnis/gofish v0.2.0
-	github.com/stretchr/testify v1.8.2
-	github.com/tidwall/buntdb v1.2.10
+	github.com/stretchr/testify v1.8.4
+	github.com/tidwall/buntdb v1.3.0
 	github.com/tidwall/gjson v1.14.4
 	github.com/tidwall/sjson v1.2.5
 	github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb
@@ -69,6 +73,7 @@ require (
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/gofiber/fiber/v2 v2.49.0 // indirect
 	github.com/gofiber/template/html/v2 v2.0.5
+	github.com/gofiber/utils/v2 v2.0.0-beta.3 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.1 // indirect

@@ -8,8 +8,11 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/gofiber/storage/buntstore/v2"
 	"github.com/gofiber/template/html/v2"
 	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
@@ -79,16 +82,26 @@ func NewServer(db model.DataStore, address string) (*Server, error) {
 	return s, nil
 }
 
-
 func (s *Server) Serve() error {
-	h, err := NewHandler(s.DB)
+	storage := buntstore.New(buntstore.Config{
+		GCInterval: 5 * time.Minute,
+		DbPath:     "./grendel.db",
+	})
+	store := session.New(session.Config{
+		Expiration:     8 * time.Hour,
+		CookieSecure:   true,
+		CookieHTTPOnly: true,
+		Storage:        storage,
+	})
+
+	h, err := NewHandler(s.DB, store)
 	if err != nil {
 		return err
 	}
 	var funcMap = fiber.Map{
-		"Split":     strings.Split,
-		"Join":      strings.Join,
-		"Sprintf":   fmt.Sprintf,
+		"Split":   strings.Split,
+		"Join":    strings.Join,
+		"Sprintf": fmt.Sprintf,
 		"Stringify": func(v interface{}) string {
 			b, _ := json.MarshalIndent(v, "", "    ")
 			return string(b)
@@ -97,9 +110,8 @@ func (s *Server) Serve() error {
 
 	engine := html.New("./frontend/views/", ".gohtml")
 	engine.AddFuncMap(funcMap)
-
 	app := fiber.New(fiber.Config{
-		Views: engine,
+		Views:       engine,
 		ViewsLayout: "base",
 	})
 

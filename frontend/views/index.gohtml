@@ -1,25 +1,12 @@
 <div class="flex-col justify-center">
     <h1 class="mb-4 text-7xl">Grendel</h1>
     <hr />
-    <h2 class="mt-1 text-lg" id="register">
-        New users can register
-        <a class="text-blue-600 hover:text-blue-400" href="/register">here.</a>
-    </h2>
-    <h2 class="mt-1 text-lg" id="welcome" hidden>
-        Welcome
-        <span id="user" class="font-medium">/user/</span>
-        ! Successfully logged in.
-    </h2>
+    {{ if ne .Auth.User nil }}
+        <h2 class="mt-1 text-lg" id="welcome">Welcome {{ .Auth.User }}! Successfully logged in.</h2>
+    {{ else }}
+        <h2 class="mt-1 text-lg" id="register">
+            New users can register
+            <a class="text-blue-600 hover:text-blue-400" href="/register">here.</a>
+        </h2>
+    {{ end }}
 </div>
-<script>
-    if (document.cookie.includes("User")) {
-        let cookies = {};
-        document.cookie.split(";").forEach((e) => {
-            const [key, val] = e.split("=");
-            cookies[key.trim()] = val;
-        });
-        document.getElementById("register").hidden = true;
-        document.getElementById("welcome").hidden = false;
-        document.getElementById("user").textContent = cookies["User"];
-    }
-</script>

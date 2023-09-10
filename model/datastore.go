@@ -45,7 +45,7 @@ type DataStore interface {
 	// StoreUser stores the User in the data store
 	StoreUser(username, password string) error
 
-	// CheckUser checks if the given username exists in the data store
+	// VerifyUser checks if the given username exists in the data store
 	VerifyUser(username, password string) (bool, error)
 
 	// BootImages returns a list of all boot images

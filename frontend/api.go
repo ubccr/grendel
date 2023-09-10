@@ -32,38 +32,20 @@ func (h *Handler) LoginUser(f *fiber.Ctx) error {
 
 		return ToastError(f, err, msg)
 	}
-	sess, _ := h.Store.Get(f)
+	sess, err := h.Store.Get(f)
+	if err != nil {
+		return ToastError(f, err, "Error getting session")
+	}
 
+	sess.Set("authenticated", val)
 	sess.Set("user", user)
 	sess.Set("role", "admin")
 
 	if err := sess.Save(); err != nil {
-		return ToastError(f, err, "Internal server error")
+		return ToastError(f, err, "Failed to save session")
 	}
-
-	tCookie := new(fiber.Cookie)
-	uCookie := new(fiber.Cookie)
-
-	t, e, err := Sign(user, "user")
-	if err != nil {
-		return ToastError(f, err, "Internal server error")
-	}
-	tCookie.Name = "Authorization"
-	tCookie.Value = t
-	tCookie.HTTPOnly = true
-	tCookie.Secure = true
-	tCookie.Expires = e
-	tCookie.Path = "/"
-	f.Cookie(tCookie)
-
-	uCookie.Name = "User"
-	uCookie.Value = user
-	uCookie.Expires = e
-	uCookie.Path = "/"
-	f.Cookie(uCookie)
 
 	f.Response().Header.Add("HX-Redirect", "/")
-
 	return ToastSuccess(f, "Successfully logged in")
 }
 
@@ -71,23 +53,7 @@ func (h *Handler) LogoutUser(f *fiber.Ctx) error {
 	sess, _ := h.Store.Get(f)
 	sess.Destroy()
 
-	t := new(fiber.Cookie)
-	u := new(fiber.Cookie)
-
-	t.Name = "Authorization"
-	t.Value = ""
-	t.Expires = time.Now()
-	t.Path = "/"
-	f.Cookie(t)
-
-	u.Name = "User"
-	u.Value = ""
-	u.Expires = time.Now()
-	u.Path = "/"
-	f.Cookie(u)
-
 	f.Response().Header.Add("HX-Redirect", "/")
-
 	return ToastSuccess(f, "Successfully logged out")
 }
 
