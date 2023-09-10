@@ -17,23 +17,15 @@
             <nav class="bg-white p-4 xl:px-12">
                 {{ define "nav" }}
                     {{ $linkClasses := "rounded-md px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-200" }}
-                    <a class="{{ $linkClasses }} {{ if eq . "mobile" }}block{{ end }}" href="/" hx-boost="false">
-                        Home
-                    </a>
+                    <a class="{{ $linkClasses }} {{ if eq . "mobile" }}block{{ end }}" href="/" hx-boost="true">Home</a>
                     <a
                         class="{{ $linkClasses }} {{ if eq . "mobile" }}block{{ end }}"
                         href="/floorplan"
-                        hx-boost="false">
+                        hx-boost="true">
                         Floorplan
                     </a>
-                    <!-- <a
-                        class="{{ $linkClasses }} {{ if eq . "mobile" }}block{{ end }}"
-                        href="/grendel/add"
-                        hx-boost="false">
-                        Add
-                    </a> -->
                 {{ end }}
-                <div class="flex justify-between">
+                <div class="flex">
                     <button
                         class="border-netural-400 block rounded-lg border p-1 px-2 hover:text-neutral-700 sm:hidden"
                         onclick="showMobile()">
@@ -44,15 +36,37 @@
                             {{ template "icon-x-mark" }}
                         </span>
                     </button>
-                    <div class="flex">
+                    <div class="flex whitespace-nowrap">
                         <img src="/favicon.ico" alt="UBCCR" width="{36}" height="{36}" />
-                        <div class="ml-2 mt-2 hidden space-y-1 sm:my-auto sm:ml-4 sm:block" hidden>
+                        <div class="ml-2 mt-2 space-y-1 sm:my-auto sm:ml-4 sm:block" hidden>
                             {{ template "nav" "desktop" }}
                         </div>
                     </div>
-                    <div class="my-auto">
-                        <a href="/login" id="login" hx-boost="false">Login</a>
-                        <button hx-post="/api/auth/logout" hx-swap="none" id="logout" hidden>Logout</button>
+                    <div class="flex-grow"></div>
+                    <div class="my-auto flex gap-4">
+                        {{ if eq .Auth.User nil }}
+                            <a href="/login" id="login" hx-boost="true">Login</a>
+                        {{ else }}
+                            <div class="flex gap-1 rounded-md border border-neutral-200 px-1">
+                                <span class="my-auto text-neutral-300">
+                                    {{ template "icon-magnifying-glass" }}
+                                </span>
+                                <input
+                                    type="search"
+                                    list="search"
+                                    name="search"
+                                    class="w-44 px-2 py-1"
+                                    hx-get="/api/search"
+                                    hx-trigger="keyup[keyCode==13]"
+                                    hx-swap="none" />
+                                <datalist id="search">
+                                    {{ range .SearchList }}
+                                        <option value="{{ .Name }}">{{ .Name }}</option>
+                                    {{ end }}
+                                </datalist>
+                            </div>
+                            <button hx-post="/api/auth/logout" hx-swap="none" id="logout">Logout</button>
+                        {{ end }}
                     </div>
                 </div>
                 <div id="mobile-menu" class="ml-2 mt-2 space-y-1" hidden>
@@ -69,18 +83,19 @@
     </body>
 
     <script>
-        var notyf = new Notyf();
-        document.body.addEventListener("toast-error", function (e) {
-            notyf.error(e.detail.value);
-        });
-        document.body.addEventListener("toast-success", function (e) {
-            notyf.success(e.detail.value);
-        });
-
-        if (document.cookie.includes("User")) {
-            document.getElementById("login").hidden = true;
-            document.getElementById("logout").hidden = false;
+        if (!notyf) {
+            var notyf = new Notyf({
+                duration: 3000,
+                dismissible: false,
+            });
+            document.body.addEventListener("toast-error", function (e) {
+                notyf.error(e.detail.value);
+            });
+            document.body.addEventListener("toast-success", function (e) {
+                notyf.success(e.detail.value);
+            });
         }
+
         function showMobile() {
             const m = document.getElementById("mobile-menu").hidden;
             document.getElementById("mobile-menu").hidden = !m;
@@ -161,5 +176,20 @@
         stroke="currentColor"
         class="h-6 w-6">
         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+{{ end }}
+
+{{ define "icon-magnifying-glass" }}
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="h-6 w-6">
+        <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
     </svg>
 {{ end }}

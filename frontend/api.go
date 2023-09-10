@@ -32,35 +32,45 @@ func (h *Handler) LoginUser(f *fiber.Ctx) error {
 
 		return ToastError(f, err, msg)
 	}
-	if val {
-		tCookie := new(fiber.Cookie)
-		uCookie := new(fiber.Cookie)
+	sess, _ := h.Store.Get(f)
 
-		t, e, err := Sign(user, "user")
-		if err != nil {
-			return ToastError(f, err, "Internal server error")
-		}
-		tCookie.Name = "Authorization"
-		tCookie.Value = t
-		tCookie.HTTPOnly = true
-		tCookie.Secure = true
-		tCookie.Expires = e
-		tCookie.Path = "/"
-		f.Cookie(tCookie)
+	sess.Set("user", user)
+	sess.Set("role", "admin")
 
-		uCookie.Name = "User"
-		uCookie.Value = user
-		uCookie.Expires = e
-		uCookie.Path = "/"
-		f.Cookie(uCookie)
-
-		f.Response().Header.Add("HX-Redirect", "/")
+	if err := sess.Save(); err != nil {
+		return ToastError(f, err, "Internal server error")
 	}
+
+	tCookie := new(fiber.Cookie)
+	uCookie := new(fiber.Cookie)
+
+	t, e, err := Sign(user, "user")
+	if err != nil {
+		return ToastError(f, err, "Internal server error")
+	}
+	tCookie.Name = "Authorization"
+	tCookie.Value = t
+	tCookie.HTTPOnly = true
+	tCookie.Secure = true
+	tCookie.Expires = e
+	tCookie.Path = "/"
+	f.Cookie(tCookie)
+
+	uCookie.Name = "User"
+	uCookie.Value = user
+	uCookie.Expires = e
+	uCookie.Path = "/"
+	f.Cookie(uCookie)
+
+	f.Response().Header.Add("HX-Redirect", "/")
 
 	return ToastSuccess(f, "Successfully logged in")
 }
 
 func (h *Handler) LogoutUser(f *fiber.Ctx) error {
+	sess, _ := h.Store.Get(f)
+	sess.Destroy()
+
 	t := new(fiber.Cookie)
 	u := new(fiber.Cookie)
 
@@ -329,4 +339,11 @@ func (h *Handler) SwitchMac(f *fiber.Ctx) error {
 		"Hosts":    hostList,
 		"HostList": strings.Join(hosts, ","),
 	}, "")
+}
+
+func (h *Handler) Search(f *fiber.Ctx) error {
+	search := f.FormValue("search")
+
+	f.Response().Header.Add("HX-Redirect", fmt.Sprintf("/host/%s", search))
+	return nil
 }
