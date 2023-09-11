@@ -2,7 +2,7 @@
 
 Programs such as: https://github.com/mitranim/gow can be used to auto rebuild & restart the grendel binary whenever you save a file.
 
-Example command: `gow -e go,gohtml run . serve frontend -c grendel.toml`
+Example command: `gow -e go,gohtml,css run . serve frontend -c grendel.toml`
 
 TailwindCSS is used for client side HTML styling, changing the tailwind classes will require recompiling the `frontend/public/tailwind.css` file. You can install the standalone Tailwind CLI, or use the node package, to automatically rebuild the css file. See https://tailwindcss.com/docs/installation for more details.
 
