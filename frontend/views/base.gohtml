@@ -54,8 +54,8 @@
                     </div>
                 </div>
                 <div id="mobile-menu" class="ml-2 mt-2 space-y-1 sm:hidden" hidden>
-                    {{ template "nav" "mobile" }}
                     {{ template "navSearch" .SearchList }}
+                    {{ template "nav" "mobile" }}
                 </div>
             </nav>
             <div class="flex justify-center px-2 py-4 text-center">
@@ -91,7 +91,7 @@
             if (!document.startViewTransition) {
                 return func();
             } else {
-                document.startViewTransition(func());
+                document.startViewTransition(() => func());
             }
         }
     </script>

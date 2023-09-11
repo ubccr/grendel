@@ -1,9 +1,16 @@
 <div class="m-2">
     <h1 class="mb-3 text-xl">Add Hosts</h1>
     <div class="mb-2 flex justify-center gap-2">
-        <button class="border-b-2 border-blue-500 px-1" type="button" onclick="showTab('details')">Details</button>
-        <button class="border-b-2 border-blue-500 px-1" type="button" onclick="showTab('mapping')">Port Mapping</button>
-        <button class="border-b-2 border-blue-500 px-1" type="button" onclick="showTab('interfaces')">
+        <button class="border-b-2 border-blue-500 px-1" type="button" onclick="useTransition(() => showTab('details'))">
+            Details
+        </button>
+        <button class="border-b-2 border-blue-500 px-1" type="button" onclick="useTransition(() => showTab('mapping'))">
+            Port Mapping
+        </button>
+        <button
+            class="border-b-2 border-blue-500 px-1"
+            type="button"
+            onclick="useTransition(() => showTab('interfaces'))">
             Interfaces
         </button>
     </div>
@@ -215,21 +222,19 @@
         var details = document.getElementById("details");
         var mapping = document.getElementById("mapping");
         var interfaces = document.getElementById("interfaces");
-        useTransition(() => {
-            if (tab === "details") {
-                details.classList.remove("hidden");
-                mapping.classList.add("hidden");
-                interfaces.classList.add("hidden");
-            } else if (tab === "mapping") {
-                details.classList.add("hidden");
-                mapping.classList.remove("hidden");
-                interfaces.classList.add("hidden");
-            } else if (tab === "interfaces") {
-                details.classList.add("hidden");
-                mapping.classList.add("hidden");
-                interfaces.classList.remove("hidden");
-            }
-        });
+        if (tab === "details") {
+            details.classList.remove("hidden");
+            mapping.classList.add("hidden");
+            interfaces.classList.add("hidden");
+        } else if (tab === "mapping") {
+            details.classList.add("hidden");
+            mapping.classList.remove("hidden");
+            interfaces.classList.add("hidden");
+        } else if (tab === "interfaces") {
+            details.classList.add("hidden");
+            mapping.classList.add("hidden");
+            interfaces.classList.remove("hidden");
+        }
     }
 
     function closeModal() {
