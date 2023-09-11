@@ -37,6 +37,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 				"Role":          sess.Get("role"),
 			},
 			"SearchList": hostList,
+			"CurrentPath": c.Path(),
 		})
 		if err != nil {
 			log.Error(err)

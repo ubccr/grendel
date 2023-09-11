@@ -12,19 +12,10 @@
         <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
     </head>
 
+    {{ $linkClasses := "rounded-md px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-200" }}
     <body>
         <div class="min-h-screen bg-large-triangles-ub">
             <nav class="bg-white p-4 xl:px-12">
-                {{ define "nav" }}
-                    {{ $linkClasses := "rounded-md px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-200" }}
-                    <a class="{{ $linkClasses }} {{ if eq . "mobile" }}block{{ end }}" href="/" hx-boost="true">Home</a>
-                    <a
-                        class="{{ $linkClasses }} {{ if eq . "mobile" }}block{{ end }}"
-                        href="/floorplan"
-                        hx-boost="true">
-                        Floorplan
-                    </a>
-                {{ end }}
                 <div class="flex justify-between">
                     <button
                         class="border-netural-400 block rounded-lg border p-1 px-2 hover:text-neutral-700 sm:hidden"
@@ -39,7 +30,18 @@
                     <div class="flex whitespace-nowrap">
                         <img src="/favicon.ico" alt="UBCCR" width="{36}" height="{36}" />
                         <div class="ml-2 mt-2 space-y-1 sm:my-auto sm:ml-4 sm:block" hidden>
-                            {{ template "nav" "desktop" }}
+                            <a
+                                class="{{ $linkClasses }} {{ if eq .CurrentPath "/" }}bg-neutral-100{{ end }}"
+                                href="/"
+                                hx-boost="true">
+                                Home
+                            </a>
+                            <a
+                                class="{{ $linkClasses }} {{ if eq .CurrentPath "/floorplan" }}bg-neutral-100{{ end }}"
+                                href="/floorplan"
+                                hx-boost="true">
+                                Floorplan
+                            </a>
                         </div>
                     </div>
                     <div class="my-auto flex gap-4">
@@ -55,7 +57,18 @@
                 </div>
                 <div id="mobile-menu" class="ml-2 mt-2 space-y-1 sm:hidden" hidden>
                     {{ template "navSearch" .SearchList }}
-                    {{ template "nav" "mobile" }}
+                    <a
+                        class="{{ $linkClasses }} {{ if eq .CurrentPath "/" }}bg-neutral-100{{ end }} block"
+                        href="/"
+                        hx-boost="true">
+                        Home
+                    </a>
+                    <a
+                        class="{{ $linkClasses }} {{ if eq .CurrentPath "/floorplan" }}bg-neutral-100{{ end }} block"
+                        href="/floorplan"
+                        hx-boost="true">
+                        Floorplan
+                    </a>
                 </div>
             </nav>
             <div class="flex justify-center px-2 py-4 text-center">
