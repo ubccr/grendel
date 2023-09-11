@@ -1,0 +1,20 @@
+{{ define "navSearch" }}
+    <div class="flex content-center gap-1 rounded-md border border-neutral-200 px-1">
+        <span class="float-left my-auto text-neutral-300">
+            {{ template "icon-magnifying-glass" }}
+        </span>
+        <input
+            type="search"
+            list="search"
+            name="search"
+            class="w-full rounded-md px-2 py-1"
+            hx-get="/api/search"
+            hx-trigger="keyup[keyCode==13]"
+            hx-swap="none" />
+        <datalist id="search">
+            {{ range . }}
+                <option value="{{ .Name }}">{{ .Name }}</option>
+            {{ end }}
+        </datalist>
+    </div>
+{{ end }}

@@ -25,10 +25,10 @@
                         Floorplan
                     </a>
                 {{ end }}
-                <div class="flex">
+                <div class="flex justify-between">
                     <button
                         class="border-netural-400 block rounded-lg border p-1 px-2 hover:text-neutral-700 sm:hidden"
-                        onclick="showMobile()">
+                        onclick="useTransition(() => showMobile())">
                         <span id="icon-bars" class="">
                             {{ template "icon-bars-3" }}
                         </span>
@@ -42,35 +42,20 @@
                             {{ template "nav" "desktop" }}
                         </div>
                     </div>
-                    <div class="flex-grow"></div>
                     <div class="my-auto flex gap-4">
                         {{ if eq .Auth.User nil }}
                             <a href="/login" id="login" hx-boost="true">Login</a>
                         {{ else }}
-                            <div class="flex gap-1 rounded-md border border-neutral-200 px-1">
-                                <span class="my-auto text-neutral-300">
-                                    {{ template "icon-magnifying-glass" }}
-                                </span>
-                                <input
-                                    type="search"
-                                    list="search"
-                                    name="search"
-                                    class="w-44 px-2 py-1"
-                                    hx-get="/api/search"
-                                    hx-trigger="keyup[keyCode==13]"
-                                    hx-swap="none" />
-                                <datalist id="search">
-                                    {{ range .SearchList }}
-                                        <option value="{{ .Name }}">{{ .Name }}</option>
-                                    {{ end }}
-                                </datalist>
+                            <div class="mx-1 hidden sm:flex">
+                                {{ template "navSearch" .SearchList }}
                             </div>
                             <button hx-post="/api/auth/logout" hx-swap="none" id="logout">Logout</button>
                         {{ end }}
                     </div>
                 </div>
-                <div id="mobile-menu" class="ml-2 mt-2 space-y-1" hidden>
+                <div id="mobile-menu" class="ml-2 mt-2 space-y-1 sm:hidden" hidden>
                     {{ template "nav" "mobile" }}
+                    {{ template "navSearch" .SearchList }}
                 </div>
             </nav>
             <div class="flex justify-center px-2 py-4 text-center">
