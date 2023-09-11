@@ -179,14 +179,6 @@ func initConfig() {
 
 		viper.Set("api.secret", secret)
 	}
-	if !viper.IsSet("frontend.signingKey") {
-		secret, err := util.GenerateSecret(64)
-		if err != nil {
-			Log.Fatal(err)
-		}
-
-		viper.Set("frontend.signingKey", secret)
-	}
 
 	err := model.ParseConfigs()
 	if err != nil {
