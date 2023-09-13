@@ -36,7 +36,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 				"User":          sess.Get("user"),
 				"Role":          sess.Get("role"),
 			},
-			"SearchList": hostList,
+			"SearchList":  hostList,
 			"CurrentPath": c.Path(),
 		})
 		if err != nil {
@@ -53,6 +53,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	app.Get("/host/:host", auth, h.Host)
 	app.Get("/floorplan", auth, h.Floorplan)
 	app.Get("/rack/:rack", auth, h.Rack)
+	app.Get("/users", auth, h.Users)
 
 	fragment := app.Group("/fragments")
 	fragment.Get("/hostAddModal", auth, h.HostAddModal)

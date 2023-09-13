@@ -117,3 +117,14 @@ func (h *Handler) Rack(f *fiber.Ctx) error {
 		"Rack":  rack,
 	})
 }
+
+func (h *Handler) Users(f *fiber.Ctx) error {
+	users, err := h.DB.GetUsers()
+	if err != nil {
+		return ToastError(f, err, "Failed to load users")
+	}
+
+	return f.Render("users", fiber.Map{
+		"Users": users,
+	})
+}
