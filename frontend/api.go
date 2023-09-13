@@ -21,7 +21,7 @@ func (h *Handler) LoginUser(f *fiber.Ctx) error {
 	user := f.FormValue("username")
 	pass := f.FormValue("password")
 
-	val, err := h.DB.VerifyUser(user, pass)
+	val, role, err := h.DB.VerifyUser(user, pass)
 	if err != nil || !val {
 		msg := "Internal server error"
 		if err.Error() == "crypto/bcrypt: hashedPassword is not the hash of the given password" {
@@ -39,7 +39,7 @@ func (h *Handler) LoginUser(f *fiber.Ctx) error {
 
 	sess.Set("authenticated", val)
 	sess.Set("user", user)
-	sess.Set("role", "admin")
+	sess.Set("role", role)
 
 	if err := sess.Save(); err != nil {
 		return ToastError(f, err, "Failed to save session")
@@ -191,7 +191,11 @@ func (h *Handler) BmcConfigure(f *fiber.Ctx) error {
 
 func (h *Handler) HostAdd(f *fiber.Ctx) error {
 	fw := f.FormValue("Firmware")
-	p := f.FormValue("Provision")
+	pString := f.FormValue("Provision")
+	provision := false
+	if pString == "on" {
+		provision = true
+	}
 	bootImage := f.FormValue("BootImage")
 	tags := f.FormValue("Tags")
 	mgmtDomain := f.FormValue("Mgmt:Domain")
@@ -206,7 +210,6 @@ func (h *Handler) HostAdd(f *fiber.Ctx) error {
 		return ToastError(f, err, "Failed to parse MTU")
 	}
 
-	provision, _ := strconv.ParseBool(p)
 	hostList := strings.Split(f.FormValue("HostList"), ",")
 
 	for _, v := range hostList {

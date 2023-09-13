@@ -84,25 +84,25 @@
     </table>
 </form>
 
-<dialog id="hostModal" class="h-5/6 w-full rounded-lg shadow-md md:w-2/3 lg:w-3/4"></dialog>
+<dialog id="hostModal" class="w-full rounded-lg shadow-md md:w-2/3 lg:w-3/4"></dialog>
 
 <script>
     function SelectAllNodes() {
-        var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
+        var c = document.querySelectorAll('td > input[type="checkbox"]').forEach((val) => {
             var n = val.name.split(":");
             if (n[2] === "server") val.checked = true;
         });
     }
 
     function Clear() {
-        var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
+        var c = document.querySelectorAll('td > input[type="checkbox"]').forEach((val) => {
             val.checked = false;
         });
     }
 
     function HostMap(type = "hostname") {
         var h = [];
-        var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
+        var c = document.querySelectorAll('td > input[type="checkbox"]').forEach((val) => {
             if (val.checked === true) {
                 var n = val.name.split(":");
                 if (type === "hostname") h.push(n[1]);
@@ -113,7 +113,7 @@
     }
 
     var lastChecked = null;
-    checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"]'));
+    checkboxes = Array.from(document.querySelectorAll('td > input[type="checkbox"]'));
     checkboxes.forEach((val) => {
         val.addEventListener("click", function (e) {
             if (lastChecked !== null && e.shiftKey) {

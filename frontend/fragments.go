@@ -61,7 +61,7 @@ func (h *Handler) HostAddModalList(f *fiber.Ctx) error {
 		hostList[i] = host
 		hostArr[i] = hostStruct{
 			Host:     host,
-			MgmtPort: f.FormValue(fmt.Sprintf("%s:Mgmt", host), ""),
+			MgmtPort: f.FormValue(fmt.Sprintf("%s:Mgmt", host), v),
 			CorePort: f.FormValue(fmt.Sprintf("%s:Core", host), ""),
 			MgmtMac:  f.FormValue(fmt.Sprintf("%s:MgmtMac", host), ""),
 			CoreMac:  f.FormValue(fmt.Sprintf("%s:CoreMac", host), ""),
