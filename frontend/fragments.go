@@ -114,3 +114,14 @@ func (h *Handler) HostAddModalInterfaces(f *fiber.Ctx) error {
 	}, "")
 
 }
+
+func (h *Handler) userTable(f *fiber.Ctx) error {
+	users, err := h.DB.GetUsers()
+	if err != nil {
+		return ToastError(f, err, "Failed to load users")
+	}
+
+	return f.Render("fragments/userTable", fiber.Map{
+		"Users": users,
+	}, "")
+}

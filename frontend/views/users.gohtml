@@ -1,24 +1,25 @@
-<h1 class="mb-4 text-3xl">Users:</h1>
-<div class="flex justify-center">
-    {{ $tdClasses := "border border-gray-400 px-2 py-1" }}
-    <table class="table-fixed">
-        <thead>
-            <tr>
-                <th class="{{ $tdClasses }}">Username</th>
-                <th class="{{ $tdClasses }}">Role</th>
-                <th class="{{ $tdClasses }}">Created At</th>
-                <th class="{{ $tdClasses }}">Modified At</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{ range .Users }}
-                <tr>
-                    <td class="{{ $tdClasses }}">{{ .Username }}</td>
-                    <td class="{{ $tdClasses }}">{{ .Role }}</td>
-                    <td class="{{ $tdClasses }}">{{ .CreatedAt.Format "Jan 02, 2006 15:04:05 EST" }}</td>
-                    <td class="{{ $tdClasses }}">{{ .ModifiedAt.Format "Jan 02, 2006 15:04:05 EST" }}</td>
-                </tr>
-            {{ end }}
-        </tbody>
-    </table>
+<div>
+    <h1 class="mb-4 text-3xl">Users:</h1>
+    <div class="flex-col justify-center">
+        <div class="flex justify-center" hx-get="/fragments/userTable" hx-trigger="load, updateUsers from:body"></div>
+        <div class="mt-4 flex justify-center gap-2">
+            <form hx-post="/api/users" hx-vals="js:{Usernames: getUsers()}" hx-swap="none">
+                <select class="rounded-md border border-neutral-400 px-2 py-1" name="Role">
+                    <option value="disabled">Disabled</option>
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                </select>
+                <button class="rounded-md bg-blue-500 px-2 py-1 text-white" type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
 </div>
+<script>
+    function getUsers() {
+        var userArr = [];
+        document.querySelectorAll("input[type=checkbox]").forEach((checkbox) => {
+            if (checkbox.checked) userArr.push(checkbox.name);
+        });
+        return userArr.join(",");
+    }
+</script>

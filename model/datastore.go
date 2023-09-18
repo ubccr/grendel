@@ -46,7 +46,13 @@ type DataStore interface {
 	StoreUser(username, password string) error
 
 	// VerifyUser checks if the given username exists in the data store
-	VerifyUser(username, password string) (bool, error)
+	VerifyUser(username, password string) (bool, string, error)
+
+	// GetUsers returns a list of all the usernames
+	GetUsers() ([]User, error)
+
+	// UpdateUser updates the role of the given users
+	UpdateUser(username, role string) error
 
 	// BootImages returns a list of all boot images
 	BootImages() (BootImageList, error)

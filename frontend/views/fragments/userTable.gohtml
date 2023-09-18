@@ -1,0 +1,25 @@
+{{ $tdClasses := "border border-gray-400 px-2 py-1" }}
+<table class="table-fixed">
+    <thead>
+        <tr>
+            <th class="{{ $tdClasses }}">Username</th>
+            <th class="{{ $tdClasses }}">Role</th>
+            <th class="{{ $tdClasses }}">Created At</th>
+            <th class="{{ $tdClasses }}">Modified At</th>
+            <th class="{{ $tdClasses }}"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range .Users }}
+            <tr>
+                <td class="{{ $tdClasses }}">{{ .Username }}</td>
+                <td class="{{ $tdClasses }}">{{ .Role }}</td>
+                <td class="{{ $tdClasses }}">{{ .CreatedAt.Format "Jan 02, 2006 15:04:05 MST" }}</td>
+                <td class="{{ $tdClasses }}">{{ .ModifiedAt.Format "Jan 02, 2006 15:04:05 MST" }}</td>
+                <td class="{{ $tdClasses }}">
+                    <input type="checkbox" name="{{ .Username }}" />
+                </td>
+            </tr>
+        {{ end }}
+    </tbody>
+</table>

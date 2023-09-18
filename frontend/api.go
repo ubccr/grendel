@@ -29,7 +29,6 @@ func (h *Handler) LoginUser(f *fiber.Ctx) error {
 		} else if err.Error() == "not found" {
 			msg = "Failed to login: Username not found."
 		}
-
 		return ToastError(f, err, msg)
 	}
 	sess, err := h.Store.Get(f)
@@ -46,7 +45,7 @@ func (h *Handler) LoginUser(f *fiber.Ctx) error {
 	}
 
 	f.Response().Header.Add("HX-Redirect", "/")
-	return ToastSuccess(f, "Successfully logged in")
+	return ToastSuccess(f, "Successfully logged in", ``)
 }
 
 func (h *Handler) LogoutUser(f *fiber.Ctx) error {
@@ -54,19 +53,26 @@ func (h *Handler) LogoutUser(f *fiber.Ctx) error {
 	sess.Destroy()
 
 	f.Response().Header.Add("HX-Redirect", "/")
-	return ToastSuccess(f, "Successfully logged out")
+	return ToastSuccess(f, "Successfully logged out", ``)
 }
 
 func (h *Handler) RegisterUser(f *fiber.Ctx) error {
 	u := f.FormValue("username")
 	p := f.FormValue("password")
 
+	msg := "Successfully registered user"
+
 	err := h.DB.StoreUser(u, p)
 	if err != nil {
-		return ToastError(f, err, "Failed to register user")
+		if err.Error() == fmt.Sprintf("user %s already exists", u) {
+			msg = "Failed to register: Username already exists"
+		} else {
+			msg = "Failed to register user"
+		}
+		return ToastError(f, err, msg)
 	}
 
-	return ToastSuccess(f, "Successfully registered user")
+	return ToastSuccess(f, msg, ``)
 }
 
 type FormData struct {
@@ -111,7 +117,7 @@ func (h *Handler) EditHost(f *fiber.Ctx) error {
 		return ToastError(f, err, "Failed to update host")
 	}
 
-	return ToastSuccess(f, "Successfully updated host")
+	return ToastSuccess(f, "Successfully updated host", ``)
 }
 
 func (h *Handler) DeleteHost(f *fiber.Ctx) error {
@@ -124,7 +130,7 @@ func (h *Handler) DeleteHost(f *fiber.Ctx) error {
 	h.DB.DeleteHosts(ns)
 
 	f.Response().Header.Add("HX-Refresh", "true")
-	return ToastSuccess(f, "Successfully deleted host(s)")
+	return ToastSuccess(f, "Successfully deleted host(s)", ``)
 }
 
 type RebootData struct {
@@ -157,7 +163,7 @@ func (h *Handler) RebootHost(f *fiber.Ctx) error {
 	runner.Wait()
 
 	// TODO: add channel to get status of each job
-	return ToastSuccess(f, "Successfully Rebooted node(s)")
+	return ToastSuccess(f, "Successfully Rebooted node(s)", ``)
 }
 
 func (h *Handler) BmcConfigure(f *fiber.Ctx) error {
@@ -186,7 +192,7 @@ func (h *Handler) BmcConfigure(f *fiber.Ctx) error {
 	runner.Wait()
 
 	// TODO: add channel to get status of each job
-	return ToastSuccess(f, "Successfully sent Auto Configure node(s)")
+	return ToastSuccess(f, "Successfully sent Auto Configure node(s)", ``)
 }
 
 func (h *Handler) HostAdd(f *fiber.Ctx) error {
@@ -270,7 +276,7 @@ func (h *Handler) HostAdd(f *fiber.Ctx) error {
 	}
 
 	f.Response().Header.Add("HX-Refresh", "true")
-	return ToastSuccess(f, "Successfully added host(s)")
+	return ToastSuccess(f, "Successfully added host(s)", ``)
 }
 
 func (h *Handler) SwitchMac(f *fiber.Ctx) error {
@@ -315,4 +321,19 @@ func (h *Handler) Search(f *fiber.Ctx) error {
 
 	f.Response().Header.Add("HX-Redirect", fmt.Sprintf("/host/%s", search))
 	return nil
+}
+
+func (h *Handler) UsersPost(f *fiber.Ctx) error {
+	users := f.FormValue("Usernames")
+	role := f.FormValue("Role")
+	userList := strings.Split(users, ",")
+
+	for _, user := range userList {
+		err := h.DB.UpdateUser(user, role)
+		if err != nil {
+			return ToastError(f, err, "Failed to update user: "+user)
+		}
+	}
+
+	return ToastSuccess(f, "Successfully updated user(s)", `, "updateUsers": ""`)
 }

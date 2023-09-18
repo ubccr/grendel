@@ -24,6 +24,7 @@ import (
 	"net"
 	"net/netip"
 	"strings"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -67,8 +68,17 @@ func (s *BuntStore) Close() error {
 	return s.db.Close()
 }
 
+type UserValue struct {
+	Hash       []byte    `json:"hash"`
+	Role       string    `json:"role"`
+	CreatedAt  time.Time `json:"created_at"`
+	ModifiedAt time.Time `json:"modified_at"`
+}
+
+// StoreUser stores the User in the data store
 func (s *BuntStore) StoreUser(username, password string) error {
 	d := true
+	role := "disabled"
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
 		_, err := tx.Get(UserKeyPrefix + ":" + username)
@@ -84,42 +94,120 @@ func (s *BuntStore) StoreUser(username, password string) error {
 	if err != nil {
 		return err
 	}
-
-	if !d {
-		hashed, _ := bcrypt.GenerateFromPassword([]byte(password), 8)
-		return s.db.Update(func(tx *buntdb.Tx) error {
-			// need to hash pass
-			_, _, err := tx.Set(UserKeyPrefix+":"+username, string(hashed), nil)
-			if err != nil {
-				return err
-			}
-
-			return nil
-		})
+	if d {
+		return fmt.Errorf("user %s already exists", username)
 	}
-	return fmt.Errorf("user %s already exists", username)
+
+	// Set role to admin if this is the first user
+	count := 0
+	err = s.db.View(func(tx *buntdb.Tx) error {
+		return tx.AscendKeys(UserKeyPrefix+":*", func(key, value string) bool {
+			count++
+			return true
+		})
+	})
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		role = "admin"
+	}
+
+	hashed, _ := bcrypt.GenerateFromPassword([]byte(password), 8)
+	return s.db.Update(func(tx *buntdb.Tx) error {
+		user := UserValue{
+			Hash:       hashed,
+			Role:       role,
+			CreatedAt:  time.Now(),
+			ModifiedAt: time.Now(),
+		}
+		value, err := json.Marshal(user)
+		if err != nil {
+			return err
+		}
+		_, _, err = tx.Set(UserKeyPrefix+":"+username, string(value), nil)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
-func (s *BuntStore) VerifyUser(username, password string) (bool, error) {
-	var hash string
+// VerifyUser checks if the given username exists in the data store
+func (s *BuntStore) VerifyUser(username, password string) (bool, string, error) {
+	var dbVal UserValue
+
 	err := s.db.View(func(tx *buntdb.Tx) error {
 		val, err := tx.Get(UserKeyPrefix + ":" + username)
 		if err != nil {
 			return err
 		}
-		hash = val
-		return nil
+		return json.Unmarshal([]byte(val), &dbVal)
 	})
 
 	if err != nil {
-		return false, err
+		return false, "", err
 	}
-
-	err = bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	err = bcrypt.CompareHashAndPassword(dbVal.Hash, []byte(password))
 	if err != nil {
-		return false, err
+		return false, "", err
 	}
-	return true, nil
+	return true, dbVal.Role, nil
+}
+
+type User struct {
+	Username   string
+	Role       string
+	CreatedAt  time.Time
+	ModifiedAt time.Time
+}
+
+// GetUsers returns a list of all the usernames
+func (s *BuntStore) GetUsers() ([]User, error) {
+	var users []User
+	var dbVal UserValue
+
+	err := s.db.View(func(tx *buntdb.Tx) error {
+		return tx.AscendKeys(UserKeyPrefix+":*", func(key, value string) bool {
+			noPrefix := strings.Split(key, ":")[1]
+			json.Unmarshal([]byte(value), &dbVal)
+
+			users = append(users, User{Username: noPrefix, Role: dbVal.Role, CreatedAt: dbVal.CreatedAt, ModifiedAt: dbVal.ModifiedAt})
+			return true
+		})
+	})
+	return users, err
+}
+
+// UpdateUser updates the role of the given users
+func (s *BuntStore) UpdateUser(username, role string) error {
+	var dbVal UserValue
+
+	err := s.db.View(func(tx *buntdb.Tx) error {
+		val, err := tx.Get(UserKeyPrefix + ":" + username)
+		if err != nil {
+			return err
+		}
+		return json.Unmarshal([]byte(val), &dbVal)
+	})
+
+	if err != nil {
+		return err
+	}
+	dbVal.Role = role
+	dbVal.ModifiedAt = time.Now()
+
+	err = s.db.Update(func(tx *buntdb.Tx) error {
+		val, err := json.Marshal(dbVal)
+		if err != nil {
+			return err
+		}
+		_, _, err = tx.Set(UserKeyPrefix+":"+username, string(val), nil)
+		return err
+	})
+
+	return err
 }
 
 // StoreHost stores a host in the data store. If the host exists it is overwritten
