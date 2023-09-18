@@ -4,10 +4,6 @@ go 1.21
 
 toolchain go1.21.0
 
-require github.com/gofiber/storage/buntstore/v2 v2.0.0
-
-replace github.com/gofiber/storage/buntstore/v2 v2.0.0 => github.com/jafurlan/storage/buntstore/v2 v2.0.0-20230908033914-7daaa7ff133f
-
 require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
 	github.com/Pallinder/go-randomdata v1.2.0
@@ -51,8 +47,11 @@ require (
 )
 
 require (
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/gofiber/template v1.8.2 // indirect
 	github.com/gofiber/utils v1.1.0 // indirect
+	github.com/redis/go-redis/v9 v9.0.2 // indirect
 )
 
 require (
@@ -72,6 +71,7 @@ require (
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/gofiber/fiber/v2 v2.49.0 // indirect
+	github.com/gofiber/storage/redis v1.3.4
 	github.com/gofiber/template/html/v2 v2.0.5
 	github.com/gofiber/utils/v2 v2.0.0-beta.3 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect

@@ -12,7 +12,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
-	"github.com/gofiber/storage/buntstore/v2"
+	"github.com/gofiber/storage/redis"
 	"github.com/gofiber/template/html/v2"
 	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
@@ -83,10 +83,7 @@ func NewServer(db model.DataStore, address string) (*Server, error) {
 }
 
 func (s *Server) Serve() error {
-	storage := buntstore.New(buntstore.Config{
-		GCInterval: 5 * time.Minute,
-		DbPath:     "./grendel.db",
-	})
+	storage := redis.New()
 	store := session.New(session.Config{
 		Expiration:     8 * time.Hour,
 		CookieSecure:   true,
