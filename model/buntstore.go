@@ -238,7 +238,8 @@ func (s *BuntStore) ReverseResolve(ip string) ([]string, error) {
 		err := tx.AscendKeys(HostKeyPrefix+":*", func(key, value string) bool {
 			res := gjson.Get(value, "interfaces")
 			for _, i := range res.Array() {
-				if strings.Contains(i.Get("ip").String(), ip) {
+				ipWithMask := strings.Split(i.Get("ip").String(), "/")
+				if len(ipWithMask) >= 1 && ipWithMask[0] == ip {
 					names := strings.Split(i.Get("fqdn").String(), ",")
 					for _, name := range names {
 						fqdn = append(fqdn, name)
