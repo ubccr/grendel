@@ -1,15 +1,15 @@
-{{ $tdClasses := "border border-blue-500 px-2 py-1" }}
+{{ $tdClasses := "border border-neutral-300 px-2 py-1" }}
 
 
 <div class="flex justify-center">
-    <div class="mb-3 flex justify-center gap-2 rounded-xl border border-blue-500 p-2 text-center shadow-lg">
+    <div class="mb-3 flex justify-center gap-2 rounded-xl border border-neutral-300 p-2 text-center shadow-lg">
         <div class="group z-50 my-auto flex justify-center">
             <button
                 hx-post="/api/bmc/reboot"
                 hx-vals='{"hosts": "{{ .Host.Name }}"}'
                 hx-target="#replace-me"
                 hx-confirm="Are you sure you want to reboot {{ .Host.Name }}?"
-                class="rounded-lg border border-blue-500 p-1 text-sm hover:bg-neutral-50">
+                class="rounded-lg border border-neutral-300 p-1 text-sm hover:bg-neutral-50">
                 {{ template "icon-power" }}
             </button>
             <span
@@ -23,7 +23,7 @@
                 hx-post="/api/bmc/configure"
                 hx-vals='{"hosts": "{{ .Host.Name }}"}'
                 hx-target="#toast"
-                class="rounded-lg border border-blue-500 p-1 text-sm">
+                class="rounded-lg border border-neutral-300 p-1 text-sm">
                 {{ template "icon-adjustments-horizontal" }}
             </button>
             <span
@@ -45,7 +45,10 @@
 
         <div class="my-1">
             <label for="Firmware" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Firmware:</label>
-            <select class="w-full rounded-lg border border-blue-500 bg-white px-2 py-1" name="Firmware" id="Firmware">
+            <select
+                class="w-full rounded-lg border border-neutral-300 bg-white px-2 py-1"
+                name="Firmware"
+                id="Firmware">
                 <option value="" class="italic">None</option>
                 {{ $fw := Sprintf "%s" $.Host.Firmware }}
                 {{ range .Firmware }}
@@ -60,7 +63,10 @@
 
         <div class="my-1">
             <label for="BootImage" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Boot Image:</label>
-            <select class="w-full rounded-lg border border-blue-500 bg-white px-2 py-1" name="BootImage" id="BootImage">
+            <select
+                class="w-full rounded-lg border border-neutral-300 bg-white px-2 py-1"
+                name="BootImage"
+                id="BootImage">
                 <option value="" class="italic">None</option>
                 {{ range .BootImages }}
                     <option
@@ -78,19 +84,23 @@
                 name="Tags"
                 id="Tags"
                 value="{{ Join .Host.Tags "," }}"
-                class="w-full rounded-lg border border-blue-500 p-1 px-2" />
+                class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
         </div>
 
         <div class="my-1">
             <label for="Interfaces" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Interfaces:</label>
-            <textarea name="Interfaces" id="Interfaces" rows="13" class="w-full rounded-lg border border-blue-500 p-2">
+            <textarea
+                name="Interfaces"
+                id="Interfaces"
+                rows="13"
+                class="w-full rounded-lg border border-neutral-300 p-2">
                     {{- Stringify .Host.Interfaces }}
                 </textarea
             >
         </div>
 
         <div>
-            <button type="submit" class="rounded-lg border border-blue-500 p-1">Submit</button>
+            <button type="submit" class="rounded-md bg-blue-500 px-2 py-1 text-white">Submit</button>
         </div>
     </div>
 </form>
