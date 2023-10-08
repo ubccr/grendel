@@ -37,17 +37,26 @@ func GetMacAddress(h *Handler, f *fiber.Ctx, rack string, switchType string, hos
 	}
 
 	for _, v := range hosts {
+
 		portString := f.FormValue(fmt.Sprintf("%s:%s", v, switchType))
+		// Exit if port is blank
+		if portString == "" {
+			hostMacMap[v] = ""
+			continue
+		}
 		port, err := strconv.Atoi(portString)
 		if err != nil {
 			return hostMacMap, err
 		}
 
+		var mac string
 		rawMac := macTable.Port(port)
 		if len(rawMac) == 0 {
-			return hostMacMap, fmt.Errorf("No MAC address found for port %d", port)
+			mac = ""
+			// return hostMacMap, fmt.Errorf("No MAC address found for port %d", port)
+		} else {
+			mac = rawMac[0].MAC.String()
 		}
-		mac := rawMac[0].MAC.String()
 
 		hostMacMap[v] = mac
 	}

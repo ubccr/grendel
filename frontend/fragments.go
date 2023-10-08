@@ -80,18 +80,22 @@ func (h *Handler) HostAddModalInterfaces(f *fiber.Ctx) error {
 	hostList := f.FormValue("HostList")
 	hostArr := strings.Split(hostList, ",")
 
-	if mgmtSubnet == "" || coreSubnet == "" {
-		return ToastError(f, nil, "Missing subnet")
+	mgmtRange := make([]string, len(hostArr))
+	coreRange := make([]string, len(hostArr))
+	err := error(nil)
+
+	if mgmtSubnet != "" {
+		mgmtRange, err = h.newHostIPs(mgmtSubnet)
+		if err != nil {
+			return ToastError(f, err, "Failed to generate IP range for management network")
+		}
 	}
 
-	mgmtRange, err := h.newHostIPs(mgmtSubnet)
-	if err != nil {
-		return ToastError(f, err, "Failed to generate IP range for management network")
-	}
-
-	coreRange, err := h.newHostIPs(coreSubnet)
-	if err != nil {
-		return ToastError(f, err, "Failed to generate IP range for core network")
+	if coreSubnet != "" {
+		coreRange, err = h.newHostIPs(coreSubnet)
+		if err != nil {
+			return ToastError(f, err, "Failed to generate IP range for core network")
+		}
 	}
 
 	type hostStruct struct {

@@ -195,23 +195,35 @@ func (h *Handler) BmcConfigure(f *fiber.Ctx) error {
 	return ToastSuccess(f, "Successfully sent Auto Configure node(s)", ``)
 }
 
+type hostAddData struct {
+	Firmware   string `form:"Firmware"`
+	Provision  string `form:"Provision"`
+	BootImage  string `form:"BootImage"`
+	Tags       string `form:"Tags"`
+	MgmtDomain string `form:"Mgmt:Domain"`
+	CoreDomain string `form:"Core:Domain"`
+	MgmtMtu    string `form:"Mgmt:Mtu"`
+	CoreMtu    string `form:"Core:Mtu"`
+}
+
 func (h *Handler) HostAdd(f *fiber.Ctx) error {
-	fw := f.FormValue("Firmware")
-	pString := f.FormValue("Provision")
+	var formData hostAddData
+	err := f.BodyParser(&formData)
+	if err != nil {
+		return ToastError(f, err, "Failed to bind form data")
+	}
+
+	pString := formData.Provision
 	provision := false
 	if pString == "on" {
 		provision = true
 	}
-	bootImage := f.FormValue("BootImage")
-	tags := f.FormValue("Tags")
-	mgmtDomain := f.FormValue("Mgmt:Domain")
-	coreDomain := f.FormValue("Core:Domain")
 
-	mgmtMtu, err := strconv.Atoi(f.FormValue("Mgmt:Mtu"))
+	mgmtMtu, err := strconv.Atoi(formData.MgmtMtu)
 	if err != nil {
 		return ToastError(f, err, "Failed to parse MTU")
 	}
-	coreMtu, err := strconv.Atoi(f.FormValue("Core:Mtu"))
+	coreMtu, err := strconv.Atoi(formData.CoreMtu)
 	if err != nil {
 		return ToastError(f, err, "Failed to parse MTU")
 	}
@@ -243,7 +255,7 @@ func (h *Handler) HostAdd(f *fiber.Ctx) error {
 		ifaces := make([]*model.NetInterface, 2)
 		ifaces[0] = &model.NetInterface{
 			Name: f.FormValue("Mgmt:Ifname"),
-			FQDN: fmt.Sprintf("%s.%s", bmcHost, mgmtDomain),
+			FQDN: fmt.Sprintf("%s.%s", bmcHost, formData.MgmtDomain),
 			IP:   mgmtIp,
 			MAC:  mgmtMac,
 			BMC:  true,
@@ -252,7 +264,7 @@ func (h *Handler) HostAdd(f *fiber.Ctx) error {
 		}
 		ifaces[1] = &model.NetInterface{
 			Name: f.FormValue("Core:Ifname"),
-			FQDN: fmt.Sprintf("%s.%s", v, coreDomain),
+			FQDN: fmt.Sprintf("%s.%s", v, formData.CoreDomain),
 			IP:   coreIp,
 			MAC:  coreMac,
 			BMC:  false,
@@ -263,9 +275,9 @@ func (h *Handler) HostAdd(f *fiber.Ctx) error {
 			ID:         ksuid.New(),
 			Name:       v,
 			Provision:  provision,
-			BootImage:  bootImage,
-			Firmware:   firmware.NewFromString(fw),
-			Tags:       strings.Split(tags, ","),
+			BootImage:  formData.BootImage,
+			Firmware:   firmware.NewFromString(formData.Firmware),
+			Tags:       strings.Split(formData.Tags, ","),
 			Interfaces: ifaces,
 		}
 		err = h.DB.StoreHost(&newHost)
@@ -284,11 +296,11 @@ func (h *Handler) SwitchMac(f *fiber.Ctx) error {
 	hosts := strings.Split(f.FormValue("HostList"), ",")
 	mgmtMacList, err := GetMacAddress(h, f, rack, "Mgmt", hosts)
 	if err != nil {
-		return ToastError(f, err, "Failed to get MAC address")
+		return ToastError(f, err, "Failed to get mgmt MAC address")
 	}
 	coreMacList, err := GetMacAddress(h, f, rack, "Core", hosts)
 	if err != nil {
-		return ToastError(f, err, "Failed to get MAC address")
+		return ToastError(f, err, "Failed to get core MAC address")
 	}
 
 	type hostStruct struct {
