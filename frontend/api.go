@@ -153,17 +153,19 @@ func (h *Handler) RebootHost(f *fiber.Ctx) error {
 	}
 
 	runner := NewJobRunner(fanout)
+	output := ""
 
 	for i, host := range hostList {
-		runner.RunReboot(host)
+		ch := make(chan string)
+		runner.RunReboot(host, ch)
 		if (i+1)%fanout == 0 {
 			time.Sleep(time.Duration(delay) * time.Second)
 		}
+		output += <-ch + "<br />"
 	}
 	runner.Wait()
 
-	// TODO: add channel to get status of each job
-	return ToastSuccess(f, "Successfully Rebooted node(s)", ``)
+	return ToastSuccess(f, "Successfully Rebooted node(s) <br />"+output, ``)
 }
 
 func (h *Handler) BmcConfigure(f *fiber.Ctx) error {
@@ -182,17 +184,19 @@ func (h *Handler) BmcConfigure(f *fiber.Ctx) error {
 	}
 
 	runner := NewJobRunner(fanout)
+	output := ""
 
 	for i, host := range hostList {
-		runner.RunConfigure(host)
+		ch := make(chan string)
+		runner.RunConfigure(host, ch)
 		if (i+1)%fanout == 0 {
 			time.Sleep(time.Duration(delay) * time.Second)
 		}
+		output += <-ch + "<br />"
 	}
 	runner.Wait()
 
-	// TODO: add channel to get status of each job
-	return ToastSuccess(f, "Successfully sent Auto Configure node(s)", ``)
+	return ToastSuccess(f, "Successfully sent Auto Configure to node(s) <br />"+output, ``)
 }
 
 type hostAddData struct {

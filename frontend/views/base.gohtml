@@ -102,8 +102,9 @@
     <script>
         if (!notyf) {
             var notyf = new Notyf({
-                duration: 3000,
+                duration: 5000,
                 dismissible: false,
+                ripple: false,
             });
             document.body.addEventListener("toast-error", function (e) {
                 notyf.error(e.detail.value);

@@ -18,6 +18,8 @@
 package frontend
 
 import (
+	"fmt"
+
 	"github.com/korovkin/limiter"
 	"github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/bmc"
@@ -37,31 +39,35 @@ func (j *JobRunner) Wait() {
 	j.limit.Wait()
 }
 
-func (j *JobRunner) RunConfigure(host *model.Host) {
+func (j *JobRunner) RunConfigure(host *model.Host, ch chan string) {
 	j.limit.Execute(func() {
 		ip := host.InterfaceBMC().AddrString()
 		err := bmc.ConfigureIdrac(ip)
+		msg := "Success"
 
 		if err != nil {
+			msg = fmt.Sprintf("Error - %s", err)
 			cmd.Log.WithFields(logrus.Fields{
 				"err":  err,
 				"name": host,
 			}).Error("Failed to connect to BMC")
-			return
 		}
+		ch <- fmt.Sprintf("%s: %s", host.Name, msg)
 	})
 }
-func (j *JobRunner) RunReboot(host *model.Host) {
+func (j *JobRunner) RunReboot(host *model.Host, ch chan string) {
 	j.limit.Execute(func() {
 		ip := host.InterfaceBMC().AddrString()
 		err := bmc.RebootHost(ip)
+		msg := "Success"
 
 		if err != nil {
+			msg = fmt.Sprintf("Error - %s", err)
 			cmd.Log.WithFields(logrus.Fields{
 				"err":  err,
 				"name": host,
 			}).Error("Failed to connect to BMC")
-			return
 		}
+		ch <- fmt.Sprintf("%s: %s", host.Name, msg)
 	})
 }

@@ -2,23 +2,45 @@
 
 
 <form>
-    <div class="mb-3">
+    <div class="mb-3 flex justify-center gap-2">
         <button
-            class="rounded-lg border border-blue-500 p-1"
+            class="grid rounded-lg border border-blue-500 p-1"
             type="button"
             hx-post="/api/bmc/reboot"
             hx-swap="none"
+            hx-target="#toast"
             hx-vals="js:{hosts: HostMap()}"
-            hx-confirm="Are you sure you want to reboot these nodes?">
-            Reboot
+            hx-confirm="Are you sure you want to reboot these nodes?"
+            hx-ext="loading-states"
+            data-loading-states
+            data-loading-disable>
+            <span data-loading-class="opacity-0" style="grid-area: 1/1;">Reboot</span>
+            <span
+                data-loading-class-remove="opacity-0"
+                data-loading-class="opacity-100"
+                class="mx-auto block h-6 w-6 opacity-0"
+                style="grid-area: 1/1;">
+                {{ template "icon-spinner" }}
+            </span>
         </button>
         <button
-            class="rounded-lg border border-blue-500 p-1"
+            class="grid rounded-lg border border-blue-500 p-1"
             type="button"
             hx-post="/api/bmc/configure"
             hx-swap="none"
-            hx-vals="js:{hosts: HostMap()}">
-            Auto Configure
+            hx-target="#toast"
+            hx-vals="js:{hosts: HostMap()}"
+            hx-ext="loading-states"
+            data-loading-states
+            data-loading-disable>
+            <span data-loading-class="opacity-0" style="grid-area: 1/1;">Auto Configure</span>
+            <span
+                data-loading-class-remove="opacity-0"
+                data-loading-class="opacity-100"
+                class="mx-auto block h-6 w-6 opacity-0"
+                style="grid-area: 1/1;">
+                {{ template "icon-spinner" }}
+            </span>
         </button>
         <button
             class="rounded-lg border border-blue-500 p-1"
@@ -44,7 +66,9 @@
         </button>
         <button class="rounded-lg border border-blue-500 p-1" type="button" onclick="Clear()">Clear</button>
     </div>
+
     <div id="replace-me"></div>
+
     <table class="w-full table-fixed">
         <thead>
             <tr>
