@@ -100,19 +100,22 @@
     </body>
 
     <script>
-        if (!notyf) {
-            var notyf = new Notyf({
+        document.body.addEventListener("toast-error", function (e) {
+            let notyf = new Notyf({
                 duration: 5000,
                 dismissible: false,
                 ripple: false,
             });
-            document.body.addEventListener("toast-error", function (e) {
-                notyf.error(e.detail.value);
+            notyf.error(e.detail.value);
+        });
+        document.body.addEventListener("toast-success", function (e) {
+            let notyf = new Notyf({
+                duration: 5000,
+                dismissible: false,
+                ripple: false,
             });
-            document.body.addEventListener("toast-success", function (e) {
-                notyf.success(e.detail.value);
-            });
-        }
+            notyf.success(e.detail.value);
+        });
 
         function showMobile() {
             const m = document.getElementById("mobile-menu").hidden;
