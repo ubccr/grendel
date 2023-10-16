@@ -6,7 +6,17 @@
         <table class="table-fixed">
             <thead>
                 <tr>
-                    <td class="{{ $tdClasses }}"></td>
+                    <td class="{{ $tdClasses }} p-0">
+                        <button
+                            class="scale-75 rounded-md bg-blue-500 p-1 text-white"
+                            type="button"
+                            hx-get="/fragments/floorplanAddRack"
+                            hx-target="#addRack"
+                            hx-swap="innerHTML transition:true"
+                            onclick="useTransition(() => document.getElementById('addRack').showModal())">
+                            {{ template "icon-plus-small" }}
+                        </button>
+                    </td>
                     {{ range $col := $.Cols }}
                         <td class="{{ $tdClasses }}">{{ $col }}</td>
                     {{ end }}
@@ -36,3 +46,5 @@
         </table>
     </div>
 </div>
+
+<dialog id="addRack" class="w-full rounded-lg shadow-md md:w-2/3 lg:w-3/4"></dialog>

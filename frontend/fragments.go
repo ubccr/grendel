@@ -129,3 +129,7 @@ func (h *Handler) userTable(f *fiber.Ctx) error {
 		"Users": users,
 	}, "")
 }
+
+func (h *Handler) floorplanAddRack(f *fiber.Ctx) error {
+	return f.Render("fragments/floorplanAddRack", fiber.Map{}, "")
+}
