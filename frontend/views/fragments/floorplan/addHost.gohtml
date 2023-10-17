@@ -1,10 +1,11 @@
 <div>
     <h1 class="mb-3 text-xl">Add Host</h1>
-    <form>
+    <form hx-post="/api/host/add2" hx-swap="none" id="newHostForm">
         <div class="my-3 grid grid-cols-2 gap-2">
             <label for="Name">Name:</label>
             <input
                 id="Name"
+                name="Name"
                 class="rounded-md border border-neutral-300 px-2 py-1"
                 placeholder="swe-d06-22"
                 type="text" />
@@ -42,17 +43,36 @@
             <label for="Tags">Tags:</label>
             <input
                 id="Tags"
+                name="Tags"
                 class="rounded-md border border-neutral-300 px-2 py-1"
                 placeholder="d06,switch"
                 type="text" />
+
+            <label>Interfaces:</label>
+            <div>
+                <button
+                    class="scale-75 rounded-md bg-blue-500 p-1 text-white"
+                    type="button"
+                    hx-get="/fragments/floorplan/interfaces"
+                    hx-target="#interfaces"
+                    hx-swap="beforeend transition:true"
+                    hx-vals="js:{ID: ifaceID()}">
+                    {{ template "icon-plus-small" }}
+                </button>
+            </div>
+
+            <input type="hidden" value="0" id="ifaceID" />
+            <div class="col-span-2" id="interfaces"></div>
         </div>
-        <div class="my-3 flex justify-center gap-3"></div>
     </form>
 </div>
 <div class="sticky bottom-0 flex w-full justify-end gap-3 border-t border-neutral-200 bg-neutral-50 p-3">
-    <!-- <button type="submit" form="modalForm" class="rounded-md border bg-blue-500 px-2 py-1 text-white hover:bg-blue-400">
+    <button
+        type="submit"
+        form="newHostForm"
+        class="rounded-md border bg-blue-500 px-2 py-1 text-white hover:bg-blue-400">
         Submit
-    </button> -->
+    </button>
     <button
         type="button"
         onclick="useTransition(() => document.getElementById('addRack').close());"
@@ -60,3 +80,10 @@
         Close
     </button>
 </div>
+<script>
+    function ifaceID() {
+        let id = document.getElementById("ifaceID").value;
+        document.getElementById("ifaceID").value++;
+        return id;
+    }
+</script>

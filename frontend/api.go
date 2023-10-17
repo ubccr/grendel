@@ -295,6 +295,85 @@ func (h *Handler) HostAdd(f *fiber.Ctx) error {
 	return ToastSuccess(f, "Successfully added host(s)", ``)
 }
 
+type FormData2 struct {
+	Name       string  `form:"Name"`
+	Provision  string  `form:"Provision"`
+	Firmware   string  `form:"Firmware"`
+	BootImage  string  `form:"BootImage"`
+	Interfaces []Iface `form:"Interfaces"`
+	Tags       string  `form:"Tags"`
+}
+type Iface struct {
+	Mac    string `form:"Mac"`
+	Ip     string `form:"Ip"`
+	Ifname string `form:"Ifname"`
+	Fqdn   string `form:"Fqdn"`
+	Vlan   string `form:"Vlan"`
+	Mtu    string `form:"Mtu"`
+	Bmc    string `form:"Bmc"`
+}
+
+func (h *Handler) HostAdd2(f *fiber.Ctx) error {
+	formData := FormData2{}
+	if err := f.BodyParser(&formData); err != nil {
+		return ToastError(f, err, "Failed to bind form data")
+	}
+
+	newHost := model.Host{
+		ID:        ksuid.New(),
+		Name:      formData.Name,
+		Provision: false,
+		Firmware:  firmware.NewFromString(formData.Firmware),
+		BootImage: formData.BootImage,
+		Tags:      strings.Split(formData.Tags, ","),
+	}
+
+	if formData.Provision == "on" {
+		newHost.Provision = true
+	}
+
+	for x, i := range formData.Interfaces {
+		mac, err := net.ParseMAC(i.Mac)
+		if err != nil {
+			return ToastError(f, err, fmt.Sprintf("Failed to parse MAC on interface %d", x))
+		}
+
+		ip, err := netip.ParsePrefix(i.Ip)
+		if err != nil {
+			return ToastError(f, err, fmt.Sprintf("Failed to parse IP on interface %d", x))
+		}
+
+		bmc := false
+		if i.Bmc == "on" {
+			bmc = true
+		}
+
+		mtu, err := strconv.Atoi(i.Mtu)
+		if err != nil {
+			return ToastError(f, err, fmt.Sprintf("Failed to parse MTU on interface %d", x))
+		}
+
+		iface := model.NetInterface{
+			Name: i.Ifname,
+			MAC:  mac,
+			IP:   ip,
+			FQDN: i.Fqdn,
+			BMC:  bmc,
+			VLAN: i.Vlan,
+			MTU:  uint16(mtu),
+		}
+		newHost.Interfaces = append(newHost.Interfaces, &iface)
+	}
+
+	err := h.DB.StoreHost(&newHost)
+	if err != nil {
+		return ToastError(f, err, "Failed to add host(s)")
+	}
+
+	f.Response().Header.Add("HX-Refresh", "true")
+	return ToastSuccess(f, "Successfully added host(s)", ``)
+}
+
 func (h *Handler) SwitchMac(f *fiber.Ctx) error {
 	rack := f.FormValue("Rack")
 	hosts := strings.Split(f.FormValue("HostList"), ",")

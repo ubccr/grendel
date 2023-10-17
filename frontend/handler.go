@@ -65,6 +65,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	api.Post("/host", auth, h.EditHost)
 	api.Delete("/host", auth, h.DeleteHost)
 	api.Post("/host/add", auth, h.HostAdd)
+	api.Post("/host/add2", auth, h.HostAdd2)
 	api.Post("/switch/mac", auth, h.SwitchMac)
 	fragment.Get("/hostAddModal", auth, h.HostAddModal)
 	fragment.Put("/hostAddModalList", auth, h.HostAddModalList)
@@ -72,6 +73,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 
 	app.Get("/floorplan", auth, h.Floorplan)
 	fragment.Get("/floorplan/addHost", auth, h.floorplanAddHost)
+	fragment.Get("/floorplan/interfaces", auth, h.floorplanInterfaces)
 
 	app.Get("/rack/:rack", auth, h.Rack)
 

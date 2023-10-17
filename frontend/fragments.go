@@ -145,22 +145,12 @@ func (h *Handler) floorplanAddHost(f *fiber.Ctx) error {
 	return f.Render("fragments/floorplan/addHost", fiber.Map{
 		"Firmware":  fw,
 		"BootImage": bootImages,
-		// "Select": fiber.Map{
-		// 	"Firmware": fiber.Map{
-		// 		"Name":     "Firmware",
-		// 		"Values":   fw,
-		// 		"Selected": "",
-		// 	},
-		// 	"BootImages": fiber.Map{
-		// 		"Name":     "Boot Image",
-		// 		"Values":   bootImages,
-		// 		"Selected": "",
-		// 	},
-		// 	"Type": fiber.Map{
-		// 		"Name":     "Host Template",
-		// 		"Values":   []string{"Compute", "Mgmt Switch", "Core Switch"},
-		// 		"Selected": "",
-		// 	},
-		// },
+	}, "")
+}
+func (h *Handler) floorplanInterfaces(f *fiber.Ctx) error {
+	id := f.Query("ID", "0")
+
+	return f.Render("fragments/floorplan/interfaces", fiber.Map{
+		"ID": id,
 	}, "")
 }
