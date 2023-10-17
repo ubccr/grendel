@@ -369,8 +369,7 @@ func (h *Handler) HostAdd2(f *fiber.Ctx) error {
 		return ToastError(f, err, "Failed to add host(s)")
 	}
 
-	f.Response().Header.Add("HX-Refresh", "true")
-	return ToastSuccess(f, "Successfully added host(s)", ``)
+	return ToastSuccess(f, "Successfully added host(s)", `, "refresh": "", "closeModal": ""`)
 }
 
 func (h *Handler) SwitchMac(f *fiber.Ctx) error {

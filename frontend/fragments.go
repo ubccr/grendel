@@ -130,6 +130,30 @@ func (h *Handler) userTable(f *fiber.Ctx) error {
 	}, "")
 }
 
+func (h *Handler) floorplanTable(f *fiber.Ctx) error {
+	hosts, _ := h.DB.Hosts()
+	racks := map[string]int{}
+	for _, host := range hosts {
+		rack := strings.Split(host.Name, "-")[1]
+		racks[rack] += 1
+	}
+
+	// TODO: make this configurable in grendel.toml
+	rows := make([]string, 0)
+	for i := 'f'; i <= 'v'; i++ {
+		rows = append(rows, fmt.Sprintf("%c", i))
+	}
+	cols := make([]string, 0)
+	for i := 28; i >= 5; i-- {
+		cols = append(cols, fmt.Sprintf("%02d", i))
+	}
+	return f.Render("fragments/floorplan/table", fiber.Map{
+		"Rows":  rows,
+		"Cols":  cols,
+		"Racks": racks,
+	}, "")
+}
+
 func (h *Handler) floorplanAddHost(f *fiber.Ctx) error {
 	fw := make([]string, 0)
 	for _, i := range firmware.BuildToStringMap {

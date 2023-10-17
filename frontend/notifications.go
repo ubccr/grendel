@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+// To append another trigger, pass a string with a leading comma in thr form of an object. ex: ', "event": "value"'
 func ToastSuccess(context *fiber.Ctx, msg string, appendTrigger string) error {
 	context.Append("HX-Trigger", fmt.Sprintf(`{"toast-success": "%s"%s}`, msg, appendTrigger))
 	return context.Send(nil)
