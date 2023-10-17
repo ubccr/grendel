@@ -108,8 +108,9 @@ func (s *Server) Serve() error {
 	engine := html.New("./frontend/views/", ".gohtml")
 	engine.AddFuncMap(funcMap)
 	app := fiber.New(fiber.Config{
-		Views:       engine,
-		ViewsLayout: "base",
+		Views:                    engine,
+		ViewsLayout:              "base",
+		EnableSplittingOnParsers: true,
 	})
 
 	h.SetupRoutes(app)

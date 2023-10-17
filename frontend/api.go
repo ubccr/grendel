@@ -318,7 +318,6 @@ func (h *Handler) HostAdd2(f *fiber.Ctx) error {
 	if err := f.BodyParser(&formData); err != nil {
 		return ToastError(f, err, "Failed to bind form data")
 	}
-
 	newHost := model.Host{
 		ID:        ksuid.New(),
 		Name:      formData.Name,

@@ -1,65 +1,99 @@
-<div class="m-2 grid grid-cols-2 gap-2 border border-neutral-300 p-3" id="interface[{{ .ID }}]">
-    <div class="flex justify-start">
-        <label for="Interfaces[{{ .ID }}][Bmc]">Bmc:</label>
-        <input
-            name="Interfaces[{{ .ID }}][Bmc]"
-            id="Interfaces[{{ .ID }}][Bmc]"
-            type="checkbox"
-            class="rounded-lg border border-neutral-300 p-1 px-2" />
+<div class="m-2 rounded-md border border-neutral-300 p-3" id="interface[{{ .ID }}]">
+    <div class="mb-4 flex justify-between align-middle">
+        <h1 class="changeme">Interface {{ .ID }}:</h1>
+        <div>
+            <button
+                class="rounded-md bg-neutral-500 text-white hover:bg-neutral-400"
+                onclick="moveIface( 'up', getCurrentID(this, 3))"
+                type="button">
+                {{ template "icon-chevron-up" }}
+            </button>
+            <button
+                class="rounded-md bg-neutral-500 text-white hover:bg-neutral-400"
+                onclick="moveIface( 'down', getCurrentID(this, 3))"
+                type="button">
+                {{ template "icon-chevron-down" }}
+            </button>
+            <button
+                class="rounded-md bg-neutral-500 text-white hover:bg-neutral-400"
+                onclick="removeIface(getCurrentID(this, 3))"
+                type="button">
+                {{ template "icon-x-mark" }}
+            </button>
+        </div>
     </div>
-    <div>
-        <button
-            class="rounded-md bg-neutral-500 text-white hover:bg-neutral-400"
-            onclick="document.getElementById('interface[{{ .ID }}]').remove()"
-            type="button">
-            {{ template "icon-x-mark" }}
-        </button>
-    </div>
-    <div>
-        <label for="Interfaces[{{ .ID }}][Mac]" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Mac:</label>
-        <input
-            name="Interfaces[{{ .ID }}][Mac]"
-            id="Interfaces[{{ .ID }}][Mac]"
-            placeholder="00:00:00:00:00:00"
-            class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
-    </div>
-    <div>
-        <label for="Interfaces[{{ .ID }}][Ip]" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Ip:</label>
-        <input
-            name="Interfaces[{{ .ID }}][Ip]"
-            id="Interfaces[{{ .ID }}][Ip]"
-            placeholder="0.0.0.0/24"
-            class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
-    </div>
-    <div>
-        <label for="Interfaces[{{ .ID }}][Ifname]" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
-            Ifname:
-        </label>
-        <input
-            name="Interfaces[{{ .ID }}][Ifname]"
-            id="Interfaces[{{ .ID }}][Ifname]"
-            class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
-    </div>
-    <div>
-        <label for="Interfaces[{{ .ID }}][Fqdn]" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">FQDN:</label>
-        <input
-            name="Interfaces[{{ .ID }}][Fqdn]"
-            id="Interfaces[{{ .ID }}][Fqdn]"
-            class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
-    </div>
-    <div>
-        <label for="Interfaces[{{ .ID }}][Vlan]" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Vlan:</label>
-        <input
-            name="Interfaces[{{ .ID }}][Vlan]"
-            id="Interfaces[{{ .ID }}][Vlan]"
-            class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
-    </div>
-    <div>
-        <label for="Interfaces[{{ .ID }}][Mtu]" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Mtu:</label>
-        <input
-            name="Interfaces[{{ .ID }}][Mtu]"
-            id="Interfaces[{{ .ID }}][Mtu]"
-            placeholder="1500"
-            class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
+    <div class="grid grid-cols-2 gap-3">
+        <div class="col-span-2">
+            <label for="Interfaces[{{ .ID }}][Fqdn]" class="changeme absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                FQDN:
+            </label>
+            <input
+                name="Interfaces[{{ .ID }}][Fqdn]"
+                id="Interfaces[{{ .ID }}][Fqdn]"
+                class="changeme w-full rounded-md border border-neutral-300 p-1 px-2" />
+        </div>
+        <div>
+            <label for="Interfaces[{{ .ID }}][Mac]" class="changeme absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                Mac:
+            </label>
+            <input
+                name="Interfaces[{{ .ID }}][Mac]"
+                id="Interfaces[{{ .ID }}][Mac]"
+                placeholder="00:00:00:00:00:00"
+                class="w-full rounded-md border border-neutral-300 p-1 px-2" />
+        </div>
+        <div>
+            <label for="Interfaces[{{ .ID }}][Ip]" class="changeme absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                Ip:
+            </label>
+            <input
+                name="Interfaces[{{ .ID }}][Ip]"
+                id="Interfaces[{{ .ID }}][Ip]"
+                placeholder="0.0.0.0/24"
+                class="changeme w-full rounded-md border border-neutral-300 p-1 px-2" />
+        </div>
+        <div>
+            <label
+                for="Interfaces[{{ .ID }}][Ifname]"
+                class="changeme absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                Ifname:
+            </label>
+            <input
+                name="Interfaces[{{ .ID }}][Ifname]"
+                id="Interfaces[{{ .ID }}][Ifname]"
+                placeholder="eno12399"
+                class="changeme w-full rounded-md border border-neutral-300 p-1 px-2" />
+        </div>
+        <div>
+            <label for="Interfaces[{{ .ID }}][Bmc]" class="changeme absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                BMC:
+            </label>
+            <select
+                class="changeme w-full rounded-md border border-neutral-300 bg-white px-2 py-1"
+                name="Interfaces[{{ .ID }}][Bmc]"
+                id="Interfaces[{{ .ID }}][Bmc]">
+                <option value="false">false</option>
+                <option value="true" {{ if eq .ID "0" }}selected{{ end }}>true</option>
+            </select>
+        </div>
+        <div>
+            <label for="Interfaces[{{ .ID }}][Vlan]" class="changeme absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                Vlan:
+            </label>
+            <input
+                name="Interfaces[{{ .ID }}][Vlan]"
+                id="Interfaces[{{ .ID }}][Vlan]"
+                class="changeme w-full rounded-md border border-neutral-300 p-1 px-2" />
+        </div>
+        <div>
+            <label for="Interfaces[{{ .ID }}][Mtu]" class="changeme absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                Mtu:
+            </label>
+            <input
+                name="Interfaces[{{ .ID }}][Mtu]"
+                id="Interfaces[{{ .ID }}][Mtu]"
+                placeholder="1500"
+                class="changeme w-full rounded-md border border-neutral-300 p-1 px-2" />
+        </div>
     </div>
 </div>
