@@ -1,0 +1,62 @@
+<div>
+    <h1 class="mb-3 text-xl">Add Host</h1>
+    <form>
+        <div class="my-3 grid grid-cols-2 gap-2">
+            <label for="Name">Name:</label>
+            <input
+                id="Name"
+                class="rounded-md border border-neutral-300 px-2 py-1"
+                placeholder="swe-d06-22"
+                type="text" />
+
+            <label for="Provision">Provision:</label>
+            <input id="Provision" checked type="checkbox" />
+            <!-- <div>
+                <label for="HostTemplate" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                    Host Template:
+                </label>
+                <select
+                    class="rounded-lg border border-neutral-300 bg-white px-2 py-1"
+                    name="HostTemplate"
+                    id="HostTemplate">
+                    <option value="" class="italic">None</option>
+                    <option value="Node">Node</option>
+                    <option value="MgmtSwitch">Mgmt Switch</option>
+                    <option value="CoreSwitch">Core Switch</option>
+                </select>
+            </div> -->
+            <label for="Firmware">Firmware:</label>
+            <select class="rounded-lg border border-neutral-300 bg-white px-2 py-1" name="Firmware" id="Firmware">
+                <option value="" class="italic">None</option>
+                {{ range .Firmware }}
+                    <option value="{{ . }}">{{ . }}</option>
+                {{ end }}
+            </select>
+            <label for="BootImage">Boot Image:</label>
+            <select class="rounded-lg border border-neutral-300 bg-white px-2 py-1" name="BootImage" id="BootImage">
+                <option value="" class="italic">None</option>
+                {{ range .BootImage }}
+                    <option value="{{ . }}">{{ . }}</option>
+                {{ end }}
+            </select>
+            <label for="Tags">Tags:</label>
+            <input
+                id="Tags"
+                class="rounded-md border border-neutral-300 px-2 py-1"
+                placeholder="d06,switch"
+                type="text" />
+        </div>
+        <div class="my-3 flex justify-center gap-3"></div>
+    </form>
+</div>
+<div class="sticky bottom-0 flex w-full justify-end gap-3 border-t border-neutral-200 bg-neutral-50 p-3">
+    <!-- <button type="submit" form="modalForm" class="rounded-md border bg-blue-500 px-2 py-1 text-white hover:bg-blue-400">
+        Submit
+    </button> -->
+    <button
+        type="button"
+        onclick="useTransition(() => document.getElementById('addRack').close());"
+        class="rounded-md border bg-neutral-500 px-2 py-1 text-white hover:bg-neutral-400">
+        Close
+    </button>
+</div>

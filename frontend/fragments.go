@@ -130,6 +130,37 @@ func (h *Handler) userTable(f *fiber.Ctx) error {
 	}, "")
 }
 
-func (h *Handler) floorplanAddRack(f *fiber.Ctx) error {
-	return f.Render("fragments/floorplanAddRack", fiber.Map{}, "")
+func (h *Handler) floorplanAddHost(f *fiber.Ctx) error {
+	fw := make([]string, 0)
+	for _, i := range firmware.BuildToStringMap {
+		fw = append(fw, i)
+	}
+
+	images, _ := h.DB.BootImages()
+	bootImages := make([]string, 0)
+	for _, i := range images {
+		bootImages = append(bootImages, i.Name)
+	}
+
+	return f.Render("fragments/floorplan/addHost", fiber.Map{
+		"Firmware":  fw,
+		"BootImage": bootImages,
+		// "Select": fiber.Map{
+		// 	"Firmware": fiber.Map{
+		// 		"Name":     "Firmware",
+		// 		"Values":   fw,
+		// 		"Selected": "",
+		// 	},
+		// 	"BootImages": fiber.Map{
+		// 		"Name":     "Boot Image",
+		// 		"Values":   bootImages,
+		// 		"Selected": "",
+		// 	},
+		// 	"Type": fiber.Map{
+		// 		"Name":     "Host Template",
+		// 		"Values":   []string{"Compute", "Mgmt Switch", "Core Switch"},
+		// 		"Selected": "",
+		// 	},
+		// },
+	}, "")
 }
