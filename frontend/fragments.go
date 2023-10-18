@@ -154,7 +154,7 @@ func (h *Handler) floorplanTable(f *fiber.Ctx) error {
 	}, "")
 }
 
-func (h *Handler) floorplanAddHost(f *fiber.Ctx) error {
+func (h *Handler) floorplanModal(f *fiber.Ctx) error {
 	fw := make([]string, 0)
 	for _, i := range firmware.BuildToStringMap {
 		fw = append(fw, i)
@@ -166,7 +166,7 @@ func (h *Handler) floorplanAddHost(f *fiber.Ctx) error {
 		bootImages = append(bootImages, i.Name)
 	}
 
-	return f.Render("fragments/floorplan/addHost", fiber.Map{
+	return f.Render("fragments/floorplan/modal", fiber.Map{
 		"Firmware":  fw,
 		"BootImage": bootImages,
 	}, "")

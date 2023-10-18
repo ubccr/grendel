@@ -8,8 +8,8 @@
                 <button
                     class="scale-75 rounded-md bg-blue-500 p-1 text-white"
                     type="button"
-                    hx-get="/fragments/floorplan/addHost"
-                    hx-target="#addRack"
+                    hx-get="/fragments/floorplan/modal"
+                    hx-target="#addHost"
                     hx-swap="innerHTML transition:true"
                     onclick="showModal()">
                     {{ template "icon-plus-small" }}

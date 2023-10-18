@@ -73,7 +73,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 
 	app.Get("/floorplan", auth, h.Floorplan)
 	fragment.Get("/floorplan/table", auth, h.floorplanTable)
-	fragment.Get("/floorplan/addHost", auth, h.floorplanAddHost)
+	fragment.Get("/floorplan/modal", auth, h.floorplanModal)
 	fragment.Get("/floorplan/interfaces", auth, h.floorplanInterfaces)
 
 	app.Get("/rack/:rack", auth, h.Rack)
