@@ -1,236 +1,263 @@
-<div class="m-2">
-    <h1 class="mb-3 text-xl">Add Hosts</h1>
-    <div class="mb-3 flex justify-center gap-2">
-        <button class="border-b-2 border-blue-500 px-1" type="button" onclick="useTransition(() => showTab('details'))">
-            Details
-        </button>
-        <button class="border-b-2 border-blue-500 px-1" type="button" onclick="useTransition(() => showTab('mapping'))">
-            Port Mapping
+<div class="flex h-full flex-col">
+    <div>
+        <h1 class="py-4 text-2xl">Add Hosts</h1>
+        <div class="mb-3 flex justify-center gap-2">
+            <button
+                class="border-b-2 border-blue-500 px-1"
+                type="button"
+                onclick="useTransition(() => showTab('details'))">
+                Details
+            </button>
+            <button
+                class="border-b-2 border-blue-500 px-1"
+                type="button"
+                onclick="useTransition(() => showTab('mapping'))">
+                Port Mapping
+            </button>
+            <button
+                class="border-b-2 border-blue-500 px-1"
+                type="button"
+                onclick="useTransition(() => showTab('interfaces'))">
+                Interfaces
+            </button>
+        </div>
+        <form hx-post="/api/host/add" hx-swap="none" id="modalForm">
+            <input type="hidden" name="Rack" id="Rack" value="{{ .Rack }}" />
+            <input type="hidden" name="Us" id="Us" value="{{ .HostUs }}" />
+            <div class="h-5/6 min-h-full">
+                <div class="grid grid-cols-1 gap-2" id="details">
+                    <div>
+                        <label for="Provision">Provision:</label>
+                        <input
+                            type="checkbox"
+                            name="Provision"
+                            id="Provision"
+                            {{ if .Host.Provision }}checked{{ end }} />
+                    </div>
+
+                    <div class="my-1">
+                        <label for="Prefix" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Prefix:</label>
+                        <input
+                            name="Prefix"
+                            type="text"
+                            id="Prefix"
+                            value="cpn"
+                            class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
+                    </div>
+
+                    <div class="my-1">
+                        <label for="Firmware" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                            Firmware:
+                        </label>
+                        <select
+                            class="w-full rounded-lg border border-neutral-300 bg-white px-2 py-1"
+                            name="Firmware"
+                            id="Firmware">
+                            <option value="" class="italic">None</option>
+                            {{ range .Firmwares }}
+                                <option value="{{ . }}">
+                                    {{ . }}
+                                </option>
+                            {{ end }}
+                        </select>
+                    </div>
+
+                    <div class="my-1">
+                        <label for="BootImage" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                            Boot Image:
+                        </label>
+                        <select
+                            class="w-full rounded-lg border border-neutral-300 bg-white px-2 py-1"
+                            name="BootImage"
+                            id="BootImage">
+                            <option value="" class="italic">None</option>
+                            {{ range .BootImages }}
+                                <option value="{{ .Name }}">
+                                    {{ .Name }}
+                                </option>
+                            {{ end }}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="Tags" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Tags:</label>
+                        <input
+                            type="text"
+                            name="Tags"
+                            id="Tags"
+                            value="{{ .Rack }}"
+                            class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
+                    </div>
+                </div>
+                <div class="hidden" id="mapping">
+                    <div
+                        hx-put="/fragments/hostAddModalList"
+                        hx-trigger="load, change from:#Prefix"
+                        hx-include="#modalForm"
+                        hx-swap="innerHTML"
+                        id="hostList"
+                        class="flex justify-center"></div>
+                    <button
+                        class="rounded-md bg-blue-500 px-2 py-1 text-white hover:bg-blue-400"
+                        type="button"
+                        hx-post="/api/switch/mac"
+                        hx-swap="innerHTML"
+                        hx-target="#hostList"
+                        hx-include="#modalForm"
+                        hx-ext="loading-states">
+                        <span data-loading-class="hidden">Query Switches</span>
+                        <span
+                            data-loading-class-remove="hidden"
+                            data-loading-class="block"
+                            class="mx-auto hidden h-5 w-5">
+                            {{ template "icon-spinner" }}
+                        </span>
+                    </button>
+                </div>
+                <div class="hidden" id="interfaces">
+                    <h1>Mgmt:</h1>
+                    <div
+                        class="grid grid-cols-2 gap-3 rounded-md  border border-neutral-400 p-3 md:grid-cols-3 lg:grid-cols-5">
+                        <div>
+                            <label for="Mgmt:Ifname" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                                Ifname:
+                            </label>
+                            <input
+                                type="text"
+                                name="Mgmt:Ifname"
+                                id="Mgmt:Ifname"
+                                value="{{ .Defaults.Mgmt.Ifname }}"
+                                class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
+                        </div>
+                        <div>
+                            <label for="Mgmt:Domain" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                                Domain:
+                            </label>
+                            <input
+                                type="text"
+                                name="Mgmt:Domain"
+                                id="Mgmt:Domain"
+                                value="{{ .Defaults.Mgmt.Domain }}"
+                                class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
+                        </div>
+                        <div>
+                            <label for="Mgmt:Subnet" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                                Subnet:
+                            </label>
+                            <input
+                                type="text"
+                                name="Mgmt:Subnet"
+                                id="Mgmt:Subnet"
+                                value=""
+                                class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
+                        </div>
+                        <div>
+                            <label for="Mgmt:Vlan" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                                Vlan:
+                            </label>
+                            <input
+                                type="text"
+                                name="Mgmt:Vlan"
+                                id="Mgmt:Vlan"
+                                value=""
+                                class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
+                        </div>
+                        <div>
+                            <label for="Mgmt:Mtu" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">MTU:</label>
+                            <input
+                                type="text"
+                                name="Mgmt:Mtu"
+                                id="Mgmt:Mtu"
+                                value="{{ .Defaults.Mgmt.Mtu }}"
+                                class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
+                        </div>
+                    </div>
+                    <h1>Core:</h1>
+                    <div
+                        class="mb-4 grid grid-cols-2 gap-3 rounded-md border border-neutral-400 p-3 md:grid-cols-3 lg:grid-cols-5">
+                        <div>
+                            <label for="Core:Ifname" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                                Ifname:
+                            </label>
+                            <input
+                                type="text"
+                                name="Core:Ifname"
+                                id="Core:Ifname"
+                                value="{{ .Defaults.Core.Ifname }}"
+                                class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
+                        </div>
+                        <div>
+                            <label for="Core:Domain" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                                Domain:
+                            </label>
+                            <input
+                                type="text"
+                                name="Core:Domain"
+                                id="Core:Domain"
+                                value="{{ .Defaults.Core.Domain }}"
+                                class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
+                        </div>
+                        <div>
+                            <label for="Core:Subnet" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                                Subnet:
+                            </label>
+                            <input
+                                type="text"
+                                name="Core:Subnet"
+                                id="Core:Subnet"
+                                value=""
+                                class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
+                        </div>
+                        <div>
+                            <label for="Core:Vlan" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                                Vlan:
+                            </label>
+                            <input
+                                type="text"
+                                name="Core:Vlan"
+                                id="Core:Vlan"
+                                value=""
+                                class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
+                        </div>
+                        <div>
+                            <label for="Core:Mtu" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">MTU:</label>
+                            <input
+                                type="text"
+                                name="Core:Mtu"
+                                id="Core:Mtu"
+                                value="{{ .Defaults.Core.Mtu }}"
+                                class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
+                        </div>
+                    </div>
+                    <button
+                        class="rounded-md bg-blue-500 px-2 py-1 text-white hover:bg-blue-400"
+                        type="button"
+                        hx-put="/fragments/hostAddModalInterfaces"
+                        hx-swap="innerHTML"
+                        hx-target="#interfacesList"
+                        hx-include="#modalForm">
+                        Generate IPs
+                    </button>
+                    <div class="mt-2 flex justify-center" id="interfacesList"></div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="flex-grow"></div>
+    <div class="sticky bottom-0 flex w-full justify-end gap-3 border-t border-neutral-200 bg-neutral-50 p-3">
+        <button
+            type="submit"
+            form="modalForm"
+            class="rounded-md border bg-blue-500 px-2 py-1 text-white hover:bg-blue-400">
+            Submit
         </button>
         <button
-            class="border-b-2 border-blue-500 px-1"
             type="button"
-            onclick="useTransition(() => showTab('interfaces'))">
-            Interfaces
+            onclick="closeModal()"
+            class="rounded-md border bg-neutral-500 px-2 py-1 text-white hover:bg-neutral-400">
+            Close
         </button>
     </div>
-    <form hx-post="/api/host/add" hx-swap="none" id="modalForm">
-        <input type="hidden" name="Rack" id="Rack" value="{{ .Rack }}" />
-        <input type="hidden" name="Us" id="Us" value="{{ .HostUs }}" />
-        <div class="h-5/6 min-h-full">
-            <div class="grid grid-cols-1 gap-2" id="details">
-                <div>
-                    <label for="Provision">Provision:</label>
-                    <input type="checkbox" name="Provision" id="Provision" {{ if .Host.Provision }}checked{{ end }} />
-                </div>
-
-                <div class="my-1">
-                    <label for="Prefix" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Prefix:</label>
-                    <input
-                        name="Prefix"
-                        type="text"
-                        id="Prefix"
-                        value="cpn"
-                        class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
-                </div>
-
-                <div class="my-1">
-                    <label for="Firmware" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Firmware:</label>
-                    <select
-                        class="w-full rounded-lg border border-neutral-300 bg-white px-2 py-1"
-                        name="Firmware"
-                        id="Firmware">
-                        <option value="" class="italic">None</option>
-                        {{ range .Firmwares }}
-                            <option value="{{ . }}">
-                                {{ . }}
-                            </option>
-                        {{ end }}
-                    </select>
-                </div>
-
-                <div class="my-1">
-                    <label for="BootImage" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Boot Image:</label>
-                    <select
-                        class="w-full rounded-lg border border-neutral-300 bg-white px-2 py-1"
-                        name="BootImage"
-                        id="BootImage">
-                        <option value="" class="italic">None</option>
-                        {{ range .BootImages }}
-                            <option value="{{ .Name }}">
-                                {{ .Name }}
-                            </option>
-                        {{ end }}
-                    </select>
-                </div>
-
-                <div>
-                    <label for="Tags" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Tags:</label>
-                    <input
-                        type="text"
-                        name="Tags"
-                        id="Tags"
-                        value="{{ .Rack }}"
-                        class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
-                </div>
-            </div>
-            <div class="hidden" id="mapping">
-                <div
-                    hx-put="/fragments/hostAddModalList"
-                    hx-trigger="load, change from:#Prefix"
-                    hx-include="#modalForm"
-                    hx-swap="innerHTML"
-                    id="hostList"
-                    class="flex justify-center"></div>
-                <button
-                    class="rounded-md bg-blue-500 px-2 py-1 text-white hover:bg-blue-400"
-                    type="button"
-                    hx-post="/api/switch/mac"
-                    hx-swap="innerHTML"
-                    hx-target="#hostList"
-                    hx-include="#modalForm"
-                    hx-ext="loading-states">
-                    <span data-loading-class="hidden">Query Switches</span>
-                    <span data-loading-class-remove="hidden" data-loading-class="block" class="mx-auto hidden h-5 w-5">
-                        {{ template "icon-spinner" }}
-                    </span>
-                </button>
-            </div>
-            <div class="hidden" id="interfaces">
-                <h1>Mgmt:</h1>
-                <div
-                    class="grid grid-cols-2 gap-3 rounded-md  border border-neutral-400 p-3 md:grid-cols-3 lg:grid-cols-5">
-                    <div>
-                        <label for="Mgmt:Ifname" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
-                            Ifname:
-                        </label>
-                        <input
-                            type="text"
-                            name="Mgmt:Ifname"
-                            id="Mgmt:Ifname"
-                            value="{{ .Defaults.Mgmt.Ifname }}"
-                            class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
-                    </div>
-                    <div>
-                        <label for="Mgmt:Domain" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
-                            Domain:
-                        </label>
-                        <input
-                            type="text"
-                            name="Mgmt:Domain"
-                            id="Mgmt:Domain"
-                            value="{{ .Defaults.Mgmt.Domain }}"
-                            class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
-                    </div>
-                    <div>
-                        <label for="Mgmt:Subnet" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
-                            Subnet:
-                        </label>
-                        <input
-                            type="text"
-                            name="Mgmt:Subnet"
-                            id="Mgmt:Subnet"
-                            value=""
-                            class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
-                    </div>
-                    <div>
-                        <label for="Mgmt:Vlan" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Vlan:</label>
-                        <input
-                            type="text"
-                            name="Mgmt:Vlan"
-                            id="Mgmt:Vlan"
-                            value=""
-                            class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
-                    </div>
-                    <div>
-                        <label for="Mgmt:Mtu" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">MTU:</label>
-                        <input
-                            type="text"
-                            name="Mgmt:Mtu"
-                            id="Mgmt:Mtu"
-                            value="{{ .Defaults.Mgmt.Mtu }}"
-                            class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
-                    </div>
-                </div>
-                <h1>Core:</h1>
-                <div
-                    class="mb-4 grid grid-cols-2 gap-3 rounded-md border border-neutral-400 p-3 md:grid-cols-3 lg:grid-cols-5">
-                    <div>
-                        <label for="Core:Ifname" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
-                            Ifname:
-                        </label>
-                        <input
-                            type="text"
-                            name="Core:Ifname"
-                            id="Core:Ifname"
-                            value="{{ .Defaults.Core.Ifname }}"
-                            class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
-                    </div>
-                    <div>
-                        <label for="Core:Domain" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
-                            Domain:
-                        </label>
-                        <input
-                            type="text"
-                            name="Core:Domain"
-                            id="Core:Domain"
-                            value="{{ .Defaults.Core.Domain }}"
-                            class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
-                    </div>
-                    <div>
-                        <label for="Core:Subnet" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
-                            Subnet:
-                        </label>
-                        <input
-                            type="text"
-                            name="Core:Subnet"
-                            id="Core:Subnet"
-                            value=""
-                            class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
-                    </div>
-                    <div>
-                        <label for="Core:Vlan" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Vlan:</label>
-                        <input
-                            type="text"
-                            name="Core:Vlan"
-                            id="Core:Vlan"
-                            value=""
-                            class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
-                    </div>
-                    <div>
-                        <label for="Core:Mtu" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">MTU:</label>
-                        <input
-                            type="text"
-                            name="Core:Mtu"
-                            id="Core:Mtu"
-                            value="{{ .Defaults.Core.Mtu }}"
-                            class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
-                    </div>
-                </div>
-                <button
-                    class="rounded-md bg-blue-500 px-2 py-1 text-white hover:bg-blue-400"
-                    type="button"
-                    hx-put="/fragments/hostAddModalInterfaces"
-                    hx-swap="innerHTML"
-                    hx-target="#interfacesList"
-                    hx-include="#modalForm">
-                    Generate IPs
-                </button>
-                <div class="mt-2 flex justify-center" id="interfacesList"></div>
-            </div>
-        </div>
-    </form>
-</div>
-<div class="sticky bottom-0 flex w-full justify-end gap-3 border-t border-neutral-200 bg-neutral-50 p-3">
-    <button type="submit" form="modalForm" class="rounded-md border bg-blue-500 px-2 py-1 text-white hover:bg-blue-400">
-        Submit
-    </button>
-    <button
-        type="button"
-        onclick="closeModal()"
-        class="rounded-md border bg-neutral-500 px-2 py-1 text-white hover:bg-neutral-400">
-        Close
-    </button>
 </div>
 
 <script>
