@@ -1,7 +1,7 @@
 <div class="flex h-full flex-col">
     <div>
         <h1 class="py-4 text-2xl">Add Host</h1>
-        <form hx-post="/api/host/add2" hx-swap="none" id="newHostForm">
+        <form hx-post="/api/host/add2" hx-vals="js:{Interfaces: parseForm()}" hx-swap="none" id="newHostForm">
             <div class="grid grid-cols-2 gap-3 p-3">
                 <div>
                     <label for="Name" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Name:</label>
@@ -65,20 +65,22 @@
                         hx-vals="js:{ID: ifaceID()}">
                         Add Interface
                     </button>
-                    <button
+                    <!-- <button
                         class="rounded-md bg-blue-500 px-2 py-1 text-white enabled:hover:bg-blue-400 disabled:opacity-75"
                         type="button"
                         onclick="undoRemoveIface()"
                         id="undoBtn"
                         disabled>
                         Undo
-                    </button>
+                    </button> -->
                 </div>
-                <input type="hidden" value="0" id="ifaceID" />
-                <div class="col-span-2" id="interfaces"></div>
-                <div class="col-span-2 hidden" id="deletedInterfaces"></div>
             </div>
         </form>
+        <div class="grid grid-cols-2 gap-3 p-3">
+            <input type="hidden" value="0" id="ifaceID" />
+            <div class="col-span-2 p-2" id="interfaces"></div>
+            <!-- <div class="col-span-2 hidden" id="deletedInterfaces"></div> -->
+        </div>
     </div>
     <div class="flex-grow"></div>
     <div class="sticky bottom-0 flex w-full justify-end gap-3 border-t border-neutral-200 bg-neutral-50 p-3">
@@ -103,63 +105,63 @@
         return id;
     }
     function removeIface(id) {
-        let iface = document.getElementById(`interface[${id}]`);
-        let deleted = document.getElementById("deletedInterfaces");
-        useTransition(() => deleted.appendChild(iface));
+        let iface = document.getElementById(`interface:${id}`);
+        useTransition(() => iface.remove());
+        // let deleted = document.getElementById("deletedInterfaces");
+        // useTransition(() => deleted.appendChild(iface));
 
-        document.getElementById("undoBtn").disabled = false;
+        // document.getElementById("undoBtn").disabled = false;
     }
-    function undoRemoveIface() {
-        let iface = document.getElementById("deletedInterfaces").lastChild;
-        let interfaceParent = document.getElementById("interfaces");
-        if (document.getElementById("deletedInterfaces").childElementCount <= 1) {
-            document.getElementById("undoBtn").disabled = true;
+    // function undoRemoveIface() {
+    //     let iface = document.getElementById("deletedInterfaces").lastChild;
+    //     let interfaceParent = document.getElementById("interfaces");
+    //     if (document.getElementById("deletedInterfaces").childElementCount <= 1) {
+    //         document.getElementById("undoBtn").disabled = true;
+    //     }
+
+    //     prevId = parseInt(iface.id.substring(10, iface.id.length - 1));
+    //     useTransition(() => interfaceParent.insertBefore(iface, document.getElementById(`interface[${prevId + 1}]`)));
+    // }
+    function moveUp(id) {
+        let ifaces = document.getElementById("interfaces").children;
+        for (let i = 0; i < ifaces.length; i++) {
+            if (ifaces[i].id == `interface:${id}`) {
+                useTransition(() => ifaces[i].parentNode.insertBefore(ifaces[i], ifaces[i - 1]));
+                return;
+            }
         }
-
-        prevId = parseInt(iface.id.substring(10, iface.id.length - 1));
-        useTransition(() => interfaceParent.insertBefore(iface, document.getElementById(`interface[${prevId + 1}]`)));
     }
-    // Problems: ID's in functions are not updated (deleting & moving doesn't work after first move), Drag and Drop??
-    function moveIface(direction, id) {
-        let newID = direction === "up" ? id-- : id++;
-        changeIDs(newID, -1);
-        changeIDs(id, newID);
-        changeIDs(-1, id);
-
-        function changeIDs(prevID, newID) {
-            let root = document.getElementById(`interface[${prevID}]`).getElementsByClassName("changeme");
-            for (let i = 0; i < root.length; i++) {
-                let element = root[i];
-                if (element.tagName == "LABEL") {
-                    element.htmlFor = element.htmlFor.replace(/\[(-?\d+)\]/, `[${newID}]`);
-                } else if (element.tagName == "H1") {
-                    element.innerText = element.innerText.replace(/(-?\d+)/, newID);
+    function moveDown(id) {
+        let ifaces = document.getElementById("interfaces").children;
+        for (let i = 0; i < ifaces.length; i++) {
+            if (ifaces[i].id == `interface:${id}`) {
+                if (i + 2 <= ifaces.length) {
+                    useTransition(() => ifaces[i].parentNode.insertBefore(ifaces[i], ifaces[i + 2]));
+                    return;
+                } else if (i + 1 == ifaces.length) {
+                    useTransition(() => ifaces[i].parentNode.insertBefore(ifaces[i], ifaces[0]));
+                    return;
                 } else {
-                    element.name = element.name.replace(/\[(-?\d+)\]/, `[${newID}]`);
-                    element.id = element.id.replace(/\[(-?\d+)\]/, `[${newID}]`);
+                    useTransition(() => ifaces[i].parentNode.append(ifaces[i]));
+                    return;
                 }
             }
-            document.getElementById(`interface[${prevID}]`).id = `interface[${newID}]`;
-        }
-        sortIfaces();
-    }
-    function sortIfaces() {
-        let ifaces = document.getElementById("interfaces");
-        let children = Array.from(ifaces.children);
-        children.sort((a, b) => {
-            let aID = parseInt(a.id.substring(10, a.id.length - 1));
-            let bID = parseInt(b.id.substring(10, b.id.length - 1));
-            return aID - bID;
-        });
-        for (let i = 0; i < children.length; i++) {
-            ifaces.appendChild(children[i]);
         }
     }
-    function getCurrentID(e, i) {
-        let parent = e;
-        for (let j = 0; j < i; j++) {
-            parent = parent.parentNode;
+    function parseForm() {
+        let ifaces = document.getElementById("interfaces").children;
+        let interfaces = [];
+        for (let i = 0; i < ifaces.length; i++) {
+            let iface = {};
+            iface.Fqdn = ifaces[i].querySelector("input[name='Fqdn']").value;
+            iface.Mac = ifaces[i].querySelector("input[name='Mac']").value;
+            iface.Ip = ifaces[i].querySelector("input[name='Ip']").value;
+            iface.Ifname = ifaces[i].querySelector("input[name='Ifname']").value;
+            iface.Bmc = ifaces[i].querySelector("select[name='Bmc']").value;
+            iface.Vlan = ifaces[i].querySelector("input[name='Vlan']").value;
+            iface.Mtu = ifaces[i].querySelector("input[name='Mtu']").value;
+            interfaces.push(iface);
         }
-        return parseInt(parent.id.match(/(-?\d+)/)[0]);
+        return JSON.stringify(interfaces);
     }
 </script>

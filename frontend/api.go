@@ -296,21 +296,22 @@ func (h *Handler) HostAdd(f *fiber.Ctx) error {
 }
 
 type FormData2 struct {
-	Name       string  `form:"Name"`
-	Provision  string  `form:"Provision"`
-	Firmware   string  `form:"Firmware"`
-	BootImage  string  `form:"BootImage"`
-	Interfaces []Iface `form:"Interfaces"`
-	Tags       string  `form:"Tags"`
+	Name       string  `json:"Name" form:"Name"`
+	Provision  string  `json:"Provision" form:"Provision"`
+	Firmware   string  `json:"Firmware" form:"Firmware"`
+	BootImage  string  `json:"BootImage" form:"BootImage"`
+	Tags       string  `json:"Tags" form:"Tags"`
+	Interfaces []Iface `json:"Interfaces"`
 }
+
 type Iface struct {
-	Mac    string `form:"Mac"`
-	Ip     string `form:"Ip"`
-	Ifname string `form:"Ifname"`
-	Fqdn   string `form:"Fqdn"`
-	Vlan   string `form:"Vlan"`
-	Mtu    string `form:"Mtu"`
-	Bmc    string `form:"Bmc"`
+	Fqdn   string `json:"Fqdn"`
+	Mac    string `json:"Mac"`
+	Ip     string `json:"Ip"`
+	Ifname string `json:"Ifname"`
+	Vlan   string `json:"Vlan"`
+	Mtu    string `json:"Mtu"`
+	Bmc    string `json:"Bmc"`
 }
 
 func (h *Handler) HostAdd2(f *fiber.Ctx) error {
@@ -318,17 +319,23 @@ func (h *Handler) HostAdd2(f *fiber.Ctx) error {
 	if err := f.BodyParser(&formData); err != nil {
 		return ToastError(f, err, "Failed to bind form data")
 	}
+
+	err := json.Unmarshal([]byte(f.FormValue("Interfaces")), &formData.Interfaces)
+	if err != nil {
+		return ToastError(f, err, "Failed to unmarshal interfaces")
+	}
+
+	provision, err := strconv.ParseBool(formData.Provision)
+	if err != nil {
+		return ToastError(f, err, "Failed to parse provision boolean")
+	}
 	newHost := model.Host{
 		ID:        ksuid.New(),
 		Name:      formData.Name,
-		Provision: false,
+		Provision: provision,
 		Firmware:  firmware.NewFromString(formData.Firmware),
 		BootImage: formData.BootImage,
 		Tags:      strings.Split(formData.Tags, ","),
-	}
-
-	if formData.Provision == "on" {
-		newHost.Provision = true
 	}
 
 	for x, i := range formData.Interfaces {
@@ -364,7 +371,7 @@ func (h *Handler) HostAdd2(f *fiber.Ctx) error {
 		newHost.Interfaces = append(newHost.Interfaces, &iface)
 	}
 
-	err := h.DB.StoreHost(&newHost)
+	err = h.DB.StoreHost(&newHost)
 	if err != nil {
 		return ToastError(f, err, "Failed to add host(s)")
 	}

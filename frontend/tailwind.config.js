@@ -26,9 +26,18 @@ module.exports = {
                         width: "0%",
                     },
                 },
+                wiggle: {
+                    "0%": {
+                        transform: "rotate(-0.5deg)",
+                    },
+                    "50%": {
+                        transform: "rotate(0.7deg)",
+                    },
+                },
             },
             animation: {
                 loading: "loading 2s linear infinite",
+                wiggle: "wiggle 0.25s ease-in-out infinite",
             },
             backgroundImage: {
                 "large-triangles-ub": "url('/backgrounds/large-triangles-ub.svg')",
