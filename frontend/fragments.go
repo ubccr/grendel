@@ -10,7 +10,7 @@ import (
 	"github.com/ubccr/grendel/nodeset"
 )
 
-func (h *Handler) hostIndex(f *fiber.Ctx) error {
+func (h *Handler) hostForm(f *fiber.Ctx) error {
 	reqHost, err := nodeset.NewNodeSet(f.Params("host"))
 	if err != nil {
 		return ToastError(f, fmt.Errorf("invalid host"), "Invalid host")
@@ -52,7 +52,7 @@ func (h *Handler) hostIndex(f *fiber.Ctx) error {
 		fw = append(fw, i)
 	}
 
-	return f.Render("fragments/host/index", fiber.Map{
+	return f.Render("fragments/host/form", fiber.Map{
 		"Host":       host[0],
 		"BootImages": bootImages,
 		"Firmwares":  fw,

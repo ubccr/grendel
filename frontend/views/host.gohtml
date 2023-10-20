@@ -30,7 +30,7 @@
         </div>
     </div>
 </div>
-<div hx-get="/fragments/host/index/{{ .HostName }}" hx-trigger="load, refresh from:body"></div>
+<div hx-get="/fragments/host/{{ .HostName }}/form" hx-trigger="load, refresh from:body"></div>
 <script>
     function ifaceID() {
         let id = document.getElementById("ifaceID").value;

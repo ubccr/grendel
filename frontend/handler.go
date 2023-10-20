@@ -62,7 +62,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	api.Post("/auth/register", h.RegisterUser)
 
 	app.Get("/host/:host", auth, h.Host)
-	fragment.Get("/host/index/:host", auth, h.hostIndex)
+	fragment.Get("/host/:host/form", auth, h.hostForm)
 	api.Post("/host", auth, h.EditHost)
 	api.Delete("/host", auth, h.DeleteHost)
 	api.Post("/host/add", auth, h.HostAdd)
