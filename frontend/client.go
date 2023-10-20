@@ -4,9 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/ubccr/grendel/firmware"
 	"github.com/ubccr/grendel/model"
-	"github.com/ubccr/grendel/nodeset"
 )
 
 func (h *Handler) Index(f *fiber.Ctx) error {
@@ -28,30 +26,9 @@ func (h *Handler) Login(f *fiber.Ctx) error {
 }
 
 func (h *Handler) Host(f *fiber.Ctx) error {
-	reqHost, err := nodeset.NewNodeSet(f.Params("host"))
-	if err != nil {
-		return ToastError(f, fmt.Errorf("invalid host"), "Invalid host")
-	}
-
-	host, err := h.DB.FindHosts(reqHost)
-	if err != nil || len(host) == 0 {
-		return ToastError(f, err, "Failed to find host")
-	}
-	bootImages, err := h.DB.BootImages()
-	if err != nil {
-		return ToastError(f, err, "Failed to load boot images")
-	}
-
-	fw := make([]string, 0)
-	for _, i := range firmware.BuildToStringMap {
-		fw = append(fw, i)
-	}
-
 	return f.Render("host", fiber.Map{
-		"Title":      fmt.Sprintf("Grendel - %s", host[0].Name),
-		"Host":       host[0],
-		"BootImages": bootImages,
-		"Firmware":   fw,
+		"Title":    fmt.Sprintf("Grendel - %s", f.Params("host")),
+		"HostName": f.Params("host"),
 	})
 }
 

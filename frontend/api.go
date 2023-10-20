@@ -84,6 +84,15 @@ type FormData struct {
 	Tags       string `form:"Tags"`
 	Interfaces string `form:"Interfaces"`
 }
+type InterfacesString struct {
+	FQDN string `json:"Fqdn"`
+	MAC  string `json:"Mac"`
+	IP   string `json:"Ip"`
+	Name string `json:"Ifname"`
+	BMC  string `json:"bmc"`
+	VLAN string `json:"Vlan"`
+	MTU  string `json:"Mtu"`
+}
 
 func (h *Handler) EditHost(f *fiber.Ctx) error {
 	formHost := new(FormData)
@@ -95,12 +104,44 @@ func (h *Handler) EditHost(f *fiber.Ctx) error {
 
 	id, _ := ksuid.Parse(formHost.ID)
 
-	provision := false
-	if formHost.Provision == "on" {
-		provision = true
+	provision, err := strconv.ParseBool(formHost.Provision)
+	if err != nil {
+		return ToastError(f, err, "Failed to parse provision boolean")
 	}
-	var ifaces []*model.NetInterface
+
+	var ifaces []InterfacesString
 	json.Unmarshal([]byte(formHost.Interfaces), &ifaces)
+
+	var interfaces []*model.NetInterface
+
+	for i, iface := range ifaces {
+		mac, err := net.ParseMAC(iface.MAC)
+		if err != nil {
+			return ToastError(f, err, fmt.Sprintf("Failed to parse MAC address on interface %s", i))
+		}
+		ip, err := netip.ParsePrefix(iface.IP)
+		if err != nil {
+			return ToastError(f, err, fmt.Sprintf("Failed to parse IP address on interface %s", i))
+		}
+		bmc, err := strconv.ParseBool(iface.BMC)
+		if err != nil {
+			return ToastError(f, err, fmt.Sprintf("Failed to parse BMC boolean on interface %s", i))
+		}
+		mtu, err := strconv.Atoi(iface.MTU)
+		if err != nil {
+			return ToastError(f, err, fmt.Sprintf("Failed to parse MTU on interface %s", i))
+		}
+
+		interfaces = append(interfaces, &model.NetInterface{
+			Name: iface.Name,
+			FQDN: iface.FQDN,
+			MAC:  mac,
+			IP:   ip,
+			BMC:  bmc,
+			VLAN: iface.VLAN,
+			MTU:  uint16(mtu),
+		})
+	}
 
 	newHost := model.Host{
 		ID:         id,
@@ -109,7 +150,7 @@ func (h *Handler) EditHost(f *fiber.Ctx) error {
 		Firmware:   firmware.NewFromString(formHost.Firmware),
 		BootImage:  formHost.BootImage,
 		Tags:       strings.Split(formHost.Tags, ","),
-		Interfaces: ifaces,
+		Interfaces: interfaces,
 	}
 
 	err = h.DB.StoreHost(&newHost)
@@ -117,7 +158,7 @@ func (h *Handler) EditHost(f *fiber.Ctx) error {
 		return ToastError(f, err, "Failed to update host")
 	}
 
-	return ToastSuccess(f, "Successfully updated host", ``)
+	return ToastSuccess(f, "Successfully updated host", `, "refresh": ""`)
 }
 
 func (h *Handler) DeleteHost(f *fiber.Ctx) error {
@@ -293,90 +334,6 @@ func (h *Handler) HostAdd(f *fiber.Ctx) error {
 
 	f.Response().Header.Add("HX-Refresh", "true")
 	return ToastSuccess(f, "Successfully added host(s)", ``)
-}
-
-type FormData2 struct {
-	Name       string  `json:"Name" form:"Name"`
-	Provision  string  `json:"Provision" form:"Provision"`
-	Firmware   string  `json:"Firmware" form:"Firmware"`
-	BootImage  string  `json:"BootImage" form:"BootImage"`
-	Tags       string  `json:"Tags" form:"Tags"`
-	Interfaces []Iface `json:"Interfaces"`
-}
-
-type Iface struct {
-	Fqdn   string `json:"Fqdn"`
-	Mac    string `json:"Mac"`
-	Ip     string `json:"Ip"`
-	Ifname string `json:"Ifname"`
-	Vlan   string `json:"Vlan"`
-	Mtu    string `json:"Mtu"`
-	Bmc    string `json:"Bmc"`
-}
-
-func (h *Handler) HostAdd2(f *fiber.Ctx) error {
-	formData := FormData2{}
-	if err := f.BodyParser(&formData); err != nil {
-		return ToastError(f, err, "Failed to bind form data")
-	}
-
-	err := json.Unmarshal([]byte(f.FormValue("Interfaces")), &formData.Interfaces)
-	if err != nil {
-		return ToastError(f, err, "Failed to unmarshal interfaces")
-	}
-
-	provision, err := strconv.ParseBool(formData.Provision)
-	if err != nil {
-		return ToastError(f, err, "Failed to parse provision boolean")
-	}
-	newHost := model.Host{
-		ID:        ksuid.New(),
-		Name:      formData.Name,
-		Provision: provision,
-		Firmware:  firmware.NewFromString(formData.Firmware),
-		BootImage: formData.BootImage,
-		Tags:      strings.Split(formData.Tags, ","),
-	}
-
-	for x, i := range formData.Interfaces {
-		mac, err := net.ParseMAC(i.Mac)
-		if err != nil {
-			return ToastError(f, err, fmt.Sprintf("Failed to parse MAC on interface %d", x))
-		}
-
-		ip, err := netip.ParsePrefix(i.Ip)
-		if err != nil {
-			return ToastError(f, err, fmt.Sprintf("Failed to parse IP on interface %d", x))
-		}
-
-		bmc := false
-		if i.Bmc == "on" {
-			bmc = true
-		}
-
-		mtu, err := strconv.Atoi(i.Mtu)
-		if err != nil {
-			return ToastError(f, err, fmt.Sprintf("Failed to parse MTU on interface %d", x))
-		}
-
-		iface := model.NetInterface{
-			Name: i.Ifname,
-			MAC:  mac,
-			IP:   ip,
-			FQDN: i.Fqdn,
-			BMC:  bmc,
-			VLAN: i.Vlan,
-			MTU:  uint16(mtu),
-		}
-		newHost.Interfaces = append(newHost.Interfaces, &iface)
-	}
-
-	err = h.DB.StoreHost(&newHost)
-	if err != nil {
-		return ToastError(f, err, "Failed to add host(s)")
-	}
-
-	return ToastSuccess(f, "Successfully added host(s)", `, "refresh": "", "closeModal": ""`)
 }
 
 func (h *Handler) SwitchMac(f *fiber.Ctx) error {

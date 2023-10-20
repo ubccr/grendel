@@ -1,8 +1,10 @@
 <div class="flex h-full flex-col">
     <div>
-        <h1 class="py-4 text-2xl">Add Host</h1>
-        <form hx-post="/api/host/add2" hx-vals="js:{Interfaces: parseForm()}" hx-swap="none" id="newHostForm">
-            <div class="grid grid-cols-2 gap-3 p-3">
+        <div class="m-2 flex justify-center align-middle ">
+            <h1 class="rounded-xl border border-neutral-300 px-3 py-1 text-3xl shadow-lg">Add Host</h1>
+        </div>
+        <form hx-post="/api/host" hx-vals="js:{Interfaces: parseForm()}" hx-swap="none" id="newHostForm">
+            <div class="grid grid-cols-2 gap-3 p-3 drop-shadow-sm">
                 <div>
                     <label for="Name" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Name:</label>
                     <input
@@ -59,7 +61,7 @@
                     <button
                         class="rounded-md bg-blue-500 px-2 py-1 text-white hover:bg-blue-400"
                         type="button"
-                        hx-get="/fragments/floorplan/interfaces"
+                        hx-get="/fragments/interfaces"
                         hx-target="#interfaces"
                         hx-swap="beforeend transition:true"
                         hx-vals="js:{ID: ifaceID()}">
@@ -78,7 +80,7 @@
         </form>
         <div class="grid grid-cols-2 gap-3 p-3">
             <input type="hidden" value="0" id="ifaceID" />
-            <div class="col-span-2 p-2" id="interfaces"></div>
+            <div class="col-span-2" id="interfaces"></div>
             <!-- <div class="col-span-2 hidden" id="deletedInterfaces"></div> -->
         </div>
     </div>

@@ -1,14 +1,11 @@
-{{ $tdClasses := "border border-neutral-300 px-2 py-1" }}
-
-
 <div class="flex justify-center">
-    <div class="mb-3 flex justify-center gap-2 rounded-xl border border-neutral-300 p-2 text-center shadow-lg">
+    <div class="mb-4 flex justify-center gap-2 rounded-xl border border-neutral-300 p-2 text-center shadow-lg">
         <div class="group z-50 my-auto flex justify-center">
             <button
                 hx-post="/api/bmc/reboot"
-                hx-vals='{"hosts": "{{ .Host.Name }}"}'
+                hx-vals='{"hosts": "{{ .HostName }}"}'
                 hx-target="#replace-me"
-                hx-confirm="Are you sure you want to reboot {{ .Host.Name }}?"
+                hx-confirm="Are you sure you want to reboot {{ .HostName }}?"
                 class="rounded-lg border border-neutral-300 p-1 text-sm hover:bg-neutral-50">
                 {{ template "icon-power" }}
             </button>
@@ -17,11 +14,11 @@
                 Reboot
             </span>
         </div>
-        <h1 class="text-3xl">{{ .Host.Name }}</h1>
+        <h1 class="text-3xl">{{ .HostName }}</h1>
         <div class="group z-50 my-auto flex justify-center">
             <button
                 hx-post="/api/bmc/configure"
-                hx-vals='{"hosts": "{{ .Host.Name }}"}'
+                hx-vals='{"hosts": "{{ .HostName }}"}'
                 hx-target="#toast"
                 class="rounded-lg border border-neutral-300 p-1 text-sm">
                 {{ template "icon-adjustments-horizontal" }}
@@ -33,76 +30,57 @@
         </div>
     </div>
 </div>
-<div id="replace-me"></div>
-<form class="flex justify-center" hx-post="/api/host" hx-ext="json-enc" hx-target="#update-message">
-    <input type="hidden" name="ID" value="{{ .Host.ID }}" />
-    <input type="hidden" name="Name" value="{{ .Host.Name }}" />
-    <div class="grid w-full grid-cols-1 gap-1 sm:w-2/3 lg:w-1/2 xl:w-2/5">
-        <div>
-            <label for="Provision">Provision:</label>
-            <input type="checkbox" name="Provision" id="Provision" {{ if .Host.Provision }}checked{{ end }} />
-        </div>
-
-        <div class="my-1">
-            <label for="Firmware" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Firmware:</label>
-            <select
-                class="w-full rounded-lg border border-neutral-300 bg-white px-2 py-1"
-                name="Firmware"
-                id="Firmware">
-                <option value="" class="italic">None</option>
-                {{ $fw := Sprintf "%s" $.Host.Firmware }}
-                {{ range .Firmware }}
-                    <option
-                        {{ if eq . $fw }}selected{{ end }}
-                        value="{{ . }}">
-                        {{ . }}
-                    </option>
-                {{ end }}
-            </select>
-        </div>
-
-        <div class="my-1">
-            <label for="BootImage" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Boot Image:</label>
-            <select
-                class="w-full rounded-lg border border-neutral-300 bg-white px-2 py-1"
-                name="BootImage"
-                id="BootImage">
-                <option value="" class="italic">None</option>
-                {{ range .BootImages }}
-                    <option
-                        {{ if eq .Name $.Host.BootImage }}selected{{ end }}
-                        value="{{ .Name }}">
-                        {{ .Name }}
-                    </option>
-                {{ end }}
-            </select>
-        </div>
-
-        <div class="my-1">
-            <label for="Tags" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Tags:</label>
-            <input
-                name="Tags"
-                id="Tags"
-                value="{{ Join .Host.Tags "," }}"
-                class="w-full rounded-lg border border-neutral-300 p-1 px-2" />
-        </div>
-
-        <div class="my-1">
-            <label for="Interfaces" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Interfaces:</label>
-            <textarea
-                name="Interfaces"
-                id="Interfaces"
-                rows="13"
-                class="w-full rounded-lg border border-neutral-300 p-2">
-                    {{- Stringify .Host.Interfaces }}
-                </textarea
-            >
-        </div>
-
-        <div>
-            <button type="submit" class="rounded-md bg-blue-500 px-2 py-1 text-white">Submit</button>
-        </div>
-    </div>
-</form>
-<div id="update-message"></div>
-<br />
+<div hx-get="/fragments/host/index/{{ .HostName }}" hx-trigger="load, refresh from:body"></div>
+<script>
+    function ifaceID() {
+        let id = document.getElementById("ifaceID").value;
+        document.getElementById("ifaceID").value++;
+        return id;
+    }
+    function removeIface(id) {
+        let iface = document.getElementById(`interface:${id}`);
+        useTransition(() => iface.remove());
+    }
+    function moveUp(id) {
+        let ifaces = document.getElementById("interfaces").children;
+        for (let i = 0; i < ifaces.length; i++) {
+            if (ifaces[i].id == `interface:${id}`) {
+                useTransition(() => ifaces[i].parentNode.insertBefore(ifaces[i], ifaces[i - 1]));
+                return;
+            }
+        }
+    }
+    function moveDown(id) {
+        let ifaces = document.getElementById("interfaces").children;
+        for (let i = 0; i < ifaces.length; i++) {
+            if (ifaces[i].id == `interface:${id}`) {
+                if (i + 2 <= ifaces.length) {
+                    useTransition(() => ifaces[i].parentNode.insertBefore(ifaces[i], ifaces[i + 2]));
+                    return;
+                } else if (i + 1 == ifaces.length) {
+                    useTransition(() => ifaces[i].parentNode.insertBefore(ifaces[i], ifaces[0]));
+                    return;
+                } else {
+                    useTransition(() => ifaces[i].parentNode.append(ifaces[i]));
+                    return;
+                }
+            }
+        }
+    }
+    function parseForm() {
+        let ifaces = document.getElementById("interfaces").children;
+        let interfaces = [];
+        for (let i = 0; i < ifaces.length; i++) {
+            let iface = {};
+            iface.Fqdn = ifaces[i].querySelector("input[name='Fqdn']").value;
+            iface.Mac = ifaces[i].querySelector("input[name='Mac']").value;
+            iface.Ip = ifaces[i].querySelector("input[name='Ip']").value;
+            iface.Ifname = ifaces[i].querySelector("input[name='Ifname']").value;
+            iface.Bmc = ifaces[i].querySelector("select[name='Bmc']").value;
+            iface.Vlan = ifaces[i].querySelector("input[name='Vlan']").value;
+            iface.Mtu = ifaces[i].querySelector("input[name='Mtu']").value;
+            interfaces.push(iface);
+        }
+        return JSON.stringify(interfaces);
+    }
+</script>

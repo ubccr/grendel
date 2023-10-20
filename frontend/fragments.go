@@ -2,11 +2,63 @@ package frontend
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/ubccr/grendel/firmware"
+	"github.com/ubccr/grendel/nodeset"
 )
+
+func (h *Handler) hostIndex(f *fiber.Ctx) error {
+	reqHost, err := nodeset.NewNodeSet(f.Params("host"))
+	if err != nil {
+		return ToastError(f, fmt.Errorf("invalid host"), "Invalid host")
+	}
+
+	host, err := h.DB.FindHosts(reqHost)
+	if err != nil || len(host) == 0 {
+		return ToastError(f, err, "Failed to find host")
+	}
+	type IfaceStrings struct {
+		FQDN string
+		MAC  string
+		IP   string
+		Name string
+		BMC  string
+		VLAN string
+		MTU  string
+	}
+	Interfaces := make([]IfaceStrings, len(host[0].Interfaces))
+
+	for i, iface := range host[0].Interfaces {
+		Interfaces[i].FQDN = iface.FQDN
+		Interfaces[i].MAC = iface.MAC.String()
+		Interfaces[i].IP = iface.IP.String()
+		Interfaces[i].Name = iface.Name
+		Interfaces[i].BMC = strconv.FormatBool(iface.BMC)
+		Interfaces[i].VLAN = iface.VLAN
+		Interfaces[i].MTU = strconv.FormatUint(uint64(iface.MTU), 10)
+	}
+
+	images, _ := h.DB.BootImages()
+	bootImages := make([]string, 0)
+	for _, i := range images {
+		bootImages = append(bootImages, i.Name)
+	}
+
+	fw := make([]string, 0)
+	for _, i := range firmware.BuildToStringMap {
+		fw = append(fw, i)
+	}
+
+	return f.Render("fragments/host/index", fiber.Map{
+		"Host":       host[0],
+		"BootImages": bootImages,
+		"Firmwares":  fw,
+		"Interfaces": Interfaces,
+	}, "")
+}
 
 func (h *Handler) HostAddModal(f *fiber.Ctx) error {
 	bootImages, _ := h.DB.BootImages()
@@ -171,10 +223,10 @@ func (h *Handler) floorplanModal(f *fiber.Ctx) error {
 		"BootImage": bootImages,
 	}, "")
 }
-func (h *Handler) floorplanInterfaces(f *fiber.Ctx) error {
+func (h *Handler) interfaces(f *fiber.Ctx) error {
 	id := f.Query("ID", "0")
 
-	return f.Render("fragments/floorplan/interfaces", fiber.Map{
+	return f.Render("fragments/interfaces", fiber.Map{
 		"ID": id,
 	}, "")
 }

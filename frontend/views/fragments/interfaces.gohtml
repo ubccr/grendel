@@ -1,4 +1,4 @@
-<div class="mb-4 grid grid-cols-2 gap-3 rounded-md border border-neutral-300 p-3" id="interface:{{ .ID }}">
+<div class="mb-4 grid grid-cols-2 gap-3 rounded-md border border-neutral-300 p-3 shadow-sm" id="interface:{{ .ID }}">
     <div class="col-span-2 flex gap-4 align-middle">
         <label for="Fqdn:{{ .ID }}" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">FQDN:</label>
         <input name="Fqdn" id="Fqdn:{{ .ID }}" class="w-full rounded-md border border-neutral-300 p-1 px-2" />
@@ -50,8 +50,8 @@
     <div>
         <label for="Bmc:{{ .ID }}" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">BMC:</label>
         <select class="w-full rounded-md border border-neutral-300 bg-white px-2 py-1" name="Bmc" id="Bmc:{{ .ID }}">
-            <option value="false">false</option>
-            <option value="true" {{ if eq .ID "0" }}selected{{ end }}>true</option>
+            <option value="true">true</option>
+            <option value="false" {{ if ne .ID "0" }}selected{{ end }}>false</option>
         </select>
     </div>
     <div>
