@@ -80,8 +80,8 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	app.Get("/rack/:rack", auth, h.Rack)
 
 	app.Get("/users", auth, h.Users)
-	api.Post("/users", auth, h.UsersPost)
-	fragment.Get("/userTable", auth, h.userTable)
+	api.Post("/users", auth, h.usersPost)
+	fragment.Get("/users/table", auth, h.usersTable)
 
 	api.Get("/search", auth, h.Search)
 

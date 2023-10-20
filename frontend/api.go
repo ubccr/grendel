@@ -380,7 +380,7 @@ func (h *Handler) Search(f *fiber.Ctx) error {
 	return nil
 }
 
-func (h *Handler) UsersPost(f *fiber.Ctx) error {
+func (h *Handler) usersPost(f *fiber.Ctx) error {
 	users := f.FormValue("Usernames")
 	role := f.FormValue("Role")
 	userList := strings.Split(users, ",")
@@ -392,5 +392,5 @@ func (h *Handler) UsersPost(f *fiber.Ctx) error {
 		}
 	}
 
-	return ToastSuccess(f, "Successfully updated user(s)", `, "updateUsers": ""`)
+	return ToastSuccess(f, "Successfully updated user(s)", `, "refresh": ""`)
 }
