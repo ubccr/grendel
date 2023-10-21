@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/ubccr/grendel/model"
 )
 
 func (h *Handler) Index(f *fiber.Ctx) error {
@@ -22,13 +21,15 @@ func (h *Handler) Register(f *fiber.Ctx) error {
 func (h *Handler) Login(f *fiber.Ctx) error {
 	return f.Render("login", fiber.Map{
 		"Title": "Grendel - Login",
+		"Rack":  f.Params("rack"),
 	})
 }
 
 func (h *Handler) Host(f *fiber.Ctx) error {
+	host := f.Params("host")
 	return f.Render("host", fiber.Map{
-		"Title":    fmt.Sprintf("Grendel - %s", f.Params("host")),
-		"HostName": f.Params("host"),
+		"Title":    fmt.Sprintf("Grendel - %s", host),
+		"HostName": host,
 	})
 }
 
@@ -40,36 +41,8 @@ func (h *Handler) Floorplan(f *fiber.Ctx) error {
 
 func (h *Handler) Rack(f *fiber.Ctx) error {
 	rack := f.Params("rack")
-
-	n, err := h.DB.FindTags([]string{rack})
-	if err != nil {
-		return ToastError(f, err, "Failed to find hosts tagged with rack")
-	}
-
-	hosts, err := h.DB.FindHosts(n)
-	if err != nil {
-		return ToastError(f, err, "Failed to find hosts")
-	}
-
-	var filtered model.HostList
-	for _, v := range hosts {
-		if v.HostType() == "power" && !v.HasAnyTags("1u", "2u") {
-			continue
-		}
-
-		filtered = append(filtered, v)
-	}
-
-	u := make([]string, 0)
-	// TODO: move min and max rack u to grendel.toml
-	for i := 42; i >= 3; i-- {
-		u = append(u, fmt.Sprintf("%02d", i))
-	}
-
 	return f.Render("rack", fiber.Map{
 		"Title": fmt.Sprintf("Grendel - %s", rack),
-		"u":     u,
-		"Hosts": filtered,
 		"Rack":  rack,
 	})
 }

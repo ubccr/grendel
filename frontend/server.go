@@ -2,7 +2,6 @@ package frontend
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -99,9 +98,12 @@ func (s *Server) Serve() error {
 		"Split":   strings.Split,
 		"Join":    strings.Join,
 		"Sprintf": fmt.Sprintf,
-		"Stringify": func(v interface{}) string {
-			b, _ := json.MarshalIndent(v, "", "    ")
-			return string(b)
+		"Iterate": func(count int) []string {
+			var Items []string
+			for i := 0; i < count; i++ {
+				Items = append(Items, fmt.Sprint(i))
+			}
+			return Items
 		},
 	}
 

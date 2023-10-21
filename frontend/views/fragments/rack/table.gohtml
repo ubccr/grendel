@@ -1,0 +1,61 @@
+{{ $tdClasses := "border border-neutral-300 px-2 py-1" }}
+
+
+<table class="w-full table-fixed">
+    <thead>
+        <tr>
+            <th class="{{ $tdClasses }} w-14">u</th>
+            <th class="{{ $tdClasses }}">{{ .Rack }}</th>
+            <th class="{{ $tdClasses }} w-14"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range $u := .u }}
+            {{ $hostName := "" }}
+            {{ $hostType := "" }}
+            {{ range $host := $.Hosts }}
+                {{ $s := Split $host.Name "-" }}
+                {{ $hostU := index $s 2 }}
+                {{ if eq $hostU $u }}
+                    {{ $hostName = $host.Name }}
+                    {{ $hostType = $host.HostType }}
+                {{ end }}
+            {{ end }}
+            <tr>
+                <td class="{{ $tdClasses }}">{{ $u }}</td>
+                <td
+                    class="{{ $tdClasses }} {{ if eq $hostType "switch" }}
+                        text-red-700
+                    {{ end }} hover:bg-neutral-50">
+                    <a class="hover:font-medium" href="/host/{{ $hostName }}" hx-boost="false">
+                        {{ $hostName }}
+                    </a>
+                </td>
+                <td class="{{ $tdClasses }}">
+                    <input type="checkbox" name="{{ $u }}:{{ $hostName }}:{{ $hostType }}" />
+                </td>
+            </tr>
+        {{ end }}
+    </tbody>
+</table>
+<script>
+    var lastChecked = null;
+    checkboxes = Array.from(document.querySelectorAll('td > input[type="checkbox"]'));
+    checkboxes.forEach((val) => {
+        val.addEventListener("click", function (e) {
+            if (lastChecked !== null && e.shiftKey) {
+                var start = checkboxes.indexOf(lastChecked);
+                var end = checkboxes.indexOf(this);
+
+                // reverse in case of selecting from bottom to top
+                var first = start < end ? start : end;
+                var last = start < end ? end : start;
+
+                for (let i = first; i <= last; i++) {
+                    checkboxes[i].checked = this.checked;
+                }
+            }
+            lastChecked = this;
+        });
+    });
+</script>

@@ -168,10 +168,12 @@ func (h *Handler) DeleteHost(f *fiber.Ctx) error {
 		return ToastError(f, err, "Failed to parse node set")
 	}
 
-	h.DB.DeleteHosts(ns)
+	err = h.DB.DeleteHosts(ns)
+	if err != nil {
+		return ToastError(f, err, "Failed to delete host(s)")
+	}
 
-	f.Response().Header.Add("HX-Refresh", "true")
-	return ToastSuccess(f, "Successfully deleted host(s)", ``)
+	return ToastSuccess(f, "Successfully deleted host(s)", `, "refresh":""`)
 }
 
 type RebootData struct {
@@ -336,43 +338,6 @@ func (h *Handler) HostAdd(f *fiber.Ctx) error {
 	return ToastSuccess(f, "Successfully added host(s)", ``)
 }
 
-func (h *Handler) SwitchMac(f *fiber.Ctx) error {
-	rack := f.FormValue("Rack")
-	hosts := strings.Split(f.FormValue("HostList"), ",")
-	mgmtMacList, err := GetMacAddress(h, f, rack, "Mgmt", hosts)
-	if err != nil {
-		return ToastError(f, err, "Failed to get mgmt MAC address")
-	}
-	coreMacList, err := GetMacAddress(h, f, rack, "Core", hosts)
-	if err != nil {
-		return ToastError(f, err, "Failed to get core MAC address")
-	}
-
-	type hostStruct struct {
-		Host     string
-		MgmtPort string
-		CorePort string
-		MgmtMac  string
-		CoreMac  string
-	}
-	hostList := make([]hostStruct, len(hosts))
-
-	for i, host := range hosts {
-		hostList[i] = hostStruct{
-			Host:     host,
-			MgmtPort: f.FormValue(fmt.Sprintf("%s:Mgmt", host), ""),
-			CorePort: f.FormValue(fmt.Sprintf("%s:Core", host), ""),
-			MgmtMac:  mgmtMacList[host],
-			CoreMac:  coreMacList[host],
-		}
-	}
-
-	return f.Render("fragments/hostAddModalList", fiber.Map{
-		"Hosts":    hostList,
-		"HostList": strings.Join(hosts, ","),
-	}, "")
-}
-
 func (h *Handler) Search(f *fiber.Ctx) error {
 	search := f.FormValue("search")
 
@@ -393,4 +358,87 @@ func (h *Handler) usersPost(f *fiber.Ctx) error {
 	}
 
 	return ToastSuccess(f, "Successfully updated user(s)", `, "refresh": ""`)
+}
+
+func (h *Handler) bulkHostAdd(f *fiber.Ctx) error {
+	type formStruct struct {
+		Provision string `form:"Provision"`
+		Firmware  string `form:"Firmware"`
+		BootImage string `form:"BootImage"`
+		Tags      string `form:"Tags"`
+	}
+
+	var formData formStruct
+	err := f.BodyParser(&formData)
+	if err != nil {
+		return ToastError(f, err, "Failed to bind form data")
+	}
+
+	var hostTableForm RackAddFormStruct
+	err = json.Unmarshal([]byte(f.FormValue("hostTable")), &hostTableForm)
+	if err != nil {
+		return ToastError(f, err, "Failed to Unmarshal the host table")
+	}
+
+	var newHosts []*model.Host
+	provision, err := strconv.ParseBool(formData.Provision)
+	if err != nil {
+		return ToastError(f, err, "Failed to parse provision boolean")
+	}
+
+	for _, host := range hostTableForm.Hosts {
+		var newInterface []*model.NetInterface
+		for i, iface := range host.Interfaces {
+			hostName := host.Name
+			hostNameArr := strings.Split(hostName, "-")
+			if hostTableForm.Interfaces[i].BMC == "true" && (hostNameArr[0] == "cpn" || hostNameArr[0] == "srv") {
+				hostName = strings.Replace(hostName, hostNameArr[0], "bmc", 1)
+			}
+
+			fqdn := fmt.Sprintf("%s.%s", hostName, hostTableForm.Interfaces[i].Domain)
+			mac, err := net.ParseMAC(iface.MAC)
+			if err != nil {
+				return ToastError(f, err, "Failed to parse MAC address")
+			}
+			ip, err := netip.ParsePrefix(iface.IP)
+			if err != nil {
+				return ToastError(f, err, "Failed to parse IP address")
+			}
+			bmc, err := strconv.ParseBool(hostTableForm.Interfaces[i].BMC)
+			if err != nil {
+				return ToastError(f, err, "Failed to parse BMC boolean")
+			}
+			mtu, err := strconv.Atoi(hostTableForm.Interfaces[i].MTU)
+			if err != nil {
+				return ToastError(f, err, "Failed to parse MTU")
+			}
+
+			newInterface = append(newInterface, &model.NetInterface{
+				Name: hostTableForm.Interfaces[i].Name,
+				FQDN: fqdn,
+				MAC:  mac,
+				IP:   ip,
+				BMC:  bmc,
+				VLAN: hostTableForm.Interfaces[i].VLAN,
+				MTU:  uint16(mtu),
+			})
+		}
+
+		newHosts = append(newHosts, &model.Host{
+			ID:         ksuid.New(),
+			Name:       host.Name,
+			Provision:  provision,
+			BootImage:  formData.BootImage,
+			Firmware:   firmware.NewFromString(formData.Firmware),
+			Tags:       strings.Split(formData.Tags, ","),
+			Interfaces: newInterface,
+		})
+	}
+
+	err = h.DB.StoreHosts(newHosts)
+	if err != nil {
+		return ToastError(f, err, "Failed to add host(s)")
+	}
+
+	return ToastSuccess(f, "Successfully added host(s)", `, "closeModal": "", "refresh": ""`)
 }

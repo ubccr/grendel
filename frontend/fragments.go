@@ -1,13 +1,15 @@
 package frontend
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/ubccr/grendel/firmware"
+	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
+	"github.com/ubccr/grendel/tors"
 )
 
 func (h *Handler) hostForm(f *fiber.Ctx) error {
@@ -41,21 +43,10 @@ func (h *Handler) hostForm(f *fiber.Ctx) error {
 		Interfaces[i].MTU = strconv.FormatUint(uint64(iface.MTU), 10)
 	}
 
-	images, _ := h.DB.BootImages()
-	bootImages := make([]string, 0)
-	for _, i := range images {
-		bootImages = append(bootImages, i.Name)
-	}
-
-	fw := make([]string, 0)
-	for _, i := range firmware.BuildToStringMap {
-		fw = append(fw, i)
-	}
-
 	return f.Render("fragments/host/form", fiber.Map{
 		"Host":       host[0],
-		"BootImages": bootImages,
-		"Firmwares":  fw,
+		"BootImages": h.getBootImages(),
+		"Firmwares":  h.getFirmware(),
 		"Interfaces": Interfaces,
 	}, "")
 }
@@ -63,15 +54,10 @@ func (h *Handler) hostForm(f *fiber.Ctx) error {
 func (h *Handler) HostAddModal(f *fiber.Ctx) error {
 	bootImages, _ := h.DB.BootImages()
 
-	fw := make([]string, 0)
-	for _, i := range firmware.BuildToStringMap {
-		fw = append(fw, i)
-	}
-
 	return f.Render("fragments/hostModal", fiber.Map{
 		"Rack":       f.FormValue("rack"),
 		"HostUs":     f.FormValue("hosts"),
-		"Firmwares":  fw,
+		"Firmwares":  h.getFirmware(),
 		"BootImages": bootImages,
 		"Defaults": fiber.Map{
 			"Core": fiber.Map{
@@ -168,7 +154,188 @@ func (h *Handler) HostAddModalInterfaces(f *fiber.Ctx) error {
 	return f.Render("fragments/hostAddModalInterfaces", fiber.Map{
 		"Hosts": hosts,
 	}, "")
+}
 
+func (h *Handler) rackTable(f *fiber.Ctx) error {
+	rack := f.Params("rack")
+
+	n, err := h.DB.FindTags([]string{rack})
+	if err != nil {
+		return ToastError(f, err, "Failed to find hosts tagged with rack")
+	}
+
+	hosts, err := h.DB.FindHosts(n)
+	if err != nil {
+		return ToastError(f, err, "Failed to find hosts")
+	}
+
+	var filtered model.HostList
+	for _, v := range hosts {
+		if v.HostType() == "power" && !v.HasAnyTags("1u", "2u") {
+			continue
+		}
+
+		filtered = append(filtered, v)
+	}
+
+	u := make([]string, 0)
+	// TODO: move min and max rack u to grendel.toml
+	for i := 42; i >= 3; i-- {
+		u = append(u, fmt.Sprintf("%02d", i))
+	}
+
+	return f.Render("fragments/rack/table", fiber.Map{
+		"u":     u,
+		"Hosts": filtered,
+		"Rack":  rack,
+	}, "")
+}
+
+func (h *Handler) rackAddModal(f *fiber.Ctx) error {
+	return f.Render("fragments/rack/add/modal", fiber.Map{
+		"Rack":       f.Params("rack"),
+		"Firmwares":  h.getFirmware(),
+		"BootImages": h.getBootImages(),
+		"RackUs":     f.Query("hosts"), // rename me
+	}, "")
+}
+
+type hostIfaceStruct struct {
+	Port string
+	MAC  string
+	IP   string
+}
+type hostStruct struct {
+	Name       string
+	Interfaces []hostIfaceStruct
+}
+type interfaceStruct struct {
+	Domain string
+	Name   string
+	BMC    string
+	VLAN   string
+	MTU    string
+}
+type RackAddFormStruct struct {
+	Hosts      []hostStruct
+	Interfaces []interfaceStruct
+}
+
+func (h *Handler) rackAddTable(f *fiber.Ctx) error {
+
+	prefix := f.FormValue("Prefix")
+	rack := f.Params("rack")
+	rackUs := f.FormValue("rackUs")
+	hostTable := f.FormValue("hostTable", "")
+	ifaceCount, err := strconv.Atoi(f.FormValue("IfaceCount"))
+	if err != nil {
+		return ToastError(f, err, "Invalid interface count")
+	}
+	uArr := strings.Split(rackUs, ",")
+
+	// Get list of switches for switch datalist
+	dbHosts, err := h.DB.Hosts()
+	if err != nil {
+		return ToastError(f, err, "Failed to load hosts")
+	}
+	switches := dbHosts.FilterPrefix("swe")
+	switchNames := make([]string, len(switches))
+	for i, sw := range switches {
+		switchNames[i] = sw.Name
+	}
+
+	// Hosts
+	var hosts RackAddFormStruct
+
+	if hostTable != "" {
+		err := json.Unmarshal([]byte(hostTable), &hosts)
+		if err != nil {
+			return ToastError(f, err, "Failed to Unmarshal the host table")
+		}
+	} else {
+		// Init new form
+		hosts = RackAddFormStruct{
+			Hosts:      make([]hostStruct, len(uArr)),
+			Interfaces: make([]interfaceStruct, ifaceCount),
+		}
+		for i := 0; i < len(uArr); i++ {
+			hosts.Hosts[i] = hostStruct{
+				Name:       fmt.Sprintf("%s-%s-%s", prefix, rack, uArr[i]),
+				Interfaces: make([]hostIfaceStruct, ifaceCount),
+			}
+			// Set first port (BMC) to same number as rack u
+			hosts.Hosts[i].Interfaces[0].Port = uArr[i]
+		}
+
+		// TODO: this should be configurable
+		// first iface (usually bmc)
+		hosts.Interfaces[0] = interfaceStruct{
+			Domain: "mgmt.ccr.buffalo.edu",
+			Name:   "",
+			BMC:    "true",
+			VLAN:   "",
+			MTU:    "1500",
+		}
+
+	}
+
+	// Generate IP ranges from subnet
+	interfaceIpArr := make([][]string, ifaceCount)
+	for i := 0; i < ifaceCount; i++ {
+		interfaceIpArr[i] = make([]string, len(hosts.Hosts))
+		subnet := f.FormValue(fmt.Sprintf("subnet:%d", i))
+		if subnet != "" {
+			ipArr, err := h.newHostIPs(subnet)
+			if err != nil {
+				return ToastError(f, err, "Failed to generate IP range")
+			}
+			interfaceIpArr[i] = ipArr
+		}
+	}
+
+	// Query MAC addresses
+	interfaceMacArr := make([]tors.MACTable, ifaceCount)
+	for i := 0; i < ifaceCount; i++ {
+		sw := f.FormValue(fmt.Sprintf("switch:%d", i), "")
+		if sw != "" && hosts.Hosts[0].Interfaces[i].MAC == "" {
+			macTable, err := h.getMacAddress(sw)
+			if err != nil {
+				return ToastError(f, err, "Failed to get MAC address table")
+			}
+			interfaceMacArr[i] = macTable
+		} else {
+			interfaceMacArr[i] = nil
+		}
+	}
+
+	// Map IP and MAC to hosts array
+	for i, host := range hosts.Hosts {
+		// update prefix if changed
+		// possible bug if prefix is individually changed by user
+		hostNameArr := strings.Split(host.Name, "-")
+		if hostNameArr[0] != prefix {
+			hosts.Hosts[i].Name = strings.Replace(host.Name, hostNameArr[0], prefix, 1)
+		}
+		for x, iface := range host.Interfaces {
+			hosts.Hosts[i].Interfaces[x].IP = interfaceIpArr[x][i]
+			if iface.Port != "" {
+				port, err := strconv.Atoi(iface.Port)
+				if err != nil {
+					return ToastError(f, err, "Invalid port number")
+				}
+				MAC := interfaceMacArr[x].Port(port)
+				if len(MAC) != 0 {
+					hosts.Hosts[i].Interfaces[x].MAC = MAC[0].MAC.String()
+				}
+			}
+		}
+	}
+
+	return f.Render("fragments/rack/add/table", fiber.Map{
+		"Hosts":      hosts,
+		"Switches":   switchNames,
+		"IfaceCount": ifaceCount,
+	}, "")
 }
 
 func (h *Handler) usersTable(f *fiber.Ctx) error {
@@ -207,22 +374,12 @@ func (h *Handler) floorplanTable(f *fiber.Ctx) error {
 }
 
 func (h *Handler) floorplanModal(f *fiber.Ctx) error {
-	fw := make([]string, 0)
-	for _, i := range firmware.BuildToStringMap {
-		fw = append(fw, i)
-	}
-
-	images, _ := h.DB.BootImages()
-	bootImages := make([]string, 0)
-	for _, i := range images {
-		bootImages = append(bootImages, i.Name)
-	}
-
 	return f.Render("fragments/floorplan/modal", fiber.Map{
-		"Firmware":  fw,
-		"BootImage": bootImages,
+		"Firmware":  h.getFirmware(),
+		"BootImage": h.getBootImages(),
 	}, "")
 }
+
 func (h *Handler) interfaces(f *fiber.Ctx) error {
 	id := f.Query("ID", "0")
 

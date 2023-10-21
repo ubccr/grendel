@@ -2,63 +2,31 @@ package frontend
 
 import (
 	"fmt"
-	"strconv"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/nodeset"
 	"github.com/ubccr/grendel/tors"
 )
 
-func GetMacAddress(h *Handler, f *fiber.Ctx, rack string, switchType string, hosts []string) (map[string]string, error) {
-	switchTag := "mgmt_leaf"
-	if switchType == "Core" {
-		switchTag = "core_leaf"
-	}
-	hostMacMap := make(map[string]string)
-
-	nodeset, err := h.DB.MatchTags([]string{rack, switchTag})
+func (h *Handler) getMacAddress(switchName string) (tors.MACTable, error) {
+	nodeset, err := nodeset.NewNodeSet(switchName)
 	if err != nil {
-		return hostMacMap, err
+		return nil, err
 	}
 	host, err := h.DB.FindHosts(nodeset)
 	if err != nil {
-		return hostMacMap, err
+		return nil, err
 	}
 
 	endpoint := fmt.Sprintf("https://%s", host[0].InterfaceBMC().ToStdAddr().String())
 	sw, err := tors.NewDellOS10(endpoint, "admin", viper.GetString("bmc.switch_admin_password"), "", true)
 	if err != nil {
-		return hostMacMap, err
+		return nil, err
 	}
 
 	macTable, err := sw.GetMACTable()
 	if err != nil {
-		return hostMacMap, err
+		return nil, err
 	}
-
-	for _, v := range hosts {
-
-		portString := f.FormValue(fmt.Sprintf("%s:%s", v, switchType))
-		// Exit if port is blank
-		if portString == "" {
-			hostMacMap[v] = ""
-			continue
-		}
-		port, err := strconv.Atoi(portString)
-		if err != nil {
-			return hostMacMap, err
-		}
-
-		var mac string
-		rawMac := macTable.Port(port)
-		if len(rawMac) == 0 {
-			mac = ""
-			// return hostMacMap, fmt.Errorf("No MAC address found for port %d", port)
-		} else {
-			mac = rawMac[0].MAC.String()
-		}
-
-		hostMacMap[v] = mac
-	}
-	return hostMacMap, nil
+	return macTable, nil
 }
