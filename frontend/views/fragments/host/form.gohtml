@@ -81,6 +81,20 @@
                         value="{{ $iface.FQDN }}"
                         class="w-full rounded-md border border-neutral-300 p-1 px-2" />
                     <div class="flex gap-1 align-middle">
+                        {{ if eq $iface.BMC "true" }}
+                            <a
+                                class="my-auto rounded-md bg-blue-500 text-white hover:bg-blue-400"
+                                href="https://{{- if eq $iface.FQDN "" -}}
+                                    {{- $iface.IP -}}
+                                {{- else -}}
+                                    {{- $iface.FQDN -}}
+                                {{- end -}}"
+                                target="_blank">
+                                <div class="scale-90">
+                                    {{ template "icon-arrow-top-right-on-square" }}
+                                </div>
+                            </a>
+                        {{ end }}
                         <button
                             class="my-auto rounded-md bg-neutral-500 text-white hover:bg-neutral-400"
                             onclick="moveUp('{{ $i }}')"
