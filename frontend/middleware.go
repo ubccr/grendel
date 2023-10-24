@@ -12,7 +12,7 @@ func (h *Handler) EnforceAuthMiddleware() func(f *fiber.Ctx) error {
 		if sess.Get("authenticated") == nil {
 			msg := "Authentication required. Please login to continue."
 			c.Response().Header.Add("HX-Trigger", fmt.Sprintf(`{"toast-error": "%s"}`, msg))
-			return c.Status(fiber.StatusUnauthorized).SendString(msg)
+			return c.Status(fiber.StatusUnauthorized).Redirect("/login")
 		}
 		return c.Next()
 	}
