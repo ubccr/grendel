@@ -107,6 +107,7 @@
                 ripple: false,
             });
             notyf.error(e.detail.value);
+            console.error(e.detail.value);
         });
         document.body.addEventListener("toast-success", function (e) {
             let notyf = new Notyf({
@@ -115,6 +116,7 @@
                 ripple: false,
             });
             notyf.success(e.detail.value);
+            console.log(e.detail.value);
         });
 
         function showMobile() {
