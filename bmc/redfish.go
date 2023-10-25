@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	"github.com/kgrvamsi/redfishapi"
 	"github.com/spf13/viper"
 	"github.com/stmcginnis/gofish"
@@ -67,7 +68,7 @@ func NewRedfish(endpoint, user, pass string, insecure bool) (*Redfish, error) {
 func (r *Redfish) Logout() {
 	r.client.Logout()
 }
-func ConfigureIdrac(ip string) error {
+func IdracAutoConfigure(ip string) error {
 
 	user := viper.GetString("bmc.user")
 	pass := viper.GetString("bmc.password")
@@ -87,6 +88,12 @@ func ConfigureIdrac(ip string) error {
 	})
 
 	_, err := c.SetAttributesDell("idrac", b)
+	if err != nil {
+		// Try default creds
+		c.Username = "root"
+		c.Password = "calvin"
+		_, err = c.SetAttributesDell("idrac", b)
+	}
 	return err
 
 }
@@ -122,6 +129,49 @@ func RebootHost(ip string) error {
 		}
 	}
 	return nil
+}
+func IdracImportSytemConfig(ip string, path string) error {
+
+	user := viper.GetString("bmc.user")
+	pass := viper.GetString("bmc.password")
+
+	c := redfishapi.NewIloClient(fmt.Sprintf("https://%s", ip), user, pass)
+
+	type shareParameters struct {
+		Target    []string `json:"Target"`
+		ShareType string   `json:"ShareType"`
+		IPAddress string   `json:"IPAddress"`
+		FileName  string   `json:"FileName"`
+	}
+	type body struct {
+		HostPowerState  string `json:"HostPowerState"`
+		ShutdownType    string `json:"ShutdownType"`
+		ImportBuffer    string `json:"ImportBuffer"`
+		ShareParameters shareParameters
+	}
+
+	b, _ := json.Marshal(body{
+		HostPowerState: "On",
+		ShutdownType:   "Graceful",
+		ShareParameters: shareParameters{
+			Target:    []string{"ALL"},
+			ShareType: viper.GetString("bmc.config_share_type"),
+			IPAddress: viper.GetString("bmc.config_share_ip"),
+			FileName:  path,
+		},
+	})
+
+	_, err := c.ImportConfigDell(b)
+
+	if err != nil && err.Error() == "Unauthorized" {
+		// Try default creds
+		c.Username = "root"
+		c.Password = "calvin"
+		_, err = c.ImportConfigDell(b)
+	}
+
+	return err
+
 }
 
 func (r *Redfish) powerReset(resetTypeOrder []string) error {

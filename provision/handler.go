@@ -85,6 +85,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	boot.GET("cloud-init/vendor-data", h.VendorData)
 	boot.GET("pxe-config.ign", h.Ignition)
 	boot.GET("provision/:name", h.ProvisionTemplate)
+	boot.GET("bmc/:name", h.BmcTemplate)
 }
 
 func (h *Handler) Index(c echo.Context) error {
@@ -332,6 +333,21 @@ func (h *Handler) ProvisionTemplate(c echo.Context) error {
 	}
 
 	log.Infof("Sending provision template %s to host %s", c.Param("name"), host.Name)
+	return c.Render(http.StatusOK, tmplName, data)
+}
+
+func (h *Handler) BmcTemplate(c echo.Context) error {
+	_, host, _, data, err := h.verifyClaims(c)
+	if err != nil {
+		return err
+	}
+
+	tmplName := c.Param("name")
+	if tmplName == "" {
+		return echo.NewHTTPError(http.StatusNotFound, "")
+	}
+
+	log.Infof("Sending bmc template %s to host %s", c.Param("name"), host.Name)
 	return c.Render(http.StatusOK, tmplName, data)
 }
 

@@ -65,7 +65,6 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	fragment.Get("/host/:host/form", auth, h.hostForm)
 	api.Post("/host", auth, h.EditHost)
 	api.Delete("/host", auth, h.DeleteHost)
-	api.Post("/host/add", auth, h.HostAdd)
 
 	fragment.Get("/interfaces", auth, h.interfaces)
 
@@ -75,6 +74,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 
 	app.Get("/rack/:rack", auth, h.Rack)
 	fragment.Get("/rack/:rack/table", auth, h.rackTable)
+	fragment.Get("/rack/:rack/actions", auth, h.rackActions)
 	fragment.Get("/rack/:rack/add/modal", auth, h.rackAddModal)
 	fragment.Post("/rack/:rack/add/table", auth, h.rackAddTable)
 
@@ -87,6 +87,6 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	api.Get("/search", auth, h.Search)
 
 	api.Post("/bmc/reboot", auth, h.RebootHost)
-	api.Post("/bmc/configure", auth, h.BmcConfigure)
-	api.Post("/bmc/configureTest", auth, h.BmcConfigureTest)
+	api.Post("/bmc/configure/auto", auth, h.bmcConfigureAuto)
+	api.Post("/bmc/configure/import", auth, h.bmcConfigureImport)
 }

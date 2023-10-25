@@ -39,11 +39,34 @@ func (j *JobRunner) Wait() {
 	j.limit.Wait()
 }
 
-func (j *JobRunner) RunConfigure(host *model.Host, ch chan string) {
+func (j *JobRunner) RunConfigureAuto(host *model.Host, ch chan string) {
 	j.limit.Execute(func() {
 		ip := host.InterfaceBMC().AddrString()
-		err := bmc.ConfigureIdrac(ip)
+		err := bmc.IdracAutoConfigure(ip)
 		msg := "Success"
+
+		if err != nil {
+			msg = fmt.Sprintf("Error - %s", err)
+			cmd.Log.WithFields(logrus.Fields{
+				"err":  err,
+				"name": host,
+			}).Error("Failed to connect to BMC")
+		}
+		ch <- fmt.Sprintf("%s: %s", host.Name, msg)
+	})
+}
+func (j *JobRunner) RunConfigureImport(host *model.Host, file string, ch chan string) {
+	j.limit.Execute(func() {
+		ip := host.InterfaceBMC().AddrString()
+		token, err := model.NewBootToken(host.ID.String(), host.InterfaceBMC().MAC.String())
+		if err != nil {
+			ch <- fmt.Sprintf("%s: Error - %s", host.Name, err)
+			return
+		}
+		path := fmt.Sprintf("/boot/%s/bmc/%s", token, file)
+		msg := "Success"
+
+		err = bmc.IdracImportSytemConfig(ip, path)
 
 		if err != nil {
 			msg = fmt.Sprintf("Error - %s", err)

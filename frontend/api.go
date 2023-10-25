@@ -117,19 +117,19 @@ func (h *Handler) EditHost(f *fiber.Ctx) error {
 	for i, iface := range ifaces {
 		mac, err := net.ParseMAC(iface.MAC)
 		if err != nil {
-			return ToastError(f, err, fmt.Sprintf("Failed to parse MAC address on interface %s", i))
+			return ToastError(f, err, fmt.Sprintf("Failed to parse MAC address on interface %d", i))
 		}
 		ip, err := netip.ParsePrefix(iface.IP)
 		if err != nil {
-			return ToastError(f, err, fmt.Sprintf("Failed to parse IP address on interface %s", i))
+			return ToastError(f, err, fmt.Sprintf("Failed to parse IP address on interface %d", i))
 		}
 		bmc, err := strconv.ParseBool(iface.BMC)
 		if err != nil {
-			return ToastError(f, err, fmt.Sprintf("Failed to parse BMC boolean on interface %s", i))
+			return ToastError(f, err, fmt.Sprintf("Failed to parse BMC boolean on interface %d", i))
 		}
 		mtu, err := strconv.Atoi(iface.MTU)
 		if err != nil {
-			return ToastError(f, err, fmt.Sprintf("Failed to parse MTU on interface %s", i))
+			return ToastError(f, err, fmt.Sprintf("Failed to parse MTU on interface %d", i))
 		}
 
 		interfaces = append(interfaces, &model.NetInterface{
@@ -211,7 +211,7 @@ func (h *Handler) RebootHost(f *fiber.Ctx) error {
 	return ToastSuccess(f, "Successfully Rebooted node(s) <br />"+output, ``)
 }
 
-func (h *Handler) BmcConfigure(f *fiber.Ctx) error {
+func (h *Handler) bmcConfigureAuto(f *fiber.Ctx) error {
 	delay := viper.GetInt("bmc.delay")
 	fanout := viper.GetInt("bmc.fanout")
 
@@ -231,7 +231,7 @@ func (h *Handler) BmcConfigure(f *fiber.Ctx) error {
 
 	for i, host := range hostList {
 		ch := make(chan string)
-		runner.RunConfigure(host, ch)
+		runner.RunConfigureAuto(host, ch)
 		if (i+1)%fanout == 0 {
 			time.Sleep(time.Duration(delay) * time.Second)
 		}
@@ -241,101 +241,39 @@ func (h *Handler) BmcConfigure(f *fiber.Ctx) error {
 
 	return ToastSuccess(f, "Successfully sent Auto Configure to node(s) <br />"+output, ``)
 }
+func (h *Handler) bmcConfigureImport(f *fiber.Ctx) error {
+	delay := viper.GetInt("bmc.delay")
+	fanout := viper.GetInt("bmc.fanout")
+	file := f.FormValue("File")
+	if file == "" {
+		return ToastError(f, nil, "No file specified")
+	}
 
-type hostAddData struct {
-	Firmware   string `form:"Firmware"`
-	Provision  string `form:"Provision"`
-	BootImage  string `form:"BootImage"`
-	Tags       string `form:"Tags"`
-	MgmtDomain string `form:"Mgmt:Domain"`
-	CoreDomain string `form:"Core:Domain"`
-	MgmtMtu    string `form:"Mgmt:Mtu"`
-	CoreMtu    string `form:"Core:Mtu"`
-}
-
-func (h *Handler) HostAdd(f *fiber.Ctx) error {
-	var formData hostAddData
-	err := f.BodyParser(&formData)
+	hosts := f.FormValue("hosts")
+	ns, err := nodeset.NewNodeSet(hosts)
 	if err != nil {
-		return ToastError(f, err, "Failed to bind form data")
+		return ToastError(f, err, "Failed to parse node set")
 	}
 
-	pString := formData.Provision
-	provision := false
-	if pString == "on" {
-		provision = true
-	}
-
-	mgmtMtu, err := strconv.Atoi(formData.MgmtMtu)
+	hostList, _ := h.DB.FindHosts(ns)
 	if err != nil {
-		return ToastError(f, err, "Failed to parse MTU")
-	}
-	coreMtu, err := strconv.Atoi(formData.CoreMtu)
-	if err != nil {
-		return ToastError(f, err, "Failed to parse MTU")
+		return ToastError(f, err, "Failed to find nodes")
 	}
 
-	hostList := strings.Split(f.FormValue("HostList"), ",")
+	runner := NewJobRunner(fanout)
+	output := ""
 
-	for _, v := range hostList {
-		hostArr := strings.Split(v, "-")
-		noPrefix := strings.Join(hostArr[1:], "-")
-		bmcHost := fmt.Sprintf("bmc-%s", noPrefix)
-		mgmtMac, err := net.ParseMAC(f.FormValue(fmt.Sprintf("%s:MgmtMac", v)))
-		if err != nil {
-			return ToastError(f, err, "Failed to parse MAC address")
+	for i, host := range hostList {
+		ch := make(chan string)
+		runner.RunConfigureImport(host, file, ch)
+		if (i+1)%fanout == 0 {
+			time.Sleep(time.Duration(delay) * time.Second)
 		}
-		coreMac, err := net.ParseMAC(f.FormValue(fmt.Sprintf("%s:CoreMac", v)))
-		if err != nil {
-			return ToastError(f, err, "Failed to parse MAC address")
-		}
-
-		mgmtIp, err := netip.ParsePrefix(f.FormValue(fmt.Sprintf("%s:MgmtIp", v)))
-		if err != nil {
-			return ToastError(f, err, "Failed to parse IP address")
-		}
-		coreIp, err := netip.ParsePrefix(f.FormValue(fmt.Sprintf("%s:CoreIp", v)))
-		if err != nil {
-			return ToastError(f, err, "Failed to parse IP address")
-		}
-
-		ifaces := make([]*model.NetInterface, 2)
-		ifaces[0] = &model.NetInterface{
-			Name: f.FormValue("Mgmt:Ifname"),
-			FQDN: fmt.Sprintf("%s.%s", bmcHost, formData.MgmtDomain),
-			IP:   mgmtIp,
-			MAC:  mgmtMac,
-			BMC:  true,
-			VLAN: f.FormValue("Mgmt:Vlan"),
-			MTU:  uint16(mgmtMtu),
-		}
-		ifaces[1] = &model.NetInterface{
-			Name: f.FormValue("Core:Ifname"),
-			FQDN: fmt.Sprintf("%s.%s", v, formData.CoreDomain),
-			IP:   coreIp,
-			MAC:  coreMac,
-			BMC:  false,
-			VLAN: f.FormValue("Core:Vlan"),
-			MTU:  uint16(coreMtu),
-		}
-		newHost := model.Host{
-			ID:         ksuid.New(),
-			Name:       v,
-			Provision:  provision,
-			BootImage:  formData.BootImage,
-			Firmware:   firmware.NewFromString(formData.Firmware),
-			Tags:       strings.Split(formData.Tags, ","),
-			Interfaces: ifaces,
-		}
-		err = h.DB.StoreHost(&newHost)
-		if err != nil {
-			return ToastError(f, err, "Failed to add host(s)")
-		}
-
+		output += <-ch + "<br />"
 	}
+	runner.Wait()
 
-	f.Response().Header.Add("HX-Refresh", "true")
-	return ToastSuccess(f, "Successfully added host(s)", ``)
+	return ToastSuccess(f, "Successfully sent system config to node(s) <br />"+output, ``)
 }
 
 func (h *Handler) Search(f *fiber.Ctx) error {
@@ -391,11 +329,15 @@ func (h *Handler) bulkHostAdd(f *fiber.Ctx) error {
 		for i, iface := range host.Interfaces {
 			hostName := host.Name
 			hostNameArr := strings.Split(hostName, "-")
+			if len(hostNameArr) < 1 {
+				return ToastError(f, err, "Failed to parse host name")
+			}
 			if hostTableForm.Interfaces[i].BMC == "true" && (hostNameArr[0] == "cpn" || hostNameArr[0] == "srv") {
 				hostName = strings.Replace(hostName, hostNameArr[0], "bmc", 1)
 			}
 
 			fqdn := fmt.Sprintf("%s.%s", hostName, hostTableForm.Interfaces[i].Domain)
+			// TODO: allow blank MACs
 			mac, err := net.ParseMAC(iface.MAC)
 			if err != nil {
 				return ToastError(f, err, "Failed to parse MAC address")

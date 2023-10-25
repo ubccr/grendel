@@ -1,46 +1,16 @@
 <form>
     <div class="mb-3 flex justify-center gap-2">
         <button
-            class="grid rounded-lg border border-blue-500 p-1"
+            class="rounded-lg border bg-blue-500 px-2 py-1 text-white hover:bg-blue-400"
             type="button"
-            hx-post="/api/bmc/reboot"
-            hx-swap="none"
-            hx-target="#toast"
-            hx-vals="js:{hosts: HostMap()}"
-            hx-confirm="Are you sure you want to reboot these nodes?"
-            hx-ext="loading-states"
-            data-loading-states
-            data-loading-disable>
-            <span data-loading-class="opacity-0" style="grid-area: 1/1;">Reboot</span>
-            <span
-                data-loading-class-remove="opacity-0"
-                data-loading-class="opacity-100"
-                class="mx-auto block h-6 w-6 opacity-0"
-                style="grid-area: 1/1;">
-                {{ template "icon-spinner" }}
-            </span>
+            hx-get="/fragments/rack/{{ .Rack }}/actions"
+            hx-target="#hostModal"
+            hx-swap="innerHTML transition:true"
+            onclick="showModal()">
+            Actions
         </button>
         <button
-            class="grid rounded-lg border border-blue-500 p-1"
-            type="button"
-            hx-post="/api/bmc/configure"
-            hx-swap="none"
-            hx-target="#toast"
-            hx-vals="js:{hosts: HostMap()}"
-            hx-ext="loading-states"
-            data-loading-states
-            data-loading-disable>
-            <span data-loading-class="opacity-0" style="grid-area: 1/1;">Auto Configure</span>
-            <span
-                data-loading-class-remove="opacity-0"
-                data-loading-class="opacity-100"
-                class="mx-auto block h-6 w-6 opacity-0"
-                style="grid-area: 1/1;">
-                {{ template "icon-spinner" }}
-            </span>
-        </button>
-        <button
-            class="rounded-lg border border-blue-500 p-1"
+            class="rounded-lg border bg-blue-500 px-2 py-1 text-white hover:bg-blue-400"
             type="button"
             hx-get="/fragments/rack/{{ .Rack }}/add/modal"
             hx-target="#hostModal"
@@ -50,7 +20,7 @@
             Add Hosts
         </button>
         <button
-            class="rounded-lg border border-blue-500 p-1"
+            class="rounded-lg border bg-amber-500 px-2 py-1 text-white hover:bg-amber-400"
             type="button"
             hx-delete="/api/host"
             hx-vals='js:{hosts: HostMap("hostname")}'
@@ -58,10 +28,18 @@
             hx-confirm="Are you sure you want to delete the selected hosts?">
             Delete Hosts
         </button>
-        <button class="rounded-lg border border-blue-500 p-1" type="button" onclick="SelectAllNodes()">
+        <button
+            class="rounded-lg border bg-blue-500 px-2 py-1 text-white hover:bg-blue-400"
+            type="button"
+            onclick="SelectAllNodes()">
             Select Nodes
         </button>
-        <button class="rounded-lg border border-blue-500 p-1" type="button" onclick="Clear()">Clear</button>
+        <button
+            class="rounded-lg border bg-neutral-500 px-2 py-1 text-white hover:bg-neutral-400"
+            type="button"
+            onclick="Clear()">
+            Clear
+        </button>
     </div>
 
     <div hx-get="/fragments/rack/{{ .Rack }}/table" hx-swap="innerHTML" hx-trigger="load, refresh from:body"></div>
@@ -75,6 +53,7 @@
     }
     function closeModal() {
         useTransition(() => document.getElementById("hostModal").close());
+        useTransition(() => (document.getElementById("hostModal").innerHTML = ""));
     }
     function SelectAllNodes() {
         var c = document.querySelectorAll('td > input[type="checkbox"]').forEach((val) => {
@@ -109,7 +88,7 @@
         if (document.getElementById("hostTableBody") == null) return "";
 
         let table = document.getElementById("hostTableBody").children;
-        let ifaceCount = document.getElementById("ifaceCount").value;
+        let ifaceCount = document.getElementById("hostTableFirstRow").children.length - 1; //exclude first col
         let hosts = [];
 
         for (let i = 0; i < table.length; i++) {

@@ -1,0 +1,87 @@
+<div class="flex h-full flex-col">
+    <div>
+        <div class="m-2 mb-4 flex justify-center align-middle ">
+            <h1 class="rounded-xl border border-neutral-300 px-3 py-1 text-3xl shadow-lg">Actions</h1>
+        </div>
+        <div class="flex justify-center gap-3">
+            <button
+                class="grid rounded-lg border bg-amber-500 px-2 py-1 text-white hover:bg-amber-400"
+                type="button"
+                hx-post="/api/bmc/reboot"
+                hx-swap="none"
+                hx-vals="js:{hosts: HostMap()}"
+                hx-confirm="Are you sure you want to reboot these nodes?"
+                hx-ext="loading-states"
+                data-loading-states
+                data-loading-disable>
+                <span data-loading-class="opacity-0" style="grid-area: 1/1;">Reboot</span>
+                <span
+                    data-loading-class-remove="opacity-0"
+                    data-loading-class="opacity-100"
+                    class="mx-auto block h-6 w-6 opacity-0"
+                    style="grid-area: 1/1;">
+                    {{ template "icon-spinner" }}
+                </span>
+            </button>
+            <button
+                class="grid rounded-lg border bg-blue-500 px-2 py-1 text-white hover:bg-blue-400"
+                type="button"
+                hx-post="/api/bmc/configure/auto"
+                hx-swap="none"
+                hx-vals="js:{hosts: HostMap()}"
+                hx-ext="loading-states"
+                data-loading-states
+                data-loading-disable>
+                <span data-loading-class="opacity-0" style="grid-area: 1/1;">Auto Configure</span>
+                <span
+                    data-loading-class-remove="opacity-0"
+                    data-loading-class="opacity-100"
+                    class="mx-auto block h-6 w-6 opacity-0"
+                    style="grid-area: 1/1;">
+                    {{ template "icon-spinner" }}
+                </span>
+            </button>
+            <form
+                hx-post="/api/bmc/config/import"
+                hx-swap="none"
+                hx-vals="js:{hosts: HostMap()}"
+                hx-ext="loading-states"
+                hx-confirm="Warning: Sending a system configuration will reboot the selected hosts if necessary.">
+                <div class="flex gap-2">
+                    <div class="group">
+                        <label for="File" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">File:</label>
+                        <input
+                            id="File"
+                            name="File"
+                            class="w-full rounded-md border border-neutral-300 px-2 py-1"
+                            placeholder="idrac-config.json.tmpl"
+                            type="text" />
+                    </div>
+                    <button
+                        class="grid rounded-lg border bg-amber-500 px-2 py-1 text-white hover:bg-amber-400"
+                        type="submit"
+                        data-loading-states
+                        data-loading-disable>
+                        <span data-loading-class="opacity-0" style="grid-area: 1/1;">Send Config</span>
+                        <span
+                            data-loading-class-remove="opacity-0"
+                            data-loading-class="opacity-100"
+                            class="mx-auto block h-6 w-6 opacity-0"
+                            style="grid-area: 1/1;">
+                            {{ template "icon-spinner" }}
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="flex-grow"></div>
+    <div class="sticky bottom-0 flex w-full justify-end gap-3 border-t border-neutral-200 bg-neutral-50 p-3">
+        <button
+            type="button"
+            onclick="closeModal()"
+            class="rounded-md border bg-neutral-500 px-2 py-1 text-white hover:bg-neutral-400">
+            Close
+        </button>
+    </div>
+</div>
