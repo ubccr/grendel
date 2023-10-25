@@ -150,7 +150,7 @@ var (
 					}
 				}
 
-				fmt.Printf("%-20s%-20s%-20s\n", k, host.Name, name)
+				fmt.Printf("%-20s%-20s%-40s%-45s\n", k, host.Name, name, strings.Join(host.Tags, ","))
 			}
 
 			return nil
