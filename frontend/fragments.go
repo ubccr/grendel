@@ -86,6 +86,10 @@ func (h *Handler) rackTable(f *fiber.Ctx) error {
 	}, "")
 }
 
+func (h *Handler) rackActions(f *fiber.Ctx) error {
+	return f.Render("fragments/rack/actions", fiber.Map{}, "")
+}
+
 func (h *Handler) rackAddModal(f *fiber.Ctx) error {
 	return f.Render("fragments/rack/add/modal", fiber.Map{
 		"Rack":       f.Params("rack"),
@@ -146,6 +150,25 @@ func (h *Handler) rackAddTable(f *fiber.Ctx) error {
 		err := json.Unmarshal([]byte(hostTable), &hosts)
 		if err != nil {
 			return ToastError(f, err, "Failed to Unmarshal the host table")
+		}
+
+		// init new iface if needed
+		if len(hosts.Interfaces) < ifaceCount {
+			hosts.Interfaces = append(hosts.Interfaces, interfaceStruct{
+				// TODO: make configurable
+				Domain: "core.ccr.buffalo.edu",
+				Name:   "eno12399",
+				BMC:    "false",
+				VLAN:   "",
+				MTU:    "9000",
+			})
+			for h := range hosts.Hosts {
+				hosts.Hosts[h].Interfaces = append(hosts.Hosts[h].Interfaces, hostIfaceStruct{
+					Port: "",
+					MAC:  "",
+					IP:   "",
+				})
+			}
 		}
 	} else {
 		// Init new form

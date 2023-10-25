@@ -1,8 +1,13 @@
 <div class="overflow-x-auto pb-3">
     <table class="table-fixed" id="hostTable">
         <thead>
-            <tr>
+            <tr id="hostTableFirstRow">
                 <th class="border border-neutral-300" rowspan="3">Node</th>
+                {{ range $i := Iterate .IfaceCount }}
+                    <th class="interface-{{ $i }} border border-neutral-300" colspan="3">Interface {{ $i }}</th>
+                {{ end }}
+            </tr>
+            <tr>
                 {{ range $i := Iterate .IfaceCount }}
                     <td class="interface-{{ $i }} border border-neutral-300">
                         <div class="flex justify-center align-middle">
@@ -14,18 +19,14 @@
                             </button>
                         </div>
                     </td>
-                    <th class="interface-{{ $i }} border border-neutral-300" colspan="2">Interface {{ $i }}</th>
-                {{ end }}
-            </tr>
-            <tr>
-                {{ range $i := Iterate .IfaceCount }}
-                    <th class="interface-{{ $i }} w-10 border border-neutral-300" rowspan="2">Port</th>
                     <th class="interface-{{ $i }} border border-neutral-300">MAC Address</th>
                     <th class="interface-{{ $i }} border border-neutral-300">IP Address</th>
                 {{ end }}
             </tr>
             <tr>
                 {{ range $i := Iterate .IfaceCount }}
+                    <th class="interface-{{ $i }} w-10 border border-neutral-300">Port</th>
+
                     <td class="interface-{{ $i }} border border-neutral-300">
                         <input
                             class="refresh w-36 rounded-md border border-neutral-300 p-1 px-2"

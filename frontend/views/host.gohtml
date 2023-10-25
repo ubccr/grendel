@@ -17,7 +17,7 @@
         <h1 class="text-3xl">{{ .HostName }}</h1>
         <div class="group z-50 my-auto flex justify-center">
             <button
-                hx-post="/api/bmc/configure"
+                hx-post="/api/bmc/configure/auto"
                 hx-vals='{"hosts": "{{ .HostName }}"}'
                 hx-target="#toast"
                 class="rounded-lg border border-neutral-300 p-1 text-sm">
