@@ -4,7 +4,7 @@
             <button
                 hx-post="/api/bmc/reboot"
                 hx-vals='{"hosts": "{{ .HostName }}"}'
-                hx-target="#replace-me"
+                hx-swap="none"
                 hx-confirm="Are you sure you want to reboot {{ .HostName }}?"
                 class="rounded-lg border border-neutral-300 p-1 text-sm hover:bg-neutral-50">
                 {{ template "icon-power" }}
@@ -19,7 +19,7 @@
             <button
                 hx-post="/api/bmc/configure/auto"
                 hx-vals='{"hosts": "{{ .HostName }}"}'
-                hx-target="#toast"
+                hx-swap="none"
                 class="rounded-lg border border-neutral-300 p-1 text-sm">
                 {{ template "icon-adjustments-horizontal" }}
             </button>
