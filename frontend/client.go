@@ -21,15 +21,6 @@ func (h *Handler) Register(f *fiber.Ctx) error {
 func (h *Handler) Login(f *fiber.Ctx) error {
 	return f.Render("login", fiber.Map{
 		"Title": "Grendel - Login",
-		"Rack":  f.Params("rack"),
-	})
-}
-
-func (h *Handler) Host(f *fiber.Ctx) error {
-	host := f.Params("host")
-	return f.Render("host", fiber.Map{
-		"Title":    fmt.Sprintf("Grendel - %s", host),
-		"HostName": host,
 	})
 }
 
@@ -44,6 +35,14 @@ func (h *Handler) Rack(f *fiber.Ctx) error {
 	return f.Render("rack", fiber.Map{
 		"Title": fmt.Sprintf("Grendel - %s", rack),
 		"Rack":  rack,
+	})
+}
+
+func (h *Handler) Host(f *fiber.Ctx) error {
+	host := f.Params("host")
+	return f.Render("host", fiber.Map{
+		"Title":    fmt.Sprintf("Grendel - %s", host),
+		"HostName": host,
 	})
 }
 
