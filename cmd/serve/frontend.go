@@ -14,6 +14,10 @@ import (
 func init() {
 	frontendCmd.PersistentFlags().String("frontend-listen", "0.0.0.0:8080", "address to listen on")
 	viper.BindPFlag("frontend.listen", frontendCmd.PersistentFlags().Lookup("frontend-listen"))
+	frontendCmd.Flags().String("frontend-cert", "", "path to ssl cert")
+	viper.BindPFlag("frontend.cert", frontendCmd.Flags().Lookup("frontend-cert"))
+	frontendCmd.Flags().String("frontend-key", "", "path to ssl key")
+	viper.BindPFlag("frontend.key", frontendCmd.Flags().Lookup("frontend-key"))
 
 	serveCmd.AddCommand(frontendCmd)
 }
@@ -22,8 +26,8 @@ func init() {
 var (
 	frontendCmd = &cobra.Command{
 		Use:   "frontend",
-		Short: "Run Fronend WebUI",
-		Long:  `Run Fronend WebUI`,
+		Short: "Run Frontend WebUI",
+		Long:  `Run Frontend WebUI`,
 		RunE: func(command *cobra.Command, args []string) error {
 			t := NewInterruptTomb()
 			t.Go(func() error { return serveFrontend(t) })
@@ -42,9 +46,8 @@ func serveFrontend(t *tomb.Tomb) error {
 	if err != nil {
 		return err
 	}
-
-	// frontendServer.KeyFile = viper.GetString("api.key")
-	// frontendServer.CertFile = viper.GetString("api.cert")
+	frontendServer.KeyFile = viper.GetString("frontend.key")
+	frontendServer.CertFile = viper.GetString("frontend.cert")
 
 	t.Go(func() error {
 		time.Sleep(1 * time.Second)

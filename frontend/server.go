@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -29,11 +28,10 @@ type Server struct {
 	ServerAddress net.IP
 	Port          int
 	Scheme        string
-	// KeyFile       string
-	// CertFile      string
-	// RepoDir       string
-	DB         model.DataStore
-	httpServer *http.Server
+	KeyFile       string
+	CertFile      string
+	DB            model.DataStore
+	app           *fiber.App
 }
 
 func NewServer(db model.DataStore, address string) (*Server, error) {
@@ -109,22 +107,29 @@ func (s *Server) Serve() error {
 
 	engine := html.New("./frontend/views/", ".gohtml")
 	engine.AddFuncMap(funcMap)
-	app := fiber.New(fiber.Config{
+	s.app = fiber.New(fiber.Config{
 		Views:       engine,
 		ViewsLayout: "base",
 	})
 
-	h.SetupRoutes(app)
+	h.SetupRoutes(s.app)
 
-	app.Listen(fmt.Sprintf("%s:%d", s.ListenAddress, s.Port))
+	if s.CertFile != "" && s.KeyFile != "" {
+		s.Scheme = "https"
+		err = s.app.ListenTLS(fmt.Sprintf("%s:%d", s.ListenAddress, s.Port), s.CertFile, s.KeyFile)
+	} else {
+		s.Scheme = "http"
+		err = s.app.Listen(fmt.Sprintf("%s:%d", s.ListenAddress, s.Port))
+	}
 
-	return nil
+	log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
+	return err
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {
-	if s.httpServer == nil {
+	if s.app == nil {
 		return nil
 	}
 
-	return s.httpServer.Shutdown(ctx)
+	return s.app.Shutdown()
 }
