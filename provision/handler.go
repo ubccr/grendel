@@ -147,12 +147,18 @@ func (h *Handler) verifyClaims(c echo.Context) (*model.BootImage, *model.Host, *
 	serverHost := c.Request().Host
 	endpoints := model.NewEndpoints(serverHost, token)
 
+	log.WithFields(logrus.Fields{
+		"host":    host.Name,
+		"headers": c.Request().Header,
+	}).Debug("HTTP request headers")
+
 	data := map[string]interface{}{
 		"token":           c.Param("token"),
 		"endpoints":       endpoints,
 		"bootimage":       bootImage,
 		"nic":             nic,
 		"host":            host,
+		"headers":         c.Request().Header,
 		"rootpw":          viper.GetString("provision.root_password"),
 		"adminSSHPubKeys": viper.GetStringSlice("admin_ssh_pubkeys"),
 	}
