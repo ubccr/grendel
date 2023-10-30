@@ -5,7 +5,7 @@
         </div>
         <div class="flex justify-center gap-3">
             <button
-                class="grid rounded-lg border bg-amber-500 px-2 py-1 text-white hover:bg-amber-400"
+                class="grid transform rounded-lg border bg-amber-500 px-2 py-1 text-white transition-transform hover:bg-amber-400 active:scale-90"
                 type="button"
                 hx-post="/api/bmc/reboot"
                 hx-swap="none"
@@ -24,7 +24,7 @@
                 </span>
             </button>
             <button
-                class="grid rounded-lg border bg-blue-500 px-2 py-1 text-white hover:bg-blue-400"
+                class="grid transform rounded-lg border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90"
                 type="button"
                 hx-post="/api/bmc/configure/auto"
                 hx-swap="none"
@@ -58,7 +58,7 @@
                             type="text" />
                     </div>
                     <button
-                        class="grid rounded-lg border bg-amber-500 px-2 py-1 text-white hover:bg-amber-400"
+                        class="grid transform rounded-lg border bg-amber-500 px-2 py-1 text-white transition-transform hover:bg-amber-400 active:scale-90"
                         type="submit"
                         data-loading-states
                         data-loading-disable>
@@ -80,7 +80,7 @@
         <button
             type="button"
             onclick="closeModal()"
-            class="rounded-md border bg-neutral-500 px-2 py-1 text-white hover:bg-neutral-400">
+            class="transform rounded-md border bg-neutral-500 px-2 py-1 text-white transition-transform hover:bg-neutral-400 active:scale-90">
             Close
         </button>
     </div>

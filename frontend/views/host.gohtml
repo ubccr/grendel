@@ -6,7 +6,7 @@
                 hx-vals='{"hosts": "{{ .HostName }}"}'
                 hx-swap="none"
                 hx-confirm="Are you sure you want to reboot {{ .HostName }}?"
-                class="rounded-lg border border-neutral-300 p-1 text-sm hover:bg-neutral-50">
+                class="transform rounded-lg border border-neutral-300 p-1 text-sm transition-transform hover:bg-neutral-50 active:scale-90">
                 {{ template "icon-power" }}
             </button>
             <span
@@ -20,7 +20,7 @@
                 hx-post="/api/bmc/configure/auto"
                 hx-vals='{"hosts": "{{ .HostName }}"}'
                 hx-swap="none"
-                class="rounded-lg border border-neutral-300 p-1 text-sm">
+                class="transform rounded-lg border border-neutral-300 p-1 text-sm transition-transform active:scale-90">
                 {{ template "icon-adjustments-horizontal" }}
             </button>
             <span

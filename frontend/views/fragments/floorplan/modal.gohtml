@@ -59,7 +59,7 @@
                 </div>
                 <div class="flex justify-center gap-3 align-middle">
                     <button
-                        class="rounded-md bg-blue-500 px-2 py-1 text-white hover:bg-blue-400"
+                        class="transform rounded-md bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90"
                         type="button"
                         hx-get="/fragments/interfaces"
                         hx-target="#interfaces"
@@ -89,13 +89,13 @@
         <button
             type="submit"
             form="newHostForm"
-            class="rounded-md border bg-blue-500 px-2 py-1 text-white hover:bg-blue-400">
+            class="transform rounded-md border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90">
             Submit
         </button>
         <button
             type="button"
             onclick="closeModal()"
-            class="rounded-md border bg-neutral-500 px-2 py-1 text-white hover:bg-neutral-400">
+            class="transform rounded-md border bg-neutral-500 px-2 py-1 text-white transition-transform hover:bg-neutral-400 active:scale-90">
             Close
         </button>
     </div>

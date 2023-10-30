@@ -1,7 +1,7 @@
 <form>
     <div class="mb-3 flex justify-center gap-2">
         <button
-            class="rounded-lg border bg-blue-500 px-2 py-1 text-white hover:bg-blue-400"
+            class="transform rounded-lg border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90"
             type="button"
             hx-get="/fragments/rack/{{ .Rack }}/actions"
             hx-target="#hostModal"
@@ -10,7 +10,7 @@
             Actions
         </button>
         <button
-            class="rounded-lg border bg-blue-500 px-2 py-1 text-white hover:bg-blue-400"
+            class="transform rounded-lg border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90"
             type="button"
             hx-get="/fragments/rack/{{ .Rack }}/add/modal"
             hx-target="#hostModal"
@@ -20,7 +20,7 @@
             Add Hosts
         </button>
         <button
-            class="rounded-lg border bg-amber-500 px-2 py-1 text-white hover:bg-amber-400"
+            class="transform rounded-lg border bg-amber-500 px-2 py-1 text-white transition-transform hover:bg-amber-400 active:scale-90"
             type="button"
             hx-delete="/api/host"
             hx-vals='js:{hosts: HostMap("hostname")}'
@@ -29,13 +29,13 @@
             Delete Hosts
         </button>
         <button
-            class="rounded-lg border bg-blue-500 px-2 py-1 text-white hover:bg-blue-400"
+            class="transform rounded-lg border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90"
             type="button"
             onclick="SelectAllNodes()">
             Select Nodes
         </button>
         <button
-            class="rounded-lg border bg-neutral-500 px-2 py-1 text-white hover:bg-neutral-400"
+            class="transform rounded-lg border bg-neutral-500 px-2 py-1 text-white transition-transform hover:bg-neutral-400 active:scale-90"
             type="button"
             onclick="Clear()">
             Clear

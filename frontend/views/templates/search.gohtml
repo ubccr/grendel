@@ -3,7 +3,10 @@
         hx-get="/api/search"
         hx-swap="none"
         class="group flex content-center gap-1 rounded-md border border-neutral-200 px-1">
-        <button type="submit" id="searchBtn" class="float-left my-auto text-neutral-300 hover:text-neutral-600">
+        <button
+            type="submit"
+            id="searchBtn"
+            class="float-left my-auto transform text-neutral-300 transition-transform hover:text-neutral-600 active:scale-90">
             {{ template "icon-magnifying-glass" }}
         </button>
         <input

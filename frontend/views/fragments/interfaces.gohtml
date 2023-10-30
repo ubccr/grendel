@@ -4,19 +4,19 @@
         <input name="Fqdn" id="Fqdn:{{ .ID }}" class="w-full rounded-md border border-neutral-300 p-1 px-2" />
         <div class="flex gap-1 align-middle">
             <button
-                class="my-auto rounded-md bg-neutral-500 text-white hover:bg-neutral-400"
+                class="my-auto transform rounded-md bg-neutral-500 text-white transition-transform hover:bg-neutral-400 active:scale-90"
                 onclick="moveUp('{{ .ID }}')"
                 type="button">
                 {{ template "icon-chevron-up" }}
             </button>
             <button
-                class="my-auto rounded-md bg-neutral-500 text-white hover:bg-neutral-400"
+                class="my-auto transform rounded-md bg-neutral-500 text-white transition-transform hover:bg-neutral-400 active:scale-90"
                 onclick="moveDown('{{ .ID }}')"
                 type="button">
                 {{ template "icon-chevron-down" }}
             </button>
             <button
-                class="my-auto rounded-md bg-neutral-500 text-white hover:bg-neutral-400"
+                class="my-auto transform rounded-md bg-neutral-500 text-white transition-transform hover:bg-neutral-400 active:scale-90"
                 onclick="removeIface('{{ .ID }}')"
                 type="button">
                 {{ template "icon-x-mark" }}

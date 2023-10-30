@@ -5,15 +5,17 @@
     <thead>
         <tr>
             <td class="{{ $tdClasses }} p-0">
-                <button
-                    class="scale-75 rounded-md bg-blue-500 p-1 text-white"
-                    type="button"
-                    hx-get="/fragments/floorplan/modal"
-                    hx-target="#addHost"
-                    hx-swap="innerHTML transition:true"
-                    onclick="showModal()">
-                    {{ template "icon-plus-small" }}
-                </button>
+                <div class="flex justify-center align-middle">
+                    <button
+                        class="transform rounded-md bg-blue-500 text-white transition-transform active:scale-90"
+                        type="button"
+                        hx-get="/fragments/floorplan/modal"
+                        hx-target="#addHost"
+                        hx-swap="innerHTML transition:true"
+                        onclick="showModal()">
+                        {{ template "icon-plus-small" }}
+                    </button>
+                </div>
             </td>
             {{ range $col := $.Cols }}
                 <td class="{{ $tdClasses }}">{{ $col }}</td>
@@ -29,12 +31,13 @@
                         {{ $rackName := Sprintf "%s%s" $row $col }}
                         {{ $rackIndex := index $.Racks $rackName }}
                         {{ if gt $rackIndex 0 }}
-                            <a
-                                class="rounded-md bg-blue-500 p-1 text-xs text-white"
-                                href="/rack/{{ $rackName }}"
-                                hx-boost="true">
-                                {{ $rackName }}
-                            </a>
+                            <div class="flex">
+                                <a
+                                    class="transform rounded-md bg-blue-500 p-1 text-xs text-white transition-transform active:scale-90"
+                                    href="/rack/{{ $rackName }}">
+                                    {{ $rackName }}
+                                </a>
+                            </div>
                         {{ end }}
                     </td>
                 {{ end }}
