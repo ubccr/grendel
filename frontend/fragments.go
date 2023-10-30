@@ -195,7 +195,7 @@ func (h *Handler) rackAddTable(f *fiber.Ctx) error {
 				Interfaces: make([]hostIfaceStruct, ifaceCount),
 			}
 			// Set first port (BMC) to same number as rack u
-			if viper.GetBool("frontend.first_iface.auto_mapping") == true {
+			if viper.GetBool("frontend.first_iface.auto_mapping") {
 				hosts.Hosts[i].Interfaces[0].Port = uArr[i]
 			}
 		}
