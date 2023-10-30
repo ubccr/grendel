@@ -166,12 +166,6 @@ listen = "0.0.0.0:8081"
 # key = ""
 # cert = ""
 
-# Floorplan table config. Rows are ascending, Cols are descending
-rows_start = "f"
-rows_end = "v"
-cols_start = 28
-cols_end = 5
-
 # Session storage driver. Valid options: redis, sqlite3, memory.
 session_storage = "memory"
 
@@ -180,3 +174,32 @@ session_storage = "memory"
 
 [frontend.sqlite]
 # path = ""
+
+# Floorplan table config. Rows are ascending, Cols are descending
+rows_start = "f"
+rows_end = "v"
+cols_start = 28
+cols_end = 5
+
+# Rack table config
+rack_min = 3
+rack_max = 42
+
+# First interface default vals in Rack -> Add Hosts -> Interface Details
+[frontend.first_iface]
+# Maps port number to rack u
+auto_mapping = true
+
+interface_name = ""
+interface_domain = ""
+interface_bmc = "true"
+interface_vlan = ""
+interface_mtu = ""
+
+# Other interfaces default vals in Rack -> Add Hosts -> Interface Details
+[frontend.other_ifaces]
+interface_name = ""
+interface_domain = ""
+interface_bmc = "false"
+interface_vlan = ""
+interface_mtu = ""

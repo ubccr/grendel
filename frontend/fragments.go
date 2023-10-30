@@ -75,8 +75,11 @@ func (h *Handler) rackTable(f *fiber.Ctx) error {
 	}
 
 	u := make([]string, 0)
-	// TODO: move min and max rack u to grendel.toml
-	for i := 42; i >= 3; i-- {
+	viper.SetDefault("frontend.rack_min", 3)
+	viper.SetDefault("frontend.rack_max", 42)
+	min := viper.GetInt("frontend.rack_min")
+	max := viper.GetInt("frontend.rack_max")
+	for i := max; i >= min; i-- {
 		u = append(u, fmt.Sprintf("%02d", i))
 	}
 
@@ -144,6 +147,22 @@ func (h *Handler) rackAddTable(f *fiber.Ctx) error {
 		switchNames[i] = sw.Name
 	}
 
+	// Defaults
+	defaultIface := interfaceStruct{
+		Domain: viper.GetString("frontend.other_ifaces.interface_domain"),
+		Name:   viper.GetString("frontend.other_ifaces.interface_name"),
+		BMC:    viper.GetString("frontend.other_ifaces.interface_bmc"),
+		VLAN:   viper.GetString("frontend.other_ifaces.interface_vlan"),
+		MTU:    viper.GetString("frontend.other_ifaces.interface_mtu"),
+	}
+	defaultFirstIface := interfaceStruct{
+		Domain: viper.GetString("frontend.first_iface.interface_domain"),
+		Name:   viper.GetString("frontend.first_iface.interface_name"),
+		BMC:    viper.GetString("frontend.first_iface.interface_bmc"),
+		VLAN:   viper.GetString("frontend.first_iface.interface_vlan"),
+		MTU:    viper.GetString("frontend.first_iface.interface_mtu"),
+	}
+
 	// Hosts
 	var hosts RackAddFormStruct
 
@@ -155,14 +174,7 @@ func (h *Handler) rackAddTable(f *fiber.Ctx) error {
 
 		// init new iface if needed
 		if len(hosts.Interfaces) < ifaceCount {
-			hosts.Interfaces = append(hosts.Interfaces, interfaceStruct{
-				// TODO: make configurable
-				Domain: "core.ccr.buffalo.edu",
-				Name:   "eno12399",
-				BMC:    "false",
-				VLAN:   "",
-				MTU:    "9000",
-			})
+			hosts.Interfaces = append(hosts.Interfaces, defaultIface)
 			for h := range hosts.Hosts {
 				hosts.Hosts[h].Interfaces = append(hosts.Hosts[h].Interfaces, hostIfaceStruct{
 					Port: "",
@@ -183,18 +195,13 @@ func (h *Handler) rackAddTable(f *fiber.Ctx) error {
 				Interfaces: make([]hostIfaceStruct, ifaceCount),
 			}
 			// Set first port (BMC) to same number as rack u
-			hosts.Hosts[i].Interfaces[0].Port = uArr[i]
+			if viper.GetBool("frontend.first_iface.auto_mapping") == true {
+				hosts.Hosts[i].Interfaces[0].Port = uArr[i]
+			}
 		}
 
-		// TODO: this should be configurable
 		// first iface (usually bmc)
-		hosts.Interfaces[0] = interfaceStruct{
-			Domain: "mgmt.ccr.buffalo.edu",
-			Name:   "",
-			BMC:    "true",
-			VLAN:   "",
-			MTU:    "1500",
-		}
+		hosts.Interfaces[0] = defaultFirstIface
 
 	}
 
