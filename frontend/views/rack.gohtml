@@ -56,21 +56,21 @@
         useTransition(() => (document.getElementById("hostModal").innerHTML = ""));
     }
     function SelectAllNodes() {
-        var c = document.querySelectorAll('td > input[type="checkbox"]').forEach((val) => {
+        var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
             var n = val.name.split(":");
             if (n[2] === "server") val.checked = true;
         });
     }
 
     function Clear() {
-        var c = document.querySelectorAll('td > input[type="checkbox"]').forEach((val) => {
+        var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
             val.checked = false;
         });
     }
 
     function HostMap(type = "hostname") {
         var h = [];
-        var c = document.querySelectorAll('td > input[type="checkbox"]').forEach((val) => {
+        var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
             if (val.checked === true) {
                 var n = val.name.split(":");
                 if (type === "hostname" && n[1] !== "") h.push(n[1]);

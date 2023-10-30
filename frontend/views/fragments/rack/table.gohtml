@@ -10,29 +10,41 @@
         </tr>
     </thead>
     <tbody>
-        {{ range $u := .u }}
-            {{ $hostName := "" }}
-            {{ $hostType := "" }}
-            {{ range $host := $.Hosts }}
-                {{ $s := Split $host.Name "-" }}
-                {{ $hostU := index $s 2 }}
-                {{ if eq $hostU $u }}
-                    {{ $hostName = $host.Name }}
-                    {{ $hostType = $host.HostType }}
-                {{ end }}
-            {{ end }}
-            <tr>
-                <td class="{{ $tdClasses }}">{{ $u }}</td>
-                <td
-                    class="{{ $tdClasses }} {{ if eq $hostType "switch" }}
-                        text-red-700
-                    {{ end }} hover:bg-neutral-50">
-                    <a class="hover:font-medium" href="/host/{{ $hostName }}" hx-boost="false">
-                        {{ $hostName }}
-                    </a>
+        {{ range .Hosts }}
+            <tr class="hover:bg-neutral-50">
+                <td class="{{ $tdClasses }}">{{ .U }}</td>
+                <td class="border border-neutral-300 p-0">
+                    <div class="flex divide-x-2">
+                        {{ range .Hosts }}
+                            <div class="grid w-full p-1 sm:grid-cols-1 md:grid-cols-3">
+                                <div class="gap-1 overflow-auto max-md:hidden md:flex">
+                                    {{ range .Tags }}
+                                        <span class="rounded-xl bg-neutral-200 px-2 py-1 text-xs">{{ . }}</span>
+                                    {{ end }}
+                                </div>
+                                <div>
+                                    <a class="hover:font-medium" href="/host/{{ .Name }}" hx-boost="false">
+                                        {{ .Name }}
+                                    </a>
+                                </div>
+                                <div></div>
+                            </div>
+                        {{ end }}
+                    </div>
                 </td>
-                <td class="{{ $tdClasses }}">
-                    <input type="checkbox" name="{{ $u }}:{{ $hostName }}:{{ $hostType }}" />
+                <td class="border border-neutral-300 p-0">
+                    {{ if not .Hosts }}
+                        <input type="checkbox" name="{{ .U }}::" />
+                    {{ else }}
+                        {{ $u := .U }}
+                        <div class="flex justify-center divide-x-2">
+                            {{ range .Hosts }}
+                                <div class="w-full p-1">
+                                    <input type="checkbox" name="{{ $u }}:{{ .Name }}:{{ .HostType }}" />
+                                </div>
+                            {{ end }}
+                        </div>
+                    {{ end }}
                 </td>
             </tr>
         {{ end }}

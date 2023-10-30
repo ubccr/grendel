@@ -65,27 +65,43 @@ func (h *Handler) rackTable(f *fiber.Ctx) error {
 		return ToastError(f, err, "Failed to find hosts")
 	}
 
-	var filtered model.HostList
-	for _, v := range hosts {
-		if v.HostType() == "power" && !v.HasAnyTags("1u", "2u") {
-			continue
-		}
-
-		filtered = append(filtered, v)
+	type hostArrStruct struct {
+		U     string
+		Hosts model.HostList
 	}
+	hostArr := make([]hostArrStruct, 0)
 
-	u := make([]string, 0)
 	viper.SetDefault("frontend.rack_min", 3)
 	viper.SetDefault("frontend.rack_max", 42)
 	min := viper.GetInt("frontend.rack_min")
 	max := viper.GetInt("frontend.rack_max")
+
 	for i := max; i >= min; i-- {
-		u = append(u, fmt.Sprintf("%02d", i))
+		u := fmt.Sprintf("%02d", i)
+		h := model.HostList{}
+
+		for _, v := range hosts {
+			if v.HostType() == "power" && !v.HasAnyTags("1u", "2u") {
+				continue
+			}
+			nameArr := strings.Split(v.Name, "-")
+			if len(nameArr) < 2 {
+				log.Debugf("Invalid host name: %s", v.Name)
+				continue
+			}
+			if nameArr[2] == u {
+				h = append(h, v)
+			}
+		}
+
+		hostArr = append(hostArr, hostArrStruct{
+			U:     u,
+			Hosts: h,
+		})
 	}
 
 	return f.Render("fragments/rack/table", fiber.Map{
-		"u":     u,
-		"Hosts": filtered,
+		"Hosts": hostArr,
 		"Rack":  rack,
 	}, "")
 }
