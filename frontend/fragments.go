@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
 	"github.com/ubccr/grendel/tors"
@@ -275,13 +276,24 @@ func (h *Handler) floorplanTable(f *fiber.Ctx) error {
 		racks[rack] += 1
 	}
 
-	// TODO: make this configurable in grendel.toml
+	// Probably needs a rewrite for very large floorplans
+	viper.SetDefault("frontend.rows_start", "f")
+	viper.SetDefault("frontend.rows_end", "v")
+	rStart := []rune(viper.GetString("frontend.rows_start"))
+	rEnd := []rune(viper.GetString("frontend.rows_end"))
+
 	rows := make([]string, 0)
-	for i := 'f'; i <= 'v'; i++ {
+	for i := rStart[0]; i <= rEnd[0]; i++ {
 		rows = append(rows, fmt.Sprintf("%c", i))
 	}
+
+	viper.SetDefault("frontend.cols_start", 28)
+	viper.SetDefault("frontend.cols_end", 5)
+	cStart := viper.GetInt("frontend.cols_start")
+	cEnd := viper.GetInt("frontend.cols_end")
+
 	cols := make([]string, 0)
-	for i := 28; i >= 5; i-- {
+	for i := cStart; i >= cEnd; i-- {
 		cols = append(cols, fmt.Sprintf("%02d", i))
 	}
 	return f.Render("fragments/floorplan/table", fiber.Map{

@@ -166,6 +166,12 @@ listen = "0.0.0.0:8081"
 # key = ""
 # cert = ""
 
+# Floorplan table config. Rows are ascending, Cols are descending
+rows_start = "f"
+rows_end = "v"
+cols_start = 28
+cols_end = 5
+
 # Session storage driver. Valid options: redis, sqlite3, memory.
 session_storage = "memory"
 
