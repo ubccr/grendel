@@ -159,6 +159,18 @@ domain = ""
 # Frontend Config
 #------------------------------------------------------------------------------
 [frontend]
+# Address and port to listen
 listen = "0.0.0.0:8081"
-#key = ""
-#cert = ""
+
+# HTTPS cert and key file paths. Setting these will enable https
+# key = ""
+# cert = ""
+
+# Session storage driver. Valid options: redis, sqlite3, memory.
+session_storage = "memory"
+
+[frontend.redis]
+# url = "redis://<user>:<pass>@127.0.0.1:6379/<db>"
+
+[frontend.sqlite]
+# path = ""

@@ -10,8 +10,11 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/gofiber/storage/memory"
 	"github.com/gofiber/storage/redis"
+	"github.com/gofiber/storage/sqlite3"
 	"github.com/gofiber/template/html/v2"
+	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/logger"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/util"
@@ -79,8 +82,29 @@ func NewServer(db model.DataStore, address string) (*Server, error) {
 	return s, nil
 }
 
+func newStore() fiber.Storage {
+	var storage fiber.Storage
+
+	switch viper.GetString("frontend.session_storage") {
+	case "redis":
+		storage = redis.New(redis.Config{
+			URL:   viper.GetString("frontend.redis.url"),
+			Reset: false,
+		})
+	case "sqlite3":
+		storage = sqlite3.New(sqlite3.Config{
+			Database: viper.GetString("frontend.sqlite3.path"),
+			Table:    "grendel_frontend_sessions",
+		})
+	default:
+		storage = memory.New()
+	}
+
+	return storage
+}
+
 func (s *Server) Serve() error {
-	storage := redis.New()
+	storage := newStore()
 	store := session.New(session.Config{
 		Expiration:     8 * time.Hour,
 		CookieSecure:   true,
