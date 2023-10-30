@@ -93,6 +93,33 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 		log.Debugf("Dell ZTD provision-url: %s", provisionURL)
 		resp.UpdateOption(dhcpv4.Option{Code: dhcpv4.GenericOptionCode(240), Value: dhcpv4.String(provisionURL)})
 	}
+
+	if req.ClassIdentifier() == "NVIDIA" || req.ClassIdentifier() == "Mellanox" {
+		// MLNXOS ZTP
+		// See: https://docs.nvidia.com/networking/display/MLNXOSv3103100/Getting+Started#heading-Zero-touchProvisioning
+
+		log.WithFields(logrus.Fields{
+			"ip":   nic.AddrString(),
+			"name": host.Name,
+		}).Info("Host is Mellanox ZTP. Setting bootfile URL and config dhcp options")
+
+		token, _ := model.NewBootToken(host.ID.String(), nic.MAC.String())
+		endpoints := model.NewEndpoints(serverIP.String(), token)
+
+		configURL, configFilename := endpoints.KickstartURLParts()
+		repoURL := endpoints.RepoURL() + "/onie/"
+		//XXX remove hardcoded value
+		imageFilename := "onie-installer-mlnx-os.bin"
+		log.Debugf("MLNX-OS ztd tftp: %s,%s,", configURL, repoURL)
+
+		// Format: <image url>, <config url>, <docker container url>
+		// The item value can be empty, but the comma shall not be omitted.
+		resp.UpdateOption(dhcpv4.OptTFTPServerName(repoURL + "," + configURL + ","))
+
+		// Format: <image file>, <config file>, <docker container file>
+		// The item value can be empty, but the comma shall not be omitted.
+		resp.UpdateOption(dhcpv4.OptBootFileName(imageFilename + "," + configFilename + ","))
+	}
 }
 
 func (s *Server) staticHandler4(host *model.Host, serverIP net.IP, req, resp *dhcpv4.DHCPv4) error {

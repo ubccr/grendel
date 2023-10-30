@@ -69,6 +69,10 @@ func (e *Endpoints) KickstartURL() string {
 	return e.provisionURL(endpointKickstart)
 }
 
+func (e *Endpoints) KickstartURLParts() (string, string) {
+	return e.provisionURL(""), endpointKickstart
+}
+
 func (e *Endpoints) KernelURL() string {
 	return e.provisionURL(endpointKernel)
 }
