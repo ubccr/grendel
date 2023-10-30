@@ -115,14 +115,8 @@ func (h *Handler) EditHost(f *fiber.Ctx) error {
 	var interfaces []*model.NetInterface
 
 	for i, iface := range ifaces {
-		mac, err := net.ParseMAC(iface.MAC)
-		if err != nil {
-			return ToastError(f, err, fmt.Sprintf("Failed to parse MAC address on interface %d", i))
-		}
-		ip, err := netip.ParsePrefix(iface.IP)
-		if err != nil {
-			return ToastError(f, err, fmt.Sprintf("Failed to parse IP address on interface %d", i))
-		}
+		mac, _ := net.ParseMAC(iface.MAC)
+		ip, _ := netip.ParsePrefix(iface.IP)
 		bmc, err := strconv.ParseBool(iface.BMC)
 		if err != nil {
 			return ToastError(f, err, fmt.Sprintf("Failed to parse BMC boolean on interface %d", i))
@@ -337,15 +331,8 @@ func (h *Handler) bulkHostAdd(f *fiber.Ctx) error {
 			}
 
 			fqdn := fmt.Sprintf("%s.%s", hostName, hostTableForm.Interfaces[i].Domain)
-			// TODO: allow blank MACs
-			mac, err := net.ParseMAC(iface.MAC)
-			if err != nil {
-				return ToastError(f, err, "Failed to parse MAC address")
-			}
-			ip, err := netip.ParsePrefix(iface.IP)
-			if err != nil {
-				return ToastError(f, err, "Failed to parse IP address")
-			}
+			mac, _ := net.ParseMAC(iface.MAC)
+			ip, _ := netip.ParsePrefix(iface.IP)
 			bmc, err := strconv.ParseBool(hostTableForm.Interfaces[i].BMC)
 			if err != nil {
 				return ToastError(f, err, "Failed to parse BMC boolean")
