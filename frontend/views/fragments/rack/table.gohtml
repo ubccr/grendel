@@ -51,17 +51,17 @@
     </tbody>
 </table>
 <script>
-    var lastChecked = null;
-    checkboxes = Array.from(document.querySelectorAll('td > input[type="checkbox"]'));
+    let lastChecked = null;
+    checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"]'));
     checkboxes.forEach((val) => {
         val.addEventListener("click", function (e) {
             if (lastChecked !== null && e.shiftKey) {
-                var start = checkboxes.indexOf(lastChecked);
-                var end = checkboxes.indexOf(this);
+                let start = checkboxes.indexOf(lastChecked);
+                let end = checkboxes.indexOf(this);
 
                 // reverse in case of selecting from bottom to top
-                var first = start < end ? start : end;
-                var last = start < end ? end : start;
+                let first = start < end ? start : end;
+                let last = start < end ? end : start;
 
                 for (let i = first; i <= last; i++) {
                     checkboxes[i].checked = this.checked;
