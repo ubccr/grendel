@@ -59,12 +59,36 @@ func (h *Handler) LogoutUser(f *fiber.Ctx) error {
 func (h *Handler) RegisterUser(f *fiber.Ctx) error {
 	u := f.FormValue("username")
 	p := f.FormValue("password")
+	p2 := f.FormValue("password2")
 
 	msg := "Successfully registered user"
 
-	err := h.DB.StoreUser(u, p)
+	su := strings.ToValidUTF8(strings.TrimSpace(u), "")
+	sp := strings.ToValidUTF8(strings.TrimSpace(p), "")
+
+	if len(u) < 3 {
+		return ToastError(f, nil, "Failed to register: Username must be at least 3 characters")
+	} else if u != su {
+		return ToastError(f, nil, "Failed to register: Username must not contain spaces or unicode characters")
+	} else if p != p2 {
+		return ToastError(f, nil, "Failed to register: Passwords do not match")
+	} else if len(p) < 8 {
+		return ToastError(f, nil, "Failed to register: Password must be at least 8 characters")
+	} else if !strings.ContainsAny(sp, "abcdefghijklmnopqrstuvwxyz") {
+		return ToastError(f, nil, "Failed to register: Password must contain at least one lowercase letter")
+	} else if !strings.ContainsAny(sp, "ABCDEFGHIJKLMNOPQRSTUVWXYZ") {
+		return ToastError(f, nil, "Failed to register: Password must contain at least one uppercase letter")
+	} else if !strings.ContainsAny(sp, "0123456789") {
+		return ToastError(f, nil, "Failed to register: Password must contain at least one number")
+	} else if !strings.ContainsAny(sp, "!@#$%^&*()") {
+		return ToastError(f, nil, "Failed to register: Password must contain at least one special character")
+	} else if p != sp {
+		return ToastError(f, nil, "Failed to register: Password must not contain spaces or unicode characters")
+	}
+
+	err := h.DB.StoreUser(su, sp)
 	if err != nil {
-		if err.Error() == fmt.Sprintf("user %s already exists", u) {
+		if err.Error() == fmt.Sprintf("user %s already exists", su) {
 			msg = "Failed to register: Username already exists"
 		} else {
 			msg = "Failed to register user"
@@ -72,6 +96,7 @@ func (h *Handler) RegisterUser(f *fiber.Ctx) error {
 		return ToastError(f, err, msg)
 	}
 
+	f.Set("HX-Redirect", "/login")
 	return ToastSuccess(f, msg, ``)
 }
 

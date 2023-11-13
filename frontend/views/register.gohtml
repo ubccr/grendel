@@ -1,5 +1,5 @@
 <h1 class="mb-6 text-3xl">Register</h1>
-<form class="grid grid-cols-1 gap-3" hx-post="/api/auth/register" hx-target="">
+<form class="grid grid-cols-1 gap-3" hx-post="/api/auth/register" hx-swap="none">
     <div>
         <label for="username" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Username:</label>
         <input
@@ -17,6 +17,16 @@
             type="password"
             name="password"
             id="password"
+            required
+            class="rounded-md border border-neutral-300 px-2 py-1"
+            autocomplete="new-password" />
+    </div>
+    <div>
+        <label for="password2" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Re-enter Password:</label>
+        <input
+            type="password"
+            name="password2"
+            id="password2"
             required
             class="rounded-md border border-neutral-300 px-2 py-1"
             autocomplete="new-password" />
