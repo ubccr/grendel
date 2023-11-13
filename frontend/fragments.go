@@ -107,7 +107,17 @@ func (h *Handler) rackTable(f *fiber.Ctx) error {
 }
 
 func (h *Handler) rackActions(f *fiber.Ctx) error {
-	return f.Render("fragments/rack/actions", fiber.Map{}, "")
+	hosts := f.FormValue("hosts")
+	ns, err := nodeset.NewNodeSet(hosts)
+	if err != nil {
+		return ToastError(f, err, "Invalid host set")
+	}
+
+	nodeset := ns.String()
+	return f.Render("fragments/rack/actions", fiber.Map{
+		"Hosts":      nodeset,
+		"BootImages": h.getBootImages(),
+	}, "")
 }
 
 func (h *Handler) rackAddModal(f *fiber.Ctx) error {

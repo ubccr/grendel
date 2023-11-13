@@ -80,6 +80,11 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 
 	api.Post("/bulkHostAdd", auth, h.bulkHostAdd)
 
+	api.Patch("/hosts/provision", auth, h.provisionHosts)
+	api.Patch("/hosts/tags", auth, h.tagHosts)
+	api.Patch("/hosts/image", auth, h.imageHosts)
+	api.Get("/hosts/export/:hosts", auth, h.exportHosts)
+
 	app.Get("/users", auth, h.Users)
 	api.Post("/users", auth, h.usersPost)
 	fragment.Get("/users/table", auth, h.usersTable)

@@ -5,6 +5,7 @@
             type="button"
             hx-get="/fragments/rack/{{ .Rack }}/actions"
             hx-target="#hostModal"
+            hx-vals="js:{hosts: HostMap('hostname')}"
             hx-swap="innerHTML transition:true"
             onclick="showModal()">
             Actions
@@ -46,15 +47,32 @@
 </form>
 
 <dialog id="hostModal" class="h-5/6 w-full rounded-lg shadow-md md:w-2/3 lg:w-3/4"></dialog>
-
+<dialog id="exportModal" class="h-5/6 w-full rounded-lg shadow-md md:w-2/3 lg:w-3/4">
+    <div class="flex h-full flex-col">
+        <div class="p-2">
+            <pre id="exportText" class="h-full w-full text-left"></pre>
+        </div>
+        <div class="flex-grow"></div>
+        <div class="sticky bottom-0 flex w-full justify-end gap-3 border-t border-neutral-200 bg-neutral-50 p-3">
+            <button
+                type="button"
+                onclick="copyExport()"
+                class="transform rounded-md border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90">
+                <span class="" id="exportIconList">{{ template "clipboard-document-list" }}</span>
+                <span class="hidden" id="exportIconCheck">
+                    {{ template "clipboard-document-check" }}
+                </span>
+            </button>
+            <button
+                type="button"
+                onclick="closeExportModal()"
+                class="transform rounded-md border bg-neutral-500 px-2 py-1 text-white transition-transform hover:bg-neutral-400 active:scale-90">
+                Close
+            </button>
+        </div>
+    </div>
+</dialog>
 <script>
-    function showModal() {
-        useTransition(() => document.getElementById("hostModal").showModal());
-    }
-    function closeModal() {
-        useTransition(() => document.getElementById("hostModal").close());
-        useTransition(() => (document.getElementById("hostModal").innerHTML = ""));
-    }
     function SelectAllNodes() {
         var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
             var n = val.name.split(":");
@@ -135,5 +153,33 @@
         let ifaceEls = Array.from(document.getElementsByClassName(`interface-${index}`));
         ifaceEls.forEach((el) => useTransition(() => el.remove()));
         document.getElementById("ifaceCount").value--;
+    }
+    function showModal() {
+        useTransition(() => document.getElementById("hostModal").showModal());
+    }
+    function closeModal() {
+        useTransition(() => document.getElementById("hostModal").close());
+        useTransition(() => (document.getElementById("hostModal").innerHTML = ""));
+    }
+    async function copyExport() {
+        let el = document.getElementById("exportText");
+        let text = el.innerHTML;
+        await navigator.clipboard.writeText(text);
+
+        // animate buttons
+        document.getElementById("exportIconList").classList.add("hidden");
+        document.getElementById("exportIconCheck").classList.remove("hidden");
+        setInterval(() => {
+            document.getElementById("exportIconList").classList.remove("hidden");
+            document.getElementById("exportIconCheck").classList.add("hidden");
+        }, 1500);
+    }
+    function showExportModal() {
+        closeModal();
+        useTransition(() => document.getElementById("exportModal").showModal());
+    }
+    function closeExportModal() {
+        useTransition(() => document.getElementById("exportModal").close());
+        useTransition(() => (document.getElementById("exportText").innerHTML = ""));
     }
 </script>

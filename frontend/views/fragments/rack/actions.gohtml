@@ -1,11 +1,109 @@
 <div class="flex h-full flex-col">
+    <div class="m-2 mb-4 flex justify-center align-middle ">
+        <h1 class="rounded-xl border border-neutral-300 px-3 py-1 text-3xl shadow-lg">Actions</h1>
+    </div>
     <div>
-        <div class="m-2 mb-4 flex justify-center align-middle ">
-            <h1 class="rounded-xl border border-neutral-300 px-3 py-1 text-3xl shadow-lg">Actions</h1>
+        <h2 class="text-sm">
+            {{ if eq .Hosts "" }}
+                No hosts selected!
+            {{ else }}
+                Selected hosts:
+                {{ .Hosts }}
+            {{ end }}
+        </h2>
+    </div>
+    <div class="grid grid-cols-3 gap-3 p-3">
+        <div>
+            <p class="text-left">Provision</p>
         </div>
-        <div class="flex justify-center gap-3">
+        <div class="col-span-2">
+            <form hx-patch="/api/hosts/provision" hx-swap="none">
+                <input type="hidden" name="hosts" value="{{ .Hosts }}" />
+                <div class="flex justify-end gap-2">
+                    <div>
+                        <select class="w-full rounded-md border border-neutral-300 bg-white px-2 py-1" name="provision">
+                            <option value="true">true</option>
+                            <option value="false">false</option>
+                        </select>
+                    </div>
+                    <button
+                        class="transform rounded-lg border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90 disabled:opacity-75"
+                        type="submit"
+                        {{ if eq .Hosts "" }}disabled{{ end }}>
+                        Submit
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div>
+            <p class="text-left">Tags</p>
+        </div>
+        <div class="col-span-2">
+            <form hx-patch="/api/hosts/tags" hx-swap="none">
+                <input type="hidden" name="hosts" value="{{ .Hosts }}" />
+                <div class="flex justify-end gap-2">
+                    <div>
+                        <label for="action" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Action:</label>
+                        <select
+                            id="action"
+                            class="w-full rounded-md border border-neutral-300 bg-white px-2 py-1"
+                            name="action">
+                            <option value="add">add</option>
+                            <option value="remove">remove</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="tags" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Tags:</label>
+                        <input
+                            id="tags"
+                            name="tags"
+                            class="w-full rounded-md border border-neutral-300 px-2 py-1"
+                            placeholder="d06,compute"
+                            type="text" />
+                    </div>
+                    <button
+                        class="transform rounded-lg border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90 disabled:opacity-75"
+                        type="submit"
+                        {{ if eq .Hosts "" }}disabled{{ end }}>
+                        Submit
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div>
+            <p class="text-left">Image</p>
+        </div>
+        <div class="col-span-2">
+            <form hx-patch="/api/hosts/image" hx-swap="none">
+                <input type="hidden" name="hosts" value="{{ .Hosts }}" />
+                <div class="flex justify-end gap-2">
+                    <div>
+                        <label for="image" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Boot Image:</label>
+                        <select
+                            class="w-full rounded-md border border-neutral-300 bg-white px-2 py-1"
+                            name="image"
+                            id="image">
+                            <option value="" class="italic">None</option>
+                            {{ range .BootImages }}
+                                <option value="{{ . }}" {{ if eq . $.Host.BootImage }}selected{{ end }}>{{ . }}</option>
+                            {{ end }}
+                        </select>
+                    </div>
+                    <button
+                        class="transform rounded-lg border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90 disabled:opacity-75"
+                        type="submit"
+                        {{ if eq .Hosts "" }}disabled{{ end }}>
+                        Submit
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="col-span-2 flex justify-start">
+            <p class="text-left">Sends OS Graceful Reboot command to iDRAC via Redfish</p>
+        </div>
+        <div class="flex justify-end">
             <button
-                class="grid transform rounded-lg border bg-amber-500 px-2 py-1 text-white transition-transform hover:bg-amber-400 active:scale-90"
+                class="transform rounded-lg border bg-amber-500 px-2 py-1 text-white transition-transform hover:bg-amber-400 active:scale-90 disabled:opacity-75"
                 type="button"
                 hx-post="/api/bmc/reboot"
                 hx-swap="none"
@@ -13,34 +111,41 @@
                 hx-confirm="Are you sure you want to reboot these nodes?"
                 hx-ext="loading-states"
                 data-loading-states
-                data-loading-disable>
-                <span data-loading-class="opacity-0" style="grid-area: 1/1;">Reboot</span>
-                <span
-                    data-loading-class-remove="opacity-0"
-                    data-loading-class="opacity-100"
-                    class="mx-auto block h-6 w-6 opacity-0"
-                    style="grid-area: 1/1;">
+                data-loading-disable
+                {{ if eq .Hosts "" }}disabled{{ end }}>
+                <span data-loading-class="hidden">Reboot</span>
+                <span data-loading-class-remove="hidden" data-loading-class="block" class="mx-auto hidden h-6 w-6">
                     {{ template "icon-spinner" }}
                 </span>
             </button>
+        </div>
+        <div class="col-span-2 flex justify-start">
+            <p class="text-left">Sets Auto Config flag to Enabled Once. Requires: Provision = true, Image = Flatcar</p>
+        </div>
+        <div class="flex justify-end">
             <button
-                class="grid transform rounded-lg border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90"
+                class="transform rounded-lg border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90 disabled:opacity-75"
                 type="button"
                 hx-post="/api/bmc/configure/auto"
                 hx-swap="none"
                 hx-vals="js:{hosts: HostMap()}"
                 hx-ext="loading-states"
                 data-loading-states
-                data-loading-disable>
-                <span data-loading-class="opacity-0" style="grid-area: 1/1;">Auto Configure</span>
-                <span
-                    data-loading-class-remove="opacity-0"
-                    data-loading-class="opacity-100"
-                    class="mx-auto block h-6 w-6 opacity-0"
-                    style="grid-area: 1/1;">
+                data-loading-disable
+                {{ if eq .Hosts "" }}disabled{{ end }}>
+                <span data-loading-class="hidden">Auto Configure</span>
+                <span data-loading-class-remove="hidden" data-loading-class="block" class="mx-auto hidden h-6 w-6">
                     {{ template "icon-spinner" }}
                 </span>
             </button>
+        </div>
+        <div class="col-span-2 text-left">
+            <p>
+                Sends specified file located in /var/lib/grendel/templates/ to the "Import System Config" Redfish
+                endpoint
+            </p>
+        </div>
+        <div class="flex justify-end">
             <form
                 hx-post="/api/bmc/config/import"
                 hx-swap="none"
@@ -48,7 +153,7 @@
                 hx-ext="loading-states"
                 hx-confirm="Warning: Sending a system configuration will reboot the selected hosts if necessary.">
                 <div class="flex gap-2">
-                    <div class="group">
+                    <div>
                         <label for="File" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">File:</label>
                         <input
                             id="File"
@@ -58,23 +163,57 @@
                             type="text" />
                     </div>
                     <button
-                        class="grid transform rounded-lg border bg-amber-500 px-2 py-1 text-white transition-transform hover:bg-amber-400 active:scale-90"
+                        class="transform rounded-lg border bg-amber-500 px-2 py-1 text-white transition-transform hover:bg-amber-400 active:scale-90 disabled:opacity-75"
                         type="submit"
                         data-loading-states
-                        data-loading-disable>
-                        <span data-loading-class="opacity-0" style="grid-area: 1/1;">Send Config</span>
+                        data-loading-disable
+                        {{ if eq .Hosts "" }}disabled{{ end }}>
+                        <span data-loading-class="hidden">Configure</span>
                         <span
-                            data-loading-class-remove="opacity-0"
-                            data-loading-class="opacity-100"
-                            class="mx-auto block h-6 w-6 opacity-0"
-                            style="grid-area: 1/1;">
+                            data-loading-class-remove="hidden"
+                            data-loading-class="block"
+                            class="mx-auto hidden h-6 w-6">
                             {{ template "icon-spinner" }}
                         </span>
                     </button>
                 </div>
             </form>
         </div>
+        <div class="col-span-2">
+            <p class="text-left">
+                Downloads selected nodes in JSON format. If no filename is specified, the JSON will be displayed in the
+                browser
+            </p>
+        </div>
+        <div>
+            <form
+                hx-get="/api/hosts/export/{{ .Hosts }}"
+                hx-target="#exportText"
+                hx-swap="innerHTML"
+                hx-on::after-request="showExportModal()">
+                <div class="flex justify-end gap-2">
+                    <div>
+                        <label for="exportFilename" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                            Filename:
+                        </label>
+                        <input
+                            id="exportFilename"
+                            name="filename"
+                            placeholder="export.json"
+                            class="w-full rounded-md border border-neutral-300 px-2 py-1"
+                            type="text" />
+                    </div>
+                    <button
+                        class="transform rounded-lg border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90 disabled:opacity-75"
+                        type="submit"
+                        {{ if eq .Hosts "" }}disabled{{ end }}>
+                        Export
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
+
     <div class="flex-grow"></div>
     <div class="sticky bottom-0 flex w-full justify-end gap-3 border-t border-neutral-200 bg-neutral-50 p-3">
         <button

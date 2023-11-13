@@ -205,6 +205,93 @@ func (h *Handler) RebootHost(f *fiber.Ctx) error {
 	return ToastSuccess(f, "Successfully Rebooted node(s) <br />"+output, ``)
 }
 
+func (h *Handler) provisionHosts(f *fiber.Ctx) error {
+	hosts := f.FormValue("hosts")
+	provision := f.FormValue("provision")
+
+	p, err := strconv.ParseBool(provision)
+	if err != nil {
+		return ToastError(f, err, "Failed to parse provision boolean")
+	}
+
+	ns, err := nodeset.NewNodeSet(hosts)
+	if err != nil {
+		return ToastError(f, err, "Failed to parse node set")
+	}
+
+	err = h.DB.ProvisionHosts(ns, p)
+	if err != nil {
+		return ToastError(f, err, "Failed to provision host(s)")
+	}
+	return ToastSuccess(f, "Successfully provisioned host(s)", `, "refresh": ""`)
+}
+
+func (h *Handler) tagHosts(f *fiber.Ctx) error {
+	hosts := f.FormValue("hosts")
+	tags := f.FormValue("tags")
+	action := f.FormValue("action")
+
+	t := strings.Split(tags, ",")
+
+	ns, err := nodeset.NewNodeSet(hosts)
+	if err != nil {
+		return ToastError(f, err, "Failed to parse node set")
+	}
+
+	if action == "remove" {
+		err = h.DB.UntagHosts(ns, t)
+	} else {
+		err = h.DB.TagHosts(ns, t)
+	}
+	if err != nil {
+		return ToastError(f, err, "Failed to update tags on host(s)")
+	}
+	return ToastSuccess(f, "Successfully updated tags on host(s)", `, "refresh": ""`)
+}
+
+func (h *Handler) imageHosts(f *fiber.Ctx) error {
+	hosts := f.FormValue("hosts")
+	image := f.FormValue("image")
+
+	ns, err := nodeset.NewNodeSet(hosts)
+	if err != nil {
+		return ToastError(f, err, "Failed to parse node set")
+	}
+
+	err = h.DB.SetBootImage(ns, image)
+	if err != nil {
+		return ToastError(f, err, "Failed to update boot image on host(s)")
+	}
+	return ToastSuccess(f, "Successfully updated boot image on host(s)", `, "refresh": ""`)
+}
+
+func (h *Handler) exportHosts(f *fiber.Ctx) error {
+	hosts := f.Params("hosts")
+	filename := f.Query("filename")
+
+	ns, err := nodeset.NewNodeSet(hosts)
+	if err != nil {
+		return ToastError(f, err, "Failed to parse node set")
+	}
+
+	hostList, err := h.DB.FindHosts(ns)
+	if err != nil {
+		return ToastError(f, err, "Failed to find host(s)")
+	}
+
+	o, err := json.MarshalIndent(hostList, "", "  ")
+	if err != nil {
+		return ToastError(f, err, "Failed to marshal host json")
+	}
+
+	if filename != "" {
+		f.Set("HX-Redirect", fmt.Sprintf("/api/hosts/export/%s?filename=%s", hosts, filename))
+		f.Set("Content-Type", "application/force-download")
+		f.Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+	}
+	return f.SendString(string(o))
+}
+
 func (h *Handler) bmcConfigureAuto(f *fiber.Ctx) error {
 	delay := viper.GetInt("bmc.delay")
 	fanout := viper.GetInt("bmc.fanout")
@@ -222,6 +309,8 @@ func (h *Handler) bmcConfigureAuto(f *fiber.Ctx) error {
 
 	runner := NewJobRunner(fanout)
 	output := ""
+
+	log.Debug("bmcConfigureAuto - Hosts: ", hostList)
 
 	for i, host := range hostList {
 		ch := make(chan string)
