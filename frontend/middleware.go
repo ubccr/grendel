@@ -17,3 +17,14 @@ func (h *Handler) EnforceAuthMiddleware() func(f *fiber.Ctx) error {
 		return c.Next()
 	}
 }
+func (h *Handler) EnforceAdminMiddleware() func(f *fiber.Ctx) error {
+	return func(c *fiber.Ctx) error {
+		sess, _ := h.Store.Get(c)
+		if sess.Get("authenticated") == nil || sess.Get("role") != "admin" {
+			msg := "Admin role required."
+			c.Response().Header.Add("HX-Trigger", fmt.Sprintf(`{"toast-error": "%s"}`, msg))
+			return c.SendStatus(fiber.StatusForbidden)
+		}
+		return c.Next()
+	}
+}

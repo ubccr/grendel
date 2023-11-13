@@ -25,6 +25,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	api := app.Group("/api")
 
 	auth := h.EnforceAuthMiddleware()
+	admin := h.EnforceAdminMiddleware()
 	app.Use(func(c *fiber.Ctx) error {
 		hostList, err := h.DB.Hosts()
 		if err != nil {
@@ -85,9 +86,10 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	api.Patch("/hosts/image", auth, h.imageHosts)
 	api.Get("/hosts/export/:hosts", auth, h.exportHosts)
 
-	app.Get("/users", auth, h.Users)
-	api.Post("/users", auth, h.usersPost)
-	fragment.Get("/users/table", auth, h.usersTable)
+	app.Get("/users", admin, h.Users)
+	api.Post("/users", admin, h.usersPost)
+	fragment.Get("/users/table", admin, h.usersTable)
+	api.Delete("/user/:username", admin, h.deleteUser)
 
 	api.Get("/search", auth, h.Search)
 
