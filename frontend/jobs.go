@@ -42,6 +42,7 @@ func (j *JobRunner) Wait() {
 func (j *JobRunner) RunConfigureAuto(host *model.Host, ch chan string) {
 	j.limit.Execute(func() {
 		ip := host.InterfaceBMC().AddrString()
+		log.Debugf("Running autoconfigure on %s", ip)
 		err := bmc.IdracAutoConfigure(ip)
 		msg := "Success"
 

@@ -75,6 +75,16 @@ func IdracAutoConfigure(ip string) error {
 
 	c := redfishapi.NewIloClient(fmt.Sprintf("https://%s", ip), user, pass)
 
+	// TODO: replace redfish library or submit PR to fix "k.MessageExtendedInfo[0].Message"
+	// License error response has MessageExtendedInfo nested in a error struct
+	attr, err := c.GetIDRACAttrDell()
+	if err != nil {
+		return err
+	}
+	if attr.NIC_1_AutoConfig == "" {
+		return errors.New("NIC_1_AutoConfig attribute not found. iDRAC is likely missing the required license")
+	}
+
 	type attributes struct {
 		NIC1AutoConfig string `json:"NIC.1.AutoConfig"`
 	}
@@ -87,7 +97,7 @@ func IdracAutoConfigure(ip string) error {
 		},
 	})
 
-	_, err := c.SetAttributesDell("idrac", b)
+	_, err = c.SetAttributesDell("idrac", b)
 	if err != nil {
 		// Try default creds
 		c.Username = "root"
