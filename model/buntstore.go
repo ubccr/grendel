@@ -210,6 +210,20 @@ func (s *BuntStore) UpdateUser(username, role string) error {
 	return err
 }
 
+// DeleteUser deletes the given user
+func (s *BuntStore) DeleteUser(username string) error {
+	err := s.db.Update(func(tx *buntdb.Tx) error {
+		_, err := tx.Delete(UserKeyPrefix + ":" + username)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	return err
+}
+
 // StoreHost stores a host in the data store. If the host exists it is overwritten
 func (s *BuntStore) StoreHost(host *Host) error {
 	hostList := HostList{host}

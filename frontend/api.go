@@ -100,6 +100,17 @@ func (h *Handler) RegisterUser(f *fiber.Ctx) error {
 	return ToastSuccess(f, msg, ``)
 }
 
+func (h *Handler) deleteUser(f *fiber.Ctx) error {
+	user := f.Params("username")
+
+	err := h.DB.DeleteUser(user)
+	if err != nil {
+		return ToastError(f, err, "Failed to delete user")
+	}
+
+	return ToastSuccess(f, "Successfully deleted user", `, "refresh": ""`)
+}
+
 type FormData struct {
 	ID         string `form:"ID"`
 	Name       string `form:"Name"`

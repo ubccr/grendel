@@ -54,6 +54,9 @@ type DataStore interface {
 	// UpdateUser updates the role of the given users
 	UpdateUser(username, role string) error
 
+	// DeleteUser deletes the given user
+	DeleteUser(username string) error
+
 	// BootImages returns a list of all boot images
 	BootImages() (BootImageList, error)
 
