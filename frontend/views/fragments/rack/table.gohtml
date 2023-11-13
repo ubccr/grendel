@@ -17,17 +17,26 @@
                     <div class="flex divide-x-2">
                         {{ range .Hosts }}
                             <div class="grid w-full p-1 sm:grid-cols-1 md:grid-cols-3">
-                                <div class="gap-1 overflow-auto max-md:hidden md:flex">
-                                    {{ range .Tags }}
-                                        <span class="rounded-xl bg-neutral-200 px-2 py-1 text-xs">{{ . }}</span>
+                                <div class="items-center gap-1 overflow-auto max-md:hidden md:flex">
+                                    {{ if eq .Provision true }}
+                                        <span class="scale-75 text-green-600">{{ template "bolt" }}</span>
+                                    {{ else }}
+                                        <span class="scale-75 text-red-600">{{ template "bolt-slash" }}</span>
                                     {{ end }}
+                                    <span class="h-6 rounded-xl bg-blue-500 px-2 py-1 text-xs text-white">
+                                        {{ .BootImage }}
+                                    </span>
                                 </div>
                                 <div>
                                     <a class="hover:font-medium" href="/host/{{ .Name }}" hx-boost="false">
                                         {{ .Name }}
                                     </a>
                                 </div>
-                                <div></div>
+                                <div class="items-center gap-1 overflow-auto max-md:hidden md:flex">
+                                    {{ range .Tags }}
+                                        <span class="rounded-xl bg-neutral-200 px-2 py-1 text-xs">{{ . }}</span>
+                                    {{ end }}
+                                </div>
                             </div>
                         {{ end }}
                     </div>
@@ -51,23 +60,27 @@
     </tbody>
 </table>
 <script>
-    let lastChecked = null;
-    checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"]'));
-    checkboxes.forEach((val) => {
-        val.addEventListener("click", function (e) {
-            if (lastChecked !== null && e.shiftKey) {
-                let start = checkboxes.indexOf(lastChecked);
-                let end = checkboxes.indexOf(this);
+    document.onreadystatechange = function () {
+        if (document.readyState == "complete") {
+            let lastChecked = null;
+            checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"]'));
+            checkboxes.forEach((val) => {
+                val.addEventListener("click", function (e) {
+                    if (lastChecked !== null && e.shiftKey) {
+                        let start = checkboxes.indexOf(lastChecked);
+                        let end = checkboxes.indexOf(this);
 
-                // reverse in case of selecting from bottom to top
-                let first = start < end ? start : end;
-                let last = start < end ? end : start;
+                        // reverse in case of selecting from bottom to top
+                        let first = start < end ? start : end;
+                        let last = start < end ? end : start;
 
-                for (let i = first; i <= last; i++) {
-                    checkboxes[i].checked = this.checked;
-                }
-            }
-            lastChecked = this;
-        });
-    });
+                        for (let i = first; i <= last; i++) {
+                            checkboxes[i].checked = this.checked;
+                        }
+                    }
+                    lastChecked = this;
+                });
+            });
+        }
+    };
 </script>
