@@ -9,15 +9,13 @@
 }
 
 @layer base {
-    /* VF Broken in v1.0.0
     @font-face {
         font-family: Geist;
-        src: url(/fonts/GeistVF.woff2);
-    } */
+        src: url(/fonts/GeistVariableVF.woff2);
+    }
     @font-face {
-        font-family: Geist;
-        font-weight: lighter;
-        src: url(/fonts/Geist-Light.otf);
+        font-family: GeistMono;
+        src: url(/fonts/GeistMonoVariableVF.woff2);
     }
 }
 
@@ -35,6 +33,13 @@ html {
         "Open Sans",
         "Helvetica Neue",
         sans-serif;
+}
+
+pre,
+tt,
+kbd,
+samp {
+    font-family: "GeistMono", monospace;
 }
 
 /* ===== Scrollbar CSS ===== */
