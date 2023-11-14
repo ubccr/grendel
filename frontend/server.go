@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/gofiber/storage/memory"
 	"github.com/gofiber/storage/redis"
@@ -146,6 +147,12 @@ func (s *Server) Serve() error {
 		s.Scheme = "http"
 		err = s.app.Listen(fmt.Sprintf("%s:%d", s.ListenAddress, s.Port))
 	}
+	s.app.Use(cors.New(cors.Config{
+		// TODO: verify this is correct
+		AllowOrigins:     fmt.Sprintf("%s://%s:%d", s.Scheme, s.ServerAddress, s.Port),
+		AllowHeaders:     "Origin, Content-Type, Accept, Authorization, Cache-Control",
+		AllowCredentials: true,
+	}))
 
 	log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
 	return err

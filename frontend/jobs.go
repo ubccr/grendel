@@ -44,16 +44,18 @@ func (j *JobRunner) RunConfigureAuto(host *model.Host, ch chan string) {
 		ip := host.InterfaceBMC().AddrString()
 		log.Debugf("Running autoconfigure on %s", ip)
 		err := bmc.IdracAutoConfigure(ip)
-		msg := "Success"
+		status := "success"
+		msg := "Submitted auto configure job"
 
 		if err != nil {
-			msg = fmt.Sprintf("Error - %s", err)
+			status = "error"
+			msg = fmt.Sprintf("%s", err)
 			cmd.Log.WithFields(logrus.Fields{
 				"err":  err,
-				"name": host,
+				"name": host.Name,
 			}).Error("Failed to connect to BMC")
 		}
-		ch <- fmt.Sprintf("%s: %s", host.Name, msg)
+		ch <- fmt.Sprintf("%s|%s|%s", status, host.Name, msg)
 	})
 }
 func (j *JobRunner) RunConfigureImport(host *model.Host, file string, ch chan string) {
@@ -61,37 +63,43 @@ func (j *JobRunner) RunConfigureImport(host *model.Host, file string, ch chan st
 		ip := host.InterfaceBMC().AddrString()
 		token, err := model.NewBootToken(host.ID.String(), host.InterfaceBMC().MAC.String())
 		if err != nil {
-			ch <- fmt.Sprintf("%s: Error - %s", host.Name, err)
+			status := "error"
+			msg := fmt.Sprintf("%s", err)
+			ch <- fmt.Sprintf("%s|%s|%s", status, host.Name, msg)
 			return
 		}
 		path := fmt.Sprintf("/boot/%s/bmc/%s", token, file)
-		msg := "Success"
+		status := "success"
+		msg := "Submited import job"
 
 		err = bmc.IdracImportSytemConfig(ip, path)
-
 		if err != nil {
-			msg = fmt.Sprintf("Error - %s", err)
+			status = "error"
+			msg = fmt.Sprintf("%s", err)
 			cmd.Log.WithFields(logrus.Fields{
 				"err":  err,
-				"name": host,
+				"name": host.Name,
 			}).Error("Failed to connect to BMC")
 		}
-		ch <- fmt.Sprintf("%s: %s", host.Name, msg)
+
+		ch <- fmt.Sprintf("%s|%s|%s", status, host.Name, msg)
 	})
 }
 func (j *JobRunner) RunReboot(host *model.Host, ch chan string) {
 	j.limit.Execute(func() {
 		ip := host.InterfaceBMC().AddrString()
 		err := bmc.RebootHost(ip)
-		msg := "Success"
+		status := "success"
+		msg := "Sent reboot command"
 
 		if err != nil {
-			msg = fmt.Sprintf("Error - %s", err)
+			status = "error"
+			msg = fmt.Sprintf("%s", err)
 			cmd.Log.WithFields(logrus.Fields{
 				"err":  err,
-				"name": host,
+				"name": host.Name,
 			}).Error("Failed to connect to BMC")
 		}
-		ch <- fmt.Sprintf("%s: %s", host.Name, msg)
+		ch <- fmt.Sprintf("%s|%s|%s", status, host.Name, msg)
 	})
 }

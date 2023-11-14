@@ -7,14 +7,16 @@ import (
 )
 
 type Handler struct {
-	DB    model.DataStore
-	Store *session.Store
+	DB     model.DataStore
+	Store  *session.Store
+	Events []string
 }
 
 func NewHandler(db model.DataStore, Store *session.Store) (*Handler, error) {
 	h := &Handler{
-		DB:    db,
-		Store: Store,
+		DB:     db,
+		Store:  Store,
+		Events: []string{},
 	}
 
 	return h, nil
@@ -92,6 +94,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	api.Delete("/user/:username", admin, h.deleteUser)
 
 	api.Get("/search", auth, h.Search)
+	api.Get("/events", auth, h.eventSSE)
 
 	api.Post("/bmc/reboot", auth, h.RebootHost)
 	api.Post("/bmc/configure/auto", auth, h.bmcConfigureAuto)

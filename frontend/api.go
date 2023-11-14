@@ -1,6 +1,7 @@
 package frontend
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"net"
@@ -15,6 +16,7 @@ import (
 	"github.com/ubccr/grendel/firmware"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
+	"github.com/valyala/fasthttp"
 )
 
 func (h *Handler) LoginUser(f *fiber.Ctx) error {
@@ -96,6 +98,7 @@ func (h *Handler) RegisterUser(f *fiber.Ctx) error {
 		return ToastError(f, err, msg)
 	}
 
+	h.writeEvent("info", f, fmt.Sprintf("New user: %s registered.", su))
 	f.Set("HX-Redirect", "/login")
 	return ToastSuccess(f, msg, ``)
 }
@@ -108,6 +111,7 @@ func (h *Handler) deleteUser(f *fiber.Ctx) error {
 		return ToastError(f, err, "Failed to delete user")
 	}
 
+	h.writeEvent("info", f, fmt.Sprintf("Deleted user: %s", user))
 	return ToastSuccess(f, "Successfully deleted user", `, "refresh": ""`)
 }
 
@@ -188,6 +192,7 @@ func (h *Handler) EditHost(f *fiber.Ctx) error {
 		return ToastError(f, err, "Failed to update host")
 	}
 
+	h.writeEvent("info", f, fmt.Sprintf("Edited or added host %s", newHost.Name))
 	return ToastSuccess(f, "Successfully updated host", `, "refresh": ""`)
 }
 
@@ -203,6 +208,7 @@ func (h *Handler) DeleteHost(f *fiber.Ctx) error {
 		return ToastError(f, err, "Failed to delete host(s)")
 	}
 
+	h.writeEvent("info", f, fmt.Sprintf("Deleted host(s): %s", ns))
 	return ToastSuccess(f, "Successfully deleted host(s)", `, "refresh":""`)
 }
 
@@ -226,7 +232,6 @@ func (h *Handler) RebootHost(f *fiber.Ctx) error {
 	}
 
 	runner := NewJobRunner(fanout)
-	output := ""
 
 	for i, host := range hostList {
 		ch := make(chan string)
@@ -234,11 +239,16 @@ func (h *Handler) RebootHost(f *fiber.Ctx) error {
 		if (i+1)%fanout == 0 {
 			time.Sleep(time.Duration(delay) * time.Second)
 		}
-		output += <-ch + "<br />"
+		output := strings.Split(<-ch, "|")
+
+		if len(output) < 3 {
+			return ToastError(f, nil, "Failed to run reboot job, index out of range")
+		}
+		h.writeEvent(output[0], f, fmt.Sprintf("%s: %s", output[1], output[2]))
 	}
 	runner.Wait()
 
-	return ToastSuccess(f, "Successfully Rebooted node(s) <br />"+output, ``)
+	return ToastSuccess(f, "Successfully Rebooted node(s)", ``)
 }
 
 func (h *Handler) provisionHosts(f *fiber.Ctx) error {
@@ -259,6 +269,8 @@ func (h *Handler) provisionHosts(f *fiber.Ctx) error {
 	if err != nil {
 		return ToastError(f, err, "Failed to provision host(s)")
 	}
+
+	h.writeEvent("info", f, fmt.Sprintf("Provisioned host(s): %s", ns))
 	return ToastSuccess(f, "Successfully provisioned host(s)", `, "refresh": ""`)
 }
 
@@ -282,6 +294,8 @@ func (h *Handler) tagHosts(f *fiber.Ctx) error {
 	if err != nil {
 		return ToastError(f, err, "Failed to update tags on host(s)")
 	}
+
+	h.writeEvent("info", f, fmt.Sprintf("%sed tags to %s", action, ns))
 	return ToastSuccess(f, "Successfully updated tags on host(s)", `, "refresh": ""`)
 }
 
@@ -298,6 +312,8 @@ func (h *Handler) imageHosts(f *fiber.Ctx) error {
 	if err != nil {
 		return ToastError(f, err, "Failed to update boot image on host(s)")
 	}
+
+	h.writeEvent("info", f, fmt.Sprintf("Updated boot image to %s on %s", image, ns))
 	return ToastSuccess(f, "Successfully updated boot image on host(s)", `, "refresh": ""`)
 }
 
@@ -344,9 +360,6 @@ func (h *Handler) bmcConfigureAuto(f *fiber.Ctx) error {
 	}
 
 	runner := NewJobRunner(fanout)
-	output := ""
-
-	log.Debug("bmcConfigureAuto - Hosts: ", hostList)
 
 	for i, host := range hostList {
 		ch := make(chan string)
@@ -354,11 +367,16 @@ func (h *Handler) bmcConfigureAuto(f *fiber.Ctx) error {
 		if (i+1)%fanout == 0 {
 			time.Sleep(time.Duration(delay) * time.Second)
 		}
-		output += <-ch + "<br />"
+		output := strings.Split(<-ch, "|")
+
+		if len(output) < 3 {
+			return ToastError(f, nil, "Failed to run auto config job, index out of range")
+		}
+		h.writeEvent(output[0], f, fmt.Sprintf("%s: %s", output[1], output[2]))
 	}
 	runner.Wait()
 
-	return ToastSuccess(f, "Successfully sent Auto Configure to node(s) <br />"+output, ``)
+	return ToastSuccess(f, "Successfully sent Auto Configure to node(s)", ``)
 }
 func (h *Handler) bmcConfigureImport(f *fiber.Ctx) error {
 	delay := viper.GetInt("bmc.delay")
@@ -380,7 +398,6 @@ func (h *Handler) bmcConfigureImport(f *fiber.Ctx) error {
 	}
 
 	runner := NewJobRunner(fanout)
-	output := ""
 
 	for i, host := range hostList {
 		ch := make(chan string)
@@ -388,11 +405,16 @@ func (h *Handler) bmcConfigureImport(f *fiber.Ctx) error {
 		if (i+1)%fanout == 0 {
 			time.Sleep(time.Duration(delay) * time.Second)
 		}
-		output += <-ch + "<br />"
+		output := strings.Split(<-ch, "|")
+
+		if len(output) < 3 {
+			return ToastError(f, nil, "Failed to run import job, index out of range")
+		}
+		h.writeEvent(output[0], f, fmt.Sprintf("%s: %s", output[1], output[2]))
 	}
 	runner.Wait()
 
-	return ToastSuccess(f, "Successfully sent system config to node(s) <br />"+output, ``)
+	return ToastSuccess(f, "Successfully sent system config to node(s)", ``)
 }
 
 func (h *Handler) Search(f *fiber.Ctx) error {
@@ -414,6 +436,7 @@ func (h *Handler) usersPost(f *fiber.Ctx) error {
 		}
 	}
 
+	h.writeEvent("info", f, fmt.Sprintf("Changed user(s): %s to Role: %s", users, role))
 	return ToastSuccess(f, "Successfully updated user(s)", `, "refresh": ""`)
 }
 
@@ -493,6 +516,38 @@ func (h *Handler) bulkHostAdd(f *fiber.Ctx) error {
 	if err != nil {
 		return ToastError(f, err, "Failed to add host(s)")
 	}
+	for _, host := range newHosts {
+		h.writeEvent("info", f, fmt.Sprintf("New host: %s added with BulkAdd", host.Name))
+	}
 
 	return ToastSuccess(f, "Successfully added host(s)", `, "closeModal": "", "refresh": ""`)
+}
+func (h *Handler) eventSSE(f *fiber.Ctx) error {
+	f.Set("Content-Type", "text/event-stream")
+	f.Set("Cache-Control", "no-cache")
+	f.Set("Connection", "keep-alive")
+	f.Set("Transfer-Encoding", "chunked")
+
+	sent := 0
+	f.Context().SetBodyStreamWriter(fasthttp.StreamWriter(func(w *bufio.Writer) {
+		for {
+			if sent >= len(h.Events) {
+				time.Sleep(1 * time.Second)
+				continue
+			}
+			fmt.Fprintf(w, "data: %s\n\n", h.Events[sent])
+
+			err := w.Flush()
+			if err != nil {
+				log.Debugf("Error while flushing: %v. Closing http connection.\n", err)
+
+				break
+			}
+
+			sent++
+			time.Sleep(500 * time.Millisecond)
+		}
+	}))
+
+	return nil
 }

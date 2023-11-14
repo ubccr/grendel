@@ -26,6 +26,7 @@
                             class="text-red-500 transition hover:text-red-400 active:scale-90 disabled:opacity-60"
                             hx-delete="/api/user/{{ .Username }}"
                             hx-swap="none"
+                            hx-confirm="Are you sure you want to delete {{ .Username }}?"
                             {{ if eq .Username $.Auth.User }}disabled{{ end }}>
                             {{ template "trash" }}
                         </button>
