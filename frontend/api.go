@@ -529,23 +529,31 @@ func (h *Handler) eventSSE(f *fiber.Ctx) error {
 	f.Set("Transfer-Encoding", "chunked")
 
 	sent := 0
+	if len(h.Events) > 5 && len(h.Events) == sent {
+		h.Events = h.Events[5:]
+		sent--
+	}
+
+	tdClasses := "border border-neutral-300 p-1"
 	f.Context().SetBodyStreamWriter(fasthttp.StreamWriter(func(w *bufio.Writer) {
 		for {
 			if sent >= len(h.Events) {
 				time.Sleep(1 * time.Second)
 				continue
 			}
-			fmt.Fprintf(w, "data: %s\n\n", h.Events[sent])
+			e := h.Events[sent]
+			msg := fmt.Sprintf(`<tr><td class="%s">%s</td><td class="%s">%s</td><td class="%s">%s</td><td class="%s">%s</td></tr>`, tdClasses, e.Time, tdClasses, e.User, tdClasses, e.Severity, tdClasses, e.Message)
+			fmt.Fprintf(w, "data: %s\n\n", msg)
 
 			err := w.Flush()
 			if err != nil {
-				log.Debugf("Error while flushing: %v. Closing http connection.\n", err)
+				log.Debugf("Error while flushing /events: %v. Closing http connection.\n", err)
 
 				break
 			}
 
 			sent++
-			time.Sleep(500 * time.Millisecond)
+			time.Sleep(50 * time.Millisecond)
 		}
 	}))
 

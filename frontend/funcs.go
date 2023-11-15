@@ -29,11 +29,15 @@ func (h *Handler) writeEvent(severity string, f *fiber.Ctx, message string) erro
 	if err != nil {
 		return err
 	}
-	user := sess.Get("user")
-	tdClasses := "border border-neutral-300 p-1"
-	msg := fmt.Sprintf(`<tr><td class="%s">%s</td><td class="%s">%s</td><td class="%s">%s</td><td class="%s">%s</td></tr>`, tdClasses, time.Now().Format("Jan 02 - 03:04:05pm"), tdClasses, user, tdClasses, severity, tdClasses, message)
+	user := fmt.Sprintf("%s", sess.Get("user"))
+	e := EventStruct{
+		Severity: severity,
+		Time:     time.Now().Format("Jan 02 - 03:04:05pm"),
+		User:     user,
+		Message:  message,
+	}
 
-	h.Events = append(h.Events, msg)
+	h.Events = append(h.Events, e)
 
 	return err
 }

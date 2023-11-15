@@ -6,17 +6,24 @@ import (
 	"github.com/ubccr/grendel/model"
 )
 
+type EventStruct struct {
+	Time     string
+	User     string
+	Severity string
+	Message  string
+}
+
 type Handler struct {
 	DB     model.DataStore
 	Store  *session.Store
-	Events []string
+	Events []EventStruct
 }
 
 func NewHandler(db model.DataStore, Store *session.Store) (*Handler, error) {
 	h := &Handler{
 		DB:     db,
 		Store:  Store,
-		Events: []string{},
+		Events: []EventStruct{},
 	}
 
 	return h, nil
