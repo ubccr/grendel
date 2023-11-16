@@ -12,3 +12,4 @@ key.gpg
 venv/
 
 dist/
+grendel-*-SNAPSHOT*/
