@@ -1,8 +1,9 @@
 module github.com/ubccr/grendel
 
-go 1.20
+go 1.21
 
 require (
+	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
 	github.com/Pallinder/go-randomdata v1.2.0
 	github.com/alouca/gosnmp v0.0.0-20170620005048-04d83944c9ab
 	github.com/bits-and-blooms/bitset v1.5.0
@@ -42,7 +43,6 @@ require (
 )
 
 require (
-	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5 // indirect
 	github.com/alouca/gologger v0.0.0-20120904114645-7d4b7291de9c // indirect
 	github.com/aws/aws-sdk-go v1.44.19 // indirect
 	github.com/clarketm/json v1.17.1 // indirect

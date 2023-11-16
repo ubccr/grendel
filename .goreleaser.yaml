@@ -1,5 +1,8 @@
 # Grendel goreleaser configs
 # See here: https://goreleaser.com
+
+version: 1
+
 before:
   hooks:
     - go mod tidy
@@ -13,11 +16,16 @@ builds:
     ldflags:
       - -s -w -X github.com/ubccr/grendel/api.Version={{.Version}}
 archives:
-  - replacements:
-      linux: linux
-      amd64: x86_64
+  - format: tar.gz
     wrap_in_directory: true
-    name_template: "{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
+    name_template: >-
+      {{ .ProjectName }}-
+      {{- .Version }}-
+      {{- .Os }}-
+      {{- if eq .Arch "amd64" }}amd64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
     files:
       - LICENSE
       - NOTICE
