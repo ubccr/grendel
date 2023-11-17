@@ -23,9 +23,11 @@
                                     {{ else }}
                                         <span class="scale-75 text-red-600">{{ template "bolt-slash" }}</span>
                                     {{ end }}
-                                    <span class="h-6 rounded-xl bg-blue-500 px-2 py-1 text-xs text-white">
-                                        {{ .BootImage }}
-                                    </span>
+                                    {{ if ne .BootImage "" }}
+                                        <span class="h-6 rounded-xl bg-blue-500 px-2 py-1 text-xs text-white">
+                                            {{ .BootImage }}
+                                        </span>
+                                    {{ end }}
                                 </div>
                                 <div>
                                     <a class="hover:font-medium" href="/host/{{ .Name }}" hx-boost="false">
