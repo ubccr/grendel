@@ -60,27 +60,5 @@
     </tbody>
 </table>
 <script>
-    document.onreadystatechange = function () {
-        if (document.readyState == "complete") {
-            let lastChecked = null;
-            checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"]'));
-            checkboxes.forEach((val) => {
-                val.addEventListener("click", function (e) {
-                    if (lastChecked !== null && e.shiftKey) {
-                        let start = checkboxes.indexOf(lastChecked);
-                        let end = checkboxes.indexOf(this);
-
-                        // reverse in case of selecting from bottom to top
-                        let first = start < end ? start : end;
-                        let last = start < end ? end : start;
-
-                        for (let i = first; i <= last; i++) {
-                            checkboxes[i].checked = this.checked;
-                        }
-                    }
-                    lastChecked = this;
-                });
-            });
-        }
-    };
+    shiftSelect();
 </script>
