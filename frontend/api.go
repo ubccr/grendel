@@ -541,7 +541,6 @@ func (h *Handler) eventSSE(f *fiber.Ctx) error {
 
 	sent := 0
 	if len(h.Events) > 5 {
-		log.Warn("now")
 		h.Events = h.Events[1:]
 	}
 	tdClasses := "border border-neutral-300 p-1"
