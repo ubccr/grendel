@@ -540,11 +540,10 @@ func (h *Handler) eventSSE(f *fiber.Ctx) error {
 	f.Set("Transfer-Encoding", "chunked")
 
 	sent := 0
-	if len(h.Events) > 5 && len(h.Events) == sent {
-		h.Events = h.Events[5:]
-		sent--
+	if len(h.Events) > 5 {
+		log.Warn("now")
+		h.Events = h.Events[1:]
 	}
-
 	tdClasses := "border border-neutral-300 p-1"
 	f.Context().SetBodyStreamWriter(fasthttp.StreamWriter(func(w *bufio.Writer) {
 		for {
