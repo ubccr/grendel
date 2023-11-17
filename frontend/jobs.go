@@ -22,6 +22,7 @@ import (
 
 	"github.com/korovkin/limiter"
 	"github.com/sirupsen/logrus"
+	"github.com/stmcginnis/gofish/redfish"
 	"github.com/ubccr/grendel/bmc"
 	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/model"
@@ -85,10 +86,10 @@ func (j *JobRunner) RunConfigureImport(host *model.Host, file string, ch chan st
 		ch <- fmt.Sprintf("%s|%s|%s", status, host.Name, msg)
 	})
 }
-func (j *JobRunner) RunReboot(host *model.Host, ch chan string) {
+func (j *JobRunner) RunReboot(host *model.Host, ch chan string, boot redfish.Boot) {
 	j.limit.Execute(func() {
 		ip := host.InterfaceBMC().AddrString()
-		err := bmc.RebootHost(ip)
+		err := bmc.RebootHost(ip, boot)
 		status := "success"
 		msg := "Sent reboot command"
 

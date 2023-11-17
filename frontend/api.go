@@ -13,6 +13,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/segmentio/ksuid"
 	"github.com/spf13/viper"
+	"github.com/stmcginnis/gofish/redfish"
 	"github.com/ubccr/grendel/firmware"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
@@ -220,6 +221,7 @@ func (h *Handler) RebootHost(f *fiber.Ctx) error {
 	delay := viper.GetInt("bmc.delay")
 	fanout := viper.GetInt("bmc.fanout")
 
+	bootOption := f.FormValue("boot-option")
 	hosts := f.FormValue("hosts")
 	ns, err := nodeset.NewNodeSet(hosts)
 	if err != nil {
@@ -232,10 +234,19 @@ func (h *Handler) RebootHost(f *fiber.Ctx) error {
 	}
 
 	runner := NewJobRunner(fanout)
+	boot := redfish.Boot{
+		BootSourceOverrideTarget:  redfish.NoneBootSourceOverrideTarget,
+		BootSourceOverrideEnabled: redfish.OnceBootSourceOverrideEnabled,
+	}
+	if bootOption == "pxe" {
+		boot.BootSourceOverrideTarget = redfish.PxeBootSourceOverrideTarget
+	} else if bootOption == "bios-setup" {
+		boot.BootSourceOverrideTarget = redfish.BiosSetupBootSourceOverrideTarget
+	}
 
 	for i, host := range hostList {
 		ch := make(chan string)
-		runner.RunReboot(host, ch)
+		runner.RunReboot(host, ch, boot)
 		if (i+1)%fanout == 0 {
 			time.Sleep(time.Duration(delay) * time.Second)
 		}

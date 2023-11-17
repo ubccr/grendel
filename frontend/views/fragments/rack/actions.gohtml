@@ -102,22 +102,42 @@
             <p class="text-left">Sends OS Graceful Reboot command to iDRAC via Redfish</p>
         </div>
         <div class="flex justify-end">
-            <button
-                class="transform rounded-lg border bg-amber-500 px-2 py-1 text-white transition-transform hover:bg-amber-400 active:scale-90 disabled:opacity-75"
-                type="button"
+            <form
                 hx-post="/api/bmc/reboot"
                 hx-swap="none"
                 hx-vals="js:{hosts: HostMap()}"
                 hx-confirm="Are you sure you want to reboot these nodes?"
                 hx-ext="loading-states"
-                data-loading-states
-                data-loading-disable
-                {{ if eq .Hosts "" }}disabled{{ end }}>
-                <span data-loading-class="hidden">Reboot</span>
-                <span data-loading-class-remove="hidden" data-loading-class="block" class="mx-auto hidden h-6 w-6">
-                    {{ template "icon-spinner" }}
-                </span>
-            </button>
+                data-loading-states>
+                <div class="flex justify-end gap-2">
+                    <div>
+                        <label for="boot-option" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                            Boot Option:
+                        </label>
+                        <select
+                            class="w-full rounded-md border border-neutral-300 bg-white px-2 py-1"
+                            name="boot-option"
+                            id="boot-option">
+                            <option value="" class="italic">None</option>
+                            <option value="pxe">PXE</option>
+                            <option value="bios-setup">BIOS Setup</option>
+                        </select>
+                    </div>
+                    <button
+                        class="transform rounded-lg border bg-amber-500 px-2 py-1 text-white transition-transform hover:bg-amber-400 active:scale-90 disabled:opacity-75"
+                        type="submit"
+                        data-loading-disable
+                        {{ if eq .Hosts "" }}disabled{{ end }}>
+                        <span data-loading-class="hidden">Reboot</span>
+                        <span
+                            data-loading-class-remove="hidden"
+                            data-loading-class="block"
+                            class="mx-auto hidden h-6 w-6">
+                            {{ template "icon-spinner" }}
+                        </span>
+                    </button>
+                </div>
+            </form>
         </div>
         <div class="col-span-2 flex justify-start">
             <p class="text-left">Sets Auto Config flag to Enabled Once. Requires: Provision = true, Image = Flatcar</p>

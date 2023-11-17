@@ -107,7 +107,7 @@ func IdracAutoConfigure(ip string) error {
 	return err
 
 }
-func RebootHost(ip string) error {
+func RebootHost(ip string, bootOverride redfish.Boot) error {
 	config := gofish.ClientConfig{
 		Endpoint: fmt.Sprintf("https://%s", ip),
 		Username: viper.GetString("bmc.user"),
@@ -129,10 +129,10 @@ func RebootHost(ip string) error {
 	}
 
 	for _, system := range ss {
-		//err := system.SetBoot(bootOverride)
-		//if err != nil {
-		//	panic(err)
-		//}
+		err := system.SetBoot(bootOverride)
+		if err != nil {
+			return err
+		}
 		err = system.Reset(redfish.ForceRestartResetType)
 		if err != nil {
 			return err
