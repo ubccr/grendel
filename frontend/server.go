@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	DefaultPort = 8080
+	DefaultPort = 8081
 )
 
 var log = logger.GetLogger("Frontend")
