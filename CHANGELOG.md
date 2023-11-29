@@ -1,5 +1,17 @@
 # Grendel Changelog
 
+## [0.0.9] - 2023-11-29
+
+- Add Web UI (@jafurlan)
+- Fix bug in reverse resolution with ip masks
+- Fix bug in reverse resolution with multiple names
+- Add tags to status output
+- Add network segment status command
+- Add support for Dell ONIE and iDRAC auto config
+- Allow multiple FQDN comma separated
+- Add support for NVIDIA/Mellanox zerotouch
+- Add support for Arista zerotouch deployment (ZTD)
+
 ## [0.0.8] - 2023-02-27
 
 - Add DHCP multi-interface support [#12](https://github.com/ubccr/grendel/issues/12)
@@ -87,4 +99,5 @@
 [0.0.6]: https://github.com/ubccr/grendel/releases/tag/v0.0.6
 [0.0.7]: https://github.com/ubccr/grendel/releases/tag/v0.0.7
 [0.0.8]: https://github.com/ubccr/grendel/releases/tag/v0.0.8
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.8...HEAD
+[0.0.9]: https://github.com/ubccr/grendel/releases/tag/v0.0.9
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.9...HEAD
