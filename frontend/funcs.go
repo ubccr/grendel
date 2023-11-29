@@ -29,6 +29,7 @@ func (h *Handler) writeEvent(severity string, f *fiber.Ctx, message string) erro
 	if err != nil {
 		return err
 	}
+	// TODO: fix returns "%!s()" on first user registration
 	user := fmt.Sprintf("%s", sess.Get("user"))
 	e := EventStruct{
 		Severity: severity,
