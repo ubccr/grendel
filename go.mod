@@ -70,7 +70,7 @@ require (
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
-	github.com/gofiber/fiber/v2 v2.49.0
+	github.com/gofiber/fiber/v2 v2.50.0
 	github.com/gofiber/storage/memory v1.3.4
 	github.com/gofiber/storage/redis v1.3.4
 	github.com/gofiber/storage/sqlite3 v1.3.8
@@ -106,7 +106,7 @@ require (
 	github.com/tidwall/tinyqueue v0.1.1 // indirect
 	github.com/u-root/u-root v7.0.0+incompatible // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.48.0
+	github.com/valyala/fasthttp v1.50.0
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	github.com/vincent-petithory/dataurl v1.0.0 // indirect
