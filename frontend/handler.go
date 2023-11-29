@@ -1,10 +1,20 @@
 package frontend
 
 import (
+	"embed"
+	"io/fs"
+	"net/http"
+
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/favicon"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/model"
 )
+
+//go:embed public
+var embedFS embed.FS
 
 type EventStruct struct {
 	Time     string
@@ -60,7 +70,26 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 		return c.Next()
 	})
 
-	app.Static("/", "frontend/public")
+	public, err := fs.Sub(embedFS, "public")
+	if err != nil {
+		log.Error("failed to load public files")
+	}
+
+	app.Use("/static", filesystem.New(filesystem.Config{
+		Root:   http.FS(public),
+		Browse: false,
+	}))
+
+	if viper.IsSet("frontend.favicon") {
+		app.Use(favicon.New(favicon.Config{
+			File: viper.GetString("frontend.favicon"),
+		}))
+	} else {
+		app.Use(favicon.New(favicon.Config{
+			File:       "favicon.ico",
+			FileSystem: http.FS(public),
+		}))
+	}
 
 	app.Get("/", h.Index)
 

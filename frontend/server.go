@@ -2,8 +2,11 @@ package frontend
 
 import (
 	"context"
+	"embed"
 	"fmt"
+	"io/fs"
 	"net"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -25,6 +28,9 @@ const (
 )
 
 var log = logger.GetLogger("Frontend")
+
+//go:embed views
+var staticFS embed.FS
 
 type Server struct {
 	ListenAddress net.IP
@@ -129,7 +135,12 @@ func (s *Server) Serve() error {
 		},
 	}
 
-	engine := html.New("./frontend/views/", ".gohtml")
+	views, err := fs.Sub(staticFS, "views")
+	if err != nil {
+		log.Error("failed to load views")
+		return err
+	}
+	engine := html.NewFileSystem(http.FS(views), ".gohtml")
 	engine.AddFuncMap(funcMap)
 	s.app = fiber.New(fiber.Config{
 		Views:                 engine,
