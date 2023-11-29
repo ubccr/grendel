@@ -1,0 +1,86 @@
+<div class="flex justify-center">
+    <div class="mb-4 flex justify-center gap-2 rounded-xl border border-neutral-300 p-2 text-center shadow-lg">
+        <div class="group z-50 my-auto flex justify-center">
+            <button
+                hx-post="/api/bmc/reboot"
+                hx-vals='{"hosts": "{{ .HostName }}"}'
+                hx-swap="none"
+                hx-confirm="Are you sure you want to reboot {{ .HostName }}?"
+                class="transform rounded-lg border border-neutral-300 p-1 text-sm transition-transform hover:bg-neutral-50 active:scale-90">
+                {{ template "icon-power" }}
+            </button>
+            <span
+                class="z-100 absolute mt-9 rounded-lg bg-gray-800 px-2 py-1 text-sm text-gray-100 opacity-0 transition-opacity group-hover:opacity-100">
+                Reboot
+            </span>
+        </div>
+        <h1 class="text-3xl">{{ .HostName }}</h1>
+        <div class="group z-50 my-auto flex justify-center">
+            <button
+                hx-post="/api/bmc/configure/auto"
+                hx-vals='{"hosts": "{{ .HostName }}"}'
+                hx-swap="none"
+                class="transform rounded-lg border border-neutral-300 p-1 text-sm transition-transform active:scale-90">
+                {{ template "icon-adjustments-horizontal" }}
+            </button>
+            <span
+                class="z-100 absolute mt-9 rounded-lg bg-gray-800 px-2 py-1 text-sm text-gray-100 opacity-0 transition-opacity group-hover:opacity-100">
+                Auto Configure
+            </span>
+        </div>
+    </div>
+</div>
+<div hx-get="/fragments/host/{{ .HostName }}/form" hx-trigger="load, refresh from:body"></div>
+<script>
+    function ifaceID() {
+        let id = document.getElementById("ifaceID").value;
+        document.getElementById("ifaceID").value++;
+        return id;
+    }
+    function removeIface(id) {
+        let iface = document.getElementById(`interface:${id}`);
+        useTransition(() => iface.remove());
+    }
+    function moveUp(id) {
+        let ifaces = document.getElementById("interfaces").children;
+        for (let i = 0; i < ifaces.length; i++) {
+            if (ifaces[i].id == `interface:${id}`) {
+                useTransition(() => ifaces[i].parentNode.insertBefore(ifaces[i], ifaces[i - 1]));
+                return;
+            }
+        }
+    }
+    function moveDown(id) {
+        let ifaces = document.getElementById("interfaces").children;
+        for (let i = 0; i < ifaces.length; i++) {
+            if (ifaces[i].id == `interface:${id}`) {
+                if (i + 2 <= ifaces.length) {
+                    useTransition(() => ifaces[i].parentNode.insertBefore(ifaces[i], ifaces[i + 2]));
+                    return;
+                } else if (i + 1 == ifaces.length) {
+                    useTransition(() => ifaces[i].parentNode.insertBefore(ifaces[i], ifaces[0]));
+                    return;
+                } else {
+                    useTransition(() => ifaces[i].parentNode.append(ifaces[i]));
+                    return;
+                }
+            }
+        }
+    }
+    function parseForm() {
+        let ifaces = document.getElementById("interfaces").children;
+        let interfaces = [];
+        for (let i = 0; i < ifaces.length; i++) {
+            let iface = {};
+            iface.Fqdn = ifaces[i].querySelector("input[name='Fqdn']").value;
+            iface.Mac = ifaces[i].querySelector("input[name='Mac']").value;
+            iface.Ip = ifaces[i].querySelector("input[name='Ip']").value;
+            iface.Ifname = ifaces[i].querySelector("input[name='Ifname']").value;
+            iface.Bmc = ifaces[i].querySelector("select[name='Bmc']").value;
+            iface.Vlan = ifaces[i].querySelector("input[name='Vlan']").value;
+            iface.Mtu = ifaces[i].querySelector("input[name='Mtu']").value;
+            interfaces.push(iface);
+        }
+        return JSON.stringify(interfaces);
+    }
+</script>

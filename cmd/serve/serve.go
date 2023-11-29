@@ -171,6 +171,7 @@ func runServices() error {
 		t.Go(func() error { return servePXE(t) })
 		t.Go(func() error { return serveAPI(t) })
 		t.Go(func() error { return serveProvision(t) })
+		t.Go(func() error { return serveFrontend(t) })
 		return nil
 	})
 	return t.Wait()

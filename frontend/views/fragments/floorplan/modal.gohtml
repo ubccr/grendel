@@ -1,0 +1,169 @@
+<div class="flex h-full flex-col">
+    <div>
+        <div class="m-2 flex justify-center align-middle ">
+            <h1 class="rounded-xl border border-neutral-300 px-3 py-1 text-3xl shadow-lg">Add Host</h1>
+        </div>
+        <form hx-post="/api/host" hx-vals="js:{Interfaces: parseForm()}" hx-swap="none" id="newHostForm">
+            <div class="grid grid-cols-2 gap-3 p-3 drop-shadow-sm">
+                <div>
+                    <label for="Name" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Name:</label>
+                    <input
+                        id="Name"
+                        name="Name"
+                        class="w-full rounded-md border border-neutral-300 px-2 py-1"
+                        placeholder="cpn-d06-03"
+                        type="text" />
+                </div>
+                <div>
+                    <label for="Provision" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Provision:</label>
+                    <select
+                        class="w-full rounded-md border border-neutral-300 bg-white px-2 py-1"
+                        name="Provision"
+                        id="Provision">
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="Firmware" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Firmware:</label>
+                    <select
+                        class="w-full rounded-md border border-neutral-300 bg-white px-2 py-1"
+                        name="Firmware"
+                        id="Firmware">
+                        <option value="" class="italic">None</option>
+                        {{ range .Firmware }}
+                            <option value="{{ . }}">{{ . }}</option>
+                        {{ end }}
+                    </select>
+                </div>
+                <div>
+                    <label for="BootImage" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Boot Image:</label>
+                    <select
+                        class="w-full rounded-md border border-neutral-300 bg-white px-2 py-1"
+                        name="BootImage"
+                        id="BootImage">
+                        <option value="" class="italic">None</option>
+                        {{ range .BootImage }}
+                            <option value="{{ . }}">{{ . }}</option>
+                        {{ end }}
+                    </select>
+                </div>
+                <div>
+                    <label for="Tags" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Tags:</label>
+                    <input
+                        id="Tags"
+                        name="Tags"
+                        class="w-full rounded-md border border-neutral-300 px-2 py-1"
+                        placeholder="d06,compute"
+                        type="text" />
+                </div>
+                <div class="flex justify-center gap-3 align-middle">
+                    <button
+                        class="transform rounded-md bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90"
+                        type="button"
+                        hx-get="/fragments/interfaces"
+                        hx-target="#interfaces"
+                        hx-swap="beforeend transition:true"
+                        hx-vals="js:{ID: ifaceID()}">
+                        Add Interface
+                    </button>
+                    <!-- <button
+                        class="rounded-md bg-blue-500 px-2 py-1 text-white enabled:hover:bg-blue-400 disabled:opacity-75"
+                        type="button"
+                        onclick="undoRemoveIface()"
+                        id="undoBtn"
+                        disabled>
+                        Undo
+                    </button> -->
+                </div>
+            </div>
+        </form>
+        <div class="grid grid-cols-2 gap-3 p-3">
+            <input type="hidden" value="0" id="ifaceID" />
+            <div class="col-span-2" id="interfaces"></div>
+            <!-- <div class="col-span-2 hidden" id="deletedInterfaces"></div> -->
+        </div>
+    </div>
+    <div class="flex-grow"></div>
+    <div class="sticky bottom-0 flex w-full justify-end gap-3 border-t border-neutral-200 bg-neutral-50 p-3">
+        <button
+            type="submit"
+            form="newHostForm"
+            class="transform rounded-md border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90">
+            Submit
+        </button>
+        <button
+            type="button"
+            onclick="closeModal()"
+            class="transform rounded-md border bg-neutral-500 px-2 py-1 text-white transition-transform hover:bg-neutral-400 active:scale-90">
+            Close
+        </button>
+    </div>
+</div>
+<script>
+    function ifaceID() {
+        let id = document.getElementById("ifaceID").value;
+        document.getElementById("ifaceID").value++;
+        return id;
+    }
+    function removeIface(id) {
+        let iface = document.getElementById(`interface:${id}`);
+        useTransition(() => iface.remove());
+        // let deleted = document.getElementById("deletedInterfaces");
+        // useTransition(() => deleted.appendChild(iface));
+
+        // document.getElementById("undoBtn").disabled = false;
+    }
+    // function undoRemoveIface() {
+    //     let iface = document.getElementById("deletedInterfaces").lastChild;
+    //     let interfaceParent = document.getElementById("interfaces");
+    //     if (document.getElementById("deletedInterfaces").childElementCount <= 1) {
+    //         document.getElementById("undoBtn").disabled = true;
+    //     }
+
+    //     prevId = parseInt(iface.id.substring(10, iface.id.length - 1));
+    //     useTransition(() => interfaceParent.insertBefore(iface, document.getElementById(`interface[${prevId + 1}]`)));
+    // }
+    function moveUp(id) {
+        let ifaces = document.getElementById("interfaces").children;
+        for (let i = 0; i < ifaces.length; i++) {
+            if (ifaces[i].id == `interface:${id}`) {
+                useTransition(() => ifaces[i].parentNode.insertBefore(ifaces[i], ifaces[i - 1]));
+                return;
+            }
+        }
+    }
+    function moveDown(id) {
+        let ifaces = document.getElementById("interfaces").children;
+        for (let i = 0; i < ifaces.length; i++) {
+            if (ifaces[i].id == `interface:${id}`) {
+                if (i + 2 <= ifaces.length) {
+                    useTransition(() => ifaces[i].parentNode.insertBefore(ifaces[i], ifaces[i + 2]));
+                    return;
+                } else if (i + 1 == ifaces.length) {
+                    useTransition(() => ifaces[i].parentNode.insertBefore(ifaces[i], ifaces[0]));
+                    return;
+                } else {
+                    useTransition(() => ifaces[i].parentNode.append(ifaces[i]));
+                    return;
+                }
+            }
+        }
+    }
+    function parseForm() {
+        let ifaces = document.getElementById("interfaces").children;
+        let interfaces = [];
+        for (let i = 0; i < ifaces.length; i++) {
+            let iface = {};
+            iface.Fqdn = ifaces[i].querySelector("input[name='Fqdn']").value;
+            iface.Mac = ifaces[i].querySelector("input[name='Mac']").value;
+            iface.Ip = ifaces[i].querySelector("input[name='Ip']").value;
+            iface.Ifname = ifaces[i].querySelector("input[name='Ifname']").value;
+            iface.Bmc = ifaces[i].querySelector("select[name='Bmc']").value;
+            iface.Vlan = ifaces[i].querySelector("input[name='Vlan']").value;
+            iface.Mtu = ifaces[i].querySelector("input[name='Mtu']").value;
+            interfaces.push(iface);
+        }
+        return JSON.stringify(interfaces);
+    }
+</script>

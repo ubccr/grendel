@@ -16,10 +16,10 @@ grendel serve --hosts /path/to/hosts.json --images /path/to/images.json
 
 This will ensure the hosts and boot images are loaded each time Grendel is
 started. Any changes to those files will require restarting Grendel to take
-effect. 
+effect.
 
 Alternatively, Grendel can be configured to persist the database to disk by
-setting this config param: 
+setting this config param:
 
 ```toml
 #
@@ -34,7 +34,7 @@ Any changes to the Grendel database will be persisted between restarts.
 ## DNS Stub Resolver
 
 Grendel is not a recursive DNS resolver. In production deployments it's
-recommended to run behind an [unbound](https://nlnetlabs.nl/projects/unbound/about/) 
+recommended to run behind an [unbound](https://nlnetlabs.nl/projects/unbound/about/)
 stub-resolver (or similar). This delegates management of compute node
 forward/reverse DNS entirely to Grendel while keeping existing DNS
 infrastructure in place. Here's some example configs for setting up Grendel as
@@ -64,20 +64,20 @@ part of the stub-zone like so:
 
 ```json
 {
-    "name": "cpn-d13-08",
-    "interfaces": [
-        {
-            "fqdn": "bmc-d13-08.compute.ccr.buffalo.edu",
-            "ip": "10.129.24.8/24",
-            "bmc": true
-        },
-        {
-            "fqdn": "cpn-d13-08.compute.ccr.buffalo.edu",
-            "ip": "10.65.24.8/24",
-            "bmc": false
-        }
-    ],
-    "provision": true,
+  "name": "cpn-d13-08",
+  "interfaces": [
+    {
+      "fqdn": "bmc-d13-08.compute.ccr.buffalo.edu",
+      "ip": "10.129.24.8/24",
+      "bmc": true
+    },
+    {
+      "fqdn": "cpn-d13-08.compute.ccr.buffalo.edu",
+      "ip": "10.65.24.8/24",
+      "bmc": false
+    }
+  ],
+  "provision": true
 }
 ```
 
@@ -97,7 +97,7 @@ User=grendel
 Group=grendel
 WorkingDirectory=/var/lib/grendel
 ExecStart=/usr/bin/grendel serve --verbose -c /etc/grendel/grendel.toml
-Restart=on-abort
+Restart=on-failure
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE CAP_NET_RAW
 AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_NET_RAW
 StateDirectory=grendel

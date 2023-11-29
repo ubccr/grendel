@@ -18,8 +18,12 @@
 package bmc
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 
+	"github.com/kgrvamsi/redfishapi"
+	"github.com/spf13/viper"
 	"github.com/stmcginnis/gofish"
 	"github.com/stmcginnis/gofish/redfish"
 )
@@ -63,6 +67,124 @@ func NewRedfish(endpoint, user, pass string, insecure bool) (*Redfish, error) {
 
 func (r *Redfish) Logout() {
 	r.client.Logout()
+}
+func IdracAutoConfigure(ip string) error {
+
+	user := viper.GetString("bmc.user")
+	pass := viper.GetString("bmc.password")
+
+	c := redfishapi.NewIloClient(fmt.Sprintf("https://%s", ip), user, pass)
+
+	// TODO: replace redfish library or submit PR to fix "k.MessageExtendedInfo[0].Message"
+	// License error response has MessageExtendedInfo nested in a error struct
+	attr, err := c.GetIDRACAttrDell()
+	if err != nil {
+		return err
+	}
+	if attr.NIC_1_AutoConfig == "" {
+		return errors.New("NIC_1_AutoConfig attribute not found. iDRAC is likely missing the required license")
+	}
+
+	type attributes struct {
+		NIC1AutoConfig string `json:"NIC.1.AutoConfig"`
+	}
+	type body struct {
+		Attributes attributes `json:"Attributes"`
+	}
+	b, _ := json.Marshal(body{
+		Attributes: attributes{
+			NIC1AutoConfig: "Enable Once",
+		},
+	})
+
+	_, err = c.SetAttributesDell("idrac", b)
+	if err != nil {
+		// Try default creds
+		c.Username = "root"
+		c.Password = "calvin"
+		_, err = c.SetAttributesDell("idrac", b)
+	}
+	return err
+
+}
+func RebootHost(ip string, bootOverride redfish.Boot) error {
+	config := gofish.ClientConfig{
+		Endpoint: fmt.Sprintf("https://%s", ip),
+		Username: viper.GetString("bmc.user"),
+		Password: viper.GetString("bmc.password"),
+		Insecure: true,
+	}
+
+	c, err := gofish.Connect(config)
+	if err != nil {
+		return err
+	}
+	defer c.Logout()
+
+	// Attached the client to service root
+	service := c.Service
+	ss, err := service.Systems()
+	if err != nil {
+		return err
+	}
+
+	for _, system := range ss {
+		err := system.SetBoot(bootOverride)
+		if err != nil {
+			return err
+		}
+		err = system.Reset(redfish.ForceRestartResetType)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+func IdracImportSytemConfig(ip string, path string, file string) error {
+
+	user := viper.GetString("bmc.user")
+	pass := viper.GetString("bmc.password")
+
+	c := redfishapi.NewIloClient(fmt.Sprintf("https://%s", ip), user, pass)
+
+	type shareParameters struct {
+		Target     []string `json:"Target"`
+		ShareType  string   `json:"ShareType"`
+		IPAddress  string   `json:"IPAddress"`
+		FileName   string   `json:"FileName"`
+		ShareName  string   `json:"ShareName"`
+		PortNumber string   `json:"PortNumber"`
+	}
+	type body struct {
+		HostPowerState  string `json:"HostPowerState"`
+		ShutdownType    string `json:"ShutdownType"`
+		ImportBuffer    string `json:"ImportBuffer"`
+		ShareParameters shareParameters
+	}
+
+	b, _ := json.Marshal(body{
+		HostPowerState: "On",
+		ShutdownType:   "Graceful",
+		ShareParameters: shareParameters{
+			Target:     []string{"ALL"},
+			ShareType:  viper.GetString("bmc.config_share_type"),
+			IPAddress:  viper.GetString("bmc.config_share_ip"),
+			PortNumber: viper.GetString("bmc.config_share_port"),
+			FileName:   file,
+			ShareName:  path,
+		},
+	})
+	_, err := c.ImportConfigDell(b)
+
+	if err != nil && err.Error() == "Unauthorized" {
+		// Try default creds
+		c.Username = "root"
+		c.Password = "calvin"
+		_, err = c.ImportConfigDell(b)
+	}
+
+	return err
+
 }
 
 func (r *Redfish) powerReset(resetTypeOrder []string) error {

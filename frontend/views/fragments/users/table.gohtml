@@ -1,0 +1,38 @@
+{{ $tdClasses := "border border-gray-400 px-2 py-1" }}
+<table class="table-fixed shadow-sm">
+    <thead>
+        <tr>
+            <th class="{{ $tdClasses }}">Username</th>
+            <th class="{{ $tdClasses }}">Role</th>
+            <th class="{{ $tdClasses }}">Created At</th>
+            <th class="{{ $tdClasses }}">Modified At</th>
+            <th class="{{ $tdClasses }}"></th>
+            <th class="{{ $tdClasses }}"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range .Users }}
+            <tr>
+                <td class="{{ $tdClasses }}">{{ .Username }}</td>
+                <td class="{{ $tdClasses }}">{{ .Role }}</td>
+                <td class="{{ $tdClasses }}">{{ .CreatedAt.Format "Jan 02, 2006 15:04:05 MST" }}</td>
+                <td class="{{ $tdClasses }}">{{ .ModifiedAt.Format "Jan 02, 2006 15:04:05 MST" }}</td>
+                <td class="{{ $tdClasses }}">
+                    <input type="checkbox" name="{{ .Username }}" {{ if eq .Username $.Auth.User }}disabled{{ end }} />
+                </td>
+                <td class="{{ $tdClasses }}">
+                    <div class="flex align-middle">
+                        <button
+                            class="text-red-500 transition hover:text-red-400 active:scale-90 disabled:opacity-60"
+                            hx-delete="/api/user/{{ .Username }}"
+                            hx-swap="none"
+                            hx-confirm="Are you sure you want to delete {{ .Username }}?"
+                            {{ if eq .Username $.Auth.User }}disabled{{ end }}>
+                            {{ template "trash" }}
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        {{ end }}
+    </tbody>
+</table>

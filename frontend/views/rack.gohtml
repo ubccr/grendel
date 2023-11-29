@@ -1,0 +1,207 @@
+<form>
+    <div class="mb-3 flex justify-center gap-2">
+        <button
+            class="transform rounded-lg border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90"
+            type="button"
+            hx-get="/fragments/rack/{{ .Rack }}/actions"
+            hx-target="#hostModal"
+            hx-vals="js:{hosts: HostMap('hostname')}"
+            hx-swap="innerHTML transition:true"
+            onclick="showModal()">
+            Actions
+        </button>
+        <button
+            class="transform rounded-lg border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90"
+            type="button"
+            hx-get="/fragments/rack/{{ .Rack }}/add/modal"
+            hx-target="#hostModal"
+            hx-swap="innerHTML transition:true"
+            hx-vals="js:{hosts: HostMap('u')}"
+            onclick="showModal()">
+            Add Hosts
+        </button>
+        <button
+            class="transform rounded-lg border bg-amber-500 px-2 py-1 text-white transition-transform hover:bg-amber-400 active:scale-90"
+            type="button"
+            hx-delete="/api/host"
+            hx-vals='js:{hosts: HostMap("hostname")}'
+            hx-swap="none"
+            hx-confirm="Are you sure you want to delete the selected hosts?">
+            Delete Hosts
+        </button>
+        <button
+            class="transform rounded-lg border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90"
+            type="button"
+            onclick="SelectAllNodes()">
+            Select Nodes
+        </button>
+        <button
+            class="transform rounded-lg border bg-neutral-500 px-2 py-1 text-white transition-transform hover:bg-neutral-400 active:scale-90"
+            type="button"
+            onclick="Clear()">
+            Clear
+        </button>
+    </div>
+
+    <div hx-get="/fragments/rack/{{ .Rack }}/table" hx-swap="innerHTML" hx-trigger="load, refresh from:body"></div>
+</form>
+
+<dialog id="hostModal" class="h-5/6 w-full rounded-lg shadow-md md:w-2/3 lg:w-3/4"></dialog>
+<dialog id="exportModal" class="h-5/6 w-full rounded-lg shadow-md md:w-2/3 lg:w-3/4">
+    <div class="flex h-full flex-col">
+        <div class="p-2">
+            <pre id="exportText" class="h-full w-full text-left"></pre>
+        </div>
+        <div class="flex-grow"></div>
+        <div class="sticky bottom-0 flex w-full justify-end gap-3 border-t border-neutral-200 bg-neutral-50 p-3">
+            <button
+                type="button"
+                onclick="copyExport()"
+                class="transform rounded-md border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90">
+                <span class="" id="exportIconList">{{ template "clipboard-document-list" }}</span>
+                <span class="hidden" id="exportIconCheck">
+                    {{ template "clipboard-document-check" }}
+                </span>
+            </button>
+            <button
+                type="button"
+                onclick="closeExportModal()"
+                class="transform rounded-md border bg-neutral-500 px-2 py-1 text-white transition-transform hover:bg-neutral-400 active:scale-90">
+                Close
+            </button>
+        </div>
+    </div>
+</dialog>
+<script>
+    function SelectAllNodes() {
+        var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
+            var n = val.name.split(":");
+            if (n[2] === "server") val.checked = true;
+        });
+    }
+
+    function Clear() {
+        var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
+            val.checked = false;
+        });
+    }
+
+    function HostMap(type = "hostname") {
+        var h = [];
+        var c = document.querySelectorAll('input[type="checkbox"]').forEach((val) => {
+            if (val.checked === true) {
+                var n = val.name.split(":");
+                if (type === "hostname" && n[1] !== "") h.push(n[1]);
+                else if (type === "u") h.push(n[0]);
+            }
+        });
+        return h.join(",");
+    }
+
+    document.body.addEventListener("closeModal", function (evt) {
+        closeModal();
+    });
+
+    function parseTable() {
+        if (document.getElementById("hostTableBody") == null) return "";
+
+        let table = document.getElementById("hostTableBody").children;
+        let ifaceCount = document.getElementById("hostTableFirstRow").children.length - 1; //exclude first col
+        let hosts = [];
+
+        for (let i = 0; i < table.length; i++) {
+            let Name = table[i].querySelector("input[name=Name]").value;
+            let Ports = Array.from(table[i].querySelectorAll("input[name=Port]")).map((p) => p.value);
+            let MACs = Array.from(table[i].querySelectorAll("input[name=MAC]")).map((m) => m.value);
+            let IPs = Array.from(table[i].querySelectorAll("input[name=IP]")).map((ip) => ip.value);
+
+            let hostIfaces = [];
+            for (let i = 0; i < ifaceCount; i++) {
+                hostIfaces.push({
+                    Port: Ports[i],
+                    MAC: MACs[i],
+                    IP: IPs[i],
+                });
+            }
+
+            hosts.push({
+                Name: Name,
+                Interfaces: hostIfaces,
+            });
+        }
+
+        let interfaces = [];
+        let footer = document.getElementById("hostTableFooter").children[0];
+
+        let Domain = Array.from(footer.querySelectorAll("input[name=Domain]")).map((d) => d.value);
+        let Name = Array.from(footer.querySelectorAll("input[name=Name]")).map((n) => n.value);
+        let BMC = Array.from(footer.querySelectorAll("select[name=BMC]")).map((b) => b.value);
+        let VLAN = Array.from(footer.querySelectorAll("input[name=VLAN]")).map((v) => v.value);
+        let MTU = Array.from(footer.querySelectorAll("input[name=MTU]")).map((m) => m.value);
+        for (let i = 0; i < ifaceCount; i++) {
+            interfaces.push({
+                Domain: Domain[i],
+                Name: Name[i],
+                BMC: BMC[i],
+                VLAN: VLAN[i],
+                MTU: MTU[i],
+            });
+        }
+        return JSON.stringify({ Hosts: hosts, Interfaces: interfaces });
+    }
+    function removeIface(index) {
+        let ifaceEls = Array.from(document.getElementsByClassName(`interface-${index}`));
+        ifaceEls.forEach((el) => useTransition(() => el.remove()));
+        document.getElementById("ifaceCount").value--;
+    }
+    function showModal() {
+        useTransition(() => document.getElementById("hostModal").showModal());
+    }
+    function closeModal() {
+        useTransition(() => document.getElementById("hostModal").close());
+        useTransition(() => (document.getElementById("hostModal").innerHTML = ""));
+    }
+    async function copyExport() {
+        let el = document.getElementById("exportText");
+        let text = el.innerHTML;
+        await navigator.clipboard.writeText(text);
+
+        // animate buttons
+        document.getElementById("exportIconList").classList.add("hidden");
+        document.getElementById("exportIconCheck").classList.remove("hidden");
+        setInterval(() => {
+            document.getElementById("exportIconList").classList.remove("hidden");
+            document.getElementById("exportIconCheck").classList.add("hidden");
+        }, 1500);
+    }
+    function showExportModal() {
+        closeModal();
+        useTransition(() => document.getElementById("exportModal").showModal());
+    }
+    function closeExportModal() {
+        useTransition(() => document.getElementById("exportModal").close());
+        useTransition(() => (document.getElementById("exportText").innerHTML = ""));
+    }
+    shiftSelect();
+    function shiftSelect() {
+        let lastChecked = null;
+        checkboxes = Array.from(document.querySelectorAll('input[type="checkbox"]'));
+        checkboxes.forEach((val) => {
+            val.addEventListener("click", function (e) {
+                if (lastChecked !== null && e.shiftKey) {
+                    let start = checkboxes.indexOf(lastChecked);
+                    let end = checkboxes.indexOf(this);
+
+                    // reverse in case of selecting from bottom to top
+                    let first = start < end ? start : end;
+                    let last = start < end ? end : start;
+
+                    for (let i = first; i <= last; i++) {
+                        checkboxes[i].checked = this.checked;
+                    }
+                }
+                lastChecked = this;
+            });
+        });
+    }
+</script>

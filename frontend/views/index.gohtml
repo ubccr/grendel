@@ -1,0 +1,15 @@
+<div class="flex-col justify-center">
+    <h1 class="mb-4 text-7xl">Grendel</h1>
+    <hr />
+    {{ if ne .Auth.User nil }}
+        <h2 class="mt-1 text-lg" id="welcome">Welcome {{ .Auth.User }}! Successfully logged in.</h2>
+    {{ else }}
+        <h2 class="mt-1 text-lg" id="register">
+            New users can register
+            <a class="text-blue-600 hover:text-blue-400" href="/register">here.</a>
+        </h2>
+    {{ end }}
+    {{ if eq .Auth.Role "disabled" }}
+        <h3 class="mt-1 text-sm text-red-700">Your account is Disabled. Please ask an Administrator to activate it.</h3>
+    {{ end }}
+</div>

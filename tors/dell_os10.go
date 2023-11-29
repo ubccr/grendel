@@ -23,9 +23,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -67,7 +68,7 @@ type dellRestconfError struct {
 func NewDellOS10(endpoint, user, password, cacert string, insecure bool) (*DellOS10, error) {
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure}}
 
-	pem, err := ioutil.ReadFile(cacert)
+	pem, err := os.ReadFile(cacert)
 	if err == nil {
 		certPool := x509.NewCertPool()
 		if !certPool.AppendCertsFromPEM(pem) {
@@ -113,7 +114,6 @@ func (d *DellOS10) GetMACTable() (MACTable, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	res, err := d.client.Do(req)
 	if err != nil {
 		return nil, err
@@ -124,7 +124,7 @@ func (d *DellOS10) GetMACTable() (MACTable, error) {
 		return nil, fmt.Errorf("Failed to fetch mac table with HTTP status code: %d", res.StatusCode)
 	}
 
-	rawJson, err := ioutil.ReadAll(res.Body)
+	rawJson, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}

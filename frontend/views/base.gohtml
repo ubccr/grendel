@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script src="/static/htmx.min.js"></script>
+        <script src="/static/loading-states.js"></script>
+        <script src="/static/sse.js"></script>
+        <script src="/static/notyf.min.js"></script>
+        <link rel="stylesheet" href="/static/notyf.min.css" />
+        <link rel="stylesheet" href="/static/tailwind.css" />
+        <title>{{ .Title }}</title>
+    </head>
+
+    {{ $linkClasses := "rounded-md px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-200" }}
+    <body class="flex min-h-screen flex-col bg-large-triangles-ub">
+        <div>
+            <nav class="bg-white p-4 xl:px-12">
+                <div class="flex justify-between">
+                    <button
+                        class="border-netural-400 block transform rounded-lg border p-1 px-2 transition-transform hover:text-neutral-700 active:scale-90 sm:hidden"
+                        onclick="useTransition(() => showMobile())">
+                        <span id="icon-bars" class="">
+                            {{ template "icon-bars-3" }}
+                        </span>
+                        <span id="icon-x" class="" hidden>
+                            {{ template "icon-x-mark" }}
+                        </span>
+                    </button>
+                    <div class="flex whitespace-nowrap">
+                        <img src="/favicon.ico" alt="UBCCR" width="{36}" height="{36}" />
+                        <div class="ml-2 mt-2 space-y-1 sm:my-auto sm:ml-4 sm:block" hidden>
+                            <a
+                                class="{{ $linkClasses }} {{ if eq .CurrentPath "/" }}bg-neutral-100{{ end }}"
+                                href="/"
+                                hx-boost="true">
+                                Home
+                            </a>
+                            <a
+                                class="{{ $linkClasses }} {{ if eq .CurrentPath "/floorplan" }}bg-neutral-100{{ end }}"
+                                href="/floorplan"
+                                hx-boost="true">
+                                Floorplan
+                            </a>
+                            {{ if eq .Auth.Role "admin" }}
+                                <a
+                                    class="{{ $linkClasses }} {{ if eq .CurrentPath "/users" }}
+                                        bg-neutral-100
+                                    {{ end }}"
+                                    href="/users"
+                                    hx-boost="true">
+                                    Users
+                                </a>
+                            {{ end }}
+                        </div>
+                    </div>
+                    <div class="my-auto flex gap-4">
+                        {{ if eq .Auth.User nil }}
+                            <a href="/login" id="login" hx-boost="true">Login</a>
+                        {{ else }}
+                            <div class="mx-1 hidden sm:flex">
+                                {{ template "navSearch" .SearchList }}
+                            </div>
+                            <button hx-post="/api/auth/logout" hx-swap="none" id="logout">Logout</button>
+                        {{ end }}
+                    </div>
+                </div>
+                <div id="mobile-menu" class="ml-2 mt-2 space-y-1 sm:hidden" hidden>
+                    {{ template "navSearch" .SearchList }}
+                    <a
+                        class="{{ $linkClasses }} {{ if eq .CurrentPath "/" }}bg-neutral-100{{ end }} block"
+                        href="/"
+                        hx-boost="true">
+                        Home
+                    </a>
+                    <a
+                        class="{{ $linkClasses }} {{ if eq .CurrentPath "/floorplan" }}bg-neutral-100{{ end }} block"
+                        href="/floorplan"
+                        hx-boost="true">
+                        Floorplan
+                    </a>
+                    {{ if eq .Auth.Role "admin" }}
+                        <a
+                            class="{{ $linkClasses }} {{ if eq .CurrentPath "/users" }}bg-neutral-100{{ end }} block"
+                            href="/users"
+                            hx-boost="true">
+                            Users
+                        </a>
+                    {{ end }}
+                </div>
+            </nav>
+            <div class="flex justify-center px-2 py-4 text-center">
+                <div class="w-full rounded-lg bg-white p-3 shadow-xl md:w-5/6" id="body">
+                    <noscript>Woah buddy, you think this will just work without Javascript?</noscript>
+                    {{ embed }}
+                </div>
+            </div>
+        </div>
+        <div class="flex-grow"></div>
+        <div
+            class="{{ if ne .Auth.Authenticated true }}
+                hidden
+            {{ end }} sticky bottom-0 max-h-32 overflow-scroll bg-neutral-50 p-2 shadow-inner">
+            {{ $tdClasses := "border border-neutral-300 p-1" }}
+            <table
+                class="w-full"
+                hx-ext="sse"
+                sse-connect="/api/events"
+                hx-swap="afterbegin transition:true"
+                sse-swap="message"
+                hx-target="#eventsTbody"
+                {{ if ne .Auth.Authenticated true }}
+                    hx-disable
+                {{ end }}>
+                <thead>
+                    <tr>
+                        <td class="{{ $tdClasses }}">Time</td>
+                        <td class="{{ $tdClasses }}">User</td>
+                        <td class="{{ $tdClasses }}">Severity</td>
+                        <td class="{{ $tdClasses }}">Message</td>
+                    </tr>
+                </thead>
+                <tbody id="eventsTbody"></tbody>
+            </table>
+        </div>
+    </body>
+
+    <script>
+        document.body.addEventListener("toast-error", function (e) {
+            let notyf = new Notyf({
+                duration: 5000,
+                dismissible: false,
+                ripple: false,
+            });
+            notyf.error(e.detail.value);
+            console.error(e.detail.value);
+        });
+        document.body.addEventListener("toast-success", function (e) {
+            let notyf = new Notyf({
+                duration: 5000,
+                dismissible: false,
+                ripple: false,
+            });
+            notyf.success(e.detail.value);
+            console.log(e.detail.value);
+        });
+
+        function showMobile() {
+            const m = document.getElementById("mobile-menu").hidden;
+            document.getElementById("mobile-menu").hidden = !m;
+            document.getElementById("icon-bars").hidden = m;
+            document.getElementById("icon-x").hidden = !m;
+        }
+        function useTransition(func) {
+            if (!document.startViewTransition) {
+                return func();
+            } else {
+                document.startViewTransition(() => func());
+            }
+        }
+    </script>
+</html>

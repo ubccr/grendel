@@ -1,0 +1,168 @@
+<div class="overflow-x-auto pb-3">
+    <table class="table-fixed" id="hostTable">
+        <thead>
+            <tr id="hostTableFirstRow">
+                <th class="border border-neutral-300" rowspan="3">Node</th>
+                {{ range $i := Iterate .IfaceCount }}
+                    <th class="interface-{{ $i }} border border-neutral-300" colspan="3">Interface {{ $i }}</th>
+                {{ end }}
+            </tr>
+            <tr>
+                {{ range $i := Iterate .IfaceCount }}
+                    <td class="interface-{{ $i }} border border-neutral-300">
+                        <div class="flex justify-center align-middle">
+                            <button
+                                class="my-auto transform rounded-md bg-neutral-500 text-white transition-transform hover:bg-neutral-400 active:scale-90"
+                                onclick="removeIface('{{ $i }}')"
+                                type="button">
+                                {{ template "icon-x-mark" }}
+                            </button>
+                        </div>
+                    </td>
+                    <th class="interface-{{ $i }} border border-neutral-300">MAC Address</th>
+                    <th class="interface-{{ $i }} border border-neutral-300">IP Address</th>
+                {{ end }}
+            </tr>
+            <tr>
+                {{ range $i := Iterate .IfaceCount }}
+                    <th class="interface-{{ $i }} w-10 border border-neutral-300">Port</th>
+
+                    <td class="interface-{{ $i }} border border-neutral-300">
+                        <input
+                            class="refresh w-36 rounded-md border border-neutral-300 p-1 px-2"
+                            type="search"
+                            list="switchSearch"
+                            placeholder="swe-d06-22"
+                            hx-preserve
+                            id="switch:{{ $i }}"
+                            name="switch:{{ $i }}" />
+                        <datalist id="switchSearch">
+                            {{ range $.Switches }}
+                                <option value="{{ . }}">{{ . }}</option>
+                            {{ end }}
+                        </datalist>
+                    </td>
+                    <td class="interface-{{ $i }} border border-neutral-300">
+                        <input
+                            class="refresh w-36 rounded-md border border-neutral-300 p-1 px-2"
+                            type="text"
+                            placeholder="10.0.0.0/24"
+                            hx-preserve
+                            id="subnet:{{ $i }}"
+                            name="subnet:{{ $i }}" />
+                    </td>
+                {{ end }}
+
+            </tr>
+        </thead>
+        <tbody id="hostTableBody">
+            {{ range $host := .Hosts.Hosts }}
+                {{ $tdClasses := "border border-neutral-300 p-1 px-2" }}
+                <tr>
+                    <td class="{{ $tdClasses }}">
+                        <input
+                            id="host:{{ $host.Name }}"
+                            class="w-36 rounded-md border border-neutral-300 p-1 px-2"
+                            name="Name"
+                            value="{{ $host.Name }}"
+                            tabindex="-1"
+                            type="text"
+                            hx-preserve />
+                    </td>
+                    {{ range $i, $iface := $host.Interfaces }}
+                        <td class="interface-{{ $i }} {{ $tdClasses }}">
+                            <input
+                                id="host:{{ $host.Name }}:{{ $i }}:Port"
+                                class="w-10 rounded-md border border-blue-500 p-1 px-2"
+                                name="Port"
+                                value="{{ $iface.Port }}"
+                                type="text"
+                                hx-preserve />
+                        </td>
+                        <td class="interface-{{ $i }} {{ $tdClasses }}">
+                            <input
+                                id="host:{{ $host.Name }}:{{ $i }}:Mac"
+                                class="w-36 rounded-md border border-neutral-300 p-1 px-2"
+                                name="MAC"
+                                value="{{ $iface.MAC }}" />
+                        </td>
+                        <td class="interface-{{ $i }} {{ $tdClasses }}">
+                            <input
+                                id="host:{{ $host.Name }}:{{ $i }}:Ip"
+                                class="w-36 rounded-md border border-neutral-300 p-1 px-2"
+                                name="IP"
+                                value="{{ $iface.IP }}" />
+                        </td>
+                    {{ end }}
+                </tr>
+            {{ end }}
+        </tbody>
+        <tfoot id="hostTableFooter">
+            <tr>
+                <td rowspan="2" class="border border-neutral-300">Interface Details:</td>
+                {{ range $i, $iface :=  .Hosts.Interfaces }}
+                    <td class="interface-{{ $i }} border border-neutral-300" colspan="3">
+                        <div class="grid w-96 grid-cols-3 gap-1">
+                            <div class="col-span-2 mt-2">
+                                <label for="Domain-{{ $i }}" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                                    Domain:
+                                </label>
+                                <input
+                                    id="Domain-{{ $i }}"
+                                    name="Domain"
+                                    value="{{ $iface.Domain }}"
+                                    class="w-full rounded-md border border-neutral-300 px-2 py-1"
+                                    type="text" />
+                            </div>
+                            <div class="mt-2">
+                                <label for="Ifname" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                                    Ifname:
+                                </label>
+                                <input
+                                    id="Ifname"
+                                    name="Name"
+                                    value="{{ $iface.Name }}"
+                                    class="w-full rounded-md border border-neutral-300 px-2 py-1"
+                                    type="text" />
+                            </div>
+                            <div class="mt-2">
+                                <label for="BMC-{{ $i }}" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                                    BMC:
+                                </label>
+                                <select
+                                    class="w-full rounded-md border border-neutral-300 bg-white py-1"
+                                    name="BMC"
+                                    id="BMC-{{ $i }}">
+                                    <option value="false">false</option>
+                                    <option value="true" {{ if eq $iface.BMC "true" }}selected{{ end }}>true</option>
+                                </select>
+                            </div>
+                            <div class="mt-2">
+                                <label for="VLAN-{{ $i }}" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                                    VLAN:
+                                </label>
+                                <input
+                                    id="VLAN-{{ $i }}"
+                                    name="VLAN"
+                                    value="{{ $iface.VLAN }}"
+                                    class="w-full rounded-md border border-neutral-300 px-2 py-1"
+                                    type="text" />
+                            </div>
+                            <div class="mt-2">
+                                <label for="MTU-{{ $i }}" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                                    MTU:
+                                </label>
+                                <input
+                                    id="MTU-{{ $i }}"
+                                    name="MTU"
+                                    value="{{ $iface.MTU }}"
+                                    class="w-full rounded-md border border-neutral-300 px-2 py-1"
+                                    type="text" />
+                            </div>
+                        </div>
+                    </td>
+                {{ end }}
+            </tr>
+        </tfoot>
+    </table>
+</div>

@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"net"
 	"net/netip"
+	"strings"
 
 	"github.com/segmentio/ksuid"
 	"github.com/tidwall/gjson"
@@ -40,6 +41,18 @@ type Host struct {
 	Tags       []string        `json:"tags"`
 }
 
+func (h *Host) HostType() string {
+	n := strings.Split(h.Name, "-")
+	t := "server"
+	if n[0] == "srv" || n[0] == "cpn" {
+		t = "server"
+	} else if n[0] == "swe" || n[0] == "swi" {
+		t = "switch"
+	} else if n[0] == "pdu" || n[0] == "ups" {
+		t = "power"
+	}
+	return t
+}
 func (h *Host) HasTags(tags ...string) bool {
 	for _, a := range tags {
 		found := false

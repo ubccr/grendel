@@ -1,0 +1,36 @@
+<h1 class="mb-6 text-3xl">Login</h1>
+<form class="grid grid-cols-1 gap-3" hx-post="/api/auth/login" hx-ext="loading-states" hx-swap="none">
+    <div>
+        <label for="username" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Username:</label>
+        <input
+            type="text"
+            name="username"
+            id="username"
+            required
+            class="rounded-md border border-neutral-300 px-2 py-1"
+            autocomplete="username" />
+    </div>
+
+    <div>
+        <label for="password" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Password:</label>
+        <input
+            type="password"
+            name="password"
+            id="password"
+            required
+            class="rounded-md border border-neutral-300 px-2 py-1"
+            autocomplete="password" />
+    </div>
+
+    <div>
+        <button
+            type="submit"
+            class="transform rounded-md bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90"
+            data-loading-disable>
+            <span data-loading-class="hidden">Submit</span>
+            <span data-loading-class-remove="hidden" data-loading-class="block" class="mx-auto hidden h-5 w-5">
+                {{ template "icon-spinner" }}
+            </span>
+        </button>
+    </div>
+</form>

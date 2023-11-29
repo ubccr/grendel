@@ -1,0 +1,20 @@
+<div class="flex justify-center">
+    <div
+        class="overflow-auto"
+        hx-get="/fragments/floorplan/table"
+        hx-swap="innerHTML"
+        hx-trigger="load, refresh from:body"></div>
+</div>
+
+<dialog id="addHost" class="h-5/6 w-full rounded-lg shadow-md md:w-2/3 lg:w-3/4"></dialog>
+<script>
+    function showModal() {
+        useTransition(() => document.getElementById("addHost").showModal());
+    }
+    function closeModal() {
+        useTransition(() => document.getElementById("addHost").close());
+    }
+    document.body.addEventListener("closeModal", function (evt) {
+        closeModal();
+    });
+</script>
