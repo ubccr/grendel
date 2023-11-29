@@ -171,7 +171,8 @@
                 hx-swap="none"
                 hx-vals="js:{hosts: HostMap()}"
                 hx-ext="loading-states"
-                hx-confirm="Warning: Sending a system configuration will reboot the selected hosts if necessary.">
+                hx-confirm="Warning: Sending a system configuration will reboot the selected hosts if necessary."
+                data-loading-states>
                 <div class="flex gap-2">
                     <div>
                         <label for="File" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">File:</label>
@@ -185,7 +186,6 @@
                     <button
                         class="transform rounded-lg border bg-amber-500 px-2 py-1 text-white transition-transform hover:bg-amber-400 active:scale-90 disabled:opacity-75"
                         type="submit"
-                        data-loading-states
                         data-loading-disable
                         {{ if eq .Hosts "" }}disabled{{ end }}>
                         <span data-loading-class="hidden">Configure</span>
