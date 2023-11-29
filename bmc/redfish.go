@@ -140,7 +140,7 @@ func RebootHost(ip string, bootOverride redfish.Boot) error {
 	}
 	return nil
 }
-func IdracImportSytemConfig(ip string, path string) error {
+func IdracImportSytemConfig(ip string, path string, file string) error {
 
 	user := viper.GetString("bmc.user")
 	pass := viper.GetString("bmc.password")
@@ -148,10 +148,12 @@ func IdracImportSytemConfig(ip string, path string) error {
 	c := redfishapi.NewIloClient(fmt.Sprintf("https://%s", ip), user, pass)
 
 	type shareParameters struct {
-		Target    []string `json:"Target"`
-		ShareType string   `json:"ShareType"`
-		IPAddress string   `json:"IPAddress"`
-		FileName  string   `json:"FileName"`
+		Target     []string `json:"Target"`
+		ShareType  string   `json:"ShareType"`
+		IPAddress  string   `json:"IPAddress"`
+		FileName   string   `json:"FileName"`
+		ShareName  string   `json:"ShareName"`
+		PortNumber string   `json:"PortNumber"`
 	}
 	type body struct {
 		HostPowerState  string `json:"HostPowerState"`
@@ -164,13 +166,14 @@ func IdracImportSytemConfig(ip string, path string) error {
 		HostPowerState: "On",
 		ShutdownType:   "Graceful",
 		ShareParameters: shareParameters{
-			Target:    []string{"ALL"},
-			ShareType: viper.GetString("bmc.config_share_type"),
-			IPAddress: viper.GetString("bmc.config_share_ip"),
-			FileName:  path,
+			Target:     []string{"ALL"},
+			ShareType:  viper.GetString("bmc.config_share_type"),
+			IPAddress:  viper.GetString("bmc.config_share_ip"),
+			PortNumber: viper.GetString("bmc.config_share_port"),
+			FileName:   file,
+			ShareName:  path,
 		},
 	})
-
 	_, err := c.ImportConfigDell(b)
 
 	if err != nil && err.Error() == "Unauthorized" {

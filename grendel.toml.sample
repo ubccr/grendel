@@ -169,15 +169,6 @@ listen = "0.0.0.0:8081"
 # key = ""
 # cert = ""
 
-# Session storage driver. Valid options: redis, sqlite3, memory.
-session_storage = "memory"
-
-[frontend.redis]
-# url = "redis://<user>:<pass>@127.0.0.1:6379/<db>"
-
-[frontend.sqlite]
-# path = ""
-
 # Floorplan table config. Rows are ascending, Cols are descending
 rows_start = "f"
 rows_end = "v"
@@ -187,6 +178,22 @@ cols_end = 5
 # Rack table config
 rack_min = 3
 rack_max = 42
+
+# Session storage driver. Valid options: redis, sqlite3, memory.
+session_storage = "memory"
+
+[frontend.redis]
+# url = "redis://<user>:<pass>@127.0.0.1:6379/<db>"
+
+[frontend.sqlite]
+# path = ""
+
+# Import share config for configuring Dell Systems
+[frontend.import_share]
+# Redfish ShareType - Type of share like NFS, CIFS, HTTP, HTTPS
+type = "HTTP"
+ip = ""
+port = ""
 
 # First interface default vals in Rack -> Add Hosts -> Interface Details
 [frontend.first_iface]

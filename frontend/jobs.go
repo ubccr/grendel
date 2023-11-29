@@ -69,18 +69,18 @@ func (j *JobRunner) RunConfigureImport(host *model.Host, file string, ch chan st
 			ch <- fmt.Sprintf("%s|%s|%s", status, host.Name, msg)
 			return
 		}
-		path := fmt.Sprintf("/boot/%s/bmc/%s", token, file)
+		path := fmt.Sprintf("/boot/%s/bmc", token)
 		status := "success"
 		msg := "Submited import job"
 
-		err = bmc.IdracImportSytemConfig(ip, path)
+		err = bmc.IdracImportSytemConfig(ip, path, file)
 		if err != nil {
 			status = "error"
 			msg = fmt.Sprintf("%s", err)
 			cmd.Log.WithFields(logrus.Fields{
 				"err":  err,
 				"name": host.Name,
-			}).Error("Failed to connect to BMC")
+			}).Error("Failed to import system config")
 		}
 
 		ch <- fmt.Sprintf("%s|%s|%s", status, host.Name, msg)
