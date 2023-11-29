@@ -162,6 +162,9 @@ domain = ""
 # Address and port to listen
 listen = "0.0.0.0:8081"
 
+# Favicon file path
+# favicon = ""
+
 # HTTPS cert and key file paths. Setting these will enable https
 # key = ""
 # cert = ""
