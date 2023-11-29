@@ -437,13 +437,13 @@ video {
 @font-face {
   font-family: Geist;
 
-  src: url(/fonts/GeistVariableVF.woff2);
+  src: url(/static/fonts/GeistVariableVF.woff2);
 }
 
 @font-face {
   font-family: GeistMono;
 
-  src: url(/fonts/GeistMonoVariableVF.woff2);
+  src: url(/static/fonts/GeistMonoVariableVF.woff2);
 }
 
 *, ::before, ::after {
@@ -844,10 +844,6 @@ video {
   border-top-width: 1px;
 }
 
-.border-t-2 {
-  border-top-width: 2px;
-}
-
 .border-blue-500 {
   --tw-border-opacity: 1;
   border-color: rgb(59 130 246 / var(--tw-border-opacity));
@@ -914,7 +910,7 @@ video {
 }
 
 .bg-large-triangles-ub {
-  background-image: url('/backgrounds/large-triangles-ub.svg');
+  background-image: url('/static/backgrounds/large-triangles-ub.svg');
 }
 
 .p-0 {
@@ -1077,6 +1073,12 @@ video {
   opacity: 0.75;
 }
 
+.shadow-inner {
+  --tw-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+  --tw-shadow-colored: inset 0 2px 4px 0 var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
 .shadow-lg {
   --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
@@ -1098,12 +1100,6 @@ video {
 .shadow-xl {
   --tw-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
-  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
-}
-
-.shadow-inner {
-  --tw-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
-  --tw-shadow-colored: inset 0 2px 4px 0 var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 

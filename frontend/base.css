@@ -11,11 +11,11 @@
 @layer base {
     @font-face {
         font-family: Geist;
-        src: url(/fonts/GeistVariableVF.woff2);
+        src: url(/static/fonts/GeistVariableVF.woff2);
     }
     @font-face {
         font-family: GeistMono;
-        src: url(/fonts/GeistMonoVariableVF.woff2);
+        src: url(/static/fonts/GeistMonoVariableVF.woff2);
     }
 }
 
