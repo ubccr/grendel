@@ -34,16 +34,19 @@ func (h *Handler) LoginUser(f *fiber.Ctx) error {
 		}
 		return ToastError(f, err, msg)
 	}
+	log.Debugf("User %s authenticated with role: %s", user, role)
+
 	sess, err := h.Store.Get(f)
 	if err != nil {
-		return ToastError(f, err, "Error getting session")
+		return ToastError(f, err, "Failed to create session")
 	}
 
-	sess.Set("authenticated", val)
+	sess.Set("authenticated", true)
 	sess.Set("user", user)
 	sess.Set("role", role)
 
-	if err := sess.Save(); err != nil {
+	err = sess.Save()
+	if err != nil {
 		return ToastError(f, err, "Failed to save session")
 	}
 
@@ -53,7 +56,10 @@ func (h *Handler) LoginUser(f *fiber.Ctx) error {
 
 func (h *Handler) LogoutUser(f *fiber.Ctx) error {
 	sess, _ := h.Store.Get(f)
+	user := sess.Get("user")
 	sess.Destroy()
+
+	log.Debugf("User %s logged out", user)
 
 	f.Response().Header.Add("HX-Redirect", "/")
 	return ToastSuccess(f, "Successfully logged out", ``)
@@ -91,7 +97,7 @@ func (h *Handler) RegisterUser(f *fiber.Ctx) error {
 
 	err := h.DB.StoreUser(su, sp)
 	if err != nil {
-		if err.Error() == fmt.Sprintf("user %s already exists", su) {
+		if err.Error() == fmt.Sprintf("User %s already exists", su) {
 			msg = "Failed to register: Username already exists"
 		} else {
 			msg = "Failed to register user"
@@ -99,8 +105,24 @@ func (h *Handler) RegisterUser(f *fiber.Ctx) error {
 		return ToastError(f, err, msg)
 	}
 
+	log.Debugf("New user: %s registered", su)
+
+	sess, err := h.Store.Get(f)
+	if err != nil {
+		return ToastError(f, err, "Failed to create session")
+	}
+
+	sess.Set("authenticated", true)
+	sess.Set("user", su)
+	sess.Set("role", "disabled")
+
+	err = sess.Save()
+	if err != nil {
+		return ToastError(f, err, "Failed to save session")
+	}
+
 	h.writeEvent("info", f, fmt.Sprintf("New user: %s registered.", su))
-	f.Set("HX-Redirect", "/login")
+	f.Set("HX-Redirect", "/")
 	return ToastSuccess(f, msg, ``)
 }
 
@@ -111,6 +133,8 @@ func (h *Handler) deleteUser(f *fiber.Ctx) error {
 	if err != nil {
 		return ToastError(f, err, "Failed to delete user")
 	}
+
+	log.Debugf("User %s deleted", user)
 
 	h.writeEvent("info", f, fmt.Sprintf("Deleted user: %s", user))
 	return ToastSuccess(f, "Successfully deleted user", `, "refresh": ""`)
