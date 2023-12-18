@@ -9,7 +9,7 @@ import (
 func (h *Handler) EnforceAuthMiddleware() func(f *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		sess, _ := h.Store.Get(c)
-		if sess.Get("authenticated") == nil {
+		if sess.Get("authenticated") == nil || sess.Get("role") == "disabled" {
 			msg := "Authentication required. Please login to continue."
 			c.Response().Header.Add("HX-Trigger", fmt.Sprintf(`{"toast-error": "%s"}`, msg))
 			return c.Status(fiber.StatusUnauthorized).Redirect("/login")
