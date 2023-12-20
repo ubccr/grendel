@@ -127,6 +127,9 @@
                         hx-swap="innerHTML"
                         hx-get="/api/events"
                         hx-trigger="load, every 2s"
+                        {{ if eq .Auth.Role "disabled" -}}
+                            hx-disable
+                        {{- end }}
                         hx-select-oob="#eventsCount:innerHTML"
                         {{ if ne .Auth.Authenticated true }}
                             hx-disable
