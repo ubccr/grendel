@@ -350,3 +350,9 @@ func (h *Handler) interfaces(f *fiber.Ctx) error {
 		"ID": id,
 	}, "")
 }
+
+func (h *Handler) events(f *fiber.Ctx) error {
+	return f.Render("fragments/events", fiber.Map{
+		"Events": h.Events,
+	}, "")
+}

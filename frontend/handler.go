@@ -60,6 +60,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 			},
 			"SearchList":  hostList,
 			"CurrentPath": c.Path(),
+			"Events":      h.Events,
 		})
 		if sess.Get("role") == "disabled" {
 			c.Response().Header.Add("HX-Trigger", `{"toast-error": "Your account is disabled. Please ask an Administrator to activate your account."}`)
@@ -130,7 +131,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	api.Delete("/user/:username", admin, h.deleteUser)
 
 	api.Get("/search", auth, h.Search)
-	api.Get("/events", auth, h.eventSSE)
+	api.Get("/events", auth, h.events)
 
 	api.Post("/bmc/reboot", auth, h.RebootHost)
 	api.Post("/bmc/configure/auto", auth, h.bmcConfigureAuto)

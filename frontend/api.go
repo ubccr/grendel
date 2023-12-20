@@ -1,7 +1,6 @@
 package frontend
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"net"
@@ -17,7 +16,6 @@ import (
 	"github.com/ubccr/grendel/firmware"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
-	"github.com/valyala/fasthttp"
 )
 
 func (h *Handler) LoginUser(f *fiber.Ctx) error {
@@ -556,39 +554,4 @@ func (h *Handler) bulkHostAdd(f *fiber.Ctx) error {
 	}
 
 	return ToastSuccess(f, "Successfully added host(s)", `, "closeModal": "", "refresh": ""`)
-}
-func (h *Handler) eventSSE(f *fiber.Ctx) error {
-	f.Set("Content-Type", "text/event-stream")
-	f.Set("Cache-Control", "no-cache")
-	f.Set("Connection", "keep-alive")
-	f.Set("Transfer-Encoding", "chunked")
-
-	sent := 0
-	if len(h.Events) > 5 {
-		h.Events = h.Events[1:]
-	}
-	tdClasses := "border border-neutral-300 p-1"
-	f.Context().SetBodyStreamWriter(fasthttp.StreamWriter(func(w *bufio.Writer) {
-		for {
-			if sent >= len(h.Events) {
-				time.Sleep(1 * time.Second)
-				continue
-			}
-			e := h.Events[sent]
-			msg := fmt.Sprintf(`<tr><td class="%s">%s</td><td class="%s">%s</td><td class="%s">%s</td><td class="%s">%s</td></tr>`, tdClasses, e.Time, tdClasses, e.User, tdClasses, e.Severity, tdClasses, e.Message)
-			fmt.Fprintf(w, "data: %s\n\n", msg)
-
-			err := w.Flush()
-			if err != nil {
-				log.Debugf("Error while flushing /events: %v. Closing http connection.\n", err)
-
-				break
-			}
-
-			sent++
-			time.Sleep(50 * time.Millisecond)
-		}
-	}))
-
-	return nil
 }

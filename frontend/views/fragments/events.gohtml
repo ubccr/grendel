@@ -1,0 +1,23 @@
+<span id="eventsCount" hx-swap-oob="true">{{ len .Events }}</span>
+
+{{ $tdClasses := "border border-neutral-300 p-1" }}
+<table id="eventsTable" class="w-full">
+    <thead>
+        <tr>
+            <td class="{{ $tdClasses }}">Time</td>
+            <td class="{{ $tdClasses }}">User</td>
+            <td class="{{ $tdClasses }}">Severity</td>
+            <td class="{{ $tdClasses }}">Message</td>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range .Events }}
+            <tr>
+                <td class="{{ $tdClasses }}">{{ .Time }}</td>
+                <td class="{{ $tdClasses }}">{{ .User }}</td>
+                <td class="{{ $tdClasses }}">{{ .Severity }}</td>
+                <td class="{{ $tdClasses }}">{{ .Message }}</td>
+            </tr>
+        {{ end }}
+    </tbody>
+</table>
