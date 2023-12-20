@@ -1109,6 +1109,11 @@ video {
   background-color: rgb(249 250 251 / var(--tw-bg-opacity));
 }
 
+.bg-yellow-50 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(254 252 232 / var(--tw-bg-opacity));
+}
+
 .bg-large-triangles-ub {
   background-image: url('/static/backgrounds/large-triangles-ub.svg');
 }
@@ -1330,6 +1335,21 @@ video {
   color: rgb(107 114 128 / var(--tw-text-opacity));
 }
 
+.text-yellow-600 {
+  --tw-text-opacity: 1;
+  color: rgb(202 138 4 / var(--tw-text-opacity));
+}
+
+.text-yellow-700 {
+  --tw-text-opacity: 1;
+  color: rgb(161 98 7 / var(--tw-text-opacity));
+}
+
+.text-yellow-500 {
+  --tw-text-opacity: 1;
+  color: rgb(234 179 8 / var(--tw-text-opacity));
+}
+
 .opacity-0 {
   opacity: 0;
 }
@@ -1429,6 +1449,22 @@ video {
 .ring-red-500 {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(239 68 68 / var(--tw-ring-opacity));
+}
+
+.ring-gray-700\/10 {
+  --tw-ring-color: rgb(55 65 81 / 0.1);
+}
+
+.ring-yellow-700\/10 {
+  --tw-ring-color: rgb(161 98 7 / 0.1);
+}
+
+.ring-yellow-500\/10 {
+  --tw-ring-color: rgb(234 179 8 / 0.1);
+}
+
+.ring-gray-500\/10 {
+  --tw-ring-color: rgb(107 114 128 / 0.1);
 }
 
 .drop-shadow-sm {

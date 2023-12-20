@@ -1,22 +1,35 @@
 <span id="eventsCount" hx-swap-oob="true">{{ len .Events }}</span>
 
-{{ $tdClasses := "border border-neutral-300 p-1" }}
 <table id="eventsTable" class="w-full">
     <thead>
         <tr>
-            <td class="{{ $tdClasses }}">Time</td>
-            <td class="{{ $tdClasses }}">User</td>
-            <td class="{{ $tdClasses }}">Severity</td>
-            <td class="{{ $tdClasses }}">Message</td>
+            <td class="border-b border-gray-200 p-3 font-semibold text-gray-500">Time</td>
+            <td class="border-b border-gray-200 p-3 font-semibold text-gray-500">User</td>
+            <td class="border-b border-gray-200 p-3 font-semibold text-gray-500">Severity</td>
+            <td class="border-b border-gray-200 p-3 font-semibold text-gray-500">Message</td>
         </tr>
     </thead>
     <tbody>
         {{ range .Events }}
             <tr>
-                <td class="{{ $tdClasses }}">{{ .Time }}</td>
-                <td class="{{ $tdClasses }}">{{ .User }}</td>
-                <td class="{{ $tdClasses }}">{{ .Severity }}</td>
-                <td class="{{ $tdClasses }}">{{ .Message }}</td>
+                <td class="border-b border-gray-200 p-3 text-sm font-light">{{ .Time }}</td>
+                <td class="border-b border-gray-200 p-3">{{ .User }}</td>
+                <td class=" border-b border-gray-200 p-3">
+                    <span
+                        class="
+                        {{- if eq .Severity "info" -}}
+                            bg-blue-50 ring-blue-700/10 text-blue-700
+                        {{- else if eq .Severity "warning" -}}
+                            bg-yellow-50 ring-yellow-500/10 text-yellow-500
+                        {{- else if eq .Severity "error" -}}
+                            bg-red-50 ring-red-700/10 text-red-700
+                        {{- else -}}
+                            bg-gray-50 ring-gray-500/10 text-gray-500
+                        {{- end }} rounded-md border border-gray-200 bg-gray-100 px-2 py-1 text-sm ring-1 ring-inset">
+                        {{ .Severity }}
+                    </span>
+                </td>
+                <td class="border-b border-gray-200 p-3 text-sm">{{ .Message }}</td>
             </tr>
         {{ end }}
     </tbody>
