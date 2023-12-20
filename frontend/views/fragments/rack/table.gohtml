@@ -19,9 +19,9 @@
                             <div class="grid w-full p-1 sm:grid-cols-1 md:grid-cols-3">
                                 <div class="items-center gap-1 overflow-auto max-md:hidden md:flex">
                                     {{ if eq .Provision true }}
-                                        <span class="scale-75 text-green-600">{{ template "bolt" }}</span>
+                                        <span class="scale-75 text-green-600">{{ template "icon-bolt" }}</span>
                                     {{ else }}
-                                        <span class="scale-75 text-red-600">{{ template "bolt-slash" }}</span>
+                                        <span class="scale-75 text-red-600">{{ template "icon-bolt-slash" }}</span>
                                     {{ end }}
                                     {{ if ne .BootImage "" }}
                                         <span class="h-6 rounded-xl bg-blue-500 px-2 py-1 text-xs text-white">
