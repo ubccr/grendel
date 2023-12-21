@@ -507,7 +507,7 @@ func (h *Handler) bulkHostAdd(f *fiber.Ctx) error {
 			if len(hostNameArr) < 1 {
 				return ToastError(f, err, "Failed to parse host name")
 			}
-			if hostTableForm.Interfaces[i].BMC == "true" && (hostNameArr[0] == "cpn" || hostNameArr[0] == "srv") {
+			if hostTableForm.Interfaces[i].BMC == "true" && hostNameArr[0] != "swe" && hostNameArr[0] != "swi" {
 				hostName = strings.Replace(hostName, hostNameArr[0], "bmc", 1)
 			}
 
