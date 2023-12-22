@@ -43,7 +43,10 @@
         </button>
     </div>
 
-    <div hx-get="/fragments/rack/{{ .Rack }}/table" hx-swap="innerHTML" hx-trigger="load, refresh from:body"></div>
+    <div
+        hx-get="/fragments/rack/{{ .Rack }}/table"
+        hx-swap="innerHTML transition:true"
+        hx-trigger="load, refresh from:body"></div>
 </form>
 
 <dialog id="hostModal" class="h-5/6 w-full rounded-lg shadow-md md:w-2/3 lg:w-3/4"></dialog>
