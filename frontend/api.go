@@ -235,6 +235,31 @@ func (h *Handler) DeleteHost(f *fiber.Ctx) error {
 	return ToastSuccess(f, "Successfully deleted host(s)", `, "refresh":""`)
 }
 
+func (h *Handler) importHost(f *fiber.Ctx) error {
+	s := f.FormValue("json")
+	i := model.HostList{}
+
+	err := json.Unmarshal([]byte(s), &i)
+	if err != nil {
+		return ToastError(f, err, fmt.Sprintf("Failed to unmarshal json: %s", err))
+	}
+
+	// Generate new ksuid to ensure no conflicts
+	for _, h := range i {
+		h.ID = ksuid.New()
+	}
+
+	err = h.DB.StoreHosts(i)
+	if err != nil {
+		return ToastError(f, err, "Failed to import host")
+	}
+
+	n, _ := i.ToNodeSet()
+
+	h.writeEvent("info", f, fmt.Sprintf("imported host(s) %s", n))
+	return ToastSuccess(f, fmt.Sprintf("Successfully imported host(s) %s", n), `, "refresh": ""`)
+}
+
 type RebootData struct {
 	Host string
 }

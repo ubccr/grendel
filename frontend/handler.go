@@ -105,6 +105,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	fragment.Get("/host/:host/form", auth, h.hostForm)
 	api.Post("/host", auth, h.EditHost)
 	api.Delete("/host", auth, h.DeleteHost)
+	api.Post("/host/import", auth, h.importHost)
 
 	fragment.Get("/interfaces", auth, h.interfaces)
 

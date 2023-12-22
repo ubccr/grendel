@@ -1,94 +1,116 @@
 <div class="flex h-full flex-col">
     <div>
-        <div class="m-2 flex justify-center align-middle ">
-            <h1 class="rounded-xl border border-neutral-300 px-3 py-1 text-3xl shadow-lg">Add Host</h1>
-        </div>
-        <form hx-post="/api/host" hx-vals="js:{Interfaces: parseForm()}" hx-swap="none" id="newHostForm">
-            <div class="grid grid-cols-2 gap-3 p-3 drop-shadow-sm">
-                <div>
-                    <label for="Name" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Name:</label>
-                    <input
-                        id="Name"
-                        name="Name"
-                        class="w-full rounded-md border border-neutral-300 px-2 py-1"
-                        placeholder="cpn-d06-03"
-                        type="text" />
-                </div>
-                <div>
-                    <label for="Provision" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Provision:</label>
-                    <select
-                        class="w-full rounded-md border border-neutral-300 bg-white px-2 py-1"
-                        name="Provision"
-                        id="Provision">
-                        <option value="true">true</option>
-                        <option value="false">false</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="Firmware" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Firmware:</label>
-                    <select
-                        class="w-full rounded-md border border-neutral-300 bg-white px-2 py-1"
-                        name="Firmware"
-                        id="Firmware">
-                        <option value="" class="italic">None</option>
-                        {{ range .Firmware }}
-                            <option value="{{ . }}">{{ . }}</option>
-                        {{ end }}
-                    </select>
-                </div>
-                <div>
-                    <label for="BootImage" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Boot Image:</label>
-                    <select
-                        class="w-full rounded-md border border-neutral-300 bg-white px-2 py-1"
-                        name="BootImage"
-                        id="BootImage">
-                        <option value="" class="italic">None</option>
-                        {{ range .BootImage }}
-                            <option value="{{ . }}">{{ . }}</option>
-                        {{ end }}
-                    </select>
-                </div>
-                <div>
-                    <label for="Tags" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Tags:</label>
-                    <input
-                        id="Tags"
-                        name="Tags"
-                        class="w-full rounded-md border border-neutral-300 px-2 py-1"
-                        placeholder="d06,compute"
-                        type="text" />
-                </div>
-                <div class="flex justify-center gap-3 align-middle">
-                    <button
-                        class="transform rounded-md bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90"
-                        type="button"
-                        hx-get="/fragments/interfaces"
-                        hx-target="#interfaces"
-                        hx-swap="beforeend transition:true"
-                        hx-vals="js:{ID: ifaceID()}">
-                        Add Interface
-                    </button>
-                    <!-- <button
-                        class="rounded-md bg-blue-500 px-2 py-1 text-white enabled:hover:bg-blue-400 disabled:opacity-75"
-                        type="button"
-                        onclick="undoRemoveIface()"
-                        id="undoBtn"
-                        disabled>
-                        Undo
-                    </button> -->
-                </div>
+        <div class="flex justify-center py-4 align-middle">
+            <div class="rounded-md bg-gray-50 px-2 py-1 shadow-md">
+                <button
+                    id="floorplanAddHostBtn"
+                    class="rounded-md border border-gray-200 bg-white px-3 py-2 hover:bg-white"
+                    onclick="useTransition(() => showAddHostForm())">
+                    Add Host
+                </button>
+                <button
+                    id="floorplanImportBtn"
+                    class="rounded-md px-3 py-2 hover:bg-white"
+                    onclick="useTransition(() => showImportForm())">
+                    Import JSON
+                </button>
             </div>
-        </form>
-        <div class="grid grid-cols-2 gap-3 p-3">
-            <input type="hidden" value="0" id="ifaceID" />
-            <div class="col-span-2" id="interfaces"></div>
-            <!-- <div class="col-span-2 hidden" id="deletedInterfaces"></div> -->
+        </div>
+        <div id="floorplanHostDiv">
+            <form id="floorplanAddHostForm" hx-post="/api/host" hx-vals="js:{Interfaces: parseForm()}" hx-swap="none">
+                <div class="grid grid-cols-2 gap-3 p-3 drop-shadow-sm">
+                    <div>
+                        <label for="Name" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Name:</label>
+                        <input
+                            id="Name"
+                            name="Name"
+                            class="w-full rounded-md border border-neutral-300 px-2 py-1"
+                            placeholder="cpn-d06-03"
+                            type="text" />
+                    </div>
+                    <div>
+                        <label for="Provision" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                            Provision:
+                        </label>
+                        <select
+                            class="w-full rounded-md border border-neutral-300 bg-white px-2 py-1"
+                            name="Provision"
+                            id="Provision">
+                            <option value="true">true</option>
+                            <option value="false">false</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="Firmware" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                            Firmware:
+                        </label>
+                        <select
+                            class="w-full rounded-md border border-neutral-300 bg-white px-2 py-1"
+                            name="Firmware"
+                            id="Firmware">
+                            <option value="" class="italic">None</option>
+                            {{ range .Firmware }}
+                                <option value="{{ . }}">{{ . }}</option>
+                            {{ end }}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="BootImage" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                            Boot Image:
+                        </label>
+                        <select
+                            class="w-full rounded-md border border-neutral-300 bg-white px-2 py-1"
+                            name="BootImage"
+                            id="BootImage">
+                            <option value="" class="italic">None</option>
+                            {{ range .BootImage }}
+                                <option value="{{ . }}">{{ . }}</option>
+                            {{ end }}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="Tags" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Tags:</label>
+                        <input
+                            id="Tags"
+                            name="Tags"
+                            class="w-full rounded-md border border-neutral-300 px-2 py-1"
+                            placeholder="d06,compute"
+                            type="text" />
+                    </div>
+                    <div class="flex justify-center gap-3 align-middle">
+                        <button
+                            class="transform rounded-md bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90"
+                            type="button"
+                            hx-get="/fragments/interfaces"
+                            hx-target="#interfaces"
+                            hx-swap="beforeend transition:true"
+                            hx-vals="js:{ID: ifaceID()}">
+                            Add Interface
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="grid grid-cols-2 gap-3 p-3">
+                <input type="hidden" value="0" id="ifaceID" />
+                <div class="col-span-2" id="interfaces"></div>
+            </div>
+        </div>
+        <div id="floorplanImportDiv" class="hidden p-3">
+            <form id="floorplanImportForm" hx-post="/api/host/import" hx-swap="none">
+                <textarea
+                    name="json"
+                    rows="20"
+                    class="w-full rounded-md border border-gray-300 p-2"
+                    placeholder="Import JSON"></textarea>
+            </form>
         </div>
     </div>
     <div class="flex-grow"></div>
     <div class="sticky bottom-0 flex w-full justify-end gap-3 border-t border-neutral-200 bg-neutral-50 p-3">
         <button
+            id="floorplanSubmitBtn"
             type="submit"
-            form="newHostForm"
+            form="floorplanAddHostForm"
             class="transform rounded-md border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90">
             Submit
         </button>
@@ -109,21 +131,7 @@
     function removeIface(id) {
         let iface = document.getElementById(`interface:${id}`);
         useTransition(() => iface.remove());
-        // let deleted = document.getElementById("deletedInterfaces");
-        // useTransition(() => deleted.appendChild(iface));
-
-        // document.getElementById("undoBtn").disabled = false;
     }
-    // function undoRemoveIface() {
-    //     let iface = document.getElementById("deletedInterfaces").lastChild;
-    //     let interfaceParent = document.getElementById("interfaces");
-    //     if (document.getElementById("deletedInterfaces").childElementCount <= 1) {
-    //         document.getElementById("undoBtn").disabled = true;
-    //     }
-
-    //     prevId = parseInt(iface.id.substring(10, iface.id.length - 1));
-    //     useTransition(() => interfaceParent.insertBefore(iface, document.getElementById(`interface[${prevId + 1}]`)));
-    // }
     function moveUp(id) {
         let ifaces = document.getElementById("interfaces").children;
         for (let i = 0; i < ifaces.length; i++) {
@@ -165,5 +173,35 @@
             interfaces.push(iface);
         }
         return JSON.stringify(interfaces);
+    }
+    function showAddHostForm() {
+        let addHostBtn = document.getElementById("floorplanAddHostBtn");
+        let importBtn = document.getElementById("floorplanImportBtn");
+        let submitBtn = document.getElementById("floorplanSubmitBtn");
+
+        document.getElementById("floorplanHostDiv").classList.remove("hidden");
+        document.getElementById("floorplanImportDiv").classList.add("hidden");
+
+        addHostBtn.classList.add("bg-white", "border", "border-gray-200");
+        addHostBtn.classList.remove("bg-gray-50");
+        importBtn.classList.add("bg-gray-50");
+        importBtn.classList.remove("bg-white", "border", "border-gray-200");
+
+        submitBtn.attributes["form"].value = "floorplanAddHostForm";
+    }
+    function showImportForm() {
+        let addHostBtn = document.getElementById("floorplanAddHostBtn");
+        let importBtn = document.getElementById("floorplanImportBtn");
+        let submitBtn = document.getElementById("floorplanSubmitBtn");
+
+        document.getElementById("floorplanHostDiv").classList.add("hidden");
+        document.getElementById("floorplanImportDiv").classList.remove("hidden");
+
+        addHostBtn.classList.remove("bg-white", "border", "border-gray-200");
+        addHostBtn.classList.add("bg-gray-50");
+        importBtn.classList.remove("bg-gray-50");
+        importBtn.classList.add("bg-white", "border", "border-gray-200");
+
+        submitBtn.attributes["form"].value = "floorplanImportForm";
     }
 </script>
