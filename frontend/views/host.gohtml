@@ -1,33 +1,6 @@
 <div class="flex justify-center">
     <div class="mb-4 flex justify-center gap-2 rounded-xl border border-neutral-300 p-2 text-center shadow-lg">
-        <div class="group z-50 my-auto flex justify-center">
-            <button
-                hx-post="/api/bmc/reboot"
-                hx-vals='{"hosts": "{{ .HostName }}"}'
-                hx-swap="none"
-                hx-confirm="Are you sure you want to reboot {{ .HostName }}?"
-                class="transform rounded-lg border border-neutral-300 p-1 text-sm transition-transform hover:bg-neutral-50 active:scale-90">
-                {{ template "icon-power" }}
-            </button>
-            <span
-                class="z-100 absolute mt-9 rounded-lg bg-gray-800 px-2 py-1 text-sm text-gray-100 opacity-0 transition-opacity group-hover:opacity-100">
-                Reboot
-            </span>
-        </div>
-        <h1 class="text-3xl">{{ .HostName }}</h1>
-        <div class="group z-50 my-auto flex justify-center">
-            <button
-                hx-post="/api/bmc/configure/auto"
-                hx-vals='{"hosts": "{{ .HostName }}"}'
-                hx-swap="none"
-                class="transform rounded-lg border border-neutral-300 p-1 text-sm transition-transform active:scale-90">
-                {{ template "icon-adjustments-horizontal" }}
-            </button>
-            <span
-                class="z-100 absolute mt-9 rounded-lg bg-gray-800 px-2 py-1 text-sm text-gray-100 opacity-0 transition-opacity group-hover:opacity-100">
-                Auto Configure
-            </span>
-        </div>
+        <h1 class="px-2 text-3xl">{{ .HostName }}</h1>
     </div>
 </div>
 <div
