@@ -17,7 +17,9 @@
                 <td class=" border-b border-gray-200 p-3">
                     <span
                         class="
-                        {{- if eq .Severity "info" -}}
+                        {{- if eq .Severity "success" -}}
+                            bg-green-50 ring-green-700/10 text-green-700
+                        {{- else if eq .Severity "info" -}}
                             bg-blue-50 ring-blue-700/10 text-blue-700
                         {{- else if eq .Severity "warning" -}}
                             bg-yellow-50 ring-yellow-500/10 text-yellow-500
