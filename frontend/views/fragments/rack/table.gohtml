@@ -24,7 +24,8 @@
                                         <span class="scale-75 text-red-600">{{ template "icon-bolt-slash" }}</span>
                                     {{ end }}
                                     {{ if ne .BootImage "" }}
-                                        <span class="h-6 rounded-xl bg-blue-500 px-2 py-1 text-xs text-white">
+                                        <span
+                                            class="rounded-md bg-blue-50 px-2 py-1 text-xs text-blue-700 ring-1 ring-inset ring-blue-700/10">
                                             {{ .BootImage }}
                                         </span>
                                     {{ end }}
@@ -36,7 +37,10 @@
                                 </div>
                                 <div class="items-center justify-end gap-1 overflow-auto max-md:hidden md:flex">
                                     {{ range .Tags }}
-                                        <span class="rounded-xl bg-neutral-200 px-2 py-1 text-xs">{{ . }}</span>
+                                        <span
+                                            class="rounded-md bg-gray-50 px-2 py-1 text-xs text-gray-500 ring-1 ring-inset ring-gray-500/10">
+                                            {{ . }}
+                                        </span>
                                     {{ end }}
                                 </div>
                             </div>
