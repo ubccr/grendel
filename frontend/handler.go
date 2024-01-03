@@ -134,7 +134,9 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	api.Get("/search", auth, h.Search)
 	api.Get("/events", auth, h.events)
 
-	api.Post("/bmc/reboot", auth, h.RebootHost)
+	api.Post("/bmc/powerCycle", auth, h.bmcPowerCycle)
+	api.Post("/bmc/powerCycleBmc", auth, h.bmcPowerCycleBmc)
+	api.Post("/bmc/clearSel", auth, h.bmcClearSel)
 	api.Post("/bmc/configure/auto", auth, h.bmcConfigureAuto)
 	api.Post("/bmc/configure/import", auth, h.bmcConfigureImport)
 }

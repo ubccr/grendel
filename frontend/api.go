@@ -13,6 +13,7 @@ import (
 	"github.com/segmentio/ksuid"
 	"github.com/spf13/viper"
 	"github.com/stmcginnis/gofish/redfish"
+	"github.com/ubccr/grendel/bmc"
 	"github.com/ubccr/grendel/firmware"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
@@ -260,16 +261,14 @@ func (h *Handler) importHost(f *fiber.Ctx) error {
 	return ToastSuccess(f, fmt.Sprintf("Successfully imported host(s) %s", n), `, "refresh": ""`)
 }
 
-type RebootData struct {
-	Host string
-}
-
-func (h *Handler) RebootHost(f *fiber.Ctx) error {
+func (h *Handler) bmcPowerCycle(f *fiber.Ctx) error {
 	delay := viper.GetInt("bmc.delay")
 	fanout := viper.GetInt("bmc.fanout")
 
-	bootOption := f.FormValue("boot-option")
+	powerOption := f.FormValue("power-option")
+	bootOption := f.FormValue("boot-override-option")
 	hosts := f.FormValue("hosts")
+
 	ns, err := nodeset.NewNodeSet(hosts)
 	if err != nil {
 		return ToastError(f, err, "Failed to parse node set")
@@ -280,33 +279,133 @@ func (h *Handler) RebootHost(f *fiber.Ctx) error {
 		return ToastError(f, err, "Failed to find nodes")
 	}
 
-	runner := NewJobRunner(fanout)
+	runner := bmc.NewJobRunner(fanout)
 	boot := redfish.Boot{
 		BootSourceOverrideTarget:  redfish.NoneBootSourceOverrideTarget,
 		BootSourceOverrideEnabled: redfish.OnceBootSourceOverrideEnabled,
 	}
-	if bootOption == "pxe" {
+
+	switch bootOption {
+	case "pxe":
 		boot.BootSourceOverrideTarget = redfish.PxeBootSourceOverrideTarget
-	} else if bootOption == "bios-setup" {
+	case "bios-setup":
 		boot.BootSourceOverrideTarget = redfish.BiosSetupBootSourceOverrideTarget
+	case "usb":
+		boot.BootSourceOverrideTarget = redfish.UsbBootSourceOverrideTarget
+	case "hdd":
+		boot.BootSourceOverrideTarget = redfish.HddBootSourceOverrideTarget
+	case "utilities":
+		boot.BootSourceOverrideTarget = redfish.UtilitiesBootSourceOverrideTarget
+	case "diagnostics":
+		boot.BootSourceOverrideTarget = redfish.DiagsBootSourceOverrideTarget
 	}
 
 	for i, host := range hostList {
 		ch := make(chan string)
-		runner.RunReboot(host, ch, boot)
+
+		switch powerOption {
+		case "power-cycle":
+			log.Debugf("Running PowerCycle on %s", host.Name)
+			runner.RunPowerCycle(host, ch, boot)
+		case "power-on":
+			log.Debugf("Running PowerOn on %s", host.Name)
+			runner.RunPowerOn(host, ch, boot)
+		case "power-off":
+			log.Debugf("Running PowerOff on %s", host.Name)
+			runner.RunPowerOff(host, ch)
+		}
+
 		if (i+1)%fanout == 0 {
 			time.Sleep(time.Duration(delay) * time.Second)
 		}
 		output := strings.Split(<-ch, "|")
 
 		if len(output) < 3 {
-			return ToastError(f, nil, "Failed to run reboot job, index out of range")
+			return ToastError(f, nil, "Failed to run power job, index out of range")
 		}
 		h.writeEvent(output[0], f, fmt.Sprintf("%s: %s", output[1], output[2]))
 	}
 	runner.Wait()
 
-	return ToastSuccess(f, "Successfully Rebooted node(s)", ``)
+	return ToastSuccess(f, "Successfully submitted power job on node(s)", ``)
+}
+
+func (h *Handler) bmcPowerCycleBmc(f *fiber.Ctx) error {
+	delay := viper.GetInt("bmc.delay")
+	fanout := viper.GetInt("bmc.fanout")
+
+	hosts := f.FormValue("hosts")
+
+	ns, err := nodeset.NewNodeSet(hosts)
+	if err != nil {
+		return ToastError(f, err, "Failed to parse node set")
+	}
+
+	hostList, err := h.DB.FindHosts(ns)
+	if err != nil {
+		return ToastError(f, err, "Failed to find nodes")
+	}
+
+	runner := bmc.NewJobRunner(fanout)
+
+	for i, host := range hostList {
+		ch := make(chan string)
+
+		log.Debugf("Running power cycle bmc on %s", host.Name)
+		runner.RunPowerCycleBmc(host, ch)
+
+		if (i+1)%fanout == 0 {
+			time.Sleep(time.Duration(delay) * time.Second)
+		}
+		output := strings.Split(<-ch, "|")
+
+		if len(output) < 3 {
+			return ToastError(f, nil, "Failed to run power cycle bmc job, index out of range")
+		}
+		h.writeEvent(output[0], f, fmt.Sprintf("%s: %s", output[1], output[2]))
+	}
+	runner.Wait()
+
+	return ToastSuccess(f, "Successfully submitted power cycle bmc job on node(s)", ``)
+}
+
+func (h *Handler) bmcClearSel(f *fiber.Ctx) error {
+	delay := viper.GetInt("bmc.delay")
+	fanout := viper.GetInt("bmc.fanout")
+
+	hosts := f.FormValue("hosts")
+
+	ns, err := nodeset.NewNodeSet(hosts)
+	if err != nil {
+		return ToastError(f, err, "Failed to parse node set")
+	}
+
+	hostList, err := h.DB.FindHosts(ns)
+	if err != nil {
+		return ToastError(f, err, "Failed to find nodes")
+	}
+
+	runner := bmc.NewJobRunner(fanout)
+
+	for i, host := range hostList {
+		ch := make(chan string)
+
+		log.Debugf("Running clear sel on %s", host.Name)
+		runner.RunClearSel(host, ch)
+
+		if (i+1)%fanout == 0 {
+			time.Sleep(time.Duration(delay) * time.Second)
+		}
+		output := strings.Split(<-ch, "|")
+
+		if len(output) < 3 {
+			return ToastError(f, nil, "Failed to run clear sel job, index out of range")
+		}
+		h.writeEvent(output[0], f, fmt.Sprintf("%s: %s", output[1], output[2]))
+	}
+	runner.Wait()
+
+	return ToastSuccess(f, "Successfully submitted clear sel job on node(s)", ``)
 }
 
 func (h *Handler) provisionHosts(f *fiber.Ctx) error {
