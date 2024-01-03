@@ -17,42 +17,24 @@
 
 package bmc
 
-import (
-	"time"
-
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-)
-
-var (
-	reboot     bool
-	netbootCmd = &cobra.Command{
-		Use:   "netboot",
-		Short: "Set hosts to PXE netboot",
-		Long:  `Set hosts to PXE netboot`,
-		RunE: func(command *cobra.Command, args []string) error {
-			return runNetboot()
-		},
-	}
-)
-
-func init() {
-	netbootCmd.Flags().BoolVarP(&reboot, "reboot", "r", false, "Reboot nodes")
-	bmcCmd.AddCommand(netbootCmd)
+type SystemManager interface {
+	PowerCycle() error
+	PowerOn() error
+	PowerOff() error
+	EnablePXE() error
+	Logout()
+	GetSystem() (*System, error)
 }
 
-func runNetboot() error {
-	delay := viper.GetInt("bmc.delay")
-	fanout := viper.GetInt("bmc.fanout")
-	runner := NewJobRunner(fanout)
-	for i, host := range hostList {
-		runner.RunNetBoot(host, reboot)
-		if (i+1)%fanout == 0 {
-			time.Sleep(time.Duration(delay) * time.Second)
-		}
-	}
-
-	runner.Wait()
-
-	return nil
+type System struct {
+	Name           string   `json:"name"`
+	BIOSVersion    string   `json:"bios_version"`
+	SerialNumber   string   `json:"serial_number"`
+	Manufacturer   string   `json:"manufacturer"`
+	PowerStatus    string   `json:"power_status"`
+	Health         string   `json:"health"`
+	TotalMemory    float32  `json:"total_memory"`
+	ProcessorCount int      `json:"processor_count"`
+	BootNext       string   `json:"boot_next"`
+	BootOrder      []string `json:"boot_order"`
 }

@@ -60,7 +60,6 @@ func init() {
 	bmcCmd.PersistentFlags().Int("fanout", 1, "fanout")
 	viper.BindPFlag("bmc.fanout", bmcCmd.PersistentFlags().Lookup("fanout"))
 	bmcCmd.PersistentFlags().Bool("ipmi", false, "Use ipmi instead of redfish")
-	viper.BindPFlag("bmc.ipmi", bmcCmd.PersistentFlags().Lookup("ipmi"))
 
 	bmcCmd.PersistentFlags().StringSliceVarP(&tags, "tags", "t", []string{}, "select nodes by tags")
 
@@ -79,7 +78,6 @@ func init() {
 			return errors.New("please set bmc password")
 		}
 
-		useIPMI = viper.GetBool("bmc.ipmi")
 		delay = viper.GetInt("bmc.delay")
 		fanout = viper.GetInt("bmc.fanout")
 
