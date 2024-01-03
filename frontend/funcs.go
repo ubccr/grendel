@@ -38,6 +38,8 @@ func (h *Handler) writeEvent(severity string, f *fiber.Ctx, message string) erro
 		Message:  message,
 	}
 
+	log.Debugf("User: %s - Severity: %s - Message: %s", e.User, e.Severity, e.Message)
+
 	h.Events = append([]EventStruct{e}, h.Events...)
 
 	if len(h.Events) > 50 {
