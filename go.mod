@@ -31,7 +31,7 @@ require (
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.15.0
-	github.com/stmcginnis/gofish v0.2.0
+	github.com/stmcginnis/gofish v0.15.0
 	github.com/stretchr/testify v1.8.4
 	github.com/tidwall/buntdb v1.3.0
 	github.com/tidwall/gjson v1.14.4
