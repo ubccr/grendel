@@ -516,11 +516,11 @@ func (h *Handler) bmcConfigureAuto(f *fiber.Ctx) error {
 		return ToastError(f, err, "Failed to find nodes")
 	}
 
-	runner := NewJobRunner(fanout)
+	runner := bmc.NewJobRunner(fanout)
 
 	for i, host := range hostList {
 		ch := make(chan string)
-		runner.RunConfigureAuto(host, ch)
+		runner.RunBmcAutoConfigure(host, ch)
 		if (i+1)%fanout == 0 {
 			time.Sleep(time.Duration(delay) * time.Second)
 		}
@@ -539,8 +539,12 @@ func (h *Handler) bmcConfigureImport(f *fiber.Ctx) error {
 	delay := viper.GetInt("bmc.delay")
 	fanout := viper.GetInt("bmc.fanout")
 	file := f.FormValue("File")
+	shutdownType := f.FormValue("shutdownType")
 	if file == "" {
 		return ToastError(f, nil, "No file specified")
+	}
+	if shutdownType == "" {
+		return ToastError(f, nil, "No Shutdown Type specified")
 	}
 
 	hosts := f.FormValue("hosts")
@@ -554,11 +558,11 @@ func (h *Handler) bmcConfigureImport(f *fiber.Ctx) error {
 		return ToastError(f, err, "Failed to find nodes")
 	}
 
-	runner := NewJobRunner(fanout)
+	runner := bmc.NewJobRunner(fanout)
 
 	for i, host := range hostList {
 		ch := make(chan string)
-		runner.RunConfigureImport(host, file, ch)
+		runner.RunBmcImportConfiguration(host, ch, shutdownType, file)
 		if (i+1)%fanout == 0 {
 			time.Sleep(time.Duration(delay) * time.Second)
 		}

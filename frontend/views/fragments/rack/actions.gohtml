@@ -253,9 +253,22 @@
                     hx-swap="none"
                     hx-vals="js:{hosts: HostMap()}"
                     hx-ext="loading-states"
-                    hx-confirm="Warning: Sending a system configuration will reboot the selected hosts if necessary."
+                    hx-confirm="Warning: Sending a system configuration may reboot the selected hosts depending on Shutdown Type."
                     data-loading-states>
                     <div class="flex gap-2">
+                        <div>
+                            <label for="shutdownType" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                                Shutdown Type:
+                            </label>
+                            <select
+                                class="h-8 w-full rounded-md border border-neutral-300 bg-white px-2 py-1"
+                                name="shutdownType"
+                                id="shutdownType">
+                                <option value="NoReboot">No Reboot</option>
+                                <option value="Graceful">Graceful</option>
+                                <option value="Forced">Forced</option>
+                            </select>
+                        </div>
                         <div>
                             <label for="File" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">File:</label>
                             <input
