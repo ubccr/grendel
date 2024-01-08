@@ -7,11 +7,12 @@
             <td class="border-b border-gray-200 p-3 font-semibold text-gray-500">User</td>
             <td class="border-b border-gray-200 p-3 font-semibold text-gray-500">Severity</td>
             <td class="border-b border-gray-200 p-3 font-semibold text-gray-500">Message</td>
+            <td class="border-b border-gray-200 p-3 font-semibold text-gray-500"></td>
         </tr>
     </thead>
     <tbody>
         {{ range .Events }}
-            <tr>
+            <tr id="event-{{ .ID }}">
                 <td class="border-b border-gray-200 p-3 text-sm font-light">{{ .Time }}</td>
                 <td class="border-b border-gray-200 p-3">{{ .User }}</td>
                 <td class=" border-b border-gray-200 p-3">
@@ -32,6 +33,11 @@
                     </span>
                 </td>
                 <td class="border-b border-gray-200 p-3 text-sm">{{ .Message }}</td>
+                <td class="border-b border-gray-200 p-3 text-sm">
+                    <button hx-get="/events/expanded/{{ .ID }}" hx-swap="afterend" hx-target="#event-{{ .ID }}">
+                        {{ template "icon-chevron-left" }}
+                    </button>
+                </td>
             </tr>
         {{ end }}
     </tbody>

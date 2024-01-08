@@ -132,7 +132,8 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	api.Delete("/user/:username", admin, h.deleteUser)
 
 	api.Get("/search", auth, h.Search)
-	api.Get("/events", auth, h.events)
+
+	fragment.Get("/events", auth, h.events)
 
 	api.Post("/bmc/powerCycle", auth, h.bmcPowerCycle)
 	api.Post("/bmc/powerCycleBmc", auth, h.bmcPowerCycleBmc)

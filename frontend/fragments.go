@@ -352,7 +352,7 @@ func (h *Handler) interfaces(f *fiber.Ctx) error {
 }
 
 func (h *Handler) events(f *fiber.Ctx) error {
-	return f.Render("fragments/events", fiber.Map{
+	return f.Render("fragments/events/table", fiber.Map{
 		"Events": h.Events,
 	}, "")
 }
