@@ -151,9 +151,15 @@ func (r *Redfish) ClearSel() error {
 			return err
 		}
 		for _, l := range ls {
-			err := l.ClearLog()
-			if err != nil {
-				return err
+			// ClearLog() errors on other logservice types like "FaultList" on Dell...
+			// TODO: Find better solution or add more vendor support below 🙄
+
+			// fmt.Printf("\nID: %s\n Type: %s\n Name: %s\n\n", l.ID, l.LogEntryType, l.Name)
+			if l.ID == "Sel" || l.ID == "Log1" || len(ls) == 1 {
+				err := l.ClearLog()
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
