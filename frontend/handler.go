@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/bmc"
 	"github.com/ubccr/grendel/model"
 )
 
@@ -17,10 +18,11 @@ import (
 var embedFS embed.FS
 
 type EventStruct struct {
-	Time     string
-	User     string
-	Severity string
-	Message  string
+	Time        string
+	User        string
+	Severity    string
+	Message     string
+	JobMessages []bmc.JobMessage
 }
 
 type Handler struct {

@@ -275,17 +275,21 @@ func (h *Handler) bmcPowerCycle(f *fiber.Ctx) error {
 
 	job := bmc.NewJob()
 
+	var jobMessages []bmc.JobMessage
+
 	switch powerOption {
 	case "power-cycle":
-		_, err = job.PowerCycle(hostList, bootOption)
+		jobMessages, err = job.PowerCycle(hostList, bootOption)
 	case "power-on":
-		_, err = job.PowerOn(hostList, bootOption)
+		jobMessages, err = job.PowerOn(hostList, bootOption)
 	case "power-off":
-		_, err = job.PowerOff(hostList)
+		jobMessages, err = job.PowerOff(hostList)
 	}
 	if err != nil {
 		return ToastError(f, err, "Failed to run power job")
 	}
+
+	h.writeJobEvent(f, fmt.Sprintf("Submitted host %s job", powerOption), jobMessages)
 
 	return ToastSuccess(f, "Successfully submitted power job on node(s)", ``)
 }
@@ -304,10 +308,11 @@ func (h *Handler) bmcPowerCycleBmc(f *fiber.Ctx) error {
 	}
 
 	job := bmc.NewJob()
-	_, err = job.PowerCycleBmc(hostList)
+	jobMessages, err := job.PowerCycleBmc(hostList)
 	if err != nil {
 		return ToastError(f, err, "Failed to run power cycle bmc job")
 	}
+	h.writeJobEvent(f, "Submitted power cycle BMC job", jobMessages)
 
 	return ToastSuccess(f, "Successfully submitted power cycle bmc job on node(s)", ``)
 }
@@ -327,10 +332,11 @@ func (h *Handler) bmcClearSel(f *fiber.Ctx) error {
 
 	job := bmc.NewJob()
 
-	_, err = job.ClearSel(hostList)
+	jobMessages, err := job.ClearSel(hostList)
 	if err != nil {
 		return ToastError(f, err, "Failed to run clear sel job")
 	}
+	h.writeJobEvent(f, "Submitted clear SEL job", jobMessages)
 
 	return ToastSuccess(f, "Successfully submitted clear sel job on node(s)", ``)
 }
@@ -442,11 +448,11 @@ func (h *Handler) bmcConfigureAuto(f *fiber.Ctx) error {
 
 	job := bmc.NewJob()
 
-	status, err := job.BmcAutoConfigure(hostList)
+	jobMessages, err := job.BmcAutoConfigure(hostList)
 	if err != nil {
 		return ToastError(f, err, "Failed to run auto config job")
 	}
-	h.writeJobEvent(f, status)
+	h.writeJobEvent(f, "Submitted auto configure job", jobMessages)
 
 	return ToastSuccess(f, "Successfully sent Auto Configure to node(s)", ``)
 }
@@ -472,10 +478,11 @@ func (h *Handler) bmcConfigureImport(f *fiber.Ctx) error {
 	}
 
 	job := bmc.NewJob()
-	_, err = job.BmcImportConfiguration(hostList, shutdownType, file)
+	jobMessages, err := job.BmcImportConfiguration(hostList, shutdownType, file)
 	if err != nil {
 		return ToastError(f, err, "Failed to run import config job")
 	}
+	h.writeJobEvent(f, "Submitted import system configuration job", jobMessages)
 
 	return ToastSuccess(f, "Successfully sent system config to node(s)", ``)
 }
@@ -579,9 +586,15 @@ func (h *Handler) bulkHostAdd(f *fiber.Ctx) error {
 	if err != nil {
 		return ToastError(f, err, "Failed to add host(s)")
 	}
+	var jobMessages []bmc.JobMessage
 	for _, host := range newHosts {
-		h.writeEvent("info", f, fmt.Sprintf("New host: %s added with BulkAdd", host.Name))
+		jobMessages = append(jobMessages, bmc.JobMessage{
+			Status: "success",
+			Host:   host.Name,
+			Msg:    "Successfully added host",
+		})
 	}
+	h.writeJobEvent(f, "Submitted bulk add hosts job", jobMessages)
 
 	return ToastSuccess(f, "Successfully added host(s)", `, "closeModal": "", "refresh": ""`)
 }

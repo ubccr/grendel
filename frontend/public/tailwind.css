@@ -600,6 +600,10 @@ video {
   margin: 0.5rem;
 }
 
+.m-3 {
+  margin: 0.75rem;
+}
+
 .mx-1 {
   margin-left: 0.25rem;
   margin-right: 0.25rem;
@@ -1076,6 +1080,16 @@ video {
   padding-bottom: 1rem;
 }
 
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.px-5 {
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
 .pb-3 {
   padding-bottom: 0.75rem;
 }
@@ -1348,6 +1362,42 @@ samp {
   background-color: #a8a8a8;
   border-radius: 16px;
   border: 2px solid #ffffff;
+}
+
+.\*\:border-b > * {
+  border-bottom-width: 1px;
+}
+
+.\*\:border-gray-200 > * {
+  --tw-border-opacity: 1;
+  border-color: rgb(229 231 235 / var(--tw-border-opacity));
+}
+
+.\*\:p-1 > * {
+  padding: 0.25rem;
+}
+
+.\*\:p-3 > * {
+  padding: 0.75rem;
+}
+
+.\*\:text-sm > * {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.\*\:text-xs > * {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.\*\:font-semibold > * {
+  font-weight: 600;
+}
+
+.\*\:text-gray-500 > * {
+  --tw-text-opacity: 1;
+  color: rgb(107 114 128 / var(--tw-text-opacity));
 }
 
 .hover\:bg-amber-400:hover {

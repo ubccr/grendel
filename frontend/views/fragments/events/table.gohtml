@@ -2,20 +2,19 @@
 
 <table id="eventsTable" class="w-full">
     <thead>
-        <tr>
-            <td class="border-b border-gray-200 p-3 font-semibold text-gray-500">Time</td>
-            <td class="border-b border-gray-200 p-3 font-semibold text-gray-500">User</td>
-            <td class="border-b border-gray-200 p-3 font-semibold text-gray-500">Severity</td>
-            <td class="border-b border-gray-200 p-3 font-semibold text-gray-500">Message</td>
-            <td class="border-b border-gray-200 p-3 font-semibold text-gray-500"></td>
+        <tr class="*:border-b *:border-gray-200 *:p-3 *:font-semibold *:text-gray-500">
+            <td>Time</td>
+            <td>User</td>
+            <td>Severity</td>
+            <td>Message</td>
         </tr>
     </thead>
     <tbody>
         {{ range .Events }}
-            <tr id="event-{{ .ID }}">
-                <td class="border-b border-gray-200 p-3 text-sm font-light">{{ .Time }}</td>
-                <td class="border-b border-gray-200 p-3">{{ .User }}</td>
-                <td class=" border-b border-gray-200 p-3">
+            <tr class="*:border-b *:border-gray-200 *:p-3">
+                <td class="text-sm font-light">{{ .Time }}</td>
+                <td>{{ .User }}</td>
+                <td>
                     <span
                         class="
                         {{- if eq .Severity "success" -}}
@@ -33,12 +32,52 @@
                     </span>
                 </td>
                 <td class="border-b border-gray-200 p-3 text-sm">{{ .Message }}</td>
-                <td class="border-b border-gray-200 p-3 text-sm">
-                    <button hx-get="/events/expanded/{{ .ID }}" hx-swap="afterend" hx-target="#event-{{ .ID }}">
-                        {{ template "icon-chevron-left" }}
-                    </button>
-                </td>
             </tr>
+            {{ if gt (len .JobMessages) 0 }}
+                <tr class="*:border-b *:border-gray-200">
+                    <td colspan="4" class="px-5">
+                        <table class="w-full">
+                            <thead>
+                                <tr
+                                    class="*:text-sm *:border-b *:border-gray-200 *:p-1 *:font-semibold *:text-gray-500">
+                                    <td>Status</td>
+                                    <td>Host</td>
+                                    <td>Message</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{ range .JobMessages }}
+                                    <tr class="*:border-b *:border-gray-200 *:p-1 *:text-sm">
+                                        <td>
+                                            <span
+                                                class="
+                                        {{- if eq .Status "success" -}}
+                                                    bg-green-50 ring-green-700/10 text-green-700
+                                                {{- else if eq .Status "error" -}}
+                                                    bg-red-50 ring-red-700/10 text-red-700
+                                                {{- else -}}
+                                                    bg-gray-50 ring-gray-500/10 text-gray-500
+                                                {{- end }} rounded-md px-2 py-1 text-sm ring-1 ring-inset">
+                                                {{ .Status }}
+                                            </span>
+                                        </td>
+                                        <td>{{ .Host }}</td>
+                                        <td>
+                                            {{ if ne .RedfishError.Code "" }}
+                                                {{ range .RedfishError.Error.MessageExtendedInfo }}
+                                                    {{ .Message }}
+                                                {{ end }}
+                                            {{ else }}
+                                                {{ .Msg }}
+                                            {{ end }}
+                                        </td>
+                                    </tr>
+                                {{ end }}
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            {{ end }}
         {{ end }}
     </tbody>
 </table>
