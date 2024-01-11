@@ -40,9 +40,6 @@ var (
 	tags        []string
 	bmcUser     string
 	bmcPassword string
-	useIPMI     bool
-	delay       int
-	fanout      int
 	bmcCmd      = &cobra.Command{
 		Use:   "bmc",
 		Short: "Query BMC devices",
@@ -59,7 +56,6 @@ func init() {
 	viper.BindPFlag("bmc.delay", bmcCmd.PersistentFlags().Lookup("delay"))
 	bmcCmd.PersistentFlags().Int("fanout", 1, "fanout")
 	viper.BindPFlag("bmc.fanout", bmcCmd.PersistentFlags().Lookup("fanout"))
-	bmcCmd.PersistentFlags().Bool("ipmi", false, "Use ipmi instead of redfish")
 
 	bmcCmd.PersistentFlags().StringSliceVarP(&tags, "tags", "t", []string{}, "select nodes by tags")
 
@@ -78,11 +74,8 @@ func init() {
 			return errors.New("please set bmc password")
 		}
 
-		delay = viper.GetInt("bmc.delay")
-		fanout = viper.GetInt("bmc.fanout")
-
 		if len(args) == 0 && len(tags) == 0 {
-			return fmt.Errorf("Please provide tags (--tags) or a nodeset")
+			return fmt.Errorf("please provide tags (--tags) or a nodeset")
 		}
 
 		if len(args) > 0 && len(tags) > 0 {
@@ -108,7 +101,7 @@ func init() {
 		}
 
 		if len(hostList) == 0 {
-			return errors.New("No hosts found")
+			return errors.New("no hosts found")
 		}
 
 		return nil
