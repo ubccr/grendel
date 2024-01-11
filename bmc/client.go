@@ -1,12 +1,31 @@
 package bmc
 
 import (
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/spf13/viper"
 	"github.com/stmcginnis/gofish"
 )
 
-func NewClient(ip string) (*Redfish2, error) {
+type Redfish struct {
+	config  gofish.ClientConfig
+	client  *gofish.APIClient
+	service *gofish.Service
+}
 
+type System struct {
+	Name           string   `json:"name"`
+	BIOSVersion    string   `json:"bios_version"`
+	SerialNumber   string   `json:"serial_number"`
+	Manufacturer   string   `json:"manufacturer"`
+	PowerStatus    string   `json:"power_status"`
+	Health         string   `json:"health"`
+	TotalMemory    float32  `json:"total_memory"`
+	ProcessorCount int      `json:"processor_count"`
+	BootNext       string   `json:"boot_next"`
+	BootOrder      []string `json:"boot_order"`
+}
+
+func NewRedfishClient(ip string) (*Redfish, error) {
 	user := viper.GetString("bmc.user")
 	pass := viper.GetString("bmc.password")
 	viper.SetDefault("bmc.insecure", true)
@@ -22,16 +41,24 @@ func NewClient(ip string) (*Redfish2, error) {
 	}
 
 	client, err := gofish.Connect(config)
-
-	// Try with default credentials
-	// if err != nil && err.Error() == "Invalid username or password" {
-	// client, err := gofish.ConnectDefault(endpoint)
-
-	// }
-
+	e, err := ParseRedfishError(err)
 	if err != nil {
 		return nil, err
 	}
+	// Try with default credentials
+	if e.Code == "401" {
+		config.Username = "root"
+		config.Password = "calvin"
+		client, err = gofish.Connect(config)
+		if err != nil {
+			log.Debug("default credentials failed")
+			return nil, err
+		}
+	}
 
-	return &Redfish2{config: config, client: client, service: client.Service}, nil
+	return &Redfish{
+		config:  config,
+		client:  client,
+		service: client.Service,
+	}, nil
 }

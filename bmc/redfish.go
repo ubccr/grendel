@@ -2,6 +2,7 @@ package bmc
 
 import (
 	"errors"
+	"fmt"
 	"net"
 	"strings"
 
@@ -10,121 +11,41 @@ import (
 	"github.com/ubccr/grendel/util"
 )
 
-// PowerCycle2 will power cycle the BMC
-func (r *Redfish2) PowerCycle2(bootOverride redfish.Boot) error {
+// PowerCycle will ForceRestart the host
+func (r *Redfish) PowerCycle(bootOverride string) error {
+	return r.PowerControl(redfish.ForceRestartResetType, bootOverride)
+}
+
+// PowerOn will ForceOn the host
+func (r *Redfish) PowerOn(bootOverride string) error {
+	return r.PowerControl(redfish.ForceOnResetType, bootOverride)
+}
+
+// PowerOff will ForceOff the host
+func (r *Redfish) PowerOff() error {
+	return r.PowerControl(redfish.ForceOffResetType, "")
+}
+
+// Power will change the hosts power state
+func (r *Redfish) PowerControl(resetType redfish.ResetType, bootOverride string) error {
 	ss, err := r.service.Systems()
 	if err != nil {
 		return err
 	}
-
-	defer r.client.Logout()
-
-	// TODO: support GracefulRestartResetType?
 
 	err = r.bootOverride(bootOverride)
 	if err != nil {
 		return err
 	}
 
-	for _, s := range ss {
-		err := *new(error)
-
-		switch s.PowerState {
-		case redfish.OnPowerState:
-			err = s.Reset(redfish.ForceRestartResetType)
-		case redfish.OffPowerState:
-			err = s.Reset(redfish.OnResetType)
-		// Can you ForceRestart from a paused state?
-		case redfish.PausedPowerState:
-			err = s.Reset(redfish.ForceRestartResetType)
-		case redfish.PoweringOnPowerState:
-			err = s.Reset(redfish.ForceRestartResetType)
-		case redfish.PoweringOffPowerState:
-			err = s.Reset(redfish.ForceRestartResetType)
-		default:
-			// TODO: Log powerstate
-			err = errors.New("failed to match current power state")
-		}
-
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// PowerOn2 will power on the BMC
-func (r *Redfish2) PowerOn2(bootOverride redfish.Boot) error {
-	ss, err := r.service.Systems()
-	if err != nil {
-		return err
-	}
-
-	defer r.client.Logout()
-
-	// TODO: support GracefulRestartResetType?
-
-	err = r.bootOverride(bootOverride)
-	if err != nil {
-		return err
-	}
-
-	for _, s := range ss {
-		err := *new(error)
-
-		switch s.PowerState {
-		case redfish.OnPowerState:
-			err = nil
-		case redfish.OffPowerState:
-			err = s.Reset(redfish.OnResetType)
-		case redfish.PausedPowerState:
-			err = s.Reset(redfish.ResumeResetType)
-		case redfish.PoweringOnPowerState:
-			err = nil
-		case redfish.PoweringOffPowerState:
-			err = s.Reset(redfish.ForceOnResetType)
-		default:
-			// TODO: Log powerstate
-			err = errors.New("failed to match current power state")
-		}
-
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// PowerOff2 will power off the BMC
-func (r *Redfish2) PowerOff2() error {
-	ss, err := r.service.Systems()
-	if err != nil {
-		return err
-	}
-
 	defer r.client.Logout()
 
 	for _, s := range ss {
-		err := *new(error)
-
-		switch s.PowerState {
-		case redfish.OnPowerState:
-			err = s.Reset(redfish.ForceOffResetType)
-		case redfish.OffPowerState:
-			err = nil
-		case redfish.PausedPowerState:
-			err = s.Reset(redfish.ForceOffResetType)
-		case redfish.PoweringOnPowerState:
-			err = s.Reset(redfish.ForceOffResetType)
-		case redfish.PoweringOffPowerState:
-			err = nil
-		default:
-			// TODO: Log powerstate
-			err = errors.New("failed to match current power state")
+		if s.PowerState == redfish.OffPowerState && resetType == redfish.ForceRestartResetType {
+			resetType = redfish.OnResetType
 		}
 
+		err := s.Reset(resetType)
 		if err != nil {
 			return err
 		}
@@ -134,14 +55,40 @@ func (r *Redfish2) PowerOff2() error {
 }
 
 // bootOverride will set the boot override target
-func (r *Redfish2) bootOverride(bootOverride redfish.Boot) error {
+func (r *Redfish) bootOverride(bootOption string) error {
+	if bootOption == "" {
+		return nil
+	}
+
+	boot := redfish.Boot{
+		BootSourceOverrideTarget:  redfish.NoneBootSourceOverrideTarget,
+		BootSourceOverrideEnabled: redfish.OnceBootSourceOverrideEnabled,
+	}
+
+	switch bootOption {
+	case "pxe":
+		boot.BootSourceOverrideTarget = redfish.PxeBootSourceOverrideTarget
+	case "bios-setup":
+		boot.BootSourceOverrideTarget = redfish.BiosSetupBootSourceOverrideTarget
+	case "usb":
+		boot.BootSourceOverrideTarget = redfish.UsbBootSourceOverrideTarget
+	case "hdd":
+		boot.BootSourceOverrideTarget = redfish.HddBootSourceOverrideTarget
+	case "utilities":
+		boot.BootSourceOverrideTarget = redfish.UtilitiesBootSourceOverrideTarget
+	case "diagnostics":
+		boot.BootSourceOverrideTarget = redfish.DiagsBootSourceOverrideTarget
+	default:
+		return fmt.Errorf("boot option %s not supported", bootOption)
+	}
+
 	ss, err := r.service.Systems()
 	if err != nil {
 		return err
 	}
 
 	for _, s := range ss {
-		err := s.SetBoot(bootOverride)
+		err := s.SetBoot(boot)
 		if err != nil {
 			return err
 		}
@@ -149,7 +96,7 @@ func (r *Redfish2) bootOverride(bootOverride redfish.Boot) error {
 	return nil
 }
 
-func (r *Redfish2) GetSystem2() (*System2, error) {
+func (r *Redfish) GetSystem() (*System, error) {
 	ss, err := r.service.Systems()
 	if err != nil {
 		return nil, err
@@ -161,7 +108,7 @@ func (r *Redfish2) GetSystem2() (*System2, error) {
 
 	sys := ss[0]
 
-	system := &System2{
+	system := &System{
 		Name:           sys.HostName,
 		BIOSVersion:    sys.BIOSVersion,
 		SerialNumber:   sys.SKU,
@@ -177,7 +124,7 @@ func (r *Redfish2) GetSystem2() (*System2, error) {
 	return system, nil
 }
 
-func (r *Redfish2) PowerCycleBmc() error {
+func (r *Redfish) PowerCycleBmc() error {
 	ms, err := r.service.Managers()
 	if err != nil {
 		return err
@@ -192,7 +139,7 @@ func (r *Redfish2) PowerCycleBmc() error {
 	return nil
 }
 
-func (r *Redfish2) ClearSel() error {
+func (r *Redfish) ClearSel() error {
 	ms, err := r.service.Managers()
 	if err != nil {
 		return err
@@ -213,7 +160,7 @@ func (r *Redfish2) ClearSel() error {
 	return nil
 }
 
-func (r *Redfish2) BmcAutoConfigure() error {
+func (r *Redfish) BmcAutoConfigure() error {
 	// TODO: Submit PR to gofish to support this natively?
 
 	type attributes struct {
@@ -232,7 +179,7 @@ func (r *Redfish2) BmcAutoConfigure() error {
 	return r.service.Patch("/redfish/v1/Managers/iDRAC.Embedded.1/Attributes", p)
 }
 
-func (r *Redfish2) BmcImportConfiguration(shutdownType, path, file string) error {
+func (r *Redfish) BmcImportConfiguration(shutdownType, path, file string) (string, error) {
 	// TODO: Submit PR to gofish to support this natively?
 
 	type shareParameters struct {
@@ -256,11 +203,11 @@ func (r *Redfish2) BmcImportConfiguration(shutdownType, path, file string) error
 
 	ip, err := util.GetFirstExternalIPFromInterfaces()
 	if err != nil {
-		return err
+		return "", err
 	}
 	_, port, err := net.SplitHostPort(viper.GetString("provision.listen"))
 	if err != nil {
-		return err
+		return "", err
 	}
 	viper.SetDefault("bmc.config_ignore_certificate_warning", "Disabled")
 	icw := viper.GetString("bmc.config_ignore_certificate_warning")
@@ -279,5 +226,45 @@ func (r *Redfish2) BmcImportConfiguration(shutdownType, path, file string) error
 		},
 	}
 
-	return r.service.Post("/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ImportSystemConfiguration", p)
+	err = r.service.Post("/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ImportSystemConfiguration", p)
+	if err != nil {
+		return "", err
+	}
+
+	// Get job ID
+	j, err := r.service.JobService()
+	if err != nil {
+		return "", err
+	}
+
+	jobs, err := j.Jobs()
+	if err != nil {
+		return "", err
+	}
+
+	for _, job := range jobs {
+		if job.Name == "Import Configuration" && job.JobState == redfish.RunningJobState {
+			return job.ID, nil
+		}
+	}
+	return "", errors.New("failed to find job")
+}
+
+func (r *Redfish) BmcGetJob(id string) (*redfish.Job, error) {
+	j, err := r.service.JobService()
+	if err != nil {
+		return nil, err
+	}
+
+	jobs, err := j.Jobs()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, job := range jobs {
+		if job.ID == id {
+			return job, nil
+		}
+	}
+	return nil, errors.New("failed to find job")
 }
