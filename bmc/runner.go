@@ -233,6 +233,6 @@ func (r *jobRunner) RunBmcImportConfiguration(host *model.Host, ch chan JobMessa
 		}
 
 		m.Status = "success"
-		m.Msg = "Submitted import Configuration job JID:" + jid
+		m.Msg = "Submitted import Configuration job:" + jid
 	})
 }
