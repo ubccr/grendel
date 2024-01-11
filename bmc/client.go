@@ -41,17 +41,18 @@ func NewRedfishClient(ip string) (*Redfish, error) {
 	}
 
 	client, err := gofish.Connect(config)
-	e, err := ParseRedfishError(err)
 	if err != nil {
-		return nil, err
-	}
-	// Try with default credentials
-	if e.Code == "401" {
-		config.Username = "root"
-		config.Password = "calvin"
-		client, err = gofish.Connect(config)
-		if err != nil {
-			log.Debug("default credentials failed")
+		e := ParseRedfishError(err)
+		// Try with default credentials
+		if e.Code == "401" {
+			config.Username = "root"
+			config.Password = "calvin"
+			client, err = gofish.Connect(config)
+			if err != nil {
+				log.Debug("default credentials failed")
+				return nil, err
+			}
+		} else {
 			return nil, err
 		}
 	}
@@ -59,6 +60,6 @@ func NewRedfishClient(ip string) (*Redfish, error) {
 	return &Redfish{
 		config:  config,
 		client:  client,
-		service: client.Service,
+		service: client.GetService(),
 	}, nil
 }

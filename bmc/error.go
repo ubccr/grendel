@@ -24,19 +24,19 @@ type RedfishError struct {
 	} `json:"error"`
 }
 
-func ParseRedfishError(err error) (RedfishError, error) {
+func ParseRedfishError(err error) RedfishError {
 	var e RedfishError
 	if err == nil {
-		return e, nil
+		return e
 	}
 
 	reg := regexp.MustCompile(`^[0-9]{3}`)
 	e.Code = reg.FindString(err.Error())
-	test, _ := strings.CutPrefix(err.Error(), e.Code+":")
+	if e.Code != "" {
+		test, _ := strings.CutPrefix(err.Error(), e.Code+":")
 
-	if err := json.Unmarshal([]byte(test), &e); err != nil {
-		return e, err
+		json.Unmarshal([]byte(test), &e)
 	}
 
-	return e, nil
+	return e
 }

@@ -32,11 +32,7 @@ func FormatOutput(output chan JobMessage) ([]JobMessage, error) {
 	arr := []JobMessage{}
 	for m := range output {
 		if m.Status == "error" {
-			rErr, err := ParseRedfishError(errors.New(m.Msg))
-			if err != nil {
-				return nil, err
-			}
-			m.RedfishError = rErr
+			m.RedfishError = ParseRedfishError(errors.New(m.Msg))
 		}
 		arr = append(arr, m)
 	}
@@ -60,12 +56,8 @@ func (j *Job) PowerCycle(hostList model.HostList, bootOption string) ([]JobMessa
 	runner.Wait()
 	close(ch)
 
-	arr := []JobMessage{}
-	for m := range ch {
-		arr = append(arr, m)
-	}
+	return FormatOutput(ch)
 
-	return arr, nil
 }
 
 func (j *Job) PowerOn(hostList model.HostList, bootOption string) ([]JobMessage, error) {
@@ -84,12 +76,8 @@ func (j *Job) PowerOn(hostList model.HostList, bootOption string) ([]JobMessage,
 	runner.Wait()
 	close(ch)
 
-	arr := []JobMessage{}
-	for m := range ch {
-		arr = append(arr, m)
-	}
+	return FormatOutput(ch)
 
-	return arr, nil
 }
 
 func (j *Job) PowerOff(hostList model.HostList) ([]JobMessage, error) {
@@ -108,12 +96,8 @@ func (j *Job) PowerOff(hostList model.HostList) ([]JobMessage, error) {
 	runner.Wait()
 	close(ch)
 
-	arr := []JobMessage{}
-	for m := range ch {
-		arr = append(arr, m)
-	}
+	return FormatOutput(ch)
 
-	return arr, nil
 }
 
 func (j *Job) BmcStatus(hostList model.HostList) ([]System, error) {
@@ -167,12 +151,8 @@ func (j *Job) PowerCycleBmc(hostList model.HostList) ([]JobMessage, error) {
 	runner.Wait()
 	close(ch)
 
-	arr := []JobMessage{}
-	for m := range ch {
-		arr = append(arr, m)
-	}
+	return FormatOutput(ch)
 
-	return arr, nil
 }
 
 func (j *Job) ClearSel(hostList model.HostList) ([]JobMessage, error) {
@@ -191,12 +171,8 @@ func (j *Job) ClearSel(hostList model.HostList) ([]JobMessage, error) {
 	runner.Wait()
 	close(ch)
 
-	arr := []JobMessage{}
-	for m := range ch {
-		arr = append(arr, m)
-	}
+	return FormatOutput(ch)
 
-	return arr, nil
 }
 
 func (j *Job) BmcAutoConfigure(hostList model.HostList) ([]JobMessage, error) {
@@ -234,10 +210,6 @@ func (j *Job) BmcImportConfiguration(hostList model.HostList, shutdownType, file
 	runner.Wait()
 	close(ch)
 
-	arr := []JobMessage{}
-	for m := range ch {
-		arr = append(arr, m)
-	}
+	return FormatOutput(ch)
 
-	return arr, nil
 }
