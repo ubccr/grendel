@@ -17,7 +17,6 @@ require (
 	github.com/hako/branca v0.0.0-20191227164554-3b9970524189
 	github.com/hashicorp/go-retryablehttp v0.6.6
 	github.com/insomniacslk/dhcp v0.0.0-20200922210017-67c425063dca
-	github.com/kgrvamsi/redfishapi v0.0.0-20220606190352-bd0f6a9f3c58
 	github.com/korovkin/limiter v0.0.0-20190919045942-dac5a6b2a536
 	github.com/labstack/echo/v4 v4.10.1
 	github.com/labstack/gommon v0.4.0
@@ -37,7 +36,6 @@ require (
 	github.com/tidwall/gjson v1.14.4
 	github.com/tidwall/sjson v1.2.5
 	github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb
-	github.com/vmware/goipmi v0.0.0-20181114221114-2333cd82d702
 	go4.org/netipx v0.0.0-20230125063823-8449b0a6169f
 	golang.org/x/crypto v0.16.0
 	golang.org/x/net v0.19.0
@@ -79,7 +77,6 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.1 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
-	github.com/hashicorp/go-version v1.2.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
@@ -106,7 +103,7 @@ require (
 	github.com/tidwall/tinyqueue v0.1.1 // indirect
 	github.com/u-root/u-root v7.0.0+incompatible // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.48.0
+	github.com/valyala/fasthttp v1.48.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	github.com/vincent-petithory/dataurl v1.0.0 // indirect
