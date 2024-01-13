@@ -204,19 +204,34 @@ func (r *Redfish) BmcImportConfiguration(shutdownType, path, file string) (strin
 		ShareParameters shareParameters
 	}
 
+	viper.SetDefault("provision.scheme", "http")
 	rawScheme := viper.GetString("provision.scheme")
 	scheme := strings.ToUpper(rawScheme)
 
-	ip, err := util.GetFirstExternalIPFromInterfaces()
+	rawip, err := util.GetFirstExternalIPFromInterfaces()
 	if err != nil {
 		return "", err
 	}
-	_, port, err := net.SplitHostPort(viper.GetString("provision.listen"))
+
+	ip := rawip.String()
+	lip, port, err := net.SplitHostPort(viper.GetString("provision.listen"))
 	if err != nil {
 		return "", err
 	}
+
+	if lip != "0.0.0.0" {
+		ip = lip
+	}
+
+	cip := viper.GetString("bmc.config_share_ip")
+	if cip != "" {
+		ip = cip
+	}
+
 	viper.SetDefault("bmc.config_ignore_certificate_warning", "Disabled")
 	icw := viper.GetString("bmc.config_ignore_certificate_warning")
+
+	log.Debugf("Import system config debug info: scheme=%s ip=%s port=%s file=%s path=%s icw=%s", scheme, ip, port, file, path, icw)
 
 	p := payload{
 		HostPowerState: "On",
@@ -224,7 +239,7 @@ func (r *Redfish) BmcImportConfiguration(shutdownType, path, file string) (strin
 		ShareParameters: shareParameters{
 			Target:                   []string{"ALL"},
 			ShareType:                scheme,
-			IPAddress:                ip.String(),
+			IPAddress:                ip,
 			PortNumber:               port,
 			FileName:                 file,
 			ShareName:                path,

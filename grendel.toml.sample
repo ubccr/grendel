@@ -147,6 +147,8 @@ insecure = false
 user = ""
 password = ""
 
+# IP sent to the BMC for import system config, should be an IP of the provision server which is reachable by the BMCs  
+#config_share_ip = "0.0.0.0"
 # Import System Config setting: Set to "Enabled" if using a self signed certificate on the provision server
 #config_ignore_certificate_warning = "Disabled"
 

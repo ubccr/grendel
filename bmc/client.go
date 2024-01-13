@@ -1,7 +1,6 @@
 package bmc
 
 import (
-	"github.com/gofiber/fiber/v2/log"
 	"github.com/spf13/viper"
 	"github.com/stmcginnis/gofish"
 )
