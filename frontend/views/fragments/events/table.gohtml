@@ -31,7 +31,7 @@
                         {{ .Severity }}
                     </span>
                 </td>
-                <td class="border-b border-gray-200 p-3 text-sm">{{ .Message }}</td>
+                <td class="text-sm">{{ .Message }}</td>
             </tr>
             {{ if gt (len .JobMessages) 0 }}
                 <tr class="*:border-b *:border-gray-200">
@@ -48,7 +48,7 @@
                             <tbody>
                                 {{ range .JobMessages }}
                                     <tr class="*:border-b *:border-gray-200 *:p-1 *:text-sm">
-                                        <td>
+                                        <td class="w-24">
                                             <span
                                                 class="
                                         {{- if eq .Status "success" -}}
@@ -61,7 +61,7 @@
                                                 {{ .Status }}
                                             </span>
                                         </td>
-                                        <td>{{ .Host }}</td>
+                                        <td class="w-36">{{ .Host }}</td>
                                         <td>
                                             {{ if ne .RedfishError.Code "" }}
                                                 {{ range .RedfishError.Error.MessageExtendedInfo }}
