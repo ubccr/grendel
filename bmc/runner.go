@@ -48,7 +48,7 @@ func (r *jobRunner) RunPowerCycle(host *model.Host, ch chan JobMessage, bootOver
 		}
 
 		m.Status = "success"
-		m.Msg = "Sent power off command"
+		m.Msg = "Sent power cycle command"
 	})
 }
 
@@ -73,7 +73,7 @@ func (r *jobRunner) RunPowerOn(host *model.Host, ch chan JobMessage, bootOverrid
 		}
 
 		m.Status = "success"
-		m.Msg = "Sent power off command"
+		m.Msg = "Sent power on command"
 	})
 }
 
