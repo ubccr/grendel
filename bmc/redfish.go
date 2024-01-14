@@ -38,8 +38,6 @@ func (r *Redfish) PowerControl(resetType redfish.ResetType, bootOverride string)
 		return err
 	}
 
-	defer r.client.Logout()
-
 	for _, s := range ss {
 		if s.PowerState == redfish.OffPowerState && resetType == redfish.ForceRestartResetType {
 			resetType = redfish.OnResetType
