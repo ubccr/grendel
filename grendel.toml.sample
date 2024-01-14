@@ -147,6 +147,9 @@ insecure = false
 user = ""
 password = ""
 
+# Allow unsigned https certs for redfish queries? Default=true
+#insecure = true
+
 # IP sent to the BMC for import system config, should be an IP of the provision server which is reachable by the BMCs  
 #config_share_ip = "0.0.0.0"
 # Import System Config setting: Set to "Enabled" if using a self signed certificate on the provision server
