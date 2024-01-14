@@ -18,7 +18,7 @@ func (r *Redfish) PowerCycle(bootOverride string) error {
 
 // PowerOn will ForceOn the host
 func (r *Redfish) PowerOn(bootOverride string) error {
-	return r.PowerControl(redfish.ForceOnResetType, bootOverride)
+	return r.PowerControl(redfish.OnResetType, bootOverride)
 }
 
 // PowerOff will ForceOff the host
