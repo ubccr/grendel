@@ -47,5 +47,7 @@ func (h *Handler) Host(f *fiber.Ctx) error {
 }
 
 func (h *Handler) Users(f *fiber.Ctx) error {
-	return f.Render("users", fiber.Map{})
+	return f.Render("users", fiber.Map{
+		"Title": "Grendel - Users",
+	})
 }

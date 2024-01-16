@@ -1,260 +1,107 @@
-// Copyright 2019 Grendel Authors. All rights reserved.
-//
-// This file is part of Grendel.
-//
-// Grendel is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Grendel is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Grendel. If not, see <https://www.gnu.org/licenses/>.
-
 package bmc
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
+	"net"
+	"strings"
 
-	"github.com/kgrvamsi/redfishapi"
 	"github.com/spf13/viper"
-	"github.com/stmcginnis/gofish"
 	"github.com/stmcginnis/gofish/redfish"
+	"github.com/ubccr/grendel/util"
 )
 
-type Redfish struct {
-	config gofish.ClientConfig
-	client *gofish.APIClient
+// PowerCycle will ForceRestart the host
+func (r *Redfish) PowerCycle(bootOverride string) error {
+	return r.PowerControl(redfish.ForceRestartResetType, bootOverride)
 }
 
-var (
-	powerCycleTypeOrder = []string{
-		"PowerCycle",
-		"GracefulRestart",
-		"ForceRestart",
-	}
-	powerOnTypeOrder = []string{
-		"On",
-		"ForceOn",
-	}
-	powerOffTypeOrder = []string{
-		"ForceOff",
-		"GracefulShutdown",
-	}
-)
-
-func NewRedfish(endpoint, user, pass string, insecure bool) (*Redfish, error) {
-	config := gofish.ClientConfig{
-		Endpoint: endpoint,
-		Username: user,
-		Password: pass,
-		Insecure: insecure,
-	}
-
-	fish, err := gofish.Connect(config)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Redfish{config: config, client: fish}, nil
+// PowerOn will ForceOn the host
+func (r *Redfish) PowerOn(bootOverride string) error {
+	return r.PowerControl(redfish.OnResetType, bootOverride)
 }
 
-func (r *Redfish) Logout() {
-	r.client.Logout()
+// PowerOff will ForceOff the host
+func (r *Redfish) PowerOff() error {
+	return r.PowerControl(redfish.ForceOffResetType, "")
 }
-func IdracAutoConfigure(ip string) error {
 
-	user := viper.GetString("bmc.user")
-	pass := viper.GetString("bmc.password")
-
-	c := redfishapi.NewIloClient(fmt.Sprintf("https://%s", ip), user, pass)
-
-	// TODO: replace redfish library or submit PR to fix "k.MessageExtendedInfo[0].Message"
-	// License error response has MessageExtendedInfo nested in a error struct
-	attr, err := c.GetIDRACAttrDell()
-	if err != nil {
-		return err
-	}
-	if attr.NIC_1_AutoConfig == "" {
-		return errors.New("NIC_1_AutoConfig attribute not found. iDRAC is likely missing the required license")
-	}
-
-	type attributes struct {
-		NIC1AutoConfig string `json:"NIC.1.AutoConfig"`
-	}
-	type body struct {
-		Attributes attributes `json:"Attributes"`
-	}
-	b, _ := json.Marshal(body{
-		Attributes: attributes{
-			NIC1AutoConfig: "Enable Once",
-		},
-	})
-
-	_, err = c.SetAttributesDell("idrac", b)
-	if err != nil {
-		// Try default creds
-		c.Username = "root"
-		c.Password = "calvin"
-		_, err = c.SetAttributesDell("idrac", b)
-	}
-	return err
-
-}
-func RebootHost(ip string, bootOverride redfish.Boot) error {
-	config := gofish.ClientConfig{
-		Endpoint: fmt.Sprintf("https://%s", ip),
-		Username: viper.GetString("bmc.user"),
-		Password: viper.GetString("bmc.password"),
-		Insecure: true,
-	}
-
-	c, err := gofish.Connect(config)
-	if err != nil {
-		return err
-	}
-	defer c.Logout()
-
-	// Attached the client to service root
-	service := c.Service
-	ss, err := service.Systems()
+// Power will change the hosts power state
+func (r *Redfish) PowerControl(resetType redfish.ResetType, bootOverride string) error {
+	ss, err := r.service.Systems()
 	if err != nil {
 		return err
 	}
 
-	for _, system := range ss {
-		err := system.SetBoot(bootOverride)
-		if err != nil {
-			return err
+	err = r.bootOverride(bootOverride)
+	if err != nil {
+		return err
+	}
+
+	for _, s := range ss {
+		if s.PowerState == redfish.OffPowerState && resetType == redfish.ForceRestartResetType {
+			resetType = redfish.OnResetType
 		}
-		err = system.Reset(redfish.ForceRestartResetType)
+
+		err := s.Reset(resetType)
 		if err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
-func IdracImportSytemConfig(ip string, path string, file string) error {
 
-	user := viper.GetString("bmc.user")
-	pass := viper.GetString("bmc.password")
-
-	c := redfishapi.NewIloClient(fmt.Sprintf("https://%s", ip), user, pass)
-
-	type shareParameters struct {
-		Target     []string `json:"Target"`
-		ShareType  string   `json:"ShareType"`
-		IPAddress  string   `json:"IPAddress"`
-		FileName   string   `json:"FileName"`
-		ShareName  string   `json:"ShareName"`
-		PortNumber string   `json:"PortNumber"`
-	}
-	type body struct {
-		HostPowerState  string `json:"HostPowerState"`
-		ShutdownType    string `json:"ShutdownType"`
-		ImportBuffer    string `json:"ImportBuffer"`
-		ShareParameters shareParameters
+// bootOverride will set the boot override target
+func (r *Redfish) bootOverride(bootOption string) error {
+	if bootOption == "" {
+		return nil
 	}
 
-	b, _ := json.Marshal(body{
-		HostPowerState: "On",
-		ShutdownType:   "Graceful",
-		ShareParameters: shareParameters{
-			Target:     []string{"ALL"},
-			ShareType:  viper.GetString("bmc.config_share_type"),
-			IPAddress:  viper.GetString("bmc.config_share_ip"),
-			PortNumber: viper.GetString("bmc.config_share_port"),
-			FileName:   file,
-			ShareName:  path,
-		},
-	})
-	_, err := c.ImportConfigDell(b)
-
-	if err != nil && err.Error() == "Unauthorized" {
-		// Try default creds
-		c.Username = "root"
-		c.Password = "calvin"
-		_, err = c.ImportConfigDell(b)
-	}
-
-	return err
-
-}
-
-func (r *Redfish) powerReset(resetTypeOrder []string) error {
-	service := r.client.Service
-	ss, err := service.Systems()
-	if err != nil {
-		return err
-	}
-
-	// XXX Only reset the first supported system?
-	for _, system := range ss {
-		for _, resetType := range resetTypeOrder {
-			for _, rt := range system.SupportedResetTypes {
-				if resetType == string(rt) {
-					err = system.Reset(rt)
-					if err != nil {
-						return err
-					}
-					return nil
-				}
-			}
-		}
-	}
-
-	return errors.New("Failed to find a supported reset type")
-}
-
-func (r *Redfish) PowerCycle() error {
-	return r.powerReset(powerCycleTypeOrder)
-}
-
-func (r *Redfish) PowerOn() error {
-	return r.powerReset(powerOnTypeOrder)
-}
-
-func (r *Redfish) PowerOff() error {
-	return r.powerReset(powerOffTypeOrder)
-}
-
-func (r *Redfish) EnablePXE() error {
-	service := r.client.Service
-	ss, err := service.Systems()
-	if err != nil {
-		return err
-	}
-
-	bootOverride := redfish.Boot{
-		BootSourceOverrideTarget:  redfish.PxeBootSourceOverrideTarget,
+	boot := redfish.Boot{
+		BootSourceOverrideTarget:  redfish.NoneBootSourceOverrideTarget,
 		BootSourceOverrideEnabled: redfish.OnceBootSourceOverrideEnabled,
 	}
 
-	for _, system := range ss {
-		err := system.SetBoot(bootOverride)
+	switch bootOption {
+	case "pxe":
+		boot.BootSourceOverrideTarget = redfish.PxeBootSourceOverrideTarget
+	case "bios-setup":
+		boot.BootSourceOverrideTarget = redfish.BiosSetupBootSourceOverrideTarget
+	case "usb":
+		boot.BootSourceOverrideTarget = redfish.UsbBootSourceOverrideTarget
+	case "hdd":
+		boot.BootSourceOverrideTarget = redfish.HddBootSourceOverrideTarget
+	case "utilities":
+		boot.BootSourceOverrideTarget = redfish.UtilitiesBootSourceOverrideTarget
+	case "diagnostics":
+		boot.BootSourceOverrideTarget = redfish.DiagsBootSourceOverrideTarget
+	default:
+		return fmt.Errorf("boot option %s not supported", bootOption)
+	}
+
+	ss, err := r.service.Systems()
+	if err != nil {
+		return err
+	}
+
+	for _, s := range ss {
+		err := s.SetBoot(boot)
 		if err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
 func (r *Redfish) GetSystem() (*System, error) {
-	service := r.client.Service
-	ss, err := service.Systems()
+	ss, err := r.service.Systems()
 	if err != nil {
 		return nil, err
 	}
 
 	if len(ss) == 0 {
-		return nil, errors.New("Failed to find system")
+		return nil, errors.New("failed to find system")
 	}
 
 	sys := ss[0]
@@ -273,4 +120,170 @@ func (r *Redfish) GetSystem() (*System, error) {
 	}
 
 	return system, nil
+}
+
+func (r *Redfish) PowerCycleBmc() error {
+	ms, err := r.service.Managers()
+	if err != nil {
+		return err
+	}
+
+	for _, m := range ms {
+		err := m.Reset(redfish.GracefulRestartResetType)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *Redfish) ClearSel() error {
+	ms, err := r.service.Managers()
+	if err != nil {
+		return err
+	}
+
+	for _, m := range ms {
+		ls, err := m.LogServices()
+		if err != nil {
+			return err
+		}
+		for _, l := range ls {
+			// ClearLog() errors on other logservice types like "FaultList" on Dell...
+			// TODO: Find better solution or add more vendor support below 🙄
+
+			// fmt.Printf("\nID: %s\n Type: %s\n Name: %s\n\n", l.ID, l.LogEntryType, l.Name)
+			if l.ID == "Sel" || l.ID == "Log1" || len(ls) == 1 {
+				err := l.ClearLog()
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (r *Redfish) BmcAutoConfigure() error {
+	// TODO: Submit PR to gofish to support this natively?
+
+	type attributes struct {
+		NIC1AutoConfig string `json:"NIC.1.AutoConfig"`
+	}
+	type payload struct {
+		Attributes attributes
+	}
+
+	p := payload{
+		Attributes: attributes{
+			NIC1AutoConfig: "Enable Once",
+		},
+	}
+
+	return r.service.Patch("/redfish/v1/Managers/iDRAC.Embedded.1/Attributes", p)
+}
+
+func (r *Redfish) BmcImportConfiguration(shutdownType, path, file string) (string, error) {
+	// TODO: Submit PR to gofish to support this natively?
+
+	type shareParameters struct {
+		Target                   []string
+		ShareType                string
+		IPAddress                string
+		FileName                 string
+		ShareName                string
+		PortNumber               string
+		IgnoreCertificateWarning string
+	}
+	type payload struct {
+		HostPowerState  string
+		ShutdownType    string
+		ImportBuffer    string
+		ShareParameters shareParameters
+	}
+
+	viper.SetDefault("provision.scheme", "http")
+	rawScheme := viper.GetString("provision.scheme")
+	scheme := strings.ToUpper(rawScheme)
+
+	rawip, err := util.GetFirstExternalIPFromInterfaces()
+	if err != nil {
+		return "", err
+	}
+
+	ip := rawip.String()
+	lip, port, err := net.SplitHostPort(viper.GetString("provision.listen"))
+	if err != nil {
+		return "", err
+	}
+
+	if lip != "0.0.0.0" {
+		ip = lip
+	}
+
+	cip := viper.GetString("bmc.config_share_ip")
+	if cip != "" {
+		ip = cip
+	}
+
+	viper.SetDefault("bmc.config_ignore_certificate_warning", "Disabled")
+	icw := viper.GetString("bmc.config_ignore_certificate_warning")
+
+	log.Debugf("Import system config debug info: scheme=%s ip=%s port=%s file=%s path=%s icw=%s", scheme, ip, port, file, path, icw)
+
+	p := payload{
+		HostPowerState: "On",
+		ShutdownType:   shutdownType,
+		ShareParameters: shareParameters{
+			Target:                   []string{"ALL"},
+			ShareType:                scheme,
+			IPAddress:                ip,
+			PortNumber:               port,
+			FileName:                 file,
+			ShareName:                path,
+			IgnoreCertificateWarning: icw,
+		},
+	}
+
+	err = r.service.Post("/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ImportSystemConfiguration", p)
+	if err != nil {
+		return "", err
+	}
+
+	// Get job ID
+	j, err := r.service.JobService()
+	if err != nil {
+		return "", err
+	}
+
+	jobs, err := j.Jobs()
+	if err != nil {
+		return "", err
+	}
+
+	for _, job := range jobs {
+		if job.Name == "Import Configuration" && job.JobState == redfish.RunningJobState {
+			return job.ID, nil
+		}
+	}
+	return "", errors.New("failed to find job")
+}
+
+func (r *Redfish) BmcGetJob(id string) (*redfish.Job, error) {
+	j, err := r.service.JobService()
+	if err != nil {
+		return nil, err
+	}
+
+	jobs, err := j.Jobs()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, job := range jobs {
+		if job.ID == id {
+			return job, nil
+		}
+	}
+	return nil, errors.New("failed to find job")
 }

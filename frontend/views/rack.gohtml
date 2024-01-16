@@ -43,7 +43,10 @@
         </button>
     </div>
 
-    <div hx-get="/fragments/rack/{{ .Rack }}/table" hx-swap="innerHTML" hx-trigger="load, refresh from:body"></div>
+    <div
+        hx-get="/fragments/rack/{{ .Rack }}/table"
+        hx-swap="innerHTML transition:true"
+        hx-trigger="load, refresh from:body"></div>
 </form>
 
 <dialog id="hostModal" class="h-5/6 w-full rounded-lg shadow-md md:w-2/3 lg:w-3/4"></dialog>
@@ -58,9 +61,9 @@
                 type="button"
                 onclick="copyExport()"
                 class="transform rounded-md border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90">
-                <span class="" id="exportIconList">{{ template "clipboard-document-list" }}</span>
+                <span class="" id="exportIconList">{{ template "icon-clipboard-document-list" }}</span>
                 <span class="hidden" id="exportIconCheck">
-                    {{ template "clipboard-document-check" }}
+                    {{ template "icon-clipboard-document-check" }}
                 </span>
             </button>
             <button

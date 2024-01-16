@@ -18,15 +18,12 @@
 package bmc
 
 import (
-	"time"
-
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/bmc"
 )
 
 var (
-	configureLong bool
-	configureCmd  = &cobra.Command{
+	configureCmd = &cobra.Command{
 		Use:   "configure",
 		Short: "Set iDRAC to Auto configure",
 		Long:  `Set iDRAC to Auto configure`,
@@ -37,22 +34,18 @@ var (
 )
 
 func init() {
-	configureCmd.Flags().BoolVar(&statusLong, "long", false, "Display long format")
 	bmcCmd.AddCommand(configureCmd)
 }
 
 func runConf() error {
-	delay := viper.GetInt("bmc.delay")
-	fanout := viper.GetInt("bmc.fanout")
-	runner := NewJobRunner(fanout)
-	for i, host := range hostList {
-		runner.RunStatus(host)
-		if (i+1)%fanout == 0 {
-			time.Sleep(time.Duration(delay) * time.Second)
-		}
+	job := bmc.NewJob()
+
+	output, err := job.BmcAutoConfigure(hostList)
+	if err != nil {
+		return err
 	}
 
-	runner.Wait()
+	bmc.PrintStatusCli(output)
 
 	return nil
 }

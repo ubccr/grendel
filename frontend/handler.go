@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/bmc"
 	"github.com/ubccr/grendel/model"
 )
 
@@ -17,10 +18,11 @@ import (
 var embedFS embed.FS
 
 type EventStruct struct {
-	Time     string
-	User     string
-	Severity string
-	Message  string
+	Time        string
+	User        string
+	Severity    string
+	Message     string
+	JobMessages []bmc.JobMessage
 }
 
 type Handler struct {
@@ -60,6 +62,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 			},
 			"SearchList":  hostList,
 			"CurrentPath": c.Path(),
+			"Events":      h.Events,
 		})
 		if sess.Get("role") == "disabled" {
 			c.Response().Header.Add("HX-Trigger", `{"toast-error": "Your account is disabled. Please ask an Administrator to activate your account."}`)
@@ -104,6 +107,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	fragment.Get("/host/:host/form", auth, h.hostForm)
 	api.Post("/host", auth, h.EditHost)
 	api.Delete("/host", auth, h.DeleteHost)
+	api.Post("/host/import", auth, h.importHost)
 
 	fragment.Get("/interfaces", auth, h.interfaces)
 
@@ -130,9 +134,12 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	api.Delete("/user/:username", admin, h.deleteUser)
 
 	api.Get("/search", auth, h.Search)
-	api.Get("/events", auth, h.eventSSE)
 
-	api.Post("/bmc/reboot", auth, h.RebootHost)
+	fragment.Get("/events", auth, h.events)
+
+	api.Post("/bmc/powerCycle", auth, h.bmcPowerCycle)
+	api.Post("/bmc/powerCycleBmc", auth, h.bmcPowerCycleBmc)
+	api.Post("/bmc/clearSel", auth, h.bmcClearSel)
 	api.Post("/bmc/configure/auto", auth, h.bmcConfigureAuto)
 	api.Post("/bmc/configure/import", auth, h.bmcConfigureImport)
 }

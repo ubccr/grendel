@@ -1,23 +1,19 @@
 package frontend
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"net"
 	"net/netip"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/segmentio/ksuid"
-	"github.com/spf13/viper"
-	"github.com/stmcginnis/gofish/redfish"
+	"github.com/ubccr/grendel/bmc"
 	"github.com/ubccr/grendel/firmware"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
-	"github.com/valyala/fasthttp"
 )
 
 func (h *Handler) LoginUser(f *fiber.Ctx) error {
@@ -34,16 +30,19 @@ func (h *Handler) LoginUser(f *fiber.Ctx) error {
 		}
 		return ToastError(f, err, msg)
 	}
+	log.Debugf("User %s authenticated with role: %s", user, role)
+
 	sess, err := h.Store.Get(f)
 	if err != nil {
-		return ToastError(f, err, "Error getting session")
+		return ToastError(f, err, "Failed to create session")
 	}
 
-	sess.Set("authenticated", val)
+	sess.Set("authenticated", true)
 	sess.Set("user", user)
 	sess.Set("role", role)
 
-	if err := sess.Save(); err != nil {
+	err = sess.Save()
+	if err != nil {
 		return ToastError(f, err, "Failed to save session")
 	}
 
@@ -53,7 +52,10 @@ func (h *Handler) LoginUser(f *fiber.Ctx) error {
 
 func (h *Handler) LogoutUser(f *fiber.Ctx) error {
 	sess, _ := h.Store.Get(f)
+	user := sess.Get("user")
 	sess.Destroy()
+
+	log.Debugf("User %s logged out", user)
 
 	f.Response().Header.Add("HX-Redirect", "/")
 	return ToastSuccess(f, "Successfully logged out", ``)
@@ -91,7 +93,7 @@ func (h *Handler) RegisterUser(f *fiber.Ctx) error {
 
 	err := h.DB.StoreUser(su, sp)
 	if err != nil {
-		if err.Error() == fmt.Sprintf("user %s already exists", su) {
+		if err.Error() == fmt.Sprintf("User %s already exists", su) {
 			msg = "Failed to register: Username already exists"
 		} else {
 			msg = "Failed to register user"
@@ -99,8 +101,24 @@ func (h *Handler) RegisterUser(f *fiber.Ctx) error {
 		return ToastError(f, err, msg)
 	}
 
+	log.Debugf("New user: %s registered", su)
+
+	sess, err := h.Store.Get(f)
+	if err != nil {
+		return ToastError(f, err, "Failed to create session")
+	}
+
+	sess.Set("authenticated", true)
+	sess.Set("user", su)
+	sess.Set("role", "disabled")
+
+	err = sess.Save()
+	if err != nil {
+		return ToastError(f, err, "Failed to save session")
+	}
+
 	h.writeEvent("info", f, fmt.Sprintf("New user: %s registered.", su))
-	f.Set("HX-Redirect", "/login")
+	f.Set("HX-Redirect", "/")
 	return ToastSuccess(f, msg, ``)
 }
 
@@ -111,6 +129,8 @@ func (h *Handler) deleteUser(f *fiber.Ctx) error {
 	if err != nil {
 		return ToastError(f, err, "Failed to delete user")
 	}
+
+	log.Debugf("User %s deleted", user)
 
 	h.writeEvent("info", f, fmt.Sprintf("Deleted user: %s", user))
 	return ToastSuccess(f, "Successfully deleted user", `, "refresh": ""`)
@@ -213,16 +233,36 @@ func (h *Handler) DeleteHost(f *fiber.Ctx) error {
 	return ToastSuccess(f, "Successfully deleted host(s)", `, "refresh":""`)
 }
 
-type RebootData struct {
-	Host string
+func (h *Handler) importHost(f *fiber.Ctx) error {
+	s := f.FormValue("json")
+	i := model.HostList{}
+
+	err := json.Unmarshal([]byte(s), &i)
+	if err != nil {
+		return ToastError(f, err, fmt.Sprintf("Failed to unmarshal json: %s", err))
+	}
+
+	// Generate new ksuid to ensure no conflicts
+	for _, h := range i {
+		h.ID = ksuid.New()
+	}
+
+	err = h.DB.StoreHosts(i)
+	if err != nil {
+		return ToastError(f, err, "Failed to import host")
+	}
+
+	n, _ := i.ToNodeSet()
+
+	h.writeEvent("info", f, fmt.Sprintf("imported host(s) %s", n))
+	return ToastSuccess(f, fmt.Sprintf("Successfully imported host(s) %s", n), `, "refresh": ""`)
 }
 
-func (h *Handler) RebootHost(f *fiber.Ctx) error {
-	delay := viper.GetInt("bmc.delay")
-	fanout := viper.GetInt("bmc.fanout")
-
-	bootOption := f.FormValue("boot-option")
+func (h *Handler) bmcPowerCycle(f *fiber.Ctx) error {
+	powerOption := f.FormValue("power-option")
+	bootOption := f.FormValue("boot-override-option")
 	hosts := f.FormValue("hosts")
+
 	ns, err := nodeset.NewNodeSet(hosts)
 	if err != nil {
 		return ToastError(f, err, "Failed to parse node set")
@@ -233,33 +273,72 @@ func (h *Handler) RebootHost(f *fiber.Ctx) error {
 		return ToastError(f, err, "Failed to find nodes")
 	}
 
-	runner := NewJobRunner(fanout)
-	boot := redfish.Boot{
-		BootSourceOverrideTarget:  redfish.NoneBootSourceOverrideTarget,
-		BootSourceOverrideEnabled: redfish.OnceBootSourceOverrideEnabled,
+	job := bmc.NewJob()
+
+	var jobMessages []bmc.JobMessage
+
+	switch powerOption {
+	case "power-cycle":
+		jobMessages, err = job.PowerCycle(hostList, bootOption)
+	case "power-on":
+		jobMessages, err = job.PowerOn(hostList, bootOption)
+	case "power-off":
+		jobMessages, err = job.PowerOff(hostList)
 	}
-	if bootOption == "pxe" {
-		boot.BootSourceOverrideTarget = redfish.PxeBootSourceOverrideTarget
-	} else if bootOption == "bios-setup" {
-		boot.BootSourceOverrideTarget = redfish.BiosSetupBootSourceOverrideTarget
+	if err != nil {
+		return ToastError(f, err, "Failed to run power job")
 	}
 
-	for i, host := range hostList {
-		ch := make(chan string)
-		runner.RunReboot(host, ch, boot)
-		if (i+1)%fanout == 0 {
-			time.Sleep(time.Duration(delay) * time.Second)
-		}
-		output := strings.Split(<-ch, "|")
+	h.writeJobEvent(f, fmt.Sprintf("Submitted host %s job", powerOption), jobMessages)
 
-		if len(output) < 3 {
-			return ToastError(f, nil, "Failed to run reboot job, index out of range")
-		}
-		h.writeEvent(output[0], f, fmt.Sprintf("%s: %s", output[1], output[2]))
+	return ToastSuccess(f, "Successfully submitted power job on node(s)", ``)
+}
+
+func (h *Handler) bmcPowerCycleBmc(f *fiber.Ctx) error {
+	hosts := f.FormValue("hosts")
+
+	ns, err := nodeset.NewNodeSet(hosts)
+	if err != nil {
+		return ToastError(f, err, "Failed to parse node set")
 	}
-	runner.Wait()
 
-	return ToastSuccess(f, "Successfully Rebooted node(s)", ``)
+	hostList, err := h.DB.FindHosts(ns)
+	if err != nil {
+		return ToastError(f, err, "Failed to find nodes")
+	}
+
+	job := bmc.NewJob()
+	jobMessages, err := job.PowerCycleBmc(hostList)
+	if err != nil {
+		return ToastError(f, err, "Failed to run power cycle bmc job")
+	}
+	h.writeJobEvent(f, "Submitted power cycle BMC job", jobMessages)
+
+	return ToastSuccess(f, "Successfully submitted power cycle bmc job on node(s)", ``)
+}
+
+func (h *Handler) bmcClearSel(f *fiber.Ctx) error {
+	hosts := f.FormValue("hosts")
+
+	ns, err := nodeset.NewNodeSet(hosts)
+	if err != nil {
+		return ToastError(f, err, "Failed to parse node set")
+	}
+
+	hostList, err := h.DB.FindHosts(ns)
+	if err != nil {
+		return ToastError(f, err, "Failed to find nodes")
+	}
+
+	job := bmc.NewJob()
+
+	jobMessages, err := job.ClearSel(hostList)
+	if err != nil {
+		return ToastError(f, err, "Failed to run clear sel job")
+	}
+	h.writeJobEvent(f, "Submitted clear SEL job", jobMessages)
+
+	return ToastSuccess(f, "Successfully submitted clear sel job on node(s)", ``)
 }
 
 func (h *Handler) provisionHosts(f *fiber.Ctx) error {
@@ -356,9 +435,6 @@ func (h *Handler) exportHosts(f *fiber.Ctx) error {
 }
 
 func (h *Handler) bmcConfigureAuto(f *fiber.Ctx) error {
-	delay := viper.GetInt("bmc.delay")
-	fanout := viper.GetInt("bmc.fanout")
-
 	hosts := f.FormValue("hosts")
 	ns, err := nodeset.NewNodeSet(hosts)
 	if err != nil {
@@ -370,31 +446,24 @@ func (h *Handler) bmcConfigureAuto(f *fiber.Ctx) error {
 		return ToastError(f, err, "Failed to find nodes")
 	}
 
-	runner := NewJobRunner(fanout)
+	job := bmc.NewJob()
 
-	for i, host := range hostList {
-		ch := make(chan string)
-		runner.RunConfigureAuto(host, ch)
-		if (i+1)%fanout == 0 {
-			time.Sleep(time.Duration(delay) * time.Second)
-		}
-		output := strings.Split(<-ch, "|")
-
-		if len(output) < 3 {
-			return ToastError(f, nil, "Failed to run auto config job, index out of range")
-		}
-		h.writeEvent(output[0], f, fmt.Sprintf("%s: %s", output[1], output[2]))
+	jobMessages, err := job.BmcAutoConfigure(hostList)
+	if err != nil {
+		return ToastError(f, err, "Failed to run auto config job")
 	}
-	runner.Wait()
+	h.writeJobEvent(f, "Submitted auto configure job", jobMessages)
 
 	return ToastSuccess(f, "Successfully sent Auto Configure to node(s)", ``)
 }
 func (h *Handler) bmcConfigureImport(f *fiber.Ctx) error {
-	delay := viper.GetInt("bmc.delay")
-	fanout := viper.GetInt("bmc.fanout")
 	file := f.FormValue("File")
+	shutdownType := f.FormValue("shutdownType")
 	if file == "" {
 		return ToastError(f, nil, "No file specified")
+	}
+	if shutdownType == "" {
+		return ToastError(f, nil, "No Shutdown Type specified")
 	}
 
 	hosts := f.FormValue("hosts")
@@ -408,22 +477,12 @@ func (h *Handler) bmcConfigureImport(f *fiber.Ctx) error {
 		return ToastError(f, err, "Failed to find nodes")
 	}
 
-	runner := NewJobRunner(fanout)
-
-	for i, host := range hostList {
-		ch := make(chan string)
-		runner.RunConfigureImport(host, file, ch)
-		if (i+1)%fanout == 0 {
-			time.Sleep(time.Duration(delay) * time.Second)
-		}
-		output := strings.Split(<-ch, "|")
-
-		if len(output) < 3 {
-			return ToastError(f, nil, "Failed to run import job, index out of range")
-		}
-		h.writeEvent(output[0], f, fmt.Sprintf("%s: %s", output[1], output[2]))
+	job := bmc.NewJob()
+	jobMessages, err := job.BmcImportConfiguration(hostList, shutdownType, file)
+	if err != nil {
+		return ToastError(f, err, "Failed to run import config job")
 	}
-	runner.Wait()
+	h.writeJobEvent(f, "Submitted import system configuration job", jobMessages)
 
 	return ToastSuccess(f, "Successfully sent system config to node(s)", ``)
 }
@@ -485,7 +544,7 @@ func (h *Handler) bulkHostAdd(f *fiber.Ctx) error {
 			if len(hostNameArr) < 1 {
 				return ToastError(f, err, "Failed to parse host name")
 			}
-			if hostTableForm.Interfaces[i].BMC == "true" && (hostNameArr[0] == "cpn" || hostNameArr[0] == "srv") {
+			if hostTableForm.Interfaces[i].BMC == "true" && hostNameArr[0] != "swe" && hostNameArr[0] != "swi" {
 				hostName = strings.Replace(hostName, hostNameArr[0], "bmc", 1)
 			}
 
@@ -527,44 +586,15 @@ func (h *Handler) bulkHostAdd(f *fiber.Ctx) error {
 	if err != nil {
 		return ToastError(f, err, "Failed to add host(s)")
 	}
+	var jobMessages []bmc.JobMessage
 	for _, host := range newHosts {
-		h.writeEvent("info", f, fmt.Sprintf("New host: %s added with BulkAdd", host.Name))
+		jobMessages = append(jobMessages, bmc.JobMessage{
+			Status: "success",
+			Host:   host.Name,
+			Msg:    "Successfully added host",
+		})
 	}
+	h.writeJobEvent(f, "Submitted bulk add hosts job", jobMessages)
 
 	return ToastSuccess(f, "Successfully added host(s)", `, "closeModal": "", "refresh": ""`)
-}
-func (h *Handler) eventSSE(f *fiber.Ctx) error {
-	f.Set("Content-Type", "text/event-stream")
-	f.Set("Cache-Control", "no-cache")
-	f.Set("Connection", "keep-alive")
-	f.Set("Transfer-Encoding", "chunked")
-
-	sent := 0
-	if len(h.Events) > 5 {
-		h.Events = h.Events[1:]
-	}
-	tdClasses := "border border-neutral-300 p-1"
-	f.Context().SetBodyStreamWriter(fasthttp.StreamWriter(func(w *bufio.Writer) {
-		for {
-			if sent >= len(h.Events) {
-				time.Sleep(1 * time.Second)
-				continue
-			}
-			e := h.Events[sent]
-			msg := fmt.Sprintf(`<tr><td class="%s">%s</td><td class="%s">%s</td><td class="%s">%s</td><td class="%s">%s</td></tr>`, tdClasses, e.Time, tdClasses, e.User, tdClasses, e.Severity, tdClasses, e.Message)
-			fmt.Fprintf(w, "data: %s\n\n", msg)
-
-			err := w.Flush()
-			if err != nil {
-				log.Debugf("Error while flushing /events: %v. Closing http connection.\n", err)
-
-				break
-			}
-
-			sent++
-			time.Sleep(50 * time.Millisecond)
-		}
-	}))
-
-	return nil
 }

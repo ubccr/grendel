@@ -147,6 +147,14 @@ insecure = false
 user = ""
 password = ""
 
+# Allow unsigned https certs for redfish queries? Default=true
+#insecure = true
+
+# IP sent to the BMC for import system config, should be an IP of the provision server which is reachable by the BMCs  
+#config_share_ip = "0.0.0.0"
+# Import System Config setting: Set to "Enabled" if using a self signed certificate on the provision server
+#config_ignore_certificate_warning = "Disabled"
+
 #------------------------------------------------------------------------------
 # Automatic Host Discovery Config
 #------------------------------------------------------------------------------
@@ -187,13 +195,6 @@ session_storage = "memory"
 
 [frontend.sqlite]
 # path = ""
-
-# Import share config for configuring Dell Systems
-[frontend.import_share]
-# Redfish ShareType - Type of share like NFS, CIFS, HTTP, HTTPS
-type = "HTTP"
-ip = ""
-port = ""
 
 # First interface default vals in Rack -> Add Hosts -> Interface Details
 [frontend.first_iface]

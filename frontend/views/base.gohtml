@@ -5,7 +5,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <script src="/static/htmx.min.js"></script>
         <script src="/static/loading-states.js"></script>
-        <script src="/static/sse.js"></script>
         <script src="/static/notyf.min.js"></script>
         <link rel="stylesheet" href="/static/notyf.min.css" />
         <link rel="stylesheet" href="/static/tailwind.css" />
@@ -61,7 +60,9 @@
                             <div class="mx-1 hidden sm:flex">
                                 {{ template "navSearch" .SearchList }}
                             </div>
-                            <button hx-post="/api/auth/logout" hx-swap="none" id="logout">Logout</button>
+                            <button class="{{ $linkClasses }}" hx-post="/api/auth/logout" hx-swap="none" id="logout">
+                                Logout
+                            </button>
                         {{ end }}
                     </div>
                 </div>
@@ -97,32 +98,54 @@
             </div>
         </div>
         <div class="flex-grow"></div>
-        <div
-            class="{{ if ne .Auth.Authenticated true }}
-                hidden
-            {{ end }} sticky bottom-0 max-h-32 overflow-scroll bg-neutral-50 p-2 shadow-inner">
-            {{ $tdClasses := "border border-neutral-300 p-1" }}
-            <table
-                class="w-full"
-                hx-ext="sse"
-                sse-connect="/api/events"
-                hx-swap="afterbegin transition:true"
-                sse-swap="message"
-                hx-target="#eventsTbody"
-                {{ if ne .Auth.Authenticated true }}
-                    hx-disable
-                {{ end }}>
-                <thead>
-                    <tr>
-                        <td class="{{ $tdClasses }}">Time</td>
-                        <td class="{{ $tdClasses }}">User</td>
-                        <td class="{{ $tdClasses }}">Severity</td>
-                        <td class="{{ $tdClasses }}">Message</td>
-                    </tr>
-                </thead>
-                <tbody id="eventsTbody"></tbody>
-            </table>
+        <div class="sticky bottom-0">
+            <div
+                class="{{ if ne .Auth.Authenticated true }}
+                    hidden
+                {{ end }} absolute bottom-0 right-0 -translate-x-2/3 -translate-y-2/3">
+                <button
+                    class="group relative z-10 rounded-md bg-blue-500 p-2 text-white shadow-lg hover:bg-blue-400"
+                    onclick="showEventsModal()">
+                    {{ template "icon-bell" }}
+                    <div
+                        class="absolute right-0 top-0 -translate-y-1/3 translate-x-1/3 rounded-full bg-red-500 px-1 py-0 text-xs text-white group-hover:bg-red-400"
+                        id="eventsCount">
+                        {{ len .Events }}
+                    </div>
+                </button>
+            </div>
         </div>
+        <dialog id="eventsModal" class="h-5/6 w-full rounded-lg shadow-md md:w-2/3 lg:w-3/4">
+            <div class="flex h-full flex-col">
+                <div>
+                    <div class="m-2 flex justify-center align-middle ">
+                        <h1 class="rounded-xl border border-neutral-300 px-3 py-1 text-3xl shadow-lg">Notifications</h1>
+                    </div>
+                    <div
+                        class="p-3"
+                        hx-swap="innerHTML"
+                        hx-get="/fragments/events"
+                        hx-trigger="load, every 2s"
+                        {{ if eq .Auth.Role "disabled" -}}
+                            hx-disable
+                        {{- end }}
+                        hx-select-oob="#eventsCount:innerHTML"
+                        {{ if ne .Auth.Authenticated true }}
+                            hx-disable
+                        {{ end }}></div>
+                </div>
+                <div class="flex-grow"></div>
+                <div
+                    class="sticky bottom-0 flex w-full justify-end gap-3 border-t border-neutral-200 bg-neutral-50 p-3">
+                    <button
+                        type="button"
+                        onclick="closeEventsModal()"
+                        class="transform rounded-md border bg-neutral-500 px-2 py-1 text-white transition-transform hover:bg-neutral-400 active:scale-90">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </dialog>
     </body>
 
     <script>
@@ -131,15 +154,17 @@
                 duration: 5000,
                 dismissible: false,
                 ripple: false,
+                position: { x: "left", y: "bottom" },
             });
             notyf.error(e.detail.value);
             console.error(e.detail.value);
         });
         document.body.addEventListener("toast-success", function (e) {
             let notyf = new Notyf({
-                duration: 5000,
+                duration: 3000,
                 dismissible: false,
                 ripple: false,
+                position: { x: "left", y: "bottom" },
             });
             notyf.success(e.detail.value);
             console.log(e.detail.value);
@@ -150,6 +175,12 @@
             document.getElementById("mobile-menu").hidden = !m;
             document.getElementById("icon-bars").hidden = m;
             document.getElementById("icon-x").hidden = !m;
+        }
+        function showEventsModal() {
+            useTransition(() => document.getElementById("eventsModal").showModal());
+        }
+        function closeEventsModal() {
+            useTransition(() => document.getElementById("eventsModal").close());
         }
         function useTransition(func) {
             if (!document.startViewTransition) {

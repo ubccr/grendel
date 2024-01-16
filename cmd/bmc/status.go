@@ -18,10 +18,12 @@
 package bmc
 
 import (
-	"time"
+	"encoding/json"
+	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/bmc"
 )
 
 var (
@@ -31,7 +33,7 @@ var (
 		Short: "Check BMC status",
 		Long:  `Check BMC status`,
 		RunE: func(command *cobra.Command, args []string) error {
-			return runStatus()
+			return cmdStatus()
 		},
 	}
 )
@@ -41,18 +43,31 @@ func init() {
 	bmcCmd.AddCommand(statusCmd)
 }
 
-func runStatus() error {
-	delay := viper.GetInt("bmc.delay")
-	fanout := viper.GetInt("bmc.fanout")
-	runner := NewJobRunner(fanout)
-	for i, host := range hostList {
-		runner.RunStatus(host)
-		if (i+1)%fanout == 0 {
-			time.Sleep(time.Duration(delay) * time.Second)
-		}
+func cmdStatus() error {
+	job := bmc.NewJob()
+	output, err := job.BmcStatus(hostList)
+	if err != nil {
+		return err
 	}
 
-	runner.Wait()
+	if statusLong {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "    ")
+
+		err := enc.Encode(output)
+		if err != nil {
+			return err
+		}
+	} else {
+		for _, o := range output {
+
+			if !statusLong {
+				fmt.Printf("%s\t%s\t%s\n", o.Name, o.PowerStatus, o.BIOSVersion)
+				continue
+			}
+		}
+
+	}
 
 	return nil
 }

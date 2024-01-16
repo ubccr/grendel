@@ -7,7 +7,7 @@
             <td class="{{ $tdClasses }} p-0">
                 <div class="flex justify-center align-middle">
                     <button
-                        class="transform rounded-md bg-blue-500 text-white transition-transform active:scale-90"
+                        class="transform rounded-md bg-blue-500 text-white transition-transform hover:bg-blue-400 active:scale-90"
                         type="button"
                         hx-get="/fragments/floorplan/modal"
                         hx-target="#addHost"
@@ -33,7 +33,7 @@
                         {{ if gt $rackIndex 0 }}
                             <div class="flex">
                                 <a
-                                    class="transform rounded-md bg-blue-500 p-1 text-xs text-white transition-transform active:scale-90"
+                                    class="transform rounded-md bg-blue-500 p-1 text-xs text-white transition-transform hover:bg-blue-400 active:scale-90"
                                     href="/rack/{{ $rackName }}">
                                     {{ $rackName }}
                                 </a>
