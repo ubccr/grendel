@@ -1,5 +1,25 @@
 # Grendel Changelog
 
+## [0.0.10] - 2024-01-15
+
+- Fixed "Disabled" user role not respecting auth middleware
+- Fixed bulk adding nodes other than cpn || srv not having the correct bmc fqdn prefixes
+- Improved notifications UI
+- Improved rack actions UI
+- Improved user table UI
+- Added import host by JSON in UI
+- Overhauled BMC package
+- Deprecated IPMI support
+- Added ClearSel action
+- Added host power options & overrides
+- Added bmc power cycle
+- Improved redfish error handling
+- Improved import sys config settings
+- Improved bmc CLI
+- Added CLI autoconfigure command
+- Updated Tailwind to v3.4.0
+- Updated gofish to v0.15.0
+
 ## [0.0.9] - 2023-11-29
 
 - Add Web UI (@jafurlan)
@@ -100,4 +120,5 @@
 [0.0.7]: https://github.com/ubccr/grendel/releases/tag/v0.0.7
 [0.0.8]: https://github.com/ubccr/grendel/releases/tag/v0.0.8
 [0.0.9]: https://github.com/ubccr/grendel/releases/tag/v0.0.9
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.9...HEAD
+[0.0.10]: https://github.com/ubccr/grendel/releases/tag/v0.0.10
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.10...HEAD
