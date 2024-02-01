@@ -361,18 +361,20 @@ func (s *BuntStore) ResolveIPv4(fqdn string) ([]net.IP, error) {
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
 		err := tx.AscendKeys(HostKeyPrefix+":*", func(key, value string) bool {
-			res := gjson.Get(value, "interfaces")
-			for _, i := range res.Array() {
-				names := strings.Split(i.Get("fqdn").String(), ",")
-				for _, name := range names {
-					if util.Normalize(name) == fqdn {
-						ip, _ := netip.ParsePrefix(i.Get("ip").String())
-						if ip.IsValid() {
-							ips = append(ips, net.IP(ip.Addr().AsSlice()))
-						}
+			for _, itype := range []string{"interfaces", "bonds"} {
+				res := gjson.Get(value, itype)
+				for _, i := range res.Array() {
+					names := strings.Split(i.Get("fqdn").String(), ",")
+					for _, name := range names {
+						if util.Normalize(name) == fqdn {
+							ip, _ := netip.ParsePrefix(i.Get("ip").String())
+							if ip.IsValid() {
+								ips = append(ips, net.IP(ip.Addr().AsSlice()))
+							}
 
-						// XXX stop after first match. consider changing this
-						return false
+							// XXX stop after first match. consider changing this
+							return false
+						}
 					}
 				}
 			}
@@ -396,18 +398,20 @@ func (s *BuntStore) ReverseResolve(ip string) ([]string, error) {
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
 		err := tx.AscendKeys(HostKeyPrefix+":*", func(key, value string) bool {
-			res := gjson.Get(value, "interfaces")
-			for _, i := range res.Array() {
-				ipWithMask := strings.Split(i.Get("ip").String(), "/")
-				if len(ipWithMask) >= 1 && ipWithMask[0] == ip {
-					names := strings.Split(i.Get("fqdn").String(), ",")
-					for _, name := range names {
-						fqdn = append(fqdn, name)
-						break
-					}
+			for _, itype := range []string{"interfaces", "bonds"} {
+				res := gjson.Get(value, itype)
+				for _, i := range res.Array() {
+					ipWithMask := strings.Split(i.Get("ip").String(), "/")
+					if len(ipWithMask) >= 1 && ipWithMask[0] == ip {
+						names := strings.Split(i.Get("fqdn").String(), ",")
+						for _, name := range names {
+							fqdn = append(fqdn, name)
+							break
+						}
 
-					// XXX stop after first match. consider changing this
-					return false
+						// XXX stop after first match. consider changing this
+						return false
+					}
 				}
 			}
 

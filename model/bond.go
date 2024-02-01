@@ -1,5 +1,4 @@
-// Copyright 2019 Grendel Authors. All rights reserved.
-//
+// Copyright 2019 Grendel Authors. All rights reserved.  //
 // This file is part of Grendel.
 //
 // Grendel is free software: you can redistribute it and/or modify
@@ -15,26 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with Grendel. If not, see <https://www.gnu.org/licenses/>.
 
-package tests
+package model
 
-import (
-	"testing"
+import "encoding/json"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/ubccr/grendel/model"
-)
+type Bond struct {
+	NetInterface
+	Peers []string `json:"peers"`
+}
 
-func TestFactory(t *testing.T) {
-	assert := assert.New(t)
-
-	for i := 0; i < 3; i++ {
-		host := HostFactory.MustCreate().(*model.Host)
-		assert.Greater(len(host.Name), 1)
-		assert.Equal(2, len(host.Interfaces))
-		assert.Equal(1, len(host.Bonds))
-		assert.False(host.ID.IsNil())
-
-		image := BootImageFactory.MustCreate().(*model.BootImage)
-		assert.Greater(len(image.Name), 1)
-	}
+func (b *Bond) MarshalJSON() ([]byte, error) {
+	type Alias NetInterface
+	return json.Marshal(&struct {
+		Peers []string `json:"peers"`
+		Alias
+	}{
+		Peers: b.Peers,
+		Alias: (Alias)(b.NetInterface),
+	})
 }

@@ -38,3 +38,10 @@ func TestHostTags(t *testing.T) {
 	assert.False(host.HasAnyTags())
 	assert.False(host.HasTags())
 }
+
+func TestHostBonds(t *testing.T) {
+	assert := assert.New(t)
+
+	host := tests.HostFactory.MustCreate().(*model.Host)
+	assert.Equal(host.Bonds[0].AddrString(), host.Bonds[0].IP.Addr().String())
+}

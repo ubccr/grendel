@@ -27,7 +27,7 @@ import (
 	"github.com/ubccr/grendel/model"
 )
 
-var TestHostJSON = []byte(`{"firmware": "","id": "1VCnR6qevU5BbihTIvZEhX002CI","interfaces": [{"bmc": false,"fqdn": "tux01.compute.local", "ifname": "", "ip": "10.10.1.2/24", "mac": "d0:93:ae:e1:b5:2e" } ], "name": "tux01", "boot_image": "centos6", "provision": true }`)
+var TestHostJSON = []byte(`{"firmware": "","id": "1VCnR6qevU5BbihTIvZEhX002CI","interfaces": [{"bmc": false,"fqdn": "tux01.compute.local", "ifname": "", "ip": "10.10.1.2/24", "mac": "d0:93:ae:e1:b5:2e" } ], "bonds": [{"peers": ["d0:93:ae:e1:b5:2e", "d0:93:ae:e1:b5:2f"], "bmc": false,"fqdn": "tux04.compute.local", "ifname": "bond0", "ip": "10.11.1.2/24", "mac": "" } ], "name": "tux01", "boot_image": "centos6", "provision": true }`)
 var TestBootImageJSON = []byte(`{
 	"name": "compute",
 	"kernel": "/var/grendel/images/centos7/vmlinuz",
@@ -50,6 +50,12 @@ var NetInterfaceFactory = factory.NewFactory(
 	return netip.MustParsePrefix(randomdata.IpV4Address() + "/24"), nil
 })
 
+var BondFactory = factory.NewFactory(
+	&model.Bond{},
+).Attr("Peers", func(args factory.Args) (interface{}, error) {
+	return []string{randomdata.MacAddress(), randomdata.MacAddress()}, nil
+})
+
 var HostFactory = factory.NewFactory(
 	&model.Host{},
 ).Attr("Name", func(args factory.Args) (interface{}, error) {
@@ -58,13 +64,16 @@ var HostFactory = factory.NewFactory(
 	host := args.Instance().(*model.Host)
 	host.Interfaces[0].BMC = false
 	host.Interfaces[1].BMC = true
+	host.Bonds[0].IP = netip.MustParsePrefix(randomdata.IpV4Address() + "/24")
+	host.Bonds[0].FQDN = randomdata.Alphanumeric(randomdata.Number(5, 50))
+	host.Bonds[0].Name = "bond0"
 	uuid, err := ksuid.NewRandom()
 	if err != nil {
 		return err
 	}
 	host.ID = uuid
 	return nil
-}).SubSliceFactory("Interfaces", NetInterfaceFactory, func() int { return 2 })
+}).SubSliceFactory("Interfaces", NetInterfaceFactory, func() int { return 2 }).SubSliceFactory("Bonds", BondFactory, func() int { return 1 })
 
 var BootImageFactory = factory.NewFactory(
 	&model.BootImage{},

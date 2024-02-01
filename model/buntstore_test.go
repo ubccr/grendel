@@ -76,10 +76,24 @@ func TestBuntStoreHost(t *testing.T) {
 		}
 	}
 
+	testBondIPs, err := store.ResolveIPv4(host.Bonds[0].FQDN)
+	if assert.NoError(err) {
+		if assert.Equal(1, len(testBondIPs)) {
+			assert.Equal(host.Bonds[0].AddrString(), testBondIPs[0].String())
+		}
+	}
+
 	testNames, err := store.ReverseResolve(host.Interfaces[0].AddrString())
 	if assert.NoError(err) {
 		if assert.Equal(1, len(testNames)) {
 			assert.Equal(host.Interfaces[0].FQDN, testNames[0])
+		}
+	}
+
+	testBondNames, err := store.ReverseResolve(host.Bonds[0].AddrString())
+	if assert.NoError(err) {
+		if assert.Equal(1, len(testBondNames)) {
+			assert.Equal(host.Bonds[0].FQDN, testBondNames[0])
 		}
 	}
 
@@ -120,6 +134,29 @@ func TestBuntStoreIfname(t *testing.T) {
 	testHost, err := store.LoadHostFromName(host.Name)
 	if assert.NoError(err) {
 		assert.Equal(host.Interfaces[0].Name, testHost.Interfaces[0].Name)
+	}
+}
+
+func TestBuntStoreBonds(t *testing.T) {
+	assert := assert.New(t)
+
+	store, err := model.NewBuntStore(":memory:")
+	defer store.Close()
+	assert.NoError(err)
+
+	host := tests.HostFactory.MustCreate().(*model.Host)
+	host.Bonds[0].Peers[0] = host.Interfaces[0].MAC.String()
+
+	err = store.StoreHost(host)
+	assert.NoError(err)
+
+	testHost, err := store.LoadHostFromName(host.Name)
+	if assert.NoError(err) {
+		assert.Equal(host.Bonds[0].Peers, testHost.Bonds[0].Peers)
+		assert.Equal(host.Bonds[0].IP, testHost.Bonds[0].IP)
+		assert.Equal(host.Bonds[0].Name, testHost.Bonds[0].Name)
+		assert.True(host.InterfaceBonded(host.Interfaces[0].MAC))
+		assert.False(host.InterfaceBonded(host.Interfaces[1].MAC))
 	}
 }
 
@@ -701,7 +738,7 @@ func BenchmarkBuntStoreReverseResolve(b *testing.B) {
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
 		pick := hosts[rand.Intn(size)]
-		names, err := store.ReverseResolve(pick.Interfaces[0].IP.String())
+		names, err := store.ReverseResolve(pick.Interfaces[0].AddrString())
 		if err != nil {
 			b.Fatal(err)
 		}

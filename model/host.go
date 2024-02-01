@@ -35,6 +35,7 @@ type Host struct {
 	ID         ksuid.KSUID     `json:"id,omitempty"`
 	Name       string          `json:"name" validate:"required,hostname"`
 	Interfaces []*NetInterface `json:"interfaces"`
+	Bonds      []*Bond         `json:"bonds"`
 	Provision  bool            `json:"provision"`
 	Firmware   firmware.Build  `json:"firmware"`
 	BootImage  string          `json:"boot_image"`
@@ -75,6 +76,18 @@ func (h *Host) HasAnyTags(tags ...string) bool {
 	for _, a := range h.Tags {
 		for _, b := range tags {
 			if a == b {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func (h *Host) InterfaceBonded(mac net.HardwareAddr) bool {
+	for _, bond := range h.Bonds {
+		for _, peer := range bond.Peers {
+			if peer == mac.String() {
 				return true
 			}
 		}
@@ -134,6 +147,23 @@ func (h *Host) FromJSON(hostJSON string) {
 		h.Interfaces = append(h.Interfaces, nic)
 	}
 
+	h.Bonds = make([]*Bond, 0)
+	bres := gjson.Get(hostJSON, "bonds")
+	for _, i := range bres.Array() {
+		bond := &Bond{Peers: []string{}}
+		bond.Name = i.Get("ifname").String()
+		bond.FQDN = i.Get("fqdn").String()
+		bond.BMC = i.Get("bmc").Bool()
+		bond.VLAN = i.Get("vlan").String()
+		bond.MTU = uint16(i.Get("mtu").Int())
+		bond.IP, _ = netip.ParsePrefix(i.Get("ip").String())
+		bond.MAC, _ = net.ParseMAC(i.Get("mac").String())
+		for _, p := range i.Get("peers").Array() {
+			bond.Peers = append(bond.Peers, p.String())
+		}
+		h.Bonds = append(h.Bonds, bond)
+	}
+
 	tres := gjson.Get(hostJSON, "tags")
 	for _, i := range tres.Array() {
 		h.Tags = append(h.Tags, i.String())
@@ -141,7 +171,7 @@ func (h *Host) FromJSON(hostJSON string) {
 }
 
 func (h *Host) ToJSON() string {
-	hostJSON := `{"firmware": "", "interfaces": [], "name": "", "provision": false, "kickstart": false, "boot_image": "", "tags": []}`
+	hostJSON := `{"firmware": "", "interfaces": [], "bonds": [], "name": "", "provision": false, "kickstart": false, "boot_image": "", "tags": []}`
 
 	if !h.ID.IsNil() {
 		hostJSON, _ = sjson.Set(hostJSON, "id", h.ID.String())
@@ -162,6 +192,20 @@ func (h *Host) ToJSON() string {
 			"mtu":    nic.MTU,
 		}
 		hostJSON, _ = sjson.Set(hostJSON, "interfaces.-1", n)
+	}
+
+	for _, bond := range h.Bonds {
+		b := map[string]interface{}{
+			"peers":  bond.Peers,
+			"mac":    bond.MAC.String(),
+			"ip":     bond.CIDR(),
+			"ifname": bond.Name,
+			"fqdn":   bond.FQDN,
+			"bmc":    bond.BMC,
+			"vlan":   bond.VLAN,
+			"mtu":    bond.MTU,
+		}
+		hostJSON, _ = sjson.Set(hostJSON, "bonds.-1", b)
 	}
 
 	for _, t := range h.Tags {
