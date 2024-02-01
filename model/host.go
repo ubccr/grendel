@@ -84,10 +84,10 @@ func (h *Host) HasAnyTags(tags ...string) bool {
 	return false
 }
 
-func (h *Host) InterfaceBonded(mac net.HardwareAddr) bool {
+func (h *Host) InterfaceBonded(peer string) bool {
 	for _, bond := range h.Bonds {
-		for _, peer := range bond.Peers {
-			if peer == mac.String() {
+		for _, p := range bond.Peers {
+			if peer == p {
 				return true
 			}
 		}

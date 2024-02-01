@@ -146,6 +146,7 @@ func TestBuntStoreBonds(t *testing.T) {
 
 	host := tests.HostFactory.MustCreate().(*model.Host)
 	host.Bonds[0].Peers[0] = host.Interfaces[0].MAC.String()
+	host.Bonds[0].Peers[1] = host.Interfaces[1].Name
 
 	err = store.StoreHost(host)
 	assert.NoError(err)
@@ -155,8 +156,9 @@ func TestBuntStoreBonds(t *testing.T) {
 		assert.Equal(host.Bonds[0].Peers, testHost.Bonds[0].Peers)
 		assert.Equal(host.Bonds[0].IP, testHost.Bonds[0].IP)
 		assert.Equal(host.Bonds[0].Name, testHost.Bonds[0].Name)
-		assert.True(host.InterfaceBonded(host.Interfaces[0].MAC))
-		assert.False(host.InterfaceBonded(host.Interfaces[1].MAC))
+		assert.True(host.InterfaceBonded(host.Interfaces[0].MAC.String()))
+		assert.False(host.InterfaceBonded(host.Interfaces[1].MAC.String()))
+		assert.True(host.InterfaceBonded(host.Interfaces[1].Name))
 	}
 }
 
