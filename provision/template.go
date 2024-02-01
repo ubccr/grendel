@@ -64,6 +64,7 @@ var funcMap = template.FuncMap{
 	"ConfigValueString":      ConfigValueString,
 	"ConfigValueBool":        ConfigValueBool,
 	"Add":                    Add,
+	"Mul":                    Mul,
 	"CryptSHA512":            CryptSHA512,
 	"CryptSHA256":            CryptSHA256,
 	"DellSHA256Password":     DellSHA256Password,
@@ -169,6 +170,10 @@ func Contains(s, substr string) bool {
 
 func Add(a, b int) int {
 	return a + b
+}
+
+func Mul(a, b int) int {
+	return a * b
 }
 
 func ConfigValueString(key string) string {
