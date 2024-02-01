@@ -56,6 +56,12 @@ default_image = ""
 # Path to repo directory
 repo_dir = ""
 
+# Enable prometheus service discover endpoint
+enable_prometheus_sd = false
+
+# Prometheus service discovery refresh interval in seconds
+prometheus_sd_refresh_interval = 3600
+
 #------------------------------------------------------------------------------
 # DHCP Server
 #------------------------------------------------------------------------------

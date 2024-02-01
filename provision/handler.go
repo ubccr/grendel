@@ -40,6 +40,11 @@ type Handler struct {
 	DefaultImageName string
 }
 
+func init() {
+	viper.SetDefault("provision.enable_prometheus_sd", false)
+	viper.SetDefault("provision.prometheus_sd_refresh_interval", "3600")
+}
+
 func NewHandler(db model.DataStore, defaultImageName string) (*Handler, error) {
 	h := &Handler{
 		DB:               db,
@@ -69,6 +74,9 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	e.GET("/", h.Index).Name = "index"
 	e.GET("/onie-installer*", h.Onie).Name = "onie"
 	e.GET("/onie-updater*", h.Onie).Name = "onie"
+	if viper.GetBool("provision.enable_prometheus_sd") {
+		e.GET("/service-discovery/:tag/:port", h.ServiceDiscovery).Name = "sd"
+	}
 
 	boot := e.Group("/boot/:token/")
 	boot.Use(TokenRequired)
