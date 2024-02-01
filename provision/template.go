@@ -167,7 +167,7 @@ func Contains(s, substr string) bool {
 	return strings.Contains(s, substr)
 }
 
-func Add(a, b uint16) uint16 {
+func Add(a, b int) int {
 	return a + b
 }
 
