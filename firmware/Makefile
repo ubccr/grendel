@@ -35,7 +35,10 @@ build:
 		bin-x86_64-efi/ipxe.efi \
 		bin-x86_64-efi/snponly.efi \
 		bin-i386-efi/ipxe.efi \
-		EMBED=../../boot.ipxe)
+		EMBED=../../boot.ipxe &&\
+	CROSS=aarch64-linux-gnu- \
+	    make bin-arm64-efi/snponly.efi \
+        EMBED=../../boot.ipxe)
 
 .PHONY: build-with-ca
 build-with-ca:
@@ -65,6 +68,7 @@ bindata:
 	mv -f ipxe/src/bin/undionly.kpxe bin/undionly.kpxe
 	mv -f ipxe/src/bin-x86_64-efi/ipxe.efi bin/ipxe-x86_64.efi
 	mv -f ipxe/src/bin-x86_64-efi/snponly.efi bin/snponly-x86_64.efi
+	mv -f ipxe/src/bin-arm64-efi/snponly.efi bin/snponly-arm64.efi
 	mv -f ipxe/src/bin-i386-efi/ipxe.efi bin/ipxe-i386.efi
 
 .PHONY: clean
