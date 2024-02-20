@@ -143,7 +143,7 @@ func (s *Server) mainHandler4(peer *net.UDPAddr, req *dhcpv4.DHCPv4, oob *ipv4.C
 	switch mt := req.MessageType(); mt {
 	case dhcpv4.MessageTypeDiscover:
 		err := s.bootingHandler4(host, serverIP, req, resp)
-		if err != nil && s.ProxyOnly {
+		if err != nil && !s.ProxyOnly {
 			log.WithFields(logrus.Fields{
 				"mac":     req.ClientHWAddr.String(),
 				"host_id": host.ID.String(),
