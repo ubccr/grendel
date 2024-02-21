@@ -20,6 +20,7 @@ package dhcp
 import (
 	"fmt"
 	"net"
+	"slices"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/insomniacslk/dhcp/rfc1035label"
@@ -49,32 +50,6 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 		log.Debugf("Arista provision script URL: %s", configURL)
 
 		resp.UpdateOption(dhcpv4.OptBootFileName(configURL))
-	}
-
-	if host.HasTags("dellbmp") {
-		// Dell Bare Metal Provisioning (BMP) for FTOS
-		// See: https://i.dell.com/sites/doccontent/shared-content/Documents/Bare_Metal_Provisioning.pdf
-
-		log.WithFields(logrus.Fields{
-			"ip":   nic.AddrString(),
-			"name": host.Name,
-		}).Info("Host tagged with Dell BMP. Setting FTOS image URL and config dhcp options")
-
-		token, _ := model.NewBootToken(host.ID.String(), nic.MAC.String())
-		endpoints := model.NewEndpoints(serverIP.String(), token)
-
-		imageURL := endpoints.KernelURL()
-		log.Debugf("Dell FTOS - image URL: %s", imageURL)
-
-		if req.IsOptionRequested(dhcpv4.OptionBootfileName) {
-			resp.UpdateOption(dhcpv4.OptBootFileName(imageURL))
-		}
-
-		configURL := endpoints.KickstartURL()
-		log.Debugf("Dell FTOS - PXELinuxConfigFile: %s", configURL)
-		if req.IsOptionRequested(dhcpv4.OptionPXELinuxConfigFile) {
-			resp.UpdateOption(dhcpv4.Option{Code: dhcpv4.OptionPXELinuxConfigFile, Value: dhcpv4.String(configURL)})
-		}
 	}
 
 	if host.HasTags("dellztd") {
@@ -119,6 +94,24 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 		// Format: <image file>, <config file>, <docker container file>
 		// The item value can be empty, but the comma shall not be omitted.
 		resp.UpdateOption(dhcpv4.OptBootFileName(imageFilename + "," + configFilename + ","))
+	}
+
+	if slices.Contains(req.UserClass(), "SONiC-ZTP") {
+		// Dell Zero-touch provisioning (ZTP) for SONiC
+		// See: https://github.com/sonic-net/SONiC/blob/master/doc/ztp/ztp.md
+
+		log.WithFields(logrus.Fields{
+			"ip":   nic.AddrString(),
+			"name": host.Name,
+		}).Info("Host tagged with Dell ZTP. Setting ZTP provision URL dhcp option")
+
+		token, _ := model.NewBootToken(host.ID.String(), nic.MAC.String())
+		endpoints := model.NewEndpoints(serverIP.String(), token)
+
+		provisionURL := endpoints.KickstartURL()
+		log.Debugf("Dell ZTP provision-url: %s", provisionURL)
+		resp.UpdateOption(dhcpv4.OptBootFileName(provisionURL))
+		// resp.UpdateOption(dhcpv4.Option{Code: dhcpv4.GenericOptionCode(239), Value: dhcpv4.String(provisionURL)})
 	}
 }
 

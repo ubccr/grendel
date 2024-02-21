@@ -44,6 +44,7 @@ func (s *Server) bootingHandler4(host *model.Host, serverIP net.IP, req, resp *d
 	}
 
 	fwtype, err := firmware.DetectBuild(req.ClientArch(), userClass)
+	log.Debugf("iPXE Firmware type detected: %s", fwtype.String())
 	if err != nil {
 		return fmt.Errorf("Failed to get PXE firmware from DHCP: %s", err)
 	}
@@ -94,7 +95,7 @@ func (s *Server) bootingHandler4(host *model.Host, serverIP net.IP, req, resp *d
 		endpoints := model.NewEndpoints(serverIP.String(), token)
 		resp.UpdateOption(dhcpv4.OptBootFileName(endpoints.BootFileURL()))
 
-	case firmware.EFI386, firmware.EFI64:
+	case firmware.EFI386, firmware.EFI64, firmware.SNPONLYarm64:
 		log.Printf("EFI boot PXE client")
 		if host.Firmware != 0 {
 			log.Infof("Overriding firmware for host: %s", req.ClientHWAddr.String())

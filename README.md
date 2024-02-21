@@ -131,7 +131,7 @@ $ qemu-system-x86_64 -m 2048 -boot n -device e1000,netdev=net0,mac=DE:AD:BE:EF:1
 ## Hacking
 
 Building Grendel requires Go v1.20 or greater. Building iPXE requires packages
-lzma-sdk-devel and xz-devel:
+lzma-sdk-devel, xz-devel, and gcc-aarch64-linux-gnu:
 
 ```
 $ git clone --recursive https://github.com/ubccr/grendel
