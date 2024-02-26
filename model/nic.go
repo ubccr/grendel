@@ -225,6 +225,15 @@ func (n *NetInterface) DNSList() []string {
 	return dnsList
 }
 
+func (n *NetInterface) HostNameIndex(idx int) string {
+	names := strings.Split(n.FQDN, ",")
+	if idx >= 0 && idx < len(names) {
+		return names[idx]
+	}
+
+	return ""
+}
+
 func (n *NetInterface) HostName() string {
 	names := strings.Split(n.FQDN, ",")
 	return names[0]

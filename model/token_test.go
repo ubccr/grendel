@@ -30,7 +30,7 @@ func TestToken(t *testing.T) {
 	assert := assert.New(t)
 
 	host := tests.HostFactory.MustCreate().(*model.Host)
-	token, err := model.NewFirmwareToken(host.Interfaces[0].MAC.String(), firmware.SNPONLY)
+	token, err := model.NewFirmwareToken(host.Interfaces[0].MAC.String(), firmware.SNPONLYx86_64)
 	if assert.NoError(err) {
 		assert.Less(len(token), 128)
 		assert.Greater(len(token), 0)
@@ -38,7 +38,7 @@ func TestToken(t *testing.T) {
 
 	build, err := model.ParseFirmwareToken(token)
 	if assert.NoError(err) {
-		assert.Equal(build, firmware.SNPONLY)
+		assert.Equal(build, firmware.SNPONLYx86_64)
 	}
 
 	token, err = model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
