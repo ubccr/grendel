@@ -1,5 +1,13 @@
 # Grendel Changelog
 
+## [0.0.11] - 2024-02-27
+
+- Add prometheus service discovery.
+- Add support for bonded nics
+- Add arm64 pxe booting 
+- Add Dell SONiC ZTP
+- Remove Dell OS9 BMP support
+
 ## [0.0.10] - 2024-01-15
 
 - Fixed "Disabled" user role not respecting auth middleware
@@ -121,4 +129,5 @@
 [0.0.8]: https://github.com/ubccr/grendel/releases/tag/v0.0.8
 [0.0.9]: https://github.com/ubccr/grendel/releases/tag/v0.0.9
 [0.0.10]: https://github.com/ubccr/grendel/releases/tag/v0.0.10
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.10...HEAD
+[0.0.11]: https://github.com/ubccr/grendel/releases/tag/v0.0.11
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.11...HEAD
