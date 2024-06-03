@@ -50,6 +50,7 @@ require (
 	github.com/gofiber/utils v1.1.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/redis/go-redis/v9 v9.0.2 // indirect
+	github.com/rqlite/gorqlite v0.0.0-20240227123050-397b03f02418 // indirect
 )
 
 require (

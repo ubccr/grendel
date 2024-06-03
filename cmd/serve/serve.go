@@ -64,6 +64,10 @@ var (
 func init() {
 	serveCmd.PersistentFlags().String("dbpath", ":memory:", "path to database file")
 	viper.BindPFlag("dbpath", serveCmd.PersistentFlags().Lookup("dbpath"))
+	serveCmd.PersistentFlags().String("dbtype", "buntdb", "database type (buntdb, rqlite)")
+	viper.BindPFlag("dbtype", serveCmd.PersistentFlags().Lookup("dbtype"))
+	serveCmd.PersistentFlags().String("dbaddr", "http://localhost:4001", "rqlite address")
+	viper.BindPFlag("dbaddr", serveCmd.PersistentFlags().Lookup("dbaddr"))
 	serveCmd.PersistentFlags().StringVar(&hostsFile, "hosts", "", "path to hosts file")
 	serveCmd.PersistentFlags().StringVar(&imagesFile, "images", "", "path to boot images file")
 	serveCmd.PersistentFlags().StringSlice("services", []string{}, "enabled services")
@@ -76,12 +80,12 @@ func init() {
 			return err
 		}
 
-		DB, err = model.NewDataStore(viper.GetString("dbpath"))
+		DB, err = model.NewDataStore(viper.GetString("dbtype"), viper.GetString("dbpath"), viper.GetString("dbaddr"))
 		if err != nil {
 			return err
 		}
 
-		cmd.Log.Infof("Using database path: %s", viper.GetString("dbpath"))
+		cmd.Log.Infof("Using database: %s, file_path: %s, addr: %s", viper.GetString("dbtype"), viper.GetString("dbpath"), viper.GetString("dbaddr"))
 
 		return nil
 	}

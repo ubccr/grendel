@@ -124,6 +124,14 @@ type DataStore interface {
 	Close() error
 }
 
-func NewDataStore(path string) (DataStore, error) {
-	return NewBuntStore(path)
+func NewDataStore(dbtype string, path string, addr string) (DataStore, error) {
+	var db DataStore
+	var err error
+
+	if dbtype == "buntdb" {
+		db, err = NewBuntStore(path)
+	} else if dbtype == "rqlite" {
+		db, err = NewRqliteStore(addr)
+	}
+	return db, err
 }
