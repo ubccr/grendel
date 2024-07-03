@@ -48,6 +48,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	auth := h.EnforceAuthMiddleware()
 	admin := h.EnforceAdminMiddleware()
 	app.Use(func(c *fiber.Ctx) error {
+		// TODO: rework to prevent constant DB reads
 		hostList, err := h.DB.Hosts()
 		if err != nil {
 			log.Error(err)

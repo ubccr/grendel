@@ -21,12 +21,14 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/netip"
 	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/rqlite/gorqlite"
+	"github.com/ubccr/grendel/firmware"
 	"github.com/ubccr/grendel/nodeset"
 	"github.com/ubccr/grendel/util"
 )
@@ -36,7 +38,7 @@ type RQLite struct {
 	db *gorqlite.Connection
 }
 
-// NewRQLite returns a new RQLite using the given database filename. For memory only you can provide `:memory:`
+// NewRQLite returns a new RQLite using the given database address.
 func NewRqliteStore(addr string) (*RQLite, error) {
 	db, err := gorqlite.Open(addr)
 	if err != nil {
@@ -69,6 +71,10 @@ func migrate(db *gorqlite.Connection) error {
 
 		statements := []string{
 			"CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, hash TEXT, role TEXT, created_at DATETIME, modified_at DATETIME)",
+			"CREATE TABLE IF NOT EXISTS hosts (name TEXT PRIMARY KEY, provision BOOL, firmware TEXT, boot_image TEXT)",
+			"CREATE TABLE IF NOT EXISTS interfaces (id INT, host_name TEXT REFERENCES hosts (name) ON DELETE CASCADE, mac TEXT, name TEXT, ip TEXT, fqdn TEXT, bmc BOOL, vlan TEXT, mtu INT, PRIMARY KEY (id, host_name))",
+			"CREATE TABLE IF NOT EXISTS bonds (id INT, host_name TEXT REFERENCES hosts (name) ON DELETE CASCADE, mac TEXT, name TEXT, ip TEXT, fqdn TEXT, bmc BOOL, vlan TEXT, mtu INT, peers TEXT, PRIMARY KEY (id, host_name))",
+			"CREATE TABLE IF NOT EXISTS tags (host_name TEXT REFERENCES hosts(name) ON DELETE CASCADE, tag TEXT, value TEXT, PRIMARY KEY (host_name, tag))",
 		}
 
 		_, err := db.Write(statements)
@@ -76,12 +82,12 @@ func migrate(db *gorqlite.Connection) error {
 			return err
 		}
 
-		err = setVersion(db, 2)
+		err = setVersion(db, 3)
 		if err != nil {
 			return err
 		}
-		version = 2
-		log.Debugf("rqlite successfully updated tables to version 2.")
+		version = 3
+		log.Debugf("rqlite successfully updated tables to version 3.")
 	case 1:
 		// Test table datatype migration (worse case)
 		log.Debugf("rqlite updating tables from version 1 to 2.")
@@ -108,6 +114,34 @@ func migrate(db *gorqlite.Connection) error {
 		log.Debugf("rqlite successfully updated tables to version 2.")
 		fallthrough
 	case 2:
+		log.Debugf("rqlite updating tables from version 2 to 3.")
+
+		statements := []string{
+			"CREATE TABLE IF NOT EXISTS hosts (name TEXT PRIMARY KEY, provision BOOL, firmware TEXT, boot_image TEXT)",
+			"CREATE TABLE IF NOT EXISTS interfaces (id INT, host_name TEXT REFERENCES hosts (name) ON DELETE CASCADE, mac TEXT, name TEXT, ip TEXT, fqdn TEXT, bmc BOOL, vlan TEXT, mtu INT, PRIMARY KEY (id, host_name))",
+			"CREATE TABLE IF NOT EXISTS bonds (id INT, host_name TEXT REFERENCES hosts (name) ON DELETE CASCADE, mac TEXT, name TEXT, ip TEXT, fqdn TEXT, bmc BOOL, vlan TEXT, mtu INT, peers TEXT, PRIMARY KEY (id, host_name))",
+			"CREATE TABLE IF NOT EXISTS tags (host_name TEXT REFERENCES hosts(name) ON DELETE CASCADE, tag TEXT, value TEXT, PRIMARY KEY (host_name, tag))",
+			// "CREATE TABLE IF NOT EXISTS hosts (id TEXT PRIMARY KEY, name TEXT, data TEXT)",
+		}
+
+		wr, err := db.Write(statements)
+		for _, v := range wr {
+			if v.Err != nil {
+				log.Errorf("sql syntax error: %s\n", v.Err.Error())
+			}
+		}
+		if err != nil {
+			return err
+		}
+
+		err = setVersion(db, 3)
+		if err != nil {
+			return err
+		}
+		version += 1
+		log.Debugf("rqlite successfully updated tables to version 3.")
+		fallthrough
+	case 3:
 		log.Debug("rqlite tables are up to date!")
 	default:
 		return errors.New("rqlite unknown database version")
@@ -269,13 +303,107 @@ func (s *RQLite) StoreHost(host *Host) error {
 
 // StoreHosts stores a list of host in the data store. If the host exists it is overwritten
 func (s *RQLite) StoreHosts(hosts HostList) error {
+	var statements []gorqlite.ParameterizedStatement
+
+	for idx, host := range hosts {
+		if host.Name == "" {
+			return fmt.Errorf("host name required for host %d: %w", idx, ErrInvalidData)
+		}
+
+		// Keys are case-insensitive
+		host.Name = strings.ToLower(host.Name)
+
+		statements = append(statements, gorqlite.ParameterizedStatement{
+			Query: "INSERT INTO hosts (name, provision, firmware, boot_image) VALUES(?, ?, ?, ?)",
+			Arguments: []interface{}{
+				host.Name,
+				host.Provision,
+				host.Firmware.String(),
+				host.BootImage,
+			},
+		})
+
+		for _, tag := range host.Tags {
+			statements = append(statements, gorqlite.ParameterizedStatement{
+				Query: "INSERT INTO tags (host_name, tag, value) VALUES(?, ?, ?)",
+				Arguments: []interface{}{
+					host.Name,
+					tag,
+					nil,
+				},
+			})
+		}
+
+		for i, iface := range host.Interfaces {
+			statements = append(statements, gorqlite.ParameterizedStatement{
+				Query: "INSERT INTO interfaces (id, host_name, mac, name, ip, fqdn, bmc, vlan, mtu) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+				Arguments: []interface{}{
+					i,
+					host.Name,
+					iface.MAC.String(),
+					iface.Name,
+					iface.IP.String(),
+					iface.FQDN,
+					iface.BMC,
+					iface.VLAN,
+					iface.MTU,
+				},
+			})
+		}
+		for i, bonds := range host.Bonds {
+			statements = append(statements, gorqlite.ParameterizedStatement{
+				Query: "INSERT INTO interfaces (id, host_name, mac, name, ip, fqdn, bmc, vlan, mtu, peers) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+				Arguments: []interface{}{
+					i,
+					host.Name,
+					bonds.MAC.String(),
+					bonds.Name,
+					bonds.IP.String(),
+					bonds.FQDN,
+					bonds.BMC,
+					bonds.VLAN,
+					bonds.MTU,
+					strings.Join(bonds.Peers, ","),
+				},
+			})
+		}
+	}
+
+	wr, err := s.db.WriteParameterized(statements)
+	for _, v := range wr {
+		if v.Err != nil {
+			fmt.Printf("SQL ERROR: %s\n", v.Err.Error())
+		}
+	}
+	if err != nil {
+		return err
+	}
+
+	log.Debugf("rqlite.StoreHosts: stored %d host(s)", len(hosts))
 
 	return nil
 }
 
 // DeleteHosts deletes all hosts in the given nodeset.NodeSet from the data store.
 func (s *RQLite) DeleteHosts(ns *nodeset.NodeSet) error {
+	it := ns.Iterator()
 
+	statements := []gorqlite.ParameterizedStatement{}
+
+	for it.Next() {
+		statements = append(statements, gorqlite.ParameterizedStatement{
+			Query: "PRAGMA foreign_keys=on; DELETE FROM hosts WHERE name = ?",
+			Arguments: []interface{}{
+				it.Value(),
+			},
+		})
+	}
+
+	_, err := s.db.WriteParameterized(statements)
+	if err != nil {
+		return err
+	}
+	log.Debugf("rqlite.DeleteHosts: deleted %d host(s)", ns.Len())
 	return nil
 }
 
@@ -283,6 +411,92 @@ func (s *RQLite) DeleteHosts(ns *nodeset.NodeSet) error {
 func (s *RQLite) LoadHostFromName(name string) (*Host, error) {
 	var host *Host
 
+	hr, err := s.db.QueryOneParameterized(gorqlite.ParameterizedStatement{
+		Query: "SELECT * FROM hosts WHERE name = ?",
+		Arguments: []interface{}{
+			name,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	ir, err := s.db.QueryOneParameterized(gorqlite.ParameterizedStatement{
+		Query: "SELECT mac, name, ip, fqdn, bmc, vlan, mtu FROM interfaces WHERE host_name = ?",
+		Arguments: []interface{}{
+			name,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	br, err := s.db.QueryOneParameterized(gorqlite.ParameterizedStatement{
+		Query: "SELECT mac, name, ip, fqdn, bmc, vlan, mtu, peers FROM bonds WHERE host_name = ?",
+		Arguments: []interface{}{
+			name,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	tr, err := s.db.QueryOneParameterized(gorqlite.ParameterizedStatement{
+		Query: "SELECT tag FROM tags WHERE host_name = ?",
+		Arguments: []interface{}{
+			name,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	for hr.Next() {
+		var fw string
+		hr.Scan(&host.Name, &host.Provision, &fw, &host.BootImage)
+		host.Firmware = firmware.NewFromString(fw)
+	}
+	for ir.Next() {
+		var iface NetInterface
+		var mac, ip string
+		ir.Scan(&mac, &iface.Name, &ip, &iface.FQDN, &iface.BMC, &iface.VLAN, &iface.MTU)
+		pm, err := net.ParseMAC(mac)
+		if err != nil {
+			log.Errorf("failed to parse MAC: %s", err)
+		}
+		pi, err := netip.ParsePrefix(ip)
+		if err != nil {
+			log.Errorf("failed to parse MAC: %s", err)
+		}
+		iface.MAC = pm
+		iface.IP = pi
+	}
+	for br.Next() {
+		var bond Bond
+		var mac, ip, peers string
+		br.Scan(&mac, &bond.Name, &ip, &bond.FQDN, &bond.BMC, &bond.VLAN, &bond.MTU, &peers)
+		pm, err := net.ParseMAC(mac)
+		if err != nil {
+			log.Errorf("failed to parse MAC: %s", err)
+		}
+		pi, err := netip.ParsePrefix(ip)
+		if err != nil {
+			log.Errorf("failed to parse MAC: %s", err)
+		}
+		bond.MAC = pm
+		bond.IP = pi
+		bond.Peers = strings.Split(peers, ",")
+	}
+	for tr.Next() {
+		var tag, value string
+		tr.Scan(&tag, &value)
+		// TODO: key-val pairs
+		host.Tags = append(host.Tags, tag)
+	}
+
+	log.Debugf("%#v", host)
+
+	log.Debugf("rqlite.LoadHostFromName: loaded host %s", name)
 	return host, nil
 }
 
@@ -322,6 +536,46 @@ func (s *RQLite) LoadHostFromMAC(mac string) (*Host, error) {
 func (s *RQLite) Hosts() (HostList, error) {
 	hosts := make(HostList, 0)
 
+	hr, err := s.db.QueryOne("SELECT name, provision, firmware, boot_image FROM hosts")
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: Is is more efficient to send multiple queries per host vs query it all and sort it in GO?
+	tr, err := s.db.QueryOne("SELECT host_name, tag, value FROM tags")
+	if err != nil {
+		return nil, err
+	}
+
+	var tags map[string][]string
+	for tr.Next() {
+		var hostName, tag, value string
+		err := tr.Scan(&hostName, &tag, &value)
+		if err != nil {
+			tr.Next()
+			log.Errorf("error scanning tags from DB: %s", err)
+		}
+		tags[hostName] = append(tags[hostName], tag)
+	}
+
+	for hr.Next() {
+		var host Host
+		var fw string
+
+		err := hr.Scan(&host.Name, &host.Provision, &fw, &host.BootImage)
+		if err != nil {
+			hr.Next()
+			log.Errorf("error scanning host from DB: %s", err)
+		}
+		host.Firmware = firmware.NewFromString(fw)
+
+		host.Tags = tags[host.Name]
+
+		hosts = append(hosts, &host)
+	}
+
+	log.Debugf("rqlite.Hosts: loaded %d host(s)", hr.NumRows())
+
 	return hosts, nil
 }
 
@@ -329,6 +583,103 @@ func (s *RQLite) Hosts() (HostList, error) {
 func (s *RQLite) FindHosts(ns *nodeset.NodeSet) (HostList, error) {
 	hosts := make(HostList, 0)
 
+	it := ns.Iterator()
+
+	for it.Next() {
+		var host Host
+		hr, err := s.db.QueryOneParameterized(gorqlite.ParameterizedStatement{
+			Query: "SELECT * FROM hosts WHERE name = ?",
+			Arguments: []interface{}{
+				it.Value(),
+			},
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		ir, err := s.db.QueryOneParameterized(gorqlite.ParameterizedStatement{
+			Query: "SELECT mac, name, ip, fqdn, bmc, vlan, mtu FROM interfaces WHERE host_name = ?",
+			Arguments: []interface{}{
+				it.Value(),
+			},
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		br, err := s.db.QueryOneParameterized(gorqlite.ParameterizedStatement{
+			Query: "SELECT mac, name, ip, fqdn, bmc, vlan, mtu, peers FROM bonds WHERE host_name = ?",
+			Arguments: []interface{}{
+				it.Value(),
+			},
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		tr, err := s.db.QueryOneParameterized(gorqlite.ParameterizedStatement{
+			Query: "SELECT tag, value FROM tags WHERE host_name = ?",
+			Arguments: []interface{}{
+				it.Value(),
+			},
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		for hr.Next() {
+			var fw string
+			hr.Scan(&host.Name, &host.Provision, &fw, &host.BootImage)
+			host.Firmware = firmware.NewFromString(fw)
+		}
+		for ir.Next() {
+			var iface NetInterface
+			var mac, ip string
+			ir.Scan(&mac, &iface.Name, &ip, &iface.FQDN, &iface.BMC, &iface.VLAN, &iface.MTU)
+			pm, err := net.ParseMAC(mac)
+			if err != nil {
+				log.Errorf("failed to parse MAC: %s", err)
+			}
+			pi, err := netip.ParsePrefix(ip)
+			if err != nil {
+				log.Errorf("failed to parse MAC: %s", err)
+			}
+			iface.MAC = pm
+			iface.IP = pi
+
+			host.Interfaces = append(host.Interfaces, &iface)
+		}
+		for br.Next() {
+			var bond Bond
+			var mac, ip, peers string
+			br.Scan(&mac, &bond.Name, &ip, &bond.FQDN, &bond.BMC, &bond.VLAN, &bond.MTU, &peers)
+			pm, err := net.ParseMAC(mac)
+			if err != nil {
+				log.Errorf("failed to parse MAC: %s", err)
+			}
+			pi, err := netip.ParsePrefix(ip)
+			if err != nil {
+				log.Errorf("failed to parse MAC: %s", err)
+			}
+			bond.MAC = pm
+			bond.IP = pi
+			bond.Peers = strings.Split(peers, ",")
+
+			host.Bonds = append(host.Bonds, &bond)
+		}
+		for tr.Next() {
+			var tag, value string
+			tr.Scan(&tag, &value)
+			// TODO: key-val pairs
+			host.Tags = append(host.Tags, tag)
+		}
+
+		log.Debugf("%#v", host)
+		hosts = append(hosts, &host)
+
+	}
+
+	log.Debugf("rqlite.FindHosts: loaded host %s", ns.String())
 	return hosts, nil
 }
 
