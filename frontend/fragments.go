@@ -305,7 +305,11 @@ func (h *Handler) floorplanTable(f *fiber.Ctx) error {
 	hosts, _ := h.DB.Hosts()
 	racks := map[string]int{}
 	for _, host := range hosts {
-		rack := strings.Split(host.Name, "-")[1]
+		name := strings.Split(host.Name, "-")
+		if len(name) < 2 {
+			continue
+		}
+		rack := name[1]
 		racks[rack] += 1
 	}
 
