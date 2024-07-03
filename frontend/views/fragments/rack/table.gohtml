@@ -49,13 +49,17 @@
                 </td>
                 <td class="border border-neutral-300 p-0">
                     {{ if not .Hosts }}
-                        <input type="checkbox" name="{{ .U }}::" />
+                        <input id="{{ .U }}:" type="checkbox" name="{{ .U }}::" hx-preserve />
                     {{ else }}
                         {{ $u := .U }}
                         <div class="flex justify-center divide-x-2">
                             {{ range .Hosts }}
                                 <div class="w-full p-1">
-                                    <input type="checkbox" name="{{ $u }}:{{ .Name }}:{{ .HostType }}" />
+                                    <input
+                                        id="{{ $u }}:{{ .Name }}"
+                                        type="checkbox"
+                                        name="{{ $u }}:{{ .Name }}:{{ .HostType }}"
+                                        hx-preserve />
                                 </div>
                             {{ end }}
                         </div>
