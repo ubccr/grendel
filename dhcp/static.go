@@ -81,9 +81,9 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 		token, _ := model.NewBootToken(host.ID.String(), nic.MAC.String())
 		endpoints := model.NewEndpoints(serverIP.String(), token)
 
-		userDataURL := endpoints.UserDataURL()
-		log.Debugf("Proxmox Answer file url: %s", userDataURL)
-		resp.UpdateOption(dhcpv4.Option{Code: dhcpv4.GenericOptionCode(250), Value: dhcpv4.String(userDataURL)})
+		proxmoxURL := endpoints.ProxmoxURL()
+		log.Debugf("Proxmox Answer file url: %s", proxmoxURL)
+		resp.UpdateOption(dhcpv4.Option{Code: dhcpv4.GenericOptionCode(250), Value: dhcpv4.String(proxmoxURL)})
 	}
 
 	if req.ClassIdentifier() == "NVIDIA" || req.ClassIdentifier() == "Mellanox" {

@@ -20,6 +20,7 @@ const (
 	endpointVendorData        = "cloud-init/vendor-data"
 	endpointIgnition          = "pxe-config.ign"
 	endpointProvision         = "provision/"
+	endpointProxmox           = "proxmox"
 )
 
 type Endpoints struct {
@@ -111,4 +112,8 @@ func (e *Endpoints) IgnitionURL() string {
 
 func (e *Endpoints) ProvisionURL(name string) string {
 	return e.provisionURL(endpointProvision + name)
+}
+
+func (e *Endpoints) ProxmoxURL() string {
+	return e.provisionURL(endpointProxmox)
 }
