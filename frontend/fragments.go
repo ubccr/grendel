@@ -35,6 +35,16 @@ func (h *Handler) hostForm(f *fiber.Ctx) error {
 		VLAN string
 		MTU  string
 	}
+	type BondStrings struct {
+		FQDN  string
+		MAC   string
+		IP    string
+		Name  string
+		BMC   string
+		VLAN  string
+		MTU   string
+		Peers []string
+	}
 	Interfaces := make([]IfaceStrings, len(host[0].Interfaces))
 
 	for i, iface := range host[0].Interfaces {
@@ -46,12 +56,25 @@ func (h *Handler) hostForm(f *fiber.Ctx) error {
 		Interfaces[i].VLAN = iface.VLAN
 		Interfaces[i].MTU = strconv.FormatUint(uint64(iface.MTU), 10)
 	}
+	Bonds := make([]BondStrings, len(host[0].Bonds))
+
+	for i, bond := range host[0].Bonds {
+		Bonds[i].FQDN = bond.FQDN
+		Bonds[i].MAC = bond.MAC.String()
+		Bonds[i].IP = bond.IP.String()
+		Bonds[i].Name = bond.Name
+		Bonds[i].BMC = strconv.FormatBool(bond.BMC)
+		Bonds[i].VLAN = bond.VLAN
+		Bonds[i].MTU = strconv.FormatUint(uint64(bond.MTU), 10)
+		Bonds[i].Peers = bond.Peers
+	}
 
 	return f.Render("fragments/host/form", fiber.Map{
 		"Host":       host[0],
 		"BootImages": h.getBootImages(),
 		"Firmwares":  h.getFirmware(),
 		"Interfaces": Interfaces,
+		"Bonds":      Bonds,
 	}, "")
 }
 
@@ -484,6 +507,14 @@ func (h *Handler) interfaces(f *fiber.Ctx) error {
 	id := f.Query("ID", "0")
 
 	return f.Render("fragments/interfaces", fiber.Map{
+		"ID": id,
+	}, "")
+}
+
+func (h *Handler) bonds(f *fiber.Ctx) error {
+	id := f.Query("ID", "0")
+
+	return f.Render("fragments/bonds", fiber.Map{
 		"ID": id,
 	}, "")
 }

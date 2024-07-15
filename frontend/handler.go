@@ -110,6 +110,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	api.Post("/host/import", auth, h.importHost)
 
 	fragment.Get("/interfaces", auth, h.interfaces)
+	fragment.Get("/bonds", auth, h.bonds)
 
 	app.Get("/floorplan", auth, h.Floorplan)
 	fragment.Get("/floorplan/table", auth, h.floorplanTable)

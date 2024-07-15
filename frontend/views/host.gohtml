@@ -13,9 +13,18 @@
         document.getElementById("ifaceID").value++;
         return id;
     }
+    function bondID() {
+        let id = document.getElementById("bondID").value;
+        document.getElementById("bondID").value++;
+        return id;
+    }
     function removeIface(id) {
         let iface = document.getElementById(`interface:${id}`);
         useTransition(() => iface.remove());
+    }
+    function removeBond(id) {
+        let bond = document.getElementById(`bond:${id}`);
+        useTransition(() => bond.remove());
     }
     function moveUp(id) {
         let ifaces = document.getElementById("interfaces").children;
@@ -43,6 +52,32 @@
             }
         }
     }
+    function moveBondUp(id) {
+        let bonds = document.getElementById("bonds").children;
+        for (let i = 0; i < bonds.length; i++) {
+            if (bonds[i].id == `bond:${id}`) {
+                useTransition(() => bonds[i].parentNode.insertBefore(bonds[i], bonds[i - 1]));
+                return;
+            }
+        }
+    }
+    function moveBondDown(id) {
+        let bonds = document.getElementById("bonds").children;
+        for (let i = 0; i < bonds.length; i++) {
+            if (bonds[i].id == `bond:${id}`) {
+                if (i + 2 <= bonds.length) {
+                    useTransition(() => bonds[i].parentNode.insertBefore(bonds[i], bonds[i + 2]));
+                    return;
+                } else if (i + 1 == bonds.length) {
+                    useTransition(() => bonds[i].parentNode.insertBefore(bonds[i], bonds[0]));
+                    return;
+                } else {
+                    useTransition(() => bonds[i].parentNode.append(bonds[i]));
+                    return;
+                }
+            }
+        }
+    }
     function parseForm() {
         let ifaces = document.getElementById("interfaces").children;
         let interfaces = [];
@@ -58,5 +93,22 @@
             interfaces.push(iface);
         }
         return JSON.stringify(interfaces);
+    }
+    function parseFormBonds() {
+        let bonds = document.getElementById("bonds").children;
+        let bondsArr = [];
+        for (let i = 0; i < bonds.length; i++) {
+            let bond = {};
+            bond.Fqdn = bonds[i].querySelector("input[name='Fqdn']").value;
+            bond.Mac = bonds[i].querySelector("input[name='Mac']").value;
+            bond.Ip = bonds[i].querySelector("input[name='Ip']").value;
+            bond.Ifname = bonds[i].querySelector("input[name='Ifname']").value;
+            bond.Bmc = bonds[i].querySelector("select[name='Bmc']").value;
+            bond.Vlan = bonds[i].querySelector("input[name='Vlan']").value;
+            bond.Mtu = bonds[i].querySelector("input[name='Mtu']").value;
+            bond.Peers = bonds[i].querySelector("input[name='Peers']").value;
+            bondsArr.push(bond);
+        }
+        return JSON.stringify(bondsArr);
     }
 </script>
