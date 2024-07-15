@@ -3,6 +3,9 @@ package frontend
 import (
 	"encoding/json"
 	"fmt"
+	"math"
+	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -106,7 +109,7 @@ func (h *Handler) rackTable(f *fiber.Ctx) error {
 	}, "")
 }
 
-func (h *Handler) rackActions(f *fiber.Ctx) error {
+func (h *Handler) actions(f *fiber.Ctx) error {
 	hosts := f.FormValue("hosts")
 	ns, err := nodeset.NewNodeSet(hosts)
 	if err != nil {
@@ -114,7 +117,7 @@ func (h *Handler) rackActions(f *fiber.Ctx) error {
 	}
 
 	nodeset := ns.String()
-	return f.Render("fragments/rack/actions", fiber.Map{
+	return f.Render("fragments/actions", fiber.Map{
 		"Hosts":      nodeset,
 		"BootImages": h.getBootImages(),
 	}, "")
@@ -287,6 +290,136 @@ func (h *Handler) rackAddTable(f *fiber.Ctx) error {
 		"Hosts":      hosts,
 		"Switches":   switchNames,
 		"IfaceCount": ifaceCount,
+	}, "")
+}
+
+func (h *Handler) nodesTable(f *fiber.Ctx) error {
+	hosts, err := h.DB.Hosts()
+	if err != nil {
+		return ToastError(f, err, "Error getting hosts from DB")
+	}
+	qp := f.Queries()
+
+	matches := []string{}
+
+	// Filter Regex:
+	nameRegex, err := regexp.Compile(qp["Name"])
+	if err != nil {
+		return ToastError(f, err, "Invalid Name Regex")
+	}
+	provisionRegex, err := regexp.Compile(qp["Provision"])
+	if err != nil {
+		return ToastError(f, err, "Invalid Boot Image Regex")
+	}
+	firmwareRegex, err := regexp.Compile(qp["Firmware"])
+	if err != nil {
+		return ToastError(f, err, "Invalid Boot Image Regex")
+	}
+	bootImageRegex, err := regexp.Compile(qp["BootImage"])
+	if err != nil {
+		return ToastError(f, err, "Invalid Boot Image Regex")
+	}
+	tagsRegex, err := regexp.Compile(qp["Tags"])
+	if err != nil {
+		return ToastError(f, err, "Invalid Tag Regex")
+	}
+
+	for _, h := range hosts {
+		nameMatch := false
+		provisionMatch := false
+		firmwareMatch := false
+		bootImageMatch := false
+		tagsMatch := false
+
+		if nameRegex.MatchString(h.Name) {
+			nameMatch = true
+		}
+		if provisionRegex.MatchString(strconv.FormatBool(h.Provision)) {
+			provisionMatch = true
+		}
+		if firmwareRegex.MatchString(h.Firmware.String()) {
+			firmwareMatch = true
+		}
+		if bootImageRegex.MatchString(h.BootImage) {
+			bootImageMatch = true
+		}
+		for _, tag := range h.Tags {
+			if tagsRegex.MatchString(tag) {
+				tagsMatch = true
+				break
+			}
+		}
+
+		if nameMatch && provisionMatch && firmwareMatch && bootImageMatch && tagsMatch {
+			matches = append(matches, h.Name)
+		}
+
+	}
+
+	ns, err := nodeset.NewNodeSet(strings.Join(matches, ","))
+	if err != nil {
+		return ToastError(f, err, "Error filtering hosts")
+	}
+	filtered, err := h.DB.FindHosts(ns)
+	if err != nil {
+		return ToastError(f, err, "Error filtering hosts")
+	}
+	sort.Slice(filtered, func(i, j int) bool {
+		o := strings.Compare(filtered[i].Name, filtered[j].Name)
+
+		return o == -1
+	})
+	allHosts, err := filtered.ToNodeSet()
+	if err != nil {
+		return ToastError(f, err, "Error filtering hosts")
+	}
+
+	// Pagination:
+	pageSize, err := strconv.Atoi(qp["PageSize"])
+	if err != nil {
+		return ToastError(f, err, "Error calculating pagination")
+	}
+	filteredLen := len(filtered)
+	numPages := filteredLen / pageSize
+	if math.Remainder(float64(filteredLen), float64(pageSize)) != 0 {
+		numPages++
+	}
+
+	currentPage := 1
+	if qp["CurrentPage"] != "" {
+		currentPage, err = strconv.Atoi(qp["CurrentPage"])
+		if err != nil {
+			return ToastError(f, err, "Error calculating pagination")
+		}
+	}
+
+	start := (currentPage - 1) * pageSize
+
+	if start > filteredLen {
+		start = filteredLen
+	}
+
+	end := start + pageSize
+	if end > filteredLen {
+		end = filteredLen
+	}
+
+	filteredList := filtered[start:end]
+
+	checkAll := false
+	if qp["CheckAll"] == "on" {
+		checkAll = true
+	}
+
+	return f.Render("fragments/nodes/table", fiber.Map{
+		"Hosts":    filteredList,
+		"AllHosts": allHosts,
+		"CheckAll": checkAll,
+		"Pagination": fiber.Map{
+			"CurrentPage": currentPage,
+			"PageSize":    pageSize,
+			"NumPages":    numPages,
+		},
 	}, "")
 }
 

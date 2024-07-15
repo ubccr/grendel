@@ -41,6 +41,12 @@
                                 hx-boost="true">
                                 Floorplan
                             </a>
+                            <a
+                                class="{{ $linkClasses }} {{ if eq .CurrentPath "/nodes" }}bg-neutral-100{{ end }}"
+                                href="/nodes"
+                                hx-boost="true">
+                                Nodes
+                            </a>
                             {{ if eq .Auth.Role "admin" }}
                                 <a
                                     class="{{ $linkClasses }} {{ if eq .CurrentPath "/users" }}
@@ -79,6 +85,12 @@
                         href="/floorplan"
                         hx-boost="true">
                         Floorplan
+                    </a>
+                    <a
+                        class="{{ $linkClasses }} {{ if eq .CurrentPath "/nodes" }}bg-neutral-100{{ end }} block"
+                        href="/nodes"
+                        hx-boost="true">
+                        Nodes
                     </a>
                     {{ if eq .Auth.Role "admin" }}
                         <a

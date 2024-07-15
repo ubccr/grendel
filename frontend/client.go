@@ -38,6 +38,12 @@ func (h *Handler) Rack(f *fiber.Ctx) error {
 	})
 }
 
+func (h *Handler) nodes(f *fiber.Ctx) error {
+	return f.Render("nodes", fiber.Map{
+		"Title": "Grendel - Nodes",
+	})
+}
+
 func (h *Handler) Host(f *fiber.Ctx) error {
 	host := f.Params("host")
 	return f.Render("host", fiber.Map{
