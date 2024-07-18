@@ -10,7 +10,7 @@ import (
 )
 
 func BenchmarkRqliteWriteHosts(b *testing.B) {
-	store, err := model.NewRqliteStore("http://localhost:4001")
+	store, err := model.NewGORMStore("sqlite", ":memory:", "")
 	if err != nil {
 		b.Fatal(err)
 	}
@@ -33,11 +33,11 @@ func BenchmarkRqliteWriteHosts(b *testing.B) {
 }
 
 func BenchmarkRqliteWriteSingleHost(b *testing.B) {
-	store, err := model.NewRqliteStore("http://localhost:4001")
-	defer store.Close()
+	store, err := model.NewGORMStore("sqlite", ":memory:", "")
 	if err != nil {
 		b.Fatal(err)
 	}
+	defer store.Close()
 
 	size := 5000
 	hosts := make(model.HostList, size)
@@ -57,8 +57,7 @@ func BenchmarkRqliteWriteSingleHost(b *testing.B) {
 }
 
 func BenchmarkRqliteReadAll(b *testing.B) {
-	store, err := model.NewRqliteStore("http://localhost:4001")
-	defer store.DeleteHosts()
+	store, err := model.NewGORMStore("sqlite", ":memory:", "")
 	if err != nil {
 		b.Fatal(err)
 	}

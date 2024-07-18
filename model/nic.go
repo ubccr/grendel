@@ -40,9 +40,9 @@ type Subnet struct {
 type NetInterface struct {
 	HostID ksuid.KSUID
 	ID     uint16           `gorm:"primaryKey"`
-	MAC    net.HardwareAddr `json:"mac" validate:"required"`
+	MAC    net.HardwareAddr `json:"mac" validate:"required" gorm:"serializer:MACSerializer"`
 	Name   string           `json:"ifname"`
-	IP     netip.Prefix     `json:"ip" gorm:"serializer:json"`
+	IP     netip.Prefix     `json:"ip" gorm:"serializer:IPPrefixSerializer"`
 	FQDN   string           `json:"fqdn"`
 	BMC    bool             `json:"bmc"`
 	VLAN   string           `json:"vlan"`

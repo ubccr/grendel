@@ -25,6 +25,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jafurlan/rqlite"
+	_ "github.com/rqlite/gorqlite/stdlib"
 	"github.com/segmentio/ksuid"
 	"github.com/ubccr/grendel/nodeset"
 	"github.com/ubccr/grendel/util"
@@ -32,52 +34,55 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"gorm.io/gorm/schema"
 )
 
-// RQLite implements a Grendel Datastore using BuntDB
-type RQLite struct {
+// GORM implements a Grendel Datastore using BuntDB
+type GORM struct {
 	sqldb *sql.DB
 	db    *gorm.DB
 }
 
-// NewRQLite returns a new RQLite using the given database address.
-func NewRqliteStore(addr string) (*RQLite, error) {
-	db, err := gorm.Open(
-		// sqlite.New(
-		// 	sqlite.Config{
-		// 		DriverName: "rqlite",
-		// 		DSN:        addr,
-		// 	},
-		// ),
-		sqlite.Open("./grendel-gorm.db"),
-		&gorm.Config{},
-	)
+// NewGORMStore returns a new GORM using the given database address.
+func NewGORMStore(dbType, path, addr string) (*GORM, error) {
+	var conn gorm.Dialector
+
+	switch dbType {
+	case "sqlite":
+		conn = sqlite.Open(path)
+	case "rqlite":
+		conn = rqlite.Open(addr)
+	}
+
+	db, err := gorm.Open(conn, &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
+
 	sqldb, err := db.DB()
 	if err != nil {
 		return nil, err
 	}
 
-	err = db.AutoMigrate(&User{}, &Host{}, &NetInterface{}, &BootImage{})
-	if err != nil {
+	schema.RegisterSerializer("MACSerializer", &MACSerializer{})
+	schema.RegisterSerializer("IPPrefixSerializer", &IPPrefixSerializer{})
+
+	if err = db.AutoMigrate(&User{}, &Host{}, &NetInterface{}, &BootImage{}, &Bond{}); err != nil {
 		return nil, err
 	}
-
-	return &RQLite{
+	return &GORM{
 		sqldb: sqldb,
 		db:    db,
 	}, nil
 }
 
-// Close closes the RQLite database
-func (s *RQLite) Close() error {
+// Close closes the GORM database
+func (s *GORM) Close() error {
 	return s.sqldb.Close()
 }
 
 // StoreUser stores the User in the data store
-func (s *RQLite) StoreUser(username, password string) error {
+func (s *GORM) StoreUser(username, password string) error {
 	role := "disabled"
 
 	// Set role to admin if this is the first user
@@ -91,40 +96,40 @@ func (s *RQLite) StoreUser(username, password string) error {
 	u := User{
 		Username:   username,
 		Role:       role,
-		Hash:       hashed,
+		Hash:       string(hashed),
 		ModifiedAt: time.Now(),
 	}
 	err := s.db.Create(&u).Error
 
-	log.Debugf("rqlite.StoreUser: inserting '%s' user", username)
+	log.Debugf("GORM.StoreUser: inserting '%s' user", username)
 	return err
 }
 
 // VerifyUser checks if the given username exists in the data store
-func (s *RQLite) VerifyUser(username, password string) (bool, string, error) {
+func (s *GORM) VerifyUser(username, password string) (bool, string, error) {
 	var u User
 	if err := s.db.Where("username = ?", username).First(&u).Error; err != nil {
 		return false, "", err
 	}
 
-	log.Debugf("rqlite.VerifyUser: queried user: %s", username)
-	err := bcrypt.CompareHashAndPassword(u.Hash, []byte(password))
+	log.Debugf("GORM.VerifyUser: queried user: %s", username)
+	err := bcrypt.CompareHashAndPassword([]byte(u.Hash), []byte(password))
 
 	return true, u.Role, err
 }
 
 // GetUsers returns a list of all the usernames
-func (s *RQLite) GetUsers() ([]User, error) {
+func (s *GORM) GetUsers() ([]User, error) {
 	var users []User
 
 	err := s.db.Find(&users).Error
 
-	log.Debugf("rqlite.GetUsers: queried %d user(s)", len(users))
+	log.Debugf("GORM.GetUsers: queried %d user(s)", len(users))
 	return users, err
 }
 
 // UpdateUser updates the role of the given users
-func (s *RQLite) UpdateUser(username, role string) error {
+func (s *GORM) UpdateUser(username, role string) error {
 	var u User
 
 	if err := s.db.Where(&User{Username: username}).First(&u).Error; err != nil {
@@ -134,56 +139,56 @@ func (s *RQLite) UpdateUser(username, role string) error {
 	u.Role = role
 	err := s.db.Save(&u).Error
 
-	log.Debugf("rqlite.UpdateUser: updated user: %s role", username)
+	log.Debugf("GORM.UpdateUser: updated user: %s role", username)
 	return err
 }
 
 // DeleteUser deletes the given user
-func (s *RQLite) DeleteUser(username string) error {
+func (s *GORM) DeleteUser(username string) error {
 	var u User
 	err := s.db.Where(&User{Username: username}, username).Find(&u).Delete(&u).Error
 
-	log.Debugf("rqlite.DeleteUser: deleting %s user", username)
+	log.Debugf("GORM.DeleteUser: deleting %s user", username)
 	return err
 }
 
 // StoreHost stores a host in the data store. If the host exists it is overwritten
-func (s *RQLite) StoreHost(host *Host) error {
+func (s *GORM) StoreHost(host *Host) error {
 	hostList := HostList{host}
 	return s.StoreHosts(hostList)
 }
 
 // StoreHosts stores a list of host in the data store. If the host exists it is overwritten
-func (s *RQLite) StoreHosts(hosts HostList) error {
+func (s *GORM) StoreHosts(hosts HostList) error {
 	err := s.db.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "name"}},
 		UpdateAll: true,
 	}).Create(&hosts).Error
 
-	log.Debugf("rqlite.StoreHosts: stored %d host(s)", len(hosts))
+	log.Debugf("GORM.StoreHosts: stored %d host(s)", len(hosts))
 	return err
 }
 
 // DeleteHosts deletes all hosts in the given nodeset.NodeSet from the data store.
-func (s *RQLite) DeleteHosts(ns *nodeset.NodeSet) error {
+func (s *GORM) DeleteHosts(ns *nodeset.NodeSet) error {
 	it := ns.Iterator()
 	err := s.db.Delete(&Host{Name: it.Value()}).Error
 
-	log.Debugf("rqlite.DeleteHosts: deleted %d host(s)", ns.Len())
+	log.Debugf("GORM.DeleteHosts: deleted %d host(s)", ns.Len())
 	return err
 }
 
 // LoadHostFromName returns the Host with the given name
-func (s *RQLite) LoadHostFromName(name string) (*Host, error) {
+func (s *GORM) LoadHostFromName(name string) (*Host, error) {
 	var host *Host
 	err := s.db.Where(&Host{Name: name}).Find(&host).Error
 
-	log.Debugf("rqlite.LoadHostFromName: loaded host %s", name)
+	log.Debugf("GORM.LoadHostFromName: loaded host %s", name)
 	return host, err
 }
 
 // LoadHostFromID returns the Host with the given ID
-func (s *RQLite) LoadHostFromID(id string) (*Host, error) {
+func (s *GORM) LoadHostFromID(id string) (*Host, error) {
 	kid, err := ksuid.Parse(id)
 	if err != nil {
 		return nil, err
@@ -192,13 +197,13 @@ func (s *RQLite) LoadHostFromID(id string) (*Host, error) {
 	var host *Host
 	err = s.db.Where(&Host{ID: kid}).First(&host).Error
 
-	log.Debugf("rqlite.LoadHostFromName: loaded host %s", host.Name)
+	log.Debugf("GORM.LoadHostFromName: loaded host %s", host.Name)
 
 	return host, err
 }
 
 // ResolveIPv4 returns the list of IPv4 addresses with the given FQDN
-func (s *RQLite) ResolveIPv4(fqdn string) ([]net.IP, error) {
+func (s *GORM) ResolveIPv4(fqdn string) ([]net.IP, error) {
 	var hosts HostList
 	fqdn = util.Normalize(fqdn) // TODO: ???
 	ips := make([]net.IP, 0)
@@ -218,7 +223,7 @@ func (s *RQLite) ResolveIPv4(fqdn string) ([]net.IP, error) {
 }
 
 // ReverseResolve returns the list of FQDNs for the given IP
-func (s *RQLite) ReverseResolve(ip string) ([]string, error) {
+func (s *GORM) ReverseResolve(ip string) ([]string, error) {
 	var hosts HostList
 	fqdns := make([]string, 0)
 	prefix, err := netip.ParsePrefix(ip)
@@ -238,7 +243,7 @@ func (s *RQLite) ReverseResolve(ip string) ([]string, error) {
 }
 
 // LoadHostFromMAC returns the Host that has a network interface with the give MAC address
-func (s *RQLite) LoadHostFromMAC(macStr string) (*Host, error) {
+func (s *GORM) LoadHostFromMAC(macStr string) (*Host, error) {
 	var host *Host
 
 	mac, err := net.ParseMAC(macStr)
@@ -251,34 +256,34 @@ func (s *RQLite) LoadHostFromMAC(macStr string) (*Host, error) {
 }
 
 // Hosts returns a list of all the hosts
-func (s *RQLite) Hosts() (HostList, error) {
+func (s *GORM) Hosts() (HostList, error) {
 	var hosts HostList
-	err := s.db.Find(&hosts).Error
+	err := s.db.Preload("Interfaces").Preload("Bonds").Find(&hosts).Error
 
-	log.Debugf("rqlite.Hosts: loaded %d host(s)", len(hosts))
+	log.Debugf("GORM.Hosts: loaded %d host(s)", len(hosts))
 
 	return hosts, err
 }
 
 // FindHosts returns a list of all the hosts in the given NodeSet
-func (s *RQLite) FindHosts(ns *nodeset.NodeSet) (HostList, error) {
+func (s *GORM) FindHosts(ns *nodeset.NodeSet) (HostList, error) {
 	hosts := make(HostList, 0)
 	it := ns.Iterator()
 
 	for it.Next() {
 		var h Host
-		err := s.db.Preload("Interfaces").Where(&Host{Name: it.Value()}).Find(&h).Error
+		err := s.db.Preload("Interfaces").Preload("Bonds").Where(&Host{Name: it.Value()}).Find(&h).Error
 		if err != nil {
 			log.Error(err)
 		}
 		hosts = append(hosts, &h)
 	}
-	log.Debugf("rqlite.FindHosts: loaded host %s", ns.String())
+	log.Debugf("GORM.FindHosts: loaded host %s", ns.String())
 	return hosts, nil
 }
 
 // FindTags returns a nodeset.NodeSet of all the hosts with the given tags
-func (s *RQLite) FindTags(tags []string) (*nodeset.NodeSet, error) {
+func (s *GORM) FindTags(tags []string) (*nodeset.NodeSet, error) {
 	nodes := []string{}
 	var hosts HostList
 
@@ -309,7 +314,7 @@ func (s *RQLite) FindTags(tags []string) (*nodeset.NodeSet, error) {
 }
 
 // MatchTags returns a nodeset.NodeSet of all the hosts with the all given tags
-func (s *RQLite) MatchTags(tags []string) (*nodeset.NodeSet, error) {
+func (s *GORM) MatchTags(tags []string) (*nodeset.NodeSet, error) {
 	var hosts HostList
 
 	err := s.db.Where(&Host{Tags: tags}).Find(&hosts).Error
@@ -321,7 +326,7 @@ func (s *RQLite) MatchTags(tags []string) (*nodeset.NodeSet, error) {
 }
 
 // ProvisionHosts sets all hosts in the given NodeSet to provision (true) or unprovision (false)
-func (s *RQLite) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
+func (s *GORM) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
 	it := ns.Iterator()
 
 	for it.Next() {
@@ -334,7 +339,7 @@ func (s *RQLite) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
 }
 
 // TagHosts adds tags to all hosts in the given NodeSet
-func (s *RQLite) TagHosts(ns *nodeset.NodeSet, tags []string) error {
+func (s *GORM) TagHosts(ns *nodeset.NodeSet, tags []string) error {
 	it := ns.Iterator()
 
 	for it.Next() {
@@ -348,7 +353,7 @@ func (s *RQLite) TagHosts(ns *nodeset.NodeSet, tags []string) error {
 }
 
 // UntagHosts removes tags from all hosts in the given NodeSet
-func (s *RQLite) UntagHosts(ns *nodeset.NodeSet, tags []string) error {
+func (s *GORM) UntagHosts(ns *nodeset.NodeSet, tags []string) error {
 	it := ns.Iterator()
 
 	removeTags := make(map[string]struct{})
@@ -377,7 +382,7 @@ func (s *RQLite) UntagHosts(ns *nodeset.NodeSet, tags []string) error {
 }
 
 // SetBootImage sets all hosts to use the BootImage with the given name
-func (s *RQLite) SetBootImage(ns *nodeset.NodeSet, name string) error {
+func (s *GORM) SetBootImage(ns *nodeset.NodeSet, name string) error {
 	it := ns.Iterator()
 
 	for it.Next() {
@@ -391,13 +396,13 @@ func (s *RQLite) SetBootImage(ns *nodeset.NodeSet, name string) error {
 }
 
 // StoreBootImage stores a boot image in the data store. If the boot image exists it is overwritten
-func (s *RQLite) StoreBootImage(image *BootImage) error {
+func (s *GORM) StoreBootImage(image *BootImage) error {
 	imageList := BootImageList{image}
 	return s.StoreBootImages(imageList)
 }
 
 // StoreBootImages stores a list of boot images in the data store. If the boot image exists it is overwritten
-func (s *RQLite) StoreBootImages(images BootImageList) error {
+func (s *GORM) StoreBootImages(images BootImageList) error {
 	// TODO: this is not specific to the DB and should be done outside of it
 	for idx, image := range images {
 		if image.Name == "" {
@@ -423,19 +428,19 @@ func (s *RQLite) StoreBootImages(images BootImageList) error {
 		UpdateAll: true,
 	}).Create(&images).Error
 
-	log.Debugf("rqlite.StoreBootImages: stored %d image(s)", len(images))
+	log.Debugf("GORM.StoreBootImages: stored %d image(s)", len(images))
 	return err
 }
 
 // DeleteBootImages deletes boot images from the data store.
-func (s *RQLite) DeleteBootImages(names []string) error {
+func (s *GORM) DeleteBootImages(names []string) error {
 	// TODO: soft delete??
 	err := s.db.Delete("name IN ?", names).Error
 	return err
 }
 
 // LoadBootImage returns a BootImage with the given name
-func (s *RQLite) LoadBootImage(name string) (*BootImage, error) {
+func (s *GORM) LoadBootImage(name string) (*BootImage, error) {
 	var image *BootImage
 
 	err := s.db.Where(&BootImage{Name: name}).First(&image).Error
@@ -444,7 +449,7 @@ func (s *RQLite) LoadBootImage(name string) (*BootImage, error) {
 }
 
 // BootImages returns a list of all boot images
-func (s *RQLite) BootImages() (BootImageList, error) {
+func (s *GORM) BootImages() (BootImageList, error) {
 	var images BootImageList
 
 	err := s.db.Find(&images).Error
