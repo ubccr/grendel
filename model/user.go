@@ -10,7 +10,7 @@ type User struct {
 	gorm.Model
 	Username   string
 	Role       string
-	Hash       []byte
+	Hash       string
 	CreatedAt  time.Time
 	ModifiedAt time.Time
 }
