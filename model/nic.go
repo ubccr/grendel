@@ -25,6 +25,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/segmentio/ksuid"
 	"github.com/spf13/viper"
 	"go4.org/netipx"
 )
@@ -37,13 +38,15 @@ type Subnet struct {
 }
 
 type NetInterface struct {
-	MAC  net.HardwareAddr `json:"mac" validate:"required"`
-	Name string           `json:"ifname"`
-	IP   netip.Prefix     `json:"ip"`
-	FQDN string           `json:"fqdn"`
-	BMC  bool             `json:"bmc"`
-	VLAN string           `json:"vlan"`
-	MTU  uint16           `json:"mtu,omitempty"`
+	HostID ksuid.KSUID
+	ID     uint16           `gorm:"primaryKey"`
+	MAC    net.HardwareAddr `json:"mac" validate:"required"`
+	Name   string           `json:"ifname"`
+	IP     netip.Prefix     `json:"ip" gorm:"serializer:json"`
+	FQDN   string           `json:"fqdn"`
+	BMC    bool             `json:"bmc"`
+	VLAN   string           `json:"vlan"`
+	MTU    uint16           `json:"mtu,omitempty"`
 }
 
 func (n *NetInterface) MarshalJSON() ([]byte, error) {

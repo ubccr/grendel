@@ -16,11 +16,16 @@
 
 package model
 
-import "encoding/json"
+import (
+	"encoding/json"
+
+	"github.com/segmentio/ksuid"
+)
 
 type Bond struct {
+	HostID ksuid.KSUID
 	NetInterface
-	Peers []string `json:"peers"`
+	Peers []string `json:"peers" gorm:"serializer:json"`
 }
 
 func (b *Bond) MarshalJSON() ([]byte, error) {

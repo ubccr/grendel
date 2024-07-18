@@ -41,6 +41,7 @@ require (
 	golang.org/x/net v0.21.0
 	golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783
 	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637
+	gorm.io/gorm v1.25.11
 )
 
 require (
@@ -48,9 +49,10 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/gofiber/template v1.8.2 // indirect
 	github.com/gofiber/utils v1.1.0 // indirect
-	github.com/mattn/go-sqlite3 v1.14.17 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/redis/go-redis/v9 v9.0.2 // indirect
-	github.com/rqlite/gorqlite v0.0.0-20240227123050-397b03f02418 // indirect
 )
 
 require (
@@ -119,4 +121,5 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	gorm.io/driver/sqlite v1.5.6
 )
