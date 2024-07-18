@@ -18,7 +18,9 @@
 package firmware
 
 import (
+	"database/sql/driver"
 	_ "embed"
+	"errors"
 	"fmt"
 
 	"github.com/insomniacslk/dhcp/iana"
@@ -138,4 +140,21 @@ func DetectBuild(archs iana.Archs, userClass string) (Build, error) {
 	}
 
 	return build, nil
+}
+
+func (b Build) Value() (driver.Value, error) {
+	return b.String(), nil
+}
+
+func (b *Build) Scan(src interface{}) error {
+	var source string
+	switch src.(type) {
+	case string:
+		source = src.(string)
+	default:
+		return errors.New("Incompatible type for Firmware")
+	}
+
+	*b = NewFromString(source)
+	return nil
 }

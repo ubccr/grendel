@@ -6,11 +6,12 @@
 # General
 #------------------------------------------------------------------------------
 
-#
-# Path database file. Defaults to ":memory:" which uses in-memory store. Change
-# this to a filepath for persisent storage.
-#
+# Valid database types: sqlite, rqlite, buntdb
+dbtype = "sqlite"
+# Path to database file. Used for sqlite, buntdb database types. :memory: can be used for a non-peristant in memory only database
 dbpath = ":memory:"
+# Connection address to database. Used for rqlite database type. http://localhost:4001 is the default address
+dbaddr = ""
 
 #
 # By default, all loggers are on. You can turn off logging for specific

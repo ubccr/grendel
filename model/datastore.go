@@ -124,6 +124,25 @@ type DataStore interface {
 	Close() error
 }
 
-func NewDataStore(path string) (DataStore, error) {
-	return NewBuntStore(path)
+func NewDataStore(dbType string, path string, addr string) (DataStore, error) {
+	var db DataStore
+	var err error
+
+	log.Infof("Using Database: %s", dbType)
+
+	switch dbType {
+	case "buntdb":
+		log.Infof("BuntDB path: %s", path)
+		db, err = NewBuntStore(path)
+	case "sqlite":
+		log.Infof("%s path: %s", dbType, path)
+		db, err = NewGORMStore(dbType, path, addr)
+	case "rqlite":
+		log.Infof("%s address: %s", dbType, addr)
+		db, err = NewGORMStore(dbType, path, addr)
+	default:
+		log.Errorf("specified database type: %s does not match any availible types", dbType)
+	}
+
+	return db, err
 }

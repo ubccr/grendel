@@ -156,12 +156,12 @@ func (s *BuntStore) VerifyUser(username, password string) (bool, string, error) 
 	return true, dbVal.Role, nil
 }
 
-type User struct {
-	Username   string
-	Role       string
-	CreatedAt  time.Time
-	ModifiedAt time.Time
-}
+// type User struct {
+// 	Username   string    `db:"username"`
+// 	Role       string    `db:"role"`
+// 	CreatedAt  time.Time `db:"created_at"`
+// 	ModifiedAt time.Time `db:"modified_at"`
+// }
 
 // GetUsers returns a list of all the usernames
 func (s *BuntStore) GetUsers() ([]User, error) {

@@ -32,14 +32,14 @@ import (
 )
 
 type Host struct {
-	ID         ksuid.KSUID     `json:"id,omitempty"`
-	Name       string          `json:"name" validate:"required,hostname"`
-	Interfaces []*NetInterface `json:"interfaces"`
-	Bonds      []*Bond         `json:"bonds"`
-	Provision  bool            `json:"provision"`
+	ID         ksuid.KSUID     `json:"id,omitempty" gorm:"primaryKey"`
+	Name       string          `json:"name" validate:"required,hostname" gorm:"unique"`
+	Interfaces []*NetInterface `json:"interfaces" gorm:"foreignKey:HostID"`
+	Bonds      []*Bond         `json:"bonds" gorm:"foreignKey:HostID"`
+	Provision  bool            `json:"provision" gorm:"type:text"`
 	Firmware   firmware.Build  `json:"firmware"`
 	BootImage  string          `json:"boot_image"`
-	Tags       []string        `json:"tags"`
+	Tags       []string        `json:"tags" gorm:"serializer:json"`
 }
 
 func (h *Host) HostType() string {
