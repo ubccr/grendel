@@ -40,6 +40,22 @@ type BootImage struct {
 	Butane             string            `json:"butane"`
 }
 
+// TODO:
+// type ProvisionTemplate struct {
+// 	gorm.Model
+// 	Path string // fs path
+// 	Name string
+// 	Type ProvisionTemplateType
+// }
+
+// type ProvisionTemplateType struct {
+// 	gorm.Model
+// 	Name       string
+// 	URLPath    string // provision handler
+// 	OptionCode int    // nullable?
+// 	ZTP        bool
+// }
+
 func NewBootImageList() BootImageList {
 	return make(BootImageList, 0)
 }
