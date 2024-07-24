@@ -69,6 +69,23 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 		resp.UpdateOption(dhcpv4.Option{Code: dhcpv4.GenericOptionCode(240), Value: dhcpv4.String(provisionURL)})
 	}
 
+	if host.HasTags("proxmox") {
+		// Proxmox Automated Installation
+		// See: https://pve.proxmox.com/wiki/Automated_Installation
+
+		log.WithFields(logrus.Fields{
+			"ip":   nic.AddrString(),
+			"name": host.Name,
+		}).Info("Host tagged with proxmox. Setting automated install answer file url")
+
+		token, _ := model.NewBootToken(host.ID.String(), nic.MAC.String())
+		endpoints := model.NewEndpoints(serverIP.String(), token)
+
+		proxmoxURL := endpoints.ProxmoxURL()
+		log.Debugf("Proxmox Answer file url: %s", proxmoxURL)
+		resp.UpdateOption(dhcpv4.Option{Code: dhcpv4.GenericOptionCode(250), Value: dhcpv4.String(proxmoxURL)})
+	}
+
 	if req.ClassIdentifier() == "NVIDIA" || req.ClassIdentifier() == "Mellanox" {
 		// MLNXOS ZTP
 		// See: https://docs.nvidia.com/networking/display/MLNXOSv3103100/Getting+Started#heading-Zero-touchProvisioning
