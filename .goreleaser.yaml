@@ -1,18 +1,22 @@
 # Grendel goreleaser configs
 # See here: https://goreleaser.com
-
-version: 1
-
 before:
   hooks:
     - go mod tidy
 builds:
-  - goarch:
+  - env:
+      - CGO_ENABLED=1
+    goarch:
       - amd64
     goos:
       - linux
     ldflags:
       - -s -w -X github.com/ubccr/grendel/api.Version={{.Version}}
+      - -extldflags=-static
+    tags:
+      - sqlite_omit_load_extension
+      - osusergo
+      - netgo
 archives:
   - format: tar.gz
     wrap_in_directory: true
