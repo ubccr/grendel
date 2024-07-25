@@ -141,6 +141,8 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 
 	fragment.Get("/events", auth, h.events)
 
+	app.Get("/status", h.status)
+
 	api.Post("/bmc/powerCycle", auth, h.bmcPowerCycle)
 	api.Post("/bmc/powerCycleBmc", auth, h.bmcPowerCycleBmc)
 	api.Post("/bmc/clearSel", auth, h.bmcClearSel)

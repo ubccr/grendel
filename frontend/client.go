@@ -2,8 +2,10 @@ package frontend
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/ubccr/grendel/api"
 )
 
 func (h *Handler) Index(f *fiber.Ctx) error {
@@ -55,5 +57,28 @@ func (h *Handler) Host(f *fiber.Ctx) error {
 func (h *Handler) Users(f *fiber.Ctx) error {
 	return f.Render("users", fiber.Map{
 		"Title": "Grendel - Users",
+	})
+}
+
+func (h *Handler) status(f *fiber.Ctx) error {
+	hosts, err := h.DB.Hosts()
+	if err != nil {
+		return err
+	}
+	b, err := h.DB.BootImages()
+	if err != nil {
+		return err
+	}
+	hostName, err := os.Hostname()
+	if err != nil {
+		return err
+	}
+
+	return f.Render("status", fiber.Map{
+		"Title":      "Grendel - Status",
+		"HostName":   hostName,
+		"Version":    api.Version,
+		"Hosts":      len(hosts),
+		"BootImages": len(b),
 	})
 }
