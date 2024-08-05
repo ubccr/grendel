@@ -1,5 +1,17 @@
 # Grendel Changelog
 
+## [0.0.12] - 2024-08-05
+
+- Update echo, fiber deps
+- Fix provision - tftp segfault when starting with bind port permission error
+- Feat: provision - added "proxmox" tag DHCP 250 response code for Proxmox Automated Installs
+- Fix: frontend - segfault when non nodeset hostname is added
+- Fix: frontend - rack selection checkboxes not preserving state after submitting an action
+- Fix: frontend - sqlite session storage
+- Feat: fronend - added Nodes page
+- Feat: frontend - added Bond support in Host page
+- Feat: frontend - added status page
+
 ## [0.0.11] - 2024-02-27
 
 - Add prometheus service discovery.
@@ -130,4 +142,5 @@
 [0.0.9]: https://github.com/ubccr/grendel/releases/tag/v0.0.9
 [0.0.10]: https://github.com/ubccr/grendel/releases/tag/v0.0.10
 [0.0.11]: https://github.com/ubccr/grendel/releases/tag/v0.0.11
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.11...HEAD
+[0.0.12]: https://github.com/ubccr/grendel/releases/tag/v0.0.12
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.12...HEAD
