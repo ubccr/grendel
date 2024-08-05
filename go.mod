@@ -18,8 +18,8 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.6.6
 	github.com/insomniacslk/dhcp v0.0.0-20200922210017-67c425063dca
 	github.com/korovkin/limiter v0.0.0-20190919045942-dac5a6b2a536
-	github.com/labstack/echo/v4 v4.10.1
-	github.com/labstack/gommon v0.4.0
+	github.com/labstack/echo/v4 v4.12.0
+	github.com/labstack/gommon v0.4.2
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b
 	github.com/miekg/dns v1.1.50
 	github.com/mitchellh/go-homedir v1.1.0
@@ -37,8 +37,8 @@ require (
 	github.com/tidwall/sjson v1.2.5
 	github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb
 	go4.org/netipx v0.0.0-20230125063823-8449b0a6169f
-	golang.org/x/crypto v0.24.0
-	golang.org/x/net v0.26.0
+	golang.org/x/crypto v0.25.0
+	golang.org/x/net v0.27.0
 	golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783
 	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637
 )
@@ -110,9 +110,9 @@ require (
 	github.com/vincent-petithory/dataurl v1.0.0 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect
-	golang.org/x/term v0.21.0 // indirect
+	golang.org/x/term v0.22.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
-	golang.org/x/time v0.3.0 // indirect
+	golang.org/x/time v0.5.0 // indirect
 	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
