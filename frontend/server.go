@@ -133,6 +133,11 @@ func (s *Server) Serve() error {
 			}
 			return Items
 		},
+		"StrAdd": func(x, y string) int {
+			a, _ := strconv.Atoi(x)
+			b, _ := strconv.Atoi(y)
+			return a + b
+		},
 	}
 
 	views, err := fs.Sub(staticFS, "views")

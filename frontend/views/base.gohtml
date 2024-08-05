@@ -41,6 +41,12 @@
                                 hx-boost="true">
                                 Floorplan
                             </a>
+                            <a
+                                class="{{ $linkClasses }} {{ if eq .CurrentPath "/nodes" }}bg-neutral-100{{ end }}"
+                                href="/nodes"
+                                hx-boost="true">
+                                Nodes
+                            </a>
                             {{ if eq .Auth.Role "admin" }}
                                 <a
                                     class="{{ $linkClasses }} {{ if eq .CurrentPath "/users" }}
@@ -55,7 +61,7 @@
                     </div>
                     <div class="my-auto flex gap-4">
                         {{ if eq .Auth.User nil }}
-                            <a href="/login" id="login" hx-boost="true">Login</a>
+                            <a class="{{ $linkClasses }} my-auto" href="/login" id="login" hx-boost="true">Login</a>
                         {{ else }}
                             <div class="mx-1 hidden sm:flex">
                                 {{ template "navSearch" .SearchList }}
@@ -64,6 +70,9 @@
                                 Logout
                             </button>
                         {{ end }}
+                        <a href="/status" hx-boost="true" class="{{ $linkClasses }} hidden sm:block">
+                            {{ template "icon-information-circle" }}
+                        </a>
                     </div>
                 </div>
                 <div id="mobile-menu" class="ml-2 mt-2 space-y-1 sm:hidden" hidden>
@@ -80,6 +89,12 @@
                         hx-boost="true">
                         Floorplan
                     </a>
+                    <a
+                        class="{{ $linkClasses }} {{ if eq .CurrentPath "/nodes" }}bg-neutral-100{{ end }} block"
+                        href="/nodes"
+                        hx-boost="true">
+                        Nodes
+                    </a>
                     {{ if eq .Auth.Role "admin" }}
                         <a
                             class="{{ $linkClasses }} {{ if eq .CurrentPath "/users" }}bg-neutral-100{{ end }} block"
@@ -88,6 +103,12 @@
                             Users
                         </a>
                     {{ end }}
+                    <a
+                        class="{{ $linkClasses }} {{ if eq .CurrentPath "/status" }}bg-neutral-100{{ end }} block"
+                        href="/status"
+                        hx-boost="true">
+                        Status
+                    </a>
                 </div>
             </nav>
             <div class="flex justify-center px-2 py-4 text-center">

@@ -110,6 +110,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	api.Post("/host/import", auth, h.importHost)
 
 	fragment.Get("/interfaces", auth, h.interfaces)
+	fragment.Get("/bonds", auth, h.bonds)
 
 	app.Get("/floorplan", auth, h.Floorplan)
 	fragment.Get("/floorplan/table", auth, h.floorplanTable)
@@ -117,10 +118,13 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 
 	app.Get("/rack/:rack", auth, h.Rack)
 	fragment.Get("/rack/:rack/table", auth, h.rackTable)
-	fragment.Get("/rack/:rack/actions", auth, h.rackActions)
 	fragment.Get("/rack/:rack/add/modal", auth, h.rackAddModal)
 	fragment.Post("/rack/:rack/add/table", auth, h.rackAddTable)
 
+	app.Get("/nodes", auth, h.nodes)
+	fragment.Get("/nodes", auth, h.nodesTable)
+
+	fragment.Put("/actions", auth, h.actions)
 	api.Post("/bulkHostAdd", auth, h.bulkHostAdd)
 
 	api.Patch("/hosts/provision", auth, h.provisionHosts)
@@ -136,6 +140,8 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	api.Get("/search", auth, h.Search)
 
 	fragment.Get("/events", auth, h.events)
+
+	app.Get("/status", h.status)
 
 	api.Post("/bmc/powerCycle", auth, h.bmcPowerCycle)
 	api.Post("/bmc/powerCycleBmc", auth, h.bmcPowerCycleBmc)

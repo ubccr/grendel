@@ -1,4 +1,8 @@
-<form hx-post="/api/host" hx-vals="js:{Interfaces: parseForm()}" hx-swap="none" id="editHostForm">
+<form
+    hx-post="/api/host"
+    hx-vals="js:{Interfaces: parseForm(), Bonds: parseFormBonds()}"
+    hx-swap="none"
+    id="editHostForm">
     <input type="hidden" name="ID" value="{{ .Host.ID }}" />
     <input type="hidden" name="Name" value="{{ .Host.Name }}" />
     <div class="mt-2 grid grid-cols-2 gap-3 p-3 drop-shadow-sm">
@@ -59,6 +63,15 @@
             </button>
             <button
                 class="transform rounded-md bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90"
+                type="button"
+                hx-get="/fragments/bonds"
+                hx-target="#bonds"
+                hx-swap="beforeend transition:true"
+                hx-vals="js:{ID: bondID()}">
+                Add Bond
+            </button>
+            <button
+                class="transform rounded-md bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90"
                 type="submit"
                 form="editHostForm">
                 Submit
@@ -73,6 +86,9 @@
             <div
                 class="mb-4 grid grid-cols-2 gap-3 rounded-md border border-neutral-300 p-3 shadow-sm"
                 id="interface:{{ $i }}">
+                <div class="col-span-2 flex justify-center">
+                    <label class="absolute -translate-y-[22px] bg-white text-xs">Interface:</label>
+                </div>
                 <div class="col-span-2 flex gap-4 align-middle">
                     <label for="Fqdn:{{ $i }}" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">FQDN:</label>
                     <input
@@ -168,6 +184,127 @@
                         name="Mtu"
                         id="Mtu:{{ $i }}"
                         value="{{ Sprintf "%s" $iface.MTU }}"
+                        class="w-full rounded-md border border-neutral-300 p-1 px-2" />
+                </div>
+            </div>
+        {{ end }}
+    </div>
+</div>
+<div class="grid grid-cols-2 gap-3 p-3 pt-0">
+    <input type="hidden" value="{{ len .Bonds }}" id="bondID" />
+    <div class="col-span-2" id="bonds">
+        {{ range $i, $bond := .Bonds }}
+            <div
+                class="mb-4 grid grid-cols-2 gap-3 rounded-md border border-neutral-300 p-3 shadow-sm"
+                id="bond:{{ $i }}">
+                <div class="col-span-2 flex justify-center">
+                    <label class="absolute -translate-y-[22px] bg-white text-xs">Bond:</label>
+                </div>
+                <div>
+                    <label for="Fqdn:{{ $i }}" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">FQDN:</label>
+                    <input
+                        name="Fqdn"
+                        id="Fqdn:{{ $i }}"
+                        value="{{ $bond.FQDN }}"
+                        class="w-full rounded-md border border-neutral-300 p-1 px-2" />
+                </div>
+                <div class="flex gap-4 align-middle">
+                    <label for="Peers:{{ $i }}" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Peers:</label>
+                    <input
+                        name="Peers"
+                        id="Peers:{{ $i }}"
+                        value="{{ Join $bond.Peers "," }}"
+                        placeholder="eno1,eno2"
+                        class="w-full rounded-md border border-neutral-300 p-1 px-2" />
+
+                    <div class="flex gap-1 align-middle">
+                        {{ if eq $bond.BMC "true" }}
+                            <a
+                                class="my-auto transform rounded-md bg-blue-500 text-white transition-transform hover:bg-blue-400 active:scale-90"
+                                href="https://{{- if eq $bond.FQDN "" -}}
+                                    {{- $bond.IP -}}
+                                {{- else -}}
+                                    {{- $bond.FQDN -}}
+                                {{- end -}}"
+                                target="_blank">
+                                <div class="scale-90">
+                                    {{ template "icon-arrow-top-right-on-square" }}
+                                </div>
+                            </a>
+                        {{ end }}
+                        <button
+                            class="my-auto transform rounded-md bg-neutral-500 text-white transition-transform hover:bg-neutral-400 active:scale-90"
+                            onclick="moveBondUp('{{ $i }}')"
+                            type="button">
+                            {{ template "icon-chevron-up" }}
+                        </button>
+                        <button
+                            class="my-auto transform rounded-md bg-neutral-500 text-white transition-transform hover:bg-neutral-400 active:scale-90"
+                            onclick="moveBondDown('{{ $i }}')"
+                            type="button">
+                            {{ template "icon-chevron-down" }}
+                        </button>
+                        <button
+                            class="my-auto transform rounded-md bg-neutral-500 text-white transition-transform hover:bg-neutral-400 active:scale-90"
+                            onclick="removeBond('{{ $i }}')"
+                            type="button">
+                            {{ template "icon-x-mark" }}
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label for="Mac:{{ $i }}" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Mac:</label>
+                    <input
+                        name="Mac"
+                        id="Mac:{{ $i }}"
+                        value="{{ $bond.MAC }}"
+                        placeholder="00:00:00:00:00:00"
+                        class="w-full rounded-md border border-neutral-300 p-1 px-2" />
+                </div>
+                <div>
+                    <label for="Ip:{{ $i }}" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Ip:</label>
+                    <input
+                        name="Ip"
+                        id="Ip:{{ $i }}"
+                        value="{{ $bond.IP }}"
+                        placeholder="0.0.0.0/24"
+                        class="w-full rounded-md border border-neutral-300 p-1 px-2" />
+                </div>
+                <div>
+                    <label for="Ifname:{{ $i }}" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                        Ifname:
+                    </label>
+                    <input
+                        name="Ifname"
+                        id="Ifname:{{ $i }}"
+                        value="{{ $bond.Name }}"
+                        placeholder="eno12399"
+                        class="w-full rounded-md border border-neutral-300 p-1 px-2" />
+                </div>
+                <div>
+                    <label for="Bmc:{{ $i }}" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">BMC:</label>
+                    <select
+                        class="w-full rounded-md border border-neutral-300 bg-white px-2 py-1"
+                        name="Bmc"
+                        id="Bmc:{{ $i }}">
+                        <option value="true">true</option>
+                        <option value="false" {{ if eq $bond.BMC "false" }}selected{{ end }}>false</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="Vlan:{{ $i }}" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Vlan:</label>
+                    <input
+                        name="Vlan"
+                        id="Vlan:{{ $i }}"
+                        value="{{ Sprintf "%s" $bond.VLAN }}"
+                        class="w-full rounded-md border border-neutral-300 p-1 px-2" />
+                </div>
+                <div>
+                    <label for="Mtu:{{ $i }}" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Mtu:</label>
+                    <input
+                        name="Mtu"
+                        id="Mtu:{{ $i }}"
+                        value="{{ Sprintf "%s" $bond.MTU }}"
                         class="w-full rounded-md border border-neutral-300 p-1 px-2" />
                 </div>
             </div>

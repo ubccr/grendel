@@ -144,6 +144,7 @@ type FormData struct {
 	BootImage  string `form:"BootImage"`
 	Tags       string `form:"Tags"`
 	Interfaces string `form:"Interfaces"`
+	Bonds      string `form:"Bonds"`
 }
 type InterfacesString struct {
 	FQDN string `json:"Fqdn"`
@@ -153,6 +154,10 @@ type InterfacesString struct {
 	BMC  string `json:"bmc"`
 	VLAN string `json:"Vlan"`
 	MTU  string `json:"Mtu"`
+}
+type BondsString struct {
+	InterfacesString
+	Peers string `json:"Peers"`
 }
 
 func (h *Handler) EditHost(f *fiber.Ctx) error {
@@ -172,8 +177,11 @@ func (h *Handler) EditHost(f *fiber.Ctx) error {
 
 	var ifaces []InterfacesString
 	json.Unmarshal([]byte(formHost.Interfaces), &ifaces)
+	var bondsStr []BondsString
+	json.Unmarshal([]byte(formHost.Bonds), &bondsStr)
 
 	var interfaces []*model.NetInterface
+	var bonds []*model.Bond
 
 	for i, iface := range ifaces {
 		mac, _ := net.ParseMAC(iface.MAC)
@@ -197,6 +205,31 @@ func (h *Handler) EditHost(f *fiber.Ctx) error {
 			MTU:  uint16(mtu),
 		})
 	}
+	for i, bond := range bondsStr {
+		mac, _ := net.ParseMAC(bond.MAC)
+		ip, _ := netip.ParsePrefix(bond.IP)
+		bmc, err := strconv.ParseBool(bond.BMC)
+		if err != nil {
+			return ToastError(f, err, fmt.Sprintf("Failed to parse BMC boolean on interface %d", i))
+		}
+		mtu, err := strconv.Atoi(bond.MTU)
+		if err != nil {
+			return ToastError(f, err, fmt.Sprintf("Failed to parse MTU on interface %d", i))
+		}
+
+		bonds = append(bonds, &model.Bond{
+			NetInterface: model.NetInterface{
+				Name: bond.Name,
+				FQDN: bond.FQDN,
+				MAC:  mac,
+				IP:   ip,
+				BMC:  bmc,
+				VLAN: bond.VLAN,
+				MTU:  uint16(mtu),
+			},
+			Peers: strings.Split(bond.Peers, ","),
+		})
+	}
 
 	newHost := model.Host{
 		ID:         id,
@@ -206,6 +239,7 @@ func (h *Handler) EditHost(f *fiber.Ctx) error {
 		BootImage:  formHost.BootImage,
 		Tags:       strings.Split(formHost.Tags, ","),
 		Interfaces: interfaces,
+		Bonds:      bonds,
 	}
 
 	err = h.DB.StoreHost(&newHost)

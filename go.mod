@@ -18,12 +18,12 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.6.6
 	github.com/insomniacslk/dhcp v0.0.0-20200922210017-67c425063dca
 	github.com/korovkin/limiter v0.0.0-20190919045942-dac5a6b2a536
-	github.com/labstack/echo/v4 v4.10.1
-	github.com/labstack/gommon v0.4.0
+	github.com/labstack/echo/v4 v4.12.0
+	github.com/labstack/gommon v0.4.2
 	github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b
 	github.com/miekg/dns v1.1.50
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/pin/tftp/v3 v3.0.0
+	github.com/pin/tftp/v3 v3.1.0
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
 	github.com/segmentio/fasthash v1.0.3
 	github.com/segmentio/ksuid v1.0.2
@@ -37,8 +37,8 @@ require (
 	github.com/tidwall/sjson v1.2.5
 	github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb
 	go4.org/netipx v0.0.0-20230125063823-8449b0a6169f
-	golang.org/x/crypto v0.19.0
-	golang.org/x/net v0.21.0
+	golang.org/x/crypto v0.25.0
+	golang.org/x/net v0.27.0
 	golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783
 	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637
 )
@@ -50,6 +50,7 @@ require (
 	github.com/gofiber/utils v1.1.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/redis/go-redis/v9 v9.0.2 // indirect
+	golang.org/x/sync v0.7.0 // indirect
 )
 
 require (
@@ -68,7 +69,7 @@ require (
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-playground/locales v0.13.0 // indirect
 	github.com/go-playground/universal-translator v0.17.0 // indirect
-	github.com/gofiber/fiber/v2 v2.50.0
+	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/gofiber/storage/memory v1.3.4
 	github.com/gofiber/storage/redis v1.3.4
 	github.com/gofiber/storage/sqlite3 v1.3.8
@@ -79,13 +80,13 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/klauspost/compress v1.17.7 // indirect
+	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.3 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/mattn/go-runewidth v0.0.15 // indirect
+	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -103,16 +104,16 @@ require (
 	github.com/tidwall/tinyqueue v0.1.1 // indirect
 	github.com/u-root/u-root v7.0.0+incompatible // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasthttp v1.52.0 // indirect
+	github.com/valyala/fasthttp v1.55.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	github.com/vincent-petithory/dataurl v1.0.0 // indirect
-	golang.org/x/mod v0.8.0 // indirect
-	golang.org/x/sys v0.17.0 // indirect
-	golang.org/x/term v0.17.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
-	golang.org/x/time v0.3.0 // indirect
-	golang.org/x/tools v0.6.0 // indirect
+	golang.org/x/mod v0.17.0 // indirect
+	golang.org/x/sys v0.22.0 // indirect
+	golang.org/x/term v0.22.0 // indirect
+	golang.org/x/text v0.16.0 // indirect
+	golang.org/x/time v0.5.0 // indirect
+	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect

@@ -1,20 +1,22 @@
 # Grendel goreleaser configs
 # See here: https://goreleaser.com
-
-version: 1
-
 before:
   hooks:
     - go mod tidy
 builds:
   - env:
-      - CGO_ENABLED=0
+      - CGO_ENABLED=1
     goarch:
       - amd64
     goos:
       - linux
     ldflags:
       - -s -w -X github.com/ubccr/grendel/api.Version={{.Version}}
+      - -extldflags=-static
+    tags:
+      - sqlite_omit_load_extension
+      - osusergo
+      - netgo
 archives:
   - format: tar.gz
     wrap_in_directory: true
@@ -64,7 +66,7 @@ nfpms:
       - src: ./scripts/nfpm/grendel.service
         dst: /usr/lib/systemd/system/grendel.service
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 snapshot:
   name_template: "{{ incpatch .Version }}-SNAPSHOT-{{.ShortCommit}}"
 changelog:
@@ -73,12 +75,12 @@ changelog:
     - title: Features
       regexp: "^.*feat[(\\w)]*:+.*$"
       order: 0
-    - title: 'Bug fixes'
+    - title: "Bug fixes"
       regexp: "^.*fix[(\\w)]*:+.*$"
       order: 1
     - title: Other
       order: 999
   filters:
     exclude:
-      - '^docs:'
-      - 'typo'
+      - "^docs:"
+      - "typo"
