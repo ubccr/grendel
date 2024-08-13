@@ -8,6 +8,7 @@ require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
 	github.com/Pallinder/go-randomdata v1.2.0
 	github.com/alouca/gosnmp v0.0.0-20170620005048-04d83944c9ab
+	github.com/aristanetworks/goeapi v1.0.0
 	github.com/bits-and-blooms/bitset v1.5.0
 	github.com/bluele/factory-go v0.0.0-20181130035244-e6e8633dd3fe
 	github.com/coreos/butane v0.14.1-0.20220513204719-6cd92788076e
@@ -50,6 +51,7 @@ require (
 	github.com/gofiber/utils v1.1.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/redis/go-redis/v9 v9.0.2 // indirect
+	github.com/vaughan0/go-ini v0.0.0-20130923145212-a98ad7ee00ec // indirect
 	golang.org/x/sync v0.7.0 // indirect
 )
 
