@@ -45,7 +45,11 @@ func (r *jobRunner) RunPowerCycle(host *model.Host, ch chan JobMessage, bootOver
 		m := JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
-		ip := host.InterfaceBMC().AddrString()
+		bmc := host.InterfaceBMC()
+		ip := ""
+		if bmc != nil {
+			ip = bmc.AddrString()
+		}
 		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
 		if err != nil {
 			m.Msg = fmt.Sprintf("%s", err)
@@ -70,7 +74,11 @@ func (r *jobRunner) RunPowerOn(host *model.Host, ch chan JobMessage, bootOverrid
 		m := JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
-		ip := host.InterfaceBMC().AddrString()
+		bmc := host.InterfaceBMC()
+		ip := ""
+		if bmc != nil {
+			ip = bmc.AddrString()
+		}
 		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
 		if err != nil {
 			m.Msg = fmt.Sprintf("%s", err)
@@ -95,7 +103,11 @@ func (r *jobRunner) RunPowerOff(host *model.Host, ch chan JobMessage) {
 		m := JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
-		ip := host.InterfaceBMC().AddrString()
+		bmc := host.InterfaceBMC()
+		ip := ""
+		if bmc != nil {
+			ip = bmc.AddrString()
+		}
 		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
 		if err != nil {
 			m.Msg = fmt.Sprintf("%s", err)
@@ -121,7 +133,11 @@ func (r *jobRunner) RunBmcStatus(host *model.Host, ch chan JobMessage) {
 		defer func() { ch <- m }()
 
 		data := &System{}
-		ip := host.InterfaceBMC().AddrString()
+		bmc := host.InterfaceBMC()
+		ip := ""
+		if bmc != nil {
+			ip = bmc.AddrString()
+		}
 		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
 		if err != nil {
 			m.Msg = fmt.Sprintf("%s", err)
@@ -153,7 +169,11 @@ func (r *jobRunner) RunPowerCycleBmc(host *model.Host, ch chan JobMessage) {
 		m := JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
-		ip := host.InterfaceBMC().AddrString()
+		bmc := host.InterfaceBMC()
+		ip := ""
+		if bmc != nil {
+			ip = bmc.AddrString()
+		}
 		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
 		if err != nil {
 			m.Msg = fmt.Sprintf("%s", err)
@@ -177,7 +197,11 @@ func (r *jobRunner) RunClearSel(host *model.Host, ch chan JobMessage) {
 		m := JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
-		ip := host.InterfaceBMC().AddrString()
+		bmc := host.InterfaceBMC()
+		ip := ""
+		if bmc != nil {
+			ip = bmc.AddrString()
+		}
 		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
 		if err != nil {
 			m.Msg = fmt.Sprintf("%s", err)
@@ -201,7 +225,11 @@ func (r *jobRunner) RunBmcAutoConfigure(host *model.Host, ch chan JobMessage) {
 		m := JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
-		ip := host.InterfaceBMC().AddrString()
+		bmc := host.InterfaceBMC()
+		ip := ""
+		if bmc != nil {
+			ip = bmc.AddrString()
+		}
 		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
 		if err != nil {
 			m.Msg = fmt.Sprintf("%s", err)
@@ -225,8 +253,14 @@ func (r *jobRunner) RunBmcImportConfiguration(host *model.Host, ch chan JobMessa
 		m := JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
-		ip := host.InterfaceBMC().AddrString()
-		token, err := model.NewBootToken(host.ID.String(), host.InterfaceBMC().MAC.String())
+		bmc := host.InterfaceBMC()
+		mac := ""
+		ip := ""
+		if bmc != nil {
+			mac = bmc.MAC.String()
+			ip = bmc.AddrString()
+		}
+		token, err := model.NewBootToken(host.ID.String(), mac)
 		if err != nil {
 			m.Msg = fmt.Sprintf("%s", err)
 		}

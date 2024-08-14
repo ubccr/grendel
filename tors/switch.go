@@ -69,7 +69,11 @@ func NewNetworkSwitch(host *model.Host) (NetworkSwitch, error) {
 	var sw NetworkSwitch
 	var err error
 
-	ip := host.InterfaceBMC().IP.Addr().String()
+	bmc := host.InterfaceBMC()
+	ip := ""
+	if bmc != nil {
+		ip = bmc.AddrString()
+	}
 	// TODO: automatically determine NOS
 	if host.HasTags("arista") {
 		sw, err = NewArista(ip, username, password)
