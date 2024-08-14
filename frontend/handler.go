@@ -131,6 +131,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	api.Patch("/hosts/tags", auth, h.tagHosts)
 	api.Patch("/hosts/image", auth, h.imageHosts)
 	api.Get("/hosts/export/:hosts", auth, h.exportHosts)
+	api.Get("/hosts/inventory/:hosts", auth, h.exportInventory)
 
 	app.Get("/users", admin, h.Users)
 	api.Post("/users", admin, h.usersPost)

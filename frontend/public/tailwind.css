@@ -940,6 +940,10 @@ video {
   white-space: nowrap;
 }
 
+.whitespace-pre {
+  white-space: pre;
+}
+
 .rounded-full {
   border-radius: 9999px;
 }
@@ -1148,10 +1152,6 @@ video {
 
 .pb-3 {
   padding-bottom: 0.75rem;
-}
-
-.pb-6 {
-  padding-bottom: 1.5rem;
 }
 
 .pt-0 {

@@ -33,7 +33,7 @@ func TestRedfish(t *testing.T) {
 		t.Skip("Skipping BMC test. Missing env vars")
 	}
 
-	r, err := NewRedfishClient(endpoint)
+	r, err := NewRedfishClient(endpoint, user, pass, true)
 	assert.Nil(t, err)
 	defer r.client.Logout()
 

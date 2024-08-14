@@ -107,10 +107,11 @@ func (r *Redfish) GetSystem() (*System, error) {
 	sys := ss[0]
 
 	system := &System{
-		Name:           sys.HostName,
+		HostName:       sys.HostName,
 		BIOSVersion:    sys.BIOSVersion,
 		SerialNumber:   sys.SKU,
 		Manufacturer:   sys.Manufacturer,
+		Model:          sys.Model,
 		PowerStatus:    string(sys.PowerState),
 		Health:         string(sys.Status.Health),
 		TotalMemory:    sys.MemorySummary.TotalSystemMemoryGiB,

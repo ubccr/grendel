@@ -1,12 +1,16 @@
 package frontend
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net"
 	"net/netip"
+	"slices"
 	"strconv"
 	"strings"
+	"text/template"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/segmentio/ksuid"
@@ -466,6 +470,70 @@ func (h *Handler) exportHosts(f *fiber.Ctx) error {
 		f.Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
 	}
 	return f.SendString(string(o))
+}
+
+func (h *Handler) exportInventory(f *fiber.Ctx) error {
+	hosts := f.Params("hosts")
+	filename := f.Query("filename")
+	templateString := f.Query("template")
+
+	tmpl, err := template.New("test").Parse(templateString)
+	if err != nil {
+		return ToastError(f, err, "Failed to parse template")
+	}
+
+	ns, err := nodeset.NewNodeSet(hosts)
+	if err != nil {
+		return ToastError(f, err, "Failed to parse node set")
+	}
+
+	hostList, err := h.DB.FindHosts(ns)
+	if err != nil {
+		return ToastError(f, err, "Failed to find nodes")
+	}
+
+	job := bmc.NewJob()
+	jobStatus, err := job.BmcStatus(hostList)
+	if err != nil {
+		return err
+	}
+
+	type templateData struct {
+		Hosts []bmc.System
+		Date  string
+	}
+
+	td := templateData{
+		Hosts: jobStatus,
+		Date:  time.Now().Format(time.DateOnly),
+	}
+
+	var buf bytes.Buffer
+	err = tmpl.Execute(&buf, td)
+	if err != nil {
+		return ToastError(f, err, "Failed to execute template")
+	}
+
+	it := ns.Iterator()
+
+	failed := []string{}
+	for it.Next() {
+		if !slices.ContainsFunc(jobStatus, func(x bmc.System) bool { return x.Name == it.Value() }) {
+			failed = append(failed, it.Value())
+		}
+	}
+
+	if len(hostList) != len(jobStatus) {
+		buf.WriteString(fmt.Sprintf("\nWARNING: Some BMC queries have failed. Their entries will not be listed:\n%s", strings.Join(failed, "\n")))
+	}
+
+	if filename != "" {
+		f.Set("HX-Redirect", fmt.Sprintf("/api/hosts/inventory/%s?filename=%s", hosts, filename))
+		f.Set("Content-Type", "application/force-download")
+		f.Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+	}
+
+	return f.SendString(buf.String())
 }
 
 func (h *Handler) bmcConfigureAuto(f *fiber.Ctx) error {

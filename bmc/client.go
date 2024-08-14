@@ -1,7 +1,6 @@
 package bmc
 
 import (
-	"github.com/spf13/viper"
 	"github.com/stmcginnis/gofish"
 )
 
@@ -13,9 +12,11 @@ type Redfish struct {
 
 type System struct {
 	Name           string   `json:"name"`
+	HostName       string   `json:"host_name"`
 	BIOSVersion    string   `json:"bios_version"`
 	SerialNumber   string   `json:"serial_number"`
 	Manufacturer   string   `json:"manufacturer"`
+	Model          string   `json:"model"`
 	PowerStatus    string   `json:"power_status"`
 	Health         string   `json:"health"`
 	TotalMemory    float32  `json:"total_memory"`
@@ -24,12 +25,7 @@ type System struct {
 	BootOrder      []string `json:"boot_order"`
 }
 
-func NewRedfishClient(ip string) (*Redfish, error) {
-	user := viper.GetString("bmc.user")
-	pass := viper.GetString("bmc.password")
-	viper.SetDefault("bmc.insecure", true)
-	insecure := viper.GetBool("bmc.insecure")
-
+func NewRedfishClient(ip, user, pass string, insecure bool) (*Redfish, error) {
 	endpoint := "https://" + ip
 
 	config := gofish.ClientConfig{
