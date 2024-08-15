@@ -364,9 +364,7 @@
 "
                                 rows="4"
                                 class="whitespace-pre w-full rounded-md border border-neutral-300 px-2 py-1"
-                                type="text">{{ `{{ range .Hosts -}}`}}
-CCR,{{ `{{ .Name }}`}},{{ `{{ $.Date }}`}},CBLS,B1-101,{{ `{{ .Manufacturer }}`}},{{ `{{ .Model }}`}},{{ `{{ .SerialNumber }}`}}
-{{ `{{ end }}`}}</textarea>
+                                type="text">{{ .ExportCSVDefaultTemplate }}</textarea>
                         </div>
                         <div class="flex justify-end gap-2">
                             <div class="w-full">

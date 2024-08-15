@@ -142,9 +142,10 @@ func (h *Handler) actions(f *fiber.Ctx) error {
 
 	nodeset := ns.String()
 	return f.Render("fragments/actions", fiber.Map{
-		"Hosts":      nodeset,
-		"BmcSystem":  bmc.System{},
-		"BootImages": h.getBootImages(),
+		"Hosts":                    nodeset,
+		"BmcSystem":                bmc.System{},
+		"ExportCSVDefaultTemplate": viper.GetString("frontend.export_csv_default_template"),
+		"BootImages":               h.getBootImages(),
 	}, "")
 }
 
