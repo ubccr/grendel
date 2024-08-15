@@ -60,7 +60,7 @@ nfpms:
       signature:
         key_file: key.gpg
     contents:
-      - src: .grendel.toml.sample
+      - src: ./grendel.toml.sample
         dst: /etc/grendel/grendel.toml
         type: "config|noreplace"
       - src: ./scripts/nfpm/grendel.service
