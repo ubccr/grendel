@@ -95,7 +95,7 @@ func (h *Handler) RegisterUser(f *fiber.Ctx) error {
 		return ToastError(f, nil, "Failed to register: Password must not contain spaces or unicode characters")
 	}
 
-	err := h.DB.StoreUser(su, sp)
+	role, err := h.DB.StoreUser(su, sp)
 	if err != nil {
 		if err.Error() == fmt.Sprintf("User %s already exists", su) {
 			msg = "Failed to register: Username already exists"
@@ -114,7 +114,7 @@ func (h *Handler) RegisterUser(f *fiber.Ctx) error {
 
 	sess.Set("authenticated", true)
 	sess.Set("user", su)
-	sess.Set("role", "disabled")
+	sess.Set("role", role)
 
 	err = sess.Save()
 	if err != nil {
