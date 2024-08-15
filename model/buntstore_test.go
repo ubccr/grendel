@@ -40,6 +40,53 @@ func tempfile() string {
 	return name.Name()
 }
 
+func TestBuntStoreUser(t *testing.T) {
+	adminUsername := "admin"
+	adminPassword := "SuperSecureAdminPassword1234!@#$"
+	userUsername := "user"
+	userPassword := "1234"
+	assert := assert.New(t)
+
+	store, err := model.NewBuntStore(":memory:")
+	assert.NoError(err)
+	defer store.Close()
+
+	role, err := store.StoreUser(adminUsername, adminPassword)
+	assert.NoError(err)
+	assert.Equal(role, "admin")
+	role, err = store.StoreUser(userUsername, userPassword)
+	assert.NoError(err)
+	assert.Equal(role, "disabled")
+
+	authenticated, role, err := store.VerifyUser("admin", adminPassword)
+	assert.NoError(err)
+	assert.Equal(role, "admin")
+	assert.Equal(authenticated, true)
+	authenticated, role, err = store.VerifyUser("user", userPassword)
+	assert.NoError(err)
+	assert.Equal(role, "disabled")
+	assert.Equal(authenticated, true)
+
+	users, err := store.GetUsers()
+	assert.NoError(err)
+	assert.Equal(users[0].Username, "admin")
+	assert.Contains(users[1].Username, "user")
+
+	err = store.UpdateUser("user", "user")
+	assert.NoError(err)
+	authenticated, role, err = store.VerifyUser("user", userPassword)
+	assert.NoError(err)
+	assert.Equal(role, "user")
+	assert.Equal(authenticated, true)
+
+	err = store.DeleteUser("user")
+	assert.NoError(err)
+	users, err = store.GetUsers()
+	assert.NoError(err)
+	assert.Equal(len(users), 1)
+
+}
+
 func TestBuntStoreHost(t *testing.T) {
 	assert := assert.New(t)
 
