@@ -8,14 +8,15 @@ require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
 	github.com/Pallinder/go-randomdata v1.2.0
 	github.com/alouca/gosnmp v0.0.0-20170620005048-04d83944c9ab
+	github.com/aristanetworks/goeapi v1.0.0
 	github.com/bits-and-blooms/bitset v1.5.0
 	github.com/bluele/factory-go v0.0.0-20181130035244-e6e8633dd3fe
 	github.com/coreos/butane v0.14.1-0.20220513204719-6cd92788076e
 	github.com/dustin/go-humanize v1.0.1
-	github.com/fatih/color v1.13.0
+	github.com/fatih/color v1.16.0
 	github.com/go-playground/validator/v10 v10.0.1
 	github.com/hako/branca v0.0.0-20191227164554-3b9970524189
-	github.com/hashicorp/go-retryablehttp v0.6.6
+	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/insomniacslk/dhcp v0.0.0-20200922210017-67c425063dca
 	github.com/korovkin/limiter v0.0.0-20190919045942-dac5a6b2a536
 	github.com/labstack/echo/v4 v4.12.0
@@ -33,7 +34,7 @@ require (
 	github.com/stmcginnis/gofish v0.15.0
 	github.com/stretchr/testify v1.8.4
 	github.com/tidwall/buntdb v1.3.0
-	github.com/tidwall/gjson v1.14.4
+	github.com/tidwall/gjson v1.17.3
 	github.com/tidwall/sjson v1.2.5
 	github.com/ubccr/go-dhcpd-leases v0.1.1-0.20191206204522-601ab01835fb
 	go4.org/netipx v0.0.0-20230125063823-8449b0a6169f
@@ -50,6 +51,7 @@ require (
 	github.com/gofiber/utils v1.1.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/redis/go-redis/v9 v9.0.2 // indirect
+	github.com/vaughan0/go-ini v0.0.0-20130923145212-a98ad7ee00ec // indirect
 	golang.org/x/sync v0.7.0 // indirect
 )
 

@@ -332,6 +332,69 @@
                 </form>
             </div>
         </div>
+        <div class="col-span-2 rounded-md border border-gray-100 bg-white p-3 shadow-lg">
+            <div class="z-14 group relative flex justify-center p-2 align-middle">
+                <h1 class="text-sm hover:text-gray-600">Export CSV:</h1>
+                <div
+                    class="invisible absolute -translate-y-16 rounded-md bg-gray-500 text-sm text-white opacity-0 transition-all duration-300 ease-in-out group-hover:visible group-hover:opacity-80">
+                    Outputs a CSV for inventory management
+                </div>
+            </div>
+            <div class="flex justify-center p-2 align-middle">
+                <form
+                    class="w-full"
+                    hx-get="/api/hosts/inventory/{{ .Hosts }}"
+                    hx-target="#exportText"
+                    hx-swap="innerHTML"
+                    hx-on::after-request="showExportModal()"
+                    hx-ext="loading-states"
+                    data-loading-states>
+                    <div class="grid grid-cols-1 gap-2">
+                        <div>
+                            <label for="exportTemplate" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                                Template:
+                            </label>
+                            <!-- prettier-ignore -->
+                            <textarea
+                                id="exportTemplate"
+                                name="template"
+                                placeholder="See golang text/template for examples. Available methods:
+    .Hosts []{{ Sprintf "%#v" .BmcSystem }}
+    .Date string // formatted with DateOnly
+"
+                                rows="4"
+                                class="whitespace-pre w-full rounded-md border border-neutral-300 px-2 py-1"
+                                type="text">{{ .ExportCSVDefaultTemplate }}</textarea>
+                        </div>
+                        <div class="flex justify-end gap-2">
+                            <div class="w-full">
+                                <label for="exportFilename" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                                    Filename:
+                                </label>
+                                <input
+                                    id="exportFilename"
+                                    name="filename"
+                                    placeholder="export.csv"
+                                    class="h-8 w-full rounded-md border border-neutral-300 px-2 py-1"
+                                    type="text" />
+                            </div>
+                            <button
+                                class="h-8 transform rounded-md border bg-blue-500 px-2 py-1 leading-none text-white transition-transform hover:bg-blue-400 active:scale-90 disabled:opacity-75"
+                                type="submit"
+                                {{ if eq .Hosts "" }}disabled{{ end }}>
+                                <span data-loading-class="hidden">Export</span>
+                                <span
+                                    data-loading-class-remove="hidden"
+                                    data-loading-class="block"
+                                    class="mx-auto hidden h-5 w-5">
+                                    {{ template "icon-spinner" }}
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <div class="flex-grow"></div>

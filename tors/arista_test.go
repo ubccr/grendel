@@ -15,29 +15,38 @@
 // You should have received a copy of the GNU General Public License
 // along with Grendel. If not, see <https://www.gnu.org/licenses/>.
 
-package bmc
+package tors
 
 import (
+	"fmt"
 	"os"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
-func TestRedfish(t *testing.T) {
-	endpoint := os.Getenv("GRENDEL_BMC_ENDPOINT")
-	user := os.Getenv("GRENDEL_BMC_USER")
-	pass := os.Getenv("GRENDEL_BMC_PASS")
+func TestArista(t *testing.T) {
+	endpoint := os.Getenv("GRENDEL_ARISTA_ENDPOINT")
+	user := os.Getenv("GRENDEL_ARISTA_USER")
+	pass := os.Getenv("GRENDEL_ARISTA_PASS")
 
 	if endpoint == "" || user == "" || pass == "" {
-		t.Skip("Skipping BMC test. Missing env vars")
+		t.Skip("Skipping Arista test. Missing env vars")
 	}
 
-	r, err := NewRedfishClient(endpoint, user, pass, true)
-	assert.Nil(t, err)
-	defer r.client.Logout()
+	client, err := NewArista(endpoint, user, pass)
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	system, err := r.GetSystem()
-	assert.Nil(t, err)
-	assert.Greater(t, len(system.BIOSVersion), 0)
+	macTable, err := client.GetMACTable()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(macTable) == 0 {
+		t.Errorf("No mac table entries returned from api")
+	}
+
+	for _, entry := range macTable {
+		fmt.Printf("%s - %d\n", entry.MAC, entry.Port)
+	}
 }
