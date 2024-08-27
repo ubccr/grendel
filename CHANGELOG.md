@@ -1,5 +1,15 @@
 # Grendel Changelog
 
+## [0.0.13] - 2024-08-26
+
+- Update retryablehttp, gjson, ipxe deps
+- Feat: frontend - added CSV export with GO template support
+- Feat: tors - added SONiC queries
+- Feat: tors - added Arista EOS queries
+- Fix: frontend - prevent initial admin user from needing to relog after registration
+- Fix: bmc - concurrent map writes on BMC queries
+- Fix: nfpm - use updated sample toml file rather than .default file
+
 ## [0.0.12] - 2024-08-05
 
 - Update echo, fiber deps
@@ -143,4 +153,5 @@
 [0.0.10]: https://github.com/ubccr/grendel/releases/tag/v0.0.10
 [0.0.11]: https://github.com/ubccr/grendel/releases/tag/v0.0.11
 [0.0.12]: https://github.com/ubccr/grendel/releases/tag/v0.0.12
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.12...HEAD
+[0.0.13]: https://github.com/ubccr/grendel/releases/tag/v0.0.13
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.13...HEAD
