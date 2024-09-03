@@ -190,3 +190,11 @@ func (d *DellOS10) GetMACTable() (MACTable, error) {
 
 	return nil, errors.New("Failed to fetch mac table, unknown error")
 }
+
+func (d *DellOS10) GetLLDPNeighbors() (LLDPNeighbors, error) {
+	return nil, errors.New("LLDPNeighbors not supported on Dell OS10")
+}
+
+func (d *DellOS10) GetInterfaceStatus() (InterfaceTable, error) {
+	return nil, errors.New("Interface Status not supported on Dell OS10")
+}

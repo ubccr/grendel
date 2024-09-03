@@ -18,6 +18,7 @@
 package tors
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"strconv"
@@ -82,7 +83,7 @@ func (g *Generic) GetMACTable() (MACTable, error) {
 		}
 
 		macTable[macStr] = &MACTableEntry{
-			Port: rec.Value.(int)-1,
+			Port: rec.Value.(int) - 1,
 			VLAN: key[0],
 			MAC:  mac,
 		}
@@ -90,4 +91,11 @@ func (g *Generic) GetMACTable() (MACTable, error) {
 
 	log.Infof("Received %d entries", len(macTable))
 	return macTable, nil
+}
+
+func (g *Generic) GetLLDPNeighbors() (LLDPNeighbors, error) {
+	return nil, errors.New("LLDP not supported with Generic switch type")
+}
+func (g *Generic) GetInterfaceStatus() (InterfaceTable, error) {
+	return nil, errors.New("Interface status not supported with Generic switch type")
 }

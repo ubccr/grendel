@@ -29,6 +29,21 @@ import (
 
 var log = logger.GetLogger("SWITCH")
 
+type InterfaceStatus struct {
+	Name                string           // `json:"name"`
+	LineProtocolStatus  string           // `json:"lineProtocolStatus"`
+	InterfaceStatus     string           // `json:"interfaceStatus"`
+	PhysicalAddress     net.HardwareAddr // `json:"physicalAddress"`
+	Description         string           // `json:"description"`
+	Hardware            string           // `json:"hardware"`
+	Bandwidth           int              // `json:"bandwidth"`
+	MTU                 int              // `json:"mtu"`
+	InterfaceMembership string           // `json:"interfaceMembership"`
+	// Duplex              string           // `json:"duplex"`
+	// AutoNegotiate       string           // `json:"autoNegotiate"`
+	// Lanes               string           // `json:"lanes"`
+}
+
 type MACTableEntry struct {
 	Ifname string           `json:"ifname"`
 	Port   int              `json:"port"`
@@ -39,7 +54,7 @@ type MACTableEntry struct {
 
 type LLDP struct {
 	ChassisIdType     string
-	ChassisId         string
+	ChassisId         net.HardwareAddr
 	SystemName        string
 	SystemDescription string
 	ManagementAddress string
@@ -48,13 +63,16 @@ type LLDP struct {
 	PortIdType        string
 }
 
+type InterfaceTable map[int]*InterfaceStatus
+
 type MACTable map[string]*MACTableEntry
 
 type LLDPNeighbors map[string]*LLDP
 
 type NetworkSwitch interface {
+	GetInterfaceStatus() (InterfaceTable, error)
 	GetMACTable() (MACTable, error)
-	// GetLLDPNeighbors() (*LLDPNeighbors, error)
+	GetLLDPNeighbors() (LLDPNeighbors, error)
 }
 
 func NewNetworkSwitch(host *model.Host) (NetworkSwitch, error) {
