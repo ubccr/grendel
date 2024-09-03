@@ -54,7 +54,7 @@ root_password = ""
 default_image = ""
 
 # Path to repo directory
-repo_dir = ""
+repo_dir = "/var/lib/grendel/repo"
 
 # Enable prometheus service discover endpoint
 enable_prometheus_sd = false
@@ -92,7 +92,7 @@ proxy_only = false
 router_octet4 = 0
 
 # Hard code a static default gateway. (Not set by default)
-gateway = ""
+#gateway = ""
 
 # Configure settings for specific subnets. If a hosts IP address is contained
 # inside the subnet, the static dhcp response will contain the gateway IP
