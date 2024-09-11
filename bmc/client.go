@@ -2,6 +2,7 @@ package bmc
 
 import (
 	"github.com/stmcginnis/gofish"
+	"github.com/stmcginnis/gofish/redfish"
 )
 
 type Redfish struct {
@@ -23,6 +24,38 @@ type System struct {
 	ProcessorCount int      `json:"processor_count"`
 	BootNext       string   `json:"boot_next"`
 	BootOrder      []string `json:"boot_order"`
+	OEM            SystemOEM
+}
+
+type SystemOEM struct {
+	Dell struct {
+		DellSystem struct {
+			ManagedSystemSize string
+			MaxCPUSockets     int
+			MaxDIMMSlots      int
+			MacPCIeSlots      int
+			SystemID          int
+		}
+	}
+}
+
+type Firmware struct {
+	Name             string                     `json:"name"`
+	SystemID         string                     `json:"system_id"`
+	CurrentFirmwares map[string]CurrentFirmware `json:"current_firmware"`
+}
+type CurrentFirmware struct {
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	ReleaseDate string `json:"release_date"`
+	SoftwareID  string `json:"software_id"`
+	Updatable   bool   `json:"updateable"`
+	Version     string `json:"version"`
+}
+
+type FirmwareUpdate struct {
+	Firmware
+	Tasks map[string]*redfish.Task
 }
 
 func NewRedfishClient(ip, user, pass string, insecure bool) (*Redfish, error) {

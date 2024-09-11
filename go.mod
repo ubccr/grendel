@@ -4,6 +4,8 @@ go 1.21
 
 toolchain go1.21.0
 
+replace github.com/stmcginnis/gofish => ../gofish
+
 require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
 	github.com/Pallinder/go-randomdata v1.2.0
@@ -31,7 +33,7 @@ require (
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.15.0
-	github.com/stmcginnis/gofish v0.15.0
+	github.com/stmcginnis/gofish v0.19.0
 	github.com/stretchr/testify v1.8.4
 	github.com/tidwall/buntdb v1.3.0
 	github.com/tidwall/gjson v1.17.3
@@ -49,6 +51,7 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/gofiber/template v1.8.2 // indirect
 	github.com/gofiber/utils v1.1.0 // indirect
+	github.com/jedib0t/go-pretty/v6 v6.5.9 // indirect
 	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/redis/go-redis/v9 v9.0.2 // indirect
 	github.com/vaughan0/go-ini v0.0.0-20130923145212-a98ad7ee00ec // indirect

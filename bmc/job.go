@@ -135,6 +135,76 @@ func (j *Job) BmcStatus(hostList model.HostList) ([]System, error) {
 	return arr, nil
 }
 
+func (j *Job) GetFirmware(hostList model.HostList) ([]Firmware, error) {
+	runner := newJobRunner(j)
+
+	ch := make(chan JobMessage, len(hostList))
+	for i, host := range hostList {
+		runner.RunGetFirmware(host, ch)
+
+		if (i+1)%j.fanout == 0 {
+			time.Sleep(j.delay)
+			continue
+		}
+	}
+
+	runner.Wait()
+	close(ch)
+
+	arr := []Firmware{}
+	for m := range ch {
+		if m.Status != "success" {
+			fmt.Printf("%s\t%s\t%s\n", m.Status, m.Host, m.Msg)
+			fmt.Printf("Error querying host: %s\n", m.Host)
+			continue
+		}
+		d := Firmware{}
+		err := json.Unmarshal([]byte(m.Msg), &d)
+		if err != nil {
+			return nil, err
+		}
+
+		arr = append(arr, d)
+	}
+
+	return arr, nil
+}
+
+func (j *Job) UpdateFirmware(hostList model.HostList, firmwarePaths []string) ([]FirmwareUpdate, error) {
+	runner := newJobRunner(j)
+
+	ch := make(chan JobMessage, len(hostList))
+	for i, host := range hostList {
+		runner.RunUpdateFirmware(host, ch, firmwarePaths)
+
+		if (i+1)%j.fanout == 0 {
+			time.Sleep(j.delay)
+			continue
+		}
+	}
+
+	runner.Wait()
+	close(ch)
+
+	arr := []FirmwareUpdate{}
+	for m := range ch {
+		if m.Status != "success" {
+			fmt.Printf("%s\t%s\t%s\n", m.Status, m.Host, m.Msg)
+			fmt.Printf("Error querying host: %s\n", m.Host)
+			continue
+		}
+		d := FirmwareUpdate{}
+		err := json.Unmarshal([]byte(m.Msg), &d)
+		if err != nil {
+			return nil, err
+		}
+
+		arr = append(arr, d)
+	}
+
+	return arr, nil
+}
+
 func (j *Job) PowerCycleBmc(hostList model.HostList) ([]JobMessage, error) {
 	runner := newJobRunner(j)
 
