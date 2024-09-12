@@ -148,6 +148,70 @@ func (h *Handler) actions(f *fiber.Ctx) error {
 		"BootImages":               h.getBootImages(),
 	}, "")
 }
+func (h *Handler) powerPanels(f *fiber.Ctx) error {
+	ns, err := h.DB.FindTags([]string{"pdu"})
+	if err != nil {
+		return err
+	}
+	hosts, err := h.DB.FindHosts(ns)
+	if err != nil {
+		return err
+	}
+
+	type Panel struct {
+		Circuit string
+		PDU     string
+	}
+	panels := make(map[string][]Panel, 0)
+
+	for _, host := range hosts {
+		p := ""
+		c := ""
+
+		for _, tag := range host.Tags {
+			if strings.Contains(tag, "panel") {
+				p = strings.Replace(tag, "panel:", "", 1)
+			} else if strings.Contains(tag, "circuit") {
+				c = strings.Replace(tag, "circuit:", "", 1)
+
+			}
+		}
+		if p == "" && c == "" {
+			continue
+		}
+
+		panels[p] = append(panels[p], Panel{
+			Circuit: c,
+			PDU:     host.Name,
+		})
+	}
+
+	for _, circuits := range panels {
+		sort.Slice(circuits, func(i, j int) bool {
+			prev := strings.Split(circuits[i].Circuit, "-")
+			if len(prev) == 0 {
+				return false
+			}
+			prevInt, err := strconv.Atoi(prev[0])
+			if err != nil {
+				return false
+			}
+			curr := strings.Split(circuits[j].Circuit, "-")
+			if len(prev) == 0 {
+				return false
+			}
+			currInt, err := strconv.Atoi(curr[0])
+			if err != nil {
+				return false
+			}
+			return prevInt < currInt
+		})
+	}
+
+	return f.Render("fragments/power/panels", fiber.Map{
+		"Panels": panels,
+	}, "")
+}
 
 func (h *Handler) rackAddModal(f *fiber.Ctx) error {
 	return f.Render("fragments/rack/add/modal", fiber.Map{

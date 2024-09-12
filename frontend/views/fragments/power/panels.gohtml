@@ -1,0 +1,23 @@
+<div class="grid grid-cols-2 gap-2">
+    {{ range $panel, $circuits := $.Panels }}
+        <table class="border-netural-300 w-full table-fixed border p-2">
+            <thead>
+                <tr class="*:border *:border-netural-300 *:p-0">
+                    <td colspan="2">Panel: {{ $panel }}</td>
+                </tr>
+                <tr class="*:border *:border-netural-300 *:p-0">
+                    <td>Circuit</td>
+                    <td>PDU</td>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range $circuits }}
+                    <tr class="*:border *:border-netural-300 *:p-0">
+                        <td>{{ .Circuit }}</td>
+                        <td>{{ .PDU }}</td>
+                    </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    {{ end }}
+</div>

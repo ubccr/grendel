@@ -124,6 +124,9 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	app.Get("/nodes", auth, h.nodes)
 	fragment.Get("/nodes", auth, h.nodesTable)
 
+	app.Get("/power", auth, h.power)
+	fragment.Get("/power/panels", auth, h.powerPanels)
+
 	fragment.Put("/actions", auth, h.actions)
 	api.Post("/bulkHostAdd", auth, h.bulkHostAdd)
 
