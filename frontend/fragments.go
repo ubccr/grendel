@@ -80,56 +80,72 @@ func (h *Handler) hostForm(f *fiber.Ctx) error {
 }
 
 func (h *Handler) rackTable(f *fiber.Ctx) error {
-	rack := f.Params("rack")
+	rackName := f.Params("rack")
 
-	n, err := h.DB.FindTags([]string{rack})
+	ns, err := h.DB.FindTags([]string{rackName})
 	if err != nil {
 		return ToastError(f, err, "Failed to find hosts tagged with rack")
 	}
 
-	hosts, err := h.DB.FindHosts(n)
+	hosts, err := h.DB.FindHosts(ns)
 	if err != nil {
 		return ToastError(f, err, "Failed to find hosts")
 	}
 
-	type hostArrStruct struct {
+	type rackArrStruct struct {
 		U     string
 		Hosts model.HostList
 	}
-	hostArr := make([]hostArrStruct, 0)
+	rackArr := make([]rackArrStruct, 0)
 
 	viper.SetDefault("frontend.rack_min", 3)
 	viper.SetDefault("frontend.rack_max", 42)
 	min := viper.GetInt("frontend.rack_min")
 	max := viper.GetInt("frontend.rack_max")
 
+	pdus := []string{}
+
+	for _, host := range hosts {
+		if host.HostType() != "power" || !host.HasAnyTags("0u") {
+			continue
+		}
+		pdus = append(pdus, host.Name)
+		log.Debugln(host.Name)
+	}
+
 	for i := max; i >= min; i-- {
 		u := fmt.Sprintf("%02d", i)
-		h := model.HostList{}
+		hostsInU := model.HostList{}
 
-		for _, v := range hosts {
-			if v.HostType() == "power" && !v.HasAnyTags("1u", "2u") {
+		for _, host := range hosts {
+			if host.HostType() == "power" && host.HasAnyTags("0u") {
 				continue
 			}
-			nameArr := strings.Split(v.Name, "-")
+			nameArr := strings.Split(host.Name, "-")
 			if len(nameArr) < 2 {
-				log.Debugf("Invalid host name: %s", v.Name)
+				log.Debugf("Invalid host name: %s", host.Name)
 				continue
 			}
 			if nameArr[2] == u {
-				h = append(h, v)
+				hostsInU = append(hostsInU, host)
 			}
 		}
 
-		hostArr = append(hostArr, hostArrStruct{
+		rackArr = append(rackArr, rackArrStruct{
 			U:     u,
-			Hosts: h,
+			Hosts: hostsInU,
 		})
 	}
 
+	pduHalf := len(pdus) / 2
+
 	return f.Render("fragments/rack/table", fiber.Map{
-		"Hosts": hostArr,
-		"Rack":  rack,
+		"Rack":     rackArr,
+		"RackName": rackName,
+		"PDUs": fiber.Map{
+			"Left":  pdus[pduHalf:],
+			"Right": pdus[0:pduHalf],
+		},
 	}, "")
 }
 
