@@ -25,7 +25,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-type promServiceDisovery struct {
+type promServiceDiscovery struct {
 	Targets []string          `json:"targets"`
 	Labels  map[string]string `json:"labels"`
 }
@@ -47,8 +47,8 @@ func (h *Handler) ServiceDiscovery(c echo.Context) error {
 		labels[key] = c.QueryParam(key)
 	}
 
-	sd := make([]*promServiceDisovery, 0)
-	nodeExporter := &promServiceDisovery{
+	sd := make([]*promServiceDiscovery, 0)
+	nodeExporter := &promServiceDiscovery{
 		Targets: make([]string, 0),
 		Labels:  labels,
 	}
