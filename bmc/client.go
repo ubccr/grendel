@@ -55,7 +55,12 @@ type CurrentFirmware struct {
 
 type FirmwareUpdate struct {
 	Firmware
-	Tasks map[string]*redfish.Task
+	Jobs map[string]*redfish.Job
+}
+
+type BMCJob struct {
+	Host string `json:"name"`
+	Jobs []*redfish.Job
 }
 
 func NewRedfishClient(ip, user, pass string, insecure bool) (*Redfish, error) {

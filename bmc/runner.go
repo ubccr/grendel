@@ -6,7 +6,6 @@ import (
 
 	"github.com/korovkin/limiter"
 	"github.com/spf13/viper"
-	"github.com/stmcginnis/gofish/redfish"
 	"github.com/ubccr/grendel/model"
 )
 
@@ -211,12 +210,135 @@ func (r *jobRunner) RunGetFirmware(host *model.Host, ch chan JobMessage) {
 	})
 }
 
-func (r *jobRunner) RunUpdateFirmware(host *model.Host, ch chan JobMessage, firmwarePaths []string) {
-	r.limit.Execute(func() {
+func (jr *jobRunner) RunUpdateFirmware(host *model.Host, ch chan JobMessage, firmwarePaths []string) {
+	jr.limit.Execute(func() {
 		m := JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
 		data := FirmwareUpdate{}
+		bmc := host.InterfaceBMC()
+		ip := ""
+		if bmc != nil {
+			ip = bmc.AddrString()
+		}
+		r, err := NewRedfishClient(ip, jr.user, jr.pass, jr.insecure)
+		if err != nil {
+			m.Msg = fmt.Sprintf("%s", err)
+			return
+		}
+
+		defer r.client.Logout()
+
+		jids := make(map[string]string)
+		for _, firmwarePath := range firmwarePaths {
+			jid, err := r.UpdateFirmware(firmwarePath)
+			if err != nil {
+				m.Msg = fmt.Sprintf("%s", err)
+				return
+			}
+			jids[firmwarePath] = jid
+		}
+
+		// time.Sleep(time.Second * 5)
+
+		// completeJobs := make(map[string]*redfish.Job, 0)
+		// scheduledJobs := make(map[string]string, 0)
+
+		// for len(jids) > 0 {
+		// 	for firmwarePath, jid := range jids {
+		// 		job, err := r.GetJobInfo(jid)
+		// 		if err != nil {
+		// 			m.Msg = fmt.Sprintf("%s", err)
+		// 			return
+		// 		}
+		// 		if job.JobState == "Completed" {
+		// 			completeJobs[firmwarePath] = job
+		// 			delete(jids, firmwarePath)
+		// 		}
+		// 		if job.JobState == "Starting" {
+		// 			scheduledJobs[firmwarePath] = jid
+		// 			delete(jids, firmwarePath)
+		// 		}
+		// 	}
+		// }
+		// if len(scheduledJobs) > 0 {
+		// 	err := r.PowerCycle("")
+		// 	if err != nil {
+		// 		m.Msg = fmt.Sprintf("%s", err)
+		// 		return // will returning now cause more issues than it's worth??
+		// 	}
+		// }
+
+		// for len(scheduledJobs) > 0 {
+		// 	for firmwarePath, jid := range scheduledJobs {
+		// 		job, err := r.GetJobInfo(jid)
+		// 		if err != nil {
+		// 			if strings.Contains(err.Error(), "401") {
+		// 				r.client.Logout()
+		// 				r, err = NewRedfishClient(ip, jr.user, jr.pass, jr.insecure)
+		// 				if err != nil {
+		// 					m.Msg = fmt.Sprintf("%s", err)
+		// 					return
+		// 				}
+		// 			} else {
+		// 				m.Msg = fmt.Sprintf("%s", err)
+		// 				return
+		// 			}
+		// 			time.Sleep(time.Minute)
+		// 			break
+		// 		}
+
+		// 		if job.JobState == "Completed" {
+		// 			completeJobs[firmwarePath] = job
+		// 			delete(scheduledJobs, firmwarePath)
+		// 		}
+		// 	}
+		// }
+
+		// data.Jobs = completeJobs
+
+		// for i := 0; i < 30; i++ {
+		// 	data.CurrentFirmwares, err = r.GetFirmware()
+		// 	if err == nil {
+		// 		break
+		// 	}
+		// 	if strings.Contains(err.Error(), "401") {
+		// 		r.client.Logout()
+		// 		r, err = NewRedfishClient(ip, jr.user, jr.pass, jr.insecure)
+		// 		if err != nil {
+		// 			m.Msg = fmt.Sprintf("%s", err)
+		// 			return
+		// 		}
+		// 	}
+		// 	time.Sleep(time.Minute)
+		// }
+
+		// if r.service.Vendor == "Dell" {
+		// 	sys, err := r.GetSystem()
+		// 	if err != nil {
+		// 		m.Msg = fmt.Sprintf("%s", err)
+		// 		return
+		// 	}
+		// 	data.SystemID = fmt.Sprintf("%04X", sys.OEM.Dell.DellSystem.SystemID)
+		// }
+
+		data.Name = host.Name
+		output, err := json.Marshal(data)
+		if err != nil {
+			m.Msg = fmt.Sprintf("%s", err)
+			return
+		}
+
+		m.Status = "success"
+		m.Msg = string(output)
+	})
+}
+
+func (r *jobRunner) RunGetJobs(host *model.Host, ch chan JobMessage) {
+	r.limit.Execute(func() {
+		m := JobMessage{Status: "error", Host: host.Name}
+		defer func() { ch <- m }()
+
 		bmc := host.InterfaceBMC()
 		ip := ""
 		if bmc != nil {
@@ -230,77 +352,15 @@ func (r *jobRunner) RunUpdateFirmware(host *model.Host, ch chan JobMessage, firm
 
 		defer r.client.Logout()
 
-		tids := make(map[string]string)
-		for _, firmwarePath := range firmwarePaths {
-			tid, err := r.UpdateFirmware("grendel-dev.mgmt.ccr.buffalo.edu" + firmwarePath)
-			if err != nil {
-				m.Msg = fmt.Sprintf("%s", err)
-				return
-			}
-			tids[firmwarePath] = tid
-		}
-
-		completeTasks := make(map[string]*redfish.Task, 0)
-		scheduledTasks := make(map[string]string, 0)
-
-		for len(tids) > 0 {
-			for firmwarePath, tid := range tids {
-				task, err := r.GetTaskInfo(tid)
-				if err != nil {
-					m.Msg = fmt.Sprintf("%s", err)
-					return
-				}
-				if task.TaskState == "Completed" {
-					completeTasks[firmwarePath] = task
-					delete(tids, firmwarePath)
-				}
-				if task.TaskState == "Starting" {
-					scheduledTasks[firmwarePath] = tid
-					delete(tids, firmwarePath)
-				}
-			}
-		}
-
-		if len(scheduledTasks) > 0 {
-			err := r.PowerCycle("")
-			if err != nil {
-				m.Msg = fmt.Sprintf("%s", err)
-				return // will returning now cause more issues than it's worth??
-			}
-		}
-
-		for len(scheduledTasks) > 0 {
-			for firmwarePath, tid := range scheduledTasks {
-				task, err := r.GetTaskInfo(tid)
-				if err != nil {
-					m.Msg = fmt.Sprintf("%s", err)
-					return
-				}
-				if task.TaskState == "Completed" {
-					completeTasks[firmwarePath] = task
-					delete(scheduledTasks, firmwarePath)
-				}
-			}
-		}
-
-		data.Tasks = completeTasks
-
-		data.CurrentFirmwares, err = r.GetFirmware()
+		data := BMCJob{}
+		data.Jobs, err = r.GetJobs()
 		if err != nil {
 			m.Msg = fmt.Sprintf("%s", err)
 			return
 		}
 
-		if r.service.Vendor == "Dell" {
-			sys, err := r.GetSystem()
-			if err != nil {
-				m.Msg = fmt.Sprintf("%s", err)
-				return
-			}
-			data.SystemID = fmt.Sprintf("%04X", sys.OEM.Dell.DellSystem.SystemID)
-		}
+		data.Host = host.Name
 
-		data.Name = host.Name
 		output, err := json.Marshal(data)
 		if err != nil {
 			m.Msg = fmt.Sprintf("%s", err)

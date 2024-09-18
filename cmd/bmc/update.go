@@ -251,7 +251,7 @@ func runFirmwareUpgrade() error {
 	t.AppendHeader(table.Row{"Host", "Path", "Job Name", "Job Status", "Job State", "Job Messages"})
 
 	for _, host := range hosts {
-		for path, job := range host.Tasks {
+		for path, job := range host.Jobs {
 			msg := []string{}
 			for _, message := range job.Messages {
 				msg = append(msg, message.Message)
@@ -260,8 +260,8 @@ func runFirmwareUpgrade() error {
 				host.Name,
 				path,
 				job.Name,
-				job.TaskStatus,
-				job.TaskState,
+				job.JobStatus,
+				job.JobState,
 				strings.Join(msg, ", "),
 			})
 		}

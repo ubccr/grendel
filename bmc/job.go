@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"sort"
 	"time"
 
 	"github.com/spf13/viper"
@@ -198,6 +199,55 @@ func (j *Job) UpdateFirmware(hostList model.HostList, firmwarePaths []string) ([
 		if err != nil {
 			return nil, err
 		}
+
+		arr = append(arr, d)
+	}
+
+	return arr, nil
+}
+
+func (j *Job) GetJobs(hostList model.HostList) ([]BMCJob, error) {
+	runner := newJobRunner(j)
+
+	ch := make(chan JobMessage, len(hostList))
+	for i, host := range hostList {
+		runner.RunGetJobs(host, ch)
+
+		if (i+1)%j.fanout == 0 {
+			time.Sleep(j.delay)
+			continue
+		}
+	}
+
+	runner.Wait()
+	close(ch)
+
+	arr := []BMCJob{}
+	for m := range ch {
+		if m.Status != "success" {
+			fmt.Printf("%s\t%s\t%s\n", m.Status, m.Host, m.Msg)
+			fmt.Printf("Error querying host: %s\n", m.Host)
+			continue
+		}
+		d := BMCJob{}
+		err := json.Unmarshal([]byte(m.Msg), &d)
+		if err != nil {
+			return nil, err
+		}
+
+		layout := "2006-01-02T15:04:05-07:00"
+		sort.Slice(d.Jobs, func(i, j int) bool {
+			ti, err := time.Parse(layout, d.Jobs[i].StartTime)
+			if err != nil {
+				return false
+			}
+			tj, err := time.Parse(layout, d.Jobs[j].StartTime)
+			if err != nil {
+				return false
+			}
+
+			return tj.Before(ti)
+		})
 
 		arr = append(arr, d)
 	}

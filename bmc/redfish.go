@@ -188,11 +188,33 @@ func (r *Redfish) UpdateFirmware(target string) (string, error) {
 		protocol = redfish.HTTPSTransferProtocolType
 	}
 
+	// This should probably be a function?
+	rawip, err := util.GetFirstExternalIPFromInterfaces()
+	if err != nil {
+		return "", err
+	}
+
+	ip := rawip.String()
+	lip, port, err := net.SplitHostPort(viper.GetString("provision.listen"))
+	if err != nil {
+		return "", err
+	}
+
+	if lip != "0.0.0.0" {
+		ip = lip
+	}
+
+	cip := viper.GetString("bmc.config_share_ip")
+	if cip != "" {
+		ip = cip
+	}
+	//
+
 	params := redfish.SimpleUpdateParameters{
 		ForceUpdate: false,
 		// Targets: []string{""},
 		TransferProtocol: protocol,
-		ImageURI:         target,
+		ImageURI:         fmt.Sprintf("%s:%s%s", ip, port, target),
 	}
 
 	tid, err := us.SimpleUpdate(&params)
@@ -223,13 +245,20 @@ func (r *Redfish) GetJobInfo(jid string) (*redfish.Job, error) {
 	return nil, fmt.Errorf("unable to find job with JID: %s", jid)
 }
 
-func (r *Redfish) GetTaskInfo(jid string) (*redfish.Task, error) {
-	ts, err := r.service.TaskService()
+func (r *Redfish) GetJobs() ([]*redfish.Job, error) {
+	js, err := r.service.JobService()
 	if err != nil {
 		return nil, err
 	}
 
-	r.service.TaskService()
+	return js.Jobs()
+}
+
+func (r *Redfish) GetTaskInfo(tid string) (*redfish.Task, error) {
+	ts, err := r.service.TaskService()
+	if err != nil {
+		return nil, err
+	}
 
 	tasks, err := ts.Tasks()
 	if err != nil {
@@ -237,12 +266,13 @@ func (r *Redfish) GetTaskInfo(jid string) (*redfish.Task, error) {
 	}
 
 	for _, task := range tasks {
-		if task.ID == jid {
+		if task.ID == tid {
 			return task, nil
 		}
 	}
 
-	return nil, fmt.Errorf("unable to find job with JID: %s", jid)
+	fmt.Printf("%#v\n", tasks)
+	return nil, fmt.Errorf("unable to find task with ID: %s", tid)
 }
 
 func (r *Redfish) PowerCycleBmc() error {
