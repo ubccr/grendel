@@ -60,8 +60,8 @@ func (h *Handler) PDUServiceDiscovery(c echo.Context) error {
 		for _, tag := range h.Tags {
 			if strings.Contains(tag, "panel") {
 				labels["panel"] = strings.Replace(tag, "panel:", "", 1)
-			} else if tag == "faculty" || tag == "ubhpc" {
-				labels["cluster"] = tag
+			} else if strings.Contains(tag, "cluster") {
+				labels["cluster"] = strings.Replace(tag, "cluster:", "", 1)
 			} else if strings.Contains(tag, "partition") {
 				labels["partition"] = strings.Replace(tag, "partition:", "", 1)
 			}
