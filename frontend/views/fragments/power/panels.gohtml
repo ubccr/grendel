@@ -14,7 +14,11 @@
                 {{ range $circuits }}
                     <tr class="*:border *:border-netural-300 *:p-0">
                         <td>{{ .Circuit }}</td>
-                        <td>{{ .PDU }}</td>
+                        <td>
+                            <a class="hover:font-medium" href="/host/{{ .PDU }}">
+                                {{ .PDU }}
+                            </a>
+                        </td>
                     </tr>
                 {{ end }}
             </tbody>
