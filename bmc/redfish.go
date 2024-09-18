@@ -253,6 +253,28 @@ func (r *Redfish) GetJobs() ([]*redfish.Job, error) {
 
 	return js.Jobs()
 }
+func (r *Redfish) ClearJobs() error {
+	js, err := r.service.JobService()
+	if err != nil {
+		return err
+	}
+
+	jobs, err := js.Jobs()
+	if err != nil {
+		return err
+	}
+
+	for _, job := range jobs {
+		uri := fmt.Sprintf("/redfish/v1/JobService/Jobs/%s", job.ID)
+		resp, err := r.client.Delete(uri)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+	}
+
+	return nil
+}
 
 func (r *Redfish) GetTaskInfo(tid string) (*redfish.Task, error) {
 	ts, err := r.service.TaskService()

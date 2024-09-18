@@ -255,6 +255,26 @@ func (j *Job) GetJobs(hostList model.HostList) ([]BMCJob, error) {
 	return arr, nil
 }
 
+func (j *Job) ClearJobs(hostList model.HostList) ([]JobMessage, error) {
+	runner := newJobRunner(j)
+
+	ch := make(chan JobMessage, len(hostList))
+	for i, host := range hostList {
+		runner.RunClearJobs(host, ch)
+
+		if (i+1)%j.fanout == 0 {
+			time.Sleep(j.delay)
+			continue
+		}
+	}
+
+	runner.Wait()
+	close(ch)
+
+	return FormatOutput(ch)
+
+}
+
 func (j *Job) PowerCycleBmc(hostList model.HostList) ([]JobMessage, error) {
 	runner := newJobRunner(j)
 

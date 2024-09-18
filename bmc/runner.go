@@ -372,6 +372,35 @@ func (r *jobRunner) RunGetJobs(host *model.Host, ch chan JobMessage) {
 	})
 }
 
+func (r *jobRunner) RunClearJobs(host *model.Host, ch chan JobMessage) {
+	r.limit.Execute(func() {
+		m := JobMessage{Status: "error", Host: host.Name}
+		defer func() { ch <- m }()
+
+		bmc := host.InterfaceBMC()
+		ip := ""
+		if bmc != nil {
+			ip = bmc.AddrString()
+		}
+		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
+		if err != nil {
+			m.Msg = fmt.Sprintf("%s", err)
+			return
+		}
+
+		defer r.client.Logout()
+
+		err = r.ClearJobs()
+		if err != nil {
+			m.Msg = fmt.Sprintf("%s", err)
+			return
+		}
+
+		m.Status = "success"
+		m.Msg = "Cleared Jobs from the BMC"
+	})
+}
+
 func (r *jobRunner) RunPowerCycleBmc(host *model.Host, ch chan JobMessage) {
 	r.limit.Execute(func() {
 		m := JobMessage{Status: "error", Host: host.Name}
