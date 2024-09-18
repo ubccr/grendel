@@ -62,10 +62,9 @@ func (h *Handler) PDUServiceDiscovery(c echo.Context) error {
 				labels["panel"] = strings.Replace(tag, "panel:", "", 1)
 			} else if tag == "faculty" || tag == "ubhpc" {
 				labels["cluster"] = tag
+			} else if strings.Contains(tag, "partition") {
+				labels["partition"] = strings.Replace(tag, "partition:", "", 1)
 			}
-			// else if strings.Contains(tag, "circuit") {
-			// 	labels["circuit"] = strings.Replace(tag, "circuit:", "", 1)
-			// }
 		}
 		nameSlice := strings.Split(h.Name, "-")
 		if len(nameSlice) > 1 {
