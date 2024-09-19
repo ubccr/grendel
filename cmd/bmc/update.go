@@ -19,6 +19,7 @@ package bmc
 
 import (
 	"encoding/xml"
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -57,8 +58,8 @@ var (
 			return runFirmwareUpgrade()
 		},
 	}
-	firmwareUpgradePaths  []string
-	firmwareUpgradeReboot bool
+	firmwareUpgradePaths []string
+	// firmwareUpgradeReboot bool
 )
 
 func init() {
@@ -67,11 +68,12 @@ func init() {
 	firmwareCmd.AddCommand(firmwareUpgradeCmd)
 
 	firmwareCheckCmd.Flags().StringVar(&firmwareCheckCatalog, "catalog", "", "Path to catalog.xml from downloads.dell.com")
+	firmwareCheckCmd.MarkFlagRequired("catalog")
 	firmwareCheckCmd.Flags().BoolVar(&firmwareCheckShort, "short", false, "Only display componets with an update available")
 
 	firmwareUpgradeCmd.Flags().StringSliceVar(&firmwareUpgradePaths, "paths", []string{}, "Path from /repo directory to update files. (required) EX: --paths /repo/bmc/dell/idrac_fw_v7.10.0.0.EXE,/repo/bmc/dell/bios_fw_2.1.8.EXE")
 	firmwareUpgradeCmd.MarkFlagRequired("paths")
-	firmwareUpgradeCmd.Flags().BoolVar(&firmwareUpgradeReboot, "reboot", false, "Reboot host automatically if required by Firmware upgrade")
+	// firmwareUpgradeCmd.Flags().BoolVar(&firmwareUpgradeReboot, "reboot", false, "Reboot host automatically if required by Firmware upgrade")
 }
 
 type Catalog struct {
@@ -175,13 +177,29 @@ func runFirmwareCheck() error {
 	t := table.NewWriter()
 	t.SetOutputMirror(os.Stdout)
 	t.AppendHeader(table.Row{"Host", "Component", "Current Version", "Latest Version", "Reboot Required"})
+	t.SetColumnConfigs([]table.ColumnConfig{
+		{
+			Name:      "Host",
+			AutoMerge: true,
+		},
+	})
+	t2 := table.NewWriter()
+	t2.SetOutputMirror(os.Stdout)
+	t2.AppendHeader(table.Row{"Component", "Path"})
+	t2.SetColumnConfigs([]table.ColumnConfig{
+		{
+			Name:      "Component",
+			AutoMerge: true,
+		},
+		{
+			Name:      "Path",
+			AutoMerge: true,
+		},
+	})
 
 	for _, host := range hostsFirmware {
-		name := host.Name
-		// fmt.Println(host.SystemID)
 		for componentID, firmware := range host.CurrentFirmwares {
 			latestFirmwares := []SoftwareComponents{}
-			// fmt.Printf("%s:\n%#v\n\n", componentID, firmware)
 			for _, softwareComponent := range updateCatalog[host.SystemID] {
 				for _, device := range softwareComponent.SupportedDevices.Device {
 					if device.ComponentID == componentID {
@@ -212,22 +230,33 @@ func runFirmwareCheck() error {
 			if firmwareCheckShort && (firmware.Version == latest.VendorVersion || latest.VendorVersion == "") {
 				continue
 			}
+			method := strings.ToLower(catalog.BaseLocationAccessProtocols)
+
+			path := fmt.Sprintf("%s://%s/%s", method, catalog.BaseLocation, latest.Path)
 
 			t.AppendRow(table.Row{
-				name,
+				host.Name,
 				firmware.Name,
 				firmware.Version,
 				colorVersion(firmware.Version, latest.VendorVersion),
 				latest.RebootRequired,
-			})
-
-			name = ""
+			}, table.RowConfig{AutoMerge: true})
+			t2.AppendRow(table.Row{
+				firmware.Name,
+				path,
+			}, table.RowConfig{AutoMerge: true})
+			t2.AppendSeparator()
 		}
 		t.AppendSeparator()
 	}
 
 	t.SetStyle(table.StyleLight)
 	t.Render()
+	t2.SetStyle(table.StyleLight)
+	t2.SortBy([]table.SortBy{
+		{Name: "Component", Mode: table.Asc},
+	})
+	t2.Render()
 
 	return nil
 }
@@ -246,30 +275,9 @@ func runFirmwareUpgrade() error {
 		return err
 	}
 
-	t := table.NewWriter()
-	t.SetOutputMirror(os.Stdout)
-	t.AppendHeader(table.Row{"Host", "Path", "Job Name", "Job Status", "Job State", "Job Messages"})
-
 	for _, host := range hosts {
-		for path, job := range host.Jobs {
-			msg := []string{}
-			for _, message := range job.Messages {
-				msg = append(msg, message.Message)
-			}
-			t.AppendRow(table.Row{
-				host.Name,
-				path,
-				job.Name,
-				job.JobStatus,
-				job.JobState,
-				strings.Join(msg, ", "),
-			})
-		}
-		t.AppendSeparator()
+		fmt.Printf("%s\t %s\t %s\n", host.Host, host.Status, host.Msg)
 	}
-
-	t.SetStyle(table.StyleLight)
-	t.Render()
 
 	return nil
 }

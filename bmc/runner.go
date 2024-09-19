@@ -215,7 +215,6 @@ func (jr *jobRunner) RunUpdateFirmware(host *model.Host, ch chan JobMessage, fir
 		m := JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
-		data := FirmwareUpdate{}
 		bmc := host.InterfaceBMC()
 		ip := ""
 		if bmc != nil {
@@ -229,108 +228,16 @@ func (jr *jobRunner) RunUpdateFirmware(host *model.Host, ch chan JobMessage, fir
 
 		defer r.client.Logout()
 
-		jids := make(map[string]string)
 		for _, firmwarePath := range firmwarePaths {
-			jid, err := r.UpdateFirmware(firmwarePath)
+			err := r.UpdateFirmware(firmwarePath)
 			if err != nil {
 				m.Msg = fmt.Sprintf("%s", err)
 				return
 			}
-			jids[firmwarePath] = jid
-		}
-
-		// time.Sleep(time.Second * 5)
-
-		// completeJobs := make(map[string]*redfish.Job, 0)
-		// scheduledJobs := make(map[string]string, 0)
-
-		// for len(jids) > 0 {
-		// 	for firmwarePath, jid := range jids {
-		// 		job, err := r.GetJobInfo(jid)
-		// 		if err != nil {
-		// 			m.Msg = fmt.Sprintf("%s", err)
-		// 			return
-		// 		}
-		// 		if job.JobState == "Completed" {
-		// 			completeJobs[firmwarePath] = job
-		// 			delete(jids, firmwarePath)
-		// 		}
-		// 		if job.JobState == "Starting" {
-		// 			scheduledJobs[firmwarePath] = jid
-		// 			delete(jids, firmwarePath)
-		// 		}
-		// 	}
-		// }
-		// if len(scheduledJobs) > 0 {
-		// 	err := r.PowerCycle("")
-		// 	if err != nil {
-		// 		m.Msg = fmt.Sprintf("%s", err)
-		// 		return // will returning now cause more issues than it's worth??
-		// 	}
-		// }
-
-		// for len(scheduledJobs) > 0 {
-		// 	for firmwarePath, jid := range scheduledJobs {
-		// 		job, err := r.GetJobInfo(jid)
-		// 		if err != nil {
-		// 			if strings.Contains(err.Error(), "401") {
-		// 				r.client.Logout()
-		// 				r, err = NewRedfishClient(ip, jr.user, jr.pass, jr.insecure)
-		// 				if err != nil {
-		// 					m.Msg = fmt.Sprintf("%s", err)
-		// 					return
-		// 				}
-		// 			} else {
-		// 				m.Msg = fmt.Sprintf("%s", err)
-		// 				return
-		// 			}
-		// 			time.Sleep(time.Minute)
-		// 			break
-		// 		}
-
-		// 		if job.JobState == "Completed" {
-		// 			completeJobs[firmwarePath] = job
-		// 			delete(scheduledJobs, firmwarePath)
-		// 		}
-		// 	}
-		// }
-
-		// data.Jobs = completeJobs
-
-		// for i := 0; i < 30; i++ {
-		// 	data.CurrentFirmwares, err = r.GetFirmware()
-		// 	if err == nil {
-		// 		break
-		// 	}
-		// 	if strings.Contains(err.Error(), "401") {
-		// 		r.client.Logout()
-		// 		r, err = NewRedfishClient(ip, jr.user, jr.pass, jr.insecure)
-		// 		if err != nil {
-		// 			m.Msg = fmt.Sprintf("%s", err)
-		// 			return
-		// 		}
-		// 	}
-		// 	time.Sleep(time.Minute)
-		// }
-
-		// if r.service.Vendor == "Dell" {
-		// 	sys, err := r.GetSystem()
-		// 	if err != nil {
-		// 		m.Msg = fmt.Sprintf("%s", err)
-		// 		return
-		// 	}
-		// 	data.SystemID = fmt.Sprintf("%04X", sys.OEM.Dell.DellSystem.SystemID)
-		// }
-
-		data.Name = host.Name
-		output, err := json.Marshal(data)
-		if err != nil {
-			m.Msg = fmt.Sprintf("%s", err)
-			return
 		}
 
 		m.Status = "success"
-		m.Msg = string(output)
+		m.Msg = "Submitted update job(s) to BMC"
 	})
 }
 

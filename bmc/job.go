@@ -171,7 +171,7 @@ func (j *Job) GetFirmware(hostList model.HostList) ([]Firmware, error) {
 	return arr, nil
 }
 
-func (j *Job) UpdateFirmware(hostList model.HostList, firmwarePaths []string) ([]FirmwareUpdate, error) {
+func (j *Job) UpdateFirmware(hostList model.HostList, firmwarePaths []string) ([]JobMessage, error) {
 	runner := newJobRunner(j)
 
 	ch := make(chan JobMessage, len(hostList))
@@ -187,23 +187,7 @@ func (j *Job) UpdateFirmware(hostList model.HostList, firmwarePaths []string) ([
 	runner.Wait()
 	close(ch)
 
-	arr := []FirmwareUpdate{}
-	for m := range ch {
-		if m.Status != "success" {
-			fmt.Printf("%s\t%s\t%s\n", m.Status, m.Host, m.Msg)
-			fmt.Printf("Error querying host: %s\n", m.Host)
-			continue
-		}
-		d := FirmwareUpdate{}
-		err := json.Unmarshal([]byte(m.Msg), &d)
-		if err != nil {
-			return nil, err
-		}
-
-		arr = append(arr, d)
-	}
-
-	return arr, nil
+	return FormatOutput(ch)
 }
 
 func (j *Job) GetJobs(hostList model.HostList) ([]BMCJob, error) {
@@ -226,7 +210,6 @@ func (j *Job) GetJobs(hostList model.HostList) ([]BMCJob, error) {
 	for m := range ch {
 		if m.Status != "success" {
 			fmt.Printf("%s\t%s\t%s\n", m.Status, m.Host, m.Msg)
-			fmt.Printf("Error querying host: %s\n", m.Host)
 			continue
 		}
 		d := BMCJob{}

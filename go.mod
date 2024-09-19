@@ -4,8 +4,6 @@ go 1.21
 
 toolchain go1.21.0
 
-replace github.com/stmcginnis/gofish => ../gofish
-
 require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
 	github.com/Pallinder/go-randomdata v1.2.0
@@ -20,6 +18,7 @@ require (
 	github.com/hako/branca v0.0.0-20191227164554-3b9970524189
 	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/insomniacslk/dhcp v0.0.0-20200922210017-67c425063dca
+	github.com/jedib0t/go-pretty/v6 v6.5.9
 	github.com/korovkin/limiter v0.0.0-20190919045942-dac5a6b2a536
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/labstack/gommon v0.4.2
@@ -51,7 +50,6 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/gofiber/template v1.8.2 // indirect
 	github.com/gofiber/utils v1.1.0 // indirect
-	github.com/jedib0t/go-pretty/v6 v6.5.9 // indirect
 	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/redis/go-redis/v9 v9.0.2 // indirect
 	github.com/vaughan0/go-ini v0.0.0-20130923145212-a98ad7ee00ec // indirect

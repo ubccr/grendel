@@ -78,6 +78,8 @@ func (r *Redfish) bootOverride(bootOption string) error {
 		boot.BootSourceOverrideTarget = redfish.UtilitiesBootSourceOverrideTarget
 	case "diagnostics":
 		boot.BootSourceOverrideTarget = redfish.DiagsBootSourceOverrideTarget
+	case "none":
+		return nil
 	default:
 		return fmt.Errorf("boot option %s not supported", bootOption)
 	}
@@ -175,10 +177,10 @@ func (r *Redfish) GetFirmware() (map[string]CurrentFirmware, error) {
 	return firmware, nil
 }
 
-func (r *Redfish) UpdateFirmware(target string) (string, error) {
+func (r *Redfish) UpdateFirmware(target string) error {
 	us, err := r.service.UpdateService()
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	rawScheme := viper.GetString("provision.scheme")
@@ -191,17 +193,17 @@ func (r *Redfish) UpdateFirmware(target string) (string, error) {
 	// This should probably be a function?
 	rawip, err := util.GetFirstExternalIPFromInterfaces()
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	ip := rawip.String()
 	lip, port, err := net.SplitHostPort(viper.GetString("provision.listen"))
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	if lip != "0.0.0.0" {
-		ip = lip
+		ip = fmt.Sprintf("%s:%s", lip, port)
 	}
 
 	cip := viper.GetString("bmc.config_share_ip")
@@ -214,15 +216,10 @@ func (r *Redfish) UpdateFirmware(target string) (string, error) {
 		ForceUpdate: false,
 		// Targets: []string{""},
 		TransferProtocol: protocol,
-		ImageURI:         fmt.Sprintf("%s:%s%s", ip, port, target),
+		ImageURI:         fmt.Sprintf("%s%s", ip, target),
 	}
 
-	tid, err := us.SimpleUpdate(&params)
-	if err != nil {
-		return "", err
-	}
-
-	return tid, nil
+	return us.SimpleUpdate(&params)
 }
 
 func (r *Redfish) GetJobInfo(jid string) (*redfish.Job, error) {

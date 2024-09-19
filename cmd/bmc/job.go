@@ -72,16 +72,19 @@ func cmdJobStatus() error {
 	t.AppendHeader(table.Row{"Host", "Start Time", "Job Name", "State", "Progress", "Messages"})
 	t.SetColumnConfigs([]table.ColumnConfig{
 		{
+			Name:      "Host",
+			AutoMerge: true,
+		},
+		{
 			Name:     "Messages",
 			WidthMax: 64,
 		},
 	})
 
 	for _, hostJob := range hostJobs {
-		name := hostJob.Host
 		if len(hostJob.Jobs) == 0 {
 			t.AppendRow(table.Row{
-				name,
+				hostJob.Host,
 			})
 		}
 		for _, job := range hostJob.Jobs {
@@ -95,14 +98,13 @@ func cmdJobStatus() error {
 				return err
 			}
 			t.AppendRow(table.Row{
-				name,
+				hostJob.Host,
 				startTime.Format(time.DateTime),
 				job.Name,
 				job.JobState,
 				fmt.Sprintf("%d%%", job.PercentComplete),
 				strings.Join(messages, ", "),
-			})
-			name = ""
+			}, table.RowConfig{AutoMerge: true})
 		}
 		t.AppendSeparator()
 	}
