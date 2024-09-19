@@ -19,6 +19,7 @@ package provision
 
 import (
 	"fmt"
+	"maps"
 	"net/http"
 	"strings"
 
@@ -46,6 +47,11 @@ func (h *Handler) PDUServiceDiscovery(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to find hosts").SetInternal(err)
 	}
 
+	allLabels := make(map[string]string, 0)
+	for key := range c.QueryParams() {
+		allLabels[key] = c.QueryParam(key)
+	}
+
 	for _, h := range hosts {
 		if !h.HasTags(tag) {
 			continue
@@ -56,14 +62,15 @@ func (h *Handler) PDUServiceDiscovery(c echo.Context) error {
 			continue
 		}
 		labels := make(map[string]string, 0)
+		maps.Copy(labels, allLabels)
 
 		for _, tag := range h.Tags {
 			if strings.Contains(tag, "panel") {
 				labels["panel"] = strings.Replace(tag, "panel:", "", 1)
-			} else if strings.Contains(tag, "cluster") {
-				labels["cluster"] = strings.Replace(tag, "cluster:", "", 1)
-			} else if strings.Contains(tag, "partition") {
-				labels["partition"] = strings.Replace(tag, "partition:", "", 1)
+			} else if strings.Contains(tag, "rack_type") {
+				labels["rack_type"] = strings.Replace(tag, "rack_type:", "", 1)
+			} else if strings.Contains(tag, "generation") {
+				labels["generation"] = strings.Replace(tag, "generation:", "", 1)
 			}
 		}
 		nameSlice := strings.Split(h.Name, "-")
