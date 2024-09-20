@@ -58,7 +58,8 @@ var (
 			return runFirmwareUpgrade()
 		},
 	}
-	firmwareUpgradePaths []string
+	firmwareUpgradePackages []string
+	firmwareUpgradePath     string
 	// firmwareUpgradeReboot bool
 )
 
@@ -71,9 +72,9 @@ func init() {
 	firmwareCheckCmd.MarkFlagRequired("catalog")
 	firmwareCheckCmd.Flags().BoolVar(&firmwareCheckShort, "short", false, "Only display componets with an update available")
 
-	firmwareUpgradeCmd.Flags().StringSliceVar(&firmwareUpgradePaths, "paths", []string{}, "Path from /repo directory to update files. (required) EX: --paths /repo/bmc/dell/idrac_fw_v7.10.0.0.EXE,/repo/bmc/dell/bios_fw_2.1.8.EXE")
+	firmwareUpgradeCmd.Flags().StringSliceVar(&firmwareUpgradePackages, "packages", []string{}, "Path from repo endpoint to update files. (required) EX: --packages /repo/bmc/dell/idrac_fw_v7.10.0.0.EXE,/repo/bmc/dell/bios_fw_2.1.8.EXE")
+	firmwareUpgradeCmd.Flags().StringVar(&firmwareUpgradePath, "path", "", "Optional directoy to packages, can be used to avoid rewriting /repo/bmc/dell for updating multiple packaged EX: --path /repo/bmc/dell/ --packages idrac_fw_v7.10.0.0.EXE,bios_fw_2.1.8.EXE")
 	firmwareUpgradeCmd.MarkFlagRequired("paths")
-	// firmwareUpgradeCmd.Flags().BoolVar(&firmwareUpgradeReboot, "reboot", false, "Reboot host automatically if required by Firmware upgrade")
 }
 
 type Catalog struct {
@@ -269,8 +270,14 @@ func colorVersion(v1, v2 string) string {
 }
 
 func runFirmwareUpgrade() error {
+	if firmwareUpgradePath != "" {
+		for i, firmwareUpgradePackage := range firmwareUpgradePackages {
+			firmwareUpgradePackages[i] = firmwareUpgradePath + firmwareUpgradePackage
+		}
+	}
+
 	job := bmc.NewJob()
-	hosts, err := job.UpdateFirmware(hostList, firmwareUpgradePaths)
+	hosts, err := job.UpdateFirmware(hostList, firmwareUpgradePackages)
 	if err != nil {
 		return err
 	}
