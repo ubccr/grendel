@@ -49,4 +49,17 @@ func TestArista(t *testing.T) {
 	for _, entry := range macTable {
 		fmt.Printf("%s - %d\n", entry.MAC, entry.Port)
 	}
+
+	lldpNeighbors, err := client.GetLLDPNeighbors()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(lldpNeighbors) == 0 {
+		t.Errorf("No lldp neighbors returned from api")
+	}
+
+	for iface, entry := range lldpNeighbors {
+		fmt.Printf("%s - %s - %s\n", iface, entry.ChassisId, entry.PortDescription)
+	}
 }

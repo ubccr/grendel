@@ -76,6 +76,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	e.GET("/onie-updater*", h.Onie).Name = "onie"
 	if viper.GetBool("provision.enable_prometheus_sd") {
 		e.GET("/service-discovery/:tag/:port", h.ServiceDiscovery).Name = "sd"
+		e.GET("/pdu-service-discovery/:tag/:port", h.PDUServiceDiscovery).Name = "psd"
 	}
 
 	boot := e.Group("/boot/:token/")

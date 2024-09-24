@@ -1,10 +1,12 @@
 package bmc
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
 	"strings"
+	"time"
 
 	"github.com/spf13/viper"
 	"github.com/stmcginnis/gofish/redfish"
@@ -76,6 +78,8 @@ func (r *Redfish) bootOverride(bootOption string) error {
 		boot.BootSourceOverrideTarget = redfish.UtilitiesBootSourceOverrideTarget
 	case "diagnostics":
 		boot.BootSourceOverrideTarget = redfish.DiagsBootSourceOverrideTarget
+	case "none":
+		return nil
 	default:
 		return fmt.Errorf("boot option %s not supported", bootOption)
 	}
@@ -105,6 +109,8 @@ func (r *Redfish) GetSystem() (*System, error) {
 	}
 
 	sys := ss[0]
+	var oem SystemOEM
+	json.Unmarshal(sys.OEM, &oem)
 
 	system := &System{
 		HostName:       sys.HostName,
@@ -118,9 +124,174 @@ func (r *Redfish) GetSystem() (*System, error) {
 		ProcessorCount: sys.ProcessorSummary.LogicalProcessorCount,
 		BootNext:       sys.Boot.BootNext,
 		BootOrder:      sys.Boot.BootOrder,
+		OEM:            oem,
 	}
 
 	return system, nil
+}
+func (r *Redfish) GetFirmware() (map[string]CurrentFirmware, error) {
+	us, err := r.service.UpdateService()
+	if err != nil {
+		return nil, err
+	}
+	firmwareInventories, err := us.FirmwareInventories()
+	if err != nil {
+		return nil, err
+	}
+
+	layout := "2006-01-02T15:04:05Z"
+	firmware := make(map[string]CurrentFirmware, 0)
+	for _, firmwareInventory := range firmwareInventories {
+		// Dell lists Current, Installed, and Previous firmwares. We only want "Installed" firmware
+		if strings.Contains(firmwareInventory.ID, "Previous-") || strings.Contains(firmwareInventory.ID, "Current-") {
+			continue
+		}
+		// Figuring out which version is the newest is a PITA, firmwareInvnetory.VersionSchema may allow us to
+		// use the version string, except as of testing, Dell and Lenovo both don't fill out the field
+		// So use use the newest released firmware...
+		prevReleaseStr := firmware[firmwareInventory.SoftwareID].ReleaseDate
+		if prevReleaseStr != "" && prevReleaseStr != "00:00:00Z" {
+			prevReleaseTime, err := time.Parse(layout, prevReleaseStr)
+			if err != nil {
+				return nil, err
+			}
+			releaseTime, err := time.Parse(layout, firmwareInventory.ReleaseDate)
+			if err != nil {
+				return nil, err
+			}
+
+			if releaseTime.Before(prevReleaseTime) {
+				continue
+			}
+		}
+		firmware[firmwareInventory.SoftwareID] = CurrentFirmware{
+			ID:          firmwareInventory.ID,
+			Name:        firmwareInventory.Name,
+			ReleaseDate: firmwareInventory.ReleaseDate,
+			SoftwareID:  firmwareInventory.SoftwareID,
+			Updatable:   firmwareInventory.Updateable,
+			Version:     firmwareInventory.Version,
+		}
+	}
+
+	return firmware, nil
+}
+
+func (r *Redfish) UpdateFirmware(target string) error {
+	us, err := r.service.UpdateService()
+	if err != nil {
+		return err
+	}
+
+	rawScheme := viper.GetString("provision.scheme")
+	scheme := strings.ToUpper(rawScheme)
+	protocol := redfish.HTTPTransferProtocolType
+	if scheme == "HTTPS" {
+		protocol = redfish.HTTPSTransferProtocolType
+	}
+
+	// This should probably be a function?
+	rawip, err := util.GetFirstExternalIPFromInterfaces()
+	if err != nil {
+		return err
+	}
+
+	ip := rawip.String()
+	lip, port, err := net.SplitHostPort(viper.GetString("provision.listen"))
+	if err != nil {
+		return err
+	}
+
+	if lip != "0.0.0.0" {
+		ip = fmt.Sprintf("%s:%s", lip, port)
+	}
+
+	cip := viper.GetString("bmc.config_share_ip")
+	if cip != "" {
+		ip = cip
+	}
+	//
+
+	params := redfish.SimpleUpdateParameters{
+		ForceUpdate: false,
+		// Targets: []string{""},
+		TransferProtocol: protocol,
+		ImageURI:         fmt.Sprintf("%s%s", ip, target),
+	}
+
+	return us.SimpleUpdate(&params)
+}
+
+func (r *Redfish) GetJobInfo(jid string) (*redfish.Job, error) {
+	js, err := r.service.JobService()
+	if err != nil {
+		return nil, err
+	}
+
+	jobs, err := js.Jobs()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, job := range jobs {
+		if job.ID == jid {
+			return job, nil
+		}
+	}
+
+	return nil, fmt.Errorf("unable to find job with JID: %s", jid)
+}
+
+func (r *Redfish) GetJobs() ([]*redfish.Job, error) {
+	js, err := r.service.JobService()
+	if err != nil {
+		return nil, err
+	}
+
+	return js.Jobs()
+}
+func (r *Redfish) ClearJobs() error {
+	js, err := r.service.JobService()
+	if err != nil {
+		return err
+	}
+
+	jobs, err := js.Jobs()
+	if err != nil {
+		return err
+	}
+
+	for _, job := range jobs {
+		uri := fmt.Sprintf("/redfish/v1/JobService/Jobs/%s", job.ID)
+		resp, err := r.client.Delete(uri)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+	}
+
+	return nil
+}
+
+func (r *Redfish) GetTaskInfo(tid string) (*redfish.Task, error) {
+	ts, err := r.service.TaskService()
+	if err != nil {
+		return nil, err
+	}
+
+	tasks, err := ts.Tasks()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, task := range tasks {
+		if task.ID == tid {
+			return task, nil
+		}
+	}
+
+	fmt.Printf("%#v\n", tasks)
+	return nil, fmt.Errorf("unable to find task with ID: %s", tid)
 }
 
 func (r *Redfish) PowerCycleBmc() error {
@@ -203,7 +374,7 @@ func (r *Redfish) BmcImportConfiguration(shutdownType, path, file string) (strin
 		ShareParameters shareParameters
 	}
 
-	viper.SetDefault("provision.scheme", "http")
+	// viper.SetDefault("provision.scheme", "http")
 	rawScheme := viper.GetString("provision.scheme")
 	scheme := strings.ToUpper(rawScheme)
 
@@ -227,7 +398,7 @@ func (r *Redfish) BmcImportConfiguration(shutdownType, path, file string) (strin
 		ip = cip
 	}
 
-	viper.SetDefault("bmc.config_ignore_certificate_warning", "Disabled")
+	// viper.SetDefault("bmc.config_ignore_certificate_warning", "Disabled")
 	icw := viper.GetString("bmc.config_ignore_certificate_warning")
 
 	log.Debugf("Import system config debug info: scheme=%s ip=%s port=%s file=%s path=%s icw=%s", scheme, ip, port, file, path, icw)

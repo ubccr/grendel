@@ -80,56 +80,72 @@ func (h *Handler) hostForm(f *fiber.Ctx) error {
 }
 
 func (h *Handler) rackTable(f *fiber.Ctx) error {
-	rack := f.Params("rack")
+	rackName := f.Params("rack")
 
-	n, err := h.DB.FindTags([]string{rack})
+	ns, err := h.DB.FindTags([]string{rackName})
 	if err != nil {
 		return ToastError(f, err, "Failed to find hosts tagged with rack")
 	}
 
-	hosts, err := h.DB.FindHosts(n)
+	hosts, err := h.DB.FindHosts(ns)
 	if err != nil {
 		return ToastError(f, err, "Failed to find hosts")
 	}
 
-	type hostArrStruct struct {
+	type rackArrStruct struct {
 		U     string
 		Hosts model.HostList
 	}
-	hostArr := make([]hostArrStruct, 0)
+	rackArr := make([]rackArrStruct, 0)
 
 	viper.SetDefault("frontend.rack_min", 3)
 	viper.SetDefault("frontend.rack_max", 42)
 	min := viper.GetInt("frontend.rack_min")
 	max := viper.GetInt("frontend.rack_max")
 
+	pdus := []string{}
+
+	for _, host := range hosts {
+		if host.HostType() != "power" || !host.HasAnyTags("0u") {
+			continue
+		}
+		pdus = append(pdus, host.Name)
+		log.Debugln(host.Name)
+	}
+
 	for i := max; i >= min; i-- {
 		u := fmt.Sprintf("%02d", i)
-		h := model.HostList{}
+		hostsInU := model.HostList{}
 
-		for _, v := range hosts {
-			if v.HostType() == "power" && !v.HasAnyTags("1u", "2u") {
+		for _, host := range hosts {
+			if host.HostType() == "power" && host.HasAnyTags("0u") {
 				continue
 			}
-			nameArr := strings.Split(v.Name, "-")
+			nameArr := strings.Split(host.Name, "-")
 			if len(nameArr) < 2 {
-				log.Debugf("Invalid host name: %s", v.Name)
+				log.Debugf("Invalid host name: %s", host.Name)
 				continue
 			}
 			if nameArr[2] == u {
-				h = append(h, v)
+				hostsInU = append(hostsInU, host)
 			}
 		}
 
-		hostArr = append(hostArr, hostArrStruct{
+		rackArr = append(rackArr, rackArrStruct{
 			U:     u,
-			Hosts: h,
+			Hosts: hostsInU,
 		})
 	}
 
+	pduHalf := len(pdus) / 2
+
 	return f.Render("fragments/rack/table", fiber.Map{
-		"Hosts": hostArr,
-		"Rack":  rack,
+		"Rack":     rackArr,
+		"RackName": rackName,
+		"PDUs": fiber.Map{
+			"Left":  pdus[pduHalf:],
+			"Right": pdus[0:pduHalf],
+		},
 	}, "")
 }
 
@@ -146,6 +162,70 @@ func (h *Handler) actions(f *fiber.Ctx) error {
 		"BmcSystem":                bmc.System{},
 		"ExportCSVDefaultTemplate": viper.GetString("frontend.export_csv_default_template"),
 		"BootImages":               h.getBootImages(),
+	}, "")
+}
+func (h *Handler) powerPanels(f *fiber.Ctx) error {
+	ns, err := h.DB.FindTags([]string{"pdu"})
+	if err != nil {
+		return err
+	}
+	hosts, err := h.DB.FindHosts(ns)
+	if err != nil {
+		return err
+	}
+
+	type Panel struct {
+		Circuit string
+		PDU     string
+	}
+	panels := make(map[string][]Panel, 0)
+
+	for _, host := range hosts {
+		p := ""
+		c := ""
+
+		for _, tag := range host.Tags {
+			if strings.Contains(tag, "panel") {
+				p = strings.Replace(tag, "panel:", "", 1)
+			} else if strings.Contains(tag, "circuit") {
+				c = strings.Replace(tag, "circuit:", "", 1)
+
+			}
+		}
+		if p == "" && c == "" {
+			continue
+		}
+
+		panels[p] = append(panels[p], Panel{
+			Circuit: c,
+			PDU:     host.Name,
+		})
+	}
+
+	for _, circuits := range panels {
+		sort.Slice(circuits, func(i, j int) bool {
+			prev := strings.Split(circuits[i].Circuit, "-")
+			if len(prev) == 0 {
+				return false
+			}
+			prevInt, err := strconv.Atoi(prev[0])
+			if err != nil {
+				return false
+			}
+			curr := strings.Split(circuits[j].Circuit, "-")
+			if len(prev) == 0 {
+				return false
+			}
+			currInt, err := strconv.Atoi(curr[0])
+			if err != nil {
+				return false
+			}
+			return prevInt < currInt
+		})
+	}
+
+	return f.Render("fragments/power/panels", fiber.Map{
+		"Panels": panels,
 	}, "")
 }
 

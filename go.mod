@@ -18,6 +18,7 @@ require (
 	github.com/hako/branca v0.0.0-20191227164554-3b9970524189
 	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/insomniacslk/dhcp v0.0.0-20200922210017-67c425063dca
+	github.com/jedib0t/go-pretty/v6 v6.5.9
 	github.com/korovkin/limiter v0.0.0-20190919045942-dac5a6b2a536
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/labstack/gommon v0.4.2
@@ -31,7 +32,7 @@ require (
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.15.0
-	github.com/stmcginnis/gofish v0.15.0
+	github.com/stmcginnis/gofish v0.19.0
 	github.com/stretchr/testify v1.8.4
 	github.com/tidwall/buntdb v1.3.0
 	github.com/tidwall/gjson v1.17.3
@@ -41,6 +42,7 @@ require (
 	golang.org/x/crypto v0.25.0
 	golang.org/x/net v0.27.0
 	golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783
+	golang.org/x/sync v0.7.0
 	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637
 )
 
@@ -52,7 +54,6 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/redis/go-redis/v9 v9.0.2 // indirect
 	github.com/vaughan0/go-ini v0.0.0-20130923145212-a98ad7ee00ec // indirect
-	golang.org/x/sync v0.7.0 // indirect
 )
 
 require (

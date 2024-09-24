@@ -4,18 +4,36 @@
 <table class="w-full table-fixed">
     <thead>
         <tr>
+            {{ range .PDUs.Left }}
+                <th class="{{ $tdClasses }} w-14"></th>
+            {{ end }}
             <th class="{{ $tdClasses }} w-14">u</th>
-            <th class="{{ $tdClasses }}">{{ .Rack }}</th>
+            <th class="{{ $tdClasses }}">{{ .RackName }}</th>
             <th class="{{ $tdClasses }} w-14"></th>
+            {{ range .PDUs.Right }}
+                <th class="{{ $tdClasses }} w-14"></th>
+            {{ end }}
         </tr>
     </thead>
     <tbody>
-        {{ range .Hosts }}
+        {{ range $i, $rack := .Rack }}
             <tr class="hover:bg-neutral-50">
+                {{ if eq $i 0 }}
+                    {{ range $.PDUs.Left }}
+                        <td rowspan="{{ len $.Rack }}" class="{{ $tdClasses }}">
+                            <a
+                                class="[writing-mode:vertical-rl] hover:font-medium"
+                                href="/host/{{ . }}"
+                                hx-boost="false">
+                                {{ . }}
+                            </a>
+                        </td>
+                    {{ end }}
+                {{ end }}
                 <td class="{{ $tdClasses }}">{{ .U }}</td>
                 <td class="border border-neutral-300 p-0">
                     <div class="flex divide-x-2">
-                        {{ range .Hosts }}
+                        {{ range $rack.Hosts }}
                             <div class="grid w-full p-1 sm:grid-cols-1 md:grid-cols-3">
                                 <div class="items-center gap-1 overflow-auto max-md:hidden md:flex">
                                     {{ if eq .Provision true }}
@@ -65,6 +83,18 @@
                         </div>
                     {{ end }}
                 </td>
+                {{ if eq $i 0 }}
+                    {{ range $.PDUs.Right }}
+                        <td rowspan="{{ len $.Rack }}" class="{{ $tdClasses }}">
+                            <a
+                                class="[writing-mode:vertical-rl] hover:font-medium"
+                                href="/host/{{ . }}"
+                                hx-boost="false">
+                                {{ . }}
+                            </a>
+                        </td>
+                    {{ end }}
+                {{ end }}
             </tr>
         {{ end }}
     </tbody>

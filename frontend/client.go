@@ -46,6 +46,12 @@ func (h *Handler) nodes(f *fiber.Ctx) error {
 	})
 }
 
+func (h *Handler) power(f *fiber.Ctx) error {
+	return f.Render("power", fiber.Map{
+		"Title": "Grendel - Power",
+	})
+}
+
 func (h *Handler) Host(f *fiber.Ctx) error {
 	host := f.Params("host")
 	return f.Render("host", fiber.Map{

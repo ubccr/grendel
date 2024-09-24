@@ -164,6 +164,150 @@ func (r *jobRunner) RunBmcStatus(host *model.Host, ch chan JobMessage) {
 	})
 }
 
+func (r *jobRunner) RunGetFirmware(host *model.Host, ch chan JobMessage) {
+	r.limit.Execute(func() {
+		m := JobMessage{Status: "error", Host: host.Name}
+		defer func() { ch <- m }()
+
+		data := Firmware{}
+		bmc := host.InterfaceBMC()
+		ip := ""
+		if bmc != nil {
+			ip = bmc.AddrString()
+		}
+		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
+		if err != nil {
+			m.Msg = fmt.Sprintf("%s", err)
+			return
+		}
+
+		defer r.client.Logout()
+
+		data.CurrentFirmwares, err = r.GetFirmware()
+		if err != nil {
+			m.Msg = fmt.Sprintf("%s", err)
+			return
+		}
+
+		if r.service.Vendor == "Dell" {
+			sys, err := r.GetSystem()
+			if err != nil {
+				m.Msg = fmt.Sprintf("%s", err)
+				return
+			}
+			data.SystemID = fmt.Sprintf("%04X", sys.OEM.Dell.DellSystem.SystemID)
+		}
+
+		data.Name = host.Name
+		output, err := json.Marshal(data)
+		if err != nil {
+			m.Msg = fmt.Sprintf("%s", err)
+			return
+		}
+
+		m.Status = "success"
+		m.Msg = string(output)
+	})
+}
+
+func (jr *jobRunner) RunUpdateFirmware(host *model.Host, ch chan JobMessage, firmwarePaths []string) {
+	jr.limit.Execute(func() {
+		m := JobMessage{Status: "error", Host: host.Name}
+		defer func() { ch <- m }()
+
+		bmc := host.InterfaceBMC()
+		ip := ""
+		if bmc != nil {
+			ip = bmc.AddrString()
+		}
+		r, err := NewRedfishClient(ip, jr.user, jr.pass, jr.insecure)
+		if err != nil {
+			m.Msg = fmt.Sprintf("%s", err)
+			return
+		}
+
+		defer r.client.Logout()
+
+		for _, firmwarePath := range firmwarePaths {
+			err := r.UpdateFirmware(firmwarePath)
+			if err != nil {
+				m.Msg = fmt.Sprintf("%s", err)
+				return
+			}
+		}
+
+		m.Status = "success"
+		m.Msg = "Submitted update job(s) to BMC"
+	})
+}
+
+func (r *jobRunner) RunGetJobs(host *model.Host, ch chan JobMessage) {
+	r.limit.Execute(func() {
+		m := JobMessage{Status: "error", Host: host.Name}
+		defer func() { ch <- m }()
+
+		bmc := host.InterfaceBMC()
+		ip := ""
+		if bmc != nil {
+			ip = bmc.AddrString()
+		}
+		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
+		if err != nil {
+			m.Msg = fmt.Sprintf("%s", err)
+			return
+		}
+
+		defer r.client.Logout()
+
+		data := BMCJob{}
+		data.Jobs, err = r.GetJobs()
+		if err != nil {
+			m.Msg = fmt.Sprintf("%s", err)
+			return
+		}
+
+		data.Host = host.Name
+
+		output, err := json.Marshal(data)
+		if err != nil {
+			m.Msg = fmt.Sprintf("%s", err)
+			return
+		}
+
+		m.Status = "success"
+		m.Msg = string(output)
+	})
+}
+
+func (r *jobRunner) RunClearJobs(host *model.Host, ch chan JobMessage) {
+	r.limit.Execute(func() {
+		m := JobMessage{Status: "error", Host: host.Name}
+		defer func() { ch <- m }()
+
+		bmc := host.InterfaceBMC()
+		ip := ""
+		if bmc != nil {
+			ip = bmc.AddrString()
+		}
+		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
+		if err != nil {
+			m.Msg = fmt.Sprintf("%s", err)
+			return
+		}
+
+		defer r.client.Logout()
+
+		err = r.ClearJobs()
+		if err != nil {
+			m.Msg = fmt.Sprintf("%s", err)
+			return
+		}
+
+		m.Status = "success"
+		m.Msg = "Cleared Jobs from the BMC"
+	})
+}
+
 func (r *jobRunner) RunPowerCycleBmc(host *model.Host, ch chan JobMessage) {
 	r.limit.Execute(func() {
 		m := JobMessage{Status: "error", Host: host.Name}
