@@ -72,7 +72,7 @@ func init() {
 	firmwareCmd.AddCommand(firmwareUpgradeCmd)
 
 	firmwareCheckCmd.Flags().BoolVar(&firmwareCheckShort, "short", false, "Only display componets with an update available")
-	firmwareCheckCmd.Flags().StringVar(&firmwareCheckCatalog, "catalog", "/var/lib/grendel/DellCatalog.xml", "Path to catalog.xml from downloads.dell.com")
+	firmwareCheckCmd.Flags().StringVar(&firmwareCheckCatalog, "catalog", "/var/lib/grendel/repo/bmc/dell/Catalog.xml", "Path to catalog.xml from downloads.dell.com")
 	firmwareCheckCmd.Flags().BoolVar(&firmwareCheckCatalogDownload, "catalog-download", false, "Auto download latest catalog from downloads.dell.com. Uses --catalog path as download location")
 	firmwareCheckCmd.Flags().StringVar(&firmwareCheckFirmwareDownload, "firmware-download", "", "Path to a directory firmware will be downloaded, leaving this blank will not download the firmware. EX: /var/lib/grendel/repo/bmc")
 
