@@ -1,5 +1,15 @@
 # Grendel Changelog
 
+## [0.0.14] - 2024-09-24
+
+- Update default grendel.toml config
+- Feat: provision - added custom PDU prometheus service discovery endpoint
+- Feat: frontend - added Power page to display panel and circuit information. required pdu tags: panel:1,circuit:1-3
+- Feat: frontend - rack page now renders 0u PDUs
+- Feat: cli - added bmc firmware and job commands to allow firmware updates via the Redfish API
+- Feat: cli - added auto-downloading of the Dell update catalog & firmware updates
+- Fix: bmc - power command now functions correctly without an --override set
+
 ## [0.0.13] - 2024-08-26
 
 - Update retryablehttp, gjson, ipxe deps
@@ -154,4 +164,5 @@
 [0.0.11]: https://github.com/ubccr/grendel/releases/tag/v0.0.11
 [0.0.12]: https://github.com/ubccr/grendel/releases/tag/v0.0.12
 [0.0.13]: https://github.com/ubccr/grendel/releases/tag/v0.0.13
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.13...HEAD
+[0.0.14]: https://github.com/ubccr/grendel/releases/tag/v0.0.14
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.14...HEAD
