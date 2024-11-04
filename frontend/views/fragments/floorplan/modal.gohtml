@@ -115,7 +115,7 @@
                 id="floorplanInventoryForm"
                 hx-post="/api/host/inventory"
                 hx-swap="none"
-                hx-on::after-request="if(event.detail.successful) this.reset()">
+                hx-on::after-request="if(event.detail.successful) clearInvForm()">
                 <div class="grid grid-cols-1 gap-3 p-3 drop-shadow-sm">
                     <div>
                         <label for="SerialNumber" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
@@ -137,6 +137,18 @@
                         <input
                             id="AssetNumber"
                             name="AssetNumber"
+                            class="w-full rounded-md border border-neutral-300 px-2 py-1"
+                            placeholder=""
+                            type="text"
+                            autocomplete="off" />
+                    </div>
+                    <div>
+                        <label for="Manufacturer" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                            Manufacturer:
+                        </label>
+                        <input
+                            id="Manufacturer"
+                            name="Manufacturer"
                             class="w-full rounded-md border border-neutral-300 px-2 py-1"
                             placeholder=""
                             type="text"
@@ -188,6 +200,13 @@
             Submit
         </button>
         <button
+            id="floorplanClearBtn"
+            type="reset"
+            form="floorplanInventoryForm"
+            class="transform rounded-md border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90">
+            Clear
+        </button>
+        <button
             type="button"
             onclick="closeModal()"
             class="transform rounded-md border bg-neutral-500 px-2 py-1 text-white transition-transform hover:bg-neutral-400 active:scale-90">
@@ -237,6 +256,13 @@
             input.value = input.value.replace(replace, "");
         }
     }
+    function clearInvForm() {
+        s = document.getElementById("SerialNumber");
+        a = document.getElementById("AssetNumber");
+
+        s.value = "";
+        a.value = "";
+    }
     function parseForm() {
         let ifaces = document.getElementById("interfaces").children;
         let interfaces = [];
@@ -258,6 +284,7 @@
         let inventoryBtn = document.getElementById("floorplanAddInventoryBtn");
         let importBtn = document.getElementById("floorplanImportBtn");
         let submitBtn = document.getElementById("floorplanSubmitBtn");
+        let clearBtn = document.getElementById("floorplanClearBtn");
 
         document.getElementById("floorplanHostDiv").classList.remove("hidden");
         document.getElementById("floorplanInventoryDiv").classList.add("hidden");
@@ -271,12 +298,14 @@
         importBtn.classList.remove("bg-white", "border", "border-gray-200");
 
         submitBtn.attributes["form"].value = "floorplanAddHostForm";
+        clearBtn.attributes["form"].value = "floorplanAddHostForm";
     }
     function showAddInventoryForm() {
         let addHostBtn = document.getElementById("floorplanAddHostBtn");
         let inventoryBtn = document.getElementById("floorplanAddInventoryBtn");
         let importBtn = document.getElementById("floorplanImportBtn");
         let submitBtn = document.getElementById("floorplanSubmitBtn");
+        let clearBtn = document.getElementById("floorplanClearBtn");
 
         document.getElementById("floorplanHostDiv").classList.add("hidden");
         document.getElementById("floorplanInventoryDiv").classList.remove("hidden");
@@ -290,12 +319,14 @@
         importBtn.classList.remove("bg-white", "border", "border-gray-200");
 
         submitBtn.attributes["form"].value = "floorplanInventoryForm";
+        clearBtn.attributes["form"].value = "floorplanInventoryForm";
     }
     function showImportForm() {
         let addHostBtn = document.getElementById("floorplanAddHostBtn");
         let inventoryBtn = document.getElementById("floorplanAddInventoryBtn");
         let importBtn = document.getElementById("floorplanImportBtn");
         let submitBtn = document.getElementById("floorplanSubmitBtn");
+        let clearBtn = document.getElementById("floorplanClearBtn");
 
         document.getElementById("floorplanHostDiv").classList.add("hidden");
         document.getElementById("floorplanInventoryDiv").classList.add("hidden");
@@ -309,5 +340,6 @@
         importBtn.classList.add("bg-white", "border", "border-gray-200");
 
         submitBtn.attributes["form"].value = "floorplanImportForm";
+        clearBtn.attributes["form"].value = "floorplanImportForm";
     }
 </script>
