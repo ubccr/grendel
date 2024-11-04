@@ -359,9 +359,7 @@
                                 id="exportTemplate"
                                 name="template"
                                 placeholder="See golang text/template for examples. Available methods:
-    .Hosts []{{ Sprintf "%#v" .BmcSystem }}
-    .Date string // formatted with DateOnly
-"
+{{ .TemplateDataHosts }}"
                                 rows="4"
                                 class="whitespace-pre w-full rounded-md border border-neutral-300 px-2 py-1"
                                 type="text">{{ .ExportCSVDefaultTemplate }}</textarea>
