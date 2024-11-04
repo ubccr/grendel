@@ -255,6 +255,78 @@ func (h *Handler) EditHost(f *fiber.Ctx) error {
 	return ToastSuccess(f, "Successfully updated host", `, "refresh": ""`)
 }
 
+type inventoryHostData struct {
+	SerialNumber string `form:"SerialNumber"`
+	AssetNumber  string `form:"AssetNumber"`
+	Model        string `form:"Model"`
+	Tags         string `form:"Tags"`
+	PONumber     string `form:"PONumber"`
+}
+
+func (h *Handler) AddInventoryHost(f *fiber.Ctx) error {
+	form := new(inventoryHostData)
+
+	err := f.BodyParser(form)
+	if err != nil {
+		return ToastError(f, err, "Failed to bind type to request body")
+	}
+	log.Debugf("%#v", form)
+	name := fmt.Sprintf("inv-%s", form.SerialNumber)
+	tags := []string{}
+
+	serial := fmt.Sprintf("serial_number:%s", form.SerialNumber)
+	tags = append(tags, serial)
+
+	if form.AssetNumber != "" {
+		assetTag := fmt.Sprintf("asset_number:%s", form.AssetNumber)
+		tags = append(tags, assetTag)
+	}
+
+	if form.Model != "" {
+		assetTag := fmt.Sprintf("model:%s", form.Model)
+		tags = append(tags, assetTag)
+	}
+
+	if form.PONumber != "" {
+		po := fmt.Sprintf("po_number:%s", form.PONumber)
+		tags = append(tags, po)
+	}
+
+	if form.Tags != "" {
+		tags = append(tags, strings.Split(form.Tags, ",")...)
+	}
+
+	newHost := model.Host{
+		Name: name,
+		Tags: tags,
+	}
+
+	ns, err := nodeset.NewNodeSet(name)
+	if err != nil {
+		f.Status(400)
+		return ToastError(f, err, "Failed to check for duplicates")
+	}
+	hl, err := h.DB.FindHosts(ns)
+	if err != nil {
+		f.Status(400)
+		return ToastError(f, err, "Failed to lookup duplicates")
+	}
+
+	if len(hl) != 0 {
+		f.Status(400)
+		return ToastError(f, err, "Failed to add inventory host. Duplicate entry detected.")
+	}
+
+	err = h.DB.StoreHost(&newHost)
+	if err != nil {
+		f.Status(400)
+		return ToastError(f, err, "Failed to update host")
+	}
+
+	h.writeEvent("info", f, fmt.Sprintf("Added new Inventory host %s", newHost.Name))
+	return ToastSuccess(f, "Successfully added inventory host", `, "refresh": ""`)
+}
+
 func (h *Handler) DeleteHost(f *fiber.Ctx) error {
 	hosts := f.FormValue("hosts")
 	ns, err := nodeset.NewNodeSet(hosts)

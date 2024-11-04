@@ -108,6 +108,7 @@ func (h *Handler) SetupRoutes(app *fiber.App) {
 	api.Post("/host", auth, h.EditHost)
 	api.Delete("/host", auth, h.DeleteHost)
 	api.Post("/host/import", auth, h.importHost)
+	api.Post("/host/inventory", auth, h.AddInventoryHost)
 
 	fragment.Get("/interfaces", auth, h.interfaces)
 	fragment.Get("/bonds", auth, h.bonds)
