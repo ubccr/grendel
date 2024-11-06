@@ -110,7 +110,6 @@ func (h *Handler) rackTable(f *fiber.Ctx) error {
 			continue
 		}
 		pdus = append(pdus, host.Name)
-		log.Debugln(host.Name)
 	}
 
 	for i := max; i >= min; i-- {
