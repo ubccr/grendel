@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net"
 	"net/netip"
-	"slices"
 	"strconv"
 	"strings"
 	"text/template"
@@ -258,6 +257,7 @@ func (h *Handler) EditHost(f *fiber.Ctx) error {
 type inventoryHostData struct {
 	SerialNumber string `form:"SerialNumber"`
 	AssetNumber  string `form:"AssetNumber"`
+	Manufacturer string `form:"Manufacturer"`
 	Model        string `form:"Model"`
 	Tags         string `form:"Tags"`
 	PONumber     string `form:"PONumber"`
@@ -270,7 +270,7 @@ func (h *Handler) AddInventoryHost(f *fiber.Ctx) error {
 	if err != nil {
 		return ToastError(f, err, "Failed to bind type to request body")
 	}
-	log.Debugf("%#v", form)
+
 	name := fmt.Sprintf("inv-%s", form.SerialNumber)
 	tags := []string{}
 
@@ -278,18 +278,22 @@ func (h *Handler) AddInventoryHost(f *fiber.Ctx) error {
 	tags = append(tags, serial)
 
 	if form.AssetNumber != "" {
-		assetTag := fmt.Sprintf("asset_number:%s", form.AssetNumber)
-		tags = append(tags, assetTag)
+		t := fmt.Sprintf("asset_number:%s", form.AssetNumber)
+		tags = append(tags, t)
 	}
 
+	if form.Manufacturer != "" {
+		t := fmt.Sprintf("manufacturer:%s", form.Manufacturer)
+		tags = append(tags, t)
+	}
 	if form.Model != "" {
-		assetTag := fmt.Sprintf("model:%s", form.Model)
-		tags = append(tags, assetTag)
+		t := fmt.Sprintf("model:%s", form.Model)
+		tags = append(tags, t)
 	}
 
 	if form.PONumber != "" {
-		po := fmt.Sprintf("po_number:%s", form.PONumber)
-		tags = append(tags, po)
+		t := fmt.Sprintf("po_number:%s", form.PONumber)
+		tags = append(tags, t)
 	}
 
 	if form.Tags != "" {
@@ -314,7 +318,19 @@ func (h *Handler) AddInventoryHost(f *fiber.Ctx) error {
 
 	if len(hl) != 0 {
 		f.Status(400)
-		return ToastError(f, err, "Failed to add inventory host. Duplicate entry detected.")
+		ns, _ := hl.ToNodeSet()
+		return ToastError(f, err, fmt.Sprintf("Failed to add inventory host. Duplicate tag entry detected: %s", ns))
+	}
+
+	hlt, err := h.DB.FindTags([]string{serial})
+	if err != nil {
+		f.Status(400)
+		return ToastError(f, err, "Failed to lookup duplicates")
+	}
+
+	if hlt.Len() != 0 {
+		f.Status(400)
+		return ToastError(f, err, fmt.Sprintf("Failed to add inventory host. Duplicate tag entry detected: %s", hlt))
 	}
 
 	err = h.DB.StoreHost(&newHost)
@@ -544,6 +560,21 @@ func (h *Handler) exportHosts(f *fiber.Ctx) error {
 	return f.SendString(string(o))
 }
 
+type templateDataHosts struct {
+	Manufacturer string
+	Model        string
+	SerialNumber string
+	AssetNumber  string
+	PONumber     string
+	Host         *model.Host
+	System       bmc.System
+}
+
+type templateData struct {
+	Hosts []templateDataHosts
+	Date  string
+}
+
 func (h *Handler) exportInventory(f *fiber.Ctx) error {
 	hosts := f.Params("hosts")
 	filename := f.Query("filename")
@@ -565,19 +596,78 @@ func (h *Handler) exportInventory(f *fiber.Ctx) error {
 	}
 
 	job := bmc.NewJob()
-	jobStatus, err := job.BmcStatus(hostList)
+	jobStatuses, err := job.BmcStatus(hostList)
 	if err != nil {
 		return err
 	}
 
-	type templateData struct {
-		Hosts []bmc.System
-		Date  string
+	td := templateData{
+		Date: time.Now().Format(time.DateOnly),
 	}
 
-	td := templateData{
-		Hosts: jobStatus,
-		Date:  time.Now().Format(time.DateOnly),
+	queryErrors := "\n\nWARNING:\n"
+	for _, host := range hostList {
+		assetNumbers := []string{}
+		for _, tag := range host.Tags {
+			if !strings.Contains(tag, "asset_number") {
+				continue
+			}
+			t := strings.Split(tag, ":")
+			if len(t) < 2 {
+				continue
+			}
+			assetNumbers = append(assetNumbers, t[1])
+		}
+
+		if len(assetNumbers) == 0 {
+			assetNumbers = append(assetNumbers, "")
+		}
+
+		for _, assetNumber := range assetNumbers {
+			tdh := templateDataHosts{
+				Host:        host,
+				System:      bmc.System{},
+				AssetNumber: assetNumber,
+			}
+			for _, jobStatus := range jobStatuses {
+				if jobStatus.Name != host.Name {
+					continue
+				}
+				tdh.System = jobStatus
+				tdh.Manufacturer = jobStatus.Manufacturer
+				tdh.Model = jobStatus.Model
+				tdh.SerialNumber = jobStatus.SerialNumber
+				break
+			}
+			for _, tag := range host.Tags {
+				t := strings.Split(tag, ":")
+				if len(t) < 2 {
+					continue
+				}
+
+				switch t[0] {
+				case "serial_number":
+					if tdh.SerialNumber != "" && tdh.SerialNumber != t[1] {
+						queryErrors += fmt.Sprintf("Host: %s, Tag: %s does not match queried value of: %s\n", host.Name, t, tdh.SerialNumber)
+					}
+					tdh.SerialNumber = t[1]
+				case "po_number":
+					tdh.PONumber = t[1]
+				case "model":
+					if tdh.Model != "" && tdh.Model != t[1] {
+						queryErrors += fmt.Sprintf("Host: %s, Tag: %s does not match queried value of: %s\n", host.Name, t, tdh.Model)
+					}
+					tdh.Model = t[1]
+				case "manufacturer":
+					if tdh.Manufacturer != "" && tdh.Manufacturer != t[1] {
+						queryErrors += fmt.Sprintf("Host: %s, Tag: %s does not match queried value of: %s\n", host.Name, t, tdh.Manufacturer)
+					}
+					tdh.Manufacturer = t[1]
+				}
+			}
+
+			td.Hosts = append(td.Hosts, tdh)
+		}
 	}
 
 	var buf bytes.Buffer
@@ -586,17 +676,8 @@ func (h *Handler) exportInventory(f *fiber.Ctx) error {
 		return ToastError(f, err, "Failed to execute template")
 	}
 
-	it := ns.Iterator()
-
-	failed := []string{}
-	for it.Next() {
-		if !slices.ContainsFunc(jobStatus, func(x bmc.System) bool { return x.Name == it.Value() }) {
-			failed = append(failed, it.Value())
-		}
-	}
-
-	if len(hostList) != len(jobStatus) {
-		buf.WriteString(fmt.Sprintf("\nWARNING: Some BMC queries have failed. Their entries will not be listed:\n%s", strings.Join(failed, "\n")))
+	if queryErrors != "\n\nWARNING:\n" {
+		buf.WriteString(queryErrors)
 	}
 
 	if filename != "" {
