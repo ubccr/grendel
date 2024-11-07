@@ -322,13 +322,9 @@ func (h *Handler) AddInventoryHost(f *fiber.Ctx) error {
 		return ToastError(f, err, fmt.Sprintf("Failed to add inventory host. Duplicate tag entry detected: %s", ns))
 	}
 
-	hlt, err := h.DB.FindTags([]string{serial})
-	if err != nil {
-		f.Status(400)
-		return ToastError(f, err, "Failed to lookup duplicates")
-	}
+	hlt, _ := h.DB.FindTags([]string{serial})
 
-	if hlt.Len() != 0 {
+	if hlt != nil && hlt.Len() != 0 {
 		f.Status(400)
 		return ToastError(f, err, fmt.Sprintf("Failed to add inventory host. Duplicate tag entry detected: %s", hlt))
 	}
