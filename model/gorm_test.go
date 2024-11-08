@@ -20,7 +20,6 @@ package model_test
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"testing"
@@ -32,23 +31,29 @@ import (
 	"github.com/ubccr/grendel/nodeset"
 )
 
-func tempfile(prefix string) string {
-	fileName := fmt.Sprintf("grendel-%s-", prefix)
-	name, err := ioutil.TempFile("", fileName)
-	if err != nil {
-		panic(err)
-	}
-	return name.Name()
+// func tempfile(prefix string) string {
+// 	fileName := fmt.Sprintf("grendel-%s-", prefix)
+// 	name, err := ioutil.TempFile("", fileName)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	return name.Name()
+// }
+
+func newGORM() (*model.GORM, error) {
+	return model.NewGORMStore("sqlite", ":memory:", "")
 }
 
-func TestBuntStoreHost(t *testing.T) {
+func TestGORMHost(t *testing.T) {
 	assert := assert.New(t)
 
-	store, err := model.NewBuntStore(":memory:")
-	defer store.Close()
+	store, err := newGORM()
 	assert.NoError(err)
+	defer store.Close()
 
 	host := tests.HostFactory.MustCreate().(*model.Host)
+	// b, _ := json.MarshalIndent(host, "", "    ")
+	// fmt.Println(string(b))
 
 	err = store.StoreHost(host)
 	assert.NoError(err)
@@ -115,15 +120,16 @@ func TestBuntStoreHost(t *testing.T) {
 	}
 
 	_, err = store.LoadHostFromMAC("notfound")
+
 	if assert.Error(err) {
 		assert.True(errors.Is(err, model.ErrNotFound))
 	}
 }
 
-func TestBuntStoreIfname(t *testing.T) {
+func TestGORMIfname(t *testing.T) {
 	assert := assert.New(t)
 
-	store, err := model.NewBuntStore(":memory:")
+	store, err := newGORM()
 	defer store.Close()
 	assert.NoError(err)
 
@@ -138,10 +144,10 @@ func TestBuntStoreIfname(t *testing.T) {
 	}
 }
 
-func TestBuntStoreBonds(t *testing.T) {
+func TestGORMBonds(t *testing.T) {
 	assert := assert.New(t)
 
-	store, err := model.NewBuntStore(":memory:")
+	store, err := newGORM()
 	defer store.Close()
 	assert.NoError(err)
 
@@ -163,10 +169,10 @@ func TestBuntStoreBonds(t *testing.T) {
 	}
 }
 
-func TestBuntStoreHostList(t *testing.T) {
+func TestGORMHostList(t *testing.T) {
 	assert := assert.New(t)
 
-	store, err := model.NewBuntStore(":memory:")
+	store, err := newGORM()
 	defer store.Close()
 	assert.NoError(err)
 
@@ -182,10 +188,10 @@ func TestBuntStoreHostList(t *testing.T) {
 	assert.Equal(10, len(hosts))
 }
 
-func TestBuntStoreHostFind(t *testing.T) {
+func TestGORMHostFind(t *testing.T) {
 	assert := assert.New(t)
 
-	store, err := model.NewBuntStore(":memory:")
+	store, err := newGORM()
 	defer store.Close()
 	assert.NoError(err)
 
@@ -205,10 +211,10 @@ func TestBuntStoreHostFind(t *testing.T) {
 	}
 }
 
-func TestBuntStoreFindTags(t *testing.T) {
+func TestGORMFindTags(t *testing.T) {
 	assert := assert.New(t)
 
-	store, err := model.NewBuntStore(":memory:")
+	store, err := newGORM()
 	defer store.Close()
 	assert.NoError(err)
 
@@ -268,10 +274,10 @@ func TestBuntStoreFindTags(t *testing.T) {
 	}
 }
 
-func TestBuntStoreProvision(t *testing.T) {
+func TestGORMProvision(t *testing.T) {
 	assert := assert.New(t)
 
-	store, err := model.NewBuntStore(":memory:")
+	store, err := newGORM()
 	defer store.Close()
 	assert.NoError(err)
 
@@ -304,10 +310,10 @@ func TestBuntStoreProvision(t *testing.T) {
 	}
 }
 
-func TestBuntStoreSetBootImage(t *testing.T) {
+func TestGORMSetBootImage(t *testing.T) {
 	assert := assert.New(t)
 
-	store, err := model.NewBuntStore(":memory:")
+	store, err := newGORM()
 	defer store.Close()
 	assert.NoError(err)
 
@@ -340,10 +346,10 @@ func TestBuntStoreSetBootImage(t *testing.T) {
 	}
 }
 
-func TestBuntStoreBootImage(t *testing.T) {
+func TestGORMBootImage(t *testing.T) {
 	assert := assert.New(t)
 
-	store, err := model.NewBuntStore(":memory:")
+	store, err := newGORM()
 	defer store.Close()
 	assert.NoError(err)
 
@@ -387,10 +393,10 @@ func TestBuntStoreBootImage(t *testing.T) {
 	}
 }
 
-func TestBuntStoreBootImageDelete(t *testing.T) {
+func TestGORMBootImageDelete(t *testing.T) {
 	assert := assert.New(t)
 
-	store, err := model.NewBuntStore(":memory:")
+	store, err := newGORM()
 	defer store.Close()
 	assert.NoError(err)
 
@@ -413,10 +419,10 @@ func TestBuntStoreBootImageDelete(t *testing.T) {
 	}
 }
 
-func TestBuntStoreUpdate(t *testing.T) {
+func TestGORMUpdate(t *testing.T) {
 	assert := assert.New(t)
 
-	store, err := model.NewBuntStore(":memory:")
+	store, err := newGORM()
 	defer store.Close()
 	assert.NoError(err)
 
@@ -458,10 +464,10 @@ func TestBuntStoreUpdate(t *testing.T) {
 	}
 }
 
-func TestBuntStoreHostDelete(t *testing.T) {
+func TestGORMHostDelete(t *testing.T) {
 	assert := assert.New(t)
 
-	store, err := model.NewBuntStore(":memory:")
+	store, err := newGORM()
 	defer store.Close()
 	assert.NoError(err)
 
@@ -487,8 +493,8 @@ func TestBuntStoreHostDelete(t *testing.T) {
 	}
 }
 
-func BenchmarkBuntStoreWriteHosts(b *testing.B) {
-	file := tempfile("bunt")
+func BenchmarkGORMWriteHosts(b *testing.B) {
+	file := tempfile("gorm")
 	defer os.Remove(file)
 
 	store, err := model.NewBuntStore(file)
@@ -512,8 +518,8 @@ func BenchmarkBuntStoreWriteHosts(b *testing.B) {
 	}
 }
 
-func BenchmarkBuntStoreWriteSingleHost(b *testing.B) {
-	file := tempfile("bunt")
+func BenchmarkGORMWriteSingleHost(b *testing.B) {
+	file := tempfile("gorm")
 	defer os.Remove(file)
 
 	store, err := model.NewBuntStore(file)
@@ -539,8 +545,8 @@ func BenchmarkBuntStoreWriteSingleHost(b *testing.B) {
 	}
 }
 
-func BenchmarkBuntStoreReadAll(b *testing.B) {
-	file := tempfile("bunt")
+func BenchmarkGORMReadAll(b *testing.B) {
+	file := tempfile("gorm")
 	defer os.Remove(file)
 
 	store, err := model.NewBuntStore(file)
@@ -574,8 +580,8 @@ func BenchmarkBuntStoreReadAll(b *testing.B) {
 	}
 }
 
-func BenchmarkBuntStoreParallelFind(b *testing.B) {
-	file := tempfile("bunt")
+func BenchmarkGORMParallelFind(b *testing.B) {
+	file := tempfile("gorm")
 	defer os.Remove(file)
 
 	store, err := model.NewBuntStore(file)
@@ -630,8 +636,8 @@ func BenchmarkBuntStoreParallelFind(b *testing.B) {
 	}
 }
 
-func BenchmarkBuntStoreRandomParallelReads(b *testing.B) {
-	file := tempfile("bunt")
+func BenchmarkGORMRandomParallelReads(b *testing.B) {
+	file := tempfile("gorm")
 	defer os.Remove(file)
 
 	store, err := model.NewBuntStore(file)
@@ -679,8 +685,8 @@ func BenchmarkBuntStoreRandomParallelReads(b *testing.B) {
 	}
 }
 
-func BenchmarkBuntStoreResolveIPv4(b *testing.B) {
-	file := tempfile("bunt")
+func BenchmarkGORMResolveIPv4(b *testing.B) {
+	file := tempfile("gorm")
 	defer os.Remove(file)
 
 	store, err := model.NewBuntStore(file)
@@ -715,8 +721,8 @@ func BenchmarkBuntStoreResolveIPv4(b *testing.B) {
 	}
 }
 
-func BenchmarkBuntStoreReverseResolve(b *testing.B) {
-	file := tempfile("bunt")
+func BenchmarkGORMReverseResolve(b *testing.B) {
+	file := tempfile("gorm")
 	defer os.Remove(file)
 
 	store, err := model.NewBuntStore(file)

@@ -18,20 +18,15 @@ type MACSerializer net.HardwareAddr
 
 // Scan implements serializer interface
 func (MACSerializer) Scan(ctx context.Context, field *schema.Field, dst reflect.Value, dbValue interface{}) (err error) {
-	var mac net.HardwareAddr
-
 	switch value := dbValue.(type) {
 	case []byte:
-		mac = value
+		return field.Set(ctx, dst, value)
 	case string:
-		mac, err = net.ParseMAC(value)
-		if err != nil {
-			return err
-		}
+		mac, _ := net.ParseMAC(value)
+		return field.Set(ctx, dst, mac)
 	default:
 		return fmt.Errorf("unsupported data %#v", dbValue)
 	}
-	return field.Set(ctx, dst, mac)
 }
 
 // Value implements serializer interface

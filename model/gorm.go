@@ -19,9 +19,9 @@ package model
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"net"
-	"net/netip"
 	"strings"
 	"time"
 
@@ -29,7 +29,6 @@ import (
 	_ "github.com/rqlite/gorqlite/stdlib"
 	"github.com/segmentio/ksuid"
 	"github.com/ubccr/grendel/nodeset"
-	"github.com/ubccr/grendel/util"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -37,7 +36,7 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-// GORM implements a Grendel Datastore using BuntDB
+// GORM implements a Grendel Datastore using SQLite or RQLite
 type GORM struct {
 	sqldb *sql.DB
 	db    *gorm.DB
@@ -160,6 +159,34 @@ func (s *GORM) StoreHost(host *Host) error {
 
 // StoreHosts stores a list of host in the data store. If the host exists it is overwritten
 func (s *GORM) StoreHosts(hosts HostList) error {
+	for idx, host := range hosts {
+		if host.Name == "" {
+			return fmt.Errorf("host name required for host %d: %w", idx, ErrInvalidData)
+		}
+
+		// Keys are case-insensitive
+		host.Name = strings.ToLower(host.Name)
+
+		checkHost, err := s.LoadHostFromName(host.Name)
+		fmt.Println(checkHost)
+		fmt.Println(err)
+		if errors.Is(err, ErrNotFound) {
+			uuid, err := ksuid.NewRandom()
+			if err != nil {
+				return err
+			}
+
+			host.ID = uuid
+			continue
+		}
+
+		if err != nil {
+			return fmt.Errorf("Failed to check host with name %s for duplicates:  %w", host.Name, err)
+		}
+
+		host.ID = checkHost.ID
+	}
+
 	err := s.db.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "name"}},
 		UpdateAll: true,
@@ -181,7 +208,11 @@ func (s *GORM) DeleteHosts(ns *nodeset.NodeSet) error {
 // LoadHostFromName returns the Host with the given name
 func (s *GORM) LoadHostFromName(name string) (*Host, error) {
 	var host *Host
-	err := s.db.Where(&Host{Name: name}).Find(&host).Error
+	err := s.db.Preload("Interfaces").Preload("Bonds").Where(&Host{Name: name}).First(&host).Error
+
+	if err == gorm.ErrRecordNotFound {
+		return nil, fmt.Errorf("host with name %s:  %w", name, ErrNotFound)
+	}
 
 	log.Debugf("GORM.LoadHostFromName: loaded host %s", name)
 	return host, err
@@ -189,69 +220,83 @@ func (s *GORM) LoadHostFromName(name string) (*Host, error) {
 
 // LoadHostFromID returns the Host with the given ID
 func (s *GORM) LoadHostFromID(id string) (*Host, error) {
-	kid, err := ksuid.Parse(id)
-	if err != nil {
-		return nil, err
+	host := &Host{ID: ksuid.Nil}
+	err := s.db.Preload("Interfaces").Preload("Bonds").Where("id = ?", id).First(&host).Error
+
+	if err == gorm.ErrRecordNotFound {
+		return nil, fmt.Errorf("host with ID %s:  %w", id, ErrNotFound)
 	}
 
-	var host *Host
-	err = s.db.Where(&Host{ID: kid}).First(&host).Error
-
-	log.Debugf("GORM.LoadHostFromName: loaded host %s", host.Name)
-
+	log.Debugf("GORM.LoadHostFromID: loaded host %s", host.Name)
 	return host, err
 }
 
 // ResolveIPv4 returns the list of IPv4 addresses with the given FQDN
 func (s *GORM) ResolveIPv4(fqdn string) ([]net.IP, error) {
-	var hosts HostList
-	fqdn = util.Normalize(fqdn) // TODO: ???
+	var ifaces []*NetInterface
+	var bonds []*Bond
 	ips := make([]net.IP, 0)
 
-	err := s.db.Preload("Interfaces").Where(&NetInterface{FQDN: fqdn}).Find(&hosts).Error
+	err := s.db.Where(&NetInterface{FQDN: fqdn}).Find(&ifaces).Error
+	if err != nil {
+		return ips, err
+	}
 
-	for _, h := range hosts {
-		for _, i := range h.Interfaces {
-			ip, _ := netip.ParsePrefix(i.IP.String())
-			if ip.IsValid() {
-				ips = append(ips, net.IP(ip.Addr().AsSlice()))
-			}
+	for _, iface := range ifaces {
+		if iface.IP.IsValid() {
+			ips = append(ips, net.IP(iface.IP.Addr().AsSlice()))
 		}
 	}
 
+	err = s.db.Where(&Bond{NetInterface: NetInterface{FQDN: fqdn}}).Find(&bonds).Error
+
+	for _, bond := range bonds {
+		if bond.IP.IsValid() {
+			ips = append(ips, net.IP(bond.IP.Addr().AsSlice()))
+		}
+	}
+
+	log.Debugf("GORM.ResolveIPv4: resolved %d ip(s)", len(ips))
 	return ips, err
 }
 
 // ReverseResolve returns the list of FQDNs for the given IP
 func (s *GORM) ReverseResolve(ip string) ([]string, error) {
-	var hosts HostList
+	var ifaces []*NetInterface
+	var bonds []*Bond
 	fqdns := make([]string, 0)
-	prefix, err := netip.ParsePrefix(ip)
+
+	err := s.db.Where("ip LIKE ?", "%"+ip+"%").Find(&ifaces).Error
 	if err != nil {
-		return []string{}, nil
+		return fqdns, err
 	}
 
-	err = s.db.Preload("Interfaces").Where(&NetInterface{IP: prefix}).Find(&hosts).Error
-
-	for _, h := range hosts {
-		for _, i := range h.Interfaces {
-			fqdns = append(fqdns, strings.Split(i.FQDN, ",")...)
-		}
+	for _, iface := range ifaces {
+		fqdns = append(fqdns, iface.FQDN)
 	}
 
+	err = s.db.Where("ip LIKE ?", "%"+ip+"%").Find(&bonds).Error
+
+	for _, bond := range bonds {
+		fqdns = append(fqdns, bond.FQDN)
+	}
+
+	log.Debugf("GORM.ReverseResolve: resolved %d fqdn(s)", len(fqdns))
 	return fqdns, err
 }
 
 // LoadHostFromMAC returns the Host that has a network interface with the give MAC address
 func (s *GORM) LoadHostFromMAC(macStr string) (*Host, error) {
+	var iface *NetInterface
 	var host *Host
 
-	mac, err := net.ParseMAC(macStr)
-	if err != nil {
-		return nil, err
+	err := s.db.Where("mac = ?", macStr).First(&iface).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, fmt.Errorf("host with MAC %s:  %w", macStr, ErrNotFound)
 	}
-	err = s.db.Preload("Interfaces").Where(&NetInterface{MAC: mac}).First(&host).Error
 
+	err = s.db.Preload("Interfaces").Preload("Bonds").Where(&Host{ID: iface.HostID}).First(&host).Error
+	log.Debugf("GORM.LoadHostFromMAC: retrieved host %s from mac %s", host.Name, macStr)
 	return host, err
 }
 
@@ -260,7 +305,7 @@ func (s *GORM) Hosts() (HostList, error) {
 	var hosts HostList
 	err := s.db.Preload("Interfaces").Preload("Bonds").Find(&hosts).Error
 
-	log.Debugf("GORM.Hosts: loaded %d host(s)", len(hosts))
+	log.Debugf("GORM.Hosts: retrieved %d host(s)", len(hosts))
 
 	return hosts, err
 }
@@ -278,7 +323,7 @@ func (s *GORM) FindHosts(ns *nodeset.NodeSet) (HostList, error) {
 		}
 		hosts = append(hosts, &h)
 	}
-	log.Debugf("GORM.FindHosts: loaded host %s", ns.String())
+	log.Debugf("GORM.FindHosts: found host %s", ns.String())
 	return hosts, nil
 }
 
@@ -310,7 +355,10 @@ func (s *GORM) FindTags(tags []string) (*nodeset.NodeSet, error) {
 		return nil, fmt.Errorf("no hosts found with tags %#v:  %w", tags, ErrNotFound)
 	}
 
-	return nodeset.NewNodeSet(strings.Join(nodes, ","))
+	nodeString := strings.Join(nodes, ",")
+
+	// log.Debugf("GORM.FindTags: loaded host(s) %s tagged with %s", nodeString, tags)
+	return nodeset.NewNodeSet(nodeString)
 }
 
 // MatchTags returns a nodeset.NodeSet of all the hosts with the all given tags
