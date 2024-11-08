@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/netip"
+	"net/url"
 	"strconv"
 	"strings"
 	"text/template"
@@ -552,6 +553,9 @@ func (h *Handler) exportHosts(f *fiber.Ctx) error {
 		f.Set("HX-Redirect", fmt.Sprintf("/api/hosts/export/%s?filename=%s", hosts, filename))
 		f.Set("Content-Type", "application/force-download")
 		f.Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+		ToastSuccess(f, "Download starting shortly...", "")
+	} else {
+		f.Response().Header.Set("HX-Trigger", "openExportModal")
 	}
 	return f.SendString(string(o))
 }
@@ -677,9 +681,12 @@ func (h *Handler) exportInventory(f *fiber.Ctx) error {
 	}
 
 	if filename != "" {
-		f.Set("HX-Redirect", fmt.Sprintf("/api/hosts/inventory/%s?filename=%s", hosts, filename))
+		f.Set("HX-Redirect", fmt.Sprintf("/api/hosts/inventory/%s?template=%s&filename=%s", hosts, url.QueryEscape(templateString), filename))
 		f.Set("Content-Type", "application/force-download")
 		f.Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+		ToastSuccess(f, "Download starting shortly...", "")
+	} else {
+		f.Response().Header.Set("HX-Trigger", "openExportModal")
 	}
 
 	return f.SendString(buf.String())
