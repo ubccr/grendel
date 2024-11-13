@@ -168,8 +168,7 @@ func (s *GORM) StoreHosts(hosts HostList) error {
 		host.Name = strings.ToLower(host.Name)
 
 		checkHost, err := s.LoadHostFromName(host.Name)
-		fmt.Println(checkHost)
-		fmt.Println(err)
+
 		if errors.Is(err, ErrNotFound) {
 			uuid, err := ksuid.NewRandom()
 			if err != nil {
@@ -199,7 +198,12 @@ func (s *GORM) StoreHosts(hosts HostList) error {
 // DeleteHosts deletes all hosts in the given nodeset.NodeSet from the data store.
 func (s *GORM) DeleteHosts(ns *nodeset.NodeSet) error {
 	it := ns.Iterator()
-	err := s.db.Delete(&Host{Name: it.Value()}).Error
+	var hostNames []string
+	for it.Next() {
+		hostNames = append(hostNames, it.Value())
+	}
+
+	err := s.db.Where("name IN ?", hostNames).Delete(&Host{}).Error
 
 	log.Debugf("GORM.DeleteHosts: deleted %d host(s)", ns.Len())
 	return err
@@ -296,6 +300,7 @@ func (s *GORM) LoadHostFromMAC(macStr string) (*Host, error) {
 	}
 
 	err = s.db.Preload("Interfaces").Preload("Bonds").Where(&Host{ID: iface.HostID}).First(&host).Error
+
 	log.Debugf("GORM.LoadHostFromMAC: retrieved host %s from mac %s", host.Name, macStr)
 	return host, err
 }
@@ -357,7 +362,7 @@ func (s *GORM) FindTags(tags []string) (*nodeset.NodeSet, error) {
 
 	nodeString := strings.Join(nodes, ",")
 
-	// log.Debugf("GORM.FindTags: loaded host(s) %s tagged with %s", nodeString, tags)
+	log.Debugf("GORM.FindTags: loaded host(s) %s tagged with %s", nodeString, tags)
 	return nodeset.NewNodeSet(nodeString)
 }
 
@@ -375,15 +380,17 @@ func (s *GORM) MatchTags(tags []string) (*nodeset.NodeSet, error) {
 
 // ProvisionHosts sets all hosts in the given NodeSet to provision (true) or unprovision (false)
 func (s *GORM) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
+	hostNames := []string{}
 	it := ns.Iterator()
 
 	for it.Next() {
-		err := s.db.Where(&Host{Name: it.Value()}).Save(&Host{Provision: provision}).Error
-		if err != nil {
-			return err
-		}
+		hostNames = append(hostNames, it.Value())
 	}
-	return nil
+
+	err := s.db.Model(Host{}).Where("name IN ?", hostNames).Update("provision", true).Error
+
+	log.Debugf("GORM.ProvisionHosts: set host(s) %s to provision=%t", ns.String(), provision)
+	return err
 }
 
 // TagHosts adds tags to all hosts in the given NodeSet
@@ -392,11 +399,20 @@ func (s *GORM) TagHosts(ns *nodeset.NodeSet, tags []string) error {
 
 	for it.Next() {
 		var h Host
-		err := s.db.Where(&Host{Name: it.Value()}).First(&h).Save(&Host{Tags: append(h.Tags, tags...)}).Error
+		err := s.db.Where(&Host{Name: it.Value()}).First(&h).Error
+		if err != nil {
+			return err
+		}
+
+		h.Tags = append(h.Tags, tags...)
+
+		err = s.db.Save(&h).Error
 		if err != nil {
 			return err
 		}
 	}
+
+	log.Debugf("GORM.TagHosts: added tag(s) %s to host(s) %s", tags, ns.String())
 	return nil
 }
 
@@ -413,7 +429,7 @@ func (s *GORM) UntagHosts(ns *nodeset.NodeSet, tags []string) error {
 		var h Host
 		var tags []string
 		err := s.db.Where(&Host{Name: it.Value()}).First(&h).Error
-		if err != nil {
+		if err != nil && err != gorm.ErrRecordNotFound {
 			return err
 		}
 		for _, t := range h.Tags {
@@ -421,26 +437,30 @@ func (s *GORM) UntagHosts(ns *nodeset.NodeSet, tags []string) error {
 				tags = append(tags, t)
 			}
 		}
+		h.Tags = tags
 		err = s.db.Save(&h).Error
 		if err != nil {
 			return err
 		}
 	}
+
+	log.Debugf("GORM.UntagHosts: removed tag(s) %s from host(s) %s", tags, ns.String())
 	return nil
 }
 
 // SetBootImage sets all hosts to use the BootImage with the given name
 func (s *GORM) SetBootImage(ns *nodeset.NodeSet, name string) error {
+	hostNames := []string{}
 	it := ns.Iterator()
 
 	for it.Next() {
-		var h Host
-		err := s.db.Where(&Host{Name: it.Value()}).First(&h).Save(&Host{BootImage: name}).Error
-		if err != nil {
-			return err
-		}
+		hostNames = append(hostNames, it.Value())
 	}
-	return nil
+
+	err := s.db.Model(Host{}).Where("name IN ?", hostNames).Update("boot_image", name).Error
+
+	log.Debugf("GORM.SetBootImage: set host(s) %s to use boot image %s", ns.String(), name)
+	return err
 }
 
 // StoreBootImage stores a boot image in the data store. If the boot image exists it is overwritten
@@ -483,7 +503,9 @@ func (s *GORM) StoreBootImages(images BootImageList) error {
 // DeleteBootImages deletes boot images from the data store.
 func (s *GORM) DeleteBootImages(names []string) error {
 	// TODO: soft delete??
-	err := s.db.Delete("name IN ?", names).Error
+	err := s.db.Where("name IN ?", names).Delete(&BootImage{}).Error
+
+	log.Debugf("GORM.DeleteBootImages: deleted %d image(s)", len(names))
 	return err
 }
 
@@ -492,7 +514,13 @@ func (s *GORM) LoadBootImage(name string) (*BootImage, error) {
 	var image *BootImage
 
 	err := s.db.Where(&BootImage{Name: name}).First(&image).Error
+	fmt.Println(err)
+	if err == gorm.ErrRecordNotFound {
+		err = ErrNotFound
+		fmt.Println(err)
+	}
 
+	log.Debugf("GORM.LoadBootImages: loaded image %s", image.Name)
 	return image, err
 }
 
@@ -502,5 +530,6 @@ func (s *GORM) BootImages() (BootImageList, error) {
 
 	err := s.db.Find(&images).Error
 
+	log.Debugf("GORM.BootImages: loaded %d image(s)", len(images))
 	return images, err
 }

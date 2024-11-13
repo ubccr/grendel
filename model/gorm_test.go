@@ -42,6 +42,7 @@ import (
 
 func newGORM() (*model.GORM, error) {
 	return model.NewGORMStore("sqlite", ":memory:", "")
+	// return model.NewGORMStore("sqlite", "../test.db", "")
 }
 
 func TestGORMHost(t *testing.T) {
@@ -397,8 +398,8 @@ func TestGORMBootImageDelete(t *testing.T) {
 	assert := assert.New(t)
 
 	store, err := newGORM()
-	defer store.Close()
 	assert.NoError(err)
+	defer store.Close()
 
 	image := tests.BootImageFactory.MustCreate().(*model.BootImage)
 
@@ -423,8 +424,8 @@ func TestGORMUpdate(t *testing.T) {
 	assert := assert.New(t)
 
 	store, err := newGORM()
-	defer store.Close()
 	assert.NoError(err)
+	defer store.Close()
 
 	host := tests.HostFactory.MustCreate().(*model.Host)
 
@@ -468,8 +469,8 @@ func TestGORMHostDelete(t *testing.T) {
 	assert := assert.New(t)
 
 	store, err := newGORM()
-	defer store.Close()
 	assert.NoError(err)
+	defer store.Close()
 
 	host := tests.HostFactory.MustCreate().(*model.Host)
 
@@ -497,11 +498,11 @@ func BenchmarkGORMWriteHosts(b *testing.B) {
 	file := tempfile("gorm")
 	defer os.Remove(file)
 
-	store, err := model.NewBuntStore(file)
-	defer store.Close()
+	store, err := model.NewGORMStore("sqlite", file, "")
 	if err != nil {
 		b.Fatal(err)
 	}
+	defer store.Close()
 
 	size := 5000
 	hosts := make(model.HostList, size)
@@ -522,7 +523,7 @@ func BenchmarkGORMWriteSingleHost(b *testing.B) {
 	file := tempfile("gorm")
 	defer os.Remove(file)
 
-	store, err := model.NewBuntStore(file)
+	store, err := model.NewGORMStore("sqlite", file, "")
 	defer store.Close()
 	if err != nil {
 		b.Fatal(err)
@@ -549,7 +550,7 @@ func BenchmarkGORMReadAll(b *testing.B) {
 	file := tempfile("gorm")
 	defer os.Remove(file)
 
-	store, err := model.NewBuntStore(file)
+	store, err := model.NewGORMStore("sqlite", file, "")
 	defer store.Close()
 	if err != nil {
 		b.Fatal(err)
@@ -584,7 +585,7 @@ func BenchmarkGORMParallelFind(b *testing.B) {
 	file := tempfile("gorm")
 	defer os.Remove(file)
 
-	store, err := model.NewBuntStore(file)
+	store, err := model.NewGORMStore("sqlite", file, "")
 	defer store.Close()
 	if err != nil {
 		b.Fatal(err)
@@ -640,7 +641,7 @@ func BenchmarkGORMRandomParallelReads(b *testing.B) {
 	file := tempfile("gorm")
 	defer os.Remove(file)
 
-	store, err := model.NewBuntStore(file)
+	store, err := model.NewGORMStore("sqlite", file, "")
 	defer store.Close()
 	if err != nil {
 		b.Fatal(err)
@@ -689,7 +690,7 @@ func BenchmarkGORMResolveIPv4(b *testing.B) {
 	file := tempfile("gorm")
 	defer os.Remove(file)
 
-	store, err := model.NewBuntStore(file)
+	store, err := model.NewGORMStore("sqlite", file, "")
 	defer store.Close()
 	if err != nil {
 		b.Fatal(err)
@@ -725,7 +726,7 @@ func BenchmarkGORMReverseResolve(b *testing.B) {
 	file := tempfile("gorm")
 	defer os.Remove(file)
 
-	store, err := model.NewBuntStore(file)
+	store, err := model.NewGORMStore("sqlite", file, "")
 	defer store.Close()
 	if err != nil {
 		b.Fatal(err)
