@@ -19,7 +19,6 @@ package model
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -33,6 +32,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 )
 
@@ -53,7 +53,12 @@ func NewGORMStore(dbType, path, addr string) (*GORM, error) {
 		conn = rqlite.Open(addr)
 	}
 
-	db, err := gorm.Open(conn, &gorm.Config{})
+	db, err := gorm.Open(conn, &gorm.Config{
+		CreateBatchSize: 1000,
+		Logger:          logger.Discard,
+		// SkipDefaultTransaction: true,
+		PrepareStmt: true,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -167,25 +172,14 @@ func (s *GORM) StoreHosts(hosts HostList) error {
 		// Keys are case-insensitive
 		host.Name = strings.ToLower(host.Name)
 
-		checkHost, err := s.LoadHostFromName(host.Name)
-
-		if errors.Is(err, ErrNotFound) {
-			uuid, err := ksuid.NewRandom()
-			if err != nil {
-				return err
-			}
-
-			host.ID = uuid
-			continue
-		}
-
+		// Always generate a new ksuid to avoid duplicates
+		uuid, err := ksuid.NewRandom()
 		if err != nil {
-			return fmt.Errorf("Failed to check host with name %s for duplicates:  %w", host.Name, err)
+			return err
 		}
 
-		host.ID = checkHost.ID
+		host.ID = uuid
 	}
-
 	err := s.db.Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "name"}},
 		UpdateAll: true,
@@ -299,7 +293,7 @@ func (s *GORM) LoadHostFromMAC(macStr string) (*Host, error) {
 		return nil, fmt.Errorf("host with MAC %s:  %w", macStr, ErrNotFound)
 	}
 
-	err = s.db.Preload("Interfaces").Preload("Bonds").Where(&Host{ID: iface.HostID}).First(&host).Error
+	err = s.db.Preload("Interfaces").Preload("Bonds").Where(&Host{GormID: iface.HostID}).First(&host).Error
 
 	log.Debugf("GORM.LoadHostFromMAC: retrieved host %s from mac %s", host.Name, macStr)
 	return host, err
@@ -317,16 +311,16 @@ func (s *GORM) Hosts() (HostList, error) {
 
 // FindHosts returns a list of all the hosts in the given NodeSet
 func (s *GORM) FindHosts(ns *nodeset.NodeSet) (HostList, error) {
-	hosts := make(HostList, 0)
+	var nodes []string
+	var hosts HostList
 	it := ns.Iterator()
 
 	for it.Next() {
-		var h Host
-		err := s.db.Preload("Interfaces").Preload("Bonds").Where(&Host{Name: it.Value()}).Find(&h).Error
-		if err != nil {
-			log.Error(err)
-		}
-		hosts = append(hosts, &h)
+		nodes = append(nodes, it.Value())
+	}
+	err := s.db.Preload("Interfaces").Preload("Bonds").Where("name IN ?", nodes).Find(&hosts).Error
+	if err != nil {
+		return hosts, err
 	}
 	log.Debugf("GORM.FindHosts: found host %s", ns.String())
 	return hosts, nil
@@ -334,7 +328,7 @@ func (s *GORM) FindHosts(ns *nodeset.NodeSet) (HostList, error) {
 
 // FindTags returns a nodeset.NodeSet of all the hosts with the given tags
 func (s *GORM) FindTags(tags []string) (*nodeset.NodeSet, error) {
-	nodes := []string{}
+	var nodes []string
 	var hosts HostList
 
 	tagMap := make(map[string]struct{})

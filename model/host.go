@@ -32,10 +32,11 @@ import (
 )
 
 type Host struct {
-	ID         ksuid.KSUID     `json:"id,omitempty" gorm:"primaryKey"`
+	GormID     uint            `gorm:"primaryKey"`
+	ID         ksuid.KSUID     `json:"id,omitempty" gorm:"unique"`
 	Name       string          `json:"name" validate:"required,hostname" gorm:"unique"`
-	Interfaces []*NetInterface `json:"interfaces" gorm:"foreignKey:HostID"`
-	Bonds      []*Bond         `json:"bonds" gorm:"foreignKey:HostID"`
+	Interfaces []*NetInterface `json:"interfaces" gorm:"foreignKey:HostID;references:GormID"`
+	Bonds      []*Bond         `json:"bonds" gorm:"foreignKey:HostID;references:GormID"`
 	Provision  bool            `json:"provision" gorm:"type:text"`
 	Firmware   firmware.Build  `json:"firmware"`
 	BootImage  string          `json:"boot_image"`

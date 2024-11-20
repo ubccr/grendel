@@ -25,7 +25,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/segmentio/ksuid"
 	"github.com/spf13/viper"
 	"go4.org/netipx"
 )
@@ -38,7 +37,7 @@ type Subnet struct {
 }
 
 type NetInterface struct {
-	HostID ksuid.KSUID
+	HostID uint
 	ID     uint16           `gorm:"primaryKey"`
 	MAC    net.HardwareAddr `json:"mac" validate:"required" gorm:"serializer:MACSerializer"`
 	Name   string           `json:"ifname"`

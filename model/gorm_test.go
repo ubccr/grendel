@@ -193,8 +193,8 @@ func TestGORMHostFind(t *testing.T) {
 	assert := assert.New(t)
 
 	store, err := newGORM()
-	defer store.Close()
 	assert.NoError(err)
+	defer store.Close()
 
 	size := 20
 	for i := 0; i < size; i++ {
@@ -642,10 +642,10 @@ func BenchmarkGORMRandomParallelReads(b *testing.B) {
 	defer os.Remove(file)
 
 	store, err := model.NewGORMStore("sqlite", file, "")
-	defer store.Close()
 	if err != nil {
 		b.Fatal(err)
 	}
+	defer store.Close()
 
 	size := 5000
 	rand.Seed(time.Now().UnixNano())
