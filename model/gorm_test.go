@@ -45,6 +45,63 @@ func newGORM() (*model.GORM, error) {
 	// return model.NewGORMStore("sqlite", "../test.db", "")
 }
 
+func TestGORMUsers(t *testing.T) {
+	assert := assert.New(t)
+
+	store, err := newGORM()
+	assert.NoError(err)
+	defer store.Close()
+
+	testUsers := []struct {
+		username string
+		password string
+		role     string
+	}{
+		{
+			username: "admin",
+			password: "TestPass123456!@#$%^",
+		},
+		{
+			username: "user",
+			password: "TestPass123456!@#$%^",
+		},
+	}
+
+	err = store.StoreUser(testUsers[0].username, testUsers[0].password)
+	assert.NoError(err)
+	err = store.StoreUser(testUsers[1].username, testUsers[1].password)
+	assert.NoError(err)
+
+	auth, role, err := store.VerifyUser(testUsers[0].username, testUsers[0].password)
+	if assert.NoError(err) {
+		assert.Equal(true, auth)
+		assert.Equal("admin", role)
+	}
+	auth, role, err = store.VerifyUser(testUsers[1].username, testUsers[1].password)
+	if assert.NoError(err) {
+		assert.Equal(true, auth)
+		assert.Equal("disabled", role)
+	}
+
+	users, err := store.GetUsers()
+	if assert.NoError(err) {
+		assert.Equal(2, len(users))
+	}
+
+	err = store.UpdateUser(testUsers[1].username, "user")
+	if assert.NoError(err) {
+		users, _ := store.GetUsers()
+		assert.Equal("user", users[1].Role)
+	}
+
+	err = store.DeleteUser(testUsers[1].username)
+	if assert.NoError(err) {
+		users, _ := store.GetUsers()
+		assert.Equal(1, len(users))
+	}
+
+}
+
 func TestGORMHost(t *testing.T) {
 	assert := assert.New(t)
 

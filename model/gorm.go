@@ -150,7 +150,7 @@ func (s *GORM) UpdateUser(username, role string) error {
 // DeleteUser deletes the given user
 func (s *GORM) DeleteUser(username string) error {
 	var u User
-	err := s.db.Where(&User{Username: username}, username).Find(&u).Delete(&u).Error
+	err := s.db.Where(&User{Username: username}).Delete(&u).Error
 
 	log.Debugf("GORM.DeleteUser: deleting %s user", username)
 	return err
