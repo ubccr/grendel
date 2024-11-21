@@ -33,7 +33,7 @@ import (
 func newTestDB(t *testing.T) model.DataStore {
 	assert := assert.New(t)
 
-	db, err := model.NewDataStore(":memory:")
+	db, err := model.NewDataStore("sqlite", ":memory:", "")
 	if err != nil {
 		assert.Fail(err.Error())
 	}
@@ -280,12 +280,12 @@ func TestUnprovision(t *testing.T) {
 	c.SetParamNames("token")
 	c.SetParamValues(token)
 
-	if assert.NoError(TokenRequired(h.Unprovision)(c)) {
+	if assert.NoError(TokenRequired(h.Complete)(c)) {
 		assert.Equal(http.StatusOK, rec.Code)
 		assert.Equal("ok", gjson.Get(rec.Body.String(), "status").String())
 	}
 
-	hostTest, err := h.DB.LoadHostFromID(host.ID.String())
+	hostTest, err := h.DB.LoadHostFromName(host.Name)
 	if assert.NoError(err) {
 		assert.False(hostTest.Provision)
 	}

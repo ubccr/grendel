@@ -548,42 +548,6 @@ func (s *BuntStore) FindTags(tags []string) (*nodeset.NodeSet, error) {
 	return nodeset.NewNodeSet(strings.Join(nodes, ","))
 }
 
-// MatchTags returns a nodeset.NodeSet of all the hosts with the all given tags
-func (s *BuntStore) MatchTags(tags []string) (*nodeset.NodeSet, error) {
-	nodes := []string{}
-
-	err := s.db.View(func(tx *buntdb.Tx) error {
-		err := tx.AscendKeys(HostKeyPrefix+":*", func(key, value string) bool {
-			res := gjson.Get(value, "tags")
-			match := 0
-			for _, v := range tags {
-				for _, i := range res.Array() {
-					if v == i.String() {
-						match++
-					}
-				}
-			}
-			if match == len(tags) {
-				nodes = append(nodes, gjson.Get(value, "name").String())
-			}
-
-			return true
-		})
-
-		return err
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	if len(nodes) == 0 {
-		return nil, fmt.Errorf("no hosts found with tags %#v:  %w", tags, ErrNotFound)
-	}
-
-	return nodeset.NewNodeSet(strings.Join(nodes, ","))
-}
-
 // ProvisionHosts sets all hosts in the given NodeSet to provision (true) or unprovision (false)
 func (s *BuntStore) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
 	it := ns.Iterator()

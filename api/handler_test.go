@@ -28,7 +28,7 @@ import (
 )
 
 func newTestDB(t *testing.T) model.DataStore {
-	db, err := model.NewDataStore(":memory:")
+	db, err := model.NewDataStore("sqlite", ":memory:", "")
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}

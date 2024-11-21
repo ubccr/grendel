@@ -112,7 +112,7 @@ func (s *GORM) StoreUser(username, password string) error {
 // VerifyUser checks if the given username exists in the data store
 func (s *GORM) VerifyUser(username, password string) (bool, string, error) {
 	var u User
-	if err := s.db.Where("username = ?", username).First(&u).Error; err != nil {
+	if err := s.db.Where(&User{Username: username}).First(&u).Error; err != nil {
 		return false, "", err
 	}
 
@@ -218,7 +218,7 @@ func (s *GORM) LoadHostFromName(name string) (*Host, error) {
 
 // LoadHostFromID returns the Host with the given ID
 func (s *GORM) LoadHostFromID(id string) (*Host, error) {
-	host := &Host{ID: ksuid.Nil}
+	var host *Host
 	err := s.db.Preload("Interfaces").Preload("Bonds").Where("id = ?", id).First(&host).Error
 
 	if err == gorm.ErrRecordNotFound {
@@ -305,7 +305,6 @@ func (s *GORM) Hosts() (HostList, error) {
 	err := s.db.Preload("Interfaces").Preload("Bonds").Find(&hosts).Error
 
 	log.Debugf("GORM.Hosts: retrieved %d host(s)", len(hosts))
-
 	return hosts, err
 }
 
@@ -318,10 +317,12 @@ func (s *GORM) FindHosts(ns *nodeset.NodeSet) (HostList, error) {
 	for it.Next() {
 		nodes = append(nodes, it.Value())
 	}
+
 	err := s.db.Preload("Interfaces").Preload("Bonds").Where("name IN ?", nodes).Find(&hosts).Error
 	if err != nil {
 		return hosts, err
 	}
+
 	log.Debugf("GORM.FindHosts: found host %s", ns.String())
 	return hosts, nil
 }
@@ -360,18 +361,6 @@ func (s *GORM) FindTags(tags []string) (*nodeset.NodeSet, error) {
 	return nodeset.NewNodeSet(nodeString)
 }
 
-// MatchTags returns a nodeset.NodeSet of all the hosts with the all given tags
-func (s *GORM) MatchTags(tags []string) (*nodeset.NodeSet, error) {
-	var hosts HostList
-
-	err := s.db.Where(&Host{Tags: tags}).Find(&hosts).Error
-	if err != nil {
-		return nil, err
-	}
-
-	return hosts.ToNodeSet()
-}
-
 // ProvisionHosts sets all hosts in the given NodeSet to provision (true) or unprovision (false)
 func (s *GORM) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
 	hostNames := []string{}
@@ -391,23 +380,27 @@ func (s *GORM) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
 func (s *GORM) TagHosts(ns *nodeset.NodeSet, tags []string) error {
 	it := ns.Iterator()
 
+	tx := s.db.Begin()
+
 	for it.Next() {
 		var h Host
-		err := s.db.Where(&Host{Name: it.Value()}).First(&h).Error
+		err := tx.Where(&Host{Name: it.Value()}).First(&h).Error
 		if err != nil {
+			tx.Rollback()
 			return err
 		}
 
 		h.Tags = append(h.Tags, tags...)
 
-		err = s.db.Save(&h).Error
+		err = tx.Save(&h).Error
 		if err != nil {
+			tx.Rollback()
 			return err
 		}
 	}
 
 	log.Debugf("GORM.TagHosts: added tag(s) %s to host(s) %s", tags, ns.String())
-	return nil
+	return tx.Commit().Error
 }
 
 // UntagHosts removes tags from all hosts in the given NodeSet
@@ -419,11 +412,14 @@ func (s *GORM) UntagHosts(ns *nodeset.NodeSet, tags []string) error {
 		removeTags[t] = struct{}{}
 	}
 
+	tx := s.db.Begin()
+
 	for it.Next() {
 		var h Host
 		var tags []string
-		err := s.db.Where(&Host{Name: it.Value()}).First(&h).Error
+		err := tx.Where(&Host{Name: it.Value()}).First(&h).Error
 		if err != nil && err != gorm.ErrRecordNotFound {
+			tx.Rollback()
 			return err
 		}
 		for _, t := range h.Tags {
@@ -432,14 +428,15 @@ func (s *GORM) UntagHosts(ns *nodeset.NodeSet, tags []string) error {
 			}
 		}
 		h.Tags = tags
-		err = s.db.Save(&h).Error
+		err = tx.Save(&h).Error
 		if err != nil {
+			tx.Rollback()
 			return err
 		}
 	}
 
 	log.Debugf("GORM.UntagHosts: removed tag(s) %s from host(s) %s", tags, ns.String())
-	return nil
+	return tx.Commit().Error
 }
 
 // SetBootImage sets all hosts to use the BootImage with the given name
@@ -465,7 +462,7 @@ func (s *GORM) StoreBootImage(image *BootImage) error {
 
 // StoreBootImages stores a list of boot images in the data store. If the boot image exists it is overwritten
 func (s *GORM) StoreBootImages(images BootImageList) error {
-	// TODO: this is not specific to the DB and should be done outside of it
+	// TODO: this is not specific to the DB and should be done outside of it?
 	for idx, image := range images {
 		if image.Name == "" {
 			return fmt.Errorf("name required for boot image %d: %w", idx, ErrInvalidData)
@@ -508,10 +505,8 @@ func (s *GORM) LoadBootImage(name string) (*BootImage, error) {
 	var image *BootImage
 
 	err := s.db.Where(&BootImage{Name: name}).First(&image).Error
-	fmt.Println(err)
 	if err == gorm.ErrRecordNotFound {
 		err = ErrNotFound
-		fmt.Println(err)
 	}
 
 	log.Debugf("GORM.LoadBootImages: loaded image %s", image.Name)
