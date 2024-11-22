@@ -8,10 +8,10 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/bmc"
 	"github.com/ubccr/grendel/model"
 	"github.com/ubccr/grendel/nodeset"
 	"github.com/ubccr/grendel/tors"
@@ -110,7 +110,6 @@ func (h *Handler) rackTable(f *fiber.Ctx) error {
 			continue
 		}
 		pdus = append(pdus, host.Name)
-		log.Debugln(host.Name)
 	}
 
 	for i := max; i >= min; i-- {
@@ -156,10 +155,21 @@ func (h *Handler) actions(f *fiber.Ctx) error {
 		return ToastError(f, err, "Invalid host set")
 	}
 
+	sample := templateData{
+		Hosts: []templateDataHosts{
+			{
+				Host: &model.Host{},
+			},
+		},
+		Date: time.Now().Format(time.DateOnly),
+	}
+
+	b, _ := json.MarshalIndent(sample, "", "    ")
+
 	nodeset := ns.String()
 	return f.Render("fragments/actions", fiber.Map{
 		"Hosts":                    nodeset,
-		"BmcSystem":                bmc.System{},
+		"TemplateDataHosts":        string(b),
 		"ExportCSVDefaultTemplate": viper.GetString("frontend.export_csv_default_template"),
 		"BootImages":               h.getBootImages(),
 	}, "")

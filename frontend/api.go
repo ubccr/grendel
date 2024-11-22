@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/netip"
-	"slices"
+	"net/url"
 	"strconv"
 	"strings"
 	"text/template"
@@ -255,6 +255,91 @@ func (h *Handler) EditHost(f *fiber.Ctx) error {
 	return ToastSuccess(f, "Successfully updated host", `, "refresh": ""`)
 }
 
+type inventoryHostData struct {
+	SerialNumber string `form:"SerialNumber"`
+	AssetNumber  string `form:"AssetNumber"`
+	Manufacturer string `form:"Manufacturer"`
+	Model        string `form:"Model"`
+	Tags         string `form:"Tags"`
+	PONumber     string `form:"PONumber"`
+}
+
+func (h *Handler) AddInventoryHost(f *fiber.Ctx) error {
+	form := new(inventoryHostData)
+
+	err := f.BodyParser(form)
+	if err != nil {
+		return ToastError(f, err, "Failed to bind type to request body")
+	}
+
+	name := fmt.Sprintf("inv-%s", form.SerialNumber)
+	tags := []string{}
+
+	serial := fmt.Sprintf("serial_number:%s", form.SerialNumber)
+	tags = append(tags, serial)
+
+	if form.AssetNumber != "" {
+		t := fmt.Sprintf("asset_number:%s", form.AssetNumber)
+		tags = append(tags, t)
+	}
+
+	if form.Manufacturer != "" {
+		t := fmt.Sprintf("manufacturer:%s", form.Manufacturer)
+		tags = append(tags, t)
+	}
+	if form.Model != "" {
+		t := fmt.Sprintf("model:%s", form.Model)
+		tags = append(tags, t)
+	}
+
+	if form.PONumber != "" {
+		t := fmt.Sprintf("po_number:%s", form.PONumber)
+		tags = append(tags, t)
+	}
+
+	if form.Tags != "" {
+		tags = append(tags, strings.Split(form.Tags, ",")...)
+	}
+
+	newHost := model.Host{
+		Name: name,
+		Tags: tags,
+	}
+
+	ns, err := nodeset.NewNodeSet(name)
+	if err != nil {
+		f.Status(400)
+		return ToastError(f, err, "Failed to check for duplicates")
+	}
+	hl, err := h.DB.FindHosts(ns)
+	if err != nil {
+		f.Status(400)
+		return ToastError(f, err, "Failed to lookup duplicates")
+	}
+
+	if len(hl) != 0 {
+		f.Status(400)
+		ns, _ := hl.ToNodeSet()
+		return ToastError(f, err, fmt.Sprintf("Failed to add inventory host. Duplicate tag entry detected: %s", ns))
+	}
+
+	hlt, _ := h.DB.FindTags([]string{serial})
+
+	if hlt != nil && hlt.Len() != 0 {
+		f.Status(400)
+		return ToastError(f, err, fmt.Sprintf("Failed to add inventory host. Duplicate tag entry detected: %s", hlt))
+	}
+
+	err = h.DB.StoreHost(&newHost)
+	if err != nil {
+		f.Status(400)
+		return ToastError(f, err, "Failed to update host")
+	}
+
+	h.writeEvent("info", f, fmt.Sprintf("Added new Inventory host %s", newHost.Name))
+	return ToastSuccess(f, "Successfully added inventory host", `, "refresh": ""`)
+}
+
 func (h *Handler) DeleteHost(f *fiber.Ctx) error {
 	hosts := f.FormValue("hosts")
 	ns, err := nodeset.NewNodeSet(hosts)
@@ -468,8 +553,26 @@ func (h *Handler) exportHosts(f *fiber.Ctx) error {
 		f.Set("HX-Redirect", fmt.Sprintf("/api/hosts/export/%s?filename=%s", hosts, filename))
 		f.Set("Content-Type", "application/force-download")
 		f.Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+		ToastSuccess(f, "Download starting shortly...", "")
+	} else {
+		f.Response().Header.Set("HX-Trigger", "openExportModal")
 	}
 	return f.SendString(string(o))
+}
+
+type templateDataHosts struct {
+	Manufacturer string
+	Model        string
+	SerialNumber string
+	AssetNumber  string
+	PONumber     string
+	Host         *model.Host
+	System       bmc.System
+}
+
+type templateData struct {
+	Hosts []templateDataHosts
+	Date  string
 }
 
 func (h *Handler) exportInventory(f *fiber.Ctx) error {
@@ -493,19 +596,78 @@ func (h *Handler) exportInventory(f *fiber.Ctx) error {
 	}
 
 	job := bmc.NewJob()
-	jobStatus, err := job.BmcStatus(hostList)
+	jobStatuses, err := job.BmcStatus(hostList)
 	if err != nil {
 		return err
 	}
 
-	type templateData struct {
-		Hosts []bmc.System
-		Date  string
+	td := templateData{
+		Date: time.Now().Format(time.DateOnly),
 	}
 
-	td := templateData{
-		Hosts: jobStatus,
-		Date:  time.Now().Format(time.DateOnly),
+	queryErrors := "\n\nWARNING:\n"
+	for _, host := range hostList {
+		assetNumbers := []string{}
+		for _, tag := range host.Tags {
+			if !strings.Contains(tag, "asset_number") {
+				continue
+			}
+			t := strings.Split(tag, ":")
+			if len(t) < 2 {
+				continue
+			}
+			assetNumbers = append(assetNumbers, t[1])
+		}
+
+		if len(assetNumbers) == 0 {
+			assetNumbers = append(assetNumbers, "")
+		}
+
+		for _, assetNumber := range assetNumbers {
+			tdh := templateDataHosts{
+				Host:        host,
+				System:      bmc.System{},
+				AssetNumber: assetNumber,
+			}
+			for _, jobStatus := range jobStatuses {
+				if jobStatus.Name != host.Name {
+					continue
+				}
+				tdh.System = jobStatus
+				tdh.Manufacturer = jobStatus.Manufacturer
+				tdh.Model = jobStatus.Model
+				tdh.SerialNumber = jobStatus.SerialNumber
+				break
+			}
+			for _, tag := range host.Tags {
+				t := strings.Split(tag, ":")
+				if len(t) < 2 {
+					continue
+				}
+
+				switch t[0] {
+				case "serial_number":
+					if tdh.SerialNumber != "" && tdh.SerialNumber != t[1] {
+						queryErrors += fmt.Sprintf("Host: %s, Tag: %s does not match queried value of: %s\n", host.Name, t, tdh.SerialNumber)
+					}
+					tdh.SerialNumber = t[1]
+				case "po_number":
+					tdh.PONumber = t[1]
+				case "model":
+					if tdh.Model != "" && tdh.Model != t[1] {
+						queryErrors += fmt.Sprintf("Host: %s, Tag: %s does not match queried value of: %s\n", host.Name, t, tdh.Model)
+					}
+					tdh.Model = t[1]
+				case "manufacturer":
+					if tdh.Manufacturer != "" && tdh.Manufacturer != t[1] {
+						queryErrors += fmt.Sprintf("Host: %s, Tag: %s does not match queried value of: %s\n", host.Name, t, tdh.Manufacturer)
+					}
+					tdh.Manufacturer = t[1]
+				}
+			}
+
+			td.Hosts = append(td.Hosts, tdh)
+		}
 	}
 
 	var buf bytes.Buffer
@@ -514,23 +676,17 @@ func (h *Handler) exportInventory(f *fiber.Ctx) error {
 		return ToastError(f, err, "Failed to execute template")
 	}
 
-	it := ns.Iterator()
-
-	failed := []string{}
-	for it.Next() {
-		if !slices.ContainsFunc(jobStatus, func(x bmc.System) bool { return x.Name == it.Value() }) {
-			failed = append(failed, it.Value())
-		}
-	}
-
-	if len(hostList) != len(jobStatus) {
-		buf.WriteString(fmt.Sprintf("\nWARNING: Some BMC queries have failed. Their entries will not be listed:\n%s", strings.Join(failed, "\n")))
+	if queryErrors != "\n\nWARNING:\n" {
+		buf.WriteString(queryErrors)
 	}
 
 	if filename != "" {
-		f.Set("HX-Redirect", fmt.Sprintf("/api/hosts/inventory/%s?filename=%s", hosts, filename))
+		f.Set("HX-Redirect", fmt.Sprintf("/api/hosts/inventory/%s?template=%s&filename=%s", hosts, url.QueryEscape(templateString), filename))
 		f.Set("Content-Type", "application/force-download")
 		f.Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+		ToastSuccess(f, "Download starting shortly...", "")
+	} else {
+		f.Response().Header.Set("HX-Trigger", "openExportModal")
 	}
 
 	return f.SendString(buf.String())

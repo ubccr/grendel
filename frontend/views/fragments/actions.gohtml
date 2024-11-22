@@ -309,7 +309,8 @@
                     hx-get="/api/hosts/export/{{ .Hosts }}"
                     hx-target="#exportText"
                     hx-swap="innerHTML"
-                    hx-on::after-request="showExportModal()">
+                    hx-ext="loading-states"
+                    data-loading-states>
                     <div class="flex justify-end gap-2">
                         <div>
                             <label for="exportFilename" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
@@ -326,7 +327,13 @@
                             class="h-8 transform rounded-md border bg-blue-500 px-2 py-1 leading-none text-white transition-transform hover:bg-blue-400 active:scale-90 disabled:opacity-75"
                             type="submit"
                             {{ if eq .Hosts "" }}disabled{{ end }}>
-                            Export
+                            <span data-loading-class="hidden">Export</span>
+                            <span
+                                data-loading-class-remove="hidden"
+                                data-loading-class="block"
+                                class="mx-auto hidden h-5 w-5">
+                                {{ template "icon-spinner" }}
+                            </span>
                         </button>
                     </div>
                 </form>
@@ -346,7 +353,6 @@
                     hx-get="/api/hosts/inventory/{{ .Hosts }}"
                     hx-target="#exportText"
                     hx-swap="innerHTML"
-                    hx-on::after-request="showExportModal()"
                     hx-ext="loading-states"
                     data-loading-states>
                     <div class="grid grid-cols-1 gap-2">
@@ -359,9 +365,7 @@
                                 id="exportTemplate"
                                 name="template"
                                 placeholder="See golang text/template for examples. Available methods:
-    .Hosts []{{ Sprintf "%#v" .BmcSystem }}
-    .Date string // formatted with DateOnly
-"
+{{ .TemplateDataHosts }}"
                                 rows="4"
                                 class="whitespace-pre w-full rounded-md border border-neutral-300 px-2 py-1"
                                 type="text">{{ .ExportCSVDefaultTemplate }}</textarea>
@@ -407,3 +411,9 @@
         </button>
     </div>
 </div>
+
+<script>
+    document.body.addEventListener("openExportModal", function (e) {
+        showExportModal();
+    });
+</script>
