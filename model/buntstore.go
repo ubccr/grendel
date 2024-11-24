@@ -68,17 +68,10 @@ func (s *BuntStore) Close() error {
 	return s.db.Close()
 }
 
-type UserValue struct {
-	Hash       []byte    `json:"hash"`
-	Role       string    `json:"role"`
-	CreatedAt  time.Time `json:"created_at"`
-	ModifiedAt time.Time `json:"modified_at"`
-}
-
 // StoreUser stores the User in the data store
 func (s *BuntStore) StoreUser(username, password string) (string, error) {
 	d := true
-	role := "disabled"
+	role := RoleDisabled
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
 		_, err := tx.Get(UserKeyPrefix + ":" + username)
@@ -92,10 +85,10 @@ func (s *BuntStore) StoreUser(username, password string) (string, error) {
 	})
 
 	if err != nil {
-		return role, err
+		return role.String(), err
 	}
 	if d {
-		return role, fmt.Errorf("user %s already exists", username)
+		return role.String(), fmt.Errorf("user %s already exists", username)
 	}
 
 	// Set role to admin if this is the first user
@@ -107,19 +100,19 @@ func (s *BuntStore) StoreUser(username, password string) (string, error) {
 		})
 	})
 	if err != nil {
-		return role, err
+		return role.String(), err
 	}
 	if count == 0 {
-		role = "admin"
+		role = RoleAdmin
 	}
 
 	hashed, _ := bcrypt.GenerateFromPassword([]byte(password), 8)
-	return role, s.db.Update(func(tx *buntdb.Tx) error {
-		user := UserValue{
-			Hash:       hashed,
-			Role:       role,
-			CreatedAt:  time.Now(),
-			ModifiedAt: time.Now(),
+	return role.String(), s.db.Update(func(tx *buntdb.Tx) error {
+		user := User{
+			PasswordHash: hashed,
+			Role:         role.String(),
+			CreatedAt:    time.Now(),
+			ModifiedAt:   time.Now(),
 		}
 		value, err := json.Marshal(user)
 		if err != nil {
@@ -136,7 +129,7 @@ func (s *BuntStore) StoreUser(username, password string) (string, error) {
 
 // VerifyUser checks if the given username exists in the data store
 func (s *BuntStore) VerifyUser(username, password string) (bool, string, error) {
-	var dbVal UserValue
+	var dbVal User
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
 		val, err := tx.Get(UserKeyPrefix + ":" + username)
@@ -149,24 +142,17 @@ func (s *BuntStore) VerifyUser(username, password string) (bool, string, error) 
 	if err != nil {
 		return false, "", err
 	}
-	err = bcrypt.CompareHashAndPassword(dbVal.Hash, []byte(password))
+	err = bcrypt.CompareHashAndPassword(dbVal.PasswordHash, []byte(password))
 	if err != nil {
 		return false, "", err
 	}
 	return true, dbVal.Role, nil
 }
 
-type User struct {
-	Username   string
-	Role       string
-	CreatedAt  time.Time
-	ModifiedAt time.Time
-}
-
 // GetUsers returns a list of all the usernames
 func (s *BuntStore) GetUsers() ([]User, error) {
 	var users []User
-	var dbVal UserValue
+	var dbVal User
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
 		return tx.AscendKeys(UserKeyPrefix+":*", func(key, value string) bool {
@@ -182,7 +168,7 @@ func (s *BuntStore) GetUsers() ([]User, error) {
 
 // UpdateUser updates the role of the given users
 func (s *BuntStore) UpdateUser(username, role string) error {
-	var dbVal UserValue
+	var dbVal User
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
 		val, err := tx.Get(UserKeyPrefix + ":" + username)
