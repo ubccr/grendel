@@ -86,7 +86,7 @@ func (s *GORM) Close() error {
 }
 
 // StoreUser stores the User in the data store
-func (s *GORM) StoreUser(username, password string) error {
+func (s *GORM) StoreUser(username, password string) (string, error) {
 	role := "disabled"
 
 	// Set role to admin if this is the first user
@@ -106,7 +106,7 @@ func (s *GORM) StoreUser(username, password string) error {
 	err := s.db.Create(&u).Error
 
 	log.Debugf("GORM.StoreUser: inserting '%s' user", username)
-	return err
+	return u.Role, err
 }
 
 // VerifyUser checks if the given username exists in the data store

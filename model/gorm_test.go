@@ -67,9 +67,9 @@ func TestGORMUsers(t *testing.T) {
 		},
 	}
 
-	err = store.StoreUser(testUsers[0].username, testUsers[0].password)
+	_, err = store.StoreUser(testUsers[0].username, testUsers[0].password)
 	assert.NoError(err)
-	err = store.StoreUser(testUsers[1].username, testUsers[1].password)
+	_, err = store.StoreUser(testUsers[1].username, testUsers[1].password)
 	assert.NoError(err)
 
 	auth, role, err := store.VerifyUser(testUsers[0].username, testUsers[0].password)

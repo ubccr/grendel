@@ -19,6 +19,14 @@
     }
 }
 
+.tooltip {
+    @apply invisible absolute mt-3 rounded border border-gray-200 bg-gray-100 p-1 text-sm shadow-lg;
+}
+
+.has-tooltip:hover .tooltip {
+    @apply visible z-50;
+}
+
 html {
     font-family:
         Geist,

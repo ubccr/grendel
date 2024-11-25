@@ -1,9 +1,8 @@
 package frontend
 
 import (
-	"fmt"
+	"errors"
 
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/nodeset"
 	"github.com/ubccr/grendel/tors"
 )
@@ -13,17 +12,19 @@ func (h *Handler) getMacAddress(switchName string) (tors.MACTable, error) {
 	if err != nil {
 		return nil, err
 	}
-	host, err := h.DB.FindHosts(nodeset)
+	hosts, err := h.DB.FindHosts(nodeset)
 	if err != nil {
 		return nil, err
 	}
+	if len(hosts) != 1 {
+		return nil, errors.New("failed to load switch from DB")
+	}
+	host := hosts[0]
 
-	endpoint := fmt.Sprintf("https://%s", host[0].InterfaceBMC().ToStdAddr().String())
-	sw, err := tors.NewDellOS10(endpoint, "admin", viper.GetString("bmc.switch_admin_password"), "", true)
+	sw, err := tors.NewNetworkSwitch(host)
 	if err != nil {
 		return nil, err
 	}
-
 	macTable, err := sw.GetMACTable()
 	if err != nil {
 		return nil, err

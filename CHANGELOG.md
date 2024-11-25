@@ -1,5 +1,43 @@
 # Grendel Changelog
 
+## [0.0.15] - 2024-11-22
+
+- Fix: frontend - inventory export download
+- Feat: frontend - reworked inventory export variables
+- Feat: frontend - added inventory import page
+
+## [0.0.14] - 2024-09-24
+
+- Update default grendel.toml config
+- Feat: provision - added custom PDU prometheus service discovery endpoint
+- Feat: frontend - added Power page to display panel and circuit information. required pdu tags: panel:1,circuit:1-3
+- Feat: frontend - rack page now renders 0u PDUs
+- Feat: cli - added bmc firmware and job commands to allow firmware updates via the Redfish API
+- Feat: cli - added auto-downloading of the Dell update catalog & firmware updates
+- Fix: bmc - power command now functions correctly without an --override set
+
+## [0.0.13] - 2024-08-26
+
+- Update retryablehttp, gjson, ipxe deps
+- Feat: frontend - added CSV export with GO template support
+- Feat: tors - added SONiC queries
+- Feat: tors - added Arista EOS queries
+- Fix: frontend - prevent initial admin user from needing to relog after registration
+- Fix: bmc - concurrent map writes on BMC queries
+- Fix: nfpm - use updated sample toml file rather than .default file
+
+## [0.0.12] - 2024-08-05
+
+- Update echo, fiber deps
+- Fix provision - tftp segfault when starting with bind port permission error
+- Feat: provision - added "proxmox" tag DHCP 250 response code for Proxmox Automated Installs
+- Fix: frontend - segfault when non nodeset hostname is added
+- Fix: frontend - rack selection checkboxes not preserving state after submitting an action
+- Fix: frontend - sqlite session storage
+- Feat: fronend - added Nodes page
+- Feat: frontend - added Bond support in Host page
+- Feat: frontend - added status page
+
 ## [0.0.11] - 2024-02-27
 
 - Add prometheus service discovery.
@@ -130,4 +168,8 @@
 [0.0.9]: https://github.com/ubccr/grendel/releases/tag/v0.0.9
 [0.0.10]: https://github.com/ubccr/grendel/releases/tag/v0.0.10
 [0.0.11]: https://github.com/ubccr/grendel/releases/tag/v0.0.11
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.11...HEAD
+[0.0.12]: https://github.com/ubccr/grendel/releases/tag/v0.0.12
+[0.0.13]: https://github.com/ubccr/grendel/releases/tag/v0.0.13
+[0.0.14]: https://github.com/ubccr/grendel/releases/tag/v0.0.14
+[0.0.15]: https://github.com/ubccr/grendel/releases/tag/v0.0.15
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.15...HEAD

@@ -76,7 +76,7 @@ type UserValue struct {
 }
 
 // StoreUser stores the User in the data store
-func (s *BuntStore) StoreUser(username, password string) error {
+func (s *BuntStore) StoreUser(username, password string) (string, error) {
 	d := true
 	role := "disabled"
 
@@ -92,10 +92,10 @@ func (s *BuntStore) StoreUser(username, password string) error {
 	})
 
 	if err != nil {
-		return err
+		return role, err
 	}
 	if d {
-		return fmt.Errorf("user %s already exists", username)
+		return role, fmt.Errorf("user %s already exists", username)
 	}
 
 	// Set role to admin if this is the first user
@@ -107,14 +107,14 @@ func (s *BuntStore) StoreUser(username, password string) error {
 		})
 	})
 	if err != nil {
-		return err
+		return role, err
 	}
 	if count == 0 {
 		role = "admin"
 	}
 
 	hashed, _ := bcrypt.GenerateFromPassword([]byte(password), 8)
-	return s.db.Update(func(tx *buntdb.Tx) error {
+	return role, s.db.Update(func(tx *buntdb.Tx) error {
 		user := UserValue{
 			Hash:       hashed,
 			Role:       role,

@@ -1,26 +1,34 @@
-<div class="mb-4 grid grid-cols-2 gap-3 rounded-md border border-neutral-300 p-3 shadow-sm" id="interface:{{ .ID }}">
+<div class="mb-4 grid grid-cols-2 gap-3 rounded-md border border-neutral-300 p-3 shadow-sm" id="bond:{{ .ID }}">
     <div class="col-span-2 flex justify-center">
-        <label class="absolute -translate-y-[22px] bg-white text-xs">Interface:</label>
+        <label class="absolute -translate-y-[22px] bg-white text-xs">Bond:</label>
     </div>
-    <div class="col-span-2 flex gap-4 align-middle">
+    <div>
         <label for="Fqdn:{{ .ID }}" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">FQDN:</label>
         <input name="Fqdn" id="Fqdn:{{ .ID }}" class="w-full rounded-md border border-neutral-300 p-1 px-2" />
+    </div>
+    <div class="flex gap-4 align-middle">
+        <label for="Peers:{{ .ID }}" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Peers:</label>
+        <input
+            name="Peers"
+            id="Peers:{{ .ID }}"
+            placeholder="eno1,eno2"
+            class="w-full rounded-md border border-neutral-300 p-1 px-2" />
         <div class="flex gap-1 align-middle">
             <button
                 class="my-auto transform rounded-md bg-neutral-500 text-white transition-transform hover:bg-neutral-400 active:scale-90"
-                onclick="moveUp('{{ .ID }}')"
+                onclick="moveBondUp('{{ .ID }}')"
                 type="button">
                 {{ template "icon-chevron-up" }}
             </button>
             <button
                 class="my-auto transform rounded-md bg-neutral-500 text-white transition-transform hover:bg-neutral-400 active:scale-90"
-                onclick="moveDown('{{ .ID }}')"
+                onclick="moveBondDown('{{ .ID }}')"
                 type="button">
                 {{ template "icon-chevron-down" }}
             </button>
             <button
                 class="my-auto transform rounded-md bg-neutral-500 text-white transition-transform hover:bg-neutral-400 active:scale-90"
-                onclick="removeIface('{{ .ID }}')"
+                onclick="removeBond('{{ .ID }}')"
                 type="button">
                 {{ template "icon-x-mark" }}
             </button>

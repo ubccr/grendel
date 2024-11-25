@@ -3,7 +3,7 @@
         <button
             class="transform rounded-lg border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90"
             type="button"
-            hx-get="/fragments/rack/{{ .Rack }}/actions"
+            hx-put="/fragments/actions"
             hx-target="#hostModal"
             hx-vals="js:{hosts: HostMap('hostname')}"
             hx-swap="innerHTML transition:true"

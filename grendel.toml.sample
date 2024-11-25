@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# Sample Grendel Config
+# Grendel Config
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ root_password = ""
 default_image = ""
 
 # Path to repo directory
-repo_dir = ""
+repo_dir = "/var/lib/grendel/repo"
 
 # Enable prometheus service discover endpoint
 enable_prometheus_sd = false
@@ -93,7 +93,7 @@ proxy_only = false
 router_octet4 = 0
 
 # Hard code a static default gateway. (Not set by default)
-gateway = ""
+#gateway = ""
 
 # Configure settings for specific subnets. If a hosts IP address is contained
 # inside the subnet, the static dhcp response will contain the gateway IP
@@ -153,9 +153,17 @@ insecure = false
 [bmc]
 user = ""
 password = ""
+switch_admin_username = "admin"
+switch_admin_password = ""
 
-# Allow unsigned https certs for redfish queries? Default=true
-#insecure = true
+# Allow unsigned https certs for redfish queries
+insecure = true
+
+# bmc runner settings:
+# sets number of active queries allowed at one time
+fanout = 20
+# number of seconds after a query completes to wait before sending another
+delay = 1
 
 # IP sent to the BMC for import system config, should be an IP of the provision server which is reachable by the BMCs  
 #config_share_ip = "0.0.0.0"
@@ -193,6 +201,9 @@ cols_end = 5
 # Rack table config
 rack_min = 3
 rack_max = 42
+
+# Export CSV default template
+#export_csv_default_template = """"""
 
 # Session storage driver. Valid options: redis, sqlite3, memory.
 session_storage = "memory"

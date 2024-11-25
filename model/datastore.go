@@ -43,7 +43,7 @@ var (
 // DataStore
 type DataStore interface {
 	// StoreUser stores the User in the data store
-	StoreUser(username, password string) error
+	StoreUser(username, password string) (string, error)
 
 	// VerifyUser checks if the given username exists in the data store
 	VerifyUser(username, password string) (bool, string, error)

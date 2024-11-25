@@ -3,8 +3,12 @@ package frontend
 import (
 	"encoding/json"
 	"fmt"
+	"math"
+	"regexp"
+	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/spf13/viper"
@@ -32,6 +36,16 @@ func (h *Handler) hostForm(f *fiber.Ctx) error {
 		VLAN string
 		MTU  string
 	}
+	type BondStrings struct {
+		FQDN  string
+		MAC   string
+		IP    string
+		Name  string
+		BMC   string
+		VLAN  string
+		MTU   string
+		Peers []string
+	}
 	Interfaces := make([]IfaceStrings, len(host[0].Interfaces))
 
 	for i, iface := range host[0].Interfaces {
@@ -43,80 +57,185 @@ func (h *Handler) hostForm(f *fiber.Ctx) error {
 		Interfaces[i].VLAN = iface.VLAN
 		Interfaces[i].MTU = strconv.FormatUint(uint64(iface.MTU), 10)
 	}
+	Bonds := make([]BondStrings, len(host[0].Bonds))
+
+	for i, bond := range host[0].Bonds {
+		Bonds[i].FQDN = bond.FQDN
+		Bonds[i].MAC = bond.MAC.String()
+		Bonds[i].IP = bond.IP.String()
+		Bonds[i].Name = bond.Name
+		Bonds[i].BMC = strconv.FormatBool(bond.BMC)
+		Bonds[i].VLAN = bond.VLAN
+		Bonds[i].MTU = strconv.FormatUint(uint64(bond.MTU), 10)
+		Bonds[i].Peers = bond.Peers
+	}
 
 	return f.Render("fragments/host/form", fiber.Map{
 		"Host":       host[0],
 		"BootImages": h.getBootImages(),
 		"Firmwares":  h.getFirmware(),
 		"Interfaces": Interfaces,
+		"Bonds":      Bonds,
 	}, "")
 }
 
 func (h *Handler) rackTable(f *fiber.Ctx) error {
-	rack := f.Params("rack")
+	rackName := f.Params("rack")
 
-	n, err := h.DB.FindTags([]string{rack})
+	ns, err := h.DB.FindTags([]string{rackName})
 	if err != nil {
 		return ToastError(f, err, "Failed to find hosts tagged with rack")
 	}
 
-	hosts, err := h.DB.FindHosts(n)
+	hosts, err := h.DB.FindHosts(ns)
 	if err != nil {
 		return ToastError(f, err, "Failed to find hosts")
 	}
 
-	type hostArrStruct struct {
+	type rackArrStruct struct {
 		U     string
 		Hosts model.HostList
 	}
-	hostArr := make([]hostArrStruct, 0)
+	rackArr := make([]rackArrStruct, 0)
 
 	viper.SetDefault("frontend.rack_min", 3)
 	viper.SetDefault("frontend.rack_max", 42)
 	min := viper.GetInt("frontend.rack_min")
 	max := viper.GetInt("frontend.rack_max")
 
+	pdus := []string{}
+
+	for _, host := range hosts {
+		if host.HostType() != "power" || !host.HasAnyTags("0u") {
+			continue
+		}
+		pdus = append(pdus, host.Name)
+	}
+
 	for i := max; i >= min; i-- {
 		u := fmt.Sprintf("%02d", i)
-		h := model.HostList{}
+		hostsInU := model.HostList{}
 
-		for _, v := range hosts {
-			if v.HostType() == "power" && !v.HasAnyTags("1u", "2u") {
+		for _, host := range hosts {
+			if host.HostType() == "power" && host.HasAnyTags("0u") {
 				continue
 			}
-			nameArr := strings.Split(v.Name, "-")
+			nameArr := strings.Split(host.Name, "-")
 			if len(nameArr) < 2 {
-				log.Debugf("Invalid host name: %s", v.Name)
+				log.Debugf("Invalid host name: %s", host.Name)
 				continue
 			}
 			if nameArr[2] == u {
-				h = append(h, v)
+				hostsInU = append(hostsInU, host)
 			}
 		}
 
-		hostArr = append(hostArr, hostArrStruct{
+		rackArr = append(rackArr, rackArrStruct{
 			U:     u,
-			Hosts: h,
+			Hosts: hostsInU,
 		})
 	}
 
+	pduHalf := len(pdus) / 2
+
 	return f.Render("fragments/rack/table", fiber.Map{
-		"Hosts": hostArr,
-		"Rack":  rack,
+		"Rack":     rackArr,
+		"RackName": rackName,
+		"PDUs": fiber.Map{
+			"Left":  pdus[pduHalf:],
+			"Right": pdus[0:pduHalf],
+		},
 	}, "")
 }
 
-func (h *Handler) rackActions(f *fiber.Ctx) error {
+func (h *Handler) actions(f *fiber.Ctx) error {
 	hosts := f.FormValue("hosts")
 	ns, err := nodeset.NewNodeSet(hosts)
 	if err != nil {
 		return ToastError(f, err, "Invalid host set")
 	}
 
+	sample := templateData{
+		Hosts: []templateDataHosts{
+			{
+				Host: &model.Host{},
+			},
+		},
+		Date: time.Now().Format(time.DateOnly),
+	}
+
+	b, _ := json.MarshalIndent(sample, "", "    ")
+
 	nodeset := ns.String()
-	return f.Render("fragments/rack/actions", fiber.Map{
-		"Hosts":      nodeset,
-		"BootImages": h.getBootImages(),
+	return f.Render("fragments/actions", fiber.Map{
+		"Hosts":                    nodeset,
+		"TemplateDataHosts":        string(b),
+		"ExportCSVDefaultTemplate": viper.GetString("frontend.export_csv_default_template"),
+		"BootImages":               h.getBootImages(),
+	}, "")
+}
+func (h *Handler) powerPanels(f *fiber.Ctx) error {
+	ns, err := h.DB.FindTags([]string{"pdu"})
+	if err != nil {
+		return err
+	}
+	hosts, err := h.DB.FindHosts(ns)
+	if err != nil {
+		return err
+	}
+
+	type Panel struct {
+		Circuit string
+		PDU     string
+	}
+	panels := make(map[string][]Panel, 0)
+
+	for _, host := range hosts {
+		p := ""
+		c := ""
+
+		for _, tag := range host.Tags {
+			if strings.Contains(tag, "panel") {
+				p = strings.Replace(tag, "panel:", "", 1)
+			} else if strings.Contains(tag, "circuit") {
+				c = strings.Replace(tag, "circuit:", "", 1)
+
+			}
+		}
+		if p == "" && c == "" {
+			continue
+		}
+
+		panels[p] = append(panels[p], Panel{
+			Circuit: c,
+			PDU:     host.Name,
+		})
+	}
+
+	for _, circuits := range panels {
+		sort.Slice(circuits, func(i, j int) bool {
+			prev := strings.Split(circuits[i].Circuit, "-")
+			if len(prev) == 0 {
+				return false
+			}
+			prevInt, err := strconv.Atoi(prev[0])
+			if err != nil {
+				return false
+			}
+			curr := strings.Split(circuits[j].Circuit, "-")
+			if len(prev) == 0 {
+				return false
+			}
+			currInt, err := strconv.Atoi(curr[0])
+			if err != nil {
+				return false
+			}
+			return prevInt < currInt
+		})
+	}
+
+	return f.Render("fragments/power/panels", fiber.Map{
+		"Panels": panels,
 	}, "")
 }
 
@@ -290,6 +409,136 @@ func (h *Handler) rackAddTable(f *fiber.Ctx) error {
 	}, "")
 }
 
+func (h *Handler) nodesTable(f *fiber.Ctx) error {
+	hosts, err := h.DB.Hosts()
+	if err != nil {
+		return ToastError(f, err, "Error getting hosts from DB")
+	}
+	qp := f.Queries()
+
+	matches := []string{}
+
+	// Filter Regex:
+	nameRegex, err := regexp.Compile(qp["Name"])
+	if err != nil {
+		return ToastError(f, err, "Invalid Name Regex")
+	}
+	provisionRegex, err := regexp.Compile(qp["Provision"])
+	if err != nil {
+		return ToastError(f, err, "Invalid Boot Image Regex")
+	}
+	firmwareRegex, err := regexp.Compile(qp["Firmware"])
+	if err != nil {
+		return ToastError(f, err, "Invalid Boot Image Regex")
+	}
+	bootImageRegex, err := regexp.Compile(qp["BootImage"])
+	if err != nil {
+		return ToastError(f, err, "Invalid Boot Image Regex")
+	}
+	tagsRegex, err := regexp.Compile(qp["Tags"])
+	if err != nil {
+		return ToastError(f, err, "Invalid Tag Regex")
+	}
+
+	for _, h := range hosts {
+		nameMatch := false
+		provisionMatch := false
+		firmwareMatch := false
+		bootImageMatch := false
+		tagsMatch := false
+
+		if nameRegex.MatchString(h.Name) {
+			nameMatch = true
+		}
+		if provisionRegex.MatchString(strconv.FormatBool(h.Provision)) {
+			provisionMatch = true
+		}
+		if firmwareRegex.MatchString(h.Firmware.String()) {
+			firmwareMatch = true
+		}
+		if bootImageRegex.MatchString(h.BootImage) {
+			bootImageMatch = true
+		}
+		for _, tag := range h.Tags {
+			if tagsRegex.MatchString(tag) {
+				tagsMatch = true
+				break
+			}
+		}
+
+		if nameMatch && provisionMatch && firmwareMatch && bootImageMatch && tagsMatch {
+			matches = append(matches, h.Name)
+		}
+
+	}
+
+	ns, err := nodeset.NewNodeSet(strings.Join(matches, ","))
+	if err != nil {
+		return ToastError(f, err, "Error filtering hosts")
+	}
+	filtered, err := h.DB.FindHosts(ns)
+	if err != nil {
+		return ToastError(f, err, "Error filtering hosts")
+	}
+	sort.Slice(filtered, func(i, j int) bool {
+		o := strings.Compare(filtered[i].Name, filtered[j].Name)
+
+		return o == -1
+	})
+	allHosts, err := filtered.ToNodeSet()
+	if err != nil {
+		return ToastError(f, err, "Error filtering hosts")
+	}
+
+	// Pagination:
+	pageSize, err := strconv.Atoi(qp["PageSize"])
+	if err != nil {
+		return ToastError(f, err, "Error calculating pagination")
+	}
+	filteredLen := len(filtered)
+	numPages := filteredLen / pageSize
+	if math.Remainder(float64(filteredLen), float64(pageSize)) != 0 {
+		numPages++
+	}
+
+	currentPage := 1
+	if qp["CurrentPage"] != "" {
+		currentPage, err = strconv.Atoi(qp["CurrentPage"])
+		if err != nil {
+			return ToastError(f, err, "Error calculating pagination")
+		}
+	}
+
+	start := (currentPage - 1) * pageSize
+
+	if start > filteredLen {
+		start = filteredLen
+	}
+
+	end := start + pageSize
+	if end > filteredLen {
+		end = filteredLen
+	}
+
+	filteredList := filtered[start:end]
+
+	checkAll := false
+	if qp["CheckAll"] == "on" {
+		checkAll = true
+	}
+
+	return f.Render("fragments/nodes/table", fiber.Map{
+		"Hosts":    filteredList,
+		"AllHosts": allHosts,
+		"CheckAll": checkAll,
+		"Pagination": fiber.Map{
+			"CurrentPage": currentPage,
+			"PageSize":    pageSize,
+			"NumPages":    numPages,
+		},
+	}, "")
+}
+
 func (h *Handler) usersTable(f *fiber.Ctx) error {
 	users, err := h.DB.GetUsers()
 	if err != nil {
@@ -305,7 +554,11 @@ func (h *Handler) floorplanTable(f *fiber.Ctx) error {
 	hosts, _ := h.DB.Hosts()
 	racks := map[string]int{}
 	for _, host := range hosts {
-		rack := strings.Split(host.Name, "-")[1]
+		name := strings.Split(host.Name, "-")
+		if len(name) < 2 {
+			continue
+		}
+		rack := name[1]
 		racks[rack] += 1
 	}
 
@@ -347,6 +600,14 @@ func (h *Handler) interfaces(f *fiber.Ctx) error {
 	id := f.Query("ID", "0")
 
 	return f.Render("fragments/interfaces", fiber.Map{
+		"ID": id,
+	}, "")
+}
+
+func (h *Handler) bonds(f *fiber.Ctx) error {
+	id := f.Query("ID", "0")
+
+	return f.Render("fragments/bonds", fiber.Map{
 		"ID": id,
 	}, "")
 }

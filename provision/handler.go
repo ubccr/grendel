@@ -76,6 +76,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	e.GET("/onie-updater*", h.Onie).Name = "onie"
 	if viper.GetBool("provision.enable_prometheus_sd") {
 		e.GET("/service-discovery/:tag/:port", h.ServiceDiscovery).Name = "sd"
+		e.GET("/pdu-service-discovery/:tag/:port", h.PDUServiceDiscovery).Name = "psd"
 	}
 
 	boot := e.Group("/boot/:token/")
@@ -94,6 +95,7 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	boot.GET("pxe-config.ign", h.Ignition)
 	boot.GET("provision/:name", h.ProvisionTemplate)
 	boot.GET("bmc/:name", h.BmcTemplate)
+	boot.POST("proxmox", h.Proxmox)
 }
 
 func (h *Handler) Index(c echo.Context) error {
@@ -362,6 +364,22 @@ func (h *Handler) BmcTemplate(c echo.Context) error {
 	}
 
 	log.Infof("Sending bmc template %s to host %s", c.Param("name"), host.Name)
+	return c.Render(http.StatusOK, tmplName, data)
+}
+
+func (h *Handler) Proxmox(c echo.Context) error {
+	bootImage, host, _, data, err := h.verifyClaims(c)
+	if err != nil {
+		return err
+	}
+
+	tmplName := "proxmox.tmpl"
+	if bootImage.ProvisionTemplate != "" {
+		tmplName = bootImage.ProvisionTemplate
+	}
+
+	log.Infof("Sending automated install answer file to host %s", host.Name)
+	c.Response().Header().Set(echo.HeaderContentType, "application/yaml; charset=utf-8")
 	return c.Render(http.StatusOK, tmplName, data)
 }
 

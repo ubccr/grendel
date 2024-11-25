@@ -9,6 +9,12 @@
                     Add Host
                 </button>
                 <button
+                    id="floorplanAddInventoryBtn"
+                    class="rounded-md px-3 py-2 hover:bg-white"
+                    onclick="useTransition(() => showAddInventoryForm())">
+                    Add Inventory
+                </button>
+                <button
                     id="floorplanImportBtn"
                     class="rounded-md px-3 py-2 hover:bg-white"
                     onclick="useTransition(() => showImportForm())">
@@ -104,6 +110,85 @@
                     placeholder="Import JSON"></textarea>
             </form>
         </div>
+        <div id="floorplanInventoryDiv" class="hidden p-3">
+            <form
+                id="floorplanInventoryForm"
+                hx-post="/api/host/inventory"
+                hx-swap="none"
+                hx-on::after-request="if(event.detail.successful) clearInvForm()">
+                <div class="grid grid-cols-1 gap-3 p-3 drop-shadow-sm">
+                    <div>
+                        <label for="SerialNumber" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                            Serial Number:
+                        </label>
+                        <input
+                            id="SerialNumber"
+                            name="SerialNumber"
+                            class="w-full rounded-md border border-neutral-300 px-2 py-1"
+                            placeholder=""
+                            type="text"
+                            autocomplete="off"
+                            onchange="removeDellQRL(this)" />
+                    </div>
+                    <div>
+                        <label for="AssetNumber" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                            Asset Number:
+                        </label>
+                        <input
+                            id="AssetNumber"
+                            name="AssetNumber"
+                            class="w-full rounded-md border border-neutral-300 px-2 py-1"
+                            placeholder=""
+                            type="text"
+                            autocomplete="off" />
+                    </div>
+                    <div>
+                        <label for="Manufacturer" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                            Manufacturer:
+                        </label>
+                        <input
+                            id="Manufacturer"
+                            name="Manufacturer"
+                            class="w-full rounded-md border border-neutral-300 px-2 py-1"
+                            placeholder=""
+                            type="text"
+                            autocomplete="off" />
+                    </div>
+                    <div>
+                        <label for="Model" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Model:</label>
+                        <input
+                            id="Model"
+                            name="Model"
+                            class="w-full rounded-md border border-neutral-300 px-2 py-1"
+                            placeholder=""
+                            type="text"
+                            autocomplete="off" />
+                    </div>
+                    <div>
+                        <label for="PONumber" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">
+                            Purchase Order Number:
+                        </label>
+                        <input
+                            id="PONumber"
+                            name="PONumber"
+                            class="w-full rounded-md border border-neutral-300 px-2 py-1"
+                            placeholder=""
+                            type="text"
+                            autocomplete="off" />
+                    </div>
+                    <div>
+                        <label for="Tags" class="absolute ml-3 -translate-y-[9px] bg-white text-xs">Tags:</label>
+                        <input
+                            id="Tags"
+                            name="Tags"
+                            class="w-full rounded-md border border-neutral-300 px-2 py-1"
+                            placeholder="misc-tag-1,misc-tag-2"
+                            type="text"
+                            autocomplete="off" />
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
     <div class="flex-grow"></div>
     <div class="sticky bottom-0 flex w-full justify-end gap-3 border-t border-neutral-200 bg-neutral-50 p-3">
@@ -113,6 +198,13 @@
             form="floorplanAddHostForm"
             class="transform rounded-md border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90">
             Submit
+        </button>
+        <button
+            id="floorplanClearBtn"
+            type="reset"
+            form="floorplanInventoryForm"
+            class="transform rounded-md border bg-blue-500 px-2 py-1 text-white transition-transform hover:bg-blue-400 active:scale-90">
+            Clear
         </button>
         <button
             type="button"
@@ -158,6 +250,21 @@
             }
         }
     }
+    function removeDellQRL(input) {
+        replace = "https://qrl.dell.com/";
+        if (input.value.includes(replace)) {
+            input.value = input.value.replace(replace, "");
+        }
+    }
+    function clearInvForm() {
+        s = document.getElementById("SerialNumber");
+        a = document.getElementById("AssetNumber");
+
+        s.value = "";
+        a.value = "";
+
+        s.focus();
+    }
     function parseForm() {
         let ifaces = document.getElementById("interfaces").children;
         let interfaces = [];
@@ -176,32 +283,65 @@
     }
     function showAddHostForm() {
         let addHostBtn = document.getElementById("floorplanAddHostBtn");
+        let inventoryBtn = document.getElementById("floorplanAddInventoryBtn");
         let importBtn = document.getElementById("floorplanImportBtn");
         let submitBtn = document.getElementById("floorplanSubmitBtn");
+        let clearBtn = document.getElementById("floorplanClearBtn");
 
         document.getElementById("floorplanHostDiv").classList.remove("hidden");
+        document.getElementById("floorplanInventoryDiv").classList.add("hidden");
         document.getElementById("floorplanImportDiv").classList.add("hidden");
 
         addHostBtn.classList.add("bg-white", "border", "border-gray-200");
         addHostBtn.classList.remove("bg-gray-50");
+        inventoryBtn.classList.add("bg-gray-50");
+        inventoryBtn.classList.remove("bg-white", "border", "border-gray-200");
         importBtn.classList.add("bg-gray-50");
         importBtn.classList.remove("bg-white", "border", "border-gray-200");
 
         submitBtn.attributes["form"].value = "floorplanAddHostForm";
+        clearBtn.attributes["form"].value = "floorplanAddHostForm";
+    }
+    function showAddInventoryForm() {
+        let addHostBtn = document.getElementById("floorplanAddHostBtn");
+        let inventoryBtn = document.getElementById("floorplanAddInventoryBtn");
+        let importBtn = document.getElementById("floorplanImportBtn");
+        let submitBtn = document.getElementById("floorplanSubmitBtn");
+        let clearBtn = document.getElementById("floorplanClearBtn");
+
+        document.getElementById("floorplanHostDiv").classList.add("hidden");
+        document.getElementById("floorplanInventoryDiv").classList.remove("hidden");
+        document.getElementById("floorplanImportDiv").classList.add("hidden");
+
+        inventoryBtn.classList.add("bg-white", "border", "border-gray-200");
+        inventoryBtn.classList.remove("bg-gray-50");
+        addHostBtn.classList.add("bg-gray-50");
+        addHostBtn.classList.remove("bg-white", "border", "border-gray-200");
+        importBtn.classList.add("bg-gray-50");
+        importBtn.classList.remove("bg-white", "border", "border-gray-200");
+
+        submitBtn.attributes["form"].value = "floorplanInventoryForm";
+        clearBtn.attributes["form"].value = "floorplanInventoryForm";
     }
     function showImportForm() {
         let addHostBtn = document.getElementById("floorplanAddHostBtn");
+        let inventoryBtn = document.getElementById("floorplanAddInventoryBtn");
         let importBtn = document.getElementById("floorplanImportBtn");
         let submitBtn = document.getElementById("floorplanSubmitBtn");
+        let clearBtn = document.getElementById("floorplanClearBtn");
 
         document.getElementById("floorplanHostDiv").classList.add("hidden");
+        document.getElementById("floorplanInventoryDiv").classList.add("hidden");
         document.getElementById("floorplanImportDiv").classList.remove("hidden");
 
         addHostBtn.classList.remove("bg-white", "border", "border-gray-200");
         addHostBtn.classList.add("bg-gray-50");
+        inventoryBtn.classList.remove("bg-white", "border", "border-gray-200");
+        inventoryBtn.classList.add("bg-gray-50");
         importBtn.classList.remove("bg-gray-50");
         importBtn.classList.add("bg-white", "border", "border-gray-200");
 
         submitBtn.attributes["form"].value = "floorplanImportForm";
+        clearBtn.attributes["form"].value = "floorplanImportForm";
     }
 </script>
