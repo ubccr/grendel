@@ -19,13 +19,13 @@ package model
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"net"
 	"strings"
 	"time"
 
-	"github.com/jafurlan/rqlite"
-	_ "github.com/rqlite/gorqlite/stdlib"
+	// _ "github.com/rqlite/gorqlite/stdlib"
 	"github.com/segmentio/ksuid"
 	"github.com/ubccr/grendel/nodeset"
 	"golang.org/x/crypto/bcrypt"
@@ -48,9 +48,9 @@ func NewGORMStore(dbType, path, addr string) (*GORM, error) {
 
 	switch dbType {
 	case "sqlite":
-		conn = sqlite.Open(path)
-	case "rqlite":
-		conn = rqlite.Open(addr)
+		conn = sqlite.Open(path + "?mode=rwc&_journal_mode=WAL") // &_sync=NORMAL ?? seems to reduce performance by a few percent? Margin of error?
+	default:
+		return nil, errors.New("invalid database type. supported gorm options: sqlite")
 	}
 
 	db, err := gorm.Open(conn, &gorm.Config{
@@ -72,6 +72,7 @@ func NewGORMStore(dbType, path, addr string) (*GORM, error) {
 	schema.RegisterSerializer("IPPrefixSerializer", &IPPrefixSerializer{})
 
 	if err = db.AutoMigrate(&User{}, &Host{}, &NetInterface{}, &BootImage{}, &Bond{}); err != nil {
+		log.Error("db automigrate failed")
 		return nil, err
 	}
 	return &GORM{
@@ -247,6 +248,9 @@ func (s *GORM) ResolveIPv4(fqdn string) ([]net.IP, error) {
 	}
 
 	err = s.db.Where(&Bond{NetInterface: NetInterface{FQDN: fqdn}}).Find(&bonds).Error
+	if err != nil {
+		return ips, err
+	}
 
 	for _, bond := range bonds {
 		if bond.IP.IsValid() {
@@ -274,6 +278,9 @@ func (s *GORM) ReverseResolve(ip string) ([]string, error) {
 	}
 
 	err = s.db.Where("ip LIKE ?", "%"+ip+"%").Find(&bonds).Error
+	if err != nil {
+		return fqdns, err
+	}
 
 	for _, bond := range bonds {
 		fqdns = append(fqdns, bond.FQDN)
