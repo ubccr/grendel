@@ -133,10 +133,10 @@ func NewDataStore(dbType string, path string, addr string) (DataStore, error) {
 		db, err = NewBuntStore(path)
 	case "sqlite":
 		log.Infof("%s path: %s", dbType, path)
-		db, err = NewGORMStore(dbType, path, addr)
-	case "rqlite":
-		log.Infof("%s address: %s", dbType, addr)
-		db, err = NewGORMStore(dbType, path, addr)
+		db, err = NewGORMStore(dbType, path, "")
+	// case "rqlite":
+	// 	log.Infof("%s address: %s", dbType, addr)
+	// 	db, err = NewGORMStore(dbType, path, addr)
 	default:
 		log.Errorf("specified database type: %s does not match any availible types", dbType)
 	}

@@ -18,7 +18,6 @@ require (
 	github.com/hako/branca v0.0.0-20191227164554-3b9970524189
 	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/insomniacslk/dhcp v0.0.0-20200922210017-67c425063dca
-	github.com/jafurlan/rqlite v0.0.0-20240718202650-8a04e01d94cb
 	github.com/jedib0t/go-pretty/v6 v6.5.9
 	github.com/korovkin/limiter v0.0.0-20190919045942-dac5a6b2a536
 	github.com/labstack/echo/v4 v4.12.0
@@ -98,7 +97,6 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
-	github.com/rqlite/gorqlite v0.0.0-20240227123050-397b03f02418
 	github.com/spf13/afero v1.9.3 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect

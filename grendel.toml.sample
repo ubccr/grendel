@@ -6,7 +6,7 @@
 # General
 #------------------------------------------------------------------------------
 
-# Valid database types: sqlite, rqlite, buntdb
+# Valid database types: sqlite, buntdb
 dbtype = "sqlite"
 # Path to database file. Used for sqlite, buntdb database types. :memory: can be used for a non-peristant in memory only database
 dbpath = ":memory:"
