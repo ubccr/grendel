@@ -35,11 +35,11 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/api"
-	"github.com/ubccr/grendel/client"
-	"github.com/ubccr/grendel/logger"
-	"github.com/ubccr/grendel/model"
-	"github.com/ubccr/grendel/util"
+	"github.com/ubccr/grendel/internal/api"
+	"github.com/ubccr/grendel/internal/logger"
+	"github.com/ubccr/grendel/internal/util"
+	"github.com/ubccr/grendel/pkg/client"
+	"github.com/ubccr/grendel/pkg/model"
 )
 
 var (

@@ -28,9 +28,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/cmd"
-	"github.com/ubccr/grendel/firmware"
-	"github.com/ubccr/grendel/logger"
-	"github.com/ubccr/grendel/model"
+	"github.com/ubccr/grendel/internal/firmware"
+	"github.com/ubccr/grendel/internal/logger"
+	"github.com/ubccr/grendel/pkg/model"
 )
 
 var (

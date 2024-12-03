@@ -4,7 +4,7 @@ grendel.yml
 grendel.toml
 grendel.db
 out/
-firmware/bin
+internal/firmware/bin
 *.swp
 grendel-*.tar.gz
 scripts/openapi-generator-cli.jar

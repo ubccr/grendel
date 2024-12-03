@@ -20,7 +20,7 @@ package host
 import (
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd"
-	"github.com/ubccr/grendel/logger"
+	"github.com/ubccr/grendel/internal/logger"
 )
 
 var (

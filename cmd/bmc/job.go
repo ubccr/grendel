@@ -25,7 +25,7 @@ import (
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
-	"github.com/ubccr/grendel/bmc"
+	"github.com/ubccr/grendel/internal/bmc"
 )
 
 var (

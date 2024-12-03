@@ -24,7 +24,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/cmd"
-	"github.com/ubccr/grendel/provision"
+	"github.com/ubccr/grendel/internal/provision"
 	"gopkg.in/tomb.v2"
 )
 

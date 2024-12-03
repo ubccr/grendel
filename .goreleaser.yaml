@@ -1,5 +1,6 @@
 # Grendel goreleaser configs
 # See here: https://goreleaser.com
+version: 2
 before:
   hooks:
     - go mod tidy
@@ -11,7 +12,7 @@ builds:
     goos:
       - linux
     ldflags:
-      - -s -w -X github.com/ubccr/grendel/api.Version={{.Version}}
+      - -s -w -X github.com/ubccr/grendel/internal/api.Version={{.Version}}
       - -extldflags=-static
     tags:
       - sqlite_omit_load_extension
@@ -33,7 +34,7 @@ archives:
       - NOTICE
       - README.md
       - CHANGELOG.md
-      - grendel.toml.sample
+      - configs/grendel.toml.sample
 nfpms:
   - vendor: University at Buffalo
     homepage: https://github.com/ubccr/grendel
@@ -60,7 +61,7 @@ nfpms:
       signature:
         key_file: key.gpg
     contents:
-      - src: ./grendel.toml.sample
+      - src: ./configs/grendel.toml.sample
         dst: /etc/grendel/grendel.toml
         type: "config|noreplace"
       - src: ./scripts/nfpm/grendel.service
@@ -68,7 +69,7 @@ nfpms:
 checksum:
   name_template: "checksums.txt"
 snapshot:
-  name_template: "{{ incpatch .Version }}-SNAPSHOT-{{.ShortCommit}}"
+  version_template: "{{ incpatch .Version }}-SNAPSHOT-{{.ShortCommit}}"
 changelog:
   sort: desc
   groups:

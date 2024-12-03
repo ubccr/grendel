@@ -24,7 +24,7 @@ import (
 	"github.com/Pallinder/go-randomdata"
 	"github.com/bluele/factory-go/factory"
 	"github.com/segmentio/ksuid"
-	"github.com/ubccr/grendel/model"
+	"github.com/ubccr/grendel/pkg/model"
 )
 
 var TestHostJSON = []byte(`{"firmware": "","id": "1VCnR6qevU5BbihTIvZEhX002CI","interfaces": [{"bmc": false,"fqdn": "tux01.compute.local", "ifname": "", "ip": "10.10.1.2/24", "mac": "d0:93:ae:e1:b5:2e" } ], "bonds": [{"peers": ["d0:93:ae:e1:b5:2e", "d0:93:ae:e1:b5:2f"], "bmc": false,"fqdn": "tux04.compute.local", "ifname": "bond0", "ip": "10.11.1.2/24", "mac": "" } ], "name": "tux01", "boot_image": "centos6", "provision": true }`)

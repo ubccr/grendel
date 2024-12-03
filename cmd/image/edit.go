@@ -24,8 +24,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd"
-	"github.com/ubccr/grendel/model"
-	"github.com/ubccr/grendel/util"
+	"github.com/ubccr/grendel/internal/util"
+	"github.com/ubccr/grendel/pkg/model"
 )
 
 var (
