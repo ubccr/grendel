@@ -23,7 +23,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/ubccr/grendel/bmc"
+	"github.com/ubccr/grendel/internal/bmc"
 )
 
 var (

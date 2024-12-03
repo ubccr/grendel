@@ -1,14 +1,14 @@
 #!/bin/bash
 
-OUT=client
+OUT=pkg/client
 
 java -jar $OPENAPI_CLI_JAR generate \
   -g go \
-  -i openapi.json \
-  -t scripts/openapi-templates/Go \
+  -i api/openapi.json \
+  -t api/openapi-templates/Go \
   -o $OUT \
   --package-name=client \
-  --import-mappings=Host=github.com/ubccr/grendel/model,NetInterface=github.com/ubccr/grendel/model,BootImage=github.com/ubccr/grendel/model \
+  --import-mappings=Host=github.com/ubccr/grendel/pkg/model,NetInterface=github.com/ubccr/grendel/pkg/model,BootImage=github.com/ubccr/grendel/pkg/model \
   --type-mappings=Host=model.Host,NetInterface=model.NetInterface,BootImage=model.BootImage
 
 # TODO This is very hackish. Figure out how to properly support external models

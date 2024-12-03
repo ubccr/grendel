@@ -21,7 +21,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/ubccr/grendel/model"
+	"github.com/ubccr/grendel/pkg/model"
 )
 
 func TestFactory(t *testing.T) {

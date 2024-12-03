@@ -8,9 +8,9 @@ REL_DIR=${GRENDEL_DIR}/${NAME}
 rm -Rf ${GRENDEL_DIR}
 mkdir -p ${REL_DIR}
 
-go build -ldflags "-X github.com/ubccr/grendel/api.Version=$VERSION" .
+go build -ldflags "-X github.com/ubccr/grendel/internal/api.Version=$VERSION" .
 cp ./grendel ${REL_DIR}/ 
-cp ./grendel.toml.sample ${REL_DIR}/ 
+cp ./configs/grendel.toml.sample ${REL_DIR}/ 
 cp ./README.md ${REL_DIR}/ 
 cp ./AUTHORS.md ${REL_DIR}/ 
 cp ./CHANGELOG.md ${REL_DIR}/ 

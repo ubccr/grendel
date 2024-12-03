@@ -25,10 +25,10 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/api"
+	"github.com/ubccr/grendel/internal/api"
 	"github.com/ubccr/grendel/cmd"
-	"github.com/ubccr/grendel/model"
-	"github.com/ubccr/grendel/nodeset"
+	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/pkg/nodeset"
 )
 
 type StatTag struct {

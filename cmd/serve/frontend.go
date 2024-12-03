@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/cmd"
-	"github.com/ubccr/grendel/frontend"
+	"github.com/ubccr/grendel/internal/frontend"
 	"gopkg.in/tomb.v2"
 )
 
