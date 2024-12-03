@@ -30,7 +30,7 @@ archives:
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
     files:
-      - LICENSE
+      - LICENSES/*
       - NOTICE
       - README.md
       - CHANGELOG.md
