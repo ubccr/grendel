@@ -1,6 +1,7 @@
-// Adopted from coredns
-// https://github.com/coredns/coredns/blob/master/plugin/pkg/dnsutil/reverse.go
 // Copyright coredns authors Apache License
+// SPDX-FileCopyrightText: (C) 2019 Grendel Authors
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 package util
 

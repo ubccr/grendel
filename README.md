@@ -187,4 +187,4 @@ NodeSet/RangeSet algorithms ported from [ClusterShell](https://github.com/cea-hp
 
 ## License
 
-Grendel is released under the GPLv3 license. See the LICENSE file.
+Grendel is released under the GPLv3 license. See REUSE.toml
