@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -60,7 +61,7 @@ func (h *Handler) BootImageFind(c echo.Context) error {
 
 	image, err := h.DB.LoadBootImage(name)
 	if err != nil {
-		if errors.Is(err, model.ErrNotFound) {
+		if errors.Is(err, store.ErrNotFound) {
 			return echo.NewHTTPError(http.StatusNotFound, "image not found").SetInternal(err)
 		}
 

@@ -10,18 +10,18 @@ import (
 
 	"github.com/pin/tftp/v3"
 	"github.com/ubccr/grendel/internal/logger"
-	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/internal/store"
 )
 
 var log = logger.GetLogger("TFTP")
 
 type Server struct {
 	Address string
-	DB      model.DataStore
+	DB      store.Store
 	srv     *tftp.Server
 }
 
-func NewServer(db model.DataStore, address string) (*Server, error) {
+func NewServer(db store.Store, address string) (*Server, error) {
 	s := &Server{DB: db, Address: address}
 
 	s.srv = tftp.NewServer(s.ReadHandler, nil)

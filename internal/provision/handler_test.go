@@ -13,14 +13,16 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
+	"github.com/ubccr/grendel/internal/store"
+	"github.com/ubccr/grendel/internal/store/buntstore"
 	"github.com/ubccr/grendel/internal/tests"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
-func newTestDB(t *testing.T) model.DataStore {
+func newTestDB(t *testing.T) store.Store {
 	assert := assert.New(t)
 
-	db, err := model.NewDataStore(":memory:")
+	db, err := buntstore.New(":memory:")
 	if err != nil {
 		assert.Fail(err.Error())
 	}
@@ -57,7 +59,7 @@ func TestInvalidBootToken(t *testing.T) {
 	assert := assert.New(t)
 
 	host := tests.HostFactory.MustCreate().(*model.Host)
-	token, err := model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
+	token, err := model.NewBootToken(host.UID.String(), host.Interfaces[0].MAC.String())
 	assert.NoError(err)
 	badToken := []byte(token)
 	badToken[2] = 'a'
@@ -106,7 +108,7 @@ func TestIpxe(t *testing.T) {
 	err = h.DB.StoreHost(host)
 	assert.NoError(err)
 
-	token, err := model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
+	token, err := model.NewBootToken(host.UID.String(), host.Interfaces[0].MAC.String())
 	assert.NoError(err)
 
 	e := newTestEcho(t)
@@ -143,7 +145,7 @@ func TestHostNotProvision(t *testing.T) {
 	err = h.DB.StoreHost(host)
 	assert.NoError(err)
 
-	token, err := model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
+	token, err := model.NewBootToken(host.UID.String(), host.Interfaces[0].MAC.String())
 	assert.NoError(err)
 
 	for path, handler := range paths {
@@ -185,7 +187,7 @@ func TestIpxeWrongHost(t *testing.T) {
 
 	hostBad := tests.HostFactory.MustCreate().(*model.Host)
 
-	token, err := model.NewBootToken(hostBad.ID.String(), hostBad.Interfaces[0].MAC.String())
+	token, err := model.NewBootToken(hostBad.UID.String(), hostBad.Interfaces[0].MAC.String())
 	assert.NoError(err)
 
 	e := newTestEcho(t)
@@ -223,7 +225,7 @@ func TestKickstart(t *testing.T) {
 	err = h.DB.StoreHost(host)
 	assert.NoError(err)
 
-	token, err := model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
+	token, err := model.NewBootToken(host.UID.String(), host.Interfaces[0].MAC.String())
 	assert.NoError(err)
 
 	e := newTestEcho(t)
@@ -256,7 +258,7 @@ func TestComplete(t *testing.T) {
 	err = h.DB.StoreHost(host)
 	assert.NoError(err)
 
-	token, err := model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
+	token, err := model.NewBootToken(host.UID.String(), host.Interfaces[0].MAC.String())
 	assert.NoError(err)
 
 	e := newTestEcho(t)
@@ -272,7 +274,7 @@ func TestComplete(t *testing.T) {
 		assert.Equal("ok", gjson.Get(rec.Body.String(), "status").String())
 	}
 
-	hostTest, err := h.DB.LoadHostFromID(host.ID.String())
+	hostTest, err := h.DB.LoadHostFromID(host.UID.String())
 	if assert.NoError(err) {
 		assert.False(hostTest.Provision)
 	}
@@ -293,7 +295,7 @@ func TestUserData(t *testing.T) {
 	err = h.DB.StoreHost(host)
 	assert.NoError(err)
 
-	token, err := model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
+	token, err := model.NewBootToken(host.UID.String(), host.Interfaces[0].MAC.String())
 	assert.NoError(err)
 
 	e := newTestEcho(t)
@@ -326,7 +328,7 @@ func TestMetaData(t *testing.T) {
 	err = h.DB.StoreHost(host)
 	assert.NoError(err)
 
-	token, err := model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
+	token, err := model.NewBootToken(host.UID.String(), host.Interfaces[0].MAC.String())
 	assert.NoError(err)
 
 	e := newTestEcho(t)
@@ -340,6 +342,6 @@ func TestMetaData(t *testing.T) {
 	if assert.NoError(TokenRequired(h.MetaData)(c)) {
 		assert.Equal(http.StatusOK, rec.Code)
 		assert.Contains(rec.Body.String(), "instance-id")
-		assert.Contains(rec.Body.String(), host.ID.String())
+		assert.Contains(rec.Body.String(), host.UID.String())
 	}
 }

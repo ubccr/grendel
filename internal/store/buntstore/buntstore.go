@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package model
+package buntstore
 
 import (
 	"encoding/json"
@@ -20,8 +20,10 @@ import (
 	"github.com/tidwall/buntdb"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
-	"github.com/ubccr/grendel/pkg/nodeset"
+	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/util"
+	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/pkg/nodeset"
 )
 
 const (
@@ -35,8 +37,16 @@ type BuntStore struct {
 	db *buntdb.DB
 }
 
-// NewBuntStore returns a new BuntStore using the given database filename. For memory only you can provide `:memory:`
-func NewBuntStore(filename string) (*BuntStore, error) {
+type BuntUser struct {
+	Username     string    `json:"username"`
+	PasswordHash []byte    `json:"hash"`
+	Role         string    `json:"role"`
+	CreatedAt    time.Time `json:"created_at"`
+	ModifiedAt   time.Time `json:"modified_at"`
+}
+
+// New returns a new BuntStore using the given database filename. For memory only you can provide `:memory:`
+func New(filename string) (*BuntStore, error) {
 	db, err := buntdb.Open(filename)
 	if err != nil {
 		return nil, err
@@ -53,13 +63,6 @@ func NewBuntStore(filename string) (*BuntStore, error) {
 // Close closes the BuntStore database
 func (s *BuntStore) Close() error {
 	return s.db.Close()
-}
-
-type UserValue struct {
-	Hash       []byte    `json:"hash"`
-	Role       string    `json:"role"`
-	CreatedAt  time.Time `json:"created_at"`
-	ModifiedAt time.Time `json:"modified_at"`
 }
 
 // StoreUser stores the User in the data store
@@ -102,11 +105,11 @@ func (s *BuntStore) StoreUser(username, password string) (string, error) {
 
 	hashed, _ := bcrypt.GenerateFromPassword([]byte(password), 8)
 	return role, s.db.Update(func(tx *buntdb.Tx) error {
-		user := UserValue{
-			Hash:       hashed,
-			Role:       role,
-			CreatedAt:  time.Now(),
-			ModifiedAt: time.Now(),
+		user := BuntUser{
+			PasswordHash: hashed,
+			Role:         role,
+			CreatedAt:    time.Now(),
+			ModifiedAt:   time.Now(),
 		}
 		value, err := json.Marshal(user)
 		if err != nil {
@@ -123,7 +126,7 @@ func (s *BuntStore) StoreUser(username, password string) (string, error) {
 
 // VerifyUser checks if the given username exists in the data store
 func (s *BuntStore) VerifyUser(username, password string) (bool, string, error) {
-	var dbVal UserValue
+	var dbVal BuntUser
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
 		val, err := tx.Get(UserKeyPrefix + ":" + username)
@@ -136,40 +139,33 @@ func (s *BuntStore) VerifyUser(username, password string) (bool, string, error) 
 	if err != nil {
 		return false, "", err
 	}
-	err = bcrypt.CompareHashAndPassword(dbVal.Hash, []byte(password))
+	err = bcrypt.CompareHashAndPassword(dbVal.PasswordHash, []byte(password))
 	if err != nil {
 		return false, "", err
 	}
 	return true, dbVal.Role, nil
 }
 
-type User struct {
-	Username   string
-	Role       string
-	CreatedAt  time.Time
-	ModifiedAt time.Time
-}
-
 // GetUsers returns a list of all the usernames
-func (s *BuntStore) GetUsers() ([]User, error) {
-	var users []User
-	var dbVal UserValue
+func (s *BuntStore) GetUsers() ([]model.User, error) {
+	var users []model.User
+	var dbVal BuntUser
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
 		return tx.AscendKeys(UserKeyPrefix+":*", func(key, value string) bool {
 			noPrefix := strings.Split(key, ":")[1]
 			json.Unmarshal([]byte(value), &dbVal)
 
-			users = append(users, User{Username: noPrefix, Role: dbVal.Role, CreatedAt: dbVal.CreatedAt, ModifiedAt: dbVal.ModifiedAt})
+			users = append(users, model.User{Username: noPrefix, PasswordHash: string(dbVal.PasswordHash), Role: dbVal.Role, CreatedAt: dbVal.CreatedAt, ModifiedAt: dbVal.ModifiedAt})
 			return true
 		})
 	})
 	return users, err
 }
 
-// UpdateUser updates the role of the given users
-func (s *BuntStore) UpdateUser(username, role string) error {
-	var dbVal UserValue
+// UpdateUserRole updates the role of the given users
+func (s *BuntStore) UpdateUserRole(username, role string) error {
+	var dbVal BuntUser
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
 		val, err := tx.Get(UserKeyPrefix + ":" + username)
@@ -212,29 +208,29 @@ func (s *BuntStore) DeleteUser(username string) error {
 }
 
 // StoreHost stores a host in the data store. If the host exists it is overwritten
-func (s *BuntStore) StoreHost(host *Host) error {
-	hostList := HostList{host}
+func (s *BuntStore) StoreHost(host *model.Host) error {
+	hostList := model.HostList{host}
 	return s.StoreHosts(hostList)
 }
 
 // StoreHosts stores a list of host in the data store. If the host exists it is overwritten
-func (s *BuntStore) StoreHosts(hosts HostList) error {
+func (s *BuntStore) StoreHosts(hosts model.HostList) error {
 	for idx, host := range hosts {
 		if host.Name == "" {
-			return fmt.Errorf("host name required for host %d: %w", idx, ErrInvalidData)
+			return fmt.Errorf("host name required for host %d: %w", idx, store.ErrInvalidData)
 		}
 
 		// Keys are case-insensitive
 		host.Name = strings.ToLower(host.Name)
 
 		checkHost, err := s.LoadHostFromName(host.Name)
-		if errors.Is(err, ErrNotFound) {
+		if errors.Is(err, store.ErrNotFound) {
 			uuid, err := ksuid.NewRandom()
 			if err != nil {
 				return err
 			}
 
-			host.ID = uuid
+			host.UID = uuid
 			continue
 		}
 
@@ -242,7 +238,7 @@ func (s *BuntStore) StoreHosts(hosts HostList) error {
 			return fmt.Errorf("Failed to check host with name %s for duplicates:  %w", host.Name, err)
 		}
 
-		host.ID = checkHost.ID
+		host.UID = checkHost.UID
 	}
 
 	err := s.db.Update(func(tx *buntdb.Tx) error {
@@ -283,8 +279,8 @@ func (s *BuntStore) DeleteHosts(ns *nodeset.NodeSet) error {
 }
 
 // LoadHostFromName returns the Host with the given name
-func (s *BuntStore) LoadHostFromName(name string) (*Host, error) {
-	var host *Host
+func (s *BuntStore) LoadHostFromName(name string) (*model.Host, error) {
+	var host *model.Host
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
 		val, err := tx.Get(HostKeyPrefix+":"+name, false)
@@ -296,7 +292,7 @@ func (s *BuntStore) LoadHostFromName(name string) (*Host, error) {
 			return nil
 		}
 
-		host = &Host{}
+		host = &model.Host{}
 		host.FromJSON(val)
 
 		return nil
@@ -307,14 +303,14 @@ func (s *BuntStore) LoadHostFromName(name string) (*Host, error) {
 	}
 
 	if host == nil {
-		return nil, fmt.Errorf("host with name %s:  %w", name, ErrNotFound)
+		return nil, fmt.Errorf("host with name %s:  %w", name, store.ErrNotFound)
 	}
 
 	return host, nil
 }
 
 // LoadHostFromID returns the Host with the given ID
-func (s *BuntStore) LoadHostFromID(id string) (*Host, error) {
+func (s *BuntStore) LoadHostFromID(id string) (*model.Host, error) {
 	hostJSON := ""
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
@@ -333,10 +329,10 @@ func (s *BuntStore) LoadHostFromID(id string) (*Host, error) {
 	}
 
 	if hostJSON == "" {
-		return nil, fmt.Errorf("host with id %s:  %w", id, ErrNotFound)
+		return nil, fmt.Errorf("host with id %s:  %w", id, store.ErrNotFound)
 	}
 
-	host := &Host{}
+	host := &model.Host{}
 	host.FromJSON(hostJSON)
 	return host, nil
 }
@@ -416,7 +412,7 @@ func (s *BuntStore) ReverseResolve(ip string) ([]string, error) {
 }
 
 // LoadHostFromMAC returns the Host that has a network interface with the give MAC address
-func (s *BuntStore) LoadHostFromMAC(mac string) (*Host, error) {
+func (s *BuntStore) LoadHostFromMAC(mac string) (*model.Host, error) {
 	hostJSON := ""
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
@@ -440,21 +436,21 @@ func (s *BuntStore) LoadHostFromMAC(mac string) (*Host, error) {
 	}
 
 	if hostJSON == "" {
-		return nil, fmt.Errorf("no host found with mac address %s:  %w", mac, ErrNotFound)
+		return nil, fmt.Errorf("no host found with mac address %s:  %w", mac, store.ErrNotFound)
 	}
 
-	host := &Host{}
+	host := &model.Host{}
 	host.FromJSON(hostJSON)
 	return host, nil
 }
 
 // Hosts returns a list of all the hosts
-func (s *BuntStore) Hosts() (HostList, error) {
-	hosts := make(HostList, 0)
+func (s *BuntStore) Hosts() (model.HostList, error) {
+	hosts := make(model.HostList, 0)
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
 		err := tx.AscendKeys(HostKeyPrefix+":*", func(key, value string) bool {
-			h := &Host{}
+			h := &model.Host{}
 			h.FromJSON(value)
 			hosts = append(hosts, h)
 			return true
@@ -471,8 +467,8 @@ func (s *BuntStore) Hosts() (HostList, error) {
 }
 
 // FindHosts returns a list of all the hosts in the given NodeSet
-func (s *BuntStore) FindHosts(ns *nodeset.NodeSet) (HostList, error) {
-	hosts := make(HostList, 0)
+func (s *BuntStore) FindHosts(ns *nodeset.NodeSet) (model.HostList, error) {
+	hosts := make(model.HostList, 0)
 
 	it := ns.Iterator()
 
@@ -486,7 +482,7 @@ func (s *BuntStore) FindHosts(ns *nodeset.NodeSet) (HostList, error) {
 				continue
 			}
 
-			h := &Host{}
+			h := &model.Host{}
 			h.FromJSON(val)
 			hosts = append(hosts, h)
 		}
@@ -529,7 +525,7 @@ func (s *BuntStore) FindTags(tags []string) (*nodeset.NodeSet, error) {
 	}
 
 	if len(nodes) == 0 {
-		return nil, fmt.Errorf("no hosts found with tags %#v:  %w", tags, ErrNotFound)
+		return nil, fmt.Errorf("no hosts found with tags %#v:  %w", tags, store.ErrNotFound)
 	}
 
 	return nodeset.NewNodeSet(strings.Join(nodes, ","))
@@ -565,7 +561,7 @@ func (s *BuntStore) MatchTags(tags []string) (*nodeset.NodeSet, error) {
 	}
 
 	if len(nodes) == 0 {
-		return nil, fmt.Errorf("no hosts found with tags %#v:  %w", tags, ErrNotFound)
+		return nil, fmt.Errorf("no hosts found with tags %#v:  %w", tags, store.ErrNotFound)
 	}
 
 	return nodeset.NewNodeSet(strings.Join(nodes, ","))
@@ -607,7 +603,7 @@ func (s *BuntStore) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
 	}
 
 	if count == 0 {
-		return fmt.Errorf("no hosts found with nodeset %s:  %w", ns.String(), ErrNotFound)
+		return fmt.Errorf("no hosts found with nodeset %s:  %w", ns.String(), store.ErrNotFound)
 	}
 
 	return nil
@@ -667,7 +663,7 @@ func (s *BuntStore) TagHosts(ns *nodeset.NodeSet, tags []string) error {
 	}
 
 	if count == 0 {
-		return fmt.Errorf("no hosts found with nodeset %s:  %w", ns.String(), ErrNotFound)
+		return fmt.Errorf("no hosts found with nodeset %s:  %w", ns.String(), store.ErrNotFound)
 	}
 
 	return nil
@@ -722,7 +718,7 @@ func (s *BuntStore) UntagHosts(ns *nodeset.NodeSet, tags []string) error {
 	}
 
 	if count == 0 {
-		return fmt.Errorf("no hosts found with nodeset %s:  %w", ns.String(), ErrNotFound)
+		return fmt.Errorf("no hosts found with nodeset %s:  %w", ns.String(), store.ErrNotFound)
 	}
 
 	return nil
@@ -764,29 +760,29 @@ func (s *BuntStore) SetBootImage(ns *nodeset.NodeSet, name string) error {
 }
 
 // StoreBootImage stores a boot image in the data store. If the boot image exists it is overwritten
-func (s *BuntStore) StoreBootImage(image *BootImage) error {
-	imageList := BootImageList{image}
+func (s *BuntStore) StoreBootImage(image *model.BootImage) error {
+	imageList := model.BootImageList{image}
 	return s.StoreBootImages(imageList)
 }
 
 // StoreBootImages stores a list of boot images in the data store. If the boot image exists it is overwritten
-func (s *BuntStore) StoreBootImages(images BootImageList) error {
+func (s *BuntStore) StoreBootImages(images model.BootImageList) error {
 	for idx, image := range images {
 		if image.Name == "" {
-			return fmt.Errorf("name required for boot image %d: %w", idx, ErrInvalidData)
+			return fmt.Errorf("name required for boot image %d: %w", idx, store.ErrInvalidData)
 		}
 
 		// Keys are case-insensitive
 		image.Name = strings.ToLower(image.Name)
 
 		// XXX need to check for dups?
-		if image.ID.IsNil() {
+		if image.UID.IsNil() {
 			uuid, err := ksuid.NewRandom()
 			if err != nil {
 				return err
 			}
 
-			image.ID = uuid
+			image.UID = uuid
 		}
 	}
 
@@ -826,8 +822,8 @@ func (s *BuntStore) DeleteBootImages(names []string) error {
 }
 
 // LoadBootImage returns a BootImage with the given name
-func (s *BuntStore) LoadBootImage(name string) (*BootImage, error) {
-	var image *BootImage
+func (s *BuntStore) LoadBootImage(name string) (*model.BootImage, error) {
+	var image *model.BootImage
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
 		val, err := tx.Get(BootImageKeyPrefix+":"+name, false)
@@ -839,7 +835,7 @@ func (s *BuntStore) LoadBootImage(name string) (*BootImage, error) {
 			return nil
 		}
 
-		var i BootImage
+		var i model.BootImage
 		err = json.Unmarshal([]byte(val), &i)
 		if err != nil {
 			return err
@@ -854,24 +850,24 @@ func (s *BuntStore) LoadBootImage(name string) (*BootImage, error) {
 	}
 
 	if image == nil {
-		return nil, fmt.Errorf("boot image with name %s:  %w", name, ErrNotFound)
+		return nil, fmt.Errorf("boot image with name %s:  %w", name, store.ErrNotFound)
 	}
 
 	return image, nil
 }
 
 // BootImages returns a list of all boot images
-func (s *BuntStore) BootImages() (BootImageList, error) {
-	images := make(BootImageList, 0)
+func (s *BuntStore) BootImages() (model.BootImageList, error) {
+	images := make(model.BootImageList, 0)
 
 	err := s.db.View(func(tx *buntdb.Tx) error {
 		err := tx.AscendKeys(BootImageKeyPrefix+":*", func(key, value string) bool {
-			var i BootImage
+			var i model.BootImage
 			err := json.Unmarshal([]byte(value), &i)
 			if err == nil {
 				images = append(images, &i)
 			} else {
-				log.WithFields(logrus.Fields{
+				store.Log.WithFields(logrus.Fields{
 					"err": err,
 				}).Warn("Invalid boot image json stored in db")
 			}
@@ -886,4 +882,41 @@ func (s *BuntStore) BootImages() (BootImageList, error) {
 	}
 
 	return images, nil
+}
+
+// RestoreFrom restores the database using the provided data dump
+func (s *BuntStore) RestoreFrom(data model.DataDump) error {
+	err := s.db.Update(func(tx *buntdb.Tx) error {
+		for _, user := range data.Users {
+			buser := &BuntUser{
+				Username:     user.Username,
+				PasswordHash: []byte(user.PasswordHash),
+				Role:         user.Role,
+				CreatedAt:    user.CreatedAt,
+				ModifiedAt:   user.ModifiedAt,
+			}
+			val, err := json.Marshal(buser)
+			if err != nil {
+				return err
+			}
+
+			_, _, err = tx.Set(UserKeyPrefix+":"+user.Username, string(val), nil)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	err = s.StoreBootImages(data.Images)
+	if err != nil {
+		return err
+	}
+
+	return s.StoreHosts(data.Hosts)
 }

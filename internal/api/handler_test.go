@@ -11,11 +11,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
-	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/internal/store"
+	"github.com/ubccr/grendel/internal/store/buntstore"
 )
 
-func newTestDB(t *testing.T) model.DataStore {
-	db, err := model.NewDataStore(":memory:")
+func newTestDB(t *testing.T) store.Store {
+	db, err := buntstore.New(":memory:")
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}

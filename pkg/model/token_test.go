@@ -28,14 +28,14 @@ func TestToken(t *testing.T) {
 		assert.Equal(build, firmware.SNPONLYx86_64)
 	}
 
-	token, err = model.NewBootToken(host.ID.String(), host.Interfaces[0].MAC.String())
+	token, err = model.NewBootToken(host.UID.String(), host.Interfaces[0].MAC.String())
 	if assert.NoError(err) {
 		assert.Greater(len(token), 0)
 	}
 
 	claims, err := model.ParseBootToken(token)
 	if assert.NoError(err) {
-		assert.Equal(claims.ID, host.ID.String())
+		assert.Equal(claims.ID, host.UID.String())
 		assert.Equal(claims.MAC, host.Interfaces[0].MAC.String())
 	}
 }

@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
 	"github.com/ubccr/grendel/pkg/nodeset"
 )
@@ -110,7 +111,7 @@ func (h *Handler) HostFindByTags(c echo.Context) error {
 
 	ns, err := h.DB.FindTags(tags)
 	if err != nil {
-		if errors.Is(err, model.ErrNotFound) {
+		if errors.Is(err, store.ErrNotFound) {
 			return c.JSON(http.StatusOK, model.HostList{})
 		}
 
@@ -136,7 +137,7 @@ func (h *Handler) hostSetProvision(c echo.Context, provision bool) error {
 
 	err = h.DB.ProvisionHosts(nodeset, provision)
 	if err != nil {
-		if errors.Is(err, model.ErrNotFound) {
+		if errors.Is(err, store.ErrNotFound) {
 			return echo.NewHTTPError(http.StatusBadRequest, "No hosts found in nodeset").SetInternal(err)
 		}
 
@@ -188,7 +189,7 @@ func (h *Handler) hostSetTags(c echo.Context, remove bool) error {
 	}
 
 	if err != nil {
-		if errors.Is(err, model.ErrNotFound) {
+		if errors.Is(err, store.ErrNotFound) {
 			return echo.NewHTTPError(http.StatusBadRequest, "No hosts found in nodeset").SetInternal(err)
 		}
 

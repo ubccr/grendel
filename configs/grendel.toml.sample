@@ -7,6 +7,11 @@
 #------------------------------------------------------------------------------
 
 #
+# Database type: buntdb (default) sqlite (experimental)
+# dbtype = "buntdb"
+#
+
+#
 # Path database file. Defaults to ":memory:" which uses in-memory store. Change
 # this to a filepath for persisent storage.
 #

@@ -17,8 +17,9 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/internal/firmware"
 	"github.com/ubccr/grendel/internal/logger"
-	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/util"
+	"github.com/ubccr/grendel/pkg/model"
 	"golang.org/x/net/ipv4"
 )
 
@@ -27,7 +28,7 @@ const (
 )
 
 type PXEServer struct {
-	DB             model.DataStore
+	DB             store.Store
 	ListenAddress  net.IP
 	ServerAddress  net.IP
 	InterfaceIPMap map[int]net.IP
@@ -39,7 +40,7 @@ type PXEServer struct {
 	wg             sync.WaitGroup
 }
 
-func NewPXEServer(db model.DataStore, address string) (*PXEServer, error) {
+func NewPXEServer(db store.Store, address string) (*PXEServer, error) {
 	s := &PXEServer{DB: db, log: logger.GetLogger("PXE"), quit: make(chan interface{})}
 
 	if address == "" {
@@ -90,7 +91,7 @@ func NewPXEServer(db model.DataStore, address string) (*PXEServer, error) {
 func (s *PXEServer) pxeHandler4(peer *net.UDPAddr, req *dhcpv4.DHCPv4, oob *ipv4.ControlMessage) {
 	host, err := s.DB.LoadHostFromMAC(req.ClientHWAddr.String())
 	if err != nil {
-		if !errors.Is(err, model.ErrNotFound) {
+		if !errors.Is(err, store.ErrNotFound) {
 			s.log.Errorf("failed to find host: %s", err)
 		}
 		return

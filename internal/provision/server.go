@@ -18,7 +18,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/internal/logger"
-	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/util"
 )
 
@@ -36,11 +36,11 @@ type Server struct {
 	KeyFile       string
 	CertFile      string
 	RepoDir       string
-	DB            model.DataStore
+	DB            store.Store
 	httpServer    *http.Server
 }
 
-func NewServer(db model.DataStore, address string) (*Server, error) {
+func NewServer(db store.Store, address string) (*Server, error) {
 	s := &Server{DB: db}
 
 	shost, sport, err := net.SplitHostPort(address)
