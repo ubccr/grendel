@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package model
+package config
 
 import (
 	"fmt"
@@ -23,6 +23,13 @@ var (
 	DefaultMTU          uint16         = 1500
 	DefaultGateway      netip.Addr
 )
+
+type Subnet struct {
+	Gateway      netip.Prefix
+	DNS          []net.IP
+	DomainSearch []string
+	MTU          uint16
+}
 
 func ParseConfigs() error {
 	type SubnetConfig struct {

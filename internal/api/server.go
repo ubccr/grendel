@@ -19,7 +19,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/internal/logger"
-	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/util"
 )
 
@@ -34,7 +34,7 @@ type Server struct {
 	KeyFile       string
 	CertFile      string
 	Hostname      string
-	DB            model.DataStore
+	DB            store.Store
 	httpServer    *http.Server
 }
 
@@ -50,7 +50,7 @@ func newEcho() *echo.Echo {
 
 }
 
-func NewServer(db model.DataStore, socket, address string) (*Server, error) {
+func NewServer(db store.Store, socket, address string) (*Server, error) {
 	s := &Server{DB: db, SocketPath: socket}
 
 	if socket != "" {
