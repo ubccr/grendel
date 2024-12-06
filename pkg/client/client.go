@@ -1,7 +1,3 @@
-// SPDX-FileCopyrightText: (C) 2019 Grendel Authors
-//
-// SPDX-License-Identifier: GPL-3.0-or-later
-
 /*
  * Grendel API
  *
@@ -56,6 +52,10 @@ type APIClient struct {
 	HostApi *HostApiService
 
 	ImageApi *ImageApiService
+
+	RestoreApi *RestoreApiService
+
+	UserApi *UserApiService
 }
 
 type service struct {
@@ -76,6 +76,8 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	// API Services
 	c.HostApi = (*HostApiService)(&c.common)
 	c.ImageApi = (*ImageApiService)(&c.common)
+	c.RestoreApi = (*RestoreApiService)(&c.common)
+	c.UserApi = (*UserApiService)(&c.common)
 
 	return c
 }

@@ -25,6 +25,7 @@ path = [
     "**.yml",
     "**.tmpl",
     "**.md",
+    "**.sql",
     "**.mustache",
     "**.gitignore",
     "**.go",

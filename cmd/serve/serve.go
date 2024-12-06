@@ -16,12 +16,15 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/cmd"
+	"github.com/ubccr/grendel/internal/store"
+	"github.com/ubccr/grendel/internal/store/buntstore"
+	"github.com/ubccr/grendel/internal/store/sqlstore"
 	"github.com/ubccr/grendel/pkg/model"
 	"gopkg.in/tomb.v2"
 )
 
 var (
-	DB            model.DataStore
+	DB            store.Store
 	hostsFile     string
 	imagesFile    string
 	listenAddress string
@@ -49,6 +52,8 @@ var (
 )
 
 func init() {
+	serveCmd.PersistentFlags().String("dbtype", "buntdb", "database backend to use")
+	viper.BindPFlag("dbtype", serveCmd.PersistentFlags().Lookup("dbtype"))
 	serveCmd.PersistentFlags().String("dbpath", ":memory:", "path to database file")
 	viper.BindPFlag("dbpath", serveCmd.PersistentFlags().Lookup("dbpath"))
 	serveCmd.PersistentFlags().StringVar(&hostsFile, "hosts", "", "path to hosts file")
@@ -63,12 +68,19 @@ func init() {
 			return err
 		}
 
-		DB, err = model.NewDataStore(viper.GetString("dbpath"))
-		if err != nil {
-			return err
+		if "sqlite" == viper.GetString("dbtype") {
+			DB, err = sqlstore.New(viper.GetString("dbpath"))
+			if err != nil {
+				return err
+			}
+		} else {
+			DB, err = buntstore.New(viper.GetString("dbpath"))
+			if err != nil {
+				return err
+			}
 		}
 
-		cmd.Log.Infof("Using database path: %s", viper.GetString("dbpath"))
+		cmd.Log.Infof("Using %s database path: %s", viper.GetString("dbtype"), viper.GetString("dbpath"))
 
 		return nil
 	}

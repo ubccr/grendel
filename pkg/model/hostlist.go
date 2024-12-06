@@ -5,12 +5,30 @@
 package model
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/ubccr/grendel/pkg/nodeset"
 )
 
 type HostList []*Host
+
+func (hl *HostList) Scan(value interface{}) error {
+	data, ok := value.(string)
+	if !ok {
+		return errors.New("incompatible type")
+	}
+	var hlist HostList
+	err := json.Unmarshal([]byte(data), &hlist)
+	if err != nil {
+		return fmt.Errorf("failed to decode: %w", err)
+	}
+
+	*hl = hlist
+	return nil
+}
 
 func (hl HostList) FilterPrefix(prefix string) HostList {
 	n := 0

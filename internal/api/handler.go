@@ -8,14 +8,14 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/internal/store"
 )
 
 type Handler struct {
-	DB model.DataStore
+	DB store.Store
 }
 
-func NewHandler(db model.DataStore) (*Handler, error) {
+func NewHandler(db store.Store) (*Handler, error) {
 	h := &Handler{
 		DB: db,
 	}
@@ -41,6 +41,8 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	v1.GET("bootimage/find/:name", h.BootImageFind)
 	v1.DELETE("bootimage/find/:name", h.BootImageDelete)
 	v1.GET("bootimage/list", h.BootImageList)
+	v1.GET("user/list", h.UserList)
+	v1.POST("restore", h.Restore)
 }
 
 func (h *Handler) Index(c echo.Context) error {

@@ -12,6 +12,7 @@ import (
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/insomniacslk/dhcp/rfc1035label"
 	"github.com/sirupsen/logrus"
+	"github.com/ubccr/grendel/internal/provision"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -30,8 +31,8 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 			"name": host.Name,
 		}).Info("Host tagged with Arista ZTP. Setting bootfile URL and config dhcp options")
 
-		token, _ := model.NewBootToken(host.ID.String(), nic.MAC.String())
-		endpoints := model.NewEndpoints(serverIP.String(), token)
+		token, _ := model.NewBootToken(host.UID.String(), nic.MAC.String())
+		endpoints := provision.NewEndpoints(serverIP.String(), token)
 
 		configURL := endpoints.KickstartURL()
 		log.Debugf("Arista provision script URL: %s", configURL)
@@ -48,8 +49,8 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 			"name": host.Name,
 		}).Info("Host tagged with Dell ZTD. Setting ZTD provision URL dhcp option")
 
-		token, _ := model.NewBootToken(host.ID.String(), nic.MAC.String())
-		endpoints := model.NewEndpoints(serverIP.String(), token)
+		token, _ := model.NewBootToken(host.UID.String(), nic.MAC.String())
+		endpoints := provision.NewEndpoints(serverIP.String(), token)
 
 		provisionURL := endpoints.KickstartURL()
 		log.Debugf("Dell ZTD provision-url: %s", provisionURL)
@@ -65,8 +66,8 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 			"name": host.Name,
 		}).Info("Host tagged with proxmox. Setting automated install answer file url")
 
-		token, _ := model.NewBootToken(host.ID.String(), nic.MAC.String())
-		endpoints := model.NewEndpoints(serverIP.String(), token)
+		token, _ := model.NewBootToken(host.UID.String(), nic.MAC.String())
+		endpoints := provision.NewEndpoints(serverIP.String(), token)
 
 		proxmoxURL := endpoints.ProxmoxURL()
 		log.Debugf("Proxmox Answer file url: %s", proxmoxURL)
@@ -82,8 +83,8 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 			"name": host.Name,
 		}).Info("Host is Mellanox ZTP. Setting bootfile URL and config dhcp options")
 
-		token, _ := model.NewBootToken(host.ID.String(), nic.MAC.String())
-		endpoints := model.NewEndpoints(serverIP.String(), token)
+		token, _ := model.NewBootToken(host.UID.String(), nic.MAC.String())
+		endpoints := provision.NewEndpoints(serverIP.String(), token)
 
 		configURL, configFilename := endpoints.KickstartURLParts()
 		repoURL := endpoints.RepoURL() + "/onie/"
@@ -109,8 +110,8 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 			"name": host.Name,
 		}).Info("Host tagged with Dell ZTP. Setting ZTP provision URL dhcp option")
 
-		token, _ := model.NewBootToken(host.ID.String(), nic.MAC.String())
-		endpoints := model.NewEndpoints(serverIP.String(), token)
+		token, _ := model.NewBootToken(host.UID.String(), nic.MAC.String())
+		endpoints := provision.NewEndpoints(serverIP.String(), token)
 
 		provisionURL := endpoints.KickstartURL()
 		log.Debugf("Dell ZTP provision-url: %s", provisionURL)
@@ -167,7 +168,7 @@ func (s *Server) staticHandler4(host *model.Host, serverIP net.IP, req, resp *dh
 	s.setZTD(host, nic, serverIP, req, resp)
 
 	if req.ClassIdentifier() == "iDRAC" && host.Provision {
-		token, _ := model.NewBootToken(host.ID.String(), nic.MAC.String())
+		token, _ := model.NewBootToken(host.UID.String(), nic.MAC.String())
 		scpFileLocation := fmt.Sprintf("-f idrac-config.json -i %s -s 5 -n boot/%s/provision", serverIP.String(), token)
 		log.Debugf("Dell iDRAC Auto Config SCP location: %s", scpFileLocation)
 		resp.UpdateOption(dhcpv4.Option{Code: dhcpv4.OptionVendorSpecificInformation, Value: dhcpv4.String(scpFileLocation)})

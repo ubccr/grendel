@@ -23,7 +23,7 @@ go get github.com/antihax/optional
 Put the package under your project folder and add the following in import:
 
 ```golang
-import "github.com/ubccr/grendel/pkg/client"
+import "github.com/ubccr/grendel/client"
 ```
 
 ## Documentation for API Endpoints
@@ -45,6 +45,8 @@ Class | Method | HTTP request | Description
 *ImageApi* | [**ImageFind**](docs/ImageApi.md#imagefind) | **Get** /bootimage/find/{name} | Find image by name
 *ImageApi* | [**ImageList**](docs/ImageApi.md#imagelist) | **Get** /bootimage/list | List all images
 *ImageApi* | [**StoreImages**](docs/ImageApi.md#storeimages) | **Post** /bootimage | Add or update images in Grendel
+*RestoreApi* | [**Restore**](docs/RestoreApi.md#restore) | **Post** /restore | Restore Grendel database
+*UserApi* | [**UserList**](docs/UserApi.md#userlist) | **Get** /user/list | List all users
 
 
 ## Documentation For Models

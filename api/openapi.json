@@ -488,6 +488,41 @@
         "x-codegen-request-body-name": "body"
       }
     },
+    "/user/list": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "List all users",
+        "description": "Returns all users stored in Grendel",
+        "operationId": "userList",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to fetch users from database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/bootimage/list": {
       "get": {
         "tags": [
@@ -673,6 +708,53 @@
         },
         "x-codegen-request-body-name": "body"
       }
+    },
+    "/restore": {
+      "post": {
+        "tags": [
+          "restore"
+        ],
+        "summary": "Restore Grendel database",
+        "operationId": "restore",
+        "requestBody": {
+          "description": "Restore grendel database from dump",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataDump"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "successfully restored database",
+            "content": { }
+          },
+          "400": {
+            "description": "Invalid data dump input supplied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to restore database",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
     }
   },
   "components": {
@@ -755,6 +837,52 @@
           },
           "verify": {
             "type": "boolean"
+          }
+        }
+      },
+      "User": {
+        "required": [
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "password_hash": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "DataDump": {
+        "required": [
+          "hosts"
+        ],
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BootImage"
+            }
+          },
+          "hosts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Host"
+            }
           }
         }
       },
