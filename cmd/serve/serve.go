@@ -16,12 +16,14 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/cmd"
+	"github.com/ubccr/grendel/internal/store"
+	"github.com/ubccr/grendel/internal/store/buntstore"
 	"github.com/ubccr/grendel/pkg/model"
 	"gopkg.in/tomb.v2"
 )
 
 var (
-	DB            model.DataStore
+	DB            store.Store
 	hostsFile     string
 	imagesFile    string
 	listenAddress string
@@ -63,7 +65,7 @@ func init() {
 			return err
 		}
 
-		DB, err = model.NewDataStore(viper.GetString("dbpath"))
+		DB, err = buntstore.New(viper.GetString("dbpath"))
 		if err != nil {
 			return err
 		}

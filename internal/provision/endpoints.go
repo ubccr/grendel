@@ -2,10 +2,12 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package model
+package provision
 
 import (
 	"fmt"
+
+	"github.com/ubccr/grendel/internal/config"
 )
 
 const (
@@ -46,13 +48,13 @@ func (e *Endpoints) RepoURL() string {
 
 func (e *Endpoints) BaseURL() string {
 	host := e.host
-	if ProvisionHostname != "" {
-		host = ProvisionHostname
+	if config.ProvisionHostname != "" {
+		host = config.ProvisionHostname
 	}
 
-	baseURL := fmt.Sprintf("%s://%s", ProvisionScheme, host)
-	if ProvisionAddr.Port() != 80 && ProvisionAddr.Port() != 443 {
-		baseURL += fmt.Sprintf(":%d", ProvisionAddr.Port())
+	baseURL := fmt.Sprintf("%s://%s", config.ProvisionScheme, host)
+	if config.ProvisionAddr.Port() != 80 && config.ProvisionAddr.Port() != 443 {
+		baseURL += fmt.Sprintf(":%d", config.ProvisionAddr.Port())
 	}
 
 	return baseURL

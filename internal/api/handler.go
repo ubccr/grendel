@@ -8,14 +8,14 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/internal/store"
 )
 
 type Handler struct {
-	DB model.DataStore
+	DB store.Store
 }
 
-func NewHandler(db model.DataStore) (*Handler, error) {
+func NewHandler(db store.Store) (*Handler, error) {
 	h := &Handler{
 		DB: db,
 	}

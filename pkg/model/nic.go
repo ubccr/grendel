@@ -6,6 +6,7 @@ package model
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/rand"
 	"net"
@@ -14,17 +15,25 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/config"
 	"go4.org/netipx"
 )
 
-type Subnet struct {
-	Gateway      netip.Prefix
-	DNS          []net.IP
-	DomainSearch []string
-	MTU          uint16
-}
+// Enum for NicType
+type NicType int
+
+var ErrInvalidNicType = errors.New("Invalid nic type")
+
+const (
+	NicTypeEthernet NicType = iota + 1
+	NicTypeBMC
+	NicTypeBond
+)
+
+type NetInterfaceList []NetInterface
 
 type NetInterface struct {
+	ID   int64            `json:"id"`
 	MAC  net.HardwareAddr `json:"mac" validate:"required"`
 	Name string           `json:"ifname"`
 	IP   netip.Prefix     `json:"ip"`
@@ -32,6 +41,49 @@ type NetInterface struct {
 	BMC  bool             `json:"bmc"`
 	VLAN string           `json:"vlan"`
 	MTU  uint16           `json:"mtu,omitempty"`
+}
+
+// Return the string of a NicType
+func (n NicType) String() string {
+	switch n {
+	case NicTypeEthernet:
+		return "ethernet"
+	case NicTypeBMC:
+		return "bmc"
+	case NicTypeBond:
+		return "bond"
+	default:
+		return "Unknown type"
+	}
+}
+
+// New NicType from string
+func NicTypeFromString(name string) (NicType, error) {
+	switch name {
+	case "ethernet":
+		return NicTypeEthernet, nil
+	case "bmc":
+		return NicTypeBMC, nil
+	case "bond":
+		return NicTypeBond, nil
+	default:
+		return NicTypeEthernet, ErrInvalidNicType
+	}
+}
+
+func (n *NetInterfaceList) Scan(value interface{}) error {
+	data, ok := value.(string)
+	if !ok {
+		return errors.New("incompatible type")
+	}
+	var nlist NetInterfaceList
+	err := json.Unmarshal([]byte(data), &nlist)
+	if err != nil {
+		return fmt.Errorf("failed to decode: %w", err)
+	}
+
+	*n = nlist
+	return nil
 }
 
 func (n *NetInterface) MarshalJSON() ([]byte, error) {
@@ -130,7 +182,7 @@ func (n *NetInterface) InterfaceMTU() uint16 {
 		return n.MTU
 	}
 
-	for _, subnet := range Subnets {
+	for _, subnet := range config.Subnets {
 		if subnet.MTU == 0 {
 			continue
 		}
@@ -140,11 +192,11 @@ func (n *NetInterface) InterfaceMTU() uint16 {
 		}
 	}
 
-	return DefaultMTU
+	return config.DefaultMTU
 }
 
 func (n *NetInterface) Gateway() netip.Addr {
-	for _, subnet := range Subnets {
+	for _, subnet := range config.Subnets {
 		if subnet.Gateway.Contains(n.IP.Addr()) {
 			return subnet.Gateway.Addr()
 		}
@@ -157,13 +209,13 @@ func (n *NetInterface) Gateway() netip.Addr {
 		return netip.AddrFrom4(ip4)
 	}
 
-	return DefaultGateway
+	return config.DefaultGateway
 }
 
 func (n *NetInterface) DNS() []net.IP {
 	dnsServers := make([]net.IP, 0)
 
-	for _, subnet := range Subnets {
+	for _, subnet := range config.Subnets {
 		if len(subnet.DNS) == 0 {
 			continue
 		}
@@ -175,7 +227,7 @@ func (n *NetInterface) DNS() []net.IP {
 	}
 
 	if len(dnsServers) == 0 {
-		dnsServers = append(dnsServers, DefaultDNS...)
+		dnsServers = append(dnsServers, config.DefaultDNS...)
 	}
 
 	if len(dnsServers) > 1 {
@@ -189,7 +241,7 @@ func (n *NetInterface) DNS() []net.IP {
 }
 
 func (n *NetInterface) DomainSearch() []string {
-	for _, subnet := range Subnets {
+	for _, subnet := range config.Subnets {
 		if len(subnet.DomainSearch) == 0 {
 			continue
 		}
@@ -199,7 +251,7 @@ func (n *NetInterface) DomainSearch() []string {
 		}
 	}
 
-	return DefaultDomainSearch
+	return config.DefaultDomainSearch
 }
 
 func (n *NetInterface) DNSList() []string {

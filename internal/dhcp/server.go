@@ -17,7 +17,7 @@ import (
 	"github.com/insomniacslk/dhcp/dhcpv4/server4"
 	"github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/internal/logger"
-	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/util"
 	"golang.org/x/net/ipv4"
 )
@@ -30,14 +30,14 @@ type Server struct {
 	InterfaceIPMap map[int]net.IP
 	Port           int
 	ProxyOnly      bool
-	DB             model.DataStore
+	DB             store.Store
 	LeaseTime      time.Duration
 	conn           *ipv4.PacketConn
 	quit           chan interface{}
 	wg             sync.WaitGroup
 }
 
-func NewServer(db model.DataStore, address string) (*Server, error) {
+func NewServer(db store.Store, address string) (*Server, error) {
 	s := &Server{DB: db, quit: make(chan interface{})}
 
 	if address == "" {
@@ -94,7 +94,7 @@ func (s *Server) mainHandler4(peer *net.UDPAddr, req *dhcpv4.DHCPv4, oob *ipv4.C
 
 	host, err := s.DB.LoadHostFromMAC(req.ClientHWAddr.String())
 	if err != nil {
-		if errors.Is(err, model.ErrNotFound) {
+		if errors.Is(err, store.ErrNotFound) {
 			log.Debugf("Ignoring unknown client mac address: %s", req.ClientHWAddr)
 		} else {
 			log.Errorf("Failed to find host from database: %s", err)
@@ -132,9 +132,9 @@ func (s *Server) mainHandler4(peer *net.UDPAddr, req *dhcpv4.DHCPv4, oob *ipv4.C
 		err := s.bootingHandler4(host, serverIP, req, resp)
 		if err != nil {
 			log.WithFields(logrus.Fields{
-				"mac":     req.ClientHWAddr.String(),
-				"host_id": host.ID.String(),
-				"err":     err,
+				"mac":      req.ClientHWAddr.String(),
+				"host_uid": host.UID.String(),
+				"err":      err,
 			}).Error("Failed to add boot options to DHCP request")
 			if s.ProxyOnly {
 				return

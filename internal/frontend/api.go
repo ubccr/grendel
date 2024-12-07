@@ -240,7 +240,7 @@ func (h *Handler) EditHost(f *fiber.Ctx) error {
 	}
 
 	newHost := model.Host{
-		ID:         id,
+		UID:        id,
 		Name:       formHost.Name,
 		Provision:  provision,
 		Firmware:   firmware.NewFromString(formHost.Firmware),
@@ -371,7 +371,7 @@ func (h *Handler) importHost(f *fiber.Ctx) error {
 
 	// Generate new ksuid to ensure no conflicts
 	for _, h := range i {
-		h.ID = ksuid.New()
+		h.UID = ksuid.New()
 	}
 
 	err = h.DB.StoreHosts(i)
@@ -834,7 +834,7 @@ func (h *Handler) bulkHostAdd(f *fiber.Ctx) error {
 		}
 
 		newHosts = append(newHosts, &model.Host{
-			ID:         ksuid.New(),
+			UID:        ksuid.New(),
 			Name:       host.Name,
 			Provision:  provision,
 			BootImage:  formData.BootImage,

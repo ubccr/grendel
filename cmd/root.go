@@ -23,10 +23,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/api"
+	"github.com/ubccr/grendel/internal/config"
 	"github.com/ubccr/grendel/internal/logger"
 	"github.com/ubccr/grendel/internal/util"
 	"github.com/ubccr/grendel/pkg/client"
-	"github.com/ubccr/grendel/pkg/model"
 )
 
 var (
@@ -167,7 +167,7 @@ func initConfig() {
 		viper.Set("api.secret", secret)
 	}
 
-	err := model.ParseConfigs()
+	err := config.ParseConfigs()
 	if err != nil {
 		Log.Fatal(err)
 	}
