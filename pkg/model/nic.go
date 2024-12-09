@@ -33,14 +33,15 @@ const (
 type NetInterfaceList []NetInterface
 
 type NetInterface struct {
-	ID   int64            `json:"id"`
-	MAC  net.HardwareAddr `json:"mac" validate:"required"`
-	Name string           `json:"ifname"`
-	IP   netip.Prefix     `json:"ip"`
-	FQDN string           `json:"fqdn"`
-	BMC  bool             `json:"bmc"`
-	VLAN string           `json:"vlan"`
-	MTU  uint16           `json:"mtu,omitempty"`
+	ID     int64            `json:"id"`
+	HostID int64            `json:"omit" gorm:"index"`
+	MAC    net.HardwareAddr `json:"mac" validate:"required" gorm:"serializer:MACSerializer"`
+	Name   string           `json:"ifname"`
+	IP     netip.Prefix     `json:"ip" gorm:"serializer:IPPrefixSerializer"`
+	FQDN   string           `json:"fqdn"`
+	BMC    bool             `json:"bmc"`
+	VLAN   string           `json:"vlan"`
+	MTU    uint16           `json:"mtu,omitempty"`
 }
 
 // Return the string of a NicType

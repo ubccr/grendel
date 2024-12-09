@@ -8,7 +8,7 @@ import "encoding/json"
 
 type Bond struct {
 	NetInterface
-	Peers []string `json:"peers"`
+	Peers []string `json:"peers" gorm:"serializer:json"`
 }
 
 func (b *Bond) MarshalJSON() ([]byte, error) {
