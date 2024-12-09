@@ -85,6 +85,7 @@ func BenchmarkStores(b *testing.B) {
 	tests := map[string]BenchTestSuite{
 		"Buntstore": new(BuntStoreTestSuite),
 		"Sqlstore":  new(SqlStoreTestSuite),
+		"Gormstore": new(GormStoreTestSuite),
 	}
 
 	for name, ts := range tests {
