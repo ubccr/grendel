@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -733,7 +734,7 @@ func (s *StoreTestSuite) BenchmarkReverseResolve(size int, b *testing.B) {
 			if err != nil {
 				b.Fatal(err)
 			}
-			if len(names) != 1 {
+			if len(names) != len(strings.Split(pick.Interfaces[0].FQDN, ",")) {
 				b.Fatalf("wrong fqdn expected %s got %#v", pick.Interfaces[0].FQDN, names)
 			}
 		}

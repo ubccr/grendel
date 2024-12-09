@@ -30,49 +30,49 @@ func tempfile(b *testing.B) string {
 func Run(bt BenchTestSuite, b *testing.B) {
 	bt.SetT(&testing.T{})
 	for _, size := range batchSizes {
-		b.Run(fmt.Sprintf("WriteNodes%d", size), func(b *testing.B) {
+		b.Run(fmt.Sprintf("test=WriteNodes/size=%d", size), func(b *testing.B) {
 			file := tempfile(b)
 			bt.SetFile(file)
 			bt.SetupTest()
 			bt.BenchmarkWriteNodes(size, b)
 		})
 
-		b.Run(fmt.Sprintf("WriteSingleNode%d", size), func(b *testing.B) {
+		b.Run(fmt.Sprintf("test=WriteSingleNode/size=%d", size), func(b *testing.B) {
 			file := tempfile(b)
 			bt.SetFile(file)
 			bt.SetupTest()
 			bt.BenchmarkWriteSingleNode(size, b)
 		})
 
-		b.Run(fmt.Sprintf("ReadAll%d", size), func(b *testing.B) {
+		b.Run(fmt.Sprintf("test=ReadAll/size=%d", size), func(b *testing.B) {
 			file := tempfile(b)
 			bt.SetFile(file)
 			bt.SetupTest()
 			bt.BenchmarkReadAll(size, b)
 		})
 
-		b.Run(fmt.Sprintf("Find%d", size), func(b *testing.B) {
+		b.Run(fmt.Sprintf("test=Find/size=%d", size), func(b *testing.B) {
 			file := tempfile(b)
 			bt.SetFile(file)
 			bt.SetupTest()
 			bt.BenchmarkFind(size, b)
 		})
 
-		b.Run(fmt.Sprintf("RandomReads%d", size), func(b *testing.B) {
+		b.Run(fmt.Sprintf("test=RandomReads/size=%d", size), func(b *testing.B) {
 			file := tempfile(b)
 			bt.SetFile(file)
 			bt.SetupTest()
 			bt.BenchmarkRandomReads(size, b)
 		})
 
-		b.Run(fmt.Sprintf("ResolveIP%d", size), func(b *testing.B) {
+		b.Run(fmt.Sprintf("test=ResolveIP/size=%d", size), func(b *testing.B) {
 			file := tempfile(b)
 			bt.SetFile(file)
 			bt.SetupTest()
 			bt.BenchmarkResolveIP(size, b)
 		})
 
-		b.Run(fmt.Sprintf("ReverseResolve%d", size), func(b *testing.B) {
+		b.Run(fmt.Sprintf("test=ReverseResolve/size=%d", size), func(b *testing.B) {
 			file := tempfile(b)
 			bt.SetFile(file)
 			bt.SetupTest()
@@ -85,10 +85,11 @@ func BenchmarkStores(b *testing.B) {
 	tests := map[string]BenchTestSuite{
 		"Buntstore": new(BuntStoreTestSuite),
 		"Sqlstore":  new(SqlStoreTestSuite),
+		"Gormstore": new(GormStoreTestSuite),
 	}
 
 	for name, ts := range tests {
-		b.Run(name+"Benchmark", func(b *testing.B) {
+		b.Run("store="+name, func(b *testing.B) {
 			Run(ts, b)
 		})
 	}
