@@ -21,12 +21,12 @@ type BootImage struct {
 	UID                ksuid.KSUID       `json:"id"`
 	Name               string            `json:"name" validate:"required"`
 	KernelPath         string            `json:"kernel" validate:"required"`
-	InitrdPaths        []string          `json:"initrd"`
+	InitrdPaths        []string          `json:"initrd" gorm:"serializer:json"`
 	LiveImage          string            `json:"liveimg"`
 	CommandLine        string            `json:"cmdline"`
 	Verify             bool              `json:"verify"`
 	ProvisionTemplate  string            `json:"provision_template"`
-	ProvisionTemplates map[string]string `json:"provision_templates"`
+	ProvisionTemplates map[string]string `json:"provision_templates" gorm:"serializer:json"`
 	UserData           string            `json:"user_data"`
 	Butane             string            `json:"butane"`
 }
