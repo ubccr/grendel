@@ -7,6 +7,7 @@ package model
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"net/netip"
@@ -19,7 +20,8 @@ import (
 )
 
 type Host struct {
-	ID         ksuid.KSUID     `json:"id,omitempty"`
+	ID         int64           `json:"_id,omitempty"`
+	UID        ksuid.KSUID     `json:"id,omitempty"`
 	Name       string          `json:"name" validate:"required,hostname"`
 	Interfaces []*NetInterface `json:"interfaces"`
 	Bonds      []*Bond         `json:"bonds"`
@@ -27,6 +29,15 @@ type Host struct {
 	Firmware   firmware.Build  `json:"firmware"`
 	BootImage  string          `json:"boot_image"`
 	Tags       []string        `json:"tags"`
+}
+
+func (h *Host) Scan(value interface{}) error {
+	data, ok := value.(string)
+	if !ok {
+		return errors.New("incompatible type")
+	}
+	h.FromJSON(data)
+	return nil
 }
 
 func (h *Host) HostType() string {
@@ -117,13 +128,15 @@ func (h *Host) FromJSON(hostJSON string) {
 	h.Name = gjson.Get(hostJSON, "name").String()
 	h.BootImage = gjson.Get(hostJSON, "boot_image").String()
 	h.Provision = gjson.Get(hostJSON, "provision").Bool()
-	h.ID, _ = ksuid.Parse(gjson.Get(hostJSON, "id").String())
+	h.ID = int64(gjson.Get(hostJSON, "_id").Int())
+	h.UID, _ = ksuid.Parse(gjson.Get(hostJSON, "id").String())
 	h.Firmware = firmware.NewFromString(gjson.Get(hostJSON, "firmware").String())
 
 	h.Interfaces = make([]*NetInterface, 0)
 	res := gjson.Get(hostJSON, "interfaces")
 	for _, i := range res.Array() {
 		nic := &NetInterface{}
+		nic.ID = int64(i.Get("id").Int())
 		nic.Name = i.Get("ifname").String()
 		nic.FQDN = i.Get("fqdn").String()
 		nic.BMC = i.Get("bmc").Bool()
@@ -138,6 +151,7 @@ func (h *Host) FromJSON(hostJSON string) {
 	bres := gjson.Get(hostJSON, "bonds")
 	for _, i := range bres.Array() {
 		bond := &Bond{Peers: []string{}}
+		bond.ID = int64(i.Get("id").Int())
 		bond.Name = i.Get("ifname").String()
 		bond.FQDN = i.Get("fqdn").String()
 		bond.BMC = i.Get("bmc").Bool()
@@ -160,8 +174,11 @@ func (h *Host) FromJSON(hostJSON string) {
 func (h *Host) ToJSON() string {
 	hostJSON := `{"firmware": "", "interfaces": [], "bonds": [], "name": "", "provision": false, "kickstart": false, "boot_image": "", "tags": []}`
 
-	if !h.ID.IsNil() {
-		hostJSON, _ = sjson.Set(hostJSON, "id", h.ID.String())
+	if !h.UID.IsNil() {
+		hostJSON, _ = sjson.Set(hostJSON, "id", h.UID.String())
+	}
+	if h.ID != 0 {
+		hostJSON, _ = sjson.Set(hostJSON, "_id", h.ID)
 	}
 	hostJSON, _ = sjson.Set(hostJSON, "name", h.Name)
 	hostJSON, _ = sjson.Set(hostJSON, "boot_image", h.BootImage)
@@ -178,6 +195,9 @@ func (h *Host) ToJSON() string {
 			"vlan":   nic.VLAN,
 			"mtu":    nic.MTU,
 		}
+		if nic.ID != 0 {
+			n["id"] = nic.ID
+		}
 		hostJSON, _ = sjson.Set(hostJSON, "interfaces.-1", n)
 	}
 
@@ -191,6 +211,9 @@ func (h *Host) ToJSON() string {
 			"bmc":    bond.BMC,
 			"vlan":   bond.VLAN,
 			"mtu":    bond.MTU,
+		}
+		if bond.ID != 0 {
+			b["id"] = bond.ID
 		}
 		hostJSON, _ = sjson.Set(hostJSON, "bonds.-1", b)
 	}
@@ -213,10 +236,10 @@ func (h *Host) MarshalJSON() ([]byte, error) {
 		Alias:    (*Alias)(h),
 	}
 
-	if h.ID.IsNil() {
+	if h.UID.IsNil() {
 		aux.ID = ""
 	} else {
-		aux.ID = h.ID.String()
+		aux.ID = h.UID.String()
 	}
 
 	data, err := json.Marshal(&aux)
@@ -245,4 +268,20 @@ func (h *Host) UnmarshalJSON(data []byte) error {
 	}
 
 	return nil
+}
+
+func (h *Host) TagList() TagList {
+	list := make(TagList, len(h.Tags))
+
+	for i, t := range h.Tags {
+		parts := strings.Split(t, ":")
+		tag := Tag{Key: parts[0]}
+		if len(parts) == 2 {
+			tag.Value = parts[1]
+		}
+
+		list[i] = tag
+	}
+
+	return list
 }

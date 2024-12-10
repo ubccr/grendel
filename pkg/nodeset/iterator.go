@@ -45,6 +45,15 @@ func (i *NodeSetIterator) Value() string {
 	return i.nodes[i.current]
 }
 
+func (i *NodeSetIterator) StringSlice() []string {
+	nodes := make([]string, 0)
+	for i.Next() {
+		nodes = append(nodes, i.Value())
+	}
+
+	return nodes
+}
+
 func NewRangeSetNDIterator() *RangeSetNDIterator {
 	return &RangeSetNDIterator{
 		vects:   make([][]*RangeSetItem, 0),

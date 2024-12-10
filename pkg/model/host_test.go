@@ -5,6 +5,7 @@
 package model_test
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -33,4 +34,48 @@ func TestHostBonds(t *testing.T) {
 
 	host := tests.HostFactory.MustCreate().(*model.Host)
 	assert.Equal(host.Bonds[0].AddrString(), host.Bonds[0].IP.Addr().String())
+}
+
+func BenchmarkGJSONUnmarshall(b *testing.B) {
+	jsonStr := string(tests.TestHostJSON)
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		host := &model.Host{}
+		host.FromJSON(jsonStr)
+	}
+}
+
+func BenchmarkGJSONMarshall(b *testing.B) {
+	jsonStr := string(tests.TestHostJSON)
+	host := &model.Host{}
+	host.FromJSON(jsonStr)
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		host.ToJSON()
+	}
+}
+
+func BenchmarkEncodeUnmarshall(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		var host model.Host
+		err := json.Unmarshal(tests.TestHostJSON, &host)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+func BenchmarkEncodeMarshall(b *testing.B) {
+	var host model.Host
+	err := json.Unmarshal(tests.TestHostJSON, &host)
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	for n := 0; n < b.N; n++ {
+		_, err := json.Marshal(&host)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
 }

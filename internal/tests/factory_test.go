@@ -19,7 +19,7 @@ func TestFactory(t *testing.T) {
 		assert.Greater(len(host.Name), 1)
 		assert.Equal(2, len(host.Interfaces))
 		assert.Equal(1, len(host.Bonds))
-		assert.False(host.ID.IsNil())
+		assert.False(host.UID.IsNil())
 
 		image := BootImageFactory.MustCreate().(*model.BootImage)
 		assert.Greater(len(image.Name), 1)

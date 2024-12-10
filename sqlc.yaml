@@ -1,0 +1,51 @@
+version: "2"
+sql:
+  - engine: "sqlite"
+    queries: "internal/store/sqlstore/query"
+    schema: "internal/store/migrations/sql"
+    gen:
+      go:
+        package: "db"
+        out: "internal/store/sqlstore/db"
+        emit_json_tags: true
+        emit_methods_with_db_argument: true
+        initialisms: ['id', 'uid', 'fqdn', 'mtu', 'mac', 'vlan', 'ip']
+        rename:
+          host_json: "Host"
+          image_json: "Image"
+        overrides:
+          - nullable: true
+            db_type: "text"
+            go_type:
+              import: "github.com/guregu/null/v5"
+              type: "String"
+          - nullable: true
+            db_type: "integer"
+            go_type:
+              import: "github.com/guregu/null/v5"
+              type: "Int64"
+          - column: "node.provision"
+            go_type:
+              type: "bool"
+          - column: "user.is_active"
+            go_type:
+              type: "bool"
+          - column: "kernel.verify"
+            go_type:
+              type: "bool"
+          - column: "kernel.uid"
+            go_type:
+              import: "github.com/segmentio/ksuid"
+              type: "KSUID"
+          - column: "node.uid"
+            go_type:
+              import: "github.com/segmentio/ksuid"
+              type: "KSUID"
+          - column: "node_view.host_json"
+            go_type:
+              import: "github.com/ubccr/grendel/pkg/model"
+              type: "Host"
+          - column: "kernel_view.image_json"
+            go_type:
+              import: "github.com/ubccr/grendel/pkg/model"
+              type: "BootImage"

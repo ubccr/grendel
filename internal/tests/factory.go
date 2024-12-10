@@ -58,7 +58,7 @@ var HostFactory = factory.NewFactory(
 	if err != nil {
 		return err
 	}
-	host.ID = uuid
+	host.UID = uuid
 	return nil
 }).SubSliceFactory("Interfaces", NetInterfaceFactory, func() int { return 2 }).SubSliceFactory("Bonds", BondFactory, func() int { return 1 })
 

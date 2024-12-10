@@ -5,6 +5,9 @@
 package model
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -14,7 +17,8 @@ import (
 type BootImageList []*BootImage
 
 type BootImage struct {
-	ID                 ksuid.KSUID       `json:"id"`
+	ID                 int64             `json:"_id"`
+	UID                ksuid.KSUID       `json:"id"`
 	Name               string            `json:"name" validate:"required"`
 	KernelPath         string            `json:"kernel" validate:"required"`
 	InitrdPaths        []string          `json:"initrd"`
@@ -29,6 +33,21 @@ type BootImage struct {
 
 func NewBootImageList() BootImageList {
 	return make(BootImageList, 0)
+}
+
+func (b *BootImage) Scan(value interface{}) error {
+	data, ok := value.(string)
+	if !ok {
+		return errors.New("incompatible type")
+	}
+	var image BootImage
+	err := json.Unmarshal([]byte(data), &image)
+	if err != nil {
+		return fmt.Errorf("failed to decode: %w", err)
+	}
+
+	*b = image
+	return nil
 }
 
 func (b *BootImage) CheckPathsExist() error {

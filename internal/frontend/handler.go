@@ -15,7 +15,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/bmc"
-	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/internal/store"
 )
 
 //go:embed public
@@ -30,12 +30,12 @@ type EventStruct struct {
 }
 
 type Handler struct {
-	DB     model.DataStore
+	DB     store.Store
 	Store  *session.Store
 	Events []EventStruct
 }
 
-func NewHandler(db model.DataStore, Store *session.Store) (*Handler, error) {
+func NewHandler(db store.Store, Store *session.Store) (*Handler, error) {
 	h := &Handler{
 		DB:     db,
 		Store:  Store,

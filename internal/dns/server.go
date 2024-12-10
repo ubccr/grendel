@@ -9,7 +9,7 @@ import (
 
 	"github.com/miekg/dns"
 	"github.com/ubccr/grendel/internal/logger"
-	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/internal/store"
 )
 
 var log = logger.GetLogger("DNS")
@@ -20,7 +20,7 @@ type Server struct {
 	srv *dns.Server
 }
 
-func NewServer(db model.DataStore, address string, ttl int) (*Server, error) {
+func NewServer(db store.Store, address string, ttl int) (*Server, error) {
 	s := &Server{Address: address}
 
 	s.srv = &dns.Server{Addr: address, Net: "udp"}

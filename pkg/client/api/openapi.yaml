@@ -329,6 +329,28 @@ paths:
       tags:
       - host
       x-codegen-request-body-name: body
+  /user/list:
+    get:
+      description: Returns all users stored in Grendel
+      operationId: userList
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/User'
+                type: array
+          description: successful operation
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Failed to fetch users from database
+      summary: List all users
+      tags:
+      - user
   /bootimage/list:
     get:
       description: Returns all images stored in Grendel
@@ -451,6 +473,36 @@ paths:
       tags:
       - image
       x-codegen-request-body-name: body
+  /restore:
+    post:
+      operationId: restore
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataDump'
+        description: Restore grendel database from dump
+        required: true
+      responses:
+        "201":
+          content: {}
+          description: successfully restored database
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Invalid data dump input supplied
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Failed to restore database
+      summary: Restore Grendel database
+      tags:
+      - restore
+      x-codegen-request-body-name: body
 components:
   schemas:
     Host:
@@ -538,6 +590,103 @@ components:
           type: boolean
       required:
       - name
+      type: object
+    User:
+      example:
+        role: role
+        password_hash: password_hash
+        id: id
+        username: username
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        password_hash:
+          type: string
+        role:
+          type: string
+      required:
+      - username
+      type: object
+    DataDump:
+      example:
+        images:
+        - cmdline: cmdline
+          kernel: kernel
+          name: name
+          verify: true
+          id: id
+          liveimg: liveimg
+          initrd:
+          - initrd
+          - initrd
+        - cmdline: cmdline
+          kernel: kernel
+          name: name
+          verify: true
+          id: id
+          liveimg: liveimg
+          initrd:
+          - initrd
+          - initrd
+        hosts:
+        - interfaces:
+          - fqdn: fqdn
+            ip: ip
+            name: name
+            bmc: true
+            mac: mac
+          - fqdn: fqdn
+            ip: ip
+            name: name
+            bmc: true
+            mac: mac
+          provision: true
+          name: name
+          id: id
+          boot_image: boot_image
+          firmware: firmware
+        - interfaces:
+          - fqdn: fqdn
+            ip: ip
+            name: name
+            bmc: true
+            mac: mac
+          - fqdn: fqdn
+            ip: ip
+            name: name
+            bmc: true
+            mac: mac
+          provision: true
+          name: name
+          id: id
+          boot_image: boot_image
+          firmware: firmware
+        users:
+        - role: role
+          password_hash: password_hash
+          id: id
+          username: username
+        - role: role
+          password_hash: password_hash
+          id: id
+          username: username
+      properties:
+        users:
+          items:
+            $ref: '#/components/schemas/User'
+          type: array
+        images:
+          items:
+            $ref: '#/components/schemas/BootImage'
+          type: array
+        hosts:
+          items:
+            $ref: '#/components/schemas/Host'
+          type: array
+      required:
+      - hosts
       type: object
     ErrorResponse:
       properties:

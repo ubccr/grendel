@@ -408,7 +408,7 @@ func (r *jobRunner) RunBmcImportConfiguration(host *model.Host, ch chan JobMessa
 			mac = bmc.MAC.String()
 			ip = bmc.AddrString()
 		}
-		token, err := model.NewBootToken(host.ID.String(), mac)
+		token, err := model.NewBootToken(host.UID.String(), mac)
 		if err != nil {
 			m.Msg = fmt.Sprintf("%s", err)
 		}

@@ -19,11 +19,12 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
 type Handler struct {
-	DB               model.DataStore
+	DB               store.Store
 	DefaultImageName string
 }
 
@@ -32,7 +33,7 @@ func init() {
 	viper.SetDefault("provision.prometheus_sd_refresh_interval", "3600")
 }
 
-func NewHandler(db model.DataStore, defaultImageName string) (*Handler, error) {
+func NewHandler(db store.Store, defaultImageName string) (*Handler, error) {
 	h := &Handler{
 		DB:               db,
 		DefaultImageName: defaultImageName,
@@ -143,7 +144,7 @@ func (h *Handler) verifyClaims(c echo.Context) (*model.BootImage, *model.Host, *
 
 	token := c.Param("token")
 	serverHost := c.Request().Host
-	endpoints := model.NewEndpoints(serverHost, token)
+	endpoints := NewEndpoints(serverHost, token)
 
 	log.WithFields(logrus.Fields{
 		"host":    host.Name,
@@ -260,7 +261,7 @@ func (h *Handler) Complete(c echo.Context) error {
 	err = h.DB.StoreHost(host)
 	if err != nil {
 		log.WithFields(logrus.Fields{
-			"id":   host.ID,
+			"uid":  host.UID,
 			"name": host.Name,
 		}).Error("failed to unprovision host")
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to unprovision host").SetInternal(err)
@@ -382,7 +383,7 @@ func (h *Handler) Onie(c echo.Context) error {
 
 	host, err := h.DB.LoadHostFromMAC(onie.MAC.String())
 	if err != nil {
-		if errors.Is(err, model.ErrNotFound) {
+		if errors.Is(err, store.ErrNotFound) {
 			log.Debugf("Ignoring unknown host mac address: %s", onie.MAC)
 		} else {
 			log.Errorf("ONIE handler failed to fetch host from database for mac %s: %s", onie.MAC, err)

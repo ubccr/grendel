@@ -10,16 +10,16 @@ import (
 
 	"github.com/miekg/dns"
 	"github.com/sirupsen/logrus"
-	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/util"
 )
 
 type handler struct {
-	db  model.DataStore
+	db  store.Store
 	ttl uint32
 }
 
-func NewHandler(db model.DataStore, ttl uint32) (*handler, error) {
+func NewHandler(db store.Store, ttl uint32) (*handler, error) {
 	h := &handler{
 		db:  db,
 		ttl: ttl,
