@@ -14,15 +14,15 @@ to 1500 nodes.
 
 ## Key Features
 
+* Web based frontend
 * DHCP/PXE/TFTP provisioning
 * DNS forward and reverse resolution
 * Automatic host discovery
-* Diskful and Stateless (Live image) provisioning
+* Diskful and Stateless provisioning
 * BMC/iDRAC control via RedFish and IPMI
 * Authorized provisioning using [Branca](https://branca.io/) tokens
 * Rest API
 * Easy installation (single binary with no deps)
-* [Heorot Web GUI](https://github.com/ubccr/heorot)
 
 ## Project status
 
@@ -130,7 +130,7 @@ $ qemu-system-x86_64 -m 2048 -boot n -device e1000,netdev=net0,mac=DE:AD:BE:EF:1
 
 ## Hacking
 
-Building Grendel requires Go v1.20 or greater. Building iPXE requires packages
+Building Grendel requires Go v1.23 or greater. Building iPXE requires packages
 lzma-sdk-devel, xz-devel, and gcc-aarch64-linux-gnu:
 
 ```
@@ -182,7 +182,7 @@ Use "grendel [command] --help" for more information about a command.
 PXE booting is based on [Pixiecore](https://github.com/danderson/netboot/tree/master/pixiecore) by Dave
 Anderson. DHCP implementation makes heavy use of this excellent [packet library](https://github.com/insomniacslk/dhcp). 
 DNS implementation uses [this library](https://github.com/miekg/dns). TFTP implementation uses [this
-library](https://github.com/pin/tftp). Backend database runs [BuntDB](https://github.com/tidwall/buntdb). 
+library](https://github.com/pin/tftp). Backend database runs [BuntDB](https://github.com/tidwall/buntdb) or [sqlite](https://github.com/mattn/go-sqlite3). 
 NodeSet/RangeSet algorithms ported from [ClusterShell](https://github.com/cea-hpc/clustershell)
 
 ## License
