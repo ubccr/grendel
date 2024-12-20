@@ -1,5 +1,14 @@
 # Grendel Changelog
 
+## [0.1.0] - 2024-12-19
+
+- Move store interface to new package
+- Refactor store tests and benchmarks
+- Add new backend store which uses sqlc and sqlite
+- Add db dump/restore command
+- Add user/list and restore API endpoints
+- Add new config option dbtype
+
 ## [0.0.15] - 2024-11-22
 
 - Fix: frontend - inventory export download
@@ -172,4 +181,5 @@
 [0.0.13]: https://github.com/ubccr/grendel/releases/tag/v0.0.13
 [0.0.14]: https://github.com/ubccr/grendel/releases/tag/v0.0.14
 [0.0.15]: https://github.com/ubccr/grendel/releases/tag/v0.0.15
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.0.15...HEAD
+[0.1.0]: https://github.com/ubccr/grendel/releases/tag/v0.1.0
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.1.0...HEAD
