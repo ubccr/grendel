@@ -7,6 +7,7 @@ package db
 
 import (
 	"context"
+	"strings"
 
 	null "github.com/guregu/null/v5"
 )
@@ -66,4 +67,29 @@ func (q *Queries) NicUpsert(ctx context.Context, db DBTX, arg NicUpsertParams) (
 		&i.MTU,
 	)
 	return i, err
+}
+
+const nicUpsertDelete = `-- name: NicUpsertDelete :exec
+delete from nic where node_id = ?1 and id not in (/*SLICE:ids*/?)
+`
+
+type NicUpsertDeleteParams struct {
+	NodeID int64   `json:"node_id"`
+	Ids    []int64 `json:"ids"`
+}
+
+func (q *Queries) NicUpsertDelete(ctx context.Context, db DBTX, arg NicUpsertDeleteParams) error {
+	query := nicUpsertDelete
+	var queryParams []interface{}
+	queryParams = append(queryParams, arg.NodeID)
+	if len(arg.Ids) > 0 {
+		for _, v := range arg.Ids {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:ids*/?", strings.Repeat(",?", len(arg.Ids))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:ids*/?", "NULL", 1)
+	}
+	_, err := db.ExecContext(ctx, query, queryParams...)
+	return err
 }

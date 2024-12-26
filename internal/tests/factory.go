@@ -68,4 +68,9 @@ var BootImageFactory = factory.NewFactory(
 	return randomdata.Alphanumeric(randomdata.Number(2, 10)), nil
 }).Attr("KernelPath", func(args factory.Args) (interface{}, error) {
 	return randomdata.Alphanumeric(randomdata.Number(5, 50)), nil
+}).OnCreate(func(args factory.Args) error {
+	image := args.Instance().(*model.BootImage)
+	image.InitrdPaths = make([]string, 0)
+	image.InitrdPaths = append(image.InitrdPaths, randomdata.Alphanumeric(randomdata.Number(5, 50)))
+	return nil
 })

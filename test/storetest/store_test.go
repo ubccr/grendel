@@ -144,6 +144,32 @@ func (s *StoreTestSuite) TestHost() {
 	}
 }
 
+func (s *StoreTestSuite) TestResolveIPv4() {
+	testNames := []string{"test1.example.com", "cname.example.com"}
+
+	host := tests.HostFactory.MustCreate().(*model.Host)
+	host.Interfaces[0].FQDN = strings.Join(testNames, ",")
+
+	err := s.db.StoreHost(host)
+	s.Assert().NoError(err)
+
+	for _, nm := range testNames {
+		testIPs, err := s.db.ResolveIPv4(nm)
+		if s.Assert().NoError(err) {
+			if s.Assert().Equal(1, len(testIPs)) {
+				s.Assert().Equal(host.Interfaces[0].AddrString(), testIPs[0].String())
+			}
+		}
+	}
+
+	names, err := s.db.ReverseResolve(host.Interfaces[0].AddrString())
+	if s.Assert().NoError(err) {
+		if s.Assert().Equal(1, len(names)) {
+			s.Assert().Equal(testNames[0], names[0])
+		}
+	}
+}
+
 func (s *StoreTestSuite) TestIfname() {
 	host := tests.HostFactory.MustCreate().(*model.Host)
 
@@ -284,6 +310,67 @@ func (s *StoreTestSuite) TestFindTags() {
 	}
 }
 
+func (s *StoreTestSuite) TestUpdateTags() {
+	size := 5
+	for i := 0; i < size; i++ {
+		host := tests.HostFactory.MustCreate().(*model.Host)
+		host.Name = fmt.Sprintf("tux-%02d", i)
+		host.Tags = []string{"rack10", "hpc"}
+		err := s.db.StoreHost(host)
+		s.Assert().NoError(err)
+	}
+
+	ns, err := s.db.FindTags([]string{"rack10"})
+	if s.Assert().NoError(err) {
+		s.Assert().Equal(size, ns.Len())
+	}
+
+	testHost, err := s.db.LoadHostFromName("tux-01")
+	if s.Assert().NoError(err) {
+		s.Assert().Equal(2, len(testHost.Tags))
+	}
+
+	// Update Tags
+	testHost.Tags = []string{"rack10", "faculty"}
+	err = s.db.StoreHost(testHost)
+	s.Assert().NoError(err)
+
+	ns, err = s.db.FindTags([]string{"rack10"})
+	if s.Assert().NoError(err) {
+		s.Assert().Equal(size, ns.Len())
+	}
+
+	ns, err = s.db.FindTags([]string{"faculty"})
+	if s.Assert().NoError(err) {
+		s.Assert().Equal(1, ns.Len())
+	}
+
+	ns, err = s.db.FindTags([]string{"hpc"})
+	if s.Assert().NoError(err) {
+		s.Assert().Equal(size-1, ns.Len())
+	}
+
+	// Delete Tags
+	testHost.Tags = []string{"test"}
+	err = s.db.StoreHost(testHost)
+	s.Assert().NoError(err)
+
+	ns, err = s.db.FindTags([]string{"rack10"})
+	if s.Assert().NoError(err) {
+		s.Assert().Equal(size-1, ns.Len())
+	}
+
+	_, err = s.db.FindTags([]string{"faculty"})
+	if s.Assert().Error(err) {
+		s.Assert().True(errors.Is(err, store.ErrNotFound))
+	}
+
+	ns, err = s.db.FindTags([]string{"hpc"})
+	if s.Assert().NoError(err) {
+		s.Assert().Equal(size-1, ns.Len())
+	}
+}
+
 func (s *StoreTestSuite) TestProvision() {
 	size := 20
 	for i := 0; i < size; i++ {
@@ -410,6 +497,46 @@ func (s *StoreTestSuite) TestBootImageDelete() {
 	}
 }
 
+func (s *StoreTestSuite) TestBootImageUpdate() {
+	image := tests.BootImageFactory.MustCreate().(*model.BootImage)
+
+	image.ProvisionTemplates = map[string]string{
+		"kickstart":    "kickstart.tmpl",
+		"post-install": "post-install.tmpl",
+	}
+
+	err := s.db.StoreBootImage(image)
+	s.Assert().NoError(err)
+
+	testImage, err := s.db.LoadBootImage(image.Name)
+	if s.Assert().NoError(err) {
+		s.Assert().Equal(image.Name, testImage.Name)
+		s.Assert().Equal(1, len(testImage.InitrdPaths))
+		s.Assert().Contains(testImage.ProvisionTemplates, "post-install")
+		s.Assert().Contains(testImage.ProvisionTemplates, "kickstart")
+	}
+
+	testImage.ProvisionTemplates = map[string]string{
+		"kickstart": "kickstart.tmpl",
+		"test":      "test.tmpl",
+	}
+	testImage.InitrdPaths = []string{
+		"/path/1",
+		"/path/2",
+	}
+
+	err = s.db.StoreBootImage(testImage)
+	s.Assert().NoError(err)
+
+	testImage, err = s.db.LoadBootImage(testImage.Name)
+	if s.Assert().NoError(err) {
+		s.Assert().Equal(image.Name, testImage.Name)
+		s.Assert().Equal(2, len(testImage.InitrdPaths))
+		s.Assert().NotContains(testImage.ProvisionTemplates, "post-install")
+		s.Assert().Contains(testImage.ProvisionTemplates, "kickstart")
+	}
+}
+
 func (s *StoreTestSuite) TestHostUpdate() {
 	host := tests.HostFactory.MustCreate().(*model.Host)
 
@@ -447,6 +574,51 @@ func (s *StoreTestSuite) TestHostUpdate() {
 			idCheck = h.UID.String()
 		}
 	}
+}
+
+func (s *StoreTestSuite) TestHostNics() {
+	host := tests.HostFactory.MustCreate().(*model.Host)
+
+	err := s.db.StoreHost(host)
+	s.Assert().NoError(err)
+
+	testHost, err := s.db.LoadHostFromID(host.UID.String())
+	if s.Assert().NoError(err) {
+		s.Assert().Equal(2, len(testHost.Interfaces))
+	}
+
+	// Update nic
+	testHost.Interfaces[0].Name = "testifname0"
+	err = s.db.StoreHost(testHost)
+	if s.Assert().NoError(err) {
+		h, err := s.db.LoadHostFromID(testHost.UID.String())
+		if s.Assert().NoError(err) {
+			s.Assert().Equal(testHost.Interfaces[0].Name, h.Interfaces[0].Name)
+			s.Assert().Equal(len(testHost.Interfaces), len(h.Interfaces))
+		}
+	}
+
+	// Delete nic
+	testHost.Interfaces = testHost.Interfaces[1:len(testHost.Interfaces)]
+	err = s.db.StoreHost(testHost)
+	if s.Assert().NoError(err) {
+		h, err := s.db.LoadHostFromID(testHost.UID.String())
+		if s.Assert().NoError(err) {
+			s.Assert().Equal(len(testHost.Interfaces), len(h.Interfaces))
+		}
+	}
+
+	// Add nic
+	newNic := tests.NetInterfaceFactory.MustCreate().(*model.NetInterface)
+	testHost.Interfaces = append(testHost.Interfaces, newNic)
+	err = s.db.StoreHost(testHost)
+	if s.Assert().NoError(err) {
+		h, err := s.db.LoadHostFromID(testHost.UID.String())
+		if s.Assert().NoError(err) {
+			s.Assert().Equal(len(testHost.Interfaces), len(h.Interfaces))
+		}
+	}
+
 }
 
 func (s *StoreTestSuite) TestHostDelete() {
