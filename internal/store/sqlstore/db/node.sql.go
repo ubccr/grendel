@@ -372,17 +372,17 @@ select nc.fqdn, nc.ip
 from nic as nc
 where 
   case 
-    when cast(?1 as integer) then concat(rtrim(lower(nc.fqdn), '.'), '.') = ?2
+    when cast(?1 as integer) then lower(nc.fqdn) like concat('%', cast(?2 as text), '%')
     when cast(?3 as integer) then nc.ip like concat(cast(?4 as text), '%')
     else 0
   end
 `
 
 type NodeResolveParams struct {
-	FilterFQDN int64       `json:"filter_fqdn"`
-	FQDN       null.String `json:"fqdn"`
-	FilterIP   int64       `json:"filter_ip"`
-	IP         string      `json:"ip"`
+	FilterFQDN int64  `json:"filter_fqdn"`
+	FQDN       string `json:"fqdn"`
+	FilterIP   int64  `json:"filter_ip"`
+	IP         string `json:"ip"`
 }
 
 type NodeResolveRow struct {
@@ -465,6 +465,38 @@ type NodeTagUpsertParams struct {
 
 func (q *Queries) NodeTagUpsert(ctx context.Context, db DBTX, arg NodeTagUpsertParams) error {
 	_, err := db.ExecContext(ctx, nodeTagUpsert, arg.TagID, arg.NodeID, arg.Value)
+	return err
+}
+
+const nodeTagUpsertDelete = `-- name: NodeTagUpsertDelete :exec
+delete from node_tag where node_id in (/*SLICE:nodes*/?) and tag_id not in (/*SLICE:tags*/?)
+`
+
+type NodeTagUpsertDeleteParams struct {
+	Nodes []int64 `json:"nodes"`
+	Tags  []int64 `json:"tags"`
+}
+
+func (q *Queries) NodeTagUpsertDelete(ctx context.Context, db DBTX, arg NodeTagUpsertDeleteParams) error {
+	query := nodeTagUpsertDelete
+	var queryParams []interface{}
+	if len(arg.Nodes) > 0 {
+		for _, v := range arg.Nodes {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:nodes*/?", strings.Repeat(",?", len(arg.Nodes))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:nodes*/?", "NULL", 1)
+	}
+	if len(arg.Tags) > 0 {
+		for _, v := range arg.Tags {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:tags*/?", strings.Repeat(",?", len(arg.Tags))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:tags*/?", "NULL", 1)
+	}
+	_, err := db.ExecContext(ctx, query, queryParams...)
 	return err
 }
 

@@ -13,7 +13,7 @@ import (
 	"github.com/segmentio/ksuid"
 )
 
-const initrdUpsert = `-- name: InitrdUpsert :exec
+const initrdUpsert = `-- name: InitrdUpsert :one
 insert into initrd (kernel_id, path)
 values (?1, ?2)
 on conflict (path, kernel_id)
@@ -26,8 +26,41 @@ type InitrdUpsertParams struct {
 	Path     string `json:"path"`
 }
 
-func (q *Queries) InitrdUpsert(ctx context.Context, db DBTX, arg InitrdUpsertParams) error {
-	_, err := db.ExecContext(ctx, initrdUpsert, arg.KernelID, arg.Path)
+func (q *Queries) InitrdUpsert(ctx context.Context, db DBTX, arg InitrdUpsertParams) (Initrd, error) {
+	row := db.QueryRowContext(ctx, initrdUpsert, arg.KernelID, arg.Path)
+	var i Initrd
+	err := row.Scan(
+		&i.ID,
+		&i.KernelID,
+		&i.Path,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const initrdUpsertDelete = `-- name: InitrdUpsertDelete :exec
+delete from initrd where kernel_id = ?1 and id not in (/*SLICE:ids*/?)
+`
+
+type InitrdUpsertDeleteParams struct {
+	KernelID int64   `json:"kernel_id"`
+	Ids      []int64 `json:"ids"`
+}
+
+func (q *Queries) InitrdUpsertDelete(ctx context.Context, db DBTX, arg InitrdUpsertDeleteParams) error {
+	query := initrdUpsertDelete
+	var queryParams []interface{}
+	queryParams = append(queryParams, arg.KernelID)
+	if len(arg.Ids) > 0 {
+		for _, v := range arg.Ids {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:ids*/?", strings.Repeat(",?", len(arg.Ids))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:ids*/?", "NULL", 1)
+	}
+	_, err := db.ExecContext(ctx, query, queryParams...)
 	return err
 }
 
@@ -108,6 +141,31 @@ type KernelTemplateUpsertParams struct {
 
 func (q *Queries) KernelTemplateUpsert(ctx context.Context, db DBTX, arg KernelTemplateUpsertParams) error {
 	_, err := db.ExecContext(ctx, kernelTemplateUpsert, arg.KernelID, arg.TemplateID)
+	return err
+}
+
+const kernelTemplateUpsertDelete = `-- name: KernelTemplateUpsertDelete :exec
+delete from kernel_template where kernel_id = ?1 and template_id not in (/*SLICE:ids*/?)
+`
+
+type KernelTemplateUpsertDeleteParams struct {
+	KernelID int64   `json:"kernel_id"`
+	Ids      []int64 `json:"ids"`
+}
+
+func (q *Queries) KernelTemplateUpsertDelete(ctx context.Context, db DBTX, arg KernelTemplateUpsertDeleteParams) error {
+	query := kernelTemplateUpsertDelete
+	var queryParams []interface{}
+	queryParams = append(queryParams, arg.KernelID)
+	if len(arg.Ids) > 0 {
+		for _, v := range arg.Ids {
+			queryParams = append(queryParams, v)
+		}
+		query = strings.Replace(query, "/*SLICE:ids*/?", strings.Repeat(",?", len(arg.Ids))[1:], 1)
+	} else {
+		query = strings.Replace(query, "/*SLICE:ids*/?", "NULL", 1)
+	}
+	_, err := db.ExecContext(ctx, query, queryParams...)
 	return err
 }
 

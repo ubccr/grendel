@@ -35,7 +35,7 @@ select nc.fqdn, nc.ip
 from nic as nc
 where 
   case 
-    when cast(@filter_fqdn as integer) then concat(rtrim(lower(nc.fqdn), '.'), '.') = @fqdn
+    when cast(@filter_fqdn as integer) then lower(nc.fqdn) like concat('%', cast(@fqdn as text), '%')
     when cast(@filter_ip as integer) then nc.ip like concat(cast(@ip as text), '%')
     else 0
   end
@@ -107,6 +107,9 @@ insert into node_tag (tag_id, node_id, value)
 values (@tag_id, @node_id, @value)
 on conflict (tag_id, node_id, value)
 do nothing;
+
+-- name: NodeTagUpsertDelete :exec
+delete from node_tag where node_id in (sqlc.slice(nodes)) and tag_id not in (sqlc.slice(tags));
 
 -- name: NodeTagDelete :exec
 delete from node_tag where node_id in (sqlc.slice(nodes)) and tag_id in (sqlc.slice(tags));

@@ -238,6 +238,7 @@ func (s *SqlStore) StoreHosts(hosts model.HostList) error {
 		}
 
 		// Upsert tags
+		tagIDs := make([]int64, 0)
 		for _, t := range h.Tags {
 			tg, err := s.q.TagUpsert(ctx, tx, t)
 			if err != nil {
@@ -252,15 +253,26 @@ func (s *SqlStore) StoreHosts(hosts model.HostList) error {
 			if err != nil {
 				return err
 			}
+			tagIDs = append(tagIDs, tg.ID)
+		}
+
+		// Delete any tags that were removed
+		err = s.q.NodeTagUpsertDelete(ctx, tx, db.NodeTagUpsertDeleteParams{
+			Nodes: []int64{node.ID},
+			Tags:  tagIDs,
+		})
+		if err != nil {
+			return err
 		}
 
 		// Upsert network interfaces
+		nicIDs := make([]int64, 0)
 		for _, n := range h.Interfaces {
 			nt := model.NicTypeEthernet
 			if n.BMC {
 				nt = model.NicTypeBMC
 			}
-			_, err := s.q.NicUpsert(ctx, tx, db.NicUpsertParams{
+			nc, err := s.q.NicUpsert(ctx, tx, db.NicUpsertParams{
 				ID:      null.NewInt(n.ID, n.ID != 0),
 				NodeID:  node.ID,
 				NicType: nt.String(),
@@ -274,6 +286,7 @@ func (s *SqlStore) StoreHosts(hosts model.HostList) error {
 			if err != nil {
 				return err
 			}
+			nicIDs = append(nicIDs, nc.ID)
 		}
 
 		// Upsert bond interfaces
@@ -286,7 +299,7 @@ func (s *SqlStore) StoreHosts(hosts model.HostList) error {
 				}
 				peers.SetValid(string(pj))
 			}
-			_, err := s.q.NicUpsert(ctx, tx, db.NicUpsertParams{
+			bi, err := s.q.NicUpsert(ctx, tx, db.NicUpsertParams{
 				ID:      null.NewInt(n.ID, n.ID != 0),
 				NodeID:  node.ID,
 				NicType: model.NicTypeBond.String(),
@@ -301,6 +314,16 @@ func (s *SqlStore) StoreHosts(hosts model.HostList) error {
 			if err != nil {
 				return err
 			}
+			nicIDs = append(nicIDs, bi.ID)
+		}
+
+		// Delete any nics that were removed
+		err = s.q.NicUpsertDelete(ctx, tx, db.NicUpsertDeleteParams{
+			NodeID: node.ID,
+			Ids:    nicIDs,
+		})
+		if err != nil {
+			return err
 		}
 
 		h.ID = node.ID
@@ -356,7 +379,7 @@ func (s *SqlStore) ResolveIPv4(fqdn string) ([]net.IP, error) {
 	if len(fqdn) == 0 {
 		return nil, errors.New("invalid fqdn")
 	}
-	fqdnString := null.StringFrom(util.Normalize(fqdn))
+	fqdnString := strings.TrimSuffix(util.Normalize(fqdn), ".")
 	ips := make([]net.IP, 0)
 
 	rows, err := s.q.NodeResolve(context.Background(), s.ro, db.NodeResolveParams{FilterFQDN: 1, FQDN: fqdnString})
@@ -632,38 +655,63 @@ func (s *SqlStore) StoreBootImages(images model.BootImageList) error {
 		}
 
 		// Upsert initrd
+		initrdIDs := make([]int64, 0)
 		for _, rd := range image.InitrdPaths {
-			err := s.q.InitrdUpsert(ctx, tx, db.InitrdUpsertParams{
+			ird, err := s.q.InitrdUpsert(ctx, tx, db.InitrdUpsertParams{
 				KernelID: kernel.ID,
 				Path:     rd,
 			})
 			if err != nil {
 				return err
 			}
+
+			initrdIDs = append(initrdIDs, ird.ID)
 		}
 
+		// Delete any initrds that were removed
+		err = s.q.InitrdUpsertDelete(ctx, tx, db.InitrdUpsertDeleteParams{
+			KernelID: kernel.ID,
+			Ids:      initrdIDs,
+		})
+		if err != nil {
+			return err
+		}
+
+		templateIDs := make([]int64, 0)
 		// Upsert butane
 		if image.Butane != "" {
-			err := s.storeTemplate(tx, kernel.ID, "butane", image.Butane)
+			id, err := s.storeTemplate(tx, kernel.ID, "butane", image.Butane)
 			if err != nil {
 				return err
 			}
+			templateIDs = append(templateIDs, id)
 		}
 
 		// Upsert user_data
 		if image.UserData != "" {
-			err := s.storeTemplate(tx, kernel.ID, "user_data", image.UserData)
+			id, err := s.storeTemplate(tx, kernel.ID, "user_data", image.UserData)
 			if err != nil {
 				return err
 			}
+			templateIDs = append(templateIDs, id)
 		}
 
 		// Upsert templates
 		for ttype, tmpl := range image.ProvisionTemplates {
-			err := s.storeTemplate(tx, kernel.ID, ttype, tmpl)
+			id, err := s.storeTemplate(tx, kernel.ID, ttype, tmpl)
 			if err != nil {
 				return err
 			}
+			templateIDs = append(templateIDs, id)
+		}
+
+		// Delete any templates that were removed
+		err = s.q.KernelTemplateUpsertDelete(ctx, tx, db.KernelTemplateUpsertDeleteParams{
+			KernelID: kernel.ID,
+			Ids:      templateIDs,
+		})
+		if err != nil {
+			return err
 		}
 
 		image.ID = kernel.ID
@@ -671,14 +719,14 @@ func (s *SqlStore) StoreBootImages(images model.BootImageList) error {
 	return tx.Commit()
 }
 
-func (s *SqlStore) storeTemplate(tx *sql.Tx, kid int64, ttype, name string) error {
+func (s *SqlStore) storeTemplate(tx *sql.Tx, kid int64, ttype, name string) (int64, error) {
 	ctx := context.Background()
 	tt, err := s.q.TemplateTypeUpsert(ctx, tx, db.TemplateTypeUpsertParams{
 		Name:    ttype,
 		UriName: ttype,
 	})
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	t, err := s.q.TemplateUpsert(ctx, tx, db.TemplateUpsertParams{
@@ -686,7 +734,7 @@ func (s *SqlStore) storeTemplate(tx *sql.Tx, kid int64, ttype, name string) erro
 		TemplateTypeID: tt.ID,
 	})
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	err = s.q.KernelTemplateUpsert(ctx, tx, db.KernelTemplateUpsertParams{
@@ -694,10 +742,10 @@ func (s *SqlStore) storeTemplate(tx *sql.Tx, kid int64, ttype, name string) erro
 		TemplateID: t.ID,
 	})
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return nil
+	return t.ID, nil
 }
 
 // DeleteBootImages deletes boot images from the data store.
