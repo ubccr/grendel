@@ -2,7 +2,7 @@ grendel
 grendel.yaml
 grendel.yml
 grendel.toml
-grendel.db
+grendel.db*
 out/
 internal/firmware/bin
 *.swp
@@ -11,5 +11,4 @@ scripts/openapi-generator-cli.jar
 key.gpg
 venv/
 
-dist/
 grendel-*-SNAPSHOT*/

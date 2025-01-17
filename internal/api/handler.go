@@ -5,11 +5,16 @@
 package api
 
 import (
+	"embed"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/ubccr/grendel/internal/store"
 )
+
+//go:embed dist
+var dist embed.FS
 
 type Handler struct {
 	DB store.Store
@@ -24,9 +29,14 @@ func NewHandler(db store.Store) (*Handler, error) {
 }
 
 func (h *Handler) SetupRoutes(e *echo.Echo) {
-	e.GET("/", h.Index).Name = "index"
+	e.Use(middleware.StaticWithConfig(middleware.StaticConfig{
+		HTML5:      true,
+		Root:       "dist", // because files are located in `web` directory in `webAssets` fs
+		Filesystem: http.FS(dist),
+	}))
 
 	v1 := e.Group("/v1/")
+	v1.GET("/", h.Index).Name = "index"
 	v1.POST("host", h.HostAdd)
 	v1.GET("host/list", h.HostList)
 	v1.GET("host/find/*", h.HostFind)
