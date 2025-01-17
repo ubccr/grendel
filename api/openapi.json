@@ -42,9 +42,7 @@
   "paths": {
     "/host/list": {
       "get": {
-        "tags": [
-          "host"
-        ],
+        "tags": ["host"],
         "summary": "List all hosts",
         "description": "Returns all host stored in Grendel",
         "operationId": "hostList",
@@ -77,9 +75,7 @@
     },
     "/host/find/{nodeSet}": {
       "get": {
-        "tags": [
-          "host"
-        ],
+        "tags": ["host"],
         "summary": "Find hosts by name or nodeset",
         "description": "Returns a list of hosts in the given nodeset",
         "operationId": "hostFind",
@@ -131,9 +127,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "host"
-        ],
+        "tags": ["host"],
         "summary": "Delete hosts by name or nodeset",
         "description": "Delete hosts in the given nodeset",
         "operationId": "hostDelete",
@@ -151,7 +145,7 @@
         "responses": {
           "200": {
             "description": "successful operation",
-            "content": { }
+            "content": {}
           },
           "400": {
             "description": "Invalid nodeset supplied",
@@ -178,9 +172,7 @@
     },
     "/host/tags/{tags}": {
       "get": {
-        "tags": [
-          "host"
-        ],
+        "tags": ["host"],
         "summary": "Find hosts by tags",
         "description": "Returns a list of hosts with the given tags",
         "operationId": "hostTags",
@@ -234,9 +226,7 @@
     },
     "/host/provision/{nodeSet}": {
       "put": {
-        "tags": [
-          "host"
-        ],
+        "tags": ["host"],
         "summary": "Set hosts to provision by name or nodeset",
         "description": "Sets hosts to provision in the given nodeset",
         "operationId": "hostProvision",
@@ -254,7 +244,7 @@
         "responses": {
           "200": {
             "description": "successful operation",
-            "content": { }
+            "content": {}
           },
           "400": {
             "description": "Invalid nodeset supplied",
@@ -281,9 +271,7 @@
     },
     "/host/unprovision/{nodeSet}": {
       "put": {
-        "tags": [
-          "host"
-        ],
+        "tags": ["host"],
         "summary": "Set hosts to unprovision by name or nodeset",
         "description": "Sets hosts to unprovision in the given nodeset",
         "operationId": "hostUnprovision",
@@ -301,7 +289,7 @@
         "responses": {
           "200": {
             "description": "successful operation",
-            "content": { }
+            "content": {}
           },
           "400": {
             "description": "Invalid nodeset supplied",
@@ -328,9 +316,7 @@
     },
     "/host/tag/{nodeSet}": {
       "put": {
-        "tags": [
-          "host"
-        ],
+        "tags": ["host"],
         "summary": "Tag hosts by name or nodeset",
         "description": "Tag hosts in the given nodeset",
         "operationId": "hostTag",
@@ -357,7 +343,7 @@
         "responses": {
           "200": {
             "description": "successful operation",
-            "content": { }
+            "content": {}
           },
           "400": {
             "description": "Invalid nodeset supplied",
@@ -384,9 +370,7 @@
     },
     "/host/untag/{nodeSet}": {
       "put": {
-        "tags": [
-          "host"
-        ],
+        "tags": ["host"],
         "summary": "Untag hosts name or nodeset",
         "description": "Untag hosts the given nodeset",
         "operationId": "hostUntag",
@@ -413,7 +397,7 @@
         "responses": {
           "200": {
             "description": "successful operation",
-            "content": { }
+            "content": {}
           },
           "400": {
             "description": "Invalid nodeset supplied",
@@ -440,9 +424,7 @@
     },
     "/host": {
       "post": {
-        "tags": [
-          "host"
-        ],
+        "tags": ["host"],
         "summary": "Add or update hosts in Grendel",
         "operationId": "storeHosts",
         "requestBody": {
@@ -462,7 +444,7 @@
         "responses": {
           "201": {
             "description": "successfully stored hosts",
-            "content": { }
+            "content": {}
           },
           "400": {
             "description": "Invalid host input supplied",
@@ -490,9 +472,7 @@
     },
     "/user/list": {
       "get": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "List all users",
         "description": "Returns all users stored in Grendel",
         "operationId": "userList",
@@ -525,9 +505,7 @@
     },
     "/bootimage/list": {
       "get": {
-        "tags": [
-          "image"
-        ],
+        "tags": ["image"],
         "summary": "List all images",
         "description": "Returns all images stored in Grendel",
         "operationId": "imageList",
@@ -560,9 +538,7 @@
     },
     "/bootimage/find/{name}": {
       "get": {
-        "tags": [
-          "image"
-        ],
+        "tags": ["image"],
         "summary": "Find image by name",
         "description": "Returns image with the given name",
         "operationId": "imageFind",
@@ -614,9 +590,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "image"
-        ],
+        "tags": ["image"],
         "summary": "Delete boot images by name",
         "description": "Delete boot images with the given name",
         "operationId": "imageDelete",
@@ -634,7 +608,7 @@
         "responses": {
           "200": {
             "description": "successful operation",
-            "content": { }
+            "content": {}
           },
           "400": {
             "description": "Invalid name supplied",
@@ -661,9 +635,7 @@
     },
     "/bootimage": {
       "post": {
-        "tags": [
-          "image"
-        ],
+        "tags": ["image"],
         "summary": "Add or update images in Grendel",
         "operationId": "storeImages",
         "requestBody": {
@@ -683,7 +655,7 @@
         "responses": {
           "201": {
             "description": "successfully stored images",
-            "content": { }
+            "content": {}
           },
           "400": {
             "description": "Invalid boot image input supplied",
@@ -711,9 +683,7 @@
     },
     "/restore": {
       "post": {
-        "tags": [
-          "restore"
-        ],
+        "tags": ["restore"],
         "summary": "Restore Grendel database",
         "operationId": "restore",
         "requestBody": {
@@ -730,7 +700,7 @@
         "responses": {
           "201": {
             "description": "successfully restored database",
-            "content": { }
+            "content": {}
           },
           "400": {
             "description": "Invalid data dump input supplied",
@@ -760,9 +730,7 @@
   "components": {
     "schemas": {
       "Host": {
-        "required": [
-          "name"
-        ],
+        "required": ["name"],
         "type": "object",
         "properties": {
           "id": {
@@ -779,6 +747,12 @@
           },
           "boot_image": {
             "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "interfaces": {
             "type": "array",
@@ -809,9 +783,7 @@
         }
       },
       "BootImage": {
-        "required": [
-          "name"
-        ],
+        "required": ["name"],
         "type": "object",
         "properties": {
           "id": {
@@ -841,9 +813,7 @@
         }
       },
       "User": {
-        "required": [
-          "username"
-        ],
+        "required": ["username"],
         "type": "object",
         "properties": {
           "id": {
@@ -861,9 +831,7 @@
         }
       },
       "DataDump": {
-        "required": [
-          "hosts"
-        ],
+        "required": ["hosts"],
         "type": "object",
         "properties": {
           "users": {
