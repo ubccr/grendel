@@ -17,8 +17,8 @@ import (
 type BootImageList []*BootImage
 
 type BootImage struct {
-	ID                 int64             `json:"_id"`
-	UID                ksuid.KSUID       `json:"id"`
+	ID                 int64             `json:"id"`
+	UID                ksuid.KSUID       `json:"uid"`
 	Name               string            `json:"name" validate:"required"`
 	KernelPath         string            `json:"kernel" validate:"required"`
 	InitrdPaths        []string          `json:"initrd"`

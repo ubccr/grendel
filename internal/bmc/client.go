@@ -15,34 +15,6 @@ type Redfish struct {
 	service *gofish.Service
 }
 
-type System struct {
-	Name           string   `json:"name"`
-	HostName       string   `json:"host_name"`
-	BIOSVersion    string   `json:"bios_version"`
-	SerialNumber   string   `json:"serial_number"`
-	Manufacturer   string   `json:"manufacturer"`
-	Model          string   `json:"model"`
-	PowerStatus    string   `json:"power_status"`
-	Health         string   `json:"health"`
-	TotalMemory    float32  `json:"total_memory"`
-	ProcessorCount int      `json:"processor_count"`
-	BootNext       string   `json:"boot_next"`
-	BootOrder      []string `json:"boot_order"`
-	OEM            SystemOEM
-}
-
-type SystemOEM struct {
-	Dell struct {
-		DellSystem struct {
-			ManagedSystemSize string
-			MaxCPUSockets     int
-			MaxDIMMSlots      int
-			MacPCIeSlots      int
-			SystemID          int
-		}
-	}
-}
-
 type Firmware struct {
 	Name             string                     `json:"name"`
 	SystemID         string                     `json:"system_id"`
@@ -60,11 +32,6 @@ type CurrentFirmware struct {
 type FirmwareUpdate struct {
 	Firmware
 	Jobs map[string]*redfish.Job
-}
-
-type BMCJob struct {
-	Host string `json:"name"`
-	Jobs []*redfish.Job
 }
 
 func NewRedfishClient(ip, user, pass string, insecure bool) (*Redfish, error) {

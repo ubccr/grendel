@@ -7,8 +7,8 @@
 #------------------------------------------------------------------------------
 
 #
-# Database type: buntdb (default) sqlite (experimental)
-# dbtype = "buntdb"
+# Database type: sqlite (default)
+dbtype = "sqlite"
 #
 
 #
@@ -135,18 +135,40 @@ listen = "0.0.0.0:4011"
 # API Server
 #------------------------------------------------------------------------------
 [api]
-# Can generate secret with `openssl rand -hex 16`
-#secret = "_api_secret_here_"
+# API server listen config:
+# Set either socket_path or listen
 
-# Path to unix socket
+# socket_path will bind the api server to a unix socket
+# Authentication and the frontend will be disabled
 socket_path = "grendel-api.socket"
 
+# listen will bind the api server to a tcp socket
+# If possible, always bind the address to an internal mgmt network
+#listen = "0.0.0.0:8080"
+
+# Required for auth to work across restarts
+# Can be generated with `openssl rand -hex 16`
+#secret = ""
+
+# HTTPS certs, setting both key and cert will enable https
+# You should always use https if listening over tcp
+#key = "/etc/grendel/api/hostname.key"
+#cert = "/etc/grendel/api/hostname.crt"
+
+# Development settings:
+# Swagger API browser, requires CORS = true to test api routes
+swagger_ui = false
+# When enabled, allow any request method from any origin
+cors = false
+
 #------------------------------------------------------------------------------
-# API Client Config
+# Client Config
 #------------------------------------------------------------------------------
 [client]
 # Grendel API endpoint
-api_endpoint = "grendel-api.socket"
+# Can be a URL or unix socket path
+# Example if binding the API over tcp: api_endpoint = "http://localhost:8080"
+api_endpoint = "/var/lib/grendel/grendel-api.socket"
 
 # Verify ssl certs? false (yes) true (no)
 insecure = false
@@ -169,9 +191,11 @@ fanout = 20
 # number of seconds after a query completes to wait before sending another
 delay = 1
 
-# IP sent to the BMC for import system config, should be an IP of the provision server which is reachable by the BMCs  
+# IP sent to the BMC for import system config, should be an IP of the provision
+# server which is reachable by the BMCs  
 #config_share_ip = "0.0.0.0"
-# Import System Config setting: Set to "Enabled" if using a self signed certificate on the provision server
+# Import System Config setting: Set to "Enabled" if using a self signed
+# certificate on the provision server
 #config_ignore_certificate_warning = "Disabled"
 
 #------------------------------------------------------------------------------
@@ -181,58 +205,3 @@ delay = 1
 user = ""
 password = ""
 domain = ""
-
-#------------------------------------------------------------------------------
-# Frontend Config
-#------------------------------------------------------------------------------
-[frontend]
-# Address and port to listen
-listen = "0.0.0.0:8081"
-
-# Favicon file path
-# favicon = ""
-
-# HTTPS cert and key file paths. Setting these will enable https
-# key = ""
-# cert = ""
-
-# Floorplan table config. Rows are ascending, Cols are descending
-rows_start = "f"
-rows_end = "v"
-cols_start = 28
-cols_end = 5
-
-# Rack table config
-rack_min = 3
-rack_max = 42
-
-# Export CSV default template
-#export_csv_default_template = """"""
-
-# Session storage driver. Valid options: redis, sqlite3, memory.
-session_storage = "memory"
-
-[frontend.redis]
-# url = "redis://<user>:<pass>@127.0.0.1:6379/<db>"
-
-[frontend.sqlite]
-# path = ""
-
-# First interface default vals in Rack -> Add Hosts -> Interface Details
-[frontend.first_iface]
-# Maps port number to rack u
-auto_mapping = true
-
-interface_name = ""
-interface_domain = ""
-interface_bmc = "true"
-interface_vlan = ""
-interface_mtu = ""
-
-# Other interfaces default vals in Rack -> Add Hosts -> Interface Details
-[frontend.other_ifaces]
-interface_name = ""
-interface_domain = ""
-interface_bmc = "false"
-interface_vlan = ""
-interface_mtu = ""

@@ -5,7 +5,7 @@
 package model
 
 type DataDump struct {
-	Users  []User
-	Hosts  HostList
-	Images BootImageList
+	Users  []User        `json:"Users"`
+	Hosts  HostList      `json:"Hosts"`
+	Images BootImageList `json:"Images"`
 }

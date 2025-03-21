@@ -8,28 +8,32 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/internal/util"
-	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/pkg/client"
 )
 
 var (
 	editCmd = &cobra.Command{
-		Use:   "edit",
+		Use:   "edit <name>...",
 		Short: "edit images",
 		Long:  `edit images`,
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewClient()
+			gc, err := cmd.NewOgenClient()
 			if err != nil {
 				return err
 			}
 
-			imageList, _, err := gc.ImageApi.ImageFind(context.Background(), args[0])
+			params := client.GETV1ImagesFindParams{
+				Names: client.NewOptString(strings.Join(args, ",")),
+			}
+			imageList, err := gc.GETV1ImagesFind(context.Background(), params)
 			if err != nil {
-				return cmd.NewApiError("Failed to find images to edit", err)
+				return cmd.NewApiError(err)
 			}
 
 			data, err := json.MarshalIndent(imageList, "", "    ")
@@ -42,20 +46,22 @@ var (
 				return err
 			}
 
-			var check model.BootImageList
+			var check []client.NilBootImageAddRequestBootImagesItem
 			err = json.Unmarshal(newData, &check)
 			if err != nil {
 				return fmt.Errorf("Invalid JSON. Not saving changes: %w", err)
 			}
 
-			_, err = gc.ImageApi.StoreImages(context.Background(), check)
+			storeReq := &client.BootImageAddRequest{
+				BootImages: check,
+			}
+			storeParams := client.POSTV1ImagesParams{}
+			storeRes, err := gc.POSTV1Images(context.Background(), storeReq, storeParams)
 			if err != nil {
-				return cmd.NewApiError("Failed to store images", err)
+				return cmd.NewApiError(err)
 			}
 
-			fmt.Printf("Successfully saved %d images\n", len(check))
-
-			return nil
+			return cmd.NewApiResponse(storeRes)
 		},
 	}
 )

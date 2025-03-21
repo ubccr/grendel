@@ -19,7 +19,8 @@ builds:
       - osusergo
       - netgo
 archives:
-  - format: tar.gz
+  - formats:
+      - tar.gz
     wrap_in_directory: true
     name_template: >-
       {{ .ProjectName }}-
@@ -45,21 +46,9 @@ nfpms:
     formats:
       - deb
       - rpm
-    overrides:
-      deb:
-        file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Arch }}"
-        scripts:
-          postinstall: ./scripts/nfpm/postinstall.sh
-      rpm:
-        file_name_template: "{{ .ProjectName }}-{{ .Version }}-{{ .Arch }}"
-        scripts:
-          postinstall: ./scripts/nfpm/postinstall.sh
-    rpm:
-      signature:
-        key_file: key.gpg
-    deb:
-      signature:
-        key_file: key.gpg
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Arch }}"
+    scripts:
+      postinstall: ./scripts/nfpm/postinstall.sh
     contents:
       - src: ./configs/grendel.toml.sample
         dst: /etc/grendel/grendel.toml
@@ -85,3 +74,7 @@ changelog:
     exclude:
       - "^docs:"
       - "typo"
+release:
+  draft: true
+  mode: append
+  include_meta: false

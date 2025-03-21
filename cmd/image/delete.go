@@ -7,33 +7,34 @@ package image
 
 import (
 	"context"
-	"fmt"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd"
+	"github.com/ubccr/grendel/pkg/client"
 )
 
 var (
 	deleteCmd = &cobra.Command{
-		Use:   "delete",
+		Use:   "delete <name>...",
 		Short: "Delete images",
 		Long:  `Delete images`,
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewClient()
+			gc, err := cmd.NewOgenClient()
 			if err != nil {
 				return err
 			}
 
-			_, err = gc.ImageApi.ImageDelete(context.Background(), args[0])
+			params := client.DELETEV1ImagesParams{
+				Names: client.NewOptString(strings.Join(args, ",")),
+			}
+			res, err := gc.DELETEV1Images(context.Background(), params)
 			if err != nil {
-				return cmd.NewApiError("Failed to delete hosts", err)
+				return cmd.NewApiError(err)
 			}
 
-			fmt.Println("Successfully deleted image")
-
-			return nil
-
+			return cmd.NewApiResponse(res)
 		},
 	}
 )

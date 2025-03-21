@@ -1,906 +1,3859 @@
 {
-  "openapi": "3.0.1",
-  "info": {
-    "title": "Grendel API",
-    "description": "Bare Metal Provisioning system for HPC Linux clusters. Find out more about Grendel at [https://github.com/ubccr/grendel](https://github.com/ubccr/grendel)",
-    "contact": {
-      "email": "aebruno2@buffalo.edu"
-    },
-    "license": {
-      "name": "GPLv3",
-      "url": "https://www.gnu.org/licenses/gpl-3.0.en.html"
-    },
-    "version": "1.0.0"
-  },
-  "externalDocs": {
-    "description": "https://grendel.readthedocs.io/en/latest/",
-    "url": "https://grendel.readthedocs.io/en/latest/"
-  },
-  "servers": [
-    {
-      "url": "http://localhost/v1"
-    }
-  ],
-  "tags": [
-    {
-      "name": "host",
-      "description": "Host API Service",
-      "externalDocs": {
-        "description": "Operations for grendel hosts",
-        "url": "https://grendel.readthedocs.io/en/latest/"
-      }
-    },
-    {
-      "name": "image",
-      "description": "Boot Image API Service",
-      "externalDocs": {
-        "description": "Operations for grendel boot images",
-        "url": "https://grendel.readthedocs.io/en/latest/"
-      }
-    }
-  ],
-  "paths": {
-    "/host/list": {
-      "get": {
-        "tags": [
-          "host"
-        ],
-        "summary": "List all hosts",
-        "description": "Returns all host stored in Grendel",
-        "operationId": "hostList",
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Host"
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Failed to fetch hosts from database",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/host/find/{nodeSet}": {
-      "get": {
-        "tags": [
-          "host"
-        ],
-        "summary": "Find hosts by name or nodeset",
-        "description": "Returns a list of hosts in the given nodeset",
-        "operationId": "hostFind",
-        "parameters": [
-          {
-            "name": "nodeSet",
-            "in": "path",
-            "description": "nodeset syntax. Example: cpn-d13-[01-100]",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Host"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid nodeset supplied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Failed to fetch hosts from database",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "host"
-        ],
-        "summary": "Delete hosts by name or nodeset",
-        "description": "Delete hosts in the given nodeset",
-        "operationId": "hostDelete",
-        "parameters": [
-          {
-            "name": "nodeSet",
-            "in": "path",
-            "description": "nodeset syntax. Example: cpn-d13-[01-100]",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": { }
-          },
-          "400": {
-            "description": "Invalid nodeset supplied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Failed to delete hosts from database",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/host/tags/{tags}": {
-      "get": {
-        "tags": [
-          "host"
-        ],
-        "summary": "Find hosts by tags",
-        "description": "Returns a list of hosts with the given tags",
-        "operationId": "hostTags",
-        "parameters": [
-          {
-            "name": "tags",
-            "in": "path",
-            "description": "comman separated list of tags. Example: ib,noib,k16",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Host"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid tags supplied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Failed to fetch hosts by tag from database",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/host/provision/{nodeSet}": {
-      "put": {
-        "tags": [
-          "host"
-        ],
-        "summary": "Set hosts to provision by name or nodeset",
-        "description": "Sets hosts to provision in the given nodeset",
-        "operationId": "hostProvision",
-        "parameters": [
-          {
-            "name": "nodeSet",
-            "in": "path",
-            "description": "nodeset syntax. Example: cpn-d13-[01-100]",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": { }
-          },
-          "400": {
-            "description": "Invalid nodeset supplied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Failed to fetch hosts from database",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/host/unprovision/{nodeSet}": {
-      "put": {
-        "tags": [
-          "host"
-        ],
-        "summary": "Set hosts to unprovision by name or nodeset",
-        "description": "Sets hosts to unprovision in the given nodeset",
-        "operationId": "hostUnprovision",
-        "parameters": [
-          {
-            "name": "nodeSet",
-            "in": "path",
-            "description": "nodeset syntax. Example: cpn-d13-[01-100]",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": { }
-          },
-          "400": {
-            "description": "Invalid nodeset supplied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Failed to fetch hosts from database",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/host/tag/{nodeSet}": {
-      "put": {
-        "tags": [
-          "host"
-        ],
-        "summary": "Tag hosts by name or nodeset",
-        "description": "Tag hosts in the given nodeset",
-        "operationId": "hostTag",
-        "parameters": [
-          {
-            "name": "nodeSet",
-            "in": "path",
-            "description": "nodeset syntax. Example: cpn-d13-[01-100]",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "tags",
-            "in": "query",
-            "description": "list of tags. Example: ib,noib,k16",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": { }
-          },
-          "400": {
-            "description": "Invalid nodeset supplied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Failed to fetch hosts from database",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/host/untag/{nodeSet}": {
-      "put": {
-        "tags": [
-          "host"
-        ],
-        "summary": "Untag hosts name or nodeset",
-        "description": "Untag hosts the given nodeset",
-        "operationId": "hostUntag",
-        "parameters": [
-          {
-            "name": "nodeSet",
-            "in": "path",
-            "description": "nodeset syntax. Example: cpn-d13-[01-100]",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "tags",
-            "in": "query",
-            "description": "list of tags. Example: ib,noib,k16",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": { }
-          },
-          "400": {
-            "description": "Invalid nodeset supplied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Failed to fetch hosts from database",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/host": {
-      "post": {
-        "tags": [
-          "host"
-        ],
-        "summary": "Add or update hosts in Grendel",
-        "operationId": "storeHosts",
-        "requestBody": {
-          "description": "Add/Update one or more hosts to Grendel",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/Host"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "successfully stored hosts",
-            "content": { }
-          },
-          "400": {
-            "description": "Invalid host input supplied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Failed to store hosts in database",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "x-codegen-request-body-name": "body"
-      }
-    },
-    "/user/list": {
-      "get": {
-        "tags": [
-          "user"
-        ],
-        "summary": "List all users",
-        "description": "Returns all users stored in Grendel",
-        "operationId": "userList",
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Failed to fetch users from database",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/bootimage/list": {
-      "get": {
-        "tags": [
-          "image"
-        ],
-        "summary": "List all images",
-        "description": "Returns all images stored in Grendel",
-        "operationId": "imageList",
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/BootImage"
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Failed to fetch images from database",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/bootimage/find/{name}": {
-      "get": {
-        "tags": [
-          "image"
-        ],
-        "summary": "Find image by name",
-        "description": "Returns image with the given name",
-        "operationId": "imageFind",
-        "parameters": [
-          {
-            "name": "name",
-            "in": "path",
-            "description": "Name of image",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/BootImage"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid name supplied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Failed to fetch image from database",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "image"
-        ],
-        "summary": "Delete boot images by name",
-        "description": "Delete boot images with the given name",
-        "operationId": "imageDelete",
-        "parameters": [
-          {
-            "name": "name",
-            "in": "path",
-            "description": "Name of boot image to delete",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": { }
-          },
-          "400": {
-            "description": "Invalid name supplied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Failed to delete boot images from database",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/bootimage": {
-      "post": {
-        "tags": [
-          "image"
-        ],
-        "summary": "Add or update images in Grendel",
-        "operationId": "storeImages",
-        "requestBody": {
-          "description": "Add/Update one or more images to Grendel",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/BootImage"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "successfully stored images",
-            "content": { }
-          },
-          "400": {
-            "description": "Invalid boot image input supplied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Failed to store images in database",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "x-codegen-request-body-name": "body"
-      }
-    },
-    "/restore": {
-      "post": {
-        "tags": [
-          "restore"
-        ],
-        "summary": "Restore Grendel database",
-        "operationId": "restore",
-        "requestBody": {
-          "description": "Restore grendel database from dump",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DataDump"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "successfully restored database",
-            "content": { }
-          },
-          "400": {
-            "description": "Invalid data dump input supplied",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Failed to restore database",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "x-codegen-request-body-name": "body"
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "Host": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "provision": {
-            "type": "boolean"
-          },
-          "firmware": {
-            "type": "string"
-          },
-          "boot_image": {
-            "type": "string"
-          },
-          "interfaces": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/NetInterface"
-            }
-          }
-        }
-      },
-      "NetInterface": {
-        "type": "object",
-        "properties": {
-          "mac": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "ip": {
-            "type": "string"
-          },
-          "fqdn": {
-            "type": "string"
-          },
-          "bmc": {
-            "type": "boolean"
-          }
-        }
-      },
-      "BootImage": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "kernel": {
-            "type": "string"
-          },
-          "initrd": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "liveimg": {
-            "type": "string"
-          },
-          "cmdline": {
-            "type": "string"
-          },
-          "verify": {
-            "type": "boolean"
-          }
-        }
-      },
-      "User": {
-        "required": [
-          "username"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          },
-          "password_hash": {
-            "type": "string"
-          },
-          "role": {
-            "type": "string"
-          }
-        }
-      },
-      "DataDump": {
-        "required": [
-          "hosts"
-        ],
-        "type": "object",
-        "properties": {
-          "users": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/User"
-            }
-          },
-          "images": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BootImage"
-            }
-          },
-          "hosts": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Host"
-            }
-          }
-        }
-      },
-      "ErrorResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "securitySchemes": {
-      "api_key": {
-        "type": "apiKey",
-        "name": "api_key",
-        "in": "header"
-      }
-    }
-  }
+	"components": {
+		"schemas": {
+			"AuthRequest": {
+				"description": "AuthRequest schema",
+				"properties": {
+					"password": {
+						"type": "string"
+					},
+					"username": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"AuthResponse": {
+				"description": "AuthResponse schema",
+				"properties": {
+					"expire": {
+						"format": "int64",
+						"type": "integer"
+					},
+					"role": {
+						"type": "string"
+					},
+					"token": {
+						"type": "string"
+					},
+					"username": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"AuthSignupRequest": {
+				"description": "AuthSignupRequest schema",
+				"properties": {
+					"password": {
+						"minLength": 8,
+						"type": "string"
+					},
+					"username": {
+						"minLength": 2,
+						"type": "string"
+					}
+				},
+				"required": [
+					"username",
+					"password"
+				],
+				"type": "object"
+			},
+			"AuthTokenReponse": {
+				"description": "AuthTokenReponse schema",
+				"properties": {
+					"token": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"AuthTokenRequest": {
+				"description": "AuthTokenRequest schema",
+				"properties": {
+					"expire": {
+						"description": "string parsed by time.ParseDuration, examples include: infinite, 8h, 30m, 20s",
+						"example": "infinite",
+						"type": "string"
+					},
+					"role": {
+						"description": "type of model.Role, valid options: disabled, user, admin",
+						"example": "admin",
+						"type": "string"
+					},
+					"username": {
+						"description": "username shown in logs, does not need to be a valid user in the DB",
+						"example": "user1:CLI",
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"BmcImportConfigurationRequest": {
+				"description": "BmcImportConfigurationRequest schema",
+				"properties": {
+					"file": {
+						"description": "template file relative to templates directory",
+						"example": "idrac-config.json.tmpl",
+						"type": "string"
+					},
+					"shutdown_type": {
+						"description": "options include: NoReboot, Graceful, Forced",
+						"example": "Graceful",
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"BmcOsPowerBody": {
+				"description": "BmcOsPowerBody schema",
+				"properties": {
+					"boot_option": {
+						"description": "string of type redfish.BootSourceOverrideTarget. Common options include: None, Pxe, BiosSetup, Utilities, Diags",
+						"example": "Pxe",
+						"type": "string"
+					},
+					"power_option": {
+						"description": "string of type redfish.ResetType. Common options include: On, ForceOn, ForceOff, ForceRestart, GracefulRestart, GracefulShutdown, PowerCycle",
+						"example": "PowerCycle",
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"BootImage": {
+				"description": "BootImage schema",
+				"properties": {
+					"butane": {
+						"type": "string"
+					},
+					"cmdline": {
+						"type": "string"
+					},
+					"id": {
+						"format": "int64",
+						"nullable": true,
+						"type": "integer"
+					},
+					"initrd": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"kernel": {
+						"type": "string"
+					},
+					"liveimg": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"provision_template": {
+						"type": "string"
+					},
+					"provision_templates": {
+						"additionalProperties": {
+							"nullable": true,
+							"type": "string"
+						},
+						"nullable": true,
+						"type": "object"
+					},
+					"uid": {
+						"nullable": true,
+						"type": "string"
+					},
+					"user_data": {
+						"type": "string"
+					},
+					"verify": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"name",
+					"kernel"
+				],
+				"type": "object"
+			},
+			"BootImageAddRequest": {
+				"description": "BootImageAddRequest schema",
+				"properties": {
+					"boot_images": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"butane": {
+									"type": "string"
+								},
+								"cmdline": {
+									"type": "string"
+								},
+								"id": {
+									"format": "int64",
+									"nullable": true,
+									"type": "integer"
+								},
+								"initrd": {
+									"items": {
+										"type": "string"
+									},
+									"type": "array"
+								},
+								"kernel": {
+									"type": "string"
+								},
+								"liveimg": {
+									"type": "string"
+								},
+								"name": {
+									"type": "string"
+								},
+								"provision_template": {
+									"type": "string"
+								},
+								"provision_templates": {
+									"additionalProperties": {
+										"nullable": true,
+										"type": "string"
+									},
+									"nullable": true,
+									"type": "object"
+								},
+								"uid": {
+									"nullable": true,
+									"type": "string"
+								},
+								"user_data": {
+									"type": "string"
+								},
+								"verify": {
+									"type": "boolean"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					}
+				},
+				"type": "object"
+			},
+			"DataDump": {
+				"description": "DataDump schema",
+				"properties": {
+					"Hosts": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"bonds": {
+									"items": {
+										"nullable": true,
+										"properties": {
+											"bmc": {
+												"type": "boolean"
+											},
+											"fqdn": {
+												"type": "string"
+											},
+											"id": {
+												"format": "int64",
+												"nullable": true,
+												"type": "integer"
+											},
+											"ifname": {
+												"type": "string"
+											},
+											"ip": {
+												"type": "string"
+											},
+											"mac": {
+												"type": "string"
+											},
+											"mtu": {
+												"maximum": 65535,
+												"minimum": 0,
+												"type": "integer"
+											},
+											"peers": {
+												"items": {
+													"type": "string"
+												},
+												"type": "array"
+											},
+											"vlan": {
+												"type": "string"
+											}
+										},
+										"type": "object"
+									},
+									"type": "array"
+								},
+								"boot_image": {
+									"type": "string"
+								},
+								"firmware": {
+									"type": "string"
+								},
+								"id": {
+									"format": "int64",
+									"nullable": true,
+									"type": "integer"
+								},
+								"interfaces": {
+									"items": {
+										"nullable": true,
+										"properties": {
+											"bmc": {
+												"type": "boolean"
+											},
+											"fqdn": {
+												"type": "string"
+											},
+											"id": {
+												"format": "int64",
+												"nullable": true,
+												"type": "integer"
+											},
+											"ifname": {
+												"type": "string"
+											},
+											"ip": {
+												"type": "string"
+											},
+											"mac": {
+												"type": "string"
+											},
+											"mtu": {
+												"maximum": 65535,
+												"minimum": 0,
+												"type": "integer"
+											},
+											"vlan": {
+												"type": "string"
+											}
+										},
+										"type": "object"
+									},
+									"type": "array"
+								},
+								"name": {
+									"type": "string"
+								},
+								"provision": {
+									"type": "boolean"
+								},
+								"tags": {
+									"items": {
+										"type": "string"
+									},
+									"type": "array"
+								},
+								"uid": {
+									"nullable": true,
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					},
+					"Images": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"butane": {
+									"type": "string"
+								},
+								"cmdline": {
+									"type": "string"
+								},
+								"id": {
+									"format": "int64",
+									"nullable": true,
+									"type": "integer"
+								},
+								"initrd": {
+									"items": {
+										"type": "string"
+									},
+									"type": "array"
+								},
+								"kernel": {
+									"type": "string"
+								},
+								"liveimg": {
+									"type": "string"
+								},
+								"name": {
+									"type": "string"
+								},
+								"provision_template": {
+									"type": "string"
+								},
+								"provision_templates": {
+									"additionalProperties": {
+										"nullable": true,
+										"type": "string"
+									},
+									"nullable": true,
+									"type": "object"
+								},
+								"uid": {
+									"nullable": true,
+									"type": "string"
+								},
+								"user_data": {
+									"type": "string"
+								},
+								"verify": {
+									"type": "boolean"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					},
+					"Users": {
+						"items": {
+							"properties": {
+								"created_at": {
+									"format": "date-time",
+									"type": "string"
+								},
+								"hash": {
+									"type": "string"
+								},
+								"id": {
+									"format": "int64",
+									"nullable": true,
+									"type": "integer"
+								},
+								"modified_at": {
+									"format": "date-time",
+									"type": "string"
+								},
+								"role": {
+									"type": "string"
+								},
+								"username": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					}
+				},
+				"type": "object"
+			},
+			"Event": {
+				"description": "Event schema",
+				"properties": {
+					"JobMessages": {
+						"items": {
+							"properties": {
+								"host": {
+									"type": "string"
+								},
+								"msg": {
+									"type": "string"
+								},
+								"redfish_error": {
+									"properties": {
+										"code": {
+											"type": "string"
+										},
+										"error": {
+											"properties": {
+												"@Message.ExtendedInfo": {
+													"items": {
+														"properties": {
+															"Message": {
+																"type": "string"
+															},
+															"MessageArgs.@odata.count": {
+																"type": "integer"
+															},
+															"MessageId": {
+																"type": "string"
+															},
+															"RelatedProperties.@odata.count": {
+																"type": "integer"
+															},
+															"Resolution": {
+																"type": "string"
+															},
+															"Severity": {
+																"type": "string"
+															}
+														},
+														"type": "object"
+													},
+													"type": "array"
+												},
+												"code": {
+													"type": "string"
+												},
+												"message": {
+													"type": "string"
+												}
+											},
+											"type": "object"
+										}
+									},
+									"type": "object"
+								},
+								"status": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					},
+					"Message": {
+						"type": "string"
+					},
+					"Severity": {
+						"type": "string"
+					},
+					"Time": {
+						"format": "date-time",
+						"type": "string"
+					},
+					"User": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"GenericResponse": {
+				"description": "GenericResponse schema",
+				"properties": {
+					"changed": {
+						"type": "integer"
+					},
+					"detail": {
+						"type": "string"
+					},
+					"title": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"HTTPError": {
+				"description": "HTTPError schema",
+				"properties": {
+					"detail": {
+						"description": "Human readable error message",
+						"nullable": true,
+						"type": "string"
+					},
+					"errors": {
+						"items": {
+							"properties": {
+								"more": {
+									"additionalProperties": {},
+									"type": "object"
+								},
+								"name": {
+									"type": "string"
+								},
+								"reason": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"nullable": true,
+						"type": "array"
+					},
+					"instance": {
+						"nullable": true,
+						"type": "string"
+					},
+					"status": {
+						"description": "HTTP status code",
+						"example": 403,
+						"nullable": true,
+						"type": "integer"
+					},
+					"title": {
+						"description": "Short title of the error",
+						"nullable": true,
+						"type": "string"
+					},
+					"type": {
+						"description": "URL of the error type. Can be used to lookup the error in a documentation",
+						"nullable": true,
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"Host": {
+				"description": "Host schema",
+				"properties": {
+					"bonds": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"bmc": {
+									"type": "boolean"
+								},
+								"fqdn": {
+									"type": "string"
+								},
+								"id": {
+									"format": "int64",
+									"nullable": true,
+									"type": "integer"
+								},
+								"ifname": {
+									"type": "string"
+								},
+								"ip": {
+									"type": "string"
+								},
+								"mac": {
+									"type": "string"
+								},
+								"mtu": {
+									"maximum": 65535,
+									"minimum": 0,
+									"type": "integer"
+								},
+								"peers": {
+									"items": {
+										"type": "string"
+									},
+									"type": "array"
+								},
+								"vlan": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					},
+					"boot_image": {
+						"type": "string"
+					},
+					"firmware": {
+						"type": "string"
+					},
+					"id": {
+						"format": "int64",
+						"nullable": true,
+						"type": "integer"
+					},
+					"interfaces": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"bmc": {
+									"type": "boolean"
+								},
+								"fqdn": {
+									"type": "string"
+								},
+								"id": {
+									"format": "int64",
+									"nullable": true,
+									"type": "integer"
+								},
+								"ifname": {
+									"type": "string"
+								},
+								"ip": {
+									"type": "string"
+								},
+								"mac": {
+									"type": "string"
+								},
+								"mtu": {
+									"maximum": 65535,
+									"minimum": 0,
+									"type": "integer"
+								},
+								"vlan": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					},
+					"name": {
+						"type": "string"
+					},
+					"provision": {
+						"type": "boolean"
+					},
+					"tags": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"uid": {
+						"nullable": true,
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"JobMessage": {
+				"description": "JobMessage schema",
+				"properties": {
+					"host": {
+						"type": "string"
+					},
+					"msg": {
+						"type": "string"
+					},
+					"redfish_error": {
+						"properties": {
+							"code": {
+								"type": "string"
+							},
+							"error": {
+								"properties": {
+									"@Message.ExtendedInfo": {
+										"items": {
+											"properties": {
+												"Message": {
+													"type": "string"
+												},
+												"MessageArgs.@odata.count": {
+													"type": "integer"
+												},
+												"MessageId": {
+													"type": "string"
+												},
+												"RelatedProperties.@odata.count": {
+													"type": "integer"
+												},
+												"Resolution": {
+													"type": "string"
+												},
+												"Severity": {
+													"type": "string"
+												}
+											},
+											"type": "object"
+										},
+										"nullable": true,
+										"type": "array"
+									},
+									"code": {
+										"type": "string"
+									},
+									"message": {
+										"type": "string"
+									}
+								},
+								"type": "object"
+							}
+						},
+						"type": "object"
+					},
+					"status": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"NodeAddRequest": {
+				"description": "NodeAddRequest schema",
+				"properties": {
+					"node_list": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"bonds": {
+									"items": {
+										"nullable": true,
+										"properties": {
+											"bmc": {
+												"type": "boolean"
+											},
+											"fqdn": {
+												"type": "string"
+											},
+											"id": {
+												"format": "int64",
+												"nullable": true,
+												"type": "integer"
+											},
+											"ifname": {
+												"type": "string"
+											},
+											"ip": {
+												"type": "string"
+											},
+											"mac": {
+												"type": "string"
+											},
+											"mtu": {
+												"maximum": 65535,
+												"minimum": 0,
+												"type": "integer"
+											},
+											"peers": {
+												"items": {
+													"type": "string"
+												},
+												"type": "array"
+											},
+											"vlan": {
+												"type": "string"
+											}
+										},
+										"type": "object"
+									},
+									"type": "array"
+								},
+								"boot_image": {
+									"type": "string"
+								},
+								"firmware": {
+									"type": "string"
+								},
+								"id": {
+									"format": "int64",
+									"nullable": true,
+									"type": "integer"
+								},
+								"interfaces": {
+									"items": {
+										"nullable": true,
+										"properties": {
+											"bmc": {
+												"type": "boolean"
+											},
+											"fqdn": {
+												"type": "string"
+											},
+											"id": {
+												"format": "int64",
+												"nullable": true,
+												"type": "integer"
+											},
+											"ifname": {
+												"type": "string"
+											},
+											"ip": {
+												"type": "string"
+											},
+											"mac": {
+												"type": "string"
+											},
+											"mtu": {
+												"maximum": 65535,
+												"minimum": 0,
+												"type": "integer"
+											},
+											"vlan": {
+												"type": "string"
+											}
+										},
+										"type": "object"
+									},
+									"type": "array"
+								},
+								"name": {
+									"type": "string"
+								},
+								"provision": {
+									"type": "boolean"
+								},
+								"tags": {
+									"items": {
+										"type": "string"
+									},
+									"type": "array"
+								},
+								"uid": {
+									"nullable": true,
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					}
+				},
+				"type": "object"
+			},
+			"NodeBootImageRequest": {
+				"description": "NodeBootImageRequest schema",
+				"properties": {
+					"image": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"NodeBootTokenResponse": {
+				"description": "NodeBootTokenResponse schema",
+				"properties": {
+					"nodes": {
+						"items": {
+							"properties": {
+								"name": {
+									"type": "string"
+								},
+								"token": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					}
+				},
+				"type": "object"
+			},
+			"NodeProvisionRequest": {
+				"description": "NodeProvisionRequest schema",
+				"properties": {
+					"provision": {
+						"type": "boolean"
+					}
+				},
+				"type": "object"
+			},
+			"NodeTagsRequest": {
+				"description": "NodeTagsRequest schema",
+				"properties": {
+					"tags": {
+						"description": "comma separated list of tags",
+						"example": "a01,test",
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"RedfishJob": {
+				"description": "RedfishJob schema",
+				"properties": {
+					"jobs": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"@odata.context": {
+									"type": "string"
+								},
+								"@odata.id": {
+									"type": "string"
+								},
+								"@odata.type": {
+									"type": "string"
+								},
+								"CreatedBy": {
+									"type": "string"
+								},
+								"Description": {
+									"type": "string"
+								},
+								"EndTime": {
+									"type": "string"
+								},
+								"EstimatedDuration": {
+									"type": "string"
+								},
+								"HidePayload": {
+									"type": "boolean"
+								},
+								"Id": {
+									"type": "string"
+								},
+								"JobState": {
+									"type": "string"
+								},
+								"JobStatus": {
+									"type": "string"
+								},
+								"MaxExecutionTime": {
+									"type": "string"
+								},
+								"Messages": {
+									"items": {
+										"properties": {
+											"@odata.id": {
+												"type": "string"
+											},
+											"Id": {
+												"type": "string"
+											},
+											"Message": {
+												"type": "string"
+											},
+											"MessageArgs": {
+												"items": {
+													"type": "string"
+												},
+												"type": "array"
+											},
+											"MessageId": {
+												"type": "string"
+											},
+											"Name": {
+												"type": "string"
+											},
+											"RelatedProperties": {
+												"items": {
+													"nullable": true,
+													"type": "string"
+												},
+												"nullable": true,
+												"type": "array"
+											},
+											"Resolution": {
+												"type": "string"
+											},
+											"Severity": {
+												"type": "string"
+											}
+										},
+										"type": "object"
+									},
+									"type": "array"
+								},
+								"Name": {
+									"type": "string"
+								},
+								"Payload": {
+									"properties": {
+										"HttpHeaders": {
+											"items": {
+												"nullable": true,
+												"type": "string"
+											},
+											"nullable": true,
+											"type": "array"
+										},
+										"HttpOperation": {
+											"type": "string"
+										},
+										"JsonBody": {
+											"type": "string"
+										},
+										"TargetUri": {
+											"type": "string"
+										}
+									},
+									"type": "object"
+								},
+								"PercentComplete": {
+									"type": "integer"
+								},
+								"Schedule": {
+									"properties": {
+										"EnabledDaysOfMonth": {
+											"items": {
+												"nullable": true,
+												"type": "integer"
+											},
+											"nullable": true,
+											"type": "array"
+										},
+										"EnabledDaysOfWeek": {
+											"items": {
+												"nullable": true,
+												"type": "string"
+											},
+											"nullable": true,
+											"type": "array"
+										},
+										"EnabledIntervals": {
+											"items": {
+												"nullable": true,
+												"type": "string"
+											},
+											"nullable": true,
+											"type": "array"
+										},
+										"EnabledMonthsOfYear": {
+											"items": {
+												"nullable": true,
+												"type": "string"
+											},
+											"nullable": true,
+											"type": "array"
+										},
+										"InitialStartTime": {
+											"type": "string"
+										},
+										"Lifetime": {
+											"type": "string"
+										},
+										"MaxOccurrences": {
+											"type": "integer"
+										},
+										"RecurrenceInterval": {
+											"type": "string"
+										}
+									},
+									"type": "object"
+								},
+								"StartTime": {
+									"type": "string"
+								},
+								"StepOrder": {
+									"items": {
+										"nullable": true,
+										"type": "string"
+									},
+									"nullable": true,
+									"type": "array"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					},
+					"name": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"RedfishMetricReport": {
+				"description": "RedfishMetricReport schema",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"reports": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"@odata.context": {
+									"type": "string"
+								},
+								"@odata.etag": {
+									"type": "string"
+								},
+								"@odata.id": {
+									"type": "string"
+								},
+								"@odata.type": {
+									"type": "string"
+								},
+								"Context": {
+									"type": "string"
+								},
+								"Description": {
+									"type": "string"
+								},
+								"Id": {
+									"type": "string"
+								},
+								"MetricValues": {
+									"items": {
+										"properties": {
+											"MetricID": {
+												"type": "string"
+											},
+											"MetricProperty": {
+												"type": "string"
+											},
+											"MetricValue": {
+												"type": "string"
+											},
+											"Oem": {},
+											"Timestamp": {
+												"type": "string"
+											}
+										},
+										"type": "object"
+									},
+									"type": "array"
+								},
+								"Name": {
+									"type": "string"
+								},
+								"Oem": {},
+								"Timestamp": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					}
+				},
+				"type": "object"
+			},
+			"RedfishSystem": {
+				"description": "RedfishSystem schema",
+				"properties": {
+					"bios_version": {
+						"type": "string"
+					},
+					"boot_next": {
+						"type": "string"
+					},
+					"boot_order": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"health": {
+						"type": "string"
+					},
+					"host_name": {
+						"type": "string"
+					},
+					"manufacturer": {
+						"type": "string"
+					},
+					"model": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"oem": {
+						"properties": {
+							"Dell": {
+								"properties": {
+									"DellSystem": {
+										"properties": {
+											"ManagedSystemSize": {
+												"type": "string"
+											},
+											"MaxCPUSockets": {
+												"type": "integer"
+											},
+											"MaxDIMMSlots": {
+												"type": "integer"
+											},
+											"MaxPCIeSlots": {
+												"type": "integer"
+											},
+											"SystemID": {
+												"type": "integer"
+											}
+										},
+										"type": "object"
+									}
+								},
+								"type": "object"
+							}
+						},
+						"type": "object"
+					},
+					"power_status": {
+						"type": "string"
+					},
+					"processor_count": {
+						"type": "integer"
+					},
+					"serial_number": {
+						"type": "string"
+					},
+					"total_memory": {
+						"format": "float",
+						"type": "number"
+					}
+				},
+				"type": "object"
+			},
+			"User": {
+				"description": "User schema",
+				"properties": {
+					"created_at": {
+						"format": "date-time",
+						"type": "string"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"id": {
+						"format": "int64",
+						"nullable": true,
+						"type": "integer"
+					},
+					"modified_at": {
+						"format": "date-time",
+						"type": "string"
+					},
+					"role": {
+						"type": "string"
+					},
+					"username": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"UserRoleRequest": {
+				"description": "UserRoleRequest schema",
+				"properties": {
+					"role": {
+						"description": "type of model.Role, valid options: disabled, user, admin",
+						"example": "admin",
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"UserStoreRequest": {
+				"description": "UserStoreRequest schema",
+				"properties": {
+					"password": {
+						"type": "string"
+					},
+					"username": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"UserStoreResponse": {
+				"description": "UserStoreResponse schema",
+				"properties": {
+					"role": {
+						"type": "string"
+					},
+					"username": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"unknown-interface": {
+				"description": "unknown-interface schema"
+			}
+		},
+		"securitySchemes": {
+			"cookieAuth": {
+				"bearerFormat": "JWT",
+				"description": "API key cookie authentication.",
+				"in": "cookie",
+				"scheme": "bearer",
+				"type": "http"
+			},
+			"headerAuth": {
+				"bearerFormat": "JWT",
+				"description": "API key header authentication.",
+				"in": "header",
+				"scheme": "bearer",
+				"type": "http"
+			}
+		}
+	},
+	"info": {
+		"description": "\nThis is the autogenerated OpenAPI documentation for your [Fuego](https://github.com/go-fuego/fuego) API.\n\nBelow is a Fuego Cheatsheet to help you get started. Don't hesitate to check the [Fuego documentation](https://go-fuego.github.io/fuego) for more details.\n\nHappy coding! 🔥\n\n## Usage\n\n### Route registration\n\n```go\nfunc main() {\n\t// Create a new server\n\ts := fuego.NewServer()\n\n\t// Register some routes\n\tfuego.Post(s, \"/hello\", myController)\n\tfuego.Get(s, \"/myPath\", otherController)\n\tfuego.Put(s, \"/hello\", thirdController)\n\n\tadminRoutes := fuego.Group(s, \"/admin\")\n\tfuego.Use(adminRoutes, myMiddleware) // This middleware (for authentication, etc...) will be available for routes starting by /admin/*, \n\tfuego.Get(adminRoutes, \"/hello\", groupController) // This route will be available at /admin/hello\n\n\t// Start the server\n\ts.Start()\n}\n```\n\n### Basic controller\n\n```go\ntype MyBody struct {\n\tName string `json:\"name\" validate:\"required,max=30\"`\n}\n\ntype MyResponse struct {\n\tAnswer string `json:\"answer\"`\n}\n\nfunc hello(ctx fuego.ContextWithBody[MyBody]) (*MyResponse, error) {\n\tbody, err := ctx.Body()\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\n\treturn \u0026MyResponse{Answer: \"Hello \" + body.Name}, nil\n}\n```\n\n### Add openAPI information to the route\n\n```go\nimport (\n\t\"github.com/go-fuego/fuego\"\n\t\"github.com/go-fuego/fuego/option\"\n\t\"github.com/go-fuego/fuego/param\"\n)\n\nfunc main() {\n\ts := fuego.NewServer()\n\n\t// Custom OpenAPI options\n\tfuego.Post(s, \"/\", myController\n\t\toption.Description(\"This route does something...\"),\n\t\toption.Summary(\"This is my summary\"),\n\t\toption.Tags(\"MyTag\"), // A tag is set by default according to the return type (can be deactivated)\n\t\toption.Deprecated(), // Marks the route as deprecated in the OpenAPI spec\n\n\t\toption.Query(\"name\", \"Declares a query parameter with default value\", param.Default(\"Carmack\")),\n\t\toption.Header(\"Authorization\", \"Bearer token\", param.Required()),\n\t\toptionPagination,\n\t\toptionCustomBehavior,\n\t)\n\n\ts.Run()\n}\n\nvar optionPagination = option.Group(\n\toption.QueryInt(\"page\", \"Page number\", param.Default(1), param.Example(\"1st page\", 1), param.Example(\"42nd page\", 42)),\n\toption.QueryInt(\"perPage\", \"Number of items per page\"),\n)\n\nvar optionCustomBehavior = func(r *fuego.BaseRoute) {\n\tr.XXX = \"YYY\"\n}\n```\n\nThen, in the controller\n\n```go\ntype MyResponse struct {\n\tAnswer string `json:\"answer\"`\n}\n\nfunc getAllPets(ctx fuego.ContextNoBody) (*MyResponse, error) {\n\tname := ctx.QueryParam(\"name\")\n\tperPage, _ := ctx.QueryParamIntErr(\"per_page\")\n\n\treturn \u0026MyResponse{Answer: \"Hello \" + name}, nil\n}\n```\n",
+		"title": "OpenAPI",
+		"version": "0.0.1"
+	},
+	"openapi": "3.1.0",
+	"paths": {
+		"/v1/auth/signin": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).AuthSignin`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n\n---\n\nsignin user",
+				"operationId": "POST_/v1/auth/signin",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuthRequest"
+							}
+						}
+					},
+					"description": "Request body for api.AuthRequest",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					},
+					{}
+				],
+				"summary": "auth signin",
+				"tags": [
+					"v1",
+					"auth"
+				]
+			}
+		},
+		"/v1/auth/signout": {
+			"delete": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).AuthSignout`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n\n---\n\nSignout user",
+				"operationId": "DELETE_/v1/auth/signout",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "auth signout",
+				"tags": [
+					"v1",
+					"auth"
+				]
+			}
+		},
+		"/v1/auth/signup": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).AuthSignup`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n\n---\n\nSignup user",
+				"operationId": "POST_/v1/auth/signup",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuthSignupRequest"
+							}
+						}
+					},
+					"description": "Request body for api.AuthSignupRequest",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					},
+					{}
+				],
+				"summary": "auth signup",
+				"tags": [
+					"v1",
+					"auth"
+				]
+			}
+		},
+		"/v1/auth/token": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).AuthToken`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nCreate API token",
+				"operationId": "POST_/v1/auth/token",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuthTokenRequest"
+							}
+						}
+					},
+					"description": "Request body for api.AuthTokenRequest",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthTokenReponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthTokenReponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "auth token",
+				"tags": [
+					"v1",
+					"auth"
+				]
+			}
+		},
+		"/v1/bmc": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcQuery`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nGet redfish info from node(s)",
+				"operationId": "GET_/v1/bmc",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/RedfishSystem"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/RedfishSystem"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc query",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/configure/auto": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcAutoConfigure`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nSet BMC to autoconfigure",
+				"operationId": "POST_/v1/bmc/configure/auto",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/JobMessage"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/JobMessage"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc auto configure",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/configure/import": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfiguration`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nManually import system configuration to BMC",
+				"operationId": "POST_/v1/bmc/configure/import",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BmcImportConfigurationRequest"
+							}
+						}
+					},
+					"description": "Request body for api.BmcImportConfigurationRequest",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/JobMessage"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/JobMessage"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc import configuration",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/jobs": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcJobList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nGet redfish jobs from node(s)",
+				"operationId": "GET_/v1/bmc/jobs",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/RedfishJob"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/RedfishJob"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc job list",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/jobs/{jids}": {
+			"delete": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcJobDelete`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nDelete redfish jobs from node(s) by JID",
+				"operationId": "DELETE_/v1/bmc/jobs/:jids",
+				"parameters": [
+					{
+						"description": "Redfish Job IDs. Use 'JID_CLEARALL' to clear all jobs",
+						"examples": {
+							"jids": {
+								"value": "JID_000000000001,JID_000000000002"
+							}
+						},
+						"in": "path",
+						"name": "jids",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/JobMessage"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/JobMessage"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc job delete",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/metrics": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcMetricReports`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nGet metric reports by nodeset",
+				"operationId": "GET_/v1/bmc/metrics",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/RedfishMetricReport"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/RedfishMetricReport"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc metric reports",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/power/bmc": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcPower`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nReboot node(s) BMC",
+				"operationId": "POST_/v1/bmc/power/bmc",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/JobMessage"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/JobMessage"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc power",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/power/os": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcOsPower`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nChange power status of node(s)",
+				"operationId": "POST_/v1/bmc/power/os",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BmcOsPowerBody"
+							}
+						}
+					},
+					"description": "Request body for api.BmcOsPowerBody",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/JobMessage"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/JobMessage"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc os power",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/sel": {
+			"delete": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcSelClear`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nClear system event log on node(s)",
+				"operationId": "DELETE_/v1/bmc/sel",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/JobMessage"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/JobMessage"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc sel clear",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/db/dump": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).Dump`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nGet a backup of the DB",
+				"operationId": "GET_/v1/db/dump",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DataDump"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/DataDump"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "dump",
+				"tags": [
+					"v1",
+					"db"
+				]
+			}
+		},
+		"/v1/db/restore": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).Restore`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nRestore a backup of the DB",
+				"operationId": "POST_/v1/db/restore",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/DataDump"
+							}
+						}
+					},
+					"description": "Request body for model.DataDump",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "restore",
+				"tags": [
+					"v1",
+					"db"
+				]
+			}
+		},
+		"/v1/grendel/events": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).GetEvents`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\n",
+				"operationId": "GET_/v1/grendel/events",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Event"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Event"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "get events",
+				"tags": [
+					"v1",
+					"grendel"
+				]
+			}
+		},
+		"/v1/images": {
+			"delete": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageDelete`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nDelete images by name",
+				"operationId": "DELETE_/v1/images",
+				"parameters": [
+					{
+						"description": "Filter by name",
+						"examples": {
+							"names": {
+								"value": "image1,image2"
+							}
+						},
+						"in": "query",
+						"name": "names",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "boot image delete",
+				"tags": [
+					"v1",
+					"images"
+				]
+			},
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nList all images",
+				"operationId": "GET_/v1/images",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/BootImage"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/BootImage"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "boot image list",
+				"tags": [
+					"v1",
+					"images"
+				]
+			},
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageAdd`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nAdd images",
+				"operationId": "POST_/v1/images",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BootImageAddRequest"
+							}
+						}
+					},
+					"description": "Request body for api.BootImageAddRequest",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "boot image add",
+				"tags": [
+					"v1",
+					"images"
+				]
+			}
+		},
+		"/v1/images/find": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageFind`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nFind images by name",
+				"operationId": "GET_/v1/images/find",
+				"parameters": [
+					{
+						"description": "Filter by name",
+						"examples": {
+							"names": {
+								"value": "image1,image2"
+							}
+						},
+						"in": "query",
+						"name": "names",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/BootImage"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/BootImage"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "boot image find",
+				"tags": [
+					"v1",
+					"images"
+				]
+			}
+		},
+		"/v1/nodes": {
+			"delete": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeDelete`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nDelete nodes by nodeset and/or tags",
+				"operationId": "DELETE_/v1/nodes",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "node delete",
+				"tags": [
+					"v1",
+					"nodes"
+				]
+			},
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nList all nodes",
+				"operationId": "GET_/v1/nodes",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Host"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Host"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "node list",
+				"tags": [
+					"v1",
+					"nodes"
+				]
+			},
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeAdd`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nAdd nodes",
+				"operationId": "POST_/v1/nodes",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NodeAddRequest"
+							}
+						}
+					},
+					"description": "Request body for api.NodeAddRequest",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "node add",
+				"tags": [
+					"v1",
+					"nodes"
+				]
+			}
+		},
+		"/v1/nodes/find": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeFind`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nFind nodes by nodeset and/or tags",
+				"operationId": "GET_/v1/nodes/find",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Host"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Host"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "node find",
+				"tags": [
+					"v1",
+					"nodes"
+				]
+			}
+		},
+		"/v1/nodes/image": {
+			"patch": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeBootImage`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nUpdate nodes boot image by nodeset and/or tags",
+				"operationId": "PATCH_/v1/nodes/image",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NodeBootImageRequest"
+							}
+						}
+					},
+					"description": "Request body for api.NodeBootImageRequest",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "node boot image",
+				"tags": [
+					"v1",
+					"nodes"
+				]
+			}
+		},
+		"/v1/nodes/provision": {
+			"patch": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeProvision`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nProvision / Unprovision nodes by nodeset and/or tags",
+				"operationId": "PATCH_/v1/nodes/provision",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NodeProvisionRequest"
+							}
+						}
+					},
+					"description": "Request body for api.NodeProvisionRequest",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "node provision",
+				"tags": [
+					"v1",
+					"nodes"
+				]
+			}
+		},
+		"/v1/nodes/tags/{action}": {
+			"patch": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeTags`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nUpdate nodes tags by nodeset and/or tags",
+				"operationId": "PATCH_/v1/nodes/tags/:action",
+				"parameters": [
+					{
+						"description": "option to add or remove tags",
+						"examples": {
+							"action": {
+								"value": "add | remove"
+							}
+						},
+						"in": "path",
+						"name": "action",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NodeTagsRequest"
+							}
+						}
+					},
+					"description": "Request body for api.NodeTagsRequest",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "node tags",
+				"tags": [
+					"v1",
+					"nodes"
+				]
+			}
+		},
+		"/v1/nodes/token/{interface}": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeBootToken`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nCreate a boot token for the provision server. Used for debugging requests made by images",
+				"operationId": "GET_/v1/nodes/token/:interface",
+				"parameters": [
+					{
+						"description": "interface token will be created for",
+						"examples": {
+							"interface": {
+								"value": "boot | bmc"
+							}
+						},
+						"in": "path",
+						"name": "interface",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NodeBootTokenResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/NodeBootTokenResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "node boot token",
+				"tags": [
+					"v1",
+					"nodes"
+				]
+			}
+		},
+		"/v1/users": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nList all users",
+				"operationId": "GET_/v1/users",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/User"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/User"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "user list",
+				"tags": [
+					"v1",
+					"users"
+				]
+			},
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserStore`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nAdd new user",
+				"operationId": "POST_/v1/users",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserStoreRequest"
+							}
+						}
+					},
+					"description": "Request body for api.UserStoreRequest",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserStoreResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/UserStoreResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "user store",
+				"tags": [
+					"v1",
+					"users"
+				]
+			}
+		},
+		"/v1/users/{usernames}": {
+			"delete": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserDelete`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nDelete users",
+				"operationId": "DELETE_/v1/users/:usernames",
+				"parameters": [
+					{
+						"description": "target usernames",
+						"examples": {
+							"usernames": {
+								"value": "user1,user2"
+							}
+						},
+						"in": "path",
+						"name": "usernames",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "user delete",
+				"tags": [
+					"v1",
+					"users"
+				]
+			}
+		},
+		"/v1/users/{usernames}/role": {
+			"patch": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserRole`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nUpdate users role",
+				"operationId": "PATCH_/v1/users/:usernames/role",
+				"parameters": [
+					{
+						"description": "target usernames",
+						"examples": {
+							"usernames": {
+								"value": "user1,user2"
+							}
+						},
+						"in": "path",
+						"name": "usernames",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserRoleRequest"
+							}
+						}
+					},
+					"description": "Request body for api.UserRoleRequest",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "user role",
+				"tags": [
+					"v1",
+					"users"
+				]
+			}
+		}
+	},
+	"servers": [
+		{
+			"description": "local server",
+			"url": "http://grendel-api.socket"
+		}
+	],
+	"tags": [
+		{
+			"name": "auth"
+		},
+		{
+			"name": "bmc"
+		},
+		{
+			"name": "db"
+		},
+		{
+			"name": "grendel"
+		},
+		{
+			"name": "images"
+		},
+		{
+			"name": "nodes"
+		},
+		{
+			"name": "users"
+		},
+		{
+			"name": "v1"
+		}
+	]
 }

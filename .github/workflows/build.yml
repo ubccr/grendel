@@ -1,0 +1,64 @@
+name: build
+
+on:
+  push:
+    branches-ignore: main
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Get iPXE commit ID
+        id: get-ipxe-commit
+        run: cd internal/firmware/ipxe && echo "id=$(git log -1 --format=%H)" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Restore cached iPXE build
+        id: cache-ipxe
+        uses: actions/cache@v4
+        with:
+          path: internal/firmware/bin
+          key: ipxe-build-${{ steps.get-ipxe-commit.outputs.id }}-${{ hashFiles('internal/firmware/Makefile') }}
+
+      - name: install iPXE deps
+        if: ${{ steps.cache-ipxe.outputs.cache-hit != 'true' }}
+        run: sudo apt-get update && sudo apt-get install gcc-aarch64-linux-gnu liblzma-dev xz-utils gcc -y
+
+      - name: build iPXE
+        if: ${{ steps.cache-ipxe.outputs.cache-hit != 'true' }}
+        run: cd internal/firmware && make build && make bindata
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+
+      - name: Run tests
+        run: go test ./... -json > tests.json
+
+      - name: Generate test report
+        uses: becheran/go-testreport@main
+        with:
+          input: tests.json
+
+      - name: Run GoReleaser Snapshot
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          version: "~> v2"
+          args: release --clean --snapshot
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: dist/grendel*
+          retention-days: 4

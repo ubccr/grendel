@@ -7,21 +7,22 @@ package image
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd"
-	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/pkg/client"
 )
 
 var (
 	importCmd = &cobra.Command{
-		Use:   "import",
+		Use:   "import <filenames>...",
 		Short: "import images",
 		Long:  `import images`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewClient()
+			gc, err := cmd.NewOgenClient()
 			if err != nil {
 				return err
 			}
@@ -29,22 +30,27 @@ var (
 			for _, name := range args {
 				file, err := os.Open(name)
 				if err != nil {
+					fmt.Printf("failed to open file. name=%s err=%s", name, err)
 				}
 				defer file.Close()
 
 				cmd.Log.Infof("Processing file: %s", name)
 
-				var images model.BootImageList
+				var images []client.NilBootImageAddRequestBootImagesItem
 				if err := json.NewDecoder(file).Decode(&images); err != nil {
 					return err
 				}
 
-				_, err = gc.ImageApi.StoreImages(context.Background(), images)
+				req := &client.BootImageAddRequest{
+					BootImages: images,
+				}
+				params := client.POSTV1ImagesParams{}
+				res, err := gc.POSTV1Images(context.Background(), req, params)
 				if err != nil {
-					return cmd.NewApiError("Failed to store images", err)
+					return cmd.NewApiError(err)
 				}
 
-				cmd.Log.Infof("Successfully imported %d images from: %s", len(images), name)
+				return cmd.NewApiResponse(res)
 			}
 			return nil
 

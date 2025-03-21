@@ -6,18 +6,14 @@ package api
 
 import (
 	"context"
-	"crypto/tls"
+	"errors"
 	"fmt"
 	"net"
-	"net/http"
 	"os"
 	"strconv"
-	"time"
 
-	"github.com/go-playground/validator/v10"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
-	"github.com/sirupsen/logrus"
+	"github.com/getkin/kin-openapi/openapi3gen"
+	"github.com/go-fuego/fuego"
 	"github.com/ubccr/grendel/internal/logger"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/util"
@@ -35,23 +31,13 @@ type Server struct {
 	CertFile      string
 	Hostname      string
 	DB            store.Store
-	httpServer    *http.Server
-}
-
-func newEcho() *echo.Echo {
-	e := echo.New()
-	e.HTTPErrorHandler = HTTPErrorHandler
-	e.HideBanner = true
-	e.Use(middleware.Recover())
-	e.Logger = EchoLogger()
-	e.Validator = &CustomValidator{validator: validator.New()}
-
-	return e
-
+	server        *fuego.Server
+	SwaggerUI     bool
+	CORS          bool
 }
 
 func NewServer(db store.Store, socket, address string) (*Server, error) {
-	s := &Server{DB: db, SocketPath: socket}
+	s := &Server{Scheme: "http", DB: db, SocketPath: socket}
 
 	if socket != "" {
 		return s, nil
@@ -99,47 +85,9 @@ func NewServer(db store.Store, socket, address string) (*Server, error) {
 	return s, nil
 }
 
-func HTTPErrorHandler(err error, c echo.Context) {
-	if he, ok := err.(*echo.HTTPError); ok {
-		if he.Code == http.StatusNotFound {
-			log.WithFields(logrus.Fields{
-				"path": c.Request().URL,
-				"ip":   c.RealIP(),
-			}).Warn("Requested path not found")
-		} else {
-			log.WithFields(logrus.Fields{
-				"code": he.Code,
-				"err":  he.Internal,
-				"path": c.Request().URL,
-				"ip":   c.RealIP(),
-			}).Error(he.Message)
-		}
-	} else {
-		log.WithFields(logrus.Fields{
-			"err":  err,
-			"path": c.Request().URL,
-			"ip":   c.RealIP(),
-		}).Error("HTTP Error")
-	}
-
-	c.Echo().DefaultHTTPErrorHandler(err, c)
-}
-
 func (s *Server) Serve() error {
-	e := newEcho()
 
-	h, err := NewHandler(s.DB)
-	if err != nil {
-		return err
-	}
-
-	h.SetupRoutes(e)
-
-	httpServer := &http.Server{
-		ReadTimeout:  5 * time.Minute,
-		WriteTimeout: 5 * time.Minute,
-		IdleTimeout:  120 * time.Second,
-	}
+	var listen func(*fuego.Server)
 
 	if s.SocketPath != "" {
 		os.Remove(s.SocketPath)
@@ -147,58 +95,58 @@ func (s *Server) Serve() error {
 		if err != nil {
 			return err
 		}
+
 		if err := os.Chmod(s.SocketPath, 0770); err != nil {
 			return err
 		}
-		e.Listener = unixListener
-		s.Scheme = "http"
 		log.Printf("Listening on unix domain socket: %s", s.SocketPath)
-	} else if s.CertFile != "" && s.KeyFile != "" {
-		cfg := &tls.Config{
-			MinVersion: tls.VersionTLS12,
-			CurvePreferences: []tls.CurveID{
-				tls.CurveP256,
-				tls.X25519,
-			},
-			PreferServerCipherSuites: true,
-			CipherSuites: []uint16{
-				tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
-				tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
-				tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
-				tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
-				tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-				tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
-			},
-		}
-
-		httpServer.TLSConfig = cfg
-		httpServer.TLSConfig.Certificates = make([]tls.Certificate, 1)
-		httpServer.TLSConfig.Certificates[0], err = tls.LoadX509KeyPair(s.CertFile, s.KeyFile)
-		httpServer.Addr = fmt.Sprintf("%s:%d", s.ListenAddress, s.Port)
-		if err != nil {
-			return err
-		}
-
-		s.Scheme = "https"
-		log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
+		listen = fuego.WithListener(unixListener)
 	} else {
-		s.Scheme = "http"
-		httpServer.Addr = fmt.Sprintf("%s:%d", s.ListenAddress, s.Port)
-		log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
+		addr := fmt.Sprintf("%s:%d", s.ListenAddress, s.Port)
+
+		listen = fuego.WithAddr(addr)
 	}
 
-	s.httpServer = httpServer
-	if err := e.StartServer(httpServer); err != nil && err != http.ErrServerClosed {
+	s.server = fuego.NewServer(
+		listen,
+		fuego.WithEngineOptions(
+			fuego.WithOpenAPIGeneratorOptions(
+				openapi3gen.UseAllExportedFields(),
+				openapi3gen.SchemaCustomizer(schemaCustomizer()),
+			),
+			fuego.WithOpenAPIConfig(setupOpenapiConfig(s.SwaggerUI)),
+			fuego.WithErrorHandler(ErrorHandler),
+		),
+		fuego.WithErrorSerializer(ErrorSerializer),
+		fuego.WithGlobalMiddlewares(
+			corsMiddleware(s.CORS),
+			logMiddleware,
+		),
+		fuego.WithSecurity(setupSecurity()),
+	)
+
+	h, err := NewHandler(s.DB)
+	if err != nil {
 		return err
 	}
 
-	return nil
+	h.SetupRoutes(s.server)
+	if s.CertFile != "" && s.KeyFile != "" {
+		s.Scheme = "https"
+		log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
+		return s.server.RunTLS(s.CertFile, s.KeyFile)
+	}
+
+	if s.SocketPath == "" {
+		log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
+	}
+	return s.server.Run()
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {
-	if s.httpServer == nil {
-		return nil
-	}
+	if s.server != nil {
+		return s.server.Shutdown(context.TODO())
 
-	return s.httpServer.Shutdown(ctx)
+	}
+	return errors.New("failed to create api server")
 }

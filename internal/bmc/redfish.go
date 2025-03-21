@@ -15,25 +15,11 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stmcginnis/gofish/redfish"
 	"github.com/ubccr/grendel/internal/util"
+	"github.com/ubccr/grendel/pkg/model"
 )
 
-// PowerCycle will ForceRestart the host
-func (r *Redfish) PowerCycle(bootOverride string) error {
-	return r.PowerControl(redfish.ForceRestartResetType, bootOverride)
-}
-
-// PowerOn will ForceOn the host
-func (r *Redfish) PowerOn(bootOverride string) error {
-	return r.PowerControl(redfish.OnResetType, bootOverride)
-}
-
-// PowerOff will ForceOff the host
-func (r *Redfish) PowerOff() error {
-	return r.PowerControl(redfish.ForceOffResetType, "")
-}
-
 // Power will change the hosts power state
-func (r *Redfish) PowerControl(resetType redfish.ResetType, bootOverride string) error {
+func (r *Redfish) PowerControl(resetType redfish.ResetType, bootOverride redfish.BootSourceOverrideTarget) error {
 	ss, err := r.service.Systems()
 	if err != nil {
 		return err
@@ -59,33 +45,11 @@ func (r *Redfish) PowerControl(resetType redfish.ResetType, bootOverride string)
 }
 
 // bootOverride will set the boot override target
-func (r *Redfish) bootOverride(bootOption string) error {
-	if bootOption == "" {
-		return nil
-	}
+func (r *Redfish) bootOverride(bootOption redfish.BootSourceOverrideTarget) error {
 
 	boot := redfish.Boot{
-		BootSourceOverrideTarget:  redfish.NoneBootSourceOverrideTarget,
+		BootSourceOverrideTarget:  bootOption,
 		BootSourceOverrideEnabled: redfish.OnceBootSourceOverrideEnabled,
-	}
-
-	switch bootOption {
-	case "pxe":
-		boot.BootSourceOverrideTarget = redfish.PxeBootSourceOverrideTarget
-	case "bios-setup":
-		boot.BootSourceOverrideTarget = redfish.BiosSetupBootSourceOverrideTarget
-	case "usb":
-		boot.BootSourceOverrideTarget = redfish.UsbBootSourceOverrideTarget
-	case "hdd":
-		boot.BootSourceOverrideTarget = redfish.HddBootSourceOverrideTarget
-	case "utilities":
-		boot.BootSourceOverrideTarget = redfish.UtilitiesBootSourceOverrideTarget
-	case "diagnostics":
-		boot.BootSourceOverrideTarget = redfish.DiagsBootSourceOverrideTarget
-	case "none":
-		return nil
-	default:
-		return fmt.Errorf("boot option %s not supported", bootOption)
 	}
 
 	ss, err := r.service.Systems()
@@ -102,7 +66,7 @@ func (r *Redfish) bootOverride(bootOption string) error {
 	return nil
 }
 
-func (r *Redfish) GetSystem() (*System, error) {
+func (r *Redfish) GetSystem() (*model.RedfishSystem, error) {
 	ss, err := r.service.Systems()
 	if err != nil {
 		return nil, err
@@ -113,10 +77,10 @@ func (r *Redfish) GetSystem() (*System, error) {
 	}
 
 	sys := ss[0]
-	var oem SystemOEM
+	var oem model.RedfishSystemOEM
 	json.Unmarshal(sys.OEM, &oem)
 
-	system := &System{
+	system := &model.RedfishSystem{
 		HostName:       sys.HostName,
 		BIOSVersion:    sys.BIOSVersion,
 		SerialNumber:   sys.SKU,
@@ -254,24 +218,36 @@ func (r *Redfish) GetJobs() ([]*redfish.Job, error) {
 
 	return js.Jobs()
 }
-func (r *Redfish) ClearJobs() error {
+func (r *Redfish) ClearJobs(ids []string) error {
 	js, err := r.service.JobService()
 	if err != nil {
 		return err
 	}
 
-	jobs, err := js.Jobs()
-	if err != nil {
-		return err
-	}
-
-	for _, job := range jobs {
-		uri := fmt.Sprintf("/redfish/v1/JobService/Jobs/%s", job.ID)
-		resp, err := r.client.Delete(uri)
+	if len(ids) > 0 && ids[0] == "JID_CLEARALL" {
+		jobs, err := js.Jobs()
 		if err != nil {
 			return err
 		}
-		defer resp.Body.Close()
+
+		for _, job := range jobs {
+			uri := fmt.Sprintf("%s/Jobs/%s", js.ODataID, job.ID)
+			resp, err := r.client.Delete(uri)
+			if err != nil {
+				return err
+			}
+			defer resp.Body.Close()
+		}
+	} else {
+		for _, id := range ids {
+			uri := fmt.Sprintf("%s/Jobs/%s", js.ODataID, id) // TODO: find correct odataid
+			resp, err := r.client.Delete(uri)
+			if err != nil {
+				return err
+			}
+			defer resp.Body.Close()
+		}
+		return nil
 	}
 
 	return nil
@@ -462,4 +438,15 @@ func (r *Redfish) BmcGetJob(id string) (*redfish.Job, error) {
 		}
 	}
 	return nil, errors.New("failed to find job")
+}
+
+func (r *Redfish) BmcGetMetricReports() ([]*redfish.MetricReport, error) {
+	ts, err := r.service.TelemetryService()
+	if err != nil {
+		return nil, err
+	}
+
+	mr, err := ts.MetricReports()
+
+	return mr, err
 }

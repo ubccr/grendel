@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
 	"github.com/ubccr/grendel/internal/store"
-	"github.com/ubccr/grendel/internal/store/buntstore"
+	"github.com/ubccr/grendel/internal/store/sqlstore"
 	"github.com/ubccr/grendel/internal/tests"
 	"github.com/ubccr/grendel/pkg/model"
 )
@@ -22,7 +22,7 @@ import (
 func newTestDB(t *testing.T) store.Store {
 	assert := assert.New(t)
 
-	db, err := buntstore.New(":memory:")
+	db, err := sqlstore.New(":memory:")
 	if err != nil {
 		assert.Fail(err.Error())
 	}

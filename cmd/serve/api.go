@@ -11,8 +11,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/internal/api"
 	"github.com/ubccr/grendel/cmd"
+	"github.com/ubccr/grendel/internal/api"
 	"gopkg.in/tomb.v2"
 )
 
@@ -55,6 +55,12 @@ func serveAPI(t *tomb.Tomb) error {
 
 	apiServer.KeyFile = viper.GetString("api.key")
 	apiServer.CertFile = viper.GetString("api.cert")
+	apiServer.CORS = viper.GetBool("api.cors")
+	apiServer.SwaggerUI = viper.GetBool("api.swagger_ui")
+
+	if viper.IsSet("api.listen") && !viper.IsSet("client.api_key") {
+		cmd.Log.Warn("client.api_key is not set, CLI authentication will not work. Either bind the API to a unix socket or signup for an account in the web ui and create a token")
+	}
 
 	t.Go(func() error {
 		time.Sleep(1 * time.Second)

@@ -17,7 +17,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/internal/store"
-	"github.com/ubccr/grendel/internal/store/buntstore"
 	"github.com/ubccr/grendel/internal/store/sqlstore"
 	"github.com/ubccr/grendel/pkg/model"
 	"gopkg.in/tomb.v2"
@@ -52,7 +51,7 @@ var (
 )
 
 func init() {
-	serveCmd.PersistentFlags().String("dbtype", "buntdb", "database backend to use")
+	serveCmd.PersistentFlags().String("dbtype", "sqlite", "database backend to use")
 	viper.BindPFlag("dbtype", serveCmd.PersistentFlags().Lookup("dbtype"))
 	serveCmd.PersistentFlags().String("dbpath", ":memory:", "path to database file")
 	viper.BindPFlag("dbpath", serveCmd.PersistentFlags().Lookup("dbpath"))
@@ -68,20 +67,19 @@ func init() {
 			return err
 		}
 
-		if "sqlite" == viper.GetString("dbtype") {
+		dbType := viper.GetString("dbtype")
+
+		switch dbType {
+		case "sqlite":
 			DB, err = sqlstore.New(viper.GetString("dbpath"))
 			if err != nil {
 				return err
 			}
-		} else {
-			DB, err = buntstore.New(viper.GetString("dbpath"))
-			if err != nil {
-				return err
-			}
+		default:
+			cmd.Log.Fatalf("unsupported dbtype: %s", dbType)
 		}
 
-		cmd.Log.Infof("Using %s database path: %s", viper.GetString("dbtype"), viper.GetString("dbpath"))
-
+		cmd.Log.Infof("Using %s database path: %s", dbType, viper.GetString("dbpath"))
 		return nil
 	}
 
@@ -170,7 +168,6 @@ func runServices() error {
 		t.Go(func() error { return servePXE(t) })
 		t.Go(func() error { return serveAPI(t) })
 		t.Go(func() error { return serveProvision(t) })
-		t.Go(func() error { return serveFrontend(t) })
 		return nil
 	})
 	return t.Wait()

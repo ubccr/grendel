@@ -5,88 +5,68 @@
 package bmc
 
 import (
+	"context"
+	"fmt"
+	"strings"
+
 	"github.com/spf13/cobra"
-	"github.com/ubccr/grendel/internal/bmc"
+	"github.com/ubccr/grendel/cmd"
+	"github.com/ubccr/grendel/pkg/client"
 )
 
 var (
-	powerCmd = &cobra.Command{
-		Use:   "power",
-		Short: "Change power state of hosts",
-		Long:  `Change power state of hosts`,
-	}
-	cycleCmd = &cobra.Command{
-		Use:   "cycle",
-		Short: "Reboot the hosts",
-		Long:  `Reboot the hosts`,
-		RunE: func(command *cobra.Command, args []string) error {
-			return runPowerCycle()
-		},
-	}
-	onCmd = &cobra.Command{
-		Use:   "on",
-		Short: "Power on the hosts",
-		Long:  `Power on the hosts`,
-		RunE: func(command *cobra.Command, args []string) error {
-			return runPowerOn()
-		},
-	}
-	offCmd = &cobra.Command{
-		Use:   "off",
-		Short: "Power off the hosts",
-		Long:  `Power off the hosts`,
-		RunE: func(command *cobra.Command, args []string) error {
-			return runPowerOff()
-		},
-	}
-
 	override string
+	powerCmd = &cobra.Command{
+		Use:   "power {cycle | off | on | redfish.ResetType} {nodeset | all}",
+		Short: "Change power state of nodes",
+		Long:  "Valid redfish.ResetType options: On, ForceOn, ForceOff, ForceRestart, GracefulRestart, GracefulShutdown, PowerCycle",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(command *cobra.Command, args []string) error {
+			var err error
+			gc, err := cmd.NewOgenClient()
+			if err != nil {
+				return err
+			}
+
+			// shorthand option syntax
+			powerOption := ""
+			switch args[0] {
+			case "cycle":
+				powerOption = "ForceRestart"
+			case "off":
+				powerOption = "ForceOff"
+			case "on":
+				powerOption = "ForceOn"
+			default:
+				powerOption = args[0]
+			}
+
+			nodeset := args[1]
+			if args[1] == "all" {
+				nodeset = ""
+			}
+			req := &client.BmcOsPowerBody{
+				PowerOption: client.NewOptString(powerOption),
+				BootOption:  client.NewOptString(args[1]),
+			}
+			params := client.POSTV1BmcPowerOsParams{
+				Nodeset: client.NewOptString(nodeset),
+				Tags:    client.NewOptString(strings.Join(tags, ",")),
+			}
+			res, err := gc.POSTV1BmcPowerOs(context.Background(), req, params)
+			if err != nil {
+				return cmd.NewApiError(err)
+			}
+
+			for _, jobMessage := range res {
+				fmt.Printf("%s\t %s\t %s\n", jobMessage.Host.Value, jobMessage.Status.Value, jobMessage.Msg.Value)
+			}
+			return nil
+		},
+	}
 )
 
 func init() {
+	powerCmd.PersistentFlags().StringVarP(&override, "override", "o", "None", "Set redfish boot override. Valid options: None, Pxe, BiosSetup, Utilities, Diags")
 	bmcCmd.AddCommand(powerCmd)
-	powerCmd.AddCommand(cycleCmd)
-	powerCmd.AddCommand(onCmd)
-	powerCmd.AddCommand(offCmd)
-	cycleCmd.Flags().StringVar(&override, "override", "none", "Set Boot override option. Valid options: none, pxe, bios-setup hdd, usb, diagnostics, utilities")
-	onCmd.Flags().StringVar(&override, "override", "none", "Set Boot override option. Valid options: none, pxe, bios-setup hdd, usb, diagnostics, utilities")
-}
-
-func runPowerCycle() error {
-	job := bmc.NewJob()
-
-	output, err := job.PowerCycle(hostList, override)
-	if err != nil {
-		return err
-	}
-
-	bmc.PrintStatusCli(output)
-
-	return nil
-}
-
-func runPowerOn() error {
-	job := bmc.NewJob()
-
-	output, err := job.PowerOn(hostList, override)
-	if err != nil {
-		return err
-	}
-
-	bmc.PrintStatusCli(output)
-
-	return nil
-}
-
-func runPowerOff() error {
-	job := bmc.NewJob()
-
-	output, err := job.PowerOff(hostList)
-	if err != nil {
-		return err
-	}
-
-	bmc.PrintStatusCli(output)
-
-	return nil
 }

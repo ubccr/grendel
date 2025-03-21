@@ -34,7 +34,7 @@ type NetInterfaceList []NetInterface
 
 type NetInterface struct {
 	ID   int64            `json:"id"`
-	MAC  net.HardwareAddr `json:"mac" validate:"required"`
+	MAC  net.HardwareAddr `json:"mac"`
 	Name string           `json:"ifname"`
 	IP   netip.Prefix     `json:"ip"`
 	FQDN string           `json:"fqdn"`

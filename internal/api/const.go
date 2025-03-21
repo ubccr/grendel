@@ -5,6 +5,10 @@
 package api
 
 const (
-	DefaultPort   = 6667
-	ContextKeyJWT = "grendelapi"
+	DefaultPort = 6667
+
+	ContextKeyUsername GrendelAuthContext = "username"
+	ContextKeyRole     GrendelAuthContext = "role"
 )
+
+type GrendelAuthContext string
