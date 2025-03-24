@@ -17,7 +17,7 @@ const initrdUpsert = `-- name: InitrdUpsert :one
 insert into initrd (kernel_id, path)
 values (?1, ?2)
 on conflict (path, kernel_id)
-do nothing
+do update set path = ?2
 returning id, kernel_id, path, created_at, updated_at
 `
 
@@ -170,8 +170,6 @@ func (q *Queries) KernelTemplateUpsertDelete(ctx context.Context, db DBTX, arg K
 }
 
 const kernelUpsert = `-- name: KernelUpsert :one
-;
-
 insert into kernel (id, uid, name, version, path, arch_id, command_line, verify)
 values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
 on conflict (id)

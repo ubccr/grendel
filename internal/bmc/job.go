@@ -7,11 +7,11 @@ package bmc
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"sort"
 	"time"
 
 	"github.com/spf13/viper"
+	"github.com/stmcginnis/gofish/redfish"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -27,14 +27,15 @@ func NewJob() *Job {
 	}
 }
 
-func PrintStatusCli(output []JobMessage) {
+func PrintStatusCli(output model.JobMessageList) {
 	for _, m := range output {
-		fmt.Printf("%s\t%s\t%s\n", m.Status, m.Host, m.Msg)
+		log.Warnf("Error during redfish query: %s\t %s\t %s", m.Status, m.Host, m.Msg)
+
 	}
 }
 
-func FormatOutput(output chan JobMessage) ([]JobMessage, error) {
-	arr := []JobMessage{}
+func FormatOutput(output chan model.JobMessage) (model.JobMessageList, error) {
+	arr := model.JobMessageList{}
 	for m := range output {
 		if m.Status == "error" {
 			m.RedfishError = ParseRedfishError(errors.New(m.Msg))
@@ -45,12 +46,15 @@ func FormatOutput(output chan JobMessage) ([]JobMessage, error) {
 	return arr, nil
 }
 
-func (j *Job) PowerCycle(hostList model.HostList, bootOption string) ([]JobMessage, error) {
+func (j *Job) PowerControl(hostList model.HostList, bootOption redfish.BootSourceOverrideTarget, powerOption redfish.ResetType) (model.JobMessageList, error) {
 	runner := newJobRunner(j)
 
-	ch := make(chan JobMessage, len(hostList))
+	ch := make(chan model.JobMessage, len(hostList))
 	for i, host := range hostList {
-		runner.RunPowerCycle(host, ch, bootOption)
+		if host.HostType() != "server" {
+			continue
+		}
+		runner.RunPowerControl(host, ch, bootOption, powerOption)
 
 		if (i+1)%j.fanout == 0 {
 			time.Sleep(j.delay)
@@ -65,51 +69,14 @@ func (j *Job) PowerCycle(hostList model.HostList, bootOption string) ([]JobMessa
 
 }
 
-func (j *Job) PowerOn(hostList model.HostList, bootOption string) ([]JobMessage, error) {
+func (j *Job) BmcStatus(hostList model.HostList) ([]model.RedfishSystem, error) {
 	runner := newJobRunner(j)
 
-	ch := make(chan JobMessage, len(hostList))
+	ch := make(chan model.JobMessage, len(hostList))
 	for i, host := range hostList {
-		runner.RunPowerOn(host, ch, bootOption)
-
-		if (i+1)%j.fanout == 0 {
-			time.Sleep(j.delay)
+		if host.HostType() != "server" {
 			continue
 		}
-	}
-
-	runner.Wait()
-	close(ch)
-
-	return FormatOutput(ch)
-
-}
-
-func (j *Job) PowerOff(hostList model.HostList) ([]JobMessage, error) {
-	runner := newJobRunner(j)
-
-	ch := make(chan JobMessage, len(hostList))
-	for i, host := range hostList {
-		runner.RunPowerOff(host, ch)
-
-		if (i+1)%j.fanout == 0 {
-			time.Sleep(j.delay)
-			continue
-		}
-	}
-
-	runner.Wait()
-	close(ch)
-
-	return FormatOutput(ch)
-
-}
-
-func (j *Job) BmcStatus(hostList model.HostList) ([]System, error) {
-	runner := newJobRunner(j)
-
-	ch := make(chan JobMessage, len(hostList))
-	for i, host := range hostList {
 		runner.RunBmcStatus(host, ch)
 
 		if (i+1)%j.fanout == 0 {
@@ -121,14 +88,13 @@ func (j *Job) BmcStatus(hostList model.HostList) ([]System, error) {
 	runner.Wait()
 	close(ch)
 
-	arr := []System{}
+	arr := []model.RedfishSystem{}
 	for m := range ch {
 		if m.Status != "success" {
-			fmt.Printf("%s\t%s\t%s\n", m.Status, m.Host, m.Msg)
-			fmt.Printf("Error querying host: %s\n", m.Host)
+			log.Warnf("Error during redfish query: %s\t %s\t %s", m.Status, m.Host, m.Msg)
 			continue
 		}
-		d := System{}
+		d := model.RedfishSystem{}
 		err := json.Unmarshal([]byte(m.Msg), &d)
 		if err != nil {
 			return nil, err
@@ -143,8 +109,11 @@ func (j *Job) BmcStatus(hostList model.HostList) ([]System, error) {
 func (j *Job) GetFirmware(hostList model.HostList) ([]Firmware, error) {
 	runner := newJobRunner(j)
 
-	ch := make(chan JobMessage, len(hostList))
+	ch := make(chan model.JobMessage, len(hostList))
 	for i, host := range hostList {
+		if host.HostType() != "server" {
+			continue
+		}
 		runner.RunGetFirmware(host, ch)
 
 		if (i+1)%j.fanout == 0 {
@@ -159,8 +128,7 @@ func (j *Job) GetFirmware(hostList model.HostList) ([]Firmware, error) {
 	arr := []Firmware{}
 	for m := range ch {
 		if m.Status != "success" {
-			fmt.Printf("%s\t%s\t%s\n", m.Status, m.Host, m.Msg)
-			fmt.Printf("Error querying host: %s\n", m.Host)
+			log.Warnf("Error during redfish query: %s\t %s\t %s", m.Status, m.Host, m.Msg)
 			continue
 		}
 		d := Firmware{}
@@ -175,11 +143,14 @@ func (j *Job) GetFirmware(hostList model.HostList) ([]Firmware, error) {
 	return arr, nil
 }
 
-func (j *Job) UpdateFirmware(hostList model.HostList, firmwarePaths []string) ([]JobMessage, error) {
+func (j *Job) UpdateFirmware(hostList model.HostList, firmwarePaths []string) (model.JobMessageList, error) {
 	runner := newJobRunner(j)
 
-	ch := make(chan JobMessage, len(hostList))
+	ch := make(chan model.JobMessage, len(hostList))
 	for i, host := range hostList {
+		if host.HostType() != "server" {
+			continue
+		}
 		runner.RunUpdateFirmware(host, ch, firmwarePaths)
 
 		if (i+1)%j.fanout == 0 {
@@ -194,11 +165,14 @@ func (j *Job) UpdateFirmware(hostList model.HostList, firmwarePaths []string) ([
 	return FormatOutput(ch)
 }
 
-func (j *Job) GetJobs(hostList model.HostList) ([]BMCJob, error) {
+func (j *Job) GetJobs(hostList model.HostList) (model.RedfishJobList, error) {
 	runner := newJobRunner(j)
 
-	ch := make(chan JobMessage, len(hostList))
+	ch := make(chan model.JobMessage, len(hostList))
 	for i, host := range hostList {
+		if host.HostType() != "server" {
+			continue
+		}
 		runner.RunGetJobs(host, ch)
 
 		if (i+1)%j.fanout == 0 {
@@ -210,13 +184,13 @@ func (j *Job) GetJobs(hostList model.HostList) ([]BMCJob, error) {
 	runner.Wait()
 	close(ch)
 
-	arr := []BMCJob{}
+	arr := model.RedfishJobList{}
 	for m := range ch {
 		if m.Status != "success" {
-			fmt.Printf("%s\t%s\t%s\n", m.Status, m.Host, m.Msg)
+			log.Warnf("Error during redfish query: %s\t %s\t %s", m.Status, m.Host, m.Msg)
 			continue
 		}
-		d := BMCJob{}
+		d := model.RedfishJob{}
 		err := json.Unmarshal([]byte(m.Msg), &d)
 		if err != nil {
 			return nil, err
@@ -239,15 +213,20 @@ func (j *Job) GetJobs(hostList model.HostList) ([]BMCJob, error) {
 		arr = append(arr, d)
 	}
 
+	sort.Slice(arr, func(i, j int) bool { return arr[i].Host > arr[j].Host })
+
 	return arr, nil
 }
 
-func (j *Job) ClearJobs(hostList model.HostList) ([]JobMessage, error) {
+func (j *Job) ClearJobs(hostList model.HostList, ids []string) (model.JobMessageList, error) {
 	runner := newJobRunner(j)
 
-	ch := make(chan JobMessage, len(hostList))
+	ch := make(chan model.JobMessage, len(hostList))
 	for i, host := range hostList {
-		runner.RunClearJobs(host, ch)
+		if host.HostType() != "server" {
+			continue
+		}
+		runner.RunClearJobs(host, ch, ids)
 
 		if (i+1)%j.fanout == 0 {
 			time.Sleep(j.delay)
@@ -262,11 +241,14 @@ func (j *Job) ClearJobs(hostList model.HostList) ([]JobMessage, error) {
 
 }
 
-func (j *Job) PowerCycleBmc(hostList model.HostList) ([]JobMessage, error) {
+func (j *Job) PowerCycleBmc(hostList model.HostList) (model.JobMessageList, error) {
 	runner := newJobRunner(j)
 
-	ch := make(chan JobMessage, len(hostList))
+	ch := make(chan model.JobMessage, len(hostList))
 	for i, host := range hostList {
+		if host.HostType() != "server" {
+			continue
+		}
 		runner.RunPowerCycleBmc(host, ch)
 
 		if (i+1)%j.fanout == 0 {
@@ -282,11 +264,14 @@ func (j *Job) PowerCycleBmc(hostList model.HostList) ([]JobMessage, error) {
 
 }
 
-func (j *Job) ClearSel(hostList model.HostList) ([]JobMessage, error) {
+func (j *Job) ClearSel(hostList model.HostList) (model.JobMessageList, error) {
 	runner := newJobRunner(j)
 
-	ch := make(chan JobMessage, len(hostList))
+	ch := make(chan model.JobMessage, len(hostList))
 	for i, host := range hostList {
+		if host.HostType() != "server" {
+			continue
+		}
 		runner.RunClearSel(host, ch)
 
 		if (i+1)%j.fanout == 0 {
@@ -302,11 +287,14 @@ func (j *Job) ClearSel(hostList model.HostList) ([]JobMessage, error) {
 
 }
 
-func (j *Job) BmcAutoConfigure(hostList model.HostList) ([]JobMessage, error) {
+func (j *Job) BmcAutoConfigure(hostList model.HostList) (model.JobMessageList, error) {
 	runner := newJobRunner(j)
 
-	ch := make(chan JobMessage, len(hostList))
+	ch := make(chan model.JobMessage, len(hostList))
 	for i, host := range hostList {
+		if host.HostType() != "server" {
+			continue
+		}
 		runner.RunBmcAutoConfigure(host, ch)
 
 		if (i+1)%j.fanout == 0 {
@@ -321,11 +309,14 @@ func (j *Job) BmcAutoConfigure(hostList model.HostList) ([]JobMessage, error) {
 	return FormatOutput(ch)
 }
 
-func (j *Job) BmcImportConfiguration(hostList model.HostList, shutdownType, file string) ([]JobMessage, error) {
+func (j *Job) BmcImportConfiguration(hostList model.HostList, shutdownType, file string) (model.JobMessageList, error) {
 	runner := newJobRunner(j)
 
-	ch := make(chan JobMessage, len(hostList))
+	ch := make(chan model.JobMessage, len(hostList))
 	for i, host := range hostList {
+		if host.HostType() != "server" {
+			continue
+		}
 		runner.RunBmcImportConfiguration(host, ch, shutdownType, file)
 
 		if (i+1)%j.fanout == 0 {
@@ -339,4 +330,42 @@ func (j *Job) BmcImportConfiguration(hostList model.HostList, shutdownType, file
 
 	return FormatOutput(ch)
 
+}
+
+func (j *Job) BmcGetMetricReports(hostList model.HostList) (model.RedfishMetricReportList, error) {
+	runner := newJobRunner(j)
+
+	ch := make(chan model.JobMessage, len(hostList))
+	for i, host := range hostList {
+		if host.HostType() != "server" {
+			continue
+		}
+		runner.RunBmcGetMetricReports(host, ch)
+
+		if (i+1)%j.fanout == 0 {
+			time.Sleep(j.delay)
+			continue
+		}
+	}
+
+	runner.Wait()
+	close(ch)
+
+	arr := model.RedfishMetricReportList{}
+	for m := range ch {
+		if m.Status != "success" {
+			log.Warnf("Error during redfish query: %s\t %s\t %s", m.Status, m.Host, m.Msg)
+			continue
+		}
+
+		d := model.RedfishMetricReport{Name: m.Host}
+		err := json.Unmarshal([]byte(m.Msg), &d.Reports)
+		if err != nil {
+			return nil, err
+		}
+
+		arr = append(arr, d)
+	}
+
+	return arr, nil
 }

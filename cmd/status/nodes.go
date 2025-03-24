@@ -12,9 +12,9 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/internal/api"
 	"github.com/ubccr/grendel/cmd"
-	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/internal/api"
+	"github.com/ubccr/grendel/pkg/client"
 	"github.com/ubccr/grendel/pkg/nodeset"
 )
 
@@ -29,9 +29,9 @@ var (
 		Use:   "nodes",
 		Short: "Detailed node status",
 		Long:  `Detailed node status`,
-		Args:  cobra.MinimumNArgs(0),
+		Args:  cobra.NoArgs,
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewClient()
+			gc, err := cmd.NewOgenClient()
 			if err != nil {
 				return err
 			}
@@ -39,16 +39,13 @@ var (
 			defaultImage := viper.GetString("provision.default_image")
 			inputTags := strings.Join(args, ",")
 
-			var hostList model.HostList
-
-			if inputTags == "" {
-				hostList, _, err = gc.HostApi.HostList(context.Background())
-			} else {
-				hostList, _, err = gc.HostApi.HostTags(context.Background(), inputTags)
+			req := client.GETV1NodesFindParams{
+				Nodeset: client.NewOptString(strings.Join(nodes, ",")),
+				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-
+			hostList, err := gc.GETV1NodesFind(context.Background(), req)
 			if err != nil {
-				return cmd.NewApiError("Failed to list hosts", err)
+				return cmd.NewApiError(err)
 			}
 
 			stats := make(map[string]*StatTag)
@@ -64,10 +61,10 @@ var (
 						stats[tag] = &StatTag{provision: nodeset.EmptyNodeSet(), unprovision: nodeset.EmptyNodeSet()}
 					}
 
-					if host.Provision {
-						stats[tag].provision.Add(host.Name)
+					if host.Provision.Value {
+						stats[tag].provision.Add(host.Name.Value)
 					} else {
-						stats[tag].unprovision.Add(host.Name)
+						stats[tag].unprovision.Add(host.Name.Value)
 					}
 				}
 
@@ -76,10 +73,10 @@ var (
 						stats[""] = &StatTag{provision: nodeset.EmptyNodeSet(), unprovision: nodeset.EmptyNodeSet()}
 					}
 
-					if host.Provision {
-						stats[""].provision.Add(host.Name)
+					if host.Provision.Value {
+						stats[""].provision.Add(host.Name.Value)
 					} else {
-						stats[""].unprovision.Add(host.Name)
+						stats[""].unprovision.Add(host.Name.Value)
 					}
 				}
 
@@ -95,26 +92,26 @@ var (
 					ipAddr := ""
 					macAddr := ""
 					if len(host.Interfaces) > 0 {
-						ipAddr = host.Interfaces[0].CIDR()
-						macAddr = host.Interfaces[0].MAC.String()
+						ipAddr = host.Interfaces[0].Value.IP.Value
+						macAddr = host.Interfaces[0].Value.MAC.Value
 					}
 
-					bi := host.BootImage
+					bi := host.BootImage.Value
 
 					if bi == "" {
 						bi = defaultImage
 					}
 
 					printer := cyan
-					if host.Provision {
+					if host.Provision.Value {
 						printer = yellow
 					}
 
 					printer.Printf("%-20s%-19s%-17s%-11s%-20s%-25s\n",
-						host.Name,
+						host.Name.Value,
 						macAddr,
 						ipAddr,
-						fmt.Sprintf("%#v", host.Provision),
+						fmt.Sprintf("%#v", host.Provision.Value),
 						bi,
 						strings.Join(host.Tags, ","))
 

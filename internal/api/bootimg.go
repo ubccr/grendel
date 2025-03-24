@@ -5,85 +5,104 @@
 package api
 
 import (
-	"errors"
-	"net/http"
+	"fmt"
+	"slices"
 	"strings"
 
-	"github.com/labstack/echo/v4"
-	"github.com/ubccr/grendel/internal/store"
+	"github.com/go-fuego/fuego"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
-func (h *Handler) BootImageAdd(c echo.Context) error {
-	var images model.BootImageList
+type BootImageAddRequest struct {
+	BootImages model.BootImageList `json:"boot_images"`
+}
 
-	if !strings.HasPrefix(c.Request().Header.Get(echo.HeaderContentType), echo.MIMEApplicationJSON) {
-		return echo.NewHTTPError(http.StatusBadRequest, "invalid content type")
-	}
-
-	if err := c.Bind(&images); err != nil {
-		return err
-	}
-
-	log.Infof("Attempting to add %d boot images", len(images))
-
-	for _, image := range images {
-		err := c.Validate(image)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, "invalid data").SetInternal(err)
+func (h *Handler) BootImageAdd(c fuego.ContextWithBody[BootImageAddRequest]) (*GenericResponse, error) {
+	images, err := c.Body()
+	if err != nil {
+		return nil, fuego.HTTPError{
+			Err:    err,
+			Title:  "Error",
+			Detail: "failed to parse body",
 		}
 	}
 
-	err := h.DB.StoreBootImages(images)
+	err = h.DB.StoreBootImages(images.BootImages)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to save boot images").SetInternal(err)
+		return nil, fuego.HTTPError{
+			Err:    err,
+			Title:  "Error",
+			Detail: "failed to add image(s)",
+		}
 	}
 
-	log.Infof("Stored %d images successfully", len(images))
-
-	res := map[string]interface{}{
-		"images": len(images),
+	var names []string
+	for _, image := range images.BootImages {
+		names = append(names, image.Name)
 	}
-	return c.JSON(http.StatusCreated, res)
+
+	h.writeEvent(c.Context(), "Success", fmt.Sprintf("Successfully saved image(s): %s", strings.Join(names, ",")))
+
+	return &GenericResponse{
+		Title:   "Success",
+		Detail:  "successfully added image(s)",
+		Changed: len(images.BootImages),
+	}, nil
 }
 
-func (h *Handler) BootImageList(c echo.Context) error {
+func (h *Handler) BootImageList(c fuego.ContextNoBody) (model.BootImageList, error) {
 	imageList, err := h.DB.BootImages()
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fetch images").SetInternal(err)
-	}
-	return c.JSON(http.StatusOK, imageList)
-}
-
-func (h *Handler) BootImageFind(c echo.Context) error {
-	name := c.Param("name")
-	imageList := make(model.BootImageList, 0)
-
-	image, err := h.DB.LoadBootImage(name)
-	if err != nil {
-		if errors.Is(err, store.ErrNotFound) {
-			return echo.NewHTTPError(http.StatusNotFound, "image not found").SetInternal(err)
+		return nil, fuego.HTTPError{
+			Err:    err,
+			Title:  "Error",
+			Detail: "failed to get images",
 		}
-
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to fetch image").SetInternal(err)
 	}
 
-	imageList = append(imageList, image)
-	return c.JSON(http.StatusOK, imageList)
+	return imageList, nil
 }
 
-func (h *Handler) BootImageDelete(c echo.Context) error {
-	name := c.Param("name")
+func (h *Handler) BootImageFind(c fuego.ContextNoBody) (model.BootImageList, error) {
+	// TODO: this should be handled in the DB
+	names := strings.Split(c.QueryParam("names"), ",")
 
-	// TODO add support for deleting more than one image
-	err := h.DB.DeleteBootImages([]string{name})
+	images, err := h.DB.BootImages()
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to delete image").SetInternal(err)
+		return nil, fuego.HTTPError{
+			Err:    err,
+			Title:  "Error",
+			Detail: "failed to find images",
+		}
 	}
 
-	res := map[string]interface{}{
-		"images": 1,
+	var imageList model.BootImageList
+	for _, image := range images {
+		if slices.Contains(names, image.Name) {
+			imageList = append(imageList, image)
+		}
 	}
 
-	return c.JSON(http.StatusOK, res)
+	return imageList, nil
+}
+
+func (h *Handler) BootImageDelete(c fuego.ContextNoBody) (*GenericResponse, error) {
+	names := strings.Split(c.QueryParam("name"), ",")
+
+	err := h.DB.DeleteBootImages(names)
+	if err != nil {
+		return nil, fuego.HTTPError{
+			Err:    err,
+			Title:  "Error",
+			Detail: "failed to delete images",
+		}
+	}
+
+	h.writeEvent(c.Context(), "Success", fmt.Sprintf("Successfully deleted image(s): %s", names))
+
+	return &GenericResponse{
+		Title:   "Success",
+		Detail:  "successfully deleted image(s)",
+		Changed: len(names),
+	}, err
 }

@@ -9,7 +9,6 @@ select * from kernel_view where name = @name;
 
 -- name: KernelAll :many
 select * from kernel_view;
-;
 
 -- name: KernelUpsert :one
 insert into kernel (id, uid, name, version, path, arch_id, command_line, verify)
@@ -22,7 +21,7 @@ returning *;
 insert into initrd (kernel_id, path)
 values (@kernel_id, @path)
 on conflict (path, kernel_id)
-do nothing
+do update set path = ?2
 returning *;
 
 -- name: InitrdUpsertDelete :exec

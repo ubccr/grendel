@@ -13,10 +13,10 @@ import (
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/internal/api"
 	"github.com/ubccr/grendel/cmd"
+	"github.com/ubccr/grendel/internal/api"
 	"github.com/ubccr/grendel/internal/logger"
-	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/pkg/client"
 )
 
 type StatProvision struct {
@@ -30,6 +30,8 @@ type Stats struct {
 }
 
 var (
+	tags      []string
+	nodes     []string
 	log       = logger.GetLogger("STATUS")
 	cyan      = color.New(color.FgCyan)
 	green     = color.New(color.FgGreen)
@@ -40,9 +42,9 @@ var (
 		Use:   "status",
 		Short: "Status commands",
 		Long:  `Status commands`,
-		Args:  cobra.MinimumNArgs(0),
+		Args:  cobra.NoArgs,
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewClient()
+			gc, err := cmd.NewOgenClient()
 			if err != nil {
 				return err
 			}
@@ -50,9 +52,10 @@ var (
 			defaultImage := viper.GetString("provision.default_image")
 			inputTags := strings.Join(args, ",")
 
-			imageList, _, err := gc.ImageApi.ImageList(context.Background())
+			params := client.GETV1ImagesParams{}
+			imageList, err := gc.GETV1Images(context.Background(), params)
 			if err != nil {
-				return cmd.NewApiError("Failed to list images", err)
+				return cmd.NewApiError(err)
 			}
 
 			stats := &Stats{images: make(map[string]*StatProvision), tags: make(map[string]*StatProvision)}
@@ -61,21 +64,18 @@ var (
 				stats.images[img.Name] = &StatProvision{}
 			}
 
-			var hostList model.HostList
-
-			if inputTags == "" {
-				hostList, _, err = gc.HostApi.HostList(context.Background())
-			} else {
-				hostList, _, err = gc.HostApi.HostTags(context.Background(), inputTags)
+			req := client.GETV1NodesFindParams{
+				Nodeset: client.NewOptString(strings.Join(nodes, ",")),
+				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-
+			hostList, err := gc.GETV1NodesFind(context.Background(), req)
 			if err != nil {
-				return cmd.NewApiError("Failed to list hosts", err)
+				return cmd.NewApiError(err)
 			}
 
 			nodes := 0
 			for _, host := range hostList {
-				bi := host.BootImage
+				bi := host.BootImage.Value
 
 				if bi == "" {
 					bi = defaultImage
@@ -85,7 +85,7 @@ var (
 					stats.images[bi] = &StatProvision{}
 				}
 
-				if host.Provision {
+				if host.Provision.Value {
 					stats.images[bi].provision++
 				} else {
 					stats.images[bi].unprovision++
@@ -100,7 +100,7 @@ var (
 						stats.tags[tag] = &StatProvision{}
 					}
 
-					if host.Provision {
+					if host.Provision.Value {
 						stats.tags[tag].provision++
 					} else {
 						stats.tags[tag].unprovision++
@@ -112,7 +112,7 @@ var (
 						stats.tags[""] = &StatProvision{}
 					}
 
-					if host.Provision {
+					if host.Provision.Value {
 						stats.tags[""].provision++
 					} else {
 						stats.tags[""].unprovision++
@@ -160,5 +160,7 @@ var (
 )
 
 func init() {
+	statusCmd.PersistentFlags().StringSliceVarP(&tags, "tags", "t", []string{}, "filter by tags")
+	statusCmd.PersistentFlags().StringSliceVarP(&nodes, "nodes", "n", []string{}, "filter by nodeset")
 	cmd.Root.AddCommand(statusCmd)
 }

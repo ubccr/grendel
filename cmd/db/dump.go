@@ -11,7 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd"
-	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/pkg/client"
 )
 
 var (
@@ -19,37 +19,22 @@ var (
 		Use:   "dump",
 		Short: "Dump database",
 		Long:  `Dump database`,
-		Args:  cobra.MinimumNArgs(0),
+		Args:  cobra.ExactArgs(0),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewClient()
+			gc, err := cmd.NewOgenClient()
 			if err != nil {
 				return err
 			}
 
-			hostList, _, err := gc.HostApi.HostList(context.Background())
+			params := client.GETV1DbDumpParams{}
+			res, err := gc.GETV1DbDump(context.Background(), params)
 			if err != nil {
-				return cmd.NewApiError("Failed to list hosts", err)
-			}
-
-			imageList, _, err := gc.ImageApi.ImageList(context.Background())
-			if err != nil {
-				return cmd.NewApiError("Failed to list images", err)
-			}
-
-			userList, _, err := gc.UserApi.UserList(context.Background())
-			if err != nil {
-				return cmd.NewApiError("Failed to list users", err)
-			}
-
-			data := model.DataDump{
-				Hosts:  hostList,
-				Images: imageList,
-				Users:  userList,
+				return cmd.NewApiError(err)
 			}
 
 			enc := json.NewEncoder(os.Stdout)
 			enc.SetIndent("", "    ")
-			if err := enc.Encode(data); err != nil {
+			if err := enc.Encode(res); err != nil {
 				return err
 			}
 

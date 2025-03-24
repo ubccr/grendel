@@ -8,28 +8,12 @@ import (
 	"encoding/json"
 	"regexp"
 	"strings"
+
+	"github.com/ubccr/grendel/pkg/model"
 )
 
-type RedfishError struct {
-	Code  string
-	Error struct {
-		MessageExtendedInfo []struct {
-			Message                string
-			MessageArgs            []string //?
-			MessageArgsCount       int      `json:"MessageArgs.@odata.count"`
-			MessageId              string
-			RelatedProperties      []string //?
-			RelatedPropertiesCount int      `json:"RelatedProperties.@odata.count"`
-			Resolution             string
-			Severity               string
-		} `json:"@Message.ExtendedInfo"`
-		Code    string `json:"code"`
-		Message string `json:"message"`
-	} `json:"error"`
-}
-
-func ParseRedfishError(err error) RedfishError {
-	var e RedfishError
+func ParseRedfishError(err error) model.RedfishError {
+	var e model.RedfishError
 	if err == nil {
 		return e
 	}

@@ -14,10 +14,11 @@ import (
 	golog "log"
 	"net"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
-	"github.com/hashicorp/go-retryablehttp"
+	retryablehttp "github.com/hashicorp/go-retryablehttp"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -41,7 +42,6 @@ var (
 		Use:     "grendel",
 		Version: api.Version,
 		Short:   "Bare Metal Provisioning for HPC",
-		Long:    ``,
 	}
 )
 
@@ -65,11 +65,27 @@ func init() {
 	}
 }
 
-func NewClient() (*client.APIClient, error) {
+type ogenAuth struct{}
+
+func newAuthHandler() ogenAuth {
+	return ogenAuth{}
+}
+
+func (o ogenAuth) HeaderAuth(ctx context.Context, operationName string, c *client.Client) (client.HeaderAuth, error) {
+	auth := client.HeaderAuth{Token: viper.GetString("client.api_key")}
+	return auth, nil
+}
+
+func (o ogenAuth) CookieAuth(ctx context.Context, operationName string, c *client.Client) (client.CookieAuth, error) {
+	auth := client.CookieAuth{Token: viper.GetString("client.api_key")}
+	return auth, nil
+}
+
+func NewOgenClient() (*client.Client, error) {
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: viper.GetBool("client.insecure")}}
 
 	cacert := viper.GetString("client.cacert")
-	pem, err := ioutil.ReadFile(cacert)
+	pem, err := os.ReadFile(cacert)
 	if err == nil {
 		certPool := x509.NewCertPool()
 		if !certPool.AppendCertsFromPEM(pem) {
@@ -78,41 +94,42 @@ func NewClient() (*client.APIClient, error) {
 
 		tr = &http.Transport{TLSClientConfig: &tls.Config{RootCAs: certPool, InsecureSkipVerify: false}}
 	}
-
-	cfg := client.NewConfiguration()
-
 	endpoint := viper.GetString("client.api_endpoint")
-	if strings.HasPrefix(endpoint, "http") {
-		cfg.BasePath = endpoint
-	} else {
+	if !strings.HasPrefix(endpoint, "http") {
 		tr = &http.Transport{
 			DialContext: func(ctx context.Context, _, addr string) (net.Conn, error) {
 				dialer := net.Dialer{}
-				return dialer.DialContext(ctx, "unix", endpoint)
+				return dialer.DialContext(ctx, "unix", viper.GetString("client.api_endpoint"))
 			},
 		}
+		endpoint = "http://localhost"
 	}
 
 	rclient := retryablehttp.NewClient()
 	rclient.HTTPClient = &http.Client{Timeout: time.Second * 3600, Transport: tr}
 	rclient.Logger = Log
-	cfg.HTTPClient = rclient.StandardClient()
-
-	client := client.NewAPIClient(cfg)
-
+	httpClient := rclient.StandardClient()
+	client, err := client.NewClient(endpoint, newAuthHandler(), client.WithClient(httpClient))
+	if err != nil {
+		return nil, err
+	}
 	return client, nil
 }
 
-func NewApiError(msg string, err error) error {
-	var ge client.GenericOpenAPIError
-	if errors.As(err, &ge) {
-		apiErr := ge.Model()
-		if apiErr != nil {
-			return fmt.Errorf("%s: %s - %w", msg, apiErr.(client.ErrorResponse).Message, ge)
-		}
+func NewApiError(apiError error) error {
+	var t *client.HTTPErrorStatusCode
+
+	if !errors.As(apiError, &t) {
+		return apiError
 	}
 
-	return err
+	httpError := t.GetResponse()
+
+	return fmt.Errorf("%d: %s - %s", httpError.GetStatus().Value, httpError.GetTitle().Value, httpError.GetDetail().Value)
+}
+func NewApiResponse(res *client.GenericResponse) error {
+	fmt.Printf("%s: %s \nchanged: %d \n", res.GetTitle().Value, res.GetDetail().Value, res.GetChanged().Value)
+	return nil
 }
 
 func SetupLogging() error {
@@ -144,8 +161,14 @@ func initConfig() {
 			Log.Fatal(err)
 		}
 
+		cwd, err := os.Getwd()
+		if err != nil {
+			Log.Fatal(err)
+		}
+
 		viper.AddConfigPath("/etc/grendel/")
 		viper.AddConfigPath(home)
+		viper.AddConfigPath(cwd)
 		viper.SetConfigName("grendel")
 		viper.SetConfigType("toml")
 	}

@@ -20,9 +20,9 @@ import (
 )
 
 type Host struct {
-	ID         int64           `json:"_id,omitempty"`
-	UID        ksuid.KSUID     `json:"id,omitempty"`
-	Name       string          `json:"name" validate:"required,hostname"`
+	ID         int64           `json:"id,omitempty"`
+	UID        ksuid.KSUID     `json:"uid,omitempty"`
+	Name       string          `json:"name"`
 	Interfaces []*NetInterface `json:"interfaces"`
 	Bonds      []*Bond         `json:"bonds"`
 	Provision  bool            `json:"provision"`
@@ -128,8 +128,8 @@ func (h *Host) FromJSON(hostJSON string) {
 	h.Name = gjson.Get(hostJSON, "name").String()
 	h.BootImage = gjson.Get(hostJSON, "boot_image").String()
 	h.Provision = gjson.Get(hostJSON, "provision").Bool()
-	h.ID = int64(gjson.Get(hostJSON, "_id").Int())
-	h.UID, _ = ksuid.Parse(gjson.Get(hostJSON, "id").String())
+	h.ID = int64(gjson.Get(hostJSON, "id").Int())
+	h.UID, _ = ksuid.Parse(gjson.Get(hostJSON, "uid").String())
 	h.Firmware = firmware.NewFromString(gjson.Get(hostJSON, "firmware").String())
 
 	h.Interfaces = make([]*NetInterface, 0)
@@ -169,16 +169,17 @@ func (h *Host) FromJSON(hostJSON string) {
 	for _, i := range tres.Array() {
 		h.Tags = append(h.Tags, i.String())
 	}
+
 }
 
 func (h *Host) ToJSON() string {
 	hostJSON := `{"firmware": "", "interfaces": [], "bonds": [], "name": "", "provision": false, "kickstart": false, "boot_image": "", "tags": []}`
 
 	if !h.UID.IsNil() {
-		hostJSON, _ = sjson.Set(hostJSON, "id", h.UID.String())
+		hostJSON, _ = sjson.Set(hostJSON, "uid", h.UID.String())
 	}
 	if h.ID != 0 {
-		hostJSON, _ = sjson.Set(hostJSON, "_id", h.ID)
+		hostJSON, _ = sjson.Set(hostJSON, "id", h.ID)
 	}
 	hostJSON, _ = sjson.Set(hostJSON, "name", h.Name)
 	hostJSON, _ = sjson.Set(hostJSON, "boot_image", h.BootImage)
@@ -228,7 +229,7 @@ func (h *Host) ToJSON() string {
 func (h *Host) MarshalJSON() ([]byte, error) {
 	type Alias Host
 	aux := &struct {
-		ID       string `json:"id,omitempty"`
+		UID      string `json:"uid,omitempty"`
 		Firmware string `json:"firmware"`
 		*Alias
 	}{
@@ -237,9 +238,9 @@ func (h *Host) MarshalJSON() ([]byte, error) {
 	}
 
 	if h.UID.IsNil() {
-		aux.ID = ""
+		aux.UID = ""
 	} else {
-		aux.ID = h.UID.String()
+		aux.UID = h.UID.String()
 	}
 
 	data, err := json.Marshal(&aux)

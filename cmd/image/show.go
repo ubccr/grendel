@@ -12,47 +12,49 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd"
-	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/pkg/client"
 )
 
 var (
 	showCmd = &cobra.Command{
-		Use:   "show",
+		Use:   "show {names... | all}",
 		Short: "Show images",
 		Long:  `Show images`,
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewClient()
+			gc, err := cmd.NewOgenClient()
 			if err != nil {
 				return err
 			}
 
-			var imageList model.BootImageList
-
 			if strings.ToLower(args[0]) == "all" {
-				imageList, _, err = gc.ImageApi.ImageList(context.Background())
+				params := client.GETV1ImagesParams{}
+				res, err := gc.GETV1Images(context.Background(), params)
 				if err != nil {
-					return cmd.NewApiError("Failed to list images", err)
+					return cmd.NewApiError(err)
 				}
+				return output(res)
 			} else {
-				imageList, _, err = gc.ImageApi.ImageFind(context.Background(), args[0])
-				if err != nil {
-					return cmd.NewApiError("Failed to find images", err)
+				params := client.GETV1ImagesFindParams{
+					Names: client.NewOptString(strings.Join(args, ",")),
 				}
+				res, err := gc.GETV1ImagesFind(context.Background(), params)
+				if err != nil {
+					return cmd.NewApiError(err)
+				}
+				return output(res)
 			}
-
-			enc := json.NewEncoder(os.Stdout)
-			enc.SetIndent("", "    ")
-			if err := enc.Encode(imageList); err != nil {
-				return err
-			}
-
-			return nil
-
 		},
 	}
 )
 
 func init() {
 	imageCmd.AddCommand(showCmd)
+}
+
+func output(data any) error {
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetIndent("", "    ")
+
+	return enc.Encode(data)
 }

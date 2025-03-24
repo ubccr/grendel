@@ -148,6 +148,7 @@ func (s *SqlStore) GetUsers() ([]model.User, error) {
 	users := make([]model.User, len(userList))
 	for i, u := range userList {
 		users[i] = model.User{
+			ID:           u.ID,
 			Username:     u.Username,
 			Role:         u.Role,
 			PasswordHash: u.PasswordHash,
@@ -640,7 +641,6 @@ func (s *SqlStore) StoreBootImages(images model.BootImageList) error {
 				return err
 			}
 		}
-
 		// Upsert kernel
 		kernel, err := s.q.KernelUpsert(ctx, tx, db.KernelUpsertParams{
 			ID:          null.NewInt(image.ID, image.ID != 0),
@@ -668,6 +668,9 @@ func (s *SqlStore) StoreBootImages(images model.BootImageList) error {
 			initrdIDs = append(initrdIDs, ird.ID)
 		}
 
+		if len(initrdIDs) == 0 {
+			initrdIDs = append(initrdIDs, 0)
+		}
 		// Delete any initrds that were removed
 		err = s.q.InitrdUpsertDelete(ctx, tx, db.InitrdUpsertDeleteParams{
 			KernelID: kernel.ID,
@@ -705,6 +708,9 @@ func (s *SqlStore) StoreBootImages(images model.BootImageList) error {
 			templateIDs = append(templateIDs, id)
 		}
 
+		if len(templateIDs) == 0 {
+			templateIDs = append(templateIDs, 0)
+		}
 		// Delete any templates that were removed
 		err = s.q.KernelTemplateUpsertDelete(ctx, tx, db.KernelTemplateUpsertDeleteParams{
 			KernelID: kernel.ID,

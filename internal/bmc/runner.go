@@ -10,6 +10,7 @@ import (
 
 	"github.com/korovkin/limiter"
 	"github.com/spf13/viper"
+	"github.com/stmcginnis/gofish/redfish"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -18,13 +19,6 @@ type jobRunner struct {
 	user     string
 	pass     string
 	insecure bool
-}
-
-type JobMessage struct {
-	Status       string
-	Host         string
-	Msg          string
-	RedfishError RedfishError
 }
 
 func newJobRunner(j *Job) *jobRunner {
@@ -44,15 +38,18 @@ func (r *jobRunner) Wait() {
 	r.limit.Wait()
 }
 
-func (r *jobRunner) RunPowerCycle(host *model.Host, ch chan JobMessage, bootOverride string) {
+func (r *jobRunner) RunPowerControl(host *model.Host, ch chan model.JobMessage, bootOverride redfish.BootSourceOverrideTarget, powerOption redfish.ResetType) {
 	r.limit.Execute(func() {
-		m := JobMessage{Status: "error", Host: host.Name}
+		m := model.JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
 		bmc := host.InterfaceBMC()
 		ip := ""
 		if bmc != nil {
 			ip = bmc.AddrString()
+		} else {
+			m.Msg = "failed to find bmc interface to query"
+			return
 		}
 		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
 		if err != nil {
@@ -62,7 +59,7 @@ func (r *jobRunner) RunPowerCycle(host *model.Host, ch chan JobMessage, bootOver
 
 		defer r.client.Logout()
 
-		err = r.PowerCycle(bootOverride)
+		err = r.PowerControl(powerOption, bootOverride)
 		if err != nil {
 			m.Msg = fmt.Sprintf("%s", err)
 			return
@@ -73,74 +70,19 @@ func (r *jobRunner) RunPowerCycle(host *model.Host, ch chan JobMessage, bootOver
 	})
 }
 
-func (r *jobRunner) RunPowerOn(host *model.Host, ch chan JobMessage, bootOverride string) {
+func (r *jobRunner) RunBmcStatus(host *model.Host, ch chan model.JobMessage) {
 	r.limit.Execute(func() {
-		m := JobMessage{Status: "error", Host: host.Name}
+		m := model.JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
+		data := &model.RedfishSystem{}
 		bmc := host.InterfaceBMC()
 		ip := ""
 		if bmc != nil {
 			ip = bmc.AddrString()
-		}
-		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
-		if err != nil {
-			m.Msg = fmt.Sprintf("%s", err)
+		} else {
+			m.Msg = "failed to find bmc interface to query"
 			return
-		}
-
-		defer r.client.Logout()
-
-		err = r.PowerOn(bootOverride)
-		if err != nil {
-			m.Msg = fmt.Sprintf("%s", err)
-			return
-		}
-
-		m.Status = "success"
-		m.Msg = "Sent power on command"
-	})
-}
-
-func (r *jobRunner) RunPowerOff(host *model.Host, ch chan JobMessage) {
-	r.limit.Execute(func() {
-		m := JobMessage{Status: "error", Host: host.Name}
-		defer func() { ch <- m }()
-
-		bmc := host.InterfaceBMC()
-		ip := ""
-		if bmc != nil {
-			ip = bmc.AddrString()
-		}
-		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
-		if err != nil {
-			m.Msg = fmt.Sprintf("%s", err)
-			return
-		}
-
-		defer r.client.Logout()
-
-		err = r.PowerOff()
-		if err != nil {
-			m.Msg = fmt.Sprintf("%s", err)
-			return
-		}
-
-		m.Status = "success"
-		m.Msg = "Sent power off command"
-	})
-}
-
-func (r *jobRunner) RunBmcStatus(host *model.Host, ch chan JobMessage) {
-	r.limit.Execute(func() {
-		m := JobMessage{Status: "error", Host: host.Name}
-		defer func() { ch <- m }()
-
-		data := &System{}
-		bmc := host.InterfaceBMC()
-		ip := ""
-		if bmc != nil {
-			ip = bmc.AddrString()
 		}
 		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
 		if err != nil {
@@ -168,9 +110,9 @@ func (r *jobRunner) RunBmcStatus(host *model.Host, ch chan JobMessage) {
 	})
 }
 
-func (r *jobRunner) RunGetFirmware(host *model.Host, ch chan JobMessage) {
+func (r *jobRunner) RunGetFirmware(host *model.Host, ch chan model.JobMessage) {
 	r.limit.Execute(func() {
-		m := JobMessage{Status: "error", Host: host.Name}
+		m := model.JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
 		data := Firmware{}
@@ -178,6 +120,9 @@ func (r *jobRunner) RunGetFirmware(host *model.Host, ch chan JobMessage) {
 		ip := ""
 		if bmc != nil {
 			ip = bmc.AddrString()
+		} else {
+			m.Msg = "failed to find bmc interface to query"
+			return
 		}
 		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
 		if err != nil {
@@ -214,15 +159,18 @@ func (r *jobRunner) RunGetFirmware(host *model.Host, ch chan JobMessage) {
 	})
 }
 
-func (jr *jobRunner) RunUpdateFirmware(host *model.Host, ch chan JobMessage, firmwarePaths []string) {
+func (jr *jobRunner) RunUpdateFirmware(host *model.Host, ch chan model.JobMessage, firmwarePaths []string) {
 	jr.limit.Execute(func() {
-		m := JobMessage{Status: "error", Host: host.Name}
+		m := model.JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
 		bmc := host.InterfaceBMC()
 		ip := ""
 		if bmc != nil {
 			ip = bmc.AddrString()
+		} else {
+			m.Msg = "failed to find bmc interface to query"
+			return
 		}
 		r, err := NewRedfishClient(ip, jr.user, jr.pass, jr.insecure)
 		if err != nil {
@@ -245,15 +193,18 @@ func (jr *jobRunner) RunUpdateFirmware(host *model.Host, ch chan JobMessage, fir
 	})
 }
 
-func (r *jobRunner) RunGetJobs(host *model.Host, ch chan JobMessage) {
+func (r *jobRunner) RunGetJobs(host *model.Host, ch chan model.JobMessage) {
 	r.limit.Execute(func() {
-		m := JobMessage{Status: "error", Host: host.Name}
+		m := model.JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
 		bmc := host.InterfaceBMC()
 		ip := ""
 		if bmc != nil {
 			ip = bmc.AddrString()
+		} else {
+			m.Msg = "failed to find bmc interface to query"
+			return
 		}
 		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
 		if err != nil {
@@ -263,7 +214,7 @@ func (r *jobRunner) RunGetJobs(host *model.Host, ch chan JobMessage) {
 
 		defer r.client.Logout()
 
-		data := BMCJob{}
+		data := model.RedfishJob{}
 		data.Jobs, err = r.GetJobs()
 		if err != nil {
 			m.Msg = fmt.Sprintf("%s", err)
@@ -283,15 +234,18 @@ func (r *jobRunner) RunGetJobs(host *model.Host, ch chan JobMessage) {
 	})
 }
 
-func (r *jobRunner) RunClearJobs(host *model.Host, ch chan JobMessage) {
+func (r *jobRunner) RunClearJobs(host *model.Host, ch chan model.JobMessage, ids []string) {
 	r.limit.Execute(func() {
-		m := JobMessage{Status: "error", Host: host.Name}
+		m := model.JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
 		bmc := host.InterfaceBMC()
 		ip := ""
 		if bmc != nil {
 			ip = bmc.AddrString()
+		} else {
+			m.Msg = "failed to find bmc interface to query"
+			return
 		}
 		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
 		if err != nil {
@@ -301,7 +255,7 @@ func (r *jobRunner) RunClearJobs(host *model.Host, ch chan JobMessage) {
 
 		defer r.client.Logout()
 
-		err = r.ClearJobs()
+		err = r.ClearJobs(ids)
 		if err != nil {
 			m.Msg = fmt.Sprintf("%s", err)
 			return
@@ -312,15 +266,18 @@ func (r *jobRunner) RunClearJobs(host *model.Host, ch chan JobMessage) {
 	})
 }
 
-func (r *jobRunner) RunPowerCycleBmc(host *model.Host, ch chan JobMessage) {
+func (r *jobRunner) RunPowerCycleBmc(host *model.Host, ch chan model.JobMessage) {
 	r.limit.Execute(func() {
-		m := JobMessage{Status: "error", Host: host.Name}
+		m := model.JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
 		bmc := host.InterfaceBMC()
 		ip := ""
 		if bmc != nil {
 			ip = bmc.AddrString()
+		} else {
+			m.Msg = "failed to find bmc interface to query"
+			return
 		}
 		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
 		if err != nil {
@@ -340,15 +297,18 @@ func (r *jobRunner) RunPowerCycleBmc(host *model.Host, ch chan JobMessage) {
 	})
 }
 
-func (r *jobRunner) RunClearSel(host *model.Host, ch chan JobMessage) {
+func (r *jobRunner) RunClearSel(host *model.Host, ch chan model.JobMessage) {
 	r.limit.Execute(func() {
-		m := JobMessage{Status: "error", Host: host.Name}
+		m := model.JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
 		bmc := host.InterfaceBMC()
 		ip := ""
 		if bmc != nil {
 			ip = bmc.AddrString()
+		} else {
+			m.Msg = "failed to find bmc interface to query"
+			return
 		}
 		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
 		if err != nil {
@@ -368,15 +328,18 @@ func (r *jobRunner) RunClearSel(host *model.Host, ch chan JobMessage) {
 	})
 }
 
-func (r *jobRunner) RunBmcAutoConfigure(host *model.Host, ch chan JobMessage) {
+func (r *jobRunner) RunBmcAutoConfigure(host *model.Host, ch chan model.JobMessage) {
 	r.limit.Execute(func() {
-		m := JobMessage{Status: "error", Host: host.Name}
+		m := model.JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
 		bmc := host.InterfaceBMC()
 		ip := ""
 		if bmc != nil {
 			ip = bmc.AddrString()
+		} else {
+			m.Msg = "failed to find bmc interface to query"
+			return
 		}
 		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
 		if err != nil {
@@ -396,9 +359,9 @@ func (r *jobRunner) RunBmcAutoConfigure(host *model.Host, ch chan JobMessage) {
 	})
 }
 
-func (r *jobRunner) RunBmcImportConfiguration(host *model.Host, ch chan JobMessage, shutdownType, file string) {
+func (r *jobRunner) RunBmcImportConfiguration(host *model.Host, ch chan model.JobMessage, shutdownType, file string) {
 	r.limit.Execute(func() {
-		m := JobMessage{Status: "error", Host: host.Name}
+		m := model.JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()
 
 		bmc := host.InterfaceBMC()
@@ -407,6 +370,9 @@ func (r *jobRunner) RunBmcImportConfiguration(host *model.Host, ch chan JobMessa
 		if bmc != nil {
 			mac = bmc.MAC.String()
 			ip = bmc.AddrString()
+		} else {
+			m.Msg = "failed to find bmc interface to query"
+			return
 		}
 		token, err := model.NewBootToken(host.UID.String(), mac)
 		if err != nil {
@@ -430,5 +396,44 @@ func (r *jobRunner) RunBmcImportConfiguration(host *model.Host, ch chan JobMessa
 
 		m.Status = "success"
 		m.Msg = "Submitted import Configuration job:" + jid
+	})
+}
+
+func (r *jobRunner) RunBmcGetMetricReports(host *model.Host, ch chan model.JobMessage) {
+	r.limit.Execute(func() {
+		m := model.JobMessage{Status: "error", Host: host.Name}
+		defer func() { ch <- m }()
+
+		bmc := host.InterfaceBMC()
+		ip := ""
+		if bmc != nil {
+			ip = bmc.AddrString()
+		} else {
+			m.Msg = "failed to find bmc interface to query"
+			return
+		}
+
+		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
+		if err != nil {
+			m.Msg = err.Error()
+			return
+		}
+
+		defer r.client.Logout()
+
+		reports, err := r.BmcGetMetricReports()
+		if err != nil {
+			m.Msg = err.Error()
+			return
+		}
+
+		output, err := json.Marshal(reports)
+		if err != nil {
+			m.Msg = err.Error()
+			return
+		}
+
+		m.Status = "success"
+		m.Msg = string(output)
 	})
 }

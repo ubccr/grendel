@@ -14,8 +14,6 @@ import (
 )
 
 const nodeAll = `-- name: NodeAll :many
-;
-
 select id, name, uid, host_json from node_view
 `
 
@@ -48,8 +46,6 @@ func (q *Queries) NodeAll(ctx context.Context, db DBTX) ([]NodeView, error) {
 }
 
 const nodeBootKernel = `-- name: NodeBootKernel :exec
-;
-
 update node set kernel_id = ?1
 where id in (/*SLICE:nodes*/?)
 `
@@ -198,8 +194,6 @@ func (q *Queries) NodeFind(ctx context.Context, db DBTX, arg NodeFindParams) (No
 }
 
 const nodeFindNodeset = `-- name: NodeFindNodeset :many
-;
-
 select id, name, uid, host_json from node_view 
 where name in (/*SLICE:nodeset*/?)
 `
@@ -243,8 +237,6 @@ func (q *Queries) NodeFindNodeset(ctx context.Context, db DBTX, nodeset []string
 }
 
 const nodeFindTags = `-- name: NodeFindTags :many
-;
-
 select 
   n.name as name,
   count(distinct(t.key)) as cnt
@@ -298,8 +290,6 @@ func (q *Queries) NodeFindTags(ctx context.Context, db DBTX, tags []string) ([]N
 }
 
 const nodeID = `-- name: NodeID :many
-;
-
 select id from node
 where name in (/*SLICE:nodeset*/?)
 `
@@ -338,8 +328,6 @@ func (q *Queries) NodeID(ctx context.Context, db DBTX, nodeset []string) ([]int6
 }
 
 const nodeProvision = `-- name: NodeProvision :exec
-;
-
 update node set provision = ?1
 where id in (/*SLICE:nodes*/?)
 `
@@ -366,8 +354,6 @@ func (q *Queries) NodeProvision(ctx context.Context, db DBTX, arg NodeProvisionP
 }
 
 const nodeResolve = `-- name: NodeResolve :many
-;
-
 select nc.fqdn, nc.ip 
 from nic as nc
 where 
@@ -501,8 +487,6 @@ func (q *Queries) NodeTagUpsertDelete(ctx context.Context, db DBTX, arg NodeTagU
 }
 
 const nodeUpsert = `-- name: NodeUpsert :one
-;
-
 insert into node (id, uid, name, provision, arch_id, kernel_id, node_type_id, firmware)
 values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
 on conflict (name)
@@ -549,8 +533,6 @@ func (q *Queries) NodeUpsert(ctx context.Context, db DBTX, arg NodeUpsertParams)
 }
 
 const tagID = `-- name: TagID :many
-;
-
 select id from tag
 where key in (/*SLICE:tags*/?)
 `

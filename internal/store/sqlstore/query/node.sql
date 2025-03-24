@@ -27,8 +27,7 @@ where
     when cast(@filter_ip as integer) then nc.ip = @ip
     else 0
   end
-limit 1
-;
+limit 1;
 
 -- name: NodeResolve :many
 select nc.fqdn, nc.ip 
@@ -38,27 +37,22 @@ where
     when cast(@filter_fqdn as integer) then lower(nc.fqdn) like concat('%', cast(@fqdn as text), '%')
     when cast(@filter_ip as integer) then nc.ip like concat(cast(@ip as text), '%')
     else 0
-  end
-;
+  end;
 
 -- name: NodeAll :many
 select * from node_view;
-;
 
 -- name: NodeID :many
 select id from node
-where name in (sqlc.slice(nodeset))
-;
+where name in (sqlc.slice(nodeset));
 
 -- name: TagID :many
 select id from tag
-where key in (sqlc.slice(tags))
-;
+where key in (sqlc.slice(tags));
 
 -- name: NodeFindNodeset :many
 select * from node_view 
-where name in (sqlc.slice(nodeset))
-;
+where name in (sqlc.slice(nodeset));
 
 -- name: NodeFindTags :many
 select 
@@ -72,18 +66,15 @@ join tag as t
   on nt.tag_id = t.id 
 where 
   t.key in (sqlc.slice(tags))
-group by name
-;
+group by name;
 
 -- name: NodeProvision :exec
 update node set provision = @provision
-where id in (sqlc.slice(nodes))
-;
+where id in (sqlc.slice(nodes));
 
 -- name: NodeBootKernel :exec
 update node set kernel_id = @kernel_id
-where id in (sqlc.slice(nodes))
-;
+where id in (sqlc.slice(nodes));
 
 -- name: NodeUpsert :one
 insert into node (id, uid, name, provision, arch_id, kernel_id, node_type_id, firmware)

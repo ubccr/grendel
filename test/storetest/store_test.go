@@ -508,6 +508,10 @@ func (s *StoreTestSuite) TestBootImageUpdate() {
 	err := s.db.StoreBootImage(image)
 	s.Assert().NoError(err)
 
+	// try storing host with no changes
+	err = s.db.StoreBootImage(image)
+	s.Assert().NoError(err)
+
 	testImage, err := s.db.LoadBootImage(image.Name)
 	if s.Assert().NoError(err) {
 		s.Assert().Equal(image.Name, testImage.Name)
@@ -524,6 +528,7 @@ func (s *StoreTestSuite) TestBootImageUpdate() {
 		"/path/1",
 		"/path/2",
 	}
+	testImage.Verify = true
 
 	err = s.db.StoreBootImage(testImage)
 	s.Assert().NoError(err)
@@ -534,6 +539,7 @@ func (s *StoreTestSuite) TestBootImageUpdate() {
 		s.Assert().Equal(2, len(testImage.InitrdPaths))
 		s.Assert().NotContains(testImage.ProvisionTemplates, "post-install")
 		s.Assert().Contains(testImage.ProvisionTemplates, "kickstart")
+		s.Assert().Equal(true, testImage.Verify)
 	}
 }
 

@@ -13,12 +13,12 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd"
-	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/pkg/client"
 	"go4.org/netipx"
 )
 
 var (
-	ipmap      map[netip.Addr]*model.Host
+	ipmap      map[netip.Addr]client.Host
 	prefixes   []netip.Prefix
 	netsegTags []string
 	netsegLong bool
@@ -29,26 +29,22 @@ var (
 		Long:  `Show IP segmentation`,
 		Args:  cobra.MinimumNArgs(0),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewClient()
+			gc, err := cmd.NewOgenClient()
 			if err != nil {
 				return err
 			}
 
-			inputTags := strings.Join(netsegTags, ",")
-			var hostList model.HostList
-
-			if inputTags == "" {
-				hostList, _, err = gc.HostApi.HostList(context.Background())
-			} else {
-				hostList, _, err = gc.HostApi.HostTags(context.Background(), inputTags)
+			req := client.GETV1NodesFindParams{
+				Nodeset: client.NewOptString(strings.Join(nodes, ",")),
+				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-
+			hostList, err := gc.GETV1NodesFind(context.Background(), req)
 			if err != nil {
-				return cmd.NewApiError("Failed to list hosts", err)
+				return cmd.NewApiError(err)
 			}
 
 			var builder netipx.IPSetBuilder
-			ipmap = make(map[netip.Addr]*model.Host)
+			ipmap = make(map[netip.Addr]client.Host)
 
 			if len(args) > 0 {
 				for _, p := range args {
@@ -61,7 +57,7 @@ var (
 			} else {
 				for _, host := range hostList {
 					for _, i := range host.Interfaces {
-						ipp, err := i.IP.Addr().Prefix(i.IP.Bits())
+						ipp, err := netip.ParsePrefix(i.Value.IP.Value)
 						if err != nil {
 							return err
 						}
@@ -75,9 +71,14 @@ var (
 
 			for _, host := range hostList {
 				for _, i := range host.Interfaces {
-					if iset.Contains(i.IP.Addr()) {
-						builder.Remove(i.IP.Addr())
-						ipmap[i.IP.Addr()] = host
+					ipp, err := netip.ParsePrefix(i.Value.IP.Value)
+					if err != nil {
+						log.Warnf("error parsing ip on host=%s ip=%s. Check for valid CIDR format", host.Name.Value, i.Value.IP.Value)
+						continue
+					}
+					if iset.Contains(ipp.Addr()) {
+						builder.Remove(ipp.Addr())
+						ipmap[ipp.Addr()] = host
 					}
 				}
 			}
@@ -104,7 +105,7 @@ var (
 					last := netipx.PrefixLastIP(p)
 					for ; i.Compare(last) <= 0; i = i.Next() {
 						if host, ok := ipmap[i]; ok {
-							fmt.Printf("%-20s%-20s\n", i, host.Name)
+							fmt.Printf("%-20s%-20s\n", i, host.Name.Value)
 							continue
 						}
 
@@ -132,12 +133,16 @@ var (
 				host := ipmap[k]
 				name := ""
 				for _, i := range host.Interfaces {
-					if i.Addr() == k && i.FQDN != "" {
-						name = i.HostName()
+					ipp, err := netip.ParsePrefix(i.Value.IP.Value)
+					if err != nil {
+						continue
+					}
+					if ipp.Addr() == k && i.Value.Fqdn.Value != "" {
+						name = strings.Split(i.Value.Fqdn.Value, ",")[0]
 					}
 				}
 
-				fmt.Printf("%-20s%-20s%-40s%-45s\n", k, host.Name, name, strings.Join(host.Tags, ","))
+				fmt.Printf("%-20s%-20s%-40s%-45s\n", k, host.Name.Value, name, strings.Join(host.Tags, ","))
 			}
 
 			return nil
