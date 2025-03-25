@@ -1,5 +1,70 @@
 # Grendel Changelog
 
+## [0.2.0] - 2025-03-24
+
+### BREAKING CHANGES
+
+- Deprecated buntdb, backend is now sqlite
+
+### Frontend
+
+- replaced frontend with react SPA
+- allow searching for nodes without a tag
+- added boot image editing
+- added redfish node queries
+- added initial redfish telemetry reporting
+- added redfish job querying
+- added redfish job clearing
+- added search by mac address, ip address, & fqdn
+- added link to open bmc page to rack page
+- added view options to rack page
+
+### API
+
+- replaced API server with fuego for automatic openapi spec generation
+- added JWT auth
+- allow filtering by nodeset and tags
+
+### CMD
+
+- replaced client with ogen client generated from the openapi file
+- added remote authenticated CLI access
+- added the ability to use nodeset = all to filter nodes by --tags
+- added checking current directory for a grendel.toml file
+- added reboot bmc command
+- changed bmc status command to return the serial number
+- temporarily deprecated bmc update command
+- renamed hosts -> nodes
+
+### Store
+
+- fixed sqlstore boot image verify
+- fixed sqlstore user updatedAt
+- fixed sqlstore not removing the last initrd or template
+
+### Update deps
+
+- github.com/insomniacslk/dhcp
+- github.com/tidwall/gjson
+- github.com/segmentio/ksuid
+- github.com/mattn/go-sqlite3
+- github.com/labstack/echo/v4
+- github.com/golang-migrate/migrate/v4
+- github.com/golang-jwt/jwt/v5
+- github.com/stmcginnis/gofish
+- github.com/spf13/cobra
+- github.com/spf13/viper
+- github.com/bits-and-blooms/bitset
+- go4.org/netipx
+
+### Development
+
+- initial workflows
+- added go generate & markdown files to explain client generation
+- added air config file
+- added actrc file for testing workflows locally
+- added swagger api explorer
+
 ## [0.1.0] - 2024-12-19
 
 - Move store interface to new package
@@ -182,4 +247,5 @@
 [0.0.14]: https://github.com/ubccr/grendel/releases/tag/v0.0.14
 [0.0.15]: https://github.com/ubccr/grendel/releases/tag/v0.0.15
 [0.1.0]: https://github.com/ubccr/grendel/releases/tag/v0.1.0
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.1.0...HEAD
+[0.2.0]: https://github.com/ubccr/grendel/releases/tag/v0.2.0
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.0...HEAD
