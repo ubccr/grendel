@@ -121,7 +121,11 @@ function TableComponent() {
                 return (
                   <TableCell key={i} className="border p-0">
                     {populated.has(rack) && (
-                      <Link to={`/rack/${rack}`} className="hover:font-bold">
+                      <Link
+                        to={"/rack/$rack"}
+                        params={{ rack: rack }}
+                        className="hover:font-bold"
+                      >
                         {view === "rackName" && rack}
                         {view === "nodeCount" && size.get(rack)}
                       </Link>
