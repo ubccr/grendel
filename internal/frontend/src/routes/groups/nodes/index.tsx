@@ -41,7 +41,11 @@ const columns: ColumnDef<BootImage>[] = [
     cell: ({ row }) => {
       const name = row.original.name;
       return (
-        <Link to={`/images/${name}`} className="hover:underline">
+        <Link
+          to={"/images/$image"}
+          params={{ image: name }}
+          className="hover:underline"
+        >
           {name}
         </Link>
       );

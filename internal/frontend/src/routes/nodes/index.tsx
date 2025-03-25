@@ -75,7 +75,11 @@ function TableComponent() {
       cell: ({ row }) => {
         const name = row.original?.name;
         return (
-          <Link to={`/nodes/${name}`} className="hover:underline">
+          <Link
+            to={"/nodes/$node"}
+            params={{ node: name ?? "unknown" }}
+            className="hover:underline"
+          >
             {name}
           </Link>
         );
