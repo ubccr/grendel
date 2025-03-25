@@ -7,6 +7,8 @@ path = [
     "go.mod",
     "go.sum",
     ".gitmodules",
+    ".actrc",
+    ".air.toml",
     "NOTICE",
     "configs/grendel.toml.sample",
     "docs/requirements.txt",
