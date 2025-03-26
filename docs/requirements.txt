@@ -1,5 +1,5 @@
 htmlmin==0.1.12
-Jinja2==3.1.4
+Jinja2==3.1.6
 jsmin==3.0.1
 Markdown==3.3.7
 MarkupSafe==2.1.1
