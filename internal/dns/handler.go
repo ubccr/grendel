@@ -10,6 +10,7 @@ import (
 
 	"github.com/miekg/dns"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/util"
 )
@@ -57,10 +58,22 @@ func (h *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		answers = a(qname, h.ttl, ips)
 	}
 
+	fwAddr := viper.GetString("dns.forward")
 	if len(answers) != 0 {
 		m.Authoritative = true
 		m.Answer = answers
 		m.SetRcode(r, dns.RcodeSuccess)
+	} else if len(answers) == 0 && fwAddr != "" {
+		fwm, err := dns.Exchange(r, fwAddr)
+		if err != nil {
+			log.WithFields(logrus.Fields{
+				"qname": qname,
+				"err":   err,
+			}).Error("Failed to forward DNS")
+			m.SetRcode(r, dns.RcodeServerFailure)
+		} else {
+			m = fwm
+		}
 	} else {
 		// XXX consider sending back NXDOMAIN here
 		m.SetRcode(r, dns.RcodeNameError)
