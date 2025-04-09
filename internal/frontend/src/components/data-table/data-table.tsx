@@ -23,7 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import React, { useState } from "react";
+import React, { JSX, useState } from "react";
 import { Input } from "../ui/input";
 import { DataTablePagination } from "./pagination";
 import { DataTableViewOptions } from "./view-options";
