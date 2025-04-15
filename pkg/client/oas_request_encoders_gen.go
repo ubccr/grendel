@@ -11,6 +11,20 @@ import (
 	ht "github.com/ogen-go/ogen/http"
 )
 
+func encodePATCHV1AuthResetRequest(
+	req *AuthResetRequest,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
 func encodePATCHV1NodesImageRequest(
 	req *NodeBootImageRequest,
 	r *http.Request,
@@ -41,6 +55,34 @@ func encodePATCHV1NodesProvisionRequest(
 
 func encodePATCHV1NodesTagsActionRequest(
 	req *NodeTagsRequest,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodePATCHV1RolesRequest(
+	req *PatchRolesRequest,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodePATCHV1UsersUsernamesEnableRequest(
+	req *UserEnableRequest,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -167,6 +209,20 @@ func encodePOSTV1ImagesRequest(
 
 func encodePOSTV1NodesRequest(
 	req *NodeAddRequest,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodePOSTV1RolesRequest(
+	req *PostRolesRequest,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"

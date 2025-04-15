@@ -6,12 +6,15 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/go-fuego/fuego"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/pkg/model"
 )
 
 type AuthRequest struct {
@@ -39,6 +42,11 @@ type AuthTokenRequest struct {
 
 type AuthTokenReponse struct {
 	Token string `json:"token"`
+}
+
+type AuthResetRequest struct {
+	CurrentPassword string `json:"current_password"`
+	NewPassword     string `json:"new_password" validate:"required,min=8"`
 }
 
 var (
@@ -191,6 +199,80 @@ func (h *Handler) AuthToken(c fuego.ContextWithBody[AuthTokenRequest]) (*AuthTok
 		TokenRole:     body.Role,
 	}
 
+	// skip access control if running on a unix socket
+	if !viper.IsSet("api.socket_path") {
+		tokenRole, err := h.DB.GetRolesByName(body.Role)
+		if err != nil {
+			return nil, fuego.HTTPError{
+				Err:    err,
+				Title:  "Error",
+				Detail: "failed to get token role",
+			}
+		}
+		contextRole, ok := c.Context().Value(ContextKeyRole).(string)
+		if !ok {
+			return nil, fuego.HTTPError{
+				Err:    err,
+				Title:  "Error",
+				Detail: "failed to parse role context",
+			}
+		}
+		contextUsername, ok := c.Context().Value(ContextKeyUsername).(string)
+		if !ok {
+			return nil, fuego.HTTPError{
+				Err:    errors.New("failed to parse username from context"),
+				Title:  "Error",
+				Detail: "failed to parse username context",
+			}
+		}
+
+		requestUser, err := h.DB.GetUserByName(body.Username)
+		if err != nil {
+			return nil, fuego.HTTPError{
+				Err:    err,
+				Title:  "Error",
+				Detail: "failed to get token username",
+			}
+		}
+		requestedRole, err := h.DB.GetRolesByName(requestUser.Role)
+		if err != nil {
+			return nil, fuego.HTTPError{
+				Err:    err,
+				Title:  "Error",
+				Detail: "failed to get token role",
+			}
+		}
+
+		if contextRole != model.RoleAdmin.String() && contextUsername != body.Username {
+			return nil, fuego.HTTPError{
+				Err:    errors.New("token username does not match request username"),
+				Title:  "Error",
+				Detail: "Failed to create token because of mismatched username. Only admins are able to create tokens with different usernames.",
+			}
+		}
+
+		var requiredPermissions []string
+		for _, r := range requestedRole.UnassignedPermissionList {
+			match := false
+			for _, t := range tokenRole.PermissionList {
+				if t.Method == r.Method && t.Path == r.Path {
+					match = true
+				}
+			}
+			if match {
+				requiredPermissions = append(requiredPermissions, fmt.Sprintf("%s:%s", r.Method, r.Path))
+			}
+		}
+
+		if len(requiredPermissions) > 0 {
+			return nil, fuego.HTTPError{
+				Err:    fmt.Errorf("failed to create token with role %s because of missing permissions: %s", body.Role, strings.Join(requiredPermissions, ",")),
+				Title:  "Error",
+				Detail: "Failed to create token because of missing permissions, assign a role with lesser or equal permissions to the users role",
+			}
+		}
+	}
+
 	if body.Expire != "infinite" {
 		exp, err := time.ParseDuration(body.Expire)
 		if err != nil {
@@ -200,7 +282,7 @@ func (h *Handler) AuthToken(c fuego.ContextWithBody[AuthTokenRequest]) (*AuthTok
 				Detail: "failed to parse expire time",
 			}
 		}
-		claims[TokenExpire] = exp
+		claims[TokenExpire] = time.Now().Add(exp).Unix()
 	}
 
 	token, err := NewToken(claims, viper.GetString("api.secret"))
@@ -214,5 +296,53 @@ func (h *Handler) AuthToken(c fuego.ContextWithBody[AuthTokenRequest]) (*AuthTok
 
 	return &AuthTokenReponse{
 		Token: token,
+	}, nil
+}
+
+func (h *Handler) AuthReset(c fuego.ContextWithBody[AuthResetRequest]) (*GenericResponse, error) {
+	body, err := c.Body()
+	if err != nil {
+		return nil, fuego.HTTPError{
+			Err:    err,
+			Title:  "Authentication Error",
+			Detail: "failed to parse body",
+		}
+	}
+
+	username, ok := c.Context().Value(ContextKeyUsername).(string)
+	if !ok {
+		return nil, errors.New("failed to parse username from context")
+	}
+
+	authenticated, _, err := h.DB.VerifyUser(username, body.CurrentPassword)
+	if err != nil {
+		return nil, fuego.HTTPError{
+			Err:    err,
+			Title:  "Authentication Error",
+			Detail: "failed to login, invalid credentials",
+		}
+	}
+
+	if !authenticated {
+		return nil, fuego.HTTPError{
+			Err:    errors.New("invalid credentials"),
+			Title:  "Authentication Error",
+			Detail: "failed to login, invalid credentials",
+		}
+	}
+
+	_, err = h.DB.StoreUser(username, body.NewPassword)
+	if err != nil {
+		return nil, fuego.HTTPError{
+			Err:    err,
+			Title:  "Error",
+			Detail: "Failed to update credentials",
+		}
+	}
+
+	return &GenericResponse{
+		Title:   "Success",
+		Detail:  "succesfully updated credentials",
+		Changed: 1,
 	}, nil
 }

@@ -9,7 +9,7 @@ sql:
         out: "internal/store/sqlstore/db"
         emit_json_tags: true
         emit_methods_with_db_argument: true
-        initialisms: ['id', 'uid', 'fqdn', 'mtu', 'mac', 'vlan', 'ip']
+        initialisms: ["id", "uid", "fqdn", "mtu", "mac", "vlan", "ip"]
         rename:
           host_json: "Host"
           image_json: "Image"
@@ -27,7 +27,7 @@ sql:
           - column: "node.provision"
             go_type:
               type: "bool"
-          - column: "user.is_active"
+          - column: "user.enabled"
             go_type:
               type: "bool"
           - column: "kernel.verify"
@@ -49,3 +49,10 @@ sql:
             go_type:
               import: "github.com/ubccr/grendel/pkg/model"
               type: "BootImage"
+          - column: "role_view.permission_json"
+            go_type:
+              import: "github.com/ubccr/grendel/pkg/model"
+              type: "RoleView"
+          - column: "user_view.enabled"
+            go_type:
+              type: "bool"
