@@ -39,7 +39,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobDelete`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Delete redfish jobs from node(s) by JID.
 	//
@@ -51,7 +51,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcSelClear`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Clear system event log on node(s).
 	//
@@ -63,7 +63,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BootImageDelete`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Delete images by name.
 	//
@@ -75,19 +75,31 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeDelete`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Delete nodes by nodeset and/or tags.
 	//
 	// DELETE /v1/nodes
 	DELETEV1Nodes(ctx context.Context, params DELETEV1NodesParams) (*GenericResponse, error)
+	// DELETEV1RolesNames invokes DELETE_/v1/roles/:names operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).DeleteRoles`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Delete roles.
+	//
+	// DELETE /v1/roles/{names}
+	DELETEV1RolesNames(ctx context.Context, params DELETEV1RolesNamesParams) (*GenericResponse, error)
 	// DELETEV1UsersUsernames invokes DELETE_/v1/users/:usernames operation.
 	//
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).UserDelete`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Delete users.
 	//
@@ -99,7 +111,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcQuery`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Get redfish info from node(s).
 	//
@@ -111,7 +123,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobList`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Get redfish jobs from node(s).
 	//
@@ -123,7 +135,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcMetricReports`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Get metric reports by nodeset.
 	//
@@ -135,7 +147,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).Dump`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Get a backup of the DB.
 	//
@@ -147,7 +159,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).GetEvents`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---.
 	//
 	// GET /v1/grendel/events
@@ -158,8 +170,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BootImageList`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// List all images.
 	//
@@ -171,7 +182,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BootImageFind`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Find images by name.
 	//
@@ -183,7 +194,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeList`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// List all nodes.
 	//
@@ -195,7 +206,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeFind`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Find nodes by nodeset and/or tags.
 	//
@@ -207,31 +218,55 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeBootToken`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Create a boot token for the provision server. Used for debugging requests made by images.
 	//
 	// GET /v1/nodes/token/{interface}
 	GETV1NodesTokenInterface(ctx context.Context, params GETV1NodesTokenInterfaceParams) (*NodeBootTokenResponse, error)
+	// GETV1Roles invokes GET_/v1/roles operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).GetRoles`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Get roles and permissions.
+	//
+	// GET /v1/roles
+	GETV1Roles(ctx context.Context, params GETV1RolesParams) (*GetRolesResponse, error)
 	// GETV1Users invokes GET_/v1/users operation.
 	//
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).UserList`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// List all users.
 	//
 	// GET /v1/users
 	GETV1Users(ctx context.Context, params GETV1UsersParams) ([]User, error)
+	// PATCHV1AuthReset invokes PATCH_/v1/auth/reset operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).AuthReset`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Change password.
+	//
+	// PATCH /v1/auth/reset
+	PATCHV1AuthReset(ctx context.Context, request *AuthResetRequest, params PATCHV1AuthResetParams) (*GenericResponse, error)
 	// PATCHV1NodesImage invokes PATCH_/v1/nodes/image operation.
 	//
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeBootImage`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Update nodes boot image by nodeset and/or tags.
 	//
@@ -243,7 +278,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeProvision`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Provision / Unprovision nodes by nodeset and/or tags.
 	//
@@ -255,19 +290,43 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeTags`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Update nodes tags by nodeset and/or tags.
 	//
 	// PATCH /v1/nodes/tags/{action}
 	PATCHV1NodesTagsAction(ctx context.Context, request *NodeTagsRequest, params PATCHV1NodesTagsActionParams) (*GenericResponse, error)
+	// PATCHV1Roles invokes PATCH_/v1/roles operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).PatchRoles`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Edit role permissions.
+	//
+	// PATCH /v1/roles
+	PATCHV1Roles(ctx context.Context, request *PatchRolesRequest, params PATCHV1RolesParams) (*GenericResponse, error)
+	// PATCHV1UsersUsernamesEnable invokes PATCH_/v1/users/:usernames/enable operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).UserEnable`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Update users enable.
+	//
+	// PATCH /v1/users/{usernames}/enable
+	PATCHV1UsersUsernamesEnable(ctx context.Context, request *UserEnableRequest, params PATCHV1UsersUsernamesEnableParams) (*GenericResponse, error)
 	// PATCHV1UsersUsernamesRole invokes PATCH_/v1/users/:usernames/role operation.
 	//
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).UserRole`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Update users role.
 	//
@@ -301,7 +360,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).AuthToken`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Create API token.
 	//
@@ -313,7 +372,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcAutoConfigure`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Set BMC to autoconfigure.
 	//
@@ -325,7 +384,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfiguration`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Manually import system configuration to BMC.
 	//
@@ -337,7 +396,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcPower`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Reboot node(s) BMC.
 	//
@@ -349,7 +408,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcOsPower`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Change power status of node(s).
 	//
@@ -361,7 +420,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).Restore`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Restore a backup of the DB.
 	//
@@ -373,7 +432,7 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BootImageAdd`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Add images.
 	//
@@ -385,19 +444,31 @@ type Invoker interface {
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeAdd`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Add nodes.
 	//
 	// POST /v1/nodes
 	POSTV1Nodes(ctx context.Context, request *NodeAddRequest, params POSTV1NodesParams) (*GenericResponse, error)
+	// POSTV1Roles invokes POST_/v1/roles operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).PostRoles`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Add roles.
+	//
+	// POST /v1/roles
+	POSTV1Roles(ctx context.Context, request *PostRolesRequest, params POSTV1RolesParams) (*GenericResponse, error)
 	// POSTV1Users invokes POST_/v1/users operation.
 	//
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).UserStore`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Add new user.
 	//
@@ -520,7 +591,7 @@ func (c *Client) sendDELETEV1AuthSignout(ctx context.Context, params DELETEV1Aut
 			for _, requirement := range []bitset{
 				{0b00000001},
 				{0b00000010},
-				{0b00000010},
+				{},
 			} {
 				for i, mask := range requirement {
 					if satisfied[i]&mask != mask {
@@ -555,7 +626,7 @@ func (c *Client) sendDELETEV1AuthSignout(ctx context.Context, params DELETEV1Aut
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobDelete`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Delete redfish jobs from node(s) by JID.
 //
@@ -713,7 +784,7 @@ func (c *Client) sendDELETEV1BmcJobsJids(ctx context.Context, params DELETEV1Bmc
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcSelClear`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Clear system event log on node(s).
 //
@@ -853,7 +924,7 @@ func (c *Client) sendDELETEV1BmcSel(ctx context.Context, params DELETEV1BmcSelPa
 // `github.com/ubccr/grendel/internal/api.(*Handler).BootImageDelete`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Delete images by name.
 //
@@ -976,7 +1047,7 @@ func (c *Client) sendDELETEV1Images(ctx context.Context, params DELETEV1ImagesPa
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeDelete`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Delete nodes by nodeset and/or tags.
 //
@@ -1110,13 +1181,134 @@ func (c *Client) sendDELETEV1Nodes(ctx context.Context, params DELETEV1NodesPara
 	return result, nil
 }
 
+// DELETEV1RolesNames invokes DELETE_/v1/roles/:names operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).DeleteRoles`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Delete roles.
+//
+// DELETE /v1/roles/{names}
+func (c *Client) DELETEV1RolesNames(ctx context.Context, params DELETEV1RolesNamesParams) (*GenericResponse, error) {
+	res, err := c.sendDELETEV1RolesNames(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendDELETEV1RolesNames(ctx context.Context, params DELETEV1RolesNamesParams) (res *GenericResponse, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/v1/roles/"
+	{
+		// Encode "names" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "names",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.Names))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "DELETE", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, DELETEV1RolesNamesOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, DELETEV1RolesNamesOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeDELETEV1RolesNamesResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // DELETEV1UsersUsernames invokes DELETE_/v1/users/:usernames operation.
 //
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).UserDelete`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Delete users.
 //
@@ -1237,7 +1429,7 @@ func (c *Client) sendDELETEV1UsersUsernames(ctx context.Context, params DELETEV1
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcQuery`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Get redfish info from node(s).
 //
@@ -1377,7 +1569,7 @@ func (c *Client) sendGETV1Bmc(ctx context.Context, params GETV1BmcParams) (res [
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobList`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Get redfish jobs from node(s).
 //
@@ -1517,7 +1709,7 @@ func (c *Client) sendGETV1BmcJobs(ctx context.Context, params GETV1BmcJobsParams
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcMetricReports`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Get metric reports by nodeset.
 //
@@ -1657,7 +1849,7 @@ func (c *Client) sendGETV1BmcMetrics(ctx context.Context, params GETV1BmcMetrics
 // `github.com/ubccr/grendel/internal/api.(*Handler).Dump`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Get a backup of the DB.
 //
@@ -1760,7 +1952,7 @@ func (c *Client) sendGETV1DbDump(ctx context.Context, params GETV1DbDumpParams) 
 // `github.com/ubccr/grendel/internal/api.(*Handler).GetEvents`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---.
 //
 // GET /v1/grendel/events
@@ -1862,8 +2054,7 @@ func (c *Client) sendGETV1GrendelEvents(ctx context.Context, params GETV1Grendel
 // `github.com/ubccr/grendel/internal/api.(*Handler).BootImageList`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // List all images.
 //
@@ -1966,7 +2157,7 @@ func (c *Client) sendGETV1Images(ctx context.Context, params GETV1ImagesParams) 
 // `github.com/ubccr/grendel/internal/api.(*Handler).BootImageFind`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Find images by name.
 //
@@ -2089,7 +2280,7 @@ func (c *Client) sendGETV1ImagesFind(ctx context.Context, params GETV1ImagesFind
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeList`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // List all nodes.
 //
@@ -2192,7 +2383,7 @@ func (c *Client) sendGETV1Nodes(ctx context.Context, params GETV1NodesParams) (r
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeFind`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Find nodes by nodeset and/or tags.
 //
@@ -2332,7 +2523,7 @@ func (c *Client) sendGETV1NodesFind(ctx context.Context, params GETV1NodesFindPa
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeBootToken`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Create a boot token for the provision server. Used for debugging requests made by images.
 //
@@ -2484,13 +2675,136 @@ func (c *Client) sendGETV1NodesTokenInterface(ctx context.Context, params GETV1N
 	return result, nil
 }
 
+// GETV1Roles invokes GET_/v1/roles operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).GetRoles`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Get roles and permissions.
+//
+// GET /v1/roles
+func (c *Client) GETV1Roles(ctx context.Context, params GETV1RolesParams) (*GetRolesResponse, error) {
+	res, err := c.sendGETV1Roles(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGETV1Roles(ctx context.Context, params GETV1RolesParams) (res *GetRolesResponse, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/roles"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "name" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "name",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Name.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, GETV1RolesOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, GETV1RolesOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGETV1RolesResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // GETV1Users invokes GET_/v1/users operation.
 //
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).UserList`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // List all users.
 //
@@ -2587,13 +2901,128 @@ func (c *Client) sendGETV1Users(ctx context.Context, params GETV1UsersParams) (r
 	return result, nil
 }
 
+// PATCHV1AuthReset invokes PATCH_/v1/auth/reset operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).AuthReset`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Change password.
+//
+// PATCH /v1/auth/reset
+func (c *Client) PATCHV1AuthReset(ctx context.Context, request *AuthResetRequest, params PATCHV1AuthResetParams) (*GenericResponse, error) {
+	res, err := c.sendPATCHV1AuthReset(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendPATCHV1AuthReset(ctx context.Context, request *AuthResetRequest, params PATCHV1AuthResetParams) (res *GenericResponse, err error) {
+	// Validate request before sending.
+	if err := func() error {
+		if err := request.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return res, errors.Wrap(err, "validate")
+	}
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/auth/reset"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePATCHV1AuthResetRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, PATCHV1AuthResetOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, PATCHV1AuthResetOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodePATCHV1AuthResetResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // PATCHV1NodesImage invokes PATCH_/v1/nodes/image operation.
 //
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeBootImage`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Update nodes boot image by nodeset and/or tags.
 //
@@ -2736,7 +3165,7 @@ func (c *Client) sendPATCHV1NodesImage(ctx context.Context, request *NodeBootIma
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeProvision`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Provision / Unprovision nodes by nodeset and/or tags.
 //
@@ -2879,7 +3308,7 @@ func (c *Client) sendPATCHV1NodesProvision(ctx context.Context, request *NodePro
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeTags`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Update nodes tags by nodeset and/or tags.
 //
@@ -3034,13 +3463,244 @@ func (c *Client) sendPATCHV1NodesTagsAction(ctx context.Context, request *NodeTa
 	return result, nil
 }
 
+// PATCHV1Roles invokes PATCH_/v1/roles operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).PatchRoles`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Edit role permissions.
+//
+// PATCH /v1/roles
+func (c *Client) PATCHV1Roles(ctx context.Context, request *PatchRolesRequest, params PATCHV1RolesParams) (*GenericResponse, error) {
+	res, err := c.sendPATCHV1Roles(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendPATCHV1Roles(ctx context.Context, request *PatchRolesRequest, params PATCHV1RolesParams) (res *GenericResponse, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/roles"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePATCHV1RolesRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, PATCHV1RolesOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, PATCHV1RolesOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodePATCHV1RolesResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// PATCHV1UsersUsernamesEnable invokes PATCH_/v1/users/:usernames/enable operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).UserEnable`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Update users enable.
+//
+// PATCH /v1/users/{usernames}/enable
+func (c *Client) PATCHV1UsersUsernamesEnable(ctx context.Context, request *UserEnableRequest, params PATCHV1UsersUsernamesEnableParams) (*GenericResponse, error) {
+	res, err := c.sendPATCHV1UsersUsernamesEnable(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendPATCHV1UsersUsernamesEnable(ctx context.Context, request *UserEnableRequest, params PATCHV1UsersUsernamesEnableParams) (res *GenericResponse, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/v1/users/"
+	{
+		// Encode "usernames" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "usernames",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.Usernames))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/enable"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePATCHV1UsersUsernamesEnableRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, PATCHV1UsersUsernamesEnableOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, PATCHV1UsersUsernamesEnableOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodePATCHV1UsersUsernamesEnableResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // PATCHV1UsersUsernamesRole invokes PATCH_/v1/users/:usernames/role operation.
 //
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).UserRole`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Update users role.
 //
@@ -3386,7 +4046,7 @@ func (c *Client) sendPOSTV1AuthSignup(ctx context.Context, request *AuthSignupRe
 // `github.com/ubccr/grendel/internal/api.(*Handler).AuthToken`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Create API token.
 //
@@ -3492,7 +4152,7 @@ func (c *Client) sendPOSTV1AuthToken(ctx context.Context, request *AuthTokenRequ
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcAutoConfigure`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Set BMC to autoconfigure.
 //
@@ -3632,7 +4292,7 @@ func (c *Client) sendPOSTV1BmcConfigureAuto(ctx context.Context, params POSTV1Bm
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfiguration`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Manually import system configuration to BMC.
 //
@@ -3775,7 +4435,7 @@ func (c *Client) sendPOSTV1BmcConfigureImport(ctx context.Context, request *BmcI
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcPower`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Reboot node(s) BMC.
 //
@@ -3915,7 +4575,7 @@ func (c *Client) sendPOSTV1BmcPowerBmc(ctx context.Context, params POSTV1BmcPowe
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcOsPower`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Change power status of node(s).
 //
@@ -4058,7 +4718,7 @@ func (c *Client) sendPOSTV1BmcPowerOs(ctx context.Context, request *BmcOsPowerBo
 // `github.com/ubccr/grendel/internal/api.(*Handler).Restore`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Restore a backup of the DB.
 //
@@ -4173,7 +4833,7 @@ func (c *Client) sendPOSTV1DbRestore(ctx context.Context, request *DataDump, par
 // `github.com/ubccr/grendel/internal/api.(*Handler).BootImageAdd`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Add images.
 //
@@ -4279,7 +4939,7 @@ func (c *Client) sendPOSTV1Images(ctx context.Context, request *BootImageAddRequ
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeAdd`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Add nodes.
 //
@@ -4388,13 +5048,119 @@ func (c *Client) sendPOSTV1Nodes(ctx context.Context, request *NodeAddRequest, p
 	return result, nil
 }
 
+// POSTV1Roles invokes POST_/v1/roles operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).PostRoles`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Add roles.
+//
+// POST /v1/roles
+func (c *Client) POSTV1Roles(ctx context.Context, request *PostRolesRequest, params POSTV1RolesParams) (*GenericResponse, error) {
+	res, err := c.sendPOSTV1Roles(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendPOSTV1Roles(ctx context.Context, request *PostRolesRequest, params POSTV1RolesParams) (res *GenericResponse, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/roles"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePOSTV1RolesRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, POSTV1RolesOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, POSTV1RolesOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodePOSTV1RolesResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // POSTV1Users invokes POST_/v1/users operation.
 //
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).UserStore`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.authMiddleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Add new user.
 //

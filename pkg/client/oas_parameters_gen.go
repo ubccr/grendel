@@ -43,6 +43,13 @@ type DELETEV1NodesParams struct {
 	Accept OptString
 }
 
+// DELETEV1RolesNamesParams is parameters of DELETE_/v1/roles/:names operation.
+type DELETEV1RolesNamesParams struct {
+	// Delete by name.
+	Names  string
+	Accept OptString
+}
+
 // DELETEV1UsersUsernamesParams is parameters of DELETE_/v1/users/:usernames operation.
 type DELETEV1UsersUsernamesParams struct {
 	// Target usernames.
@@ -124,8 +131,20 @@ type GETV1NodesTokenInterfaceParams struct {
 	Accept OptString
 }
 
+// GETV1RolesParams is parameters of GET_/v1/roles operation.
+type GETV1RolesParams struct {
+	// Filter by name.
+	Name   OptString
+	Accept OptString
+}
+
 // GETV1UsersParams is parameters of GET_/v1/users operation.
 type GETV1UsersParams struct {
+	Accept OptString
+}
+
+// PATCHV1AuthResetParams is parameters of PATCH_/v1/auth/reset operation.
+type PATCHV1AuthResetParams struct {
 	Accept OptString
 }
 
@@ -156,6 +175,18 @@ type PATCHV1NodesTagsActionParams struct {
 	// Filter by tags. Minimum of one query parameter is required.
 	Tags   OptString
 	Accept OptString
+}
+
+// PATCHV1RolesParams is parameters of PATCH_/v1/roles operation.
+type PATCHV1RolesParams struct {
+	Accept OptString
+}
+
+// PATCHV1UsersUsernamesEnableParams is parameters of PATCH_/v1/users/:usernames/enable operation.
+type PATCHV1UsersUsernamesEnableParams struct {
+	// Target usernames.
+	Usernames string
+	Accept    OptString
 }
 
 // PATCHV1UsersUsernamesRoleParams is parameters of PATCH_/v1/users/:usernames/role operation.
@@ -228,6 +259,11 @@ type POSTV1ImagesParams struct {
 
 // POSTV1NodesParams is parameters of POST_/v1/nodes operation.
 type POSTV1NodesParams struct {
+	Accept OptString
+}
+
+// POSTV1RolesParams is parameters of POST_/v1/roles operation.
+type POSTV1RolesParams struct {
 	Accept OptString
 }
 

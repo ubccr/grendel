@@ -1,5 +1,7 @@
 import {
   useDeleteV1UsersUsernames,
+  useGetV1Roles,
+  usePatchV1UsersUsernamesEnable,
   usePatchV1UsersUsernamesRole,
 } from "@/openapi/queries";
 import { Button } from "../ui/button";
@@ -35,9 +37,13 @@ import { LoaderCircle } from "lucide-react";
 export default function UserActions({ users }: { users: string }) {
   const queryClient = useQueryClient();
   const [userRole, setUserRole] = useState("");
+  const [userEnabled, setUserEnabled] = useState("");
+
+  const query_roles = useGetV1Roles();
 
   const mutation_delete = useDeleteV1UsersUsernames();
   const mutation_role = usePatchV1UsersUsernamesRole();
+  const mutation_enabled = usePatchV1UsersUsernamesEnable();
 
   return (
     <div className="mt-4 grid sm:grid-cols-2 gap-4">
@@ -73,13 +79,15 @@ export default function UserActions({ users }: { users: string }) {
                       mutation_delete.mutate(
                         { path: { usernames: users } },
                         {
-                          onSuccess: () => {
-                            toast.success("Successfully deleted user(s)");
+                          onSuccess: (e) => {
+                            toast.success(e.data?.title, {
+                              description: e.data?.detail,
+                            });
                             queryClient.invalidateQueries();
                           },
-                          onError: () =>
-                            toast.error("Failed to delete user(s)", {
-                              // description: e.message,
+                          onError: (e) =>
+                            toast.error(e.title, {
+                              description: e.detail,
                             }),
                         }
                       )
@@ -103,16 +111,22 @@ export default function UserActions({ users }: { users: string }) {
           <CardTitle>Change Role</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-2">
-          <Select onValueChange={(e) => setUserRole(e)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Action" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="disabled">Disabled</SelectItem>
-              <SelectItem value="user">User</SelectItem>
-              <SelectItem value="admin">Admin</SelectItem>
-            </SelectContent>
-          </Select>
+          {query_roles.isFetching ? (
+            <LoaderCircle className="animate-spin" />
+          ) : (
+            <Select onValueChange={(e) => setUserRole(e)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Action" />
+              </SelectTrigger>
+              <SelectContent>
+                {query_roles.data?.roles?.map((role, i) => (
+                  <SelectItem key={i} value={role.name ?? ""}>
+                    {role.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </CardContent>
         <CardFooter>
           <Button
@@ -125,19 +139,69 @@ export default function UserActions({ users }: { users: string }) {
                   body: { role: userRole },
                 },
                 {
-                  onSuccess: () => {
+                  onSuccess: (e) => {
+                    toast.success(e.data?.title, {
+                      description: e.data?.detail,
+                    });
                     queryClient.invalidateQueries();
-                    toast.success("Successfully changed user(s) role");
                   },
-                  onError: () =>
-                    toast.error("Failed to change user(s) role", {
-                      // description: e.message,
+                  onError: (e) =>
+                    toast.error(e.title, {
+                      description: e.detail,
                     }),
                 }
               )
             }
           >
             {mutation_role.isPending ? (
+              <LoaderCircle className="animate-spin" />
+            ) : (
+              <span>Submit</span>
+            )}
+          </Button>
+        </CardFooter>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Change Enabled flag</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 gap-2">
+          <Select onValueChange={(e) => setUserEnabled(e)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Enabled" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="true">True</SelectItem>
+              <SelectItem value="false">False</SelectItem>
+            </SelectContent>
+          </Select>
+        </CardContent>
+        <CardFooter>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              mutation_enabled.mutate(
+                {
+                  path: { usernames: users },
+                  body: { enabled: userEnabled === "true" },
+                },
+                {
+                  onSuccess: (e) => {
+                    toast.success(e.data?.title, {
+                      description: e.data?.detail,
+                    });
+                    queryClient.invalidateQueries();
+                  },
+                  onError: (e) =>
+                    toast.error(e.title, {
+                      description: e.detail,
+                    }),
+                }
+              )
+            }
+          >
+            {mutation_enabled.isPending ? (
               <LoaderCircle className="animate-spin" />
             ) : (
               <span>Submit</span>

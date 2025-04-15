@@ -2,7 +2,7 @@
 
 import { type Options } from "@hey-api/client-fetch";
 import { UseQueryResult } from "@tanstack/react-query";
-import { deleteV1AuthSignout, deleteV1BmcJobsJids, deleteV1BmcSel, deleteV1Images, deleteV1Nodes, deleteV1UsersUsernames, getV1Bmc, getV1BmcJobs, getV1BmcMetrics, getV1DbDump, getV1GrendelEvents, getV1Images, getV1ImagesFind, getV1Nodes, getV1NodesFind, getV1NodesTokenInterface, getV1Users, patchV1NodesImage, patchV1NodesProvision, patchV1NodesTagsAction, patchV1UsersUsernamesRole, postV1AuthSignin, postV1AuthSignup, postV1AuthToken, postV1BmcConfigureAuto, postV1BmcConfigureImport, postV1BmcPowerBmc, postV1BmcPowerOs, postV1DbRestore, postV1Images, postV1Nodes, postV1Users } from "../requests/services.gen";
+import { deleteV1AuthSignout, deleteV1BmcJobsJids, deleteV1BmcSel, deleteV1Images, deleteV1Nodes, deleteV1RolesNames, deleteV1UsersUsernames, getV1Bmc, getV1BmcJobs, getV1BmcMetrics, getV1DbDump, getV1GrendelEvents, getV1Images, getV1ImagesFind, getV1Nodes, getV1NodesFind, getV1NodesTokenInterface, getV1Roles, getV1Users, patchV1AuthReset, patchV1NodesImage, patchV1NodesProvision, patchV1NodesTagsAction, patchV1Roles, patchV1UsersUsernamesEnable, patchV1UsersUsernamesRole, postV1AuthSignin, postV1AuthSignup, postV1AuthToken, postV1BmcConfigureAuto, postV1BmcConfigureImport, postV1BmcPowerBmc, postV1BmcPowerOs, postV1DbRestore, postV1Images, postV1Nodes, postV1Roles, postV1Users } from "../requests/services.gen";
 export type GetV1BmcDefaultResponse = Awaited<ReturnType<typeof getV1Bmc>>["data"];
 export type GetV1BmcQueryResult<TData = GetV1BmcDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
 export const useGetV1BmcKey = "GetV1Bmc";
@@ -43,6 +43,10 @@ export type GetV1NodesTokenInterfaceDefaultResponse = Awaited<ReturnType<typeof 
 export type GetV1NodesTokenInterfaceQueryResult<TData = GetV1NodesTokenInterfaceDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
 export const useGetV1NodesTokenInterfaceKey = "GetV1NodesTokenInterface";
 export const UseGetV1NodesTokenInterfaceKeyFn = (clientOptions: Options<unknown, true>, queryKey?: Array<unknown>) => [useGetV1NodesTokenInterfaceKey, ...(queryKey ?? [clientOptions])];
+export type GetV1RolesDefaultResponse = Awaited<ReturnType<typeof getV1Roles>>["data"];
+export type GetV1RolesQueryResult<TData = GetV1RolesDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
+export const useGetV1RolesKey = "GetV1Roles";
+export const UseGetV1RolesKeyFn = (clientOptions: Options<unknown, true> = {}, queryKey?: Array<unknown>) => [useGetV1RolesKey, ...(queryKey ?? [clientOptions])];
 export type GetV1UsersDefaultResponse = Awaited<ReturnType<typeof getV1Users>>["data"];
 export type GetV1UsersQueryResult<TData = GetV1UsersDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
 export const useGetV1UsersKey = "GetV1Users";
@@ -77,9 +81,15 @@ export const UsePostV1ImagesKeyFn = (mutationKey?: Array<unknown>) => [usePostV1
 export type PostV1NodesMutationResult = Awaited<ReturnType<typeof postV1Nodes>>;
 export const usePostV1NodesKey = "PostV1Nodes";
 export const UsePostV1NodesKeyFn = (mutationKey?: Array<unknown>) => [usePostV1NodesKey, ...(mutationKey ?? [])];
+export type PostV1RolesMutationResult = Awaited<ReturnType<typeof postV1Roles>>;
+export const usePostV1RolesKey = "PostV1Roles";
+export const UsePostV1RolesKeyFn = (mutationKey?: Array<unknown>) => [usePostV1RolesKey, ...(mutationKey ?? [])];
 export type PostV1UsersMutationResult = Awaited<ReturnType<typeof postV1Users>>;
 export const usePostV1UsersKey = "PostV1Users";
 export const UsePostV1UsersKeyFn = (mutationKey?: Array<unknown>) => [usePostV1UsersKey, ...(mutationKey ?? [])];
+export type PatchV1AuthResetMutationResult = Awaited<ReturnType<typeof patchV1AuthReset>>;
+export const usePatchV1AuthResetKey = "PatchV1AuthReset";
+export const UsePatchV1AuthResetKeyFn = (mutationKey?: Array<unknown>) => [usePatchV1AuthResetKey, ...(mutationKey ?? [])];
 export type PatchV1NodesImageMutationResult = Awaited<ReturnType<typeof patchV1NodesImage>>;
 export const usePatchV1NodesImageKey = "PatchV1NodesImage";
 export const UsePatchV1NodesImageKeyFn = (mutationKey?: Array<unknown>) => [usePatchV1NodesImageKey, ...(mutationKey ?? [])];
@@ -89,6 +99,12 @@ export const UsePatchV1NodesProvisionKeyFn = (mutationKey?: Array<unknown>) => [
 export type PatchV1NodesTagsActionMutationResult = Awaited<ReturnType<typeof patchV1NodesTagsAction>>;
 export const usePatchV1NodesTagsActionKey = "PatchV1NodesTagsAction";
 export const UsePatchV1NodesTagsActionKeyFn = (mutationKey?: Array<unknown>) => [usePatchV1NodesTagsActionKey, ...(mutationKey ?? [])];
+export type PatchV1RolesMutationResult = Awaited<ReturnType<typeof patchV1Roles>>;
+export const usePatchV1RolesKey = "PatchV1Roles";
+export const UsePatchV1RolesKeyFn = (mutationKey?: Array<unknown>) => [usePatchV1RolesKey, ...(mutationKey ?? [])];
+export type PatchV1UsersUsernamesEnableMutationResult = Awaited<ReturnType<typeof patchV1UsersUsernamesEnable>>;
+export const usePatchV1UsersUsernamesEnableKey = "PatchV1UsersUsernamesEnable";
+export const UsePatchV1UsersUsernamesEnableKeyFn = (mutationKey?: Array<unknown>) => [usePatchV1UsersUsernamesEnableKey, ...(mutationKey ?? [])];
 export type PatchV1UsersUsernamesRoleMutationResult = Awaited<ReturnType<typeof patchV1UsersUsernamesRole>>;
 export const usePatchV1UsersUsernamesRoleKey = "PatchV1UsersUsernamesRole";
 export const UsePatchV1UsersUsernamesRoleKeyFn = (mutationKey?: Array<unknown>) => [usePatchV1UsersUsernamesRoleKey, ...(mutationKey ?? [])];
@@ -107,6 +123,9 @@ export const UseDeleteV1ImagesKeyFn = (mutationKey?: Array<unknown>) => [useDele
 export type DeleteV1NodesMutationResult = Awaited<ReturnType<typeof deleteV1Nodes>>;
 export const useDeleteV1NodesKey = "DeleteV1Nodes";
 export const UseDeleteV1NodesKeyFn = (mutationKey?: Array<unknown>) => [useDeleteV1NodesKey, ...(mutationKey ?? [])];
+export type DeleteV1RolesNamesMutationResult = Awaited<ReturnType<typeof deleteV1RolesNames>>;
+export const useDeleteV1RolesNamesKey = "DeleteV1RolesNames";
+export const UseDeleteV1RolesNamesKeyFn = (mutationKey?: Array<unknown>) => [useDeleteV1RolesNamesKey, ...(mutationKey ?? [])];
 export type DeleteV1UsersUsernamesMutationResult = Awaited<ReturnType<typeof deleteV1UsersUsernames>>;
 export const useDeleteV1UsersUsernamesKey = "DeleteV1UsersUsernames";
 export const UseDeleteV1UsersUsernamesKeyFn = (mutationKey?: Array<unknown>) => [useDeleteV1UsersUsernamesKey, ...(mutationKey ?? [])];

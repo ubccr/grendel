@@ -23,6 +23,18 @@ func TestAuthRequest_EncodeDecode(t *testing.T) {
 	var typ2 AuthRequest
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestAuthResetRequest_EncodeDecode(t *testing.T) {
+	var typ AuthResetRequest
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 AuthResetRequest
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestAuthResponse_EncodeDecode(t *testing.T) {
 	var typ AuthResponse
 	typ.SetFake()
@@ -317,6 +329,54 @@ func TestGenericResponse_EncodeDecode(t *testing.T) {
 	var typ2 GenericResponse
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestGetRolesResponse_EncodeDecode(t *testing.T) {
+	var typ GetRolesResponse
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 GetRolesResponse
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestGetRolesResponseRolesItem_EncodeDecode(t *testing.T) {
+	var typ GetRolesResponseRolesItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 GetRolesResponseRolesItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestGetRolesResponseRolesItemPermissionListItem_EncodeDecode(t *testing.T) {
+	var typ GetRolesResponseRolesItemPermissionListItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 GetRolesResponseRolesItemPermissionListItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestGetRolesResponseRolesItemUnassignedPermissionListItem_EncodeDecode(t *testing.T) {
+	var typ GetRolesResponseRolesItemUnassignedPermissionListItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 GetRolesResponseRolesItemUnassignedPermissionListItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestHTTPError_EncodeDecode(t *testing.T) {
 	var typ HTTPError
 	typ.SetFake()
@@ -547,6 +607,42 @@ func TestNodeTagsRequest_EncodeDecode(t *testing.T) {
 	var typ2 NodeTagsRequest
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestPatchRolesRequest_EncodeDecode(t *testing.T) {
+	var typ PatchRolesRequest
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 PatchRolesRequest
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestPatchRolesRequestPermissionListItem_EncodeDecode(t *testing.T) {
+	var typ PatchRolesRequestPermissionListItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 PatchRolesRequestPermissionListItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestPostRolesRequest_EncodeDecode(t *testing.T) {
+	var typ PostRolesRequest
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 PostRolesRequest
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestRedfishJob_EncodeDecode(t *testing.T) {
 	var typ RedfishJob
 	typ.SetFake()
@@ -701,6 +797,18 @@ func TestUser_EncodeDecode(t *testing.T) {
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
 	var typ2 User
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestUserEnableRequest_EncodeDecode(t *testing.T) {
+	var typ UserEnableRequest
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 UserEnableRequest
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestUserRoleRequest_EncodeDecode(t *testing.T) {

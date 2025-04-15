@@ -59,13 +59,14 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 			openapi3.NewSecurityRequirement().Authenticate("cookieAuth"),
 		),
 	)
-	grendel := fuego.Group(v1, "/grendel", option.Middleware(authMiddleware), globalOptions)
-	nodes := fuego.Group(v1, "/nodes", option.Middleware(authMiddleware), globalOptions)
-	images := fuego.Group(v1, "/images", option.Middleware(authMiddleware), globalOptions)
-	users := fuego.Group(v1, "/users", option.Middleware(authMiddleware), globalOptions)
+	grendel := fuego.Group(v1, "/grendel", option.Middleware(h.authMiddleware), globalOptions)
+	nodes := fuego.Group(v1, "/nodes", option.Middleware(h.authMiddleware), globalOptions)
+	images := fuego.Group(v1, "/images", option.Middleware(h.authMiddleware), globalOptions)
+	users := fuego.Group(v1, "/users", option.Middleware(h.authMiddleware), globalOptions)
 	auth := fuego.Group(v1, "/auth", globalOptions)
-	db := fuego.Group(v1, "/db", option.Middleware(authMiddleware), globalOptions)
-	bmc := fuego.Group(v1, "/bmc", option.Middleware(authMiddleware), globalOptions)
+	db := fuego.Group(v1, "/db", option.Middleware(h.authMiddleware), globalOptions)
+	bmc := fuego.Group(v1, "/bmc", option.Middleware(h.authMiddleware), globalOptions)
+	roles := fuego.Group(v1, "/roles", option.Middleware(h.authMiddleware), globalOptions)
 
 	// Routes
 	fuego.Get(grendel, "/events", h.GetEvents)
@@ -100,7 +101,7 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 	)
 
 	fuego.Post(images, "", h.BootImageAdd, option.Description("Add images"))
-	fuego.Get(images, "", h.BootImageList, option.Description("List all images"), option.Middleware(authMiddleware))
+	fuego.Get(images, "", h.BootImageList, option.Description("List all images"))
 	fuego.Delete(images, "", h.BootImageDelete, option.Description("Delete images by name"), filterNames)
 	fuego.Get(images, "/find", h.BootImageFind, option.Description("Find images by name"), filterNames)
 
@@ -114,6 +115,10 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 		option.Description("Update users role"),
 		usernamesExample,
 	)
+	fuego.Patch(users, "/{usernames}/enable", h.UserEnable,
+		option.Description("Update users enable"),
+		usernamesExample,
+	)
 
 	fuego.Post(auth, "/signin", h.AuthSignin,
 		option.Description("signin user"),
@@ -125,13 +130,15 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 	)
 	fuego.Delete(auth, "/signout", h.AuthSignout,
 		option.Description("Signout user"),
-		option.Security(
-			openapi3.NewSecurityRequirement().Authenticate("cookieAuth"),
-		),
+		option.Security(openapi3.NewSecurityRequirement()),
 	)
 	fuego.Post(auth, "/token", h.AuthToken,
 		option.Description("Create API token"),
-		option.Middleware(authMiddleware),
+		option.Middleware(h.authMiddleware),
+	)
+	fuego.Patch(auth, "/reset", h.AuthReset,
+		option.Description("Change password"),
+		option.Middleware(h.authMiddleware),
 	)
 
 	fuego.Post(db, "/restore", h.Restore, option.Description("Restore a backup of the DB"))
@@ -175,6 +182,21 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 	fuego.Get(bmc, "/metrics", h.BmcMetricReports,
 		option.Description("Get metric reports by nodeset"),
 		filterNodes,
+	)
+
+	fuego.Get(roles, "", h.GetRoles,
+		option.Description("Get roles and permissions"),
+		option.Query("name", "Filter by name", param.Example("name", "admin,user")),
+	)
+	fuego.Patch(roles, "", h.PatchRoles,
+		option.Description("Edit role permissions"),
+	)
+	fuego.Post(roles, "", h.PostRoles,
+		option.Description("Add roles"),
+	)
+	fuego.Delete(roles, "/{names}", h.DeleteRoles,
+		option.Description("Delete roles"),
+		option.Path("names", "Delete by name", param.Example("names", "admin,user")),
 	)
 
 }

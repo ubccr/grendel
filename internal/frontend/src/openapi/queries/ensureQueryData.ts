@@ -2,8 +2,8 @@
 
 import { type Options } from "@hey-api/client-fetch";
 import { type QueryClient } from "@tanstack/react-query";
-import { getV1Bmc, getV1BmcJobs, getV1BmcMetrics, getV1DbDump, getV1GrendelEvents, getV1Images, getV1ImagesFind, getV1Nodes, getV1NodesFind, getV1NodesTokenInterface, getV1Users } from "../requests/services.gen";
-import { GetV1BmcData, GetV1BmcJobsData, GetV1BmcMetricsData, GetV1DbDumpData, GetV1GrendelEventsData, GetV1ImagesData, GetV1ImagesFindData, GetV1NodesData, GetV1NodesFindData, GetV1NodesTokenInterfaceData, GetV1UsersData } from "../requests/types.gen";
+import { getV1Bmc, getV1BmcJobs, getV1BmcMetrics, getV1DbDump, getV1GrendelEvents, getV1Images, getV1ImagesFind, getV1Nodes, getV1NodesFind, getV1NodesTokenInterface, getV1Roles, getV1Users } from "../requests/services.gen";
+import { GetV1BmcData, GetV1BmcJobsData, GetV1BmcMetricsData, GetV1DbDumpData, GetV1GrendelEventsData, GetV1ImagesData, GetV1ImagesFindData, GetV1NodesData, GetV1NodesFindData, GetV1NodesTokenInterfaceData, GetV1RolesData, GetV1UsersData } from "../requests/types.gen";
 import * as Common from "./common";
 export const ensureUseGetV1BmcData = (queryClient: QueryClient, clientOptions: Options<GetV1BmcData, true> = {}) => queryClient.ensureQueryData({ queryKey: Common.UseGetV1BmcKeyFn(clientOptions), queryFn: () => getV1Bmc({ ...clientOptions }).then(response => response.data) });
 export const ensureUseGetV1BmcJobsData = (queryClient: QueryClient, clientOptions: Options<GetV1BmcJobsData, true> = {}) => queryClient.ensureQueryData({ queryKey: Common.UseGetV1BmcJobsKeyFn(clientOptions), queryFn: () => getV1BmcJobs({ ...clientOptions }).then(response => response.data) });
@@ -15,4 +15,5 @@ export const ensureUseGetV1ImagesFindData = (queryClient: QueryClient, clientOpt
 export const ensureUseGetV1NodesData = (queryClient: QueryClient, clientOptions: Options<GetV1NodesData, true> = {}) => queryClient.ensureQueryData({ queryKey: Common.UseGetV1NodesKeyFn(clientOptions), queryFn: () => getV1Nodes({ ...clientOptions }).then(response => response.data) });
 export const ensureUseGetV1NodesFindData = (queryClient: QueryClient, clientOptions: Options<GetV1NodesFindData, true> = {}) => queryClient.ensureQueryData({ queryKey: Common.UseGetV1NodesFindKeyFn(clientOptions), queryFn: () => getV1NodesFind({ ...clientOptions }).then(response => response.data) });
 export const ensureUseGetV1NodesTokenInterfaceData = (queryClient: QueryClient, clientOptions: Options<GetV1NodesTokenInterfaceData, true>) => queryClient.ensureQueryData({ queryKey: Common.UseGetV1NodesTokenInterfaceKeyFn(clientOptions), queryFn: () => getV1NodesTokenInterface({ ...clientOptions }).then(response => response.data) });
+export const ensureUseGetV1RolesData = (queryClient: QueryClient, clientOptions: Options<GetV1RolesData, true> = {}) => queryClient.ensureQueryData({ queryKey: Common.UseGetV1RolesKeyFn(clientOptions), queryFn: () => getV1Roles({ ...clientOptions }).then(response => response.data) });
 export const ensureUseGetV1UsersData = (queryClient: QueryClient, clientOptions: Options<GetV1UsersData, true> = {}) => queryClient.ensureQueryData({ queryKey: Common.UseGetV1UsersKeyFn(clientOptions), queryFn: () => getV1Users({ ...clientOptions }).then(response => response.data) });

@@ -1,4 +1,5 @@
-import { Button } from "@/components/ui/button";
+import { useForm } from "@tanstack/react-form";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   Card,
   CardContent,
@@ -7,47 +8,31 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useUser } from "@/hooks/user-provider";
-import { usePostV1AuthSignup } from "@/openapi/queries";
-import { useForm } from "@tanstack/react-form";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { Input } from "@/components/ui/input";
+import { usePostV1Roles } from "@/openapi/queries";
+import { Button } from "@/components/ui/button";
 import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
-import { LOGIN_REDIRECT_FALLBACK } from "./signin";
 
-export const Route = createFileRoute("/account/signup")({
+export const Route = createFileRoute("/add/role")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { mutate, isPending } = usePostV1AuthSignup();
-  const User = useUser();
-  const router = useRouter();
-
   const form = useForm({
     defaultValues: {
-      username: "",
-      password: "",
-      confirmPassword: "",
+      name: "",
+      inherit: "",
     },
     onSubmit: async ({ value }) => {
-      if (value.password !== value.confirmPassword) {
-        toast.error("Passwords do not match");
-        return;
-      }
       mutate(
-        { body: { username: value.username, password: value.password } },
+        { body: { role: value.name, inherited_role: value.inherit } },
         {
-          onSuccess: (e) => {
-            User.setUser({
-              username: e.data?.username ?? "",
-              role: e.data?.role ?? "",
-              expire: 0,
+          onSuccess: ({ data }) => {
+            toast.success(data?.title, {
+              description: data?.detail,
             });
-            toast.success("Successfully created an account");
-            router.history.push(LOGIN_REDIRECT_FALLBACK);
           },
           onError: (e) => {
             toast.error(e.title, {
@@ -58,6 +43,7 @@ function RouteComponent() {
       );
     },
   });
+  const { mutate, isPending } = usePostV1Roles();
   return (
     <div className="flex justify-center">
       <form
@@ -70,18 +56,18 @@ function RouteComponent() {
       >
         <Card>
           <CardHeader>
-            <CardTitle>Create an Account:</CardTitle>
+            <CardTitle>Add a Role:</CardTitle>
             <CardDescription>
-              New to Grendel? Create your account then ask your administrator to
-              enable it
+              New Roles can be created from an inherited role, which will copy
+              all permissions into the new role.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form.Field
-              name="username"
+              name="name"
               children={(field) => (
                 <div>
-                  <Label>Username:</Label>
+                  <Label>Name:</Label>
                   <Input
                     value={field.state.value}
                     onBlur={field.handleBlur}
@@ -91,26 +77,11 @@ function RouteComponent() {
               )}
             />
             <form.Field
-              name="password"
+              name="inherit"
               children={(field) => (
                 <div>
-                  <Label>Password:</Label>
+                  <Label>Inherited role:</Label>
                   <Input
-                    type="password"
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                </div>
-              )}
-            />
-            <form.Field
-              name="confirmPassword"
-              children={(field) => (
-                <div>
-                  <Label>Confirm Password:</Label>
-                  <Input
-                    type="password"
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}

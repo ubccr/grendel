@@ -9,6 +9,14 @@ export type AuthRequest = {
 };
 
 /**
+ * AuthResetRequest schema
+ */
+export type AuthResetRequest = {
+    current_password?: string;
+    new_password: string;
+};
+
+/**
  * AuthResponse schema
  */
 export type AuthResponse = {
@@ -173,6 +181,7 @@ export type DataDump = {
     } | null)>;
     Users?: Array<{
         created_at?: string;
+        enabled?: boolean;
         hash?: string;
         id?: (number) | null;
         modified_at?: string;
@@ -218,6 +227,23 @@ export type GenericResponse = {
     changed?: number;
     detail?: string;
     title?: string;
+};
+
+/**
+ * GetRolesResponse schema
+ */
+export type GetRolesResponse = {
+    roles?: Array<{
+        name?: string;
+        permission_list?: Array<{
+            method?: string;
+            path?: string;
+        }>;
+        unassigned_permission_list?: Array<{
+            method?: string;
+            path?: string;
+        }>;
+    }>;
 };
 
 /**
@@ -379,6 +405,25 @@ export type NodeTagsRequest = {
 };
 
 /**
+ * PatchRolesRequest schema
+ */
+export type PatchRolesRequest = {
+    permission_list?: Array<{
+        method?: string;
+        path?: string;
+    }>;
+    role?: string;
+};
+
+/**
+ * PostRolesRequest schema
+ */
+export type PostRolesRequest = {
+    inherited_role?: string;
+    role?: string;
+};
+
+/**
  * RedfishJob schema
  */
 export type RedfishJob = {
@@ -490,11 +535,19 @@ export type RedfishSystem = {
  */
 export type User = {
     created_at?: string;
+    enabled?: boolean;
     hash?: string;
     id?: (number) | null;
     modified_at?: string;
     role?: string;
     username?: string;
+};
+
+/**
+ * UserEnableRequest schema
+ */
+export type UserEnableRequest = {
+    enabled?: boolean;
 };
 
 /**
@@ -527,6 +580,20 @@ export type UserStoreResponse = {
  * unknown-interface schema
  */
 export type unknown_interface = unknown;
+
+export type PatchV1AuthResetData = {
+    /**
+     * Request body for api.AuthResetRequest
+     */
+    body: AuthResetRequest;
+    headers?: {
+        Accept?: string;
+    };
+};
+
+export type PatchV1AuthResetResponse = (GenericResponse);
+
+export type PatchV1AuthResetError = (HTTPError);
 
 export type PostV1AuthSigninData = {
     /**
@@ -1032,6 +1099,66 @@ export type GetV1NodesTokenInterfaceResponse = (NodeBootTokenResponse);
 
 export type GetV1NodesTokenInterfaceError = (HTTPError);
 
+export type GetV1RolesData = {
+    headers?: {
+        Accept?: string;
+    };
+    query?: {
+        /**
+         * Filter by name
+         */
+        name?: string;
+    };
+};
+
+export type GetV1RolesResponse = (GetRolesResponse);
+
+export type GetV1RolesError = (HTTPError);
+
+export type PatchV1RolesData = {
+    /**
+     * Request body for api.PatchRolesRequest
+     */
+    body: PatchRolesRequest;
+    headers?: {
+        Accept?: string;
+    };
+};
+
+export type PatchV1RolesResponse = (GenericResponse);
+
+export type PatchV1RolesError = (HTTPError);
+
+export type PostV1RolesData = {
+    /**
+     * Request body for api.PostRolesRequest
+     */
+    body: PostRolesRequest;
+    headers?: {
+        Accept?: string;
+    };
+};
+
+export type PostV1RolesResponse = (GenericResponse);
+
+export type PostV1RolesError = (HTTPError);
+
+export type DeleteV1RolesNamesData = {
+    headers?: {
+        Accept?: string;
+    };
+    path: {
+        /**
+         * Delete by name
+         */
+        names: string;
+    };
+};
+
+export type DeleteV1RolesNamesResponse = (GenericResponse);
+
+export type DeleteV1RolesNamesError = (HTTPError);
+
 export type GetV1UsersData = {
     headers?: {
         Accept?: string;
@@ -1071,6 +1198,26 @@ export type DeleteV1UsersUsernamesData = {
 export type DeleteV1UsersUsernamesResponse = (GenericResponse);
 
 export type DeleteV1UsersUsernamesError = (HTTPError);
+
+export type PatchV1UsersUsernamesEnableData = {
+    /**
+     * Request body for api.UserEnableRequest
+     */
+    body: UserEnableRequest;
+    headers?: {
+        Accept?: string;
+    };
+    path: {
+        /**
+         * target usernames
+         */
+        usernames: string;
+    };
+};
+
+export type PatchV1UsersUsernamesEnableResponse = (GenericResponse);
+
+export type PatchV1UsersUsernamesEnableError = (HTTPError);
 
 export type PatchV1UsersUsernamesRoleData = {
     /**

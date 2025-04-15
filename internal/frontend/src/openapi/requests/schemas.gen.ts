@@ -13,6 +13,21 @@ export const AuthRequestSchema = {
     type: 'object'
 } as const;
 
+export const AuthResetRequestSchema = {
+    description: 'AuthResetRequest schema',
+    properties: {
+        current_password: {
+            type: 'string'
+        },
+        new_password: {
+            minLength: 8,
+            type: 'string'
+        }
+    },
+    required: ['new_password'],
+    type: 'object'
+} as const;
+
 export const AuthResponseSchema = {
     description: 'AuthResponse schema',
     properties: {
@@ -415,6 +430,9 @@ export const DataDumpSchema = {
                         format: 'date-time',
                         type: 'string'
                     },
+                    enabled: {
+                        type: 'boolean'
+                    },
                     hash: {
                         type: 'string'
                     },
@@ -535,6 +553,52 @@ export const GenericResponseSchema = {
         },
         title: {
             type: 'string'
+        }
+    },
+    type: 'object'
+} as const;
+
+export const GetRolesResponseSchema = {
+    description: 'GetRolesResponse schema',
+    properties: {
+        roles: {
+            items: {
+                properties: {
+                    name: {
+                        type: 'string'
+                    },
+                    permission_list: {
+                        items: {
+                            properties: {
+                                method: {
+                                    type: 'string'
+                                },
+                                path: {
+                                    type: 'string'
+                                }
+                            },
+                            type: 'object'
+                        },
+                        type: 'array'
+                    },
+                    unassigned_permission_list: {
+                        items: {
+                            properties: {
+                                method: {
+                                    type: 'string'
+                                },
+                                path: {
+                                    type: 'string'
+                                }
+                            },
+                            type: 'object'
+                        },
+                        type: 'array'
+                    }
+                },
+                type: 'object'
+            },
+            type: 'array'
         }
     },
     type: 'object'
@@ -943,6 +1007,43 @@ export const NodeTagsRequestSchema = {
     type: 'object'
 } as const;
 
+export const PatchRolesRequestSchema = {
+    description: 'PatchRolesRequest schema',
+    properties: {
+        permission_list: {
+            items: {
+                properties: {
+                    method: {
+                        type: 'string'
+                    },
+                    path: {
+                        type: 'string'
+                    }
+                },
+                type: 'object'
+            },
+            type: 'array'
+        },
+        role: {
+            type: 'string'
+        }
+    },
+    type: 'object'
+} as const;
+
+export const PostRolesRequestSchema = {
+    description: 'PostRolesRequest schema',
+    properties: {
+        inherited_role: {
+            type: 'string'
+        },
+        role: {
+            type: 'string'
+        }
+    },
+    type: 'object'
+} as const;
+
 export const RedfishJobSchema = {
     description: 'RedfishJob schema',
     properties: {
@@ -1281,6 +1382,9 @@ export const UserSchema = {
             format: 'date-time',
             type: 'string'
         },
+        enabled: {
+            type: 'boolean'
+        },
         hash: {
             type: 'string'
         },
@@ -1298,6 +1402,16 @@ export const UserSchema = {
         },
         username: {
             type: 'string'
+        }
+    },
+    type: 'object'
+} as const;
+
+export const UserEnableRequestSchema = {
+    description: 'UserEnableRequest schema',
+    properties: {
+        enabled: {
+            type: 'boolean'
         }
     },
     type: 'object'
