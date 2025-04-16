@@ -37,18 +37,18 @@ func (s *StoreTestSuite) TestUser() {
 
 	role, err := s.db.StoreUser(adminUsername, adminPassword)
 	s.Assert().NoError(err)
-	s.Assert().Equal("admin", role)
+	s.Assert().Equal(model.RoleAdmin.String(), role)
 	role, err = s.db.StoreUser(userUsername, userPassword)
 	s.Assert().NoError(err)
-	s.Assert().Equal("disabled", role)
+	s.Assert().Equal(model.RoleUser.String(), role)
 
 	authenticated, role, err := s.db.VerifyUser("admin", adminPassword)
 	s.Assert().NoError(err)
-	s.Assert().Equal("admin", role)
+	s.Assert().Equal(model.RoleAdmin.String(), role)
 	s.Assert().Equal(true, authenticated)
 	authenticated, role, err = s.db.VerifyUser("user", userPassword)
 	s.Assert().NoError(err)
-	s.Assert().Equal("disabled", role)
+	s.Assert().Equal(model.RoleUser.String(), role)
 	s.Assert().Equal(true, authenticated)
 
 	users, err := s.db.GetUsers()
@@ -56,11 +56,11 @@ func (s *StoreTestSuite) TestUser() {
 	s.Assert().Equal(users[0].Username, "admin")
 	s.Assert().Contains(users[1].Username, "user")
 
-	err = s.db.UpdateUserRole("user", "user")
+	err = s.db.UpdateUserRole("user", model.RoleReadOnly.String())
 	s.Assert().NoError(err)
 	authenticated, role, err = s.db.VerifyUser("user", userPassword)
 	s.Assert().NoError(err)
-	s.Assert().Equal(role, "user")
+	s.Assert().Equal(role, model.RoleReadOnly.String())
 	s.Assert().Equal(authenticated, true)
 
 	err = s.db.DeleteUser("user")
@@ -666,7 +666,7 @@ func (s *StoreTestSuite) TestRestore() {
 	s.Assert().Equal("admin", role)
 	role, err = s.db.StoreUser("user", "test1234")
 	s.Assert().NoError(err)
-	s.Assert().Equal("disabled", role)
+	s.Assert().Equal("user", role)
 
 	for i := 0; i < size; i++ {
 		host := tests.HostFactory.MustCreate().(*model.Host)
