@@ -119,6 +119,10 @@ listen = "0.0.0.0:53"
 # Default TTL for dns responses
 ttl = 86400
 
+# Address that Grendel should forward unknown DNS queries to
+# By default Grendel is only a recursive resolver
+#forward = "1.1.1.1:53"
+
 #------------------------------------------------------------------------------
 # TFTP Server
 #------------------------------------------------------------------------------

@@ -18,8 +18,10 @@ import (
 func init() {
 	dnsCmd.PersistentFlags().String("dns-listen", "0.0.0.0:53", "address to listen on")
 	dnsCmd.PersistentFlags().Int("dns-ttl", 300, "ttl for dns records")
+	dnsCmd.PersistentFlags().String("dns-forward", "", "address to forward dns queries not resolved by grendel. ex: 1.1.1.1:53")
 	viper.BindPFlag("dns.listen", dnsCmd.PersistentFlags().Lookup("dns-listen"))
 	viper.BindPFlag("dns.ttl", dnsCmd.PersistentFlags().Lookup("dns-ttl"))
+	viper.BindPFlag("dns.forward", dnsCmd.PersistentFlags().Lookup("dns-forward"))
 
 	serveCmd.AddCommand(dnsCmd)
 }
@@ -46,6 +48,11 @@ func serveDNS(t *tomb.Tomb) error {
 	dnsServer, err := dns.NewServer(DB, dnsListen, viper.GetInt("dns.ttl"))
 	if err != nil {
 		return err
+	}
+
+	fwAddr := viper.GetString("dns.forward")
+	if fwAddr != "" {
+		cmd.Log.Debugf("dns.forward address set, using: %s", fwAddr)
 	}
 
 	t.Go(func() error {
