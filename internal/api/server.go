@@ -125,6 +125,10 @@ func (s *Server) Serve() error {
 		fuego.WithSecurity(setupSecurity()),
 	)
 
+	s.server.OpenAPI.Description().Info.Title = "Grendel API"
+	s.server.OpenAPI.Description().Info.Description = "OpenAPI spec for the Grendel API"
+	s.server.OpenAPI.Description().Info.Version = "0.2.0"
+
 	h, err := NewHandler(s.DB)
 	if err != nil {
 		return err
