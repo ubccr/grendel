@@ -95,24 +95,24 @@ func (b Build) ToBytes() []byte {
 func DetectBuild(archs iana.Archs, userClass string) (Build, error) {
 	var build Build
 
-	if archs == nil || len(archs) == 0 {
-		return build, fmt.Errorf("No Client System Architecture Types provided")
+	if len(archs) == 0 {
+		return build, fmt.Errorf("no client system architecture types provided")
 	}
 
 	//XXX TODO use first arch? what to do if there's more than one??
 	arch := archs[0]
 
 	switch arch {
-	case iana.INTEL_X86PC:
+	case iana.INTEL_X86PC: // BIOS Boot
 		build = UNDI
-	case iana.EFI_IA32:
+	case iana.EFI_IA32: // unverified
 		build = EFI386
-	case iana.EFI_BC, iana.EFI_X86_64:
-		build = EFI64
-	case iana.EFI_ARM64:
+	case iana.EFI_BC, iana.EFI_X86_64: // UEFI x86_64 Boot
+		build = SNPONLYx86_64
+	case iana.EFI_ARM64: // UEFI ARM64
 		build = SNPONLYarm64
 	default:
-		return build, fmt.Errorf("Unsupported Client System Architecture Type: %d", arch)
+		return build, fmt.Errorf("unsupported client system architecture type: %d", arch)
 	}
 
 	if userClass != "" {
