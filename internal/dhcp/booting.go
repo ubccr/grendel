@@ -83,7 +83,7 @@ func (s *Server) bootingHandler4(host *model.Host, serverIP net.IP, req, resp *d
 		endpoints := provision.NewEndpoints(serverIP.String(), token)
 		resp.UpdateOption(dhcpv4.OptBootFileName(endpoints.BootFileURL()))
 
-	case firmware.EFI386, firmware.EFI64, firmware.SNPONLYarm64:
+	case firmware.EFI386, firmware.EFI64, firmware.SNPONLYx86_64, firmware.SNPONLYarm64:
 		log.Printf("EFI boot PXE client")
 		if host.Firmware != 0 {
 			log.Infof("Overriding firmware for host: %s", req.ClientHWAddr.String())
