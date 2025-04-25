@@ -49,8 +49,10 @@ function RouteComponent() {
             toast.success("Successfully created an account");
             router.history.push(LOGIN_REDIRECT_FALLBACK);
           },
-          onError: () => {
-            toast.error("Failed to create an account");
+          onError: (e) => {
+            toast.error(e.title, {
+              description: e.detail,
+            });
           },
         }
       );

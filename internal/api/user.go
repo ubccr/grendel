@@ -26,6 +26,10 @@ type UserRoleRequest struct {
 	Role string `json:"role" description:"type of model.Role, valid options: disabled, user, admin" example:"admin"`
 }
 
+type UserEnableRequest struct {
+	Enabled bool `json:"enabled"`
+}
+
 func (h *Handler) UserList(c fuego.ContextNoBody) ([]model.User, error) {
 	users, err := h.DB.GetUsers()
 	if err != nil {
@@ -89,6 +93,38 @@ func (h *Handler) UserRole(c fuego.ContextWithBody[UserRoleRequest]) (*GenericRe
 	return &GenericResponse{
 		Title:   "Success",
 		Detail:  "successfully edited user(s) role",
+		Changed: len(users),
+	}, nil
+}
+
+func (h *Handler) UserEnable(c fuego.ContextWithBody[UserEnableRequest]) (*GenericResponse, error) {
+	body, err := c.Body()
+	if err != nil {
+		return nil, fuego.HTTPError{
+			Err:    err,
+			Title:  "Error",
+			Detail: "failed to parse user enable body",
+		}
+	}
+
+	users := strings.Split(c.PathParam("usernames"), ",")
+
+	for _, user := range users {
+		err := h.DB.UpdateUserEnabled(user, body.Enabled)
+		if err != nil {
+			return nil, fuego.HTTPError{
+				Err:    err,
+				Title:  "Error",
+				Detail: "failed to update user: " + user,
+			}
+		}
+	}
+
+	h.writeEvent(c.Context(), "Success", fmt.Sprintf("Successfully updated user(s) enable flag: users=%s enabled=%t", strings.Join(users, ", "), body.Enabled))
+
+	return &GenericResponse{
+		Title:   "Success",
+		Detail:  "successfully edited user(s) enabled flag",
 		Changed: len(users),
 	}, nil
 }

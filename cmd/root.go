@@ -18,7 +18,6 @@ import (
 	"strings"
 	"time"
 
-	retryablehttp "github.com/hashicorp/go-retryablehttp"
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -105,10 +104,13 @@ func NewOgenClient() (*client.Client, error) {
 		endpoint = "http://localhost"
 	}
 
-	rclient := retryablehttp.NewClient()
-	rclient.HTTPClient = &http.Client{Timeout: time.Second * 3600, Transport: tr}
-	rclient.Logger = Log
-	httpClient := rclient.StandardClient()
+	httpClient := &http.Client{Timeout: time.Second * 3600, Transport: tr}
+	// rclient needs some error handler to work properly with ogen convenient errors
+	// rclient := retryablehttp.NewClient()
+	// rclient.RetryMax = 1
+	// rclient.HTTPClient = &http.Client{Timeout: time.Second * 3600, Transport: tr}
+	// rclient.Logger = Log
+	// httpClient := rclient.StandardClient()
 	client, err := client.NewClient(endpoint, newAuthHandler(), client.WithClient(httpClient))
 	if err != nil {
 		return nil, err
@@ -118,14 +120,13 @@ func NewOgenClient() (*client.Client, error) {
 
 func NewApiError(apiError error) error {
 	var t *client.HTTPErrorStatusCode
-
 	if !errors.As(apiError, &t) {
 		return apiError
 	}
 
 	httpError := t.GetResponse()
 
-	return fmt.Errorf("%d: %s - %s", httpError.GetStatus().Value, httpError.GetTitle().Value, httpError.GetDetail().Value)
+	return fmt.Errorf("API Error: status=%d title=%s detail=%s", t.StatusCode, httpError.GetTitle().Value, httpError.GetDetail().Value)
 }
 func NewApiResponse(res *client.GenericResponse) error {
 	fmt.Printf("%s: %s \nchanged: %d \n", res.GetTitle().Value, res.GetDetail().Value, res.GetChanged().Value)

@@ -22,7 +22,7 @@ func TestJwtClaims(t *testing.T) {
 
 	claims := jwt.MapClaims{
 		TokenUsername: "test-user",
-		TokenRole:     model.RoleDisabled.String(),
+		TokenRole:     model.RoleAdmin.String(),
 	}
 	token, err := NewToken(claims, signingKey)
 	assert.Nil(err)
@@ -31,7 +31,7 @@ func TestJwtClaims(t *testing.T) {
 	assert.Nil(err)
 
 	assert.Equal(tokenClaims.username, "test-user")
-	assert.Equal(tokenClaims.role, "disabled")
+	assert.Equal(tokenClaims.role, "admin")
 }
 
 func TestJwtExpire(t *testing.T) {
@@ -39,7 +39,7 @@ func TestJwtExpire(t *testing.T) {
 
 	claims := jwt.MapClaims{
 		TokenUsername: "test-user",
-		TokenRole:     model.RoleDisabled.String(),
+		TokenRole:     model.RoleAdmin.String(),
 		TokenExpire:   time.Now().Add(time.Second).Unix(),
 	}
 	token, err := NewToken(claims, signingKey)
@@ -59,7 +59,7 @@ func TestJwtChangeSecret(t *testing.T) {
 
 	claims := jwt.MapClaims{
 		TokenUsername: "test-user",
-		TokenRole:     model.RoleDisabled.String(),
+		TokenRole:     model.RoleAdmin.String(),
 	}
 	token, err := NewToken(claims, signingKey)
 	assert.Nil(err)

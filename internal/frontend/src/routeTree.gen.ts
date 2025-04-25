@@ -23,14 +23,18 @@ import { Route as RackRackImport } from './routes/rack/$rack'
 import { Route as NodesNodeImport } from './routes/nodes/$node'
 import { Route as ImagesImageImport } from './routes/images/$image'
 import { Route as AddTemplateImport } from './routes/add/template'
+import { Route as AddRoleImport } from './routes/add/role'
 import { Route as AddNodeImport } from './routes/add/node'
 import { Route as AddImageImport } from './routes/add/image'
-import { Route as AccountUsersImport } from './routes/account/users'
 import { Route as AccountTokenImport } from './routes/account/token'
 import { Route as AccountSignupImport } from './routes/account/signup'
 import { Route as AccountSigninImport } from './routes/account/signin'
+import { Route as AccountResetImport } from './routes/account/reset'
 import { Route as GroupsNodesIndexImport } from './routes/groups/nodes/index'
+import { Route as AccountUsersIndexImport } from './routes/account/users/index'
+import { Route as AccountRolesIndexImport } from './routes/account/roles/index'
 import { Route as GroupsNodesGroupImport } from './routes/groups/nodes/$group'
+import { Route as AccountRolesRoleImport } from './routes/account/roles/$role'
 
 // Create/Update Routes
 
@@ -106,6 +110,12 @@ const AddTemplateRoute = AddTemplateImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AddRoleRoute = AddRoleImport.update({
+  id: '/add/role',
+  path: '/add/role',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const AddNodeRoute = AddNodeImport.update({
   id: '/add/node',
   path: '/add/node',
@@ -115,12 +125,6 @@ const AddNodeRoute = AddNodeImport.update({
 const AddImageRoute = AddImageImport.update({
   id: '/add/image',
   path: '/add/image',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const AccountUsersRoute = AccountUsersImport.update({
-  id: '/account/users',
-  path: '/account/users',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -142,15 +146,39 @@ const AccountSigninRoute = AccountSigninImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AccountResetRoute = AccountResetImport.update({
+  id: '/account/reset',
+  path: '/account/reset',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const GroupsNodesIndexRoute = GroupsNodesIndexImport.update({
   id: '/groups/nodes/',
   path: '/groups/nodes/',
   getParentRoute: () => rootRoute,
 } as any)
 
+const AccountUsersIndexRoute = AccountUsersIndexImport.update({
+  id: '/account/users/',
+  path: '/account/users/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AccountRolesIndexRoute = AccountRolesIndexImport.update({
+  id: '/account/roles/',
+  path: '/account/roles/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const GroupsNodesGroupRoute = GroupsNodesGroupImport.update({
   id: '/groups/nodes/$group',
   path: '/groups/nodes/$group',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AccountRolesRoleRoute = AccountRolesRoleImport.update({
+  id: '/account/roles/$role',
+  path: '/account/roles/$role',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -186,6 +214,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FloorplanImport
       parentRoute: typeof rootRoute
     }
+    '/account/reset': {
+      id: '/account/reset'
+      path: '/account/reset'
+      fullPath: '/account/reset'
+      preLoaderRoute: typeof AccountResetImport
+      parentRoute: typeof rootRoute
+    }
     '/account/signin': {
       id: '/account/signin'
       path: '/account/signin'
@@ -207,13 +242,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountTokenImport
       parentRoute: typeof rootRoute
     }
-    '/account/users': {
-      id: '/account/users'
-      path: '/account/users'
-      fullPath: '/account/users'
-      preLoaderRoute: typeof AccountUsersImport
-      parentRoute: typeof rootRoute
-    }
     '/add/image': {
       id: '/add/image'
       path: '/add/image'
@@ -226,6 +254,13 @@ declare module '@tanstack/react-router' {
       path: '/add/node'
       fullPath: '/add/node'
       preLoaderRoute: typeof AddNodeImport
+      parentRoute: typeof rootRoute
+    }
+    '/add/role': {
+      id: '/add/role'
+      path: '/add/role'
+      fullPath: '/add/role'
+      preLoaderRoute: typeof AddRoleImport
       parentRoute: typeof rootRoute
     }
     '/add/template': {
@@ -284,11 +319,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TemplatesIndexImport
       parentRoute: typeof rootRoute
     }
+    '/account/roles/$role': {
+      id: '/account/roles/$role'
+      path: '/account/roles/$role'
+      fullPath: '/account/roles/$role'
+      preLoaderRoute: typeof AccountRolesRoleImport
+      parentRoute: typeof rootRoute
+    }
     '/groups/nodes/$group': {
       id: '/groups/nodes/$group'
       path: '/groups/nodes/$group'
       fullPath: '/groups/nodes/$group'
       preLoaderRoute: typeof GroupsNodesGroupImport
+      parentRoute: typeof rootRoute
+    }
+    '/account/roles/': {
+      id: '/account/roles/'
+      path: '/account/roles'
+      fullPath: '/account/roles'
+      preLoaderRoute: typeof AccountRolesIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/account/users/': {
+      id: '/account/users/'
+      path: '/account/users'
+      fullPath: '/account/users'
+      preLoaderRoute: typeof AccountUsersIndexImport
       parentRoute: typeof rootRoute
     }
     '/groups/nodes/': {
@@ -308,12 +364,13 @@ export interface FileRoutesByFullPath {
   '/$': typeof SplatRoute
   '/events': typeof EventsRoute
   '/floorplan': typeof FloorplanRoute
+  '/account/reset': typeof AccountResetRoute
   '/account/signin': typeof AccountSigninRoute
   '/account/signup': typeof AccountSignupRoute
   '/account/token': typeof AccountTokenRoute
-  '/account/users': typeof AccountUsersRoute
   '/add/image': typeof AddImageRoute
   '/add/node': typeof AddNodeRoute
+  '/add/role': typeof AddRoleRoute
   '/add/template': typeof AddTemplateRoute
   '/images/$image': typeof ImagesImageRoute
   '/nodes/$node': typeof NodesNodeRoute
@@ -322,7 +379,10 @@ export interface FileRoutesByFullPath {
   '/images': typeof ImagesIndexRoute
   '/nodes': typeof NodesIndexRoute
   '/templates': typeof TemplatesIndexRoute
+  '/account/roles/$role': typeof AccountRolesRoleRoute
   '/groups/nodes/$group': typeof GroupsNodesGroupRoute
+  '/account/roles': typeof AccountRolesIndexRoute
+  '/account/users': typeof AccountUsersIndexRoute
   '/groups/nodes': typeof GroupsNodesIndexRoute
 }
 
@@ -331,12 +391,13 @@ export interface FileRoutesByTo {
   '/$': typeof SplatRoute
   '/events': typeof EventsRoute
   '/floorplan': typeof FloorplanRoute
+  '/account/reset': typeof AccountResetRoute
   '/account/signin': typeof AccountSigninRoute
   '/account/signup': typeof AccountSignupRoute
   '/account/token': typeof AccountTokenRoute
-  '/account/users': typeof AccountUsersRoute
   '/add/image': typeof AddImageRoute
   '/add/node': typeof AddNodeRoute
+  '/add/role': typeof AddRoleRoute
   '/add/template': typeof AddTemplateRoute
   '/images/$image': typeof ImagesImageRoute
   '/nodes/$node': typeof NodesNodeRoute
@@ -345,7 +406,10 @@ export interface FileRoutesByTo {
   '/images': typeof ImagesIndexRoute
   '/nodes': typeof NodesIndexRoute
   '/templates': typeof TemplatesIndexRoute
+  '/account/roles/$role': typeof AccountRolesRoleRoute
   '/groups/nodes/$group': typeof GroupsNodesGroupRoute
+  '/account/roles': typeof AccountRolesIndexRoute
+  '/account/users': typeof AccountUsersIndexRoute
   '/groups/nodes': typeof GroupsNodesIndexRoute
 }
 
@@ -355,12 +419,13 @@ export interface FileRoutesById {
   '/$': typeof SplatRoute
   '/events': typeof EventsRoute
   '/floorplan': typeof FloorplanRoute
+  '/account/reset': typeof AccountResetRoute
   '/account/signin': typeof AccountSigninRoute
   '/account/signup': typeof AccountSignupRoute
   '/account/token': typeof AccountTokenRoute
-  '/account/users': typeof AccountUsersRoute
   '/add/image': typeof AddImageRoute
   '/add/node': typeof AddNodeRoute
+  '/add/role': typeof AddRoleRoute
   '/add/template': typeof AddTemplateRoute
   '/images/$image': typeof ImagesImageRoute
   '/nodes/$node': typeof NodesNodeRoute
@@ -369,7 +434,10 @@ export interface FileRoutesById {
   '/images/': typeof ImagesIndexRoute
   '/nodes/': typeof NodesIndexRoute
   '/templates/': typeof TemplatesIndexRoute
+  '/account/roles/$role': typeof AccountRolesRoleRoute
   '/groups/nodes/$group': typeof GroupsNodesGroupRoute
+  '/account/roles/': typeof AccountRolesIndexRoute
+  '/account/users/': typeof AccountUsersIndexRoute
   '/groups/nodes/': typeof GroupsNodesIndexRoute
 }
 
@@ -380,12 +448,13 @@ export interface FileRouteTypes {
     | '/$'
     | '/events'
     | '/floorplan'
+    | '/account/reset'
     | '/account/signin'
     | '/account/signup'
     | '/account/token'
-    | '/account/users'
     | '/add/image'
     | '/add/node'
+    | '/add/role'
     | '/add/template'
     | '/images/$image'
     | '/nodes/$node'
@@ -394,7 +463,10 @@ export interface FileRouteTypes {
     | '/images'
     | '/nodes'
     | '/templates'
+    | '/account/roles/$role'
     | '/groups/nodes/$group'
+    | '/account/roles'
+    | '/account/users'
     | '/groups/nodes'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -402,12 +474,13 @@ export interface FileRouteTypes {
     | '/$'
     | '/events'
     | '/floorplan'
+    | '/account/reset'
     | '/account/signin'
     | '/account/signup'
     | '/account/token'
-    | '/account/users'
     | '/add/image'
     | '/add/node'
+    | '/add/role'
     | '/add/template'
     | '/images/$image'
     | '/nodes/$node'
@@ -416,7 +489,10 @@ export interface FileRouteTypes {
     | '/images'
     | '/nodes'
     | '/templates'
+    | '/account/roles/$role'
     | '/groups/nodes/$group'
+    | '/account/roles'
+    | '/account/users'
     | '/groups/nodes'
   id:
     | '__root__'
@@ -424,12 +500,13 @@ export interface FileRouteTypes {
     | '/$'
     | '/events'
     | '/floorplan'
+    | '/account/reset'
     | '/account/signin'
     | '/account/signup'
     | '/account/token'
-    | '/account/users'
     | '/add/image'
     | '/add/node'
+    | '/add/role'
     | '/add/template'
     | '/images/$image'
     | '/nodes/$node'
@@ -438,7 +515,10 @@ export interface FileRouteTypes {
     | '/images/'
     | '/nodes/'
     | '/templates/'
+    | '/account/roles/$role'
     | '/groups/nodes/$group'
+    | '/account/roles/'
+    | '/account/users/'
     | '/groups/nodes/'
   fileRoutesById: FileRoutesById
 }
@@ -448,12 +528,13 @@ export interface RootRouteChildren {
   SplatRoute: typeof SplatRoute
   EventsRoute: typeof EventsRoute
   FloorplanRoute: typeof FloorplanRoute
+  AccountResetRoute: typeof AccountResetRoute
   AccountSigninRoute: typeof AccountSigninRoute
   AccountSignupRoute: typeof AccountSignupRoute
   AccountTokenRoute: typeof AccountTokenRoute
-  AccountUsersRoute: typeof AccountUsersRoute
   AddImageRoute: typeof AddImageRoute
   AddNodeRoute: typeof AddNodeRoute
+  AddRoleRoute: typeof AddRoleRoute
   AddTemplateRoute: typeof AddTemplateRoute
   ImagesImageRoute: typeof ImagesImageRoute
   NodesNodeRoute: typeof NodesNodeRoute
@@ -462,7 +543,10 @@ export interface RootRouteChildren {
   ImagesIndexRoute: typeof ImagesIndexRoute
   NodesIndexRoute: typeof NodesIndexRoute
   TemplatesIndexRoute: typeof TemplatesIndexRoute
+  AccountRolesRoleRoute: typeof AccountRolesRoleRoute
   GroupsNodesGroupRoute: typeof GroupsNodesGroupRoute
+  AccountRolesIndexRoute: typeof AccountRolesIndexRoute
+  AccountUsersIndexRoute: typeof AccountUsersIndexRoute
   GroupsNodesIndexRoute: typeof GroupsNodesIndexRoute
 }
 
@@ -471,12 +555,13 @@ const rootRouteChildren: RootRouteChildren = {
   SplatRoute: SplatRoute,
   EventsRoute: EventsRoute,
   FloorplanRoute: FloorplanRoute,
+  AccountResetRoute: AccountResetRoute,
   AccountSigninRoute: AccountSigninRoute,
   AccountSignupRoute: AccountSignupRoute,
   AccountTokenRoute: AccountTokenRoute,
-  AccountUsersRoute: AccountUsersRoute,
   AddImageRoute: AddImageRoute,
   AddNodeRoute: AddNodeRoute,
+  AddRoleRoute: AddRoleRoute,
   AddTemplateRoute: AddTemplateRoute,
   ImagesImageRoute: ImagesImageRoute,
   NodesNodeRoute: NodesNodeRoute,
@@ -485,7 +570,10 @@ const rootRouteChildren: RootRouteChildren = {
   ImagesIndexRoute: ImagesIndexRoute,
   NodesIndexRoute: NodesIndexRoute,
   TemplatesIndexRoute: TemplatesIndexRoute,
+  AccountRolesRoleRoute: AccountRolesRoleRoute,
   GroupsNodesGroupRoute: GroupsNodesGroupRoute,
+  AccountRolesIndexRoute: AccountRolesIndexRoute,
+  AccountUsersIndexRoute: AccountUsersIndexRoute,
   GroupsNodesIndexRoute: GroupsNodesIndexRoute,
 }
 
@@ -503,12 +591,13 @@ export const routeTree = rootRoute
         "/$",
         "/events",
         "/floorplan",
+        "/account/reset",
         "/account/signin",
         "/account/signup",
         "/account/token",
-        "/account/users",
         "/add/image",
         "/add/node",
+        "/add/role",
         "/add/template",
         "/images/$image",
         "/nodes/$node",
@@ -517,7 +606,10 @@ export const routeTree = rootRoute
         "/images/",
         "/nodes/",
         "/templates/",
+        "/account/roles/$role",
         "/groups/nodes/$group",
+        "/account/roles/",
+        "/account/users/",
         "/groups/nodes/"
       ]
     },
@@ -533,6 +625,9 @@ export const routeTree = rootRoute
     "/floorplan": {
       "filePath": "floorplan.tsx"
     },
+    "/account/reset": {
+      "filePath": "account/reset.tsx"
+    },
     "/account/signin": {
       "filePath": "account/signin.tsx"
     },
@@ -542,14 +637,14 @@ export const routeTree = rootRoute
     "/account/token": {
       "filePath": "account/token.tsx"
     },
-    "/account/users": {
-      "filePath": "account/users.tsx"
-    },
     "/add/image": {
       "filePath": "add/image.tsx"
     },
     "/add/node": {
       "filePath": "add/node.tsx"
+    },
+    "/add/role": {
+      "filePath": "add/role.tsx"
     },
     "/add/template": {
       "filePath": "add/template.tsx"
@@ -575,8 +670,17 @@ export const routeTree = rootRoute
     "/templates/": {
       "filePath": "templates/index.tsx"
     },
+    "/account/roles/$role": {
+      "filePath": "account/roles/$role.tsx"
+    },
     "/groups/nodes/$group": {
       "filePath": "groups/nodes/$group.tsx"
+    },
+    "/account/roles/": {
+      "filePath": "account/roles/index.tsx"
+    },
+    "/account/users/": {
+      "filePath": "account/users/index.tsx"
     },
     "/groups/nodes/": {
       "filePath": "groups/nodes/index.tsx"

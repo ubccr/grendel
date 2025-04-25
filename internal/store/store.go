@@ -28,8 +28,14 @@ type Store interface {
 	// GetUsers returns a list of all the usernames
 	GetUsers() ([]model.User, error)
 
-	// UpdateUser updates the role of the given users
+	// GetUserByName returns a user
+	GetUserByName(name string) (*model.User, error)
+
+	// UpdateUserRole updates the role of the given users
 	UpdateUserRole(username, role string) error
+
+	// UpdateUserEnabled updates the role of the given users
+	UpdateUserEnabled(username string, enabled bool) error
 
 	// DeleteUser deletes the given user
 	DeleteUser(username string) error
@@ -99,6 +105,27 @@ type Store interface {
 
 	// RestoreFrom restores the database using the provided data dump
 	RestoreFrom(data model.DataDump) error
+
+	// GetRolesByRoute returns all roles that have access to the provided method and path
+	GetRolesByRoute(method, path string) (*[]string, error)
+
+	// GetRoles returns all roles
+	GetRoles() (model.RoleViewList, error)
+
+	// GetRoleByName returns a role by name
+	GetRolesByName(name string) (*model.RoleView, error)
+
+	// GePermissions returns all permissions
+	GetPermissions() (model.PermissionList, error)
+
+	// AddRole adds a new role and optionally sets the same permissions as the inherited role
+	AddRole(role, inheritedRole string) error
+
+	// DeleteRole removes a role by name
+	DeleteRole(roles []string) error
+
+	// UpdateRolePermissions sets the permissions for the given role
+	UpdateRolePermissions(role string, permissions model.PermissionList) error
 
 	Close() error
 }

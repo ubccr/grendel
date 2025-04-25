@@ -8,15 +8,15 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
 
 	"github.com/go-fuego/fuego"
 	"github.com/rs/cors"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/pkg/model"
 )
 
-func authMiddleware(next http.Handler) http.Handler {
+func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// skip auth if bound to unix socket
 		if viper.IsSet("api.socket_path") {
@@ -40,7 +40,7 @@ func authMiddleware(next http.Handler) http.Handler {
 				Title:  "Error",
 				Detail: "failed to authenticate",
 			}
-			fuego.SendError(w, r, err)
+			ErrorSerializer(w, r, err)
 			log.Error(err.Unwrap().Error())
 			return
 		}
@@ -50,22 +50,62 @@ func authMiddleware(next http.Handler) http.Handler {
 		claims, err := ParseToken(token, viper.GetString("api.secret"))
 		if err != nil {
 			err := fuego.HTTPError{
-				Err:    fmt.Errorf("authentication error ip=%s err=%s", r.RemoteAddr, err),
+				Status: http.StatusBadRequest,
+				Err:    err,
 				Title:  "Error",
-				Detail: "failed to verify token",
+				Detail: "Failed to verify token",
 			}
-			fuego.SendError(w, r, err)
+			ErrorSerializer(w, r, err)
 			log.Error(err.Unwrap().Error())
 			return
 		}
 
-		if claims.role == model.RoleDisabled.String() {
+		user, err := h.DB.GetUserByName(claims.username)
+		if err != nil {
 			err := fuego.HTTPError{
-				Err:    fmt.Errorf("authentication error, account is disabled ip=%s, user=%s", r.RemoteAddr, claims.username),
+				Status: http.StatusBadRequest,
+				Err:    err,
 				Title:  "Error",
-				Detail: "account is disabled",
+				Detail: "Invalid Username",
 			}
-			fuego.SendError(w, r, err)
+			ErrorSerializer(w, r, err)
+			log.Error(err.Unwrap().Error())
+			return
+		}
+
+		if !user.Enabled {
+			err := fuego.HTTPError{
+				Status: http.StatusBadRequest,
+				Err:    fmt.Errorf("user %s is not enabled", user.Username),
+				Title:  "Error",
+				Detail: "Account disabled, please ask an admin to enable it",
+			}
+			ErrorSerializer(w, r, err)
+			log.Error(err.Unwrap().Error())
+			return
+		}
+
+		validRoles, err := h.DB.GetRolesByRoute(r.Method, r.URL.Path)
+		if err != nil {
+			err := fuego.HTTPError{
+				Status: http.StatusInternalServerError,
+				Err:    err,
+				Title:  "Error",
+				Detail: "Failed to retrieve permissions",
+			}
+			ErrorSerializer(w, r, err)
+			log.Error(err.Unwrap().Error())
+			return
+		}
+
+		if !slices.Contains(*validRoles, claims.role) || !slices.Contains(*validRoles, user.Role) {
+			err := fuego.HTTPError{
+				Status: http.StatusForbidden,
+				Err:    fmt.Errorf("account does not have the required permissions to access this endpoint: user=%s, method=%s, path=%s, role=%s, validRoles=%s", claims.username, r.Method, r.URL.Path, claims.role, strings.Join(*validRoles, ",")),
+				Title:  "Error",
+				Detail: "Assigned role does not have the required permissions to access this endpoint",
+			}
+			ErrorSerializer(w, r, err)
 			log.Error(err.Unwrap().Error())
 			return
 		}

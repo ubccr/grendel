@@ -36,7 +36,7 @@ const EXPIRE_REGEX = /^[0-9]*[h,m,s]$|^infinite$/g;
 
 const reqSchema = z.object({
   username: z.string(),
-  role: z.enum(["disabled", "user", "admin"]),
+  role: z.string(),
   expire: z.string().regex(EXPIRE_REGEX, {
     message:
       "Invalid duration. Follow the Go time.ParseDuration sytax, ex: 30m",
@@ -70,8 +70,10 @@ function RouteComponent() {
             toast.success("Successfully created token");
             setResDialog(true);
           },
-          onError: () => {
-            toast.error("Failed to create token");
+          onError: (e) => {
+            toast.error(e.title, {
+              description: e.detail,
+            });
           },
         }
       );
@@ -97,18 +99,12 @@ function RouteComponent() {
               <br />
               Valid options:
               <br />
-              Username: string, used for logging and not limited to user
-              accounts
+              Username: string, must be a valid user
               <br />
-              Role: string enum, ex "disabled" | "user" | "admin"
+              Role: string, built in roles: "admin", "user", "read-only"
               <br />
               Expire: duration before token expires, ex "8h", "1h", "30m",
               "infinite"
-              <br />
-              <br />
-              Grendel provides an OpenAPI spec and can serve a Swagger API
-              browser via the{" "}
-              <span className="font-bold">[api].swagger_ui</span> config option
             </CardDescription>
           </CardHeader>
           <CardContent>
