@@ -47,8 +47,9 @@ var (
 			}
 			req := &client.BmcOsPowerBody{
 				PowerOption: client.NewOptString(powerOption),
-				BootOption:  client.NewOptString(args[1]),
+				BootOption:  client.NewOptString(override),
 			}
+
 			params := client.POSTV1BmcPowerOsParams{
 				Nodeset: client.NewOptString(nodeset),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
