@@ -154,9 +154,14 @@ export function AppSidebar() {
                 <DropdownMenuItem>
                   <ModeToggle />
                 </DropdownMenuItem>
-                {user && (
+                {user?.role === "admin" && (
                   <DropdownMenuItem asChild>
                     <Link to="/account/users">Users</Link>
+                  </DropdownMenuItem>
+                )}
+                {user?.role === "admin" && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/account/roles">Roles</Link>
                   </DropdownMenuItem>
                 )}
                 {user && (
@@ -165,18 +170,25 @@ export function AppSidebar() {
                   </DropdownMenuItem>
                 )}
                 {user && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/account/reset">Change Password</Link>
+                  </DropdownMenuItem>
+                )}
+                {user && (
                   <DropdownMenuItem
                     onClick={() => {
                       logout_mutation.mutate(
                         {},
                         {
-                          onSuccess: () => {
+                          onSuccess: ({ data }) => {
                             setUser(null);
-                            toast.success("Successfully logged out");
+                            toast.success(data?.title, {
+                              description: data?.detail,
+                            });
                           },
-                          onError: () => {
-                            toast.error("Failed to logout", {
-                              // description: e.message,
+                          onError: (e) => {
+                            toast.error(e.title, {
+                              description: e.detail,
                             });
                           },
                         }

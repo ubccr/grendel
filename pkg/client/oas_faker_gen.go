@@ -24,6 +24,20 @@ func (s *AuthRequest) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *AuthResetRequest) SetFake() {
+	{
+		{
+			s.CurrentPassword.SetFake()
+		}
+	}
+	{
+		{
+			s.NewPassword = "string"
+		}
+	}
+}
+
+// SetFake set fake values.
 func (s *AuthResponse) SetFake() {
 	{
 		{
@@ -598,6 +612,11 @@ func (s *DataDumpUsersItem) SetFake() {
 	}
 	{
 		{
+			s.Enabled.SetFake()
+		}
+	}
+	{
+		{
 			s.Hash.SetFake()
 		}
 	}
@@ -772,6 +791,83 @@ func (s *GenericResponse) SetFake() {
 	{
 		{
 			s.Title.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *GetRolesResponse) SetFake() {
+	{
+		{
+			s.Roles = nil
+			for i := 0; i < 0; i++ {
+				var elem GetRolesResponseRolesItem
+				{
+					elem.SetFake()
+				}
+				s.Roles = append(s.Roles, elem)
+			}
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *GetRolesResponseRolesItem) SetFake() {
+	{
+		{
+			s.Name.SetFake()
+		}
+	}
+	{
+		{
+			s.PermissionList = nil
+			for i := 0; i < 0; i++ {
+				var elem GetRolesResponseRolesItemPermissionListItem
+				{
+					elem.SetFake()
+				}
+				s.PermissionList = append(s.PermissionList, elem)
+			}
+		}
+	}
+	{
+		{
+			s.UnassignedPermissionList = nil
+			for i := 0; i < 0; i++ {
+				var elem GetRolesResponseRolesItemUnassignedPermissionListItem
+				{
+					elem.SetFake()
+				}
+				s.UnassignedPermissionList = append(s.UnassignedPermissionList, elem)
+			}
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *GetRolesResponseRolesItemPermissionListItem) SetFake() {
+	{
+		{
+			s.Method.SetFake()
+		}
+	}
+	{
+		{
+			s.Path.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) SetFake() {
+	{
+		{
+			s.Method.SetFake()
+		}
+	}
+	{
+		{
+			s.Path.SetFake()
 		}
 	}
 }
@@ -1619,6 +1715,55 @@ func (s *OptString) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *PatchRolesRequest) SetFake() {
+	{
+		{
+			s.PermissionList = nil
+			for i := 0; i < 0; i++ {
+				var elem PatchRolesRequestPermissionListItem
+				{
+					elem.SetFake()
+				}
+				s.PermissionList = append(s.PermissionList, elem)
+			}
+		}
+	}
+	{
+		{
+			s.Role.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *PatchRolesRequestPermissionListItem) SetFake() {
+	{
+		{
+			s.Method.SetFake()
+		}
+	}
+	{
+		{
+			s.Path.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *PostRolesRequest) SetFake() {
+	{
+		{
+			s.InheritedRole.SetFake()
+		}
+	}
+	{
+		{
+			s.Role.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
 func (s *RedfishJob) SetFake() {
 	{
 		{
@@ -2117,6 +2262,11 @@ func (s *User) SetFake() {
 	}
 	{
 		{
+			s.Enabled.SetFake()
+		}
+	}
+	{
+		{
 			s.Hash.SetFake()
 		}
 	}
@@ -2138,6 +2288,15 @@ func (s *User) SetFake() {
 	{
 		{
 			s.Username.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *UserEnableRequest) SetFake() {
+	{
+		{
+			s.Enabled.SetFake()
 		}
 	}
 }

@@ -50,8 +50,10 @@ function RouteComponent() {
             toast.success("Successfully authenticated");
             router.history.push(search.redirect ?? LOGIN_REDIRECT_FALLBACK);
           },
-          onError: () => {
-            toast.error("Failed to authenticate");
+          onError: (e) => {
+            toast.error(e.title, {
+              description: e.detail,
+            });
           },
         }
       );

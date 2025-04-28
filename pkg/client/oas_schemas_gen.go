@@ -40,6 +40,33 @@ func (s *AuthRequest) SetUsername(val OptString) {
 	s.Username = val
 }
 
+// AuthResetRequest schema.
+// Ref: #/components/schemas/AuthResetRequest
+type AuthResetRequest struct {
+	CurrentPassword OptString `json:"current_password"`
+	NewPassword     string    `json:"new_password"`
+}
+
+// GetCurrentPassword returns the value of CurrentPassword.
+func (s *AuthResetRequest) GetCurrentPassword() OptString {
+	return s.CurrentPassword
+}
+
+// GetNewPassword returns the value of NewPassword.
+func (s *AuthResetRequest) GetNewPassword() string {
+	return s.NewPassword
+}
+
+// SetCurrentPassword sets the value of CurrentPassword.
+func (s *AuthResetRequest) SetCurrentPassword(val OptString) {
+	s.CurrentPassword = val
+}
+
+// SetNewPassword sets the value of NewPassword.
+func (s *AuthResetRequest) SetNewPassword(val string) {
+	s.NewPassword = val
+}
+
 // AuthResponse schema.
 // Ref: #/components/schemas/AuthResponse
 type AuthResponse struct {
@@ -1038,6 +1065,7 @@ func (s *DataDumpImagesItemProvisionTemplates) init() DataDumpImagesItemProvisio
 
 type DataDumpUsersItem struct {
 	CreatedAt  OptDateTime `json:"created_at"`
+	Enabled    OptBool     `json:"enabled"`
 	Hash       OptString   `json:"hash"`
 	ID         OptNilInt64 `json:"id"`
 	ModifiedAt OptDateTime `json:"modified_at"`
@@ -1048,6 +1076,11 @@ type DataDumpUsersItem struct {
 // GetCreatedAt returns the value of CreatedAt.
 func (s *DataDumpUsersItem) GetCreatedAt() OptDateTime {
 	return s.CreatedAt
+}
+
+// GetEnabled returns the value of Enabled.
+func (s *DataDumpUsersItem) GetEnabled() OptBool {
+	return s.Enabled
 }
 
 // GetHash returns the value of Hash.
@@ -1078,6 +1111,11 @@ func (s *DataDumpUsersItem) GetUsername() OptString {
 // SetCreatedAt sets the value of CreatedAt.
 func (s *DataDumpUsersItem) SetCreatedAt(val OptDateTime) {
 	s.CreatedAt = val
+}
+
+// SetEnabled sets the value of Enabled.
+func (s *DataDumpUsersItem) SetEnabled(val OptBool) {
+	s.Enabled = val
 }
 
 // SetHash sets the value of Hash.
@@ -1378,6 +1416,108 @@ func (s *GenericResponse) SetDetail(val OptString) {
 // SetTitle sets the value of Title.
 func (s *GenericResponse) SetTitle(val OptString) {
 	s.Title = val
+}
+
+// GetRolesResponse schema.
+// Ref: #/components/schemas/GetRolesResponse
+type GetRolesResponse struct {
+	Roles []GetRolesResponseRolesItem `json:"roles"`
+}
+
+// GetRoles returns the value of Roles.
+func (s *GetRolesResponse) GetRoles() []GetRolesResponseRolesItem {
+	return s.Roles
+}
+
+// SetRoles sets the value of Roles.
+func (s *GetRolesResponse) SetRoles(val []GetRolesResponseRolesItem) {
+	s.Roles = val
+}
+
+type GetRolesResponseRolesItem struct {
+	Name                     OptString                                               `json:"name"`
+	PermissionList           []GetRolesResponseRolesItemPermissionListItem           `json:"permission_list"`
+	UnassignedPermissionList []GetRolesResponseRolesItemUnassignedPermissionListItem `json:"unassigned_permission_list"`
+}
+
+// GetName returns the value of Name.
+func (s *GetRolesResponseRolesItem) GetName() OptString {
+	return s.Name
+}
+
+// GetPermissionList returns the value of PermissionList.
+func (s *GetRolesResponseRolesItem) GetPermissionList() []GetRolesResponseRolesItemPermissionListItem {
+	return s.PermissionList
+}
+
+// GetUnassignedPermissionList returns the value of UnassignedPermissionList.
+func (s *GetRolesResponseRolesItem) GetUnassignedPermissionList() []GetRolesResponseRolesItemUnassignedPermissionListItem {
+	return s.UnassignedPermissionList
+}
+
+// SetName sets the value of Name.
+func (s *GetRolesResponseRolesItem) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetPermissionList sets the value of PermissionList.
+func (s *GetRolesResponseRolesItem) SetPermissionList(val []GetRolesResponseRolesItemPermissionListItem) {
+	s.PermissionList = val
+}
+
+// SetUnassignedPermissionList sets the value of UnassignedPermissionList.
+func (s *GetRolesResponseRolesItem) SetUnassignedPermissionList(val []GetRolesResponseRolesItemUnassignedPermissionListItem) {
+	s.UnassignedPermissionList = val
+}
+
+type GetRolesResponseRolesItemPermissionListItem struct {
+	Method OptString `json:"method"`
+	Path   OptString `json:"path"`
+}
+
+// GetMethod returns the value of Method.
+func (s *GetRolesResponseRolesItemPermissionListItem) GetMethod() OptString {
+	return s.Method
+}
+
+// GetPath returns the value of Path.
+func (s *GetRolesResponseRolesItemPermissionListItem) GetPath() OptString {
+	return s.Path
+}
+
+// SetMethod sets the value of Method.
+func (s *GetRolesResponseRolesItemPermissionListItem) SetMethod(val OptString) {
+	s.Method = val
+}
+
+// SetPath sets the value of Path.
+func (s *GetRolesResponseRolesItemPermissionListItem) SetPath(val OptString) {
+	s.Path = val
+}
+
+type GetRolesResponseRolesItemUnassignedPermissionListItem struct {
+	Method OptString `json:"method"`
+	Path   OptString `json:"path"`
+}
+
+// GetMethod returns the value of Method.
+func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) GetMethod() OptString {
+	return s.Method
+}
+
+// GetPath returns the value of Path.
+func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) GetPath() OptString {
+	return s.Path
+}
+
+// SetMethod sets the value of Method.
+func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) SetMethod(val OptString) {
+	s.Method = val
+}
+
+// SetPath sets the value of Path.
+func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) SetPath(val OptString) {
+	s.Path = val
 }
 
 // HTTPError schema.
@@ -4417,6 +4557,85 @@ func (o OptString) Or(d string) string {
 	return d
 }
 
+// PatchRolesRequest schema.
+// Ref: #/components/schemas/PatchRolesRequest
+type PatchRolesRequest struct {
+	PermissionList []PatchRolesRequestPermissionListItem `json:"permission_list"`
+	Role           OptString                             `json:"role"`
+}
+
+// GetPermissionList returns the value of PermissionList.
+func (s *PatchRolesRequest) GetPermissionList() []PatchRolesRequestPermissionListItem {
+	return s.PermissionList
+}
+
+// GetRole returns the value of Role.
+func (s *PatchRolesRequest) GetRole() OptString {
+	return s.Role
+}
+
+// SetPermissionList sets the value of PermissionList.
+func (s *PatchRolesRequest) SetPermissionList(val []PatchRolesRequestPermissionListItem) {
+	s.PermissionList = val
+}
+
+// SetRole sets the value of Role.
+func (s *PatchRolesRequest) SetRole(val OptString) {
+	s.Role = val
+}
+
+type PatchRolesRequestPermissionListItem struct {
+	Method OptString `json:"method"`
+	Path   OptString `json:"path"`
+}
+
+// GetMethod returns the value of Method.
+func (s *PatchRolesRequestPermissionListItem) GetMethod() OptString {
+	return s.Method
+}
+
+// GetPath returns the value of Path.
+func (s *PatchRolesRequestPermissionListItem) GetPath() OptString {
+	return s.Path
+}
+
+// SetMethod sets the value of Method.
+func (s *PatchRolesRequestPermissionListItem) SetMethod(val OptString) {
+	s.Method = val
+}
+
+// SetPath sets the value of Path.
+func (s *PatchRolesRequestPermissionListItem) SetPath(val OptString) {
+	s.Path = val
+}
+
+// PostRolesRequest schema.
+// Ref: #/components/schemas/PostRolesRequest
+type PostRolesRequest struct {
+	InheritedRole OptString `json:"inherited_role"`
+	Role          OptString `json:"role"`
+}
+
+// GetInheritedRole returns the value of InheritedRole.
+func (s *PostRolesRequest) GetInheritedRole() OptString {
+	return s.InheritedRole
+}
+
+// GetRole returns the value of Role.
+func (s *PostRolesRequest) GetRole() OptString {
+	return s.Role
+}
+
+// SetInheritedRole sets the value of InheritedRole.
+func (s *PostRolesRequest) SetInheritedRole(val OptString) {
+	s.InheritedRole = val
+}
+
+// SetRole sets the value of Role.
+func (s *PostRolesRequest) SetRole(val OptString) {
+	s.Role = val
+}
+
 // RedfishJob schema.
 // Ref: #/components/schemas/RedfishJob
 type RedfishJob struct {
@@ -5343,6 +5562,7 @@ func (s *RedfishSystemOemDellDellSystem) SetSystemID(val OptInt) {
 // Ref: #/components/schemas/User
 type User struct {
 	CreatedAt  OptDateTime `json:"created_at"`
+	Enabled    OptBool     `json:"enabled"`
 	Hash       OptString   `json:"hash"`
 	ID         OptNilInt64 `json:"id"`
 	ModifiedAt OptDateTime `json:"modified_at"`
@@ -5353,6 +5573,11 @@ type User struct {
 // GetCreatedAt returns the value of CreatedAt.
 func (s *User) GetCreatedAt() OptDateTime {
 	return s.CreatedAt
+}
+
+// GetEnabled returns the value of Enabled.
+func (s *User) GetEnabled() OptBool {
+	return s.Enabled
 }
 
 // GetHash returns the value of Hash.
@@ -5385,6 +5610,11 @@ func (s *User) SetCreatedAt(val OptDateTime) {
 	s.CreatedAt = val
 }
 
+// SetEnabled sets the value of Enabled.
+func (s *User) SetEnabled(val OptBool) {
+	s.Enabled = val
+}
+
 // SetHash sets the value of Hash.
 func (s *User) SetHash(val OptString) {
 	s.Hash = val
@@ -5408,6 +5638,22 @@ func (s *User) SetRole(val OptString) {
 // SetUsername sets the value of Username.
 func (s *User) SetUsername(val OptString) {
 	s.Username = val
+}
+
+// UserEnableRequest schema.
+// Ref: #/components/schemas/UserEnableRequest
+type UserEnableRequest struct {
+	Enabled OptBool `json:"enabled"`
+}
+
+// GetEnabled returns the value of Enabled.
+func (s *UserEnableRequest) GetEnabled() OptBool {
+	return s.Enabled
+}
+
+// SetEnabled sets the value of Enabled.
+func (s *UserEnableRequest) SetEnabled(val OptBool) {
+	s.Enabled = val
 }
 
 // UserRoleRequest schema.

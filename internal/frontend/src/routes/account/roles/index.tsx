@@ -1,4 +1,4 @@
-import UserActions from "@/components/account/user-actions";
+import RoleActions from "@/components/account/role-actions";
 import ActionsSheet from "@/components/actions-sheet";
 import {
   DataTable,
@@ -6,23 +6,22 @@ import {
 } from "@/components/data-table/data-table";
 import { DataTableColumnHeader } from "@/components/data-table/header";
 import SelectableCheckbox from "@/components/data-table/selectableCheckbox";
-import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useGetV1Users } from "@/openapi/queries";
-import { User } from "@/openapi/requests";
-import { createFileRoute } from "@tanstack/react-router";
+import { useGetV1Roles } from "@/openapi/queries";
+import { GetRolesResponse } from "@/openapi/requests";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ColumnDef } from "@tanstack/react-table";
 import { useState } from "react";
 
-export const Route = createFileRoute("/account/users")({
+export const Route = createFileRoute("/account/roles/")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const users = useGetV1Users();
+  const roles = useGetV1Roles();
   const [lastSelectedID, setLastSelectedID] = useState(0);
 
-  const columns: ColumnDef<User>[] = [
+  const columns: ColumnDef<NonNullable<GetRolesResponse["roles"]>[number]>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -42,50 +41,47 @@ function RouteComponent() {
       ),
     },
     {
-      accessorKey: "username",
+      accessorKey: "name",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Username" />
-      ),
-      cell: ({ row }) => {
-        return <span>{row.original.username}</span>;
-      },
-    },
-    {
-      accessorKey: "role",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Role" />
+        <DataTableColumnHeader column={column} title="Name" />
       ),
       cell: ({ row }) => {
         return (
-          <Badge variant="outline" className="rounded-sm">
-            {row.original.role}
-          </Badge>
+          <Link
+            to="/account/roles/$role"
+            params={{ role: row.original.name ?? "" }}
+          >
+            {row.original.name}
+          </Link>
         );
       },
     },
     {
-      accessorKey: "modified_at",
+      accessorKey: "permission_length",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Modified At" />
+        <DataTableColumnHeader column={column} title="Permission Length" />
       ),
       cell: ({ row }) => {
-        const date = new Date(row.original.modified_at ?? "");
-        return <span>{date.toLocaleString()}</span>;
+        return <span>{row.original.permission_list?.length}</span>;
       },
     },
     {
-      accessorKey: "created_at",
+      accessorKey: "unassigned_permission_length",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Created At" />
+        <DataTableColumnHeader
+          column={column}
+          title="Unassigned Permission Length"
+        />
       ),
       cell: ({ row }) => {
-        const date = new Date(row.original.created_at ?? "");
-        return <span>{date.toLocaleString()}</span>;
+        return <span>{row.original.unassigned_permission_list?.length}</span>;
       },
     },
   ];
 
-  const actions: DataTableActions<User> = ({ table }) => {
+  const actions: DataTableActions<
+    NonNullable<GetRolesResponse["roles"]>[number]
+  > = ({ table }) => {
     const checked = table
       .getSelectedRowModel()
       .rows.map((v) => v.getAllCells()[1].getValue())
@@ -95,14 +91,19 @@ function RouteComponent() {
         checked={checked}
         length={table.getSelectedRowModel().rows.length}
       >
-        <UserActions users={checked} />
+        <RoleActions roles={checked} />
       </ActionsSheet>
     );
   };
   return (
     <div className="px-5">
-      {users.isSuccess && users.data != undefined && (
-        <DataTable columns={columns} data={users.data} Actions={actions} />
+      {roles.isSuccess && roles.data?.roles != undefined && (
+        <DataTable
+          columns={columns}
+          data={roles.data.roles}
+          Actions={actions}
+          add="/add/role"
+        />
       )}
     </div>
   );

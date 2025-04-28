@@ -13,6 +13,22 @@
 				},
 				"type": "object"
 			},
+			"AuthResetRequest": {
+				"description": "AuthResetRequest schema",
+				"properties": {
+					"current_password": {
+						"type": "string"
+					},
+					"new_password": {
+						"minLength": 8,
+						"type": "string"
+					}
+				},
+				"required": [
+					"new_password"
+				],
+				"type": "object"
+			},
 			"AuthResponse": {
 				"description": "AuthResponse schema",
 				"properties": {
@@ -413,6 +429,9 @@
 									"format": "date-time",
 									"type": "string"
 								},
+								"enabled": {
+									"type": "boolean"
+								},
 								"hash": {
 									"type": "string"
 								},
@@ -531,6 +550,51 @@
 					},
 					"title": {
 						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"GetRolesResponse": {
+				"description": "GetRolesResponse schema",
+				"properties": {
+					"roles": {
+						"items": {
+							"properties": {
+								"name": {
+									"type": "string"
+								},
+								"permission_list": {
+									"items": {
+										"properties": {
+											"method": {
+												"type": "string"
+											},
+											"path": {
+												"type": "string"
+											}
+										},
+										"type": "object"
+									},
+									"type": "array"
+								},
+								"unassigned_permission_list": {
+									"items": {
+										"properties": {
+											"method": {
+												"type": "string"
+											},
+											"path": {
+												"type": "string"
+											}
+										},
+										"type": "object"
+									},
+									"type": "array"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
 					}
 				},
 				"type": "object"
@@ -930,6 +994,41 @@
 				},
 				"type": "object"
 			},
+			"PatchRolesRequest": {
+				"description": "PatchRolesRequest schema",
+				"properties": {
+					"permission_list": {
+						"items": {
+							"properties": {
+								"method": {
+									"type": "string"
+								},
+								"path": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					},
+					"role": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"PostRolesRequest": {
+				"description": "PostRolesRequest schema",
+				"properties": {
+					"inherited_role": {
+						"type": "string"
+					},
+					"role": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
 			"RedfishJob": {
 				"description": "RedfishJob schema",
 				"properties": {
@@ -1265,6 +1364,9 @@
 						"format": "date-time",
 						"type": "string"
 					},
+					"enabled": {
+						"type": "boolean"
+					},
 					"hash": {
 						"type": "string"
 					},
@@ -1282,6 +1384,15 @@
 					},
 					"username": {
 						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"UserEnableRequest": {
+				"description": "UserEnableRequest schema",
+				"properties": {
+					"enabled": {
+						"type": "boolean"
 					}
 				},
 				"type": "object"
@@ -1349,6 +1460,72 @@
 	},
 	"openapi": "3.1.0",
 	"paths": {
+		"/v1/auth/reset": {
+			"patch": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).AuthReset`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nChange password",
+				"operationId": "PATCH_/v1/auth/reset",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AuthResetRequest"
+							}
+						}
+					},
+					"description": "Request body for api.AuthResetRequest",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "auth reset",
+				"tags": [
+					"v1",
+					"auth"
+				]
+			}
+		},
 		"/v1/auth/signin": {
 			"post": {
 				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).AuthSignin`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n\n---\n\nsignin user",
@@ -1463,9 +1640,7 @@
 					{
 						"cookieAuth": []
 					},
-					{
-						"cookieAuth": []
-					}
+					{}
 				],
 				"summary": "auth signout",
 				"tags": [
@@ -1543,7 +1718,7 @@
 		},
 		"/v1/auth/token": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).AuthToken`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nCreate API token",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).AuthToken`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nCreate API token",
 				"operationId": "POST_/v1/auth/token",
 				"parameters": [
 					{
@@ -1609,7 +1784,7 @@
 		},
 		"/v1/bmc": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcQuery`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nGet redfish info from node(s)",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcQuery`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet redfish info from node(s)",
 				"operationId": "GET_/v1/bmc",
 				"parameters": [
 					{
@@ -1696,7 +1871,7 @@
 		},
 		"/v1/bmc/configure/auto": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcAutoConfigure`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nSet BMC to autoconfigure",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcAutoConfigure`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nSet BMC to autoconfigure",
 				"operationId": "POST_/v1/bmc/configure/auto",
 				"parameters": [
 					{
@@ -1783,7 +1958,7 @@
 		},
 		"/v1/bmc/configure/import": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfiguration`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nManually import system configuration to BMC",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfiguration`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nManually import system configuration to BMC",
 				"operationId": "POST_/v1/bmc/configure/import",
 				"parameters": [
 					{
@@ -1881,7 +2056,7 @@
 		},
 		"/v1/bmc/jobs": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcJobList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nGet redfish jobs from node(s)",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcJobList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet redfish jobs from node(s)",
 				"operationId": "GET_/v1/bmc/jobs",
 				"parameters": [
 					{
@@ -1968,7 +2143,7 @@
 		},
 		"/v1/bmc/jobs/{jids}": {
 			"delete": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcJobDelete`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nDelete redfish jobs from node(s) by JID",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcJobDelete`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nDelete redfish jobs from node(s) by JID",
 				"operationId": "DELETE_/v1/bmc/jobs/:jids",
 				"parameters": [
 					{
@@ -2069,7 +2244,7 @@
 		},
 		"/v1/bmc/metrics": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcMetricReports`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nGet metric reports by nodeset",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcMetricReports`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet metric reports by nodeset",
 				"operationId": "GET_/v1/bmc/metrics",
 				"parameters": [
 					{
@@ -2156,7 +2331,7 @@
 		},
 		"/v1/bmc/power/bmc": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcPower`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nReboot node(s) BMC",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcPower`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nReboot node(s) BMC",
 				"operationId": "POST_/v1/bmc/power/bmc",
 				"parameters": [
 					{
@@ -2243,7 +2418,7 @@
 		},
 		"/v1/bmc/power/os": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcOsPower`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nChange power status of node(s)",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcOsPower`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nChange power status of node(s)",
 				"operationId": "POST_/v1/bmc/power/os",
 				"parameters": [
 					{
@@ -2341,7 +2516,7 @@
 		},
 		"/v1/bmc/sel": {
 			"delete": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcSelClear`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nClear system event log on node(s)",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcSelClear`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nClear system event log on node(s)",
 				"operationId": "DELETE_/v1/bmc/sel",
 				"parameters": [
 					{
@@ -2428,7 +2603,7 @@
 		},
 		"/v1/db/dump": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).Dump`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nGet a backup of the DB",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).Dump`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet a backup of the DB",
 				"operationId": "GET_/v1/db/dump",
 				"parameters": [
 					{
@@ -2483,7 +2658,7 @@
 		},
 		"/v1/db/restore": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).Restore`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nRestore a backup of the DB",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).Restore`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nRestore a backup of the DB",
 				"operationId": "POST_/v1/db/restore",
 				"parameters": [
 					{
@@ -2549,7 +2724,7 @@
 		},
 		"/v1/grendel/events": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).GetEvents`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\n",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).GetEvents`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\n",
 				"operationId": "GET_/v1/grendel/events",
 				"parameters": [
 					{
@@ -2610,7 +2785,7 @@
 		},
 		"/v1/images": {
 			"delete": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageDelete`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nDelete images by name",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageDelete`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nDelete images by name",
 				"operationId": "DELETE_/v1/images",
 				"parameters": [
 					{
@@ -2676,7 +2851,7 @@
 				]
 			},
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nList all images",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList all images",
 				"operationId": "GET_/v1/images",
 				"parameters": [
 					{
@@ -2735,7 +2910,7 @@
 				]
 			},
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageAdd`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nAdd images",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageAdd`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nAdd images",
 				"operationId": "POST_/v1/images",
 				"parameters": [
 					{
@@ -2801,7 +2976,7 @@
 		},
 		"/v1/images/find": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageFind`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nFind images by name",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageFind`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nFind images by name",
 				"operationId": "GET_/v1/images/find",
 				"parameters": [
 					{
@@ -2875,7 +3050,7 @@
 		},
 		"/v1/nodes": {
 			"delete": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeDelete`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nDelete nodes by nodeset and/or tags",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeDelete`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nDelete nodes by nodeset and/or tags",
 				"operationId": "DELETE_/v1/nodes",
 				"parameters": [
 					{
@@ -2954,7 +3129,7 @@
 				]
 			},
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nList all nodes",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList all nodes",
 				"operationId": "GET_/v1/nodes",
 				"parameters": [
 					{
@@ -3013,7 +3188,7 @@
 				]
 			},
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeAdd`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nAdd nodes",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeAdd`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nAdd nodes",
 				"operationId": "POST_/v1/nodes",
 				"parameters": [
 					{
@@ -3079,7 +3254,7 @@
 		},
 		"/v1/nodes/find": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeFind`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nFind nodes by nodeset and/or tags",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeFind`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nFind nodes by nodeset and/or tags",
 				"operationId": "GET_/v1/nodes/find",
 				"parameters": [
 					{
@@ -3166,7 +3341,7 @@
 		},
 		"/v1/nodes/image": {
 			"patch": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeBootImage`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nUpdate nodes boot image by nodeset and/or tags",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeBootImage`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nUpdate nodes boot image by nodeset and/or tags",
 				"operationId": "PATCH_/v1/nodes/image",
 				"parameters": [
 					{
@@ -3258,7 +3433,7 @@
 		},
 		"/v1/nodes/provision": {
 			"patch": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeProvision`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nProvision / Unprovision nodes by nodeset and/or tags",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeProvision`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nProvision / Unprovision nodes by nodeset and/or tags",
 				"operationId": "PATCH_/v1/nodes/provision",
 				"parameters": [
 					{
@@ -3350,7 +3525,7 @@
 		},
 		"/v1/nodes/tags/{action}": {
 			"patch": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeTags`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nUpdate nodes tags by nodeset and/or tags",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeTags`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nUpdate nodes tags by nodeset and/or tags",
 				"operationId": "PATCH_/v1/nodes/tags/:action",
 				"parameters": [
 					{
@@ -3456,7 +3631,7 @@
 		},
 		"/v1/nodes/token/{interface}": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeBootToken`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nCreate a boot token for the provision server. Used for debugging requests made by images",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeBootToken`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nCreate a boot token for the provision server. Used for debugging requests made by images",
 				"operationId": "GET_/v1/nodes/token/:interface",
 				"parameters": [
 					{
@@ -3549,9 +3724,274 @@
 				]
 			}
 		},
+		"/v1/roles": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).GetRoles`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet roles and permissions",
+				"operationId": "GET_/v1/roles",
+				"parameters": [
+					{
+						"description": "Filter by name",
+						"examples": {
+							"name": {
+								"value": "admin,user"
+							}
+						},
+						"in": "query",
+						"name": "name",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GetRolesResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/GetRolesResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "get roles",
+				"tags": [
+					"v1",
+					"roles"
+				]
+			},
+			"patch": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).PatchRoles`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nEdit role permissions",
+				"operationId": "PATCH_/v1/roles",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PatchRolesRequest"
+							}
+						}
+					},
+					"description": "Request body for api.PatchRolesRequest",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "patch roles",
+				"tags": [
+					"v1",
+					"roles"
+				]
+			},
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).PostRoles`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nAdd roles",
+				"operationId": "POST_/v1/roles",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PostRolesRequest"
+							}
+						}
+					},
+					"description": "Request body for api.PostRolesRequest",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "post roles",
+				"tags": [
+					"v1",
+					"roles"
+				]
+			}
+		},
+		"/v1/roles/{names}": {
+			"delete": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).DeleteRoles`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nDelete roles",
+				"operationId": "DELETE_/v1/roles/:names",
+				"parameters": [
+					{
+						"description": "Delete by name",
+						"examples": {
+							"names": {
+								"value": "admin,user"
+							}
+						},
+						"in": "path",
+						"name": "names",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "delete roles",
+				"tags": [
+					"v1",
+					"roles"
+				]
+			}
+		},
 		"/v1/users": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nList all users",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList all users",
 				"operationId": "GET_/v1/users",
 				"parameters": [
 					{
@@ -3610,7 +4050,7 @@
 				]
 			},
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserStore`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nAdd new user",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserStore`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nAdd new user",
 				"operationId": "POST_/v1/users",
 				"parameters": [
 					{
@@ -3676,7 +4116,7 @@
 		},
 		"/v1/users/{usernames}": {
 			"delete": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserDelete`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nDelete users",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserDelete`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nDelete users",
 				"operationId": "DELETE_/v1/users/:usernames",
 				"parameters": [
 					{
@@ -3743,9 +4183,89 @@
 				]
 			}
 		},
+		"/v1/users/{usernames}/enable": {
+			"patch": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserEnable`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nUpdate users enable",
+				"operationId": "PATCH_/v1/users/:usernames/enable",
+				"parameters": [
+					{
+						"description": "target usernames",
+						"examples": {
+							"usernames": {
+								"value": "user1,user2"
+							}
+						},
+						"in": "path",
+						"name": "usernames",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserEnableRequest"
+							}
+						}
+					},
+					"description": "Request body for api.UserEnableRequest",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "user enable",
+				"tags": [
+					"v1",
+					"users"
+				]
+			}
+		},
 		"/v1/users/{usernames}/role": {
 			"patch": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserRole`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.authMiddleware`\n\n---\n\nUpdate users role",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserRole`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nUpdate users role",
 				"operationId": "PATCH_/v1/users/:usernames/role",
 				"parameters": [
 					{
@@ -3848,6 +4368,9 @@
 		},
 		{
 			"name": "nodes"
+		},
+		{
+			"name": "roles"
 		},
 		{
 			"name": "users"

@@ -91,7 +91,8 @@ func New(filename string, config ...Config) (*SqlStore, error) {
 func (s *SqlStore) StoreUser(username, password string) (string, error) {
 	ctx := context.Background()
 
-	role := model.RoleDisabled
+	role := model.RoleUser
+	enabled := false
 
 	count, err := s.q.UserCount(ctx, s.ro)
 	if err != nil {
@@ -100,6 +101,7 @@ func (s *SqlStore) StoreUser(username, password string) (string, error) {
 
 	if count == 0 {
 		role = model.RoleAdmin
+		enabled = true
 	}
 
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), 8)
@@ -111,6 +113,7 @@ func (s *SqlStore) StoreUser(username, password string) (string, error) {
 		Username:     username,
 		Role:         role.String(),
 		PasswordHash: string(hashed),
+		Enabled:      enabled,
 	})
 	if err != nil {
 		return "", err
@@ -151,6 +154,7 @@ func (s *SqlStore) GetUsers() ([]model.User, error) {
 			ID:           u.ID,
 			Username:     u.Username,
 			Role:         u.Role,
+			Enabled:      u.Enabled,
 			PasswordHash: u.PasswordHash,
 			CreatedAt:    u.CreatedAt,
 			ModifiedAt:   u.UpdatedAt,
@@ -160,18 +164,46 @@ func (s *SqlStore) GetUsers() ([]model.User, error) {
 	return users, nil
 }
 
-// UpdateUser updates the role of the given users
-func (s *SqlStore) UpdateUserRole(username, roleName string) error {
+// GetUsers returns a list of all the usernames
+func (s *SqlStore) GetUserByName(name string) (*model.User, error) {
 	ctx := context.Background()
 
-	role, err := model.RoleFromString(roleName)
+	user, err := s.q.UserFetch(ctx, s.ro, name)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	err = s.q.UserUpdate(ctx, s.rw, db.UserUpdateParams{
+	output := model.User{
+		ID:           user.ID,
+		Username:     user.Username,
+		Role:         user.Role,
+		Enabled:      user.Enabled,
+		PasswordHash: user.PasswordHash,
+		CreatedAt:    user.CreatedAt,
+		ModifiedAt:   user.UpdatedAt,
+	}
+	return &output, nil
+}
+
+// UpdateUser updates the role of the given users
+func (s *SqlStore) UpdateUserRole(username, role string) error {
+	ctx := context.Background()
+
+	err := s.q.UserUpdateRole(ctx, s.rw, db.UserUpdateRoleParams{
 		Username: username,
-		Role:     role.String(),
+		Role:     role,
+	})
+
+	return err
+}
+
+// UpdateUser updates the role of the given users
+func (s *SqlStore) UpdateUserEnabled(username string, enabled bool) error {
+	ctx := context.Background()
+
+	err := s.q.UserUpdateEnable(ctx, s.rw, db.UserUpdateEnableParams{
+		Username: username,
+		Enabled:  enabled,
 	})
 	if err != nil {
 		return err
@@ -806,6 +838,138 @@ func (s *SqlStore) RestoreFrom(data model.DataDump) error {
 	}
 
 	return s.StoreHosts(data.Hosts)
+}
+
+func (s *SqlStore) GetRolesByRoute(method, path string) (*[]string, error) {
+	ctx := context.Background()
+	roles, err := s.q.RoleFetchByMethodAndPath(ctx, s.ro, db.RoleFetchByMethodAndPathParams{
+		Method: method,
+		Path:   path,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &roles, nil
+}
+
+func (s *SqlStore) GetRoles() (model.RoleViewList, error) {
+	ctx := context.Background()
+	res, err := s.q.RoleFetchView(ctx, s.ro)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (s *SqlStore) GetRolesByName(name string) (*model.RoleView, error) {
+	ctx := context.Background()
+	res, err := s.q.RoleFetchViewByName(ctx, s.ro, name)
+	if err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+
+func (s *SqlStore) GetPermissions() (model.PermissionList, error) {
+	ctx := context.Background()
+	res, err := s.q.RoleFetchPermissions(ctx, s.ro)
+	if err != nil {
+		return nil, err
+	}
+	var output model.PermissionList
+	for _, p := range res {
+		output = append(output, model.Permission{
+			Method: p.Method,
+			Path:   p.Path,
+		})
+	}
+
+	return output, nil
+}
+
+func (s *SqlStore) AddRole(role, inheritedRole string) error {
+	ctx := context.Background()
+
+	roleId, err := s.q.RoleAdd(ctx, s.rw, role)
+	if err != nil {
+		return err
+	}
+
+	if inheritedRole == "" {
+		return err
+	}
+
+	inheritedRoleId, err := s.q.RoleFetchId(ctx, s.ro, inheritedRole)
+	if err != nil {
+		return err
+	}
+	permissionIds, err := s.q.RoleFetchPermissionsByRole(ctx, s.ro, inheritedRoleId)
+
+	for _, id := range permissionIds {
+		err := s.q.RoleUpsertPermission(ctx, s.rw, db.RoleUpsertPermissionParams{
+			RoleID:       roleId,
+			PermissionID: id,
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	return err
+}
+
+func (s *SqlStore) DeleteRole(roles []string) error {
+	ctx := context.Background()
+
+	for _, r := range roles {
+		err := s.q.RoleDelete(ctx, s.rw, r)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *SqlStore) UpdateRolePermissions(role string, permissions model.PermissionList) error {
+	ctx := context.Background()
+	roleId, err := s.q.RoleFetchId(ctx, s.ro, role)
+	if err != nil {
+		return err
+	}
+
+	var upsertedIds []int64
+	for _, p := range permissions {
+		permissionId, err := s.q.RoleFetchPermissionId(ctx, s.ro, db.RoleFetchPermissionIdParams{
+			Method: p.Method,
+			Path:   p.Path,
+		})
+		if err != nil {
+			return err
+		}
+
+		err = s.q.RoleUpsertPermission(ctx, s.rw, db.RoleUpsertPermissionParams{
+			RoleID:       roleId,
+			PermissionID: permissionId,
+		})
+		if err != nil {
+			return err
+		}
+		upsertedIds = append(upsertedIds, permissionId)
+	}
+	if len(upsertedIds) == 0 {
+		upsertedIds = append(upsertedIds, 0)
+	}
+
+	err = s.q.RoleUpsertDelete(ctx, s.rw, db.RoleUpsertDeleteParams{
+		RoleID: roleId,
+		Ids:    upsertedIds,
+	})
+
+	return err
 }
 
 // Close closes the SqlStore database
