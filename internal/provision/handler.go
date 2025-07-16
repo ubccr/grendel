@@ -240,9 +240,9 @@ func (h *Handler) Kickstart(c echo.Context) error {
 		return err
 	}
 
-	tmplName := "kickstart.tmpl"
-	if bootImage.ProvisionTemplate != "" {
-		tmplName = bootImage.ProvisionTemplate
+	tmplName, ok := bootImage.ProvisionTemplates["kickstart"]
+	if !ok {
+		tmplName = "kickstart.tmpl"
 	}
 
 	return c.Render(http.StatusOK, tmplName, data)
@@ -279,9 +279,9 @@ func (h *Handler) UserData(c echo.Context) error {
 		return err
 	}
 
-	tmplName := "user-data.tmpl"
-	if bootImage.UserData != "" {
-		tmplName = bootImage.UserData
+	tmplName, ok := bootImage.ProvisionTemplates["user_data"]
+	if !ok {
+		tmplName = "user-data.tmpl"
 	}
 
 	log.Infof("Sending cloud-init user-data to host %s", host.Name)
@@ -311,9 +311,9 @@ func (h *Handler) Ignition(c echo.Context) error {
 		return err
 	}
 
-	tmplName := "butane.tmpl"
-	if bootImage.Butane != "" {
-		tmplName = bootImage.Butane
+	tmplName, ok := bootImage.ProvisionTemplates["butane"]
+	if !ok {
+		tmplName = "butane.tmpl"
 	}
 
 	log.Infof("Sending ignition config to host %s", host.Name)
@@ -361,9 +361,9 @@ func (h *Handler) Proxmox(c echo.Context) error {
 		return err
 	}
 
-	tmplName := "proxmox.tmpl"
-	if bootImage.ProvisionTemplate != "" {
-		tmplName = bootImage.ProvisionTemplate
+	tmplName, ok := bootImage.ProvisionTemplates["proxmox"]
+	if !ok {
+		tmplName = "proxmox.tmpl"
 	}
 
 	log.Infof("Sending automated install answer file to host %s", host.Name)
