@@ -713,24 +713,6 @@ func (s *SqlStore) StoreBootImages(images model.BootImageList) error {
 		}
 
 		templateIDs := make([]int64, 0)
-		// Upsert butane
-		if image.Butane != "" {
-			id, err := s.storeTemplate(tx, kernel.ID, "butane", image.Butane)
-			if err != nil {
-				return err
-			}
-			templateIDs = append(templateIDs, id)
-		}
-
-		// Upsert user_data
-		if image.UserData != "" {
-			id, err := s.storeTemplate(tx, kernel.ID, "user_data", image.UserData)
-			if err != nil {
-				return err
-			}
-			templateIDs = append(templateIDs, id)
-		}
-
 		// Upsert templates
 		for ttype, tmpl := range image.ProvisionTemplates {
 			id, err := s.storeTemplate(tx, kernel.ID, ttype, tmpl)
