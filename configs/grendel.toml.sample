@@ -67,6 +67,10 @@ enable_prometheus_sd = false
 # Prometheus service discovery refresh interval in seconds
 prometheus_sd_refresh_interval = 3600
 
+# Enable netbox render config support
+# netbox_token=""
+# netbox_url=""
+
 #------------------------------------------------------------------------------
 # DHCP Server
 #------------------------------------------------------------------------------

@@ -6,6 +6,7 @@ package provision
 
 import (
 	"bytes"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"net"
@@ -26,6 +27,7 @@ import (
 type Handler struct {
 	DB               store.Store
 	DefaultImageName string
+	netBoxClient     *http.Client
 }
 
 func init() {
@@ -33,10 +35,19 @@ func init() {
 	viper.SetDefault("provision.prometheus_sd_refresh_interval", "3600")
 }
 
+func newNetBoxClient() *http.Client {
+	return &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		},
+	}
+}
+
 func NewHandler(db store.Store, defaultImageName string) (*Handler, error) {
 	h := &Handler{
 		DB:               db,
 		DefaultImageName: defaultImageName,
+		netBoxClient:     newNetBoxClient(),
 	}
 
 	if defaultImageName != "" {
@@ -84,6 +95,9 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	boot.GET("provision/:name", h.ProvisionTemplate)
 	boot.GET("bmc/:name", h.BmcTemplate)
 	boot.POST("proxmox", h.Proxmox)
+	if viper.IsSet("provision.netbox_token") && viper.IsSet("provision.netbox_url") {
+		boot.GET("netbox/render-config", h.NetBoxRenderConfig)
+	}
 }
 
 func (h *Handler) Index(c echo.Context) error {
