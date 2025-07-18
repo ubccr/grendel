@@ -11,22 +11,23 @@ import (
 )
 
 const (
-	endpointPrefix     string = "boot"
-	endpointRepo              = "repo"
-	endpointComplete          = "complete"
-	endpointIPXE              = "ipxe"
-	endpointKickstart         = "kickstart"
-	endpointKernel            = "file/kernel"
-	endpointLiveImage         = "file/liveimg"
-	endpointRootFS            = "file/rootfs"
-	endpointInitrd            = "file/initrd"
-	endpointCloudInit         = "cloud-init/"
-	endpointUserData          = "cloud-init/user-data"
-	endpointMetaData          = "cloud-init/meta-data"
-	endpointVendorData        = "cloud-init/vendor-data"
-	endpointIgnition          = "pxe-config.ign"
-	endpointProvision         = "provision/"
-	endpointProxmox           = "proxmox"
+	endpointPrefix             string = "boot"
+	endpointRepo                      = "repo"
+	endpointComplete                  = "complete"
+	endpointIPXE                      = "ipxe"
+	endpointKickstart                 = "kickstart"
+	endpointKernel                    = "file/kernel"
+	endpointLiveImage                 = "file/liveimg"
+	endpointRootFS                    = "file/rootfs"
+	endpointInitrd                    = "file/initrd"
+	endpointCloudInit                 = "cloud-init/"
+	endpointUserData                  = "cloud-init/user-data"
+	endpointMetaData                  = "cloud-init/meta-data"
+	endpointVendorData                = "cloud-init/vendor-data"
+	endpointIgnition                  = "pxe-config.ign"
+	endpointProvision                 = "provision/"
+	endpointProxmox                   = "proxmox"
+	endpointNetBoxRenderConfig        = "netbox/render-config"
 )
 
 type Endpoints struct {
@@ -122,4 +123,8 @@ func (e *Endpoints) ProvisionURL(name string) string {
 
 func (e *Endpoints) ProxmoxURL() string {
 	return e.provisionURL(endpointProxmox)
+}
+
+func (e *Endpoints) NetBoxRenderConfigURL() string {
+	return e.provisionURL(endpointNetBoxRenderConfig)
 }
