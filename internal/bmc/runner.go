@@ -66,7 +66,7 @@ func (r *jobRunner) RunPowerControl(host *model.Host, ch chan model.JobMessage, 
 		}
 
 		m.Status = "success"
-		m.Msg = "Sent power cycle command"
+		m.Msg = "Sent power command"
 	})
 }
 

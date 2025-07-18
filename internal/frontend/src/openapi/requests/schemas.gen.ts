@@ -133,9 +133,6 @@ export const BmcOsPowerBodySchema = {
 export const BootImageSchema = {
     description: 'BootImage schema',
     properties: {
-        butane: {
-            type: 'string'
-        },
         cmdline: {
             type: 'string'
         },
@@ -159,9 +156,6 @@ export const BootImageSchema = {
         name: {
             type: 'string'
         },
-        provision_template: {
-            type: 'string'
-        },
         provision_templates: {
             additionalProperties: {
                 nullable: true,
@@ -172,9 +166,6 @@ export const BootImageSchema = {
         },
         uid: {
             nullable: true,
-            type: 'string'
-        },
-        user_data: {
             type: 'string'
         },
         verify: {
@@ -192,9 +183,6 @@ export const BootImageAddRequestSchema = {
             items: {
                 nullable: true,
                 properties: {
-                    butane: {
-                        type: 'string'
-                    },
                     cmdline: {
                         type: 'string'
                     },
@@ -218,9 +206,6 @@ export const BootImageAddRequestSchema = {
                     name: {
                         type: 'string'
                     },
-                    provision_template: {
-                        type: 'string'
-                    },
                     provision_templates: {
                         additionalProperties: {
                             nullable: true,
@@ -231,9 +216,6 @@ export const BootImageAddRequestSchema = {
                     },
                     uid: {
                         nullable: true,
-                        type: 'string'
-                    },
-                    user_data: {
                         type: 'string'
                     },
                     verify: {
@@ -356,6 +338,7 @@ export const DataDumpSchema = {
                         items: {
                             type: 'string'
                         },
+                        nullable: true,
                         type: 'array'
                     },
                     uid: {
@@ -371,9 +354,6 @@ export const DataDumpSchema = {
             items: {
                 nullable: true,
                 properties: {
-                    butane: {
-                        type: 'string'
-                    },
                     cmdline: {
                         type: 'string'
                     },
@@ -397,9 +377,6 @@ export const DataDumpSchema = {
                     name: {
                         type: 'string'
                     },
-                    provision_template: {
-                        type: 'string'
-                    },
                     provision_templates: {
                         additionalProperties: {
                             nullable: true,
@@ -410,9 +387,6 @@ export const DataDumpSchema = {
                     },
                     uid: {
                         nullable: true,
-                        type: 'string'
-                    },
-                    user_data: {
                         type: 'string'
                     },
                     verify: {
@@ -438,7 +412,6 @@ export const DataDumpSchema = {
                     },
                     id: {
                         format: 'int64',
-                        nullable: true,
                         type: 'integer'
                     },
                     modified_at: {
@@ -759,6 +732,7 @@ export const HostSchema = {
             items: {
                 type: 'string'
             },
+            nullable: true,
             type: 'array'
         },
         uid: {
@@ -939,6 +913,7 @@ export const NodeAddRequestSchema = {
                         items: {
                             type: 'string'
                         },
+                        nullable: true,
                         type: 'array'
                     },
                     uid: {
@@ -1390,7 +1365,6 @@ export const UserSchema = {
         },
         id: {
             format: 'int64',
-            nullable: true,
             type: 'integer'
         },
         modified_at: {

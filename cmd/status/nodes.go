@@ -52,7 +52,7 @@ var (
 
 			nodes := 0
 			for _, host := range hostList {
-				for _, tag := range host.Tags {
+				for _, tag := range host.Tags.Value {
 					if inputTags != "" && !strings.Contains(inputTags, tag) {
 						continue
 					}
@@ -68,7 +68,7 @@ var (
 					}
 				}
 
-				if len(host.Tags) == 0 {
+				if len(host.Tags.Value) == 0 {
 					if _, ok := stats[""]; !ok {
 						stats[""] = &StatTag{provision: nodeset.EmptyNodeSet(), unprovision: nodeset.EmptyNodeSet()}
 					}
@@ -113,7 +113,7 @@ var (
 						ipAddr,
 						fmt.Sprintf("%#v", host.Provision.Value),
 						bi,
-						strings.Join(host.Tags, ","))
+						strings.Join(host.Tags.Value, ","))
 
 				}
 				return nil

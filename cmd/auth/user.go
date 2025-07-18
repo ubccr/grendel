@@ -35,7 +35,12 @@ var (
 				return err
 			}
 
+			filter := args[0]
+
 			params := client.GETV1UsersParams{}
+			if filter != "all" {
+				params.Usernames = client.NewOptString(filter)
+			}
 			res, err := gc.GETV1Users(context.Background(), params)
 			if err != nil {
 				return cmd.NewApiError(err)

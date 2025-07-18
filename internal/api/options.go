@@ -7,6 +7,7 @@ package api
 import (
 	"reflect"
 	"slices"
+	"strings"
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/getkin/kin-openapi/openapi3gen"
@@ -44,29 +45,23 @@ func setupSecurity() openapi3.SecuritySchemes {
 
 func schemaCustomizer() openapi3gen.SchemaCustomizerFn {
 	return func(name string, t reflect.Type, tag reflect.StructTag, schema *openapi3.Schema) error {
-		if name == "firmware" {
-			schema.Type = &openapi3.Types{"string"}
-		}
-		if name == "ip" {
-			schema.Type = &openapi3.Types{"string"}
-		}
-		if name == "mac" {
-			schema.Format = ""
-			schema.Type = &openapi3.Types{"string"}
-		}
-		if name == "uid" {
-			schema.Type = &openapi3.Types{"string"}
-			schema.Nullable = true
-		}
-		if name == "id" {
-			schema.Nullable = true
-		}
-		if name == "provision_templates" {
-			schema.Nullable = true
-		}
 		redfishNulls := []string{"RelatedProperties", "HttpHeaders", "EnabledDaysOfMonth", "EnabledDaysOfWeek", "EnabledIntervals", "EnabledMonthsOfYear", "StepOrder"}
 		if slices.Contains(redfishNulls, name) {
 			schema.Nullable = true
+		}
+
+		st := tag.Get("oai3")
+		for _, s := range strings.Split(st, ",") {
+			switch s {
+			case "nullable":
+				schema.Nullable = true
+			case "typeStrArr":
+				schema.Items = openapi3.NewSchemaRef("", openapi3.NewStringSchema())
+			case "typeStr":
+				schema.Type = &openapi3.Types{"string"}
+			case "formatNone":
+				schema.Format = ""
+			}
 		}
 
 		return nil

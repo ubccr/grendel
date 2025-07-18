@@ -19,6 +19,7 @@ import { Route as TemplatesIndexImport } from './routes/templates/index'
 import { Route as NodesIndexImport } from './routes/nodes/index'
 import { Route as ImagesIndexImport } from './routes/images/index'
 import { Route as TemplatesTemplateImport } from './routes/templates/$template'
+import { Route as SearchInventoryImport } from './routes/search/inventory'
 import { Route as RackRackImport } from './routes/rack/$rack'
 import { Route as NodesNodeImport } from './routes/nodes/$node'
 import { Route as ImagesImageImport } from './routes/images/$image'
@@ -83,6 +84,12 @@ const ImagesIndexRoute = ImagesIndexImport.update({
 const TemplatesTemplateRoute = TemplatesTemplateImport.update({
   id: '/templates/$template',
   path: '/templates/$template',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SearchInventoryRoute = SearchInventoryImport.update({
+  id: '/search/inventory',
+  path: '/search/inventory',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -291,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RackRackImport
       parentRoute: typeof rootRoute
     }
+    '/search/inventory': {
+      id: '/search/inventory'
+      path: '/search/inventory'
+      fullPath: '/search/inventory'
+      preLoaderRoute: typeof SearchInventoryImport
+      parentRoute: typeof rootRoute
+    }
     '/templates/$template': {
       id: '/templates/$template'
       path: '/templates/$template'
@@ -375,6 +389,7 @@ export interface FileRoutesByFullPath {
   '/images/$image': typeof ImagesImageRoute
   '/nodes/$node': typeof NodesNodeRoute
   '/rack/$rack': typeof RackRackRoute
+  '/search/inventory': typeof SearchInventoryRoute
   '/templates/$template': typeof TemplatesTemplateRoute
   '/images': typeof ImagesIndexRoute
   '/nodes': typeof NodesIndexRoute
@@ -402,6 +417,7 @@ export interface FileRoutesByTo {
   '/images/$image': typeof ImagesImageRoute
   '/nodes/$node': typeof NodesNodeRoute
   '/rack/$rack': typeof RackRackRoute
+  '/search/inventory': typeof SearchInventoryRoute
   '/templates/$template': typeof TemplatesTemplateRoute
   '/images': typeof ImagesIndexRoute
   '/nodes': typeof NodesIndexRoute
@@ -430,6 +446,7 @@ export interface FileRoutesById {
   '/images/$image': typeof ImagesImageRoute
   '/nodes/$node': typeof NodesNodeRoute
   '/rack/$rack': typeof RackRackRoute
+  '/search/inventory': typeof SearchInventoryRoute
   '/templates/$template': typeof TemplatesTemplateRoute
   '/images/': typeof ImagesIndexRoute
   '/nodes/': typeof NodesIndexRoute
@@ -459,6 +476,7 @@ export interface FileRouteTypes {
     | '/images/$image'
     | '/nodes/$node'
     | '/rack/$rack'
+    | '/search/inventory'
     | '/templates/$template'
     | '/images'
     | '/nodes'
@@ -485,6 +503,7 @@ export interface FileRouteTypes {
     | '/images/$image'
     | '/nodes/$node'
     | '/rack/$rack'
+    | '/search/inventory'
     | '/templates/$template'
     | '/images'
     | '/nodes'
@@ -511,6 +530,7 @@ export interface FileRouteTypes {
     | '/images/$image'
     | '/nodes/$node'
     | '/rack/$rack'
+    | '/search/inventory'
     | '/templates/$template'
     | '/images/'
     | '/nodes/'
@@ -539,6 +559,7 @@ export interface RootRouteChildren {
   ImagesImageRoute: typeof ImagesImageRoute
   NodesNodeRoute: typeof NodesNodeRoute
   RackRackRoute: typeof RackRackRoute
+  SearchInventoryRoute: typeof SearchInventoryRoute
   TemplatesTemplateRoute: typeof TemplatesTemplateRoute
   ImagesIndexRoute: typeof ImagesIndexRoute
   NodesIndexRoute: typeof NodesIndexRoute
@@ -566,6 +587,7 @@ const rootRouteChildren: RootRouteChildren = {
   ImagesImageRoute: ImagesImageRoute,
   NodesNodeRoute: NodesNodeRoute,
   RackRackRoute: RackRackRoute,
+  SearchInventoryRoute: SearchInventoryRoute,
   TemplatesTemplateRoute: TemplatesTemplateRoute,
   ImagesIndexRoute: ImagesIndexRoute,
   NodesIndexRoute: NodesIndexRoute,
@@ -602,6 +624,7 @@ export const routeTree = rootRoute
         "/images/$image",
         "/nodes/$node",
         "/rack/$rack",
+        "/search/inventory",
         "/templates/$template",
         "/images/",
         "/nodes/",
@@ -657,6 +680,9 @@ export const routeTree = rootRoute
     },
     "/rack/$rack": {
       "filePath": "rack/$rack.tsx"
+    },
+    "/search/inventory": {
+      "filePath": "search/inventory.tsx"
     },
     "/templates/$template": {
       "filePath": "templates/$template.tsx"

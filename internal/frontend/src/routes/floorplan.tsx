@@ -1,5 +1,3 @@
-import { Error } from "@/components/error";
-import { Loading } from "@/components/loading";
 import {
   Table,
   TableBody,
@@ -8,10 +6,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { toast } from "sonner";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Suspense, useState } from "react";
-import { ErrorBoundary } from "react-error-boundary";
+import { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Settings2 } from "lucide-react";
 import { useGetV1NodesSuspense } from "@/openapi/queries/suspense";
 import AuthRedirect from "@/auth";
+import { QuerySuspense } from "@/components/query-suspense";
 
 export const Route = createFileRoute("/floorplan")({
   component: RouteComponent,
@@ -34,18 +31,9 @@ export const Route = createFileRoute("/floorplan")({
 function RouteComponent() {
   return (
     <div className="p-4">
-      <Suspense fallback={<Loading />}>
-        <ErrorBoundary
-          fallback={<Error />}
-          onError={(error) => {
-            toast.error("Error loading response", {
-              description: error.message,
-            });
-          }}
-        >
-          <TableComponent />
-        </ErrorBoundary>
-      </Suspense>
+      <QuerySuspense>
+        <TableComponent />
+      </QuerySuspense>
     </div>
   );
 }

@@ -33,10 +33,10 @@ const (
 type NetInterfaceList []NetInterface
 
 type NetInterface struct {
-	ID   int64            `json:"id"`
-	MAC  net.HardwareAddr `json:"mac"`
+	ID   int64            `json:"id" oai3:"nullable"`
+	MAC  net.HardwareAddr `json:"mac" oai3:"typeStr,formatNone"`
 	Name string           `json:"ifname"`
-	IP   netip.Prefix     `json:"ip"`
+	IP   netip.Prefix     `json:"ip" oai3:"typeStr"`
 	FQDN string           `json:"fqdn"`
 	BMC  bool             `json:"bmc"`
 	VLAN string           `json:"vlan"`

@@ -28,13 +28,13 @@ export default function ImageForm({
         await storeImages.mutateAsync(
           { body: { boot_images: [value] } },
           {
-            onSuccess: () => {
-              toast.success("Successfully saved Image");
+            onSuccess: (e) => {
+              toast.success(e.data?.title, { description: e.data?.detail });
               queryClient.invalidateQueries();
             },
-            onError: () => {
-              toast.error("Error saving Image", {
-                // description: e.message,
+            onError: (e) => {
+              toast.error(e.title, {
+                description: e.detail,
               });
             },
           }
@@ -112,36 +112,10 @@ export default function ImageForm({
               )}
             />
             <form.Field
-              name="butane"
-              children={(field) => (
-                <div>
-                  <Label>Butane:</Label>
-                  <Input
-                    value={field.state.value ?? ""}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                </div>
-              )}
-            />
-            <form.Field
               name="cmdline"
               children={(field) => (
                 <div className="col-span-1 md:col-span-2">
                   <Label>Command Line:</Label>
-                  <Input
-                    value={field.state.value ?? ""}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                </div>
-              )}
-            />
-            <form.Field
-              name="user_data"
-              children={(field) => (
-                <div className="col-span-1 md:col-span-2">
-                  <Label>User Data:</Label>
                   <Input
                     value={field.state.value ?? ""}
                     onBlur={field.handleBlur}
@@ -168,63 +142,61 @@ export default function ImageForm({
                       </Button>
                     </div>
                     <div className="grid grid-cols-1 gap-4">
-                      {Object.keys(field.state.value ?? { "": "" }).map(
-                        (key, i) => (
-                          <Card key={i}>
-                            <CardHeader>
-                              <CardTitle className="flex justify-between">
-                                <span>Template {i + 1}:</span>
-                                <div className="flex gap-2">
-                                  <Button
-                                    type="button"
-                                    size="sm"
-                                    variant="destructive"
-                                    onClick={() => {
-                                      delete field.state.value?.[key];
-                                      field.setValue(field.state.value);
-                                    }}
-                                  >
-                                    <X />
-                                    <span className="sr-only">
-                                      Delete Template {i + 1}
-                                    </span>
-                                  </Button>
-                                </div>
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                <div>
-                                  <Input
-                                    value={key}
-                                    placeholder="name"
-                                    onChange={(e) => {
-                                      const preChange = field.state.value ?? {};
-                                      const value = preChange[key];
-                                      delete preChange[key];
-                                      field.setValue({
-                                        ...preChange,
-                                        [e.target.value]: value,
-                                      });
-                                    }}
-                                  />
-                                </div>
-                                <div>
-                                  <Input
-                                    placeholder="path"
-                                    value={field.state.value?.[key] ?? ""}
-                                    onChange={(e) => {
-                                      const preChange = field.state.value ?? {};
-                                      preChange[key] = e.target.value;
-                                      field.setValue(preChange);
-                                    }}
-                                  />
-                                </div>
+                      {Object.keys(field.state.value ?? {}).map((key, i) => (
+                        <Card key={i}>
+                          <CardHeader>
+                            <CardTitle className="flex justify-between">
+                              <span>Template {i + 1}:</span>
+                              <div className="flex gap-2">
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => {
+                                    delete field.state.value?.[key];
+                                    field.setValue(field.state.value);
+                                  }}
+                                >
+                                  <X />
+                                  <span className="sr-only">
+                                    Delete Template {i + 1}
+                                  </span>
+                                </Button>
                               </div>
-                            </CardContent>
-                          </Card>
-                        )
-                      )}
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                              <div>
+                                <Input
+                                  value={key}
+                                  placeholder="name"
+                                  onChange={(e) => {
+                                    const preChange = field.state.value ?? {};
+                                    const value = preChange[key];
+                                    delete preChange[key];
+                                    field.setValue({
+                                      ...preChange,
+                                      [e.target.value]: value,
+                                    });
+                                  }}
+                                />
+                              </div>
+                              <div>
+                                <Input
+                                  placeholder="path"
+                                  value={field.state.value?.[key] ?? ""}
+                                  onChange={(e) => {
+                                    const preChange = field.state.value ?? {};
+                                    preChange[key] = e.target.value;
+                                    field.setValue(preChange);
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
                     </div>
                   </>
                 )}

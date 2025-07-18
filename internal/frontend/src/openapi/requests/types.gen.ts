@@ -91,19 +91,16 @@ export type BmcOsPowerBody = {
  * BootImage schema
  */
 export type BootImage = {
-    butane?: string;
     cmdline?: string;
     id?: (number) | null;
     initrd?: Array<(string)>;
     kernel: string;
     liveimg?: string;
     name: string;
-    provision_template?: string;
     provision_templates?: {
         [key: string]: ((string) | null);
     } | null;
     uid?: (string) | null;
-    user_data?: string;
     verify?: boolean;
 };
 
@@ -112,19 +109,16 @@ export type BootImage = {
  */
 export type BootImageAddRequest = {
     boot_images?: Array<({
-        butane?: string;
         cmdline?: string;
         id?: (number) | null;
         initrd?: Array<(string)>;
         kernel?: string;
         liveimg?: string;
         name?: string;
-        provision_template?: string;
         provision_templates?: {
             [key: string]: ((string) | null);
         } | null;
         uid?: (string) | null;
-        user_data?: string;
         verify?: boolean;
     } | null)>;
 };
@@ -160,30 +154,27 @@ export type DataDump = {
         } | null)>;
         name?: string;
         provision?: boolean;
-        tags?: Array<(string)>;
+        tags?: Array<(string)> | null;
         uid?: (string) | null;
     } | null)>;
     Images?: Array<({
-        butane?: string;
         cmdline?: string;
         id?: (number) | null;
         initrd?: Array<(string)>;
         kernel?: string;
         liveimg?: string;
         name?: string;
-        provision_template?: string;
         provision_templates?: {
             [key: string]: ((string) | null);
         } | null;
         uid?: (string) | null;
-        user_data?: string;
         verify?: boolean;
     } | null)>;
     Users?: Array<{
         created_at?: string;
         enabled?: boolean;
         hash?: string;
-        id?: (number) | null;
+        id?: number;
         modified_at?: string;
         role?: string;
         username?: string;
@@ -306,7 +297,7 @@ export type Host = {
     } | null)>;
     name?: string;
     provision?: boolean;
-    tags?: Array<(string)>;
+    tags?: Array<(string)> | null;
     uid?: (string) | null;
 };
 
@@ -365,7 +356,7 @@ export type NodeAddRequest = {
         } | null)>;
         name?: string;
         provision?: boolean;
-        tags?: Array<(string)>;
+        tags?: Array<(string)> | null;
         uid?: (string) | null;
     } | null)>;
 };
@@ -537,7 +528,7 @@ export type User = {
     created_at?: string;
     enabled?: boolean;
     hash?: string;
-    id?: (number) | null;
+    id?: number;
     modified_at?: string;
     role?: string;
     username?: string;
@@ -1162,6 +1153,12 @@ export type DeleteV1RolesNamesError = (HTTPError);
 export type GetV1UsersData = {
     headers?: {
         Accept?: string;
+    };
+    query?: {
+        /**
+         * Filter by usernames
+         */
+        usernames?: string;
     };
 };
 

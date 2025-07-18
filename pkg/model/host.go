@@ -20,15 +20,15 @@ import (
 )
 
 type Host struct {
-	ID         int64           `json:"id,omitempty"`
-	UID        ksuid.KSUID     `json:"uid,omitempty"`
+	ID         int64           `json:"id,omitempty" oai3:"nullable"`
+	UID        ksuid.KSUID     `json:"uid,omitempty" oai3:"typeStr,nullable"`
 	Name       string          `json:"name"`
 	Interfaces []*NetInterface `json:"interfaces"`
 	Bonds      []*Bond         `json:"bonds"`
 	Provision  bool            `json:"provision"`
-	Firmware   firmware.Build  `json:"firmware"`
+	Firmware   firmware.Build  `json:"firmware" oai3:"typeStr"`
 	BootImage  string          `json:"boot_image"`
-	Tags       []string        `json:"tags"`
+	Tags       []string        `json:"tags" oai3:"nullable,typeStrArr"`
 }
 
 func (h *Host) Scan(value interface{}) error {

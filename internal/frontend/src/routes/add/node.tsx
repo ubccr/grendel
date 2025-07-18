@@ -65,13 +65,15 @@ function NodeImportJSON() {
             storeHosts.mutate(
               { body: JSON.parse(text) },
               {
-                onSuccess: () => {
-                  toast.success("Successfully saved Node");
+                onSuccess: (e) => {
+                  toast.success(e.data?.title, {
+                    description: e.data?.detail,
+                  });
                   queryClient.invalidateQueries();
                 },
-                onError: () => {
-                  toast.error("Error saving Node", {
-                    // description: e.message,
+                onError: (e) => {
+                  toast.error(e.title, {
+                    description: e.detail,
                   });
                 },
               }

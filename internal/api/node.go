@@ -40,10 +40,11 @@ type NodeBootImageRequest struct {
 func (h *Handler) NodeAdd(c fuego.ContextWithBody[NodeAddRequest]) (*GenericResponse, error) {
 	body, err := c.Body()
 	if err != nil {
+		// TODO: add error passthrough on non sensitive endpoints
 		return nil, fuego.HTTPError{
 			Err:    err,
 			Title:  "Error",
-			Detail: "failed to parse body",
+			Detail: fmt.Sprintf("failed to parse body: %s", err.Error()),
 		}
 	}
 

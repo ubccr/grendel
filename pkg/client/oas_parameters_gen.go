@@ -140,7 +140,9 @@ type GETV1RolesParams struct {
 
 // GETV1UsersParams is parameters of GET_/v1/users operation.
 type GETV1UsersParams struct {
-	Accept OptString
+	// Filter by usernames.
+	Usernames OptString
+	Accept    OptString
 }
 
 // PATCHV1AuthResetParams is parameters of PATCH_/v1/auth/reset operation.

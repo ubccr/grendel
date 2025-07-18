@@ -56,13 +56,15 @@ export default function ImageActions({ images }: { images: string }) {
                       mutation_delete.mutate(
                         { query: { name: images } },
                         {
-                          onSuccess: () => {
-                            toast.success("Successfully deleted image(s)");
+                          onSuccess: (e) => {
+                            toast.success(e.data?.title, {
+                              description: e.data?.detail,
+                            });
                             queryClient.invalidateQueries();
                           },
-                          onError: () =>
-                            toast.error("Failed to delete image(s)", {
-                              // description: e.message,
+                          onError: (e) =>
+                            toast.error(e.title, {
+                              description: e.detail,
                             }),
                         }
                       )

@@ -764,12 +764,6 @@ func (s *BootImage) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BootImage) encodeFields(e *jx.Encoder) {
 	{
-		if s.Butane.Set {
-			e.FieldStart("butane")
-			s.Butane.Encode(e)
-		}
-	}
-	{
 		if s.Cmdline.Set {
 			e.FieldStart("cmdline")
 			s.Cmdline.Encode(e)
@@ -806,12 +800,6 @@ func (s *BootImage) encodeFields(e *jx.Encoder) {
 		e.Str(s.Name)
 	}
 	{
-		if s.ProvisionTemplate.Set {
-			e.FieldStart("provision_template")
-			s.ProvisionTemplate.Encode(e)
-		}
-	}
-	{
 		if s.ProvisionTemplates.Set {
 			e.FieldStart("provision_templates")
 			s.ProvisionTemplates.Encode(e)
@@ -824,12 +812,6 @@ func (s *BootImage) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.UserData.Set {
-			e.FieldStart("user_data")
-			s.UserData.Encode(e)
-		}
-	}
-	{
 		if s.Verify.Set {
 			e.FieldStart("verify")
 			s.Verify.Encode(e)
@@ -837,19 +819,16 @@ func (s *BootImage) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfBootImage = [12]string{
-	0:  "butane",
-	1:  "cmdline",
-	2:  "id",
-	3:  "initrd",
-	4:  "kernel",
-	5:  "liveimg",
-	6:  "name",
-	7:  "provision_template",
-	8:  "provision_templates",
-	9:  "uid",
-	10: "user_data",
-	11: "verify",
+var jsonFieldsNameOfBootImage = [9]string{
+	0: "cmdline",
+	1: "id",
+	2: "initrd",
+	3: "kernel",
+	4: "liveimg",
+	5: "name",
+	6: "provision_templates",
+	7: "uid",
+	8: "verify",
 }
 
 // Decode decodes BootImage from json.
@@ -861,16 +840,6 @@ func (s *BootImage) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "butane":
-			if err := func() error {
-				s.Butane.Reset()
-				if err := s.Butane.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"butane\"")
-			}
 		case "cmdline":
 			if err := func() error {
 				s.Cmdline.Reset()
@@ -911,7 +880,7 @@ func (s *BootImage) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"initrd\"")
 			}
 		case "kernel":
-			requiredBitSet[0] |= 1 << 4
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
 				v, err := d.Str()
 				s.Kernel = string(v)
@@ -933,7 +902,7 @@ func (s *BootImage) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"liveimg\"")
 			}
 		case "name":
-			requiredBitSet[0] |= 1 << 6
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
 				v, err := d.Str()
 				s.Name = string(v)
@@ -943,16 +912,6 @@ func (s *BootImage) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"name\"")
-			}
-		case "provision_template":
-			if err := func() error {
-				s.ProvisionTemplate.Reset()
-				if err := s.ProvisionTemplate.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"provision_template\"")
 			}
 		case "provision_templates":
 			if err := func() error {
@@ -974,16 +933,6 @@ func (s *BootImage) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"uid\"")
 			}
-		case "user_data":
-			if err := func() error {
-				s.UserData.Reset()
-				if err := s.UserData.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"user_data\"")
-			}
 		case "verify":
 			if err := func() error {
 				s.Verify.Reset()
@@ -1004,7 +953,7 @@ func (s *BootImage) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
-		0b01010000,
+		0b00101000,
 		0b00000000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
@@ -1135,12 +1084,6 @@ func (s *BootImageAddRequestBootImagesItem) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BootImageAddRequestBootImagesItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.Butane.Set {
-			e.FieldStart("butane")
-			s.Butane.Encode(e)
-		}
-	}
-	{
 		if s.Cmdline.Set {
 			e.FieldStart("cmdline")
 			s.Cmdline.Encode(e)
@@ -1181,12 +1124,6 @@ func (s *BootImageAddRequestBootImagesItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.ProvisionTemplate.Set {
-			e.FieldStart("provision_template")
-			s.ProvisionTemplate.Encode(e)
-		}
-	}
-	{
 		if s.ProvisionTemplates.Set {
 			e.FieldStart("provision_templates")
 			s.ProvisionTemplates.Encode(e)
@@ -1199,12 +1136,6 @@ func (s *BootImageAddRequestBootImagesItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.UserData.Set {
-			e.FieldStart("user_data")
-			s.UserData.Encode(e)
-		}
-	}
-	{
 		if s.Verify.Set {
 			e.FieldStart("verify")
 			s.Verify.Encode(e)
@@ -1212,19 +1143,16 @@ func (s *BootImageAddRequestBootImagesItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfBootImageAddRequestBootImagesItem = [12]string{
-	0:  "butane",
-	1:  "cmdline",
-	2:  "id",
-	3:  "initrd",
-	4:  "kernel",
-	5:  "liveimg",
-	6:  "name",
-	7:  "provision_template",
-	8:  "provision_templates",
-	9:  "uid",
-	10: "user_data",
-	11: "verify",
+var jsonFieldsNameOfBootImageAddRequestBootImagesItem = [9]string{
+	0: "cmdline",
+	1: "id",
+	2: "initrd",
+	3: "kernel",
+	4: "liveimg",
+	5: "name",
+	6: "provision_templates",
+	7: "uid",
+	8: "verify",
 }
 
 // Decode decodes BootImageAddRequestBootImagesItem from json.
@@ -1235,16 +1163,6 @@ func (s *BootImageAddRequestBootImagesItem) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "butane":
-			if err := func() error {
-				s.Butane.Reset()
-				if err := s.Butane.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"butane\"")
-			}
 		case "cmdline":
 			if err := func() error {
 				s.Cmdline.Reset()
@@ -1314,16 +1232,6 @@ func (s *BootImageAddRequestBootImagesItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"name\"")
 			}
-		case "provision_template":
-			if err := func() error {
-				s.ProvisionTemplate.Reset()
-				if err := s.ProvisionTemplate.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"provision_template\"")
-			}
 		case "provision_templates":
 			if err := func() error {
 				s.ProvisionTemplates.Reset()
@@ -1343,16 +1251,6 @@ func (s *BootImageAddRequestBootImagesItem) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"uid\"")
-			}
-		case "user_data":
-			if err := func() error {
-				s.UserData.Reset()
-				if err := s.UserData.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"user_data\"")
 			}
 		case "verify":
 			if err := func() error {
@@ -1686,13 +1584,9 @@ func (s *DataDumpHostsItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Tags != nil {
+		if s.Tags.Set {
 			e.FieldStart("tags")
-			e.ArrStart()
-			for _, elem := range s.Tags {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.Tags.Encode(e)
 		}
 	}
 	{
@@ -1809,17 +1703,8 @@ func (s *DataDumpHostsItem) Decode(d *jx.Decoder) error {
 			}
 		case "tags":
 			if err := func() error {
-				s.Tags = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.Tags = append(s.Tags, elem)
-					return nil
-				}); err != nil {
+				s.Tags.Reset()
+				if err := s.Tags.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -2264,12 +2149,6 @@ func (s *DataDumpImagesItem) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *DataDumpImagesItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.Butane.Set {
-			e.FieldStart("butane")
-			s.Butane.Encode(e)
-		}
-	}
-	{
 		if s.Cmdline.Set {
 			e.FieldStart("cmdline")
 			s.Cmdline.Encode(e)
@@ -2310,12 +2189,6 @@ func (s *DataDumpImagesItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.ProvisionTemplate.Set {
-			e.FieldStart("provision_template")
-			s.ProvisionTemplate.Encode(e)
-		}
-	}
-	{
 		if s.ProvisionTemplates.Set {
 			e.FieldStart("provision_templates")
 			s.ProvisionTemplates.Encode(e)
@@ -2328,12 +2201,6 @@ func (s *DataDumpImagesItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.UserData.Set {
-			e.FieldStart("user_data")
-			s.UserData.Encode(e)
-		}
-	}
-	{
 		if s.Verify.Set {
 			e.FieldStart("verify")
 			s.Verify.Encode(e)
@@ -2341,19 +2208,16 @@ func (s *DataDumpImagesItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfDataDumpImagesItem = [12]string{
-	0:  "butane",
-	1:  "cmdline",
-	2:  "id",
-	3:  "initrd",
-	4:  "kernel",
-	5:  "liveimg",
-	6:  "name",
-	7:  "provision_template",
-	8:  "provision_templates",
-	9:  "uid",
-	10: "user_data",
-	11: "verify",
+var jsonFieldsNameOfDataDumpImagesItem = [9]string{
+	0: "cmdline",
+	1: "id",
+	2: "initrd",
+	3: "kernel",
+	4: "liveimg",
+	5: "name",
+	6: "provision_templates",
+	7: "uid",
+	8: "verify",
 }
 
 // Decode decodes DataDumpImagesItem from json.
@@ -2364,16 +2228,6 @@ func (s *DataDumpImagesItem) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "butane":
-			if err := func() error {
-				s.Butane.Reset()
-				if err := s.Butane.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"butane\"")
-			}
 		case "cmdline":
 			if err := func() error {
 				s.Cmdline.Reset()
@@ -2443,16 +2297,6 @@ func (s *DataDumpImagesItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"name\"")
 			}
-		case "provision_template":
-			if err := func() error {
-				s.ProvisionTemplate.Reset()
-				if err := s.ProvisionTemplate.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"provision_template\"")
-			}
 		case "provision_templates":
 			if err := func() error {
 				s.ProvisionTemplates.Reset()
@@ -2472,16 +2316,6 @@ func (s *DataDumpImagesItem) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"uid\"")
-			}
-		case "user_data":
-			if err := func() error {
-				s.UserData.Reset()
-				if err := s.UserData.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"user_data\"")
 			}
 		case "verify":
 			if err := func() error {
@@ -4141,13 +3975,9 @@ func (s *Host) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Tags != nil {
+		if s.Tags.Set {
 			e.FieldStart("tags")
-			e.ArrStart()
-			for _, elem := range s.Tags {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.Tags.Encode(e)
 		}
 	}
 	{
@@ -4264,17 +4094,8 @@ func (s *Host) Decode(d *jx.Decoder) error {
 			}
 		case "tags":
 			if err := func() error {
-				s.Tags = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.Tags = append(s.Tags, elem)
-					return nil
-				}); err != nil {
+				s.Tags.Reset()
+				if err := s.Tags.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -5902,13 +5723,9 @@ func (s *NodeAddRequestNodeListItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Tags != nil {
+		if s.Tags.Set {
 			e.FieldStart("tags")
-			e.ArrStart()
-			for _, elem := range s.Tags {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.Tags.Encode(e)
 		}
 	}
 	{
@@ -6025,17 +5842,8 @@ func (s *NodeAddRequestNodeListItem) Decode(d *jx.Decoder) error {
 			}
 		case "tags":
 			if err := func() error {
-				s.Tags = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.Tags = append(s.Tags, elem)
-					return nil
-				}); err != nil {
+				s.Tags.Reset()
+				if err := s.Tags.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -7697,6 +7505,69 @@ func (s OptNilString) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptNilString) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []string as json.
+func (o OptNilStringArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		e.Str(elem)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []string from json.
+func (o *OptNilStringArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilStringArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []string
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]string, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem string
+		v, err := d.Str()
+		elem = string(v)
+		if err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilStringArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilStringArray) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

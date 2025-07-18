@@ -23,7 +23,7 @@ func (h *Handler) BootImageAdd(c fuego.ContextWithBody[BootImageAddRequest]) (*G
 		return nil, fuego.HTTPError{
 			Err:    err,
 			Title:  "Error",
-			Detail: "failed to parse body",
+			Detail: fmt.Sprintf("failed to parse body: %s", err.Error()),
 		}
 	}
 
@@ -76,7 +76,7 @@ func (h *Handler) BootImageFind(c fuego.ContextNoBody) (model.BootImageList, err
 		}
 	}
 
-	var imageList model.BootImageList
+	imageList := make(model.BootImageList, 0)
 	for _, image := range images {
 		if slices.Contains(names, image.Name) {
 			imageList = append(imageList, image)

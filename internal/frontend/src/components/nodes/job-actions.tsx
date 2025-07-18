@@ -65,9 +65,9 @@ export default function JobActions({
                               queryKey: [useGetV1BmcJobsKey],
                             });
                           },
-                          onError: () =>
-                            toast.error("Failed to delete job(s)", {
-                              // description: e.message,
+                          onError: (e) =>
+                            toast.error(e.title, {
+                              description: e.detail,
                             }),
                         }
                       )
