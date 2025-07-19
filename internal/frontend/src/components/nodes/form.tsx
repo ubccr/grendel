@@ -38,15 +38,15 @@ export default function NodeForm({
         await storeHosts.mutateAsync(
           { body: { node_list: [value] } },
           {
-            onSuccess: () => {
-              toast.success("Successfully saved Node");
+            onSuccess: (e) => {
+              toast.success(e.data?.title, { description: e.data?.detail });
               queryClient.invalidateQueries();
             },
             onError: (e) => {
               console.log(e);
 
-              toast.error("Error saving Node", {
-                // description: e.message,
+              toast.error(e.title, {
+                description: e.detail,
               });
             },
           }

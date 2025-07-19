@@ -17,15 +17,15 @@ import (
 type BootImageList []*BootImage
 
 type BootImage struct {
-	ID                 int64             `json:"id"`
-	UID                ksuid.KSUID       `json:"uid"`
+	ID                 int64             `json:"id" oai3:"nullable"`
+	UID                ksuid.KSUID       `json:"uid" oai3:"typeStr,nullable"`
 	Name               string            `json:"name" validate:"required"`
 	KernelPath         string            `json:"kernel" validate:"required"`
 	InitrdPaths        []string          `json:"initrd"`
 	LiveImage          string            `json:"liveimg"`
 	CommandLine        string            `json:"cmdline"`
 	Verify             bool              `json:"verify"`
-	ProvisionTemplates map[string]string `json:"provision_templates"`
+	ProvisionTemplates map[string]string `json:"provision_templates" oai3:"nullable"`
 }
 
 func NewBootImageList() BootImageList {

@@ -142,7 +142,12 @@ var (
 					}
 				}
 
-				fmt.Printf("%-20s%-20s%-40s%-45s\n", k, host.Name.Value, name, strings.Join(host.Tags, ","))
+				tags := make([]string, 0)
+				for _, t := range host.Tags.Value {
+					tags = append(tags, t)
+				}
+
+				fmt.Printf("%-20s%-20s%-40s%-45s\n", k, host.Name.Value, name, strings.Join(tags, ","))
 			}
 
 			return nil

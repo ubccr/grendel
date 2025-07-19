@@ -8,17 +8,14 @@ import {
 import { DataTableColumnHeader } from "@/components/data-table/header";
 import { Checkbox } from "@/components/ui/checkbox";
 import ProvisionIcon from "@/components/nodes/provision-button";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import SelectableCheckbox from "@/components/data-table/selectableCheckbox";
 import TagsList from "@/components/tags";
 import NodeActions from "@/components/nodes/actions";
 import ActionsSheet from "@/components/actions-sheet";
-import { Loading } from "@/components/loading";
-import { ErrorBoundary } from "react-error-boundary";
-import { Error } from "@/components/error";
-import { toast } from "sonner";
 import { useGetV1NodesSuspense } from "@/openapi/queries/suspense";
 import AuthRedirect from "@/auth";
+import { QuerySuspense } from "@/components/query-suspense";
 
 export const Route = createFileRoute("/nodes/")({
   component: RouteComponent,
@@ -28,18 +25,9 @@ export const Route = createFileRoute("/nodes/")({
 function RouteComponent() {
   return (
     <div className="p-4">
-      <Suspense fallback={<Loading />}>
-        <ErrorBoundary
-          fallback={<Error />}
-          onError={(error) => {
-            toast.error("Error loading response", {
-              description: error.message,
-            });
-          }}
-        >
-          <TableComponent />
-        </ErrorBoundary>
-      </Suspense>
+      <QuerySuspense>
+        <TableComponent />
+      </QuerySuspense>
     </div>
   );
 }
@@ -110,7 +98,7 @@ function TableComponent() {
       ),
       cell: ({ row }) => {
         const tags = row.original?.tags;
-        return <TagsList tags={tags} />;
+        return <TagsList tags={tags ?? []} />;
       },
       filterFn: (row, _, filterValue: string[]) => {
         const match = filterValue.filter((filterTag) => {

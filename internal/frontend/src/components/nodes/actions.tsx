@@ -115,13 +115,15 @@ export default function NodeActions({
                       mutation_delete.mutate(
                         { query: { nodeset: nodes } },
                         {
-                          onSuccess: () => {
-                            toast.success("Successfully deleted node(s)");
+                          onSuccess: (e) => {
+                            toast.success(e.data?.title, {
+                              description: e.data?.detail,
+                            });
                             queryClient.invalidateQueries();
                           },
-                          onError: () =>
-                            toast.error("Failed to delete node(s)", {
-                              // description: e.message,
+                          onError: (e) =>
+                            toast.error(e.title, {
+                              description: e.detail,
                             }),
                         }
                       )
@@ -202,13 +204,15 @@ export default function NodeActions({
               mutation_provision.mutate(
                 { query: { nodeset: nodes }, body: { provision: provision } },
                 {
-                  onSuccess: () => {
-                    toast.success("Successfully set node(s) to provision");
+                  onSuccess: (e) => {
+                    toast.success(e.data?.title, {
+                      description: e.data?.detail,
+                    });
                     queryClient.invalidateQueries();
                   },
-                  onError: () =>
-                    toast.error("Failed to set node(s) to provision", {
-                      // description: e.message,
+                  onError: (e) =>
+                    toast.error(e.title, {
+                      description: e.detail,
                     }),
                 }
               )
@@ -239,13 +243,15 @@ export default function NodeActions({
                   body: { image: bootImage },
                 },
                 {
-                  onSuccess: () => {
+                  onSuccess: (e) => {
                     queryClient.invalidateQueries();
-                    toast.success("Successfully changed node(s) boot image");
+                    toast.success(e.data?.title, {
+                      description: e.data?.detail,
+                    });
                   },
-                  onError: () =>
-                    toast.error("Failed to tag node(s)", {
-                      // description: e.message,
+                  onError: (e) =>
+                    toast.error(e.title, {
+                      description: e.detail,
                     }),
                 }
               )
@@ -283,13 +289,15 @@ export default function NodeActions({
                   body: { tags: tags.join(",") },
                 },
                 {
-                  onSuccess: () => {
+                  onSuccess: (e) => {
+                    toast.success(e.data?.title, {
+                      description: e.data?.detail,
+                    });
                     queryClient.invalidateQueries();
-                    toast.success("Successfully tagged node(s)");
                   },
-                  onError: () =>
-                    toast.error("Failed to tag node(s)", {
-                      // description: e.message,
+                  onError: (e) =>
+                    toast.error(e.title, {
+                      description: e.detail,
                     }),
                 }
               )
@@ -314,10 +322,9 @@ export default function NodeActions({
                 <SelectValue placeholder="Action" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="PowerCycle">Power Cycle</SelectItem>
+                <SelectItem value="ForceRestart">Power Cycle</SelectItem>
                 <SelectItem value="On">On</SelectItem>
-                <SelectItem value="Off">Off</SelectItem>
-                <SelectItem value="ForceRestart">Force Restart</SelectItem>
+                <SelectItem value="ForceOff">Off</SelectItem>
                 <SelectItem value="GracefulRestart">
                   Graceful Restart
                 </SelectItem>
@@ -480,9 +487,9 @@ export default function NodeActions({
                               "Successfully submitted bmc configure job"
                             );
                           },
-                          onError: () =>
-                            toast.error("Failed to submit bmc configure job", {
-                              // description: e.message,
+                          onError: (e) =>
+                            toast.error(e.title, {
+                              description: e.detail,
                             }),
                         }
                       )
@@ -541,9 +548,9 @@ export default function NodeActions({
                           onSuccess: () => {
                             toast.success("Successfully rebooted bmc(s)");
                           },
-                          onError: () =>
-                            toast.error("Failed to reboot bmc(s)", {
-                              // description: e.message,
+                          onError: (e) =>
+                            toast.error(e.title, {
+                              description: e.detail,
                             }),
                         }
                       )
@@ -637,9 +644,9 @@ export default function NodeActions({
                             );
                             queryClient.invalidateQueries();
                           },
-                          onError: () =>
-                            toast.error("Failed to clear jobs on node(s)", {
-                              // description: e.message,
+                          onError: (e) =>
+                            toast.error(e.title, {
+                              description: e.detail,
                             }),
                         }
                       )

@@ -62,8 +62,10 @@ func NewHandler(db store.Store, defaultImageName string) (*Handler, error) {
 }
 
 func (h *Handler) LoadBootImageWithDefault(name string) (*model.BootImage, error) {
-	if name == "" {
-		return h.DB.LoadBootImage(h.DefaultImageName)
+	if name == "" && h.DefaultImageName == "" {
+		log.Warn("Cannot find boot image! Please either set a boot_image on the node or a default in the config file under provision.default_image")
+	} else if name == "" {
+		name = h.DefaultImageName
 	}
 
 	return h.DB.LoadBootImage(name)

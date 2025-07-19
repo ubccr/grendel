@@ -6,6 +6,7 @@ import {
   Images,
   LoaderCircle,
   Plus,
+  SearchIcon,
   Server,
   UserRound,
 } from "lucide-react";
@@ -75,6 +76,11 @@ export function AppSidebar() {
       title: "Events",
       url: "/events",
       icon: ClipboardList,
+    },
+    {
+      title: "Inventory",
+      url: "/search/inventory",
+      icon: SearchIcon,
     },
   ];
   return (

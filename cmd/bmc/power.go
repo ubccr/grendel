@@ -36,7 +36,7 @@ var (
 			case "off":
 				powerOption = "ForceOff"
 			case "on":
-				powerOption = "ForceOn"
+				powerOption = "On" // really? ForceOn isn't supported Dell???
 			default:
 				powerOption = args[0]
 			}

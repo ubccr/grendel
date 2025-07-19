@@ -131,9 +131,6 @@
 			"BootImage": {
 				"description": "BootImage schema",
 				"properties": {
-					"butane": {
-						"type": "string"
-					},
 					"cmdline": {
 						"type": "string"
 					},
@@ -157,9 +154,6 @@
 					"name": {
 						"type": "string"
 					},
-					"provision_template": {
-						"type": "string"
-					},
 					"provision_templates": {
 						"additionalProperties": {
 							"nullable": true,
@@ -170,9 +164,6 @@
 					},
 					"uid": {
 						"nullable": true,
-						"type": "string"
-					},
-					"user_data": {
 						"type": "string"
 					},
 					"verify": {
@@ -192,9 +183,6 @@
 						"items": {
 							"nullable": true,
 							"properties": {
-								"butane": {
-									"type": "string"
-								},
 								"cmdline": {
 									"type": "string"
 								},
@@ -218,9 +206,6 @@
 								"name": {
 									"type": "string"
 								},
-								"provision_template": {
-									"type": "string"
-								},
 								"provision_templates": {
 									"additionalProperties": {
 										"nullable": true,
@@ -231,9 +216,6 @@
 								},
 								"uid": {
 									"nullable": true,
-									"type": "string"
-								},
-								"user_data": {
 									"type": "string"
 								},
 								"verify": {
@@ -355,6 +337,7 @@
 									"items": {
 										"type": "string"
 									},
+									"nullable": true,
 									"type": "array"
 								},
 								"uid": {
@@ -370,9 +353,6 @@
 						"items": {
 							"nullable": true,
 							"properties": {
-								"butane": {
-									"type": "string"
-								},
 								"cmdline": {
 									"type": "string"
 								},
@@ -396,9 +376,6 @@
 								"name": {
 									"type": "string"
 								},
-								"provision_template": {
-									"type": "string"
-								},
 								"provision_templates": {
 									"additionalProperties": {
 										"nullable": true,
@@ -409,9 +386,6 @@
 								},
 								"uid": {
 									"nullable": true,
-									"type": "string"
-								},
-								"user_data": {
 									"type": "string"
 								},
 								"verify": {
@@ -437,7 +411,6 @@
 								},
 								"id": {
 									"format": "int64",
-									"nullable": true,
 									"type": "integer"
 								},
 								"modified_at": {
@@ -753,6 +726,7 @@
 						"items": {
 							"type": "string"
 						},
+						"nullable": true,
 						"type": "array"
 					},
 					"uid": {
@@ -931,6 +905,7 @@
 									"items": {
 										"type": "string"
 									},
+									"nullable": true,
 									"type": "array"
 								},
 								"uid": {
@@ -1372,7 +1347,6 @@
 					},
 					"id": {
 						"format": "int64",
-						"nullable": true,
 						"type": "integer"
 					},
 					"modified_at": {
@@ -3995,6 +3969,19 @@
 				"operationId": "GET_/v1/users",
 				"parameters": [
 					{
+						"description": "Filter by usernames",
+						"examples": {
+							"username": {
+								"value": "admin,user"
+							}
+						},
+						"in": "query",
+						"name": "usernames",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"in": "header",
 						"name": "Accept",
 						"schema": {
@@ -4347,7 +4334,7 @@
 	"servers": [
 		{
 			"description": "local server",
-			"url": "http://127.0.0.1:8080"
+			"url": "http://grendel-api.socket"
 		}
 	],
 	"tags": [

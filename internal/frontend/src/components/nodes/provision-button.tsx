@@ -38,9 +38,9 @@ export default function ProvisionIcon({ provision, name }: Props) {
                 onSuccess: () => {
                   queryClient.invalidateQueries();
                 },
-                onError: () =>
-                  toast.error("Failed to set host(s) to provision", {
-                    // description: e.message,
+                onError: (e) =>
+                  toast.error(e.title, {
+                    description: e.detail,
                   }),
               }
             );

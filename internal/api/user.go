@@ -6,6 +6,7 @@ package api
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/go-fuego/fuego"
@@ -39,6 +40,18 @@ func (h *Handler) UserList(c fuego.ContextNoBody) ([]model.User, error) {
 			Detail: "failed to get users",
 		}
 	}
+
+	if c.QueryParam("usernames") != "" {
+		usersFilter := strings.Split(c.QueryParam("usernames"), ",")
+		filteredUsers := make([]model.User, 0)
+		for _, user := range users {
+			if slices.Contains(usersFilter, user.Username) {
+				filteredUsers = append(filteredUsers, user)
+			}
+		}
+		return filteredUsers, nil
+	}
+
 	return users, nil
 }
 

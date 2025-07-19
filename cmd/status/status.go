@@ -91,7 +91,7 @@ var (
 					stats.images[bi].unprovision++
 				}
 
-				for _, tag := range host.Tags {
+				for _, tag := range host.Tags.Value {
 					if inputTags != "" && !strings.Contains(inputTags, tag) {
 						continue
 					}
@@ -107,7 +107,7 @@ var (
 					}
 				}
 
-				if len(host.Tags) == 0 {
+				if len(host.Tags.Value) == 0 {
 					if _, ok := stats.tags[""]; !ok {
 						stats.tags[""] = &StatProvision{}
 					}

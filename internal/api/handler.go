@@ -106,7 +106,7 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 	fuego.Get(images, "/find", h.BootImageFind, option.Description("Find images by name"), filterNames)
 
 	fuego.Post(users, "", h.UserStore, option.Description("Add new user"))
-	fuego.Get(users, "", h.UserList, option.Description("List all users"))
+	fuego.Get(users, "", h.UserList, option.Description("List all users"), option.Query("usernames", "Filter by usernames", param.Example("username", "admin,user")))
 	fuego.Delete(users, "/{usernames}", h.UserDelete,
 		option.Description("Delete users"),
 		usernamesExample,

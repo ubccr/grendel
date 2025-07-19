@@ -243,11 +243,14 @@ func (s *SqlStore) StoreHosts(hosts model.HostList) error {
 
 		// Link kernel if exists
 		kernelID := null.NewInt(0, false)
-		kernel, err := s.q.KernelFetch(ctx, tx, h.BootImage)
-		if err == nil {
+		if h.BootImage != "" {
+			kernel, err := s.q.KernelFetch(ctx, tx, h.BootImage)
+			if errors.Is(err, sql.ErrNoRows) {
+				return fmt.Errorf("boot image foreign key error. node=%s boot_image=%s err=%s", h.Name, h.BootImage, err)
+			} else if err != nil {
+				return err
+			}
 			kernelID.SetValid(kernel.ID)
-		} else if err != nil && !errors.Is(err, sql.ErrNoRows) {
-			return err
 		}
 
 		if h.UID.IsNil() {
@@ -287,6 +290,10 @@ func (s *SqlStore) StoreHosts(hosts model.HostList) error {
 				return err
 			}
 			tagIDs = append(tagIDs, tg.ID)
+		}
+
+		if len(tagIDs) == 0 {
+			tagIDs = append(tagIDs, 0)
 		}
 
 		// Delete any tags that were removed

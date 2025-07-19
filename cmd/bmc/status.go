@@ -22,6 +22,7 @@ var (
 		Use:   "status {nodeset | all}",
 		Short: "Check BMC status",
 		Long:  `Check BMC status`,
+		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
 			var err error
 			gc, err := cmd.NewOgenClient()

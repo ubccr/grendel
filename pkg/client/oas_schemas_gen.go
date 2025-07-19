@@ -263,23 +263,15 @@ func (s *BmcOsPowerBody) SetPowerOption(val OptString) {
 // BootImage schema.
 // Ref: #/components/schemas/BootImage
 type BootImage struct {
-	Butane             OptString                         `json:"butane"`
 	Cmdline            OptString                         `json:"cmdline"`
 	ID                 OptNilInt64                       `json:"id"`
 	Initrd             []string                          `json:"initrd"`
 	Kernel             string                            `json:"kernel"`
 	Liveimg            OptString                         `json:"liveimg"`
 	Name               string                            `json:"name"`
-	ProvisionTemplate  OptString                         `json:"provision_template"`
 	ProvisionTemplates OptNilBootImageProvisionTemplates `json:"provision_templates"`
 	UID                OptNilString                      `json:"uid"`
-	UserData           OptString                         `json:"user_data"`
 	Verify             OptBool                           `json:"verify"`
-}
-
-// GetButane returns the value of Butane.
-func (s *BootImage) GetButane() OptString {
-	return s.Butane
 }
 
 // GetCmdline returns the value of Cmdline.
@@ -312,11 +304,6 @@ func (s *BootImage) GetName() string {
 	return s.Name
 }
 
-// GetProvisionTemplate returns the value of ProvisionTemplate.
-func (s *BootImage) GetProvisionTemplate() OptString {
-	return s.ProvisionTemplate
-}
-
 // GetProvisionTemplates returns the value of ProvisionTemplates.
 func (s *BootImage) GetProvisionTemplates() OptNilBootImageProvisionTemplates {
 	return s.ProvisionTemplates
@@ -327,19 +314,9 @@ func (s *BootImage) GetUID() OptNilString {
 	return s.UID
 }
 
-// GetUserData returns the value of UserData.
-func (s *BootImage) GetUserData() OptString {
-	return s.UserData
-}
-
 // GetVerify returns the value of Verify.
 func (s *BootImage) GetVerify() OptBool {
 	return s.Verify
-}
-
-// SetButane sets the value of Butane.
-func (s *BootImage) SetButane(val OptString) {
-	s.Butane = val
 }
 
 // SetCmdline sets the value of Cmdline.
@@ -372,11 +349,6 @@ func (s *BootImage) SetName(val string) {
 	s.Name = val
 }
 
-// SetProvisionTemplate sets the value of ProvisionTemplate.
-func (s *BootImage) SetProvisionTemplate(val OptString) {
-	s.ProvisionTemplate = val
-}
-
 // SetProvisionTemplates sets the value of ProvisionTemplates.
 func (s *BootImage) SetProvisionTemplates(val OptNilBootImageProvisionTemplates) {
 	s.ProvisionTemplates = val
@@ -385,11 +357,6 @@ func (s *BootImage) SetProvisionTemplates(val OptNilBootImageProvisionTemplates)
 // SetUID sets the value of UID.
 func (s *BootImage) SetUID(val OptNilString) {
 	s.UID = val
-}
-
-// SetUserData sets the value of UserData.
-func (s *BootImage) SetUserData(val OptString) {
-	s.UserData = val
 }
 
 // SetVerify sets the value of Verify.
@@ -414,23 +381,15 @@ func (s *BootImageAddRequest) SetBootImages(val []NilBootImageAddRequestBootImag
 }
 
 type BootImageAddRequestBootImagesItem struct {
-	Butane             OptString                                                 `json:"butane"`
 	Cmdline            OptString                                                 `json:"cmdline"`
 	ID                 OptNilInt64                                               `json:"id"`
 	Initrd             []string                                                  `json:"initrd"`
 	Kernel             OptString                                                 `json:"kernel"`
 	Liveimg            OptString                                                 `json:"liveimg"`
 	Name               OptString                                                 `json:"name"`
-	ProvisionTemplate  OptString                                                 `json:"provision_template"`
 	ProvisionTemplates OptNilBootImageAddRequestBootImagesItemProvisionTemplates `json:"provision_templates"`
 	UID                OptNilString                                              `json:"uid"`
-	UserData           OptString                                                 `json:"user_data"`
 	Verify             OptBool                                                   `json:"verify"`
-}
-
-// GetButane returns the value of Butane.
-func (s *BootImageAddRequestBootImagesItem) GetButane() OptString {
-	return s.Butane
 }
 
 // GetCmdline returns the value of Cmdline.
@@ -463,11 +422,6 @@ func (s *BootImageAddRequestBootImagesItem) GetName() OptString {
 	return s.Name
 }
 
-// GetProvisionTemplate returns the value of ProvisionTemplate.
-func (s *BootImageAddRequestBootImagesItem) GetProvisionTemplate() OptString {
-	return s.ProvisionTemplate
-}
-
 // GetProvisionTemplates returns the value of ProvisionTemplates.
 func (s *BootImageAddRequestBootImagesItem) GetProvisionTemplates() OptNilBootImageAddRequestBootImagesItemProvisionTemplates {
 	return s.ProvisionTemplates
@@ -478,19 +432,9 @@ func (s *BootImageAddRequestBootImagesItem) GetUID() OptNilString {
 	return s.UID
 }
 
-// GetUserData returns the value of UserData.
-func (s *BootImageAddRequestBootImagesItem) GetUserData() OptString {
-	return s.UserData
-}
-
 // GetVerify returns the value of Verify.
 func (s *BootImageAddRequestBootImagesItem) GetVerify() OptBool {
 	return s.Verify
-}
-
-// SetButane sets the value of Butane.
-func (s *BootImageAddRequestBootImagesItem) SetButane(val OptString) {
-	s.Butane = val
 }
 
 // SetCmdline sets the value of Cmdline.
@@ -523,11 +467,6 @@ func (s *BootImageAddRequestBootImagesItem) SetName(val OptString) {
 	s.Name = val
 }
 
-// SetProvisionTemplate sets the value of ProvisionTemplate.
-func (s *BootImageAddRequestBootImagesItem) SetProvisionTemplate(val OptString) {
-	s.ProvisionTemplate = val
-}
-
 // SetProvisionTemplates sets the value of ProvisionTemplates.
 func (s *BootImageAddRequestBootImagesItem) SetProvisionTemplates(val OptNilBootImageAddRequestBootImagesItemProvisionTemplates) {
 	s.ProvisionTemplates = val
@@ -536,11 +475,6 @@ func (s *BootImageAddRequestBootImagesItem) SetProvisionTemplates(val OptNilBoot
 // SetUID sets the value of UID.
 func (s *BootImageAddRequestBootImagesItem) SetUID(val OptNilString) {
 	s.UID = val
-}
-
-// SetUserData sets the value of UserData.
-func (s *BootImageAddRequestBootImagesItem) SetUserData(val OptString) {
-	s.UserData = val
 }
 
 // SetVerify sets the value of Verify.
@@ -630,7 +564,7 @@ type DataDumpHostsItem struct {
 	Interfaces []NilDataDumpHostsItemInterfacesItem `json:"interfaces"`
 	Name       OptString                            `json:"name"`
 	Provision  OptBool                              `json:"provision"`
-	Tags       []string                             `json:"tags"`
+	Tags       OptNilStringArray                    `json:"tags"`
 	UID        OptNilString                         `json:"uid"`
 }
 
@@ -670,7 +604,7 @@ func (s *DataDumpHostsItem) GetProvision() OptBool {
 }
 
 // GetTags returns the value of Tags.
-func (s *DataDumpHostsItem) GetTags() []string {
+func (s *DataDumpHostsItem) GetTags() OptNilStringArray {
 	return s.Tags
 }
 
@@ -715,7 +649,7 @@ func (s *DataDumpHostsItem) SetProvision(val OptBool) {
 }
 
 // SetTags sets the value of Tags.
-func (s *DataDumpHostsItem) SetTags(val []string) {
+func (s *DataDumpHostsItem) SetTags(val OptNilStringArray) {
 	s.Tags = val
 }
 
@@ -918,23 +852,15 @@ func (s *DataDumpHostsItemInterfacesItem) SetVlan(val OptString) {
 }
 
 type DataDumpImagesItem struct {
-	Butane             OptString                                  `json:"butane"`
 	Cmdline            OptString                                  `json:"cmdline"`
 	ID                 OptNilInt64                                `json:"id"`
 	Initrd             []string                                   `json:"initrd"`
 	Kernel             OptString                                  `json:"kernel"`
 	Liveimg            OptString                                  `json:"liveimg"`
 	Name               OptString                                  `json:"name"`
-	ProvisionTemplate  OptString                                  `json:"provision_template"`
 	ProvisionTemplates OptNilDataDumpImagesItemProvisionTemplates `json:"provision_templates"`
 	UID                OptNilString                               `json:"uid"`
-	UserData           OptString                                  `json:"user_data"`
 	Verify             OptBool                                    `json:"verify"`
-}
-
-// GetButane returns the value of Butane.
-func (s *DataDumpImagesItem) GetButane() OptString {
-	return s.Butane
 }
 
 // GetCmdline returns the value of Cmdline.
@@ -967,11 +893,6 @@ func (s *DataDumpImagesItem) GetName() OptString {
 	return s.Name
 }
 
-// GetProvisionTemplate returns the value of ProvisionTemplate.
-func (s *DataDumpImagesItem) GetProvisionTemplate() OptString {
-	return s.ProvisionTemplate
-}
-
 // GetProvisionTemplates returns the value of ProvisionTemplates.
 func (s *DataDumpImagesItem) GetProvisionTemplates() OptNilDataDumpImagesItemProvisionTemplates {
 	return s.ProvisionTemplates
@@ -982,19 +903,9 @@ func (s *DataDumpImagesItem) GetUID() OptNilString {
 	return s.UID
 }
 
-// GetUserData returns the value of UserData.
-func (s *DataDumpImagesItem) GetUserData() OptString {
-	return s.UserData
-}
-
 // GetVerify returns the value of Verify.
 func (s *DataDumpImagesItem) GetVerify() OptBool {
 	return s.Verify
-}
-
-// SetButane sets the value of Butane.
-func (s *DataDumpImagesItem) SetButane(val OptString) {
-	s.Butane = val
 }
 
 // SetCmdline sets the value of Cmdline.
@@ -1027,11 +938,6 @@ func (s *DataDumpImagesItem) SetName(val OptString) {
 	s.Name = val
 }
 
-// SetProvisionTemplate sets the value of ProvisionTemplate.
-func (s *DataDumpImagesItem) SetProvisionTemplate(val OptString) {
-	s.ProvisionTemplate = val
-}
-
 // SetProvisionTemplates sets the value of ProvisionTemplates.
 func (s *DataDumpImagesItem) SetProvisionTemplates(val OptNilDataDumpImagesItemProvisionTemplates) {
 	s.ProvisionTemplates = val
@@ -1040,11 +946,6 @@ func (s *DataDumpImagesItem) SetProvisionTemplates(val OptNilDataDumpImagesItemP
 // SetUID sets the value of UID.
 func (s *DataDumpImagesItem) SetUID(val OptNilString) {
 	s.UID = val
-}
-
-// SetUserData sets the value of UserData.
-func (s *DataDumpImagesItem) SetUserData(val OptString) {
-	s.UserData = val
 }
 
 // SetVerify sets the value of Verify.
@@ -1067,7 +968,7 @@ type DataDumpUsersItem struct {
 	CreatedAt  OptDateTime `json:"created_at"`
 	Enabled    OptBool     `json:"enabled"`
 	Hash       OptString   `json:"hash"`
-	ID         OptNilInt64 `json:"id"`
+	ID         OptInt64    `json:"id"`
 	ModifiedAt OptDateTime `json:"modified_at"`
 	Role       OptString   `json:"role"`
 	Username   OptString   `json:"username"`
@@ -1089,7 +990,7 @@ func (s *DataDumpUsersItem) GetHash() OptString {
 }
 
 // GetID returns the value of ID.
-func (s *DataDumpUsersItem) GetID() OptNilInt64 {
+func (s *DataDumpUsersItem) GetID() OptInt64 {
 	return s.ID
 }
 
@@ -1124,7 +1025,7 @@ func (s *DataDumpUsersItem) SetHash(val OptString) {
 }
 
 // SetID sets the value of ID.
-func (s *DataDumpUsersItem) SetID(val OptNilInt64) {
+func (s *DataDumpUsersItem) SetID(val OptInt64) {
 	s.ID = val
 }
 
@@ -1692,7 +1593,7 @@ type Host struct {
 	Interfaces []NilHostInterfacesItem `json:"interfaces"`
 	Name       OptString               `json:"name"`
 	Provision  OptBool                 `json:"provision"`
-	Tags       []string                `json:"tags"`
+	Tags       OptNilStringArray       `json:"tags"`
 	UID        OptNilString            `json:"uid"`
 }
 
@@ -1732,7 +1633,7 @@ func (s *Host) GetProvision() OptBool {
 }
 
 // GetTags returns the value of Tags.
-func (s *Host) GetTags() []string {
+func (s *Host) GetTags() OptNilStringArray {
 	return s.Tags
 }
 
@@ -1777,7 +1678,7 @@ func (s *Host) SetProvision(val OptBool) {
 }
 
 // SetTags sets the value of Tags.
-func (s *Host) SetTags(val []string) {
+func (s *Host) SetTags(val OptNilStringArray) {
 	s.Tags = val
 }
 
@@ -2812,7 +2713,7 @@ type NodeAddRequestNodeListItem struct {
 	Interfaces []NilNodeAddRequestNodeListItemInterfacesItem `json:"interfaces"`
 	Name       OptString                                     `json:"name"`
 	Provision  OptBool                                       `json:"provision"`
-	Tags       []string                                      `json:"tags"`
+	Tags       OptNilStringArray                             `json:"tags"`
 	UID        OptNilString                                  `json:"uid"`
 }
 
@@ -2852,7 +2753,7 @@ func (s *NodeAddRequestNodeListItem) GetProvision() OptBool {
 }
 
 // GetTags returns the value of Tags.
-func (s *NodeAddRequestNodeListItem) GetTags() []string {
+func (s *NodeAddRequestNodeListItem) GetTags() OptNilStringArray {
 	return s.Tags
 }
 
@@ -2897,7 +2798,7 @@ func (s *NodeAddRequestNodeListItem) SetProvision(val OptBool) {
 }
 
 // SetTags sets the value of Tags.
-func (s *NodeAddRequestNodeListItem) SetTags(val []string) {
+func (s *NodeAddRequestNodeListItem) SetTags(val OptNilStringArray) {
 	s.Tags = val
 }
 
@@ -4281,6 +4182,69 @@ func (o OptNilString) Or(d string) string {
 	return d
 }
 
+// NewOptNilStringArray returns new OptNilStringArray with value set to v.
+func NewOptNilStringArray(v []string) OptNilStringArray {
+	return OptNilStringArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilStringArray is optional nullable []string.
+type OptNilStringArray struct {
+	Value []string
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilStringArray was set.
+func (o OptNilStringArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilStringArray) Reset() {
+	var v []string
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilStringArray) SetTo(v []string) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilStringArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilStringArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []string
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilStringArray) Get() (v []string, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilStringArray) Or(d []string) []string {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptRedfishJobJobsItemPayload returns new OptRedfishJobJobsItemPayload with value set to v.
 func NewOptRedfishJobJobsItemPayload(v RedfishJobJobsItemPayload) OptRedfishJobJobsItemPayload {
 	return OptRedfishJobJobsItemPayload{
@@ -5564,7 +5528,7 @@ type User struct {
 	CreatedAt  OptDateTime `json:"created_at"`
 	Enabled    OptBool     `json:"enabled"`
 	Hash       OptString   `json:"hash"`
-	ID         OptNilInt64 `json:"id"`
+	ID         OptInt64    `json:"id"`
 	ModifiedAt OptDateTime `json:"modified_at"`
 	Role       OptString   `json:"role"`
 	Username   OptString   `json:"username"`
@@ -5586,7 +5550,7 @@ func (s *User) GetHash() OptString {
 }
 
 // GetID returns the value of ID.
-func (s *User) GetID() OptNilInt64 {
+func (s *User) GetID() OptInt64 {
 	return s.ID
 }
 
@@ -5621,7 +5585,7 @@ func (s *User) SetHash(val OptString) {
 }
 
 // SetID sets the value of ID.
-func (s *User) SetID(val OptNilInt64) {
+func (s *User) SetID(val OptInt64) {
 	s.ID = val
 }
 

@@ -1,12 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { Suspense, useEffect, useState } from "react";
-import { Loading } from "@/components/loading";
-import { ErrorBoundary } from "react-error-boundary";
-import { Error } from "@/components/error";
+import { useEffect, useState } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "sonner";
 import NodeForm from "@/components/nodes/form";
 import ActionsSheet from "@/components/actions-sheet";
 import NodeActions from "@/components/nodes/actions";
@@ -18,6 +14,7 @@ import AuthRedirect from "@/auth";
 import { useGetV1Bmc, useGetV1BmcMetrics } from "@/openapi/queries";
 import { z } from "zod";
 import { TestLineChart } from "@/components/nodes/line-chart";
+import { QuerySuspense } from "@/components/query-suspense";
 
 export const Route = createFileRoute("/nodes/$node")({
   component: RouteComponent,
@@ -28,18 +25,9 @@ function RouteComponent() {
   return (
     <>
       <div className="p-4">
-        <Suspense fallback={<Loading />}>
-          <ErrorBoundary
-            fallback={<Error />}
-            onError={(error) =>
-              toast.error("Error loading response", {
-                description: error.message,
-              })
-            }
-          >
-            <Form />
-          </ErrorBoundary>
-        </Suspense>
+        <QuerySuspense>
+          <Form />
+        </QuerySuspense>
       </div>
     </>
   );

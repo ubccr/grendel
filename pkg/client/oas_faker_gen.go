@@ -135,11 +135,6 @@ func (s *BmcOsPowerBody) SetFake() {
 func (s *BootImage) SetFake() {
 	{
 		{
-			s.Butane.SetFake()
-		}
-	}
-	{
-		{
 			s.Cmdline.SetFake()
 		}
 	}
@@ -177,22 +172,12 @@ func (s *BootImage) SetFake() {
 	}
 	{
 		{
-			s.ProvisionTemplate.SetFake()
-		}
-	}
-	{
-		{
 			s.ProvisionTemplates.SetFake()
 		}
 	}
 	{
 		{
 			s.UID.SetFake()
-		}
-	}
-	{
-		{
-			s.UserData.SetFake()
 		}
 	}
 	{
@@ -220,11 +205,6 @@ func (s *BootImageAddRequest) SetFake() {
 
 // SetFake set fake values.
 func (s *BootImageAddRequestBootImagesItem) SetFake() {
-	{
-		{
-			s.Butane.SetFake()
-		}
-	}
 	{
 		{
 			s.Cmdline.SetFake()
@@ -264,22 +244,12 @@ func (s *BootImageAddRequestBootImagesItem) SetFake() {
 	}
 	{
 		{
-			s.ProvisionTemplate.SetFake()
-		}
-	}
-	{
-		{
 			s.ProvisionTemplates.SetFake()
 		}
 	}
 	{
 		{
 			s.UID.SetFake()
-		}
-	}
-	{
-		{
-			s.UserData.SetFake()
 		}
 	}
 	{
@@ -404,14 +374,7 @@ func (s *DataDumpHostsItem) SetFake() {
 	}
 	{
 		{
-			s.Tags = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.Tags = append(s.Tags, elem)
-			}
+			s.Tags.SetFake()
 		}
 	}
 	{
@@ -525,11 +488,6 @@ func (s *DataDumpHostsItemInterfacesItem) SetFake() {
 func (s *DataDumpImagesItem) SetFake() {
 	{
 		{
-			s.Butane.SetFake()
-		}
-	}
-	{
-		{
 			s.Cmdline.SetFake()
 		}
 	}
@@ -567,22 +525,12 @@ func (s *DataDumpImagesItem) SetFake() {
 	}
 	{
 		{
-			s.ProvisionTemplate.SetFake()
-		}
-	}
-	{
-		{
 			s.ProvisionTemplates.SetFake()
 		}
 	}
 	{
 		{
 			s.UID.SetFake()
-		}
-	}
-	{
-		{
-			s.UserData.SetFake()
 		}
 	}
 	{
@@ -989,14 +937,7 @@ func (s *Host) SetFake() {
 	}
 	{
 		{
-			s.Tags = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.Tags = append(s.Tags, elem)
-			}
+			s.Tags.SetFake()
 		}
 	}
 	{
@@ -1336,14 +1277,7 @@ func (s *NodeAddRequestNodeListItem) SetFake() {
 	}
 	{
 		{
-			s.Tags = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.Tags = append(s.Tags, elem)
-			}
+			s.Tags.SetFake()
 		}
 	}
 	{
@@ -1656,6 +1590,12 @@ func (s *OptNilNilStringArray) SetFake() {
 
 // SetFake set fake values.
 func (s *OptNilString) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilStringArray) SetFake() {
 	s.Null = true
 	s.Set = true
 }

@@ -1,10 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { Suspense, useState } from "react";
-import { Loading } from "@/components/loading";
-import { ErrorBoundary } from "react-error-boundary";
-import { toast } from "sonner";
-import { Error } from "@/components/error";
+import { useState } from "react";
 
 import {
   Table,
@@ -39,6 +35,7 @@ import NodeActions from "@/components/nodes/actions";
 import { Host } from "@/openapi/requests";
 import { useGetV1NodesFindSuspense } from "@/openapi/queries/suspense";
 import AuthRedirect from "@/auth";
+import { QuerySuspense } from "@/components/query-suspense";
 
 export const Route = createFileRoute("/rack/$rack")({
   component: RouteComponent,
@@ -49,18 +46,9 @@ function RouteComponent() {
   return (
     <>
       <div className="p-4">
-        <Suspense fallback={<Loading />}>
-          <ErrorBoundary
-            fallback={<Error />}
-            onError={(error) =>
-              toast.error("Error loading response", {
-                description: error.message,
-              })
-            }
-          >
-            <RackTable />
-          </ErrorBoundary>
-        </Suspense>
+        <QuerySuspense>
+          <RackTable />
+        </QuerySuspense>
       </div>
     </>
   );
@@ -177,7 +165,7 @@ function RackTable() {
                     </Link>
                     <div className="flex justify-center gap-6 sm:justify-end">
                       {!!view.find((col) => col === "tags") && (
-                        <TagsList tags={host.tags} />
+                        <TagsList tags={host.tags ?? []} />
                       )}
                       {!!view.find((col) => col === "boot image") && (
                         <span className="my-auto">{host.boot_image}</span>
