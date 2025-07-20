@@ -359,7 +359,7 @@ from nic as nc
 where 
   case 
     when cast(?1 as integer) then lower(nc.fqdn) like concat('%', cast(?2 as text), '%')
-    when cast(?3 as integer) then nc.ip like concat(cast(?4 as text), '%')
+    when cast(?3 as integer) then substring(nc.ip, 0, instr(nc.ip, '/')) = cast(?4 as text)
     else 0
   end
 `
