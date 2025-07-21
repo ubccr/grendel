@@ -10,6 +10,7 @@ import (
 	_ "embed"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -20,6 +21,7 @@ import (
 	"github.com/coreos/butane/config"
 	"github.com/coreos/butane/config/common"
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/pkg/model"
 )
@@ -55,6 +57,7 @@ var funcMap = template.FuncMap{
 	"CryptSHA512":            CryptSHA512,
 	"CryptSHA256":            CryptSHA256,
 	"DellSHA256Password":     DellSHA256Password,
+	"NetBoxRenderConfig":     NetBoxRenderConfig,
 }
 
 type TemplateRenderer struct {
@@ -192,4 +195,23 @@ func DellSHA256Password(pass, salt string) string {
 	payload := pass + salt
 	h.Write([]byte(payload))
 	return fmt.Sprintf("%x%x", h.Sum(nil), salt)
+}
+
+func NetBoxRenderConfig(name string) string {
+	res, err := netBoxClient.NetBoxFetchConfig(name)
+	if err != nil {
+		return ""
+	}
+	defer res.Body.Close()
+
+	text, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"name": name,
+			"err":  err,
+		}).Error("failed to read response body from netbox render-config")
+		return ""
+	}
+
+	return string(text)
 }

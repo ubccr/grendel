@@ -6,7 +6,6 @@ package provision
 
 import (
 	"bytes"
-	"crypto/tls"
 	"errors"
 	"fmt"
 	"net"
@@ -22,32 +21,26 @@ import (
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/pkg/netbox"
 )
+
+var netBoxClient *netbox.Client
 
 type Handler struct {
 	DB               store.Store
 	DefaultImageName string
-	netBoxClient     *http.Client
 }
 
 func init() {
 	viper.SetDefault("provision.enable_prometheus_sd", false)
 	viper.SetDefault("provision.prometheus_sd_refresh_interval", "3600")
-}
-
-func newNetBoxClient() *http.Client {
-	return &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-	}
+	netBoxClient = netbox.NewClient()
 }
 
 func NewHandler(db store.Store, defaultImageName string) (*Handler, error) {
 	h := &Handler{
 		DB:               db,
 		DefaultImageName: defaultImageName,
-		netBoxClient:     newNetBoxClient(),
 	}
 
 	if defaultImageName != "" {
@@ -440,4 +433,31 @@ func (h *Handler) Onie(c echo.Context) error {
 	}
 
 	return echo.NewHTTPError(http.StatusBadRequest, "Invalid ONIE operation")
+}
+
+func (h *Handler) NetBoxRenderConfig(c echo.Context) error {
+	_, node, _, _, err := h.verifyClaims(c)
+	if err != nil {
+		return err
+	}
+
+	res, err := netBoxClient.NetBoxFetchConfig(node.Name)
+	if err != nil {
+		if errors.Is(err, netbox.ErrNotFound) {
+			return echo.NewHTTPError(http.StatusNotFound, "")
+		}
+
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to render config").SetInternal(err)
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		log.WithFields(logrus.Fields{
+			"name": node.Name,
+			"code": res.StatusCode,
+		}).Error("failed to fetch netbox render-config wrong http code")
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to render config").SetInternal(err)
+	}
+
+	return c.Stream(http.StatusOK, "text/plain", res.Body)
 }
