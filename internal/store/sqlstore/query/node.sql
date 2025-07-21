@@ -35,7 +35,7 @@ from nic as nc
 where 
   case 
     when cast(@filter_fqdn as integer) then lower(nc.fqdn) like concat('%', cast(@fqdn as text), '%')
-    when cast(@filter_ip as integer) then nc.ip like concat(cast(@ip as text), '%')
+    when cast(@filter_ip as integer) then substring(nc.ip, 0, instr(nc.ip, '/')) = cast(@ip as text)
     else 0
   end;
 

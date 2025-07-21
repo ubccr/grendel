@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"net/netip"
 	"strings"
 	"testing"
 
@@ -166,6 +167,27 @@ func (s *StoreTestSuite) TestResolveIPv4() {
 	if s.Assert().NoError(err) {
 		if s.Assert().Equal(1, len(names)) {
 			s.Assert().Equal(testNames[0], names[0])
+		}
+	}
+}
+
+func (s *StoreTestSuite) TestReverseResolveIPv4() {
+	hostA := tests.HostFactory.MustCreate().(*model.Host)
+	hostA.Interfaces[0].IP = netip.MustParsePrefix("10.1.1.17/24")
+
+	hostB := tests.HostFactory.MustCreate().(*model.Host)
+	hostB.Interfaces[0].IP = netip.MustParsePrefix("10.1.1.174/24")
+
+	err := s.db.StoreHost(hostA)
+	s.Assert().NoError(err)
+
+	err = s.db.StoreHost(hostB)
+	s.Assert().NoError(err)
+
+	testNames, err := s.db.ReverseResolve(hostA.Interfaces[0].AddrString())
+	if s.Assert().NoError(err) {
+		if s.Assert().Equal(1, len(testNames)) {
+			s.Assert().Equal(hostA.Interfaces[0].FQDN, testNames[0])
 		}
 	}
 }
