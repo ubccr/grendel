@@ -53,7 +53,7 @@ func (h *Handler) NodeAdd(c fuego.ContextWithBody[NodeAddRequest]) (*GenericResp
 		return nil, fuego.HTTPError{
 			Err:    err,
 			Title:  "Error",
-			Detail: "failed store nodes",
+			Detail: fmt.Sprintf("failed to store node(s): %s", err.Error()),
 		}
 	}
 
