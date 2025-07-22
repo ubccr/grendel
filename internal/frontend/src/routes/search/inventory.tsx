@@ -14,22 +14,38 @@ import {
 import { useGetV1NodesFind } from "@/openapi/queries";
 import { useEffect, useState } from "react";
 import { Host } from "@/openapi/requests";
+import AuthRedirect from "@/auth";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { Info } from "lucide-react";
 
 export const Route = createFileRoute("/search/inventory")({
   component: RouteComponent,
+  beforeLoad: AuthRedirect,
 });
 
+type HostInventory = {
+  node: Host;
+  search: string;
+};
+
 function RouteComponent() {
-  const [nodes, setNodes] = useState<Array<Host>>(Array<Host>);
-  const [params, setParams] = useState({ serial: "", asset_tag: "" });
+  const [query, setQuery] = useState<Array<HostInventory>>(
+    Array<HostInventory>
+  );
+  const [searchParam, setSearchParam] = useState("");
 
   const form = useForm({
     defaultValues: {
-      serial: "",
-      asset_tag: "",
+      search: "",
     },
     onSubmit: async ({ value }) => {
-      setParams({ serial: value.serial, asset_tag: value.asset_tag });
+      setSearchParam(value.search);
       form.reset();
     },
   });
@@ -37,7 +53,7 @@ function RouteComponent() {
   const grendel_node = useGetV1NodesFind(
     {
       query: {
-        tags: `grendel:serial=${params.serial},grendel:asset=${params.asset_tag}`,
+        tags: `grendel:serial=${searchParam},grendel:asset=${searchParam}`,
       },
     },
     undefined,
@@ -49,25 +65,22 @@ function RouteComponent() {
 
   useEffect(() => {
     if (grendel_node.data)
-      setNodes((n) => [...(grendel_node.data ?? []), ...n]);
+      setQuery((n) => [
+        { node: grendel_node.data?.[0] ?? {}, search: searchParam },
+        ...n,
+      ]);
   }, [grendel_node.data]);
 
   useEffect(() => {
-    if (
-      grendel_node.isError &&
-      (params.serial !== "" || params.asset_tag !== "")
-    )
-      setNodes((n) => [
+    if (grendel_node.isError && searchParam !== "")
+      setQuery((n) => [
         {
-          name: "",
-          tags: [
-            `grendel:serial=${params.serial}`,
-            `grendel:asset=${params.asset_tag}`,
-          ],
+          node: {},
+          search: searchParam,
         },
         ...n,
       ]);
-  }, [grendel_node.isError, params]);
+  }, [grendel_node.isError, searchParam]);
 
   return (
     <div className="p-4">
@@ -82,30 +95,36 @@ function RouteComponent() {
           <CardHeader>
             <CardTitle className="flex justify-center">Inventory</CardTitle>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-2">
+          <CardContent className="grid grid-cols-1 gap-2">
             <form.Field
-              name="serial"
+              name="search"
               children={(field) => (
                 <div>
-                  <Label>Serial:</Label>
-                  <Input
-                    value={field.state.value ?? ""}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                </div>
-              )}
-            />
-            <form.Field
-              name="asset_tag"
-              children={(field) => (
-                <div>
-                  <Label>Asset Tag:</Label>
-                  <Input
-                    value={field.state.value ?? ""}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
+                  <Label>Serial or Asset:</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={field.state.value ?? ""}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="outline">
+                            <Info />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Nodes must be tagged with "grendel:serial=1234" or
+                          "grendel:asset=1234" to return here.
+                          <br /> This form can be used with a barcode scanner:
+                          <br /> Set the scanner to include an enter keystroke
+                          or Carriage Return as a suffix, focus the textbox and
+                          scan.
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                 </div>
               )}
             />
@@ -114,35 +133,37 @@ function RouteComponent() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Search</TableHead>
                     <TableHead>Node</TableHead>
                     <TableHead>Serial Number</TableHead>
                     <TableHead>Asset Tag</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {nodes.map((node, i) => (
+                  {query.map((query, i) => (
                     <TableRow
                       key={i}
-                      className={`${i == 0 && node.name !== "" && "dark:bg-green-800 hover:dark:bg-green-700 bg-green-50 hover:bg-green-100"} ${i == 0 && node.name == "" && "dark:bg-red-800 hover:dark:bg-red-700 bg-red-50 hover:bg-red-100"}`}
+                      className={`${i == 0 && !!query.node.name && "dark:bg-green-800 hover:dark:bg-green-700 bg-green-50 hover:bg-green-100"} ${i == 0 && !query.node.name && "dark:bg-red-800 hover:dark:bg-red-700 bg-red-50 hover:bg-red-100"}`}
                     >
+                      <TableCell>{query.search}</TableCell>
                       <TableCell>
                         <Link
                           className="hover:font-medium"
                           to="/nodes/$node"
-                          params={{ node: node.name ?? "" }}
+                          params={{ node: query.node.name ?? "" }}
                         >
-                          {node.name}
+                          {query.node.name}
                         </Link>
                       </TableCell>
                       <TableCell>
-                        {node.tags
+                        {query.node.tags
                           ?.filter((tag) =>
                             tag.includes("grendel:serial=")
                           )?.[0]
                           ?.replace("grendel:serial=", "")}
                       </TableCell>
                       <TableCell>
-                        {node.tags
+                        {query.node.tags
                           ?.filter((tag) => tag.includes("grendel:asset="))?.[0]
                           ?.replace("grendel:asset=", "")}
                       </TableCell>

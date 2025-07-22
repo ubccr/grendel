@@ -246,7 +246,7 @@ func (s *SqlStore) StoreHosts(hosts model.HostList) error {
 		if h.BootImage != "" {
 			kernel, err := s.q.KernelFetch(ctx, tx, h.BootImage)
 			if errors.Is(err, sql.ErrNoRows) {
-				return fmt.Errorf("boot image foreign key error. node=%s boot_image=%s err=%s", h.Name, h.BootImage, err)
+				return fmt.Errorf("boot image does not exist. image=%s node=%s", h.BootImage, h.Name)
 			} else if err != nil {
 				return err
 			}

@@ -4334,7 +4334,7 @@
 	"servers": [
 		{
 			"description": "local server",
-			"url": "http://grendel-api.socket"
+			"url": "http://127.0.0.1:8080"
 		}
 	],
 	"tags": [
