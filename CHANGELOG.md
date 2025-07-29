@@ -1,5 +1,12 @@
 # Grendel Changelog
 
+## [0.2.2] - 2025-07-28
+
+- Fix provision template store
+- Add support for rendering configs from netbox
+- Add inventory search UI which supports barcode scanning of serial & asset tags
+- Fix ipv4 reverse resolution bug
+
 ## [0.2.1] - 2025-04-28
 
 - added custom role support
@@ -265,4 +272,5 @@
 [0.1.0]: https://github.com/ubccr/grendel/releases/tag/v0.1.0
 [0.2.0]: https://github.com/ubccr/grendel/releases/tag/v0.2.0
 [0.2.1]: https://github.com/ubccr/grendel/releases/tag/v0.2.1
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.1...HEAD
+[0.2.2]: https://github.com/ubccr/grendel/releases/tag/v0.2.2
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.2...HEAD
