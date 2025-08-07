@@ -489,8 +489,8 @@ func (q *Queries) NodeTagUpsertDelete(ctx context.Context, db DBTX, arg NodeTagU
 const nodeUpsert = `-- name: NodeUpsert :one
 insert into node (id, uid, name, provision, arch_id, kernel_id, node_type_id, firmware)
 values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
-on conflict (name)
-do update set provision = ?4, arch_id = ?5, kernel_id = ?6, node_type_id = ?7, firmware = ?8
+on conflict (id)
+do update set name = ?3, provision = ?4, arch_id = ?5, kernel_id = ?6, node_type_id = ?7, firmware = ?8
 returning id, uid, name, provision, arch_id, kernel_id, node_type_id, firmware, created_at, updated_at
 `
 

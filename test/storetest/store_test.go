@@ -576,12 +576,23 @@ func (s *StoreTestSuite) TestHostUpdate() {
 		s.Assert().Equal(2, len(testHost.Interfaces))
 	}
 
-	// Store host with same name is update
+	// Store host with same id is an update
 	hostDup := tests.HostFactory.MustCreate().(*model.Host)
+	hostDup.ID = host.ID
+	hostDup.Name = "new name"
+	err = s.db.StoreHost(hostDup)
+	if s.Assert().NoError(err) {
+		hosts, err := s.db.Hosts()
+		s.Assert().NoError(err)
+		s.Assert().Equal(1, len(hosts))
+	}
+
+	// Store host with same name different id is an err
+	hostDup = tests.HostFactory.MustCreate().(*model.Host)
 	hostDup.UID = host.UID
 	hostDup.Name = host.Name
 	err = s.db.StoreHost(hostDup)
-	if s.Assert().NoError(err) {
+	if s.Assert().Error(err) {
 		hosts, err := s.db.Hosts()
 		s.Assert().NoError(err)
 		s.Assert().Equal(1, len(hosts))

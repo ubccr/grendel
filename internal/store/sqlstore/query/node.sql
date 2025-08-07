@@ -79,8 +79,8 @@ where id in (sqlc.slice(nodes));
 -- name: NodeUpsert :one
 insert into node (id, uid, name, provision, arch_id, kernel_id, node_type_id, firmware)
 values (sqlc.narg('id'), @uid, @name, @provision, @arch_id, @kernel_id, @node_type_id, @firmware)
-on conflict (name)
-do update set provision = ?4, arch_id = ?5, kernel_id = ?6, node_type_id = ?7, firmware = ?8
+on conflict (id)
+do update set name = ?3, provision = ?4, arch_id = ?5, kernel_id = ?6, node_type_id = ?7, firmware = ?8
 returning *;
 
 -- name: NodeDelete :exec
