@@ -171,6 +171,29 @@ func (s *StoreTestSuite) TestResolveIPv4() {
 	}
 }
 
+func (s *StoreTestSuite) TestResolveIPv4ExactMatch() {
+	host := tests.HostFactory.MustCreate().(*model.Host)
+	host.Interfaces[0].FQDN = "test1.example.com"
+	host.Interfaces[1].FQDN = "xxx-test1.example.com"
+
+	err := s.db.StoreHost(host)
+	s.Assert().NoError(err)
+
+	testIPs, err := s.db.ResolveIPv4("test1.example.com")
+	if s.Assert().NoError(err) {
+		if s.Assert().Equal(1, len(testIPs)) {
+			s.Assert().Equal(host.Interfaces[0].AddrString(), testIPs[0].String())
+		}
+	}
+
+	names, err := s.db.ReverseResolve(host.Interfaces[0].AddrString())
+	if s.Assert().NoError(err) {
+		if s.Assert().Equal(1, len(names)) {
+			s.Assert().Equal("test1.example.com", names[0])
+		}
+	}
+}
+
 func (s *StoreTestSuite) TestReverseResolveIPv4() {
 	hostA := tests.HostFactory.MustCreate().(*model.Host)
 	hostA.Interfaces[0].IP = netip.MustParsePrefix("10.1.1.17/24")
