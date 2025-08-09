@@ -428,6 +428,20 @@ func (s *SqlStore) ResolveIPv4(fqdn string) ([]net.IP, error) {
 	}
 
 	for _, row := range rows {
+		// TODO: consider refactor data model to store fqdn as an array? for
+		// now this code ensures only exact fqdn exact matches are returned, as
+		// the sql fetches rows with like %% because of the comma separated string
+		exatcMatch := false
+		for _, name := range strings.Split(row.FQDN.String, ",") {
+			if strings.ToLower(name) == fqdnString {
+				exatcMatch = true
+				break
+			}
+		}
+		if !exatcMatch {
+			continue
+		}
+
 		ip, _ := netip.ParsePrefix(row.IP.String)
 		if ip.IsValid() {
 			ips = append(ips, net.IP(ip.Addr().AsSlice()))

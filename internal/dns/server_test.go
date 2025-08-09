@@ -57,7 +57,7 @@ func TestDns(t *testing.T) {
 
 	// Check standard grendel lookup
 	m1 := new(dns.Msg)
-	m1.SetQuestion("test-01.", dns.TypeA)
+	m1.SetQuestion(clientFQDN+".", dns.TypeA)
 
 	r1, err := dns.Exchange(m1, serverAddr)
 	if err != nil {
@@ -67,7 +67,7 @@ func TestDns(t *testing.T) {
 	if len(r1.Answer) == 0 {
 		t.Fatal(errors.New("r1 response is empty"))
 	}
-	assert.Equal(r1.Answer[0].String(), "test-01.\t5\tIN\tA\t10.1.0.1")
+	assert.Equal(r1.Answer[0].String(), clientFQDN+".\t5\tIN\tA\t10.1.0.1")
 
 	// Check reverse grendel lookup
 	m2 := new(dns.Msg)
@@ -98,7 +98,7 @@ func TestDns(t *testing.T) {
 
 	// Check grendel lookup with forward address set
 	m4 := new(dns.Msg)
-	m4.SetQuestion("test-01.", dns.TypeA)
+	m4.SetQuestion(clientFQDN+".", dns.TypeA)
 
 	r4, err := dns.Exchange(m4, serverAddr)
 	if err != nil {
@@ -109,7 +109,7 @@ func TestDns(t *testing.T) {
 	if len(r4.Answer) == 0 {
 		t.Fatal(errors.New("r4 response is empty"))
 	}
-	assert.Equal(r4.Answer[0].String(), "test-01.\t5\tIN\tA\t10.1.0.1")
+	assert.Equal(r4.Answer[0].String(), clientFQDN+".\t5\tIN\tA\t10.1.0.1")
 
 	// Check forwarded MX lookup
 	m5 := new(dns.Msg)
