@@ -1,5 +1,10 @@
 # Grendel Changelog
 
+## [0.2.3] - 2025-08-09
+
+- Fix rename node bug
+- Fix ipv4 forward resolution bug
+
 ## [0.2.2] - 2025-07-28
 
 - Fix provision template store
@@ -273,4 +278,5 @@
 [0.2.0]: https://github.com/ubccr/grendel/releases/tag/v0.2.0
 [0.2.1]: https://github.com/ubccr/grendel/releases/tag/v0.2.1
 [0.2.2]: https://github.com/ubccr/grendel/releases/tag/v0.2.2
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.2...HEAD
+[0.2.3]: https://github.com/ubccr/grendel/releases/tag/v0.2.3
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.3...HEAD
