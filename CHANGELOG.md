@@ -1,5 +1,21 @@
 # Grendel Changelog
 
+## [0.2.1] - 2025-04-28
+
+- added custom role support
+- fixed generated api token expiry
+- added ability to reset your own password
+- added CLI for managing users
+- added CLI for managing roles
+- removed auth requirement for signout route
+- bumped frontend packages
+- fixed bmc power command
+- added snponly x86_64 to dhcp boot handler 
+- fixed mtu not returning from DB
+- changed default EFI x86_64 binary to snponly
+- added dns forwarding
+- update docs to use uv and add api docs
+
 ## [0.2.0] - 2025-03-24
 
 ### BREAKING CHANGES
@@ -248,4 +264,5 @@
 [0.0.15]: https://github.com/ubccr/grendel/releases/tag/v0.0.15
 [0.1.0]: https://github.com/ubccr/grendel/releases/tag/v0.1.0
 [0.2.0]: https://github.com/ubccr/grendel/releases/tag/v0.2.0
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.0...HEAD
+[0.2.1]: https://github.com/ubccr/grendel/releases/tag/v0.2.1
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.1...HEAD

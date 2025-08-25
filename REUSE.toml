@@ -9,6 +9,7 @@ path = [
     ".gitmodules",
     ".actrc",
     ".air.toml",
+    "docs/pyproject.toml",
     "NOTICE",
     "configs/grendel.toml.sample",
     "docs/requirements.txt",
