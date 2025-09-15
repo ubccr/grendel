@@ -25,6 +25,20 @@ func encodePATCHV1AuthResetRequest(
 	return nil
 }
 
+func encodePATCHV1ConfigSetRequest(
+	req *ConfigSetRequest,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
 func encodePATCHV1NodesImageRequest(
 	req *NodeBootImageRequest,
 	r *http.Request,

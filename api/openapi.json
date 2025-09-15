@@ -247,6 +247,40 @@
 				},
 				"type": "object"
 			},
+			"ConfigGetFileResponse": {
+				"description": "ConfigGetFileResponse schema",
+				"properties": {
+					"config": {
+						"format": "byte",
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"ConfigGetResponse": {
+				"description": "ConfigGetResponse schema",
+				"properties": {
+					"config": {
+						"additionalProperties": {
+							"type": "string"
+						},
+						"type": "object"
+					}
+				},
+				"type": "object"
+			},
+			"ConfigSetRequest": {
+				"description": "ConfigSetRequest schema",
+				"properties": {
+					"update_config": {
+						"additionalProperties": {
+							"type": "string"
+						},
+						"type": "object"
+					}
+				},
+				"type": "object"
+			},
 			"DataDump": {
 				"description": "DataDump schema",
 				"properties": {
@@ -2601,6 +2635,204 @@
 				]
 			}
 		},
+		"/v1/config/get": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).ConfigGet`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet configuration key value pairs",
+				"operationId": "GET_/v1/config/get",
+				"parameters": [
+					{
+						"description": "Filter by specific keys",
+						"examples": {
+							"key": {
+								"value": "dns.forward"
+							}
+						},
+						"in": "query",
+						"name": "key",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ConfigGetResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/ConfigGetResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "config get",
+				"tags": [
+					"v1",
+					"config"
+				]
+			}
+		},
+		"/v1/config/get/file": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).ConfigGetFile`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet DB configuration file",
+				"operationId": "GET_/v1/config/get/file",
+				"parameters": [
+					{
+						"description": "viper config type, valid options: toml, json, yaml",
+						"in": "query",
+						"name": "type",
+						"schema": {
+							"default": "yaml",
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ConfigGetFileResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/ConfigGetFileResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "config get file",
+				"tags": [
+					"v1",
+					"config"
+				]
+			}
+		},
+		"/v1/config/set": {
+			"patch": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).ConfigSet`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nSet configuration key value pairs",
+				"operationId": "PATCH_/v1/config/set",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ConfigSetRequest"
+							}
+						}
+					},
+					"description": "Request body for api.ConfigSetRequest",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/GenericResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "config set",
+				"tags": [
+					"v1",
+					"config"
+				]
+			}
+		},
 		"/v1/db/dump": {
 			"get": {
 				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).Dump`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet a backup of the DB",
@@ -4356,6 +4588,9 @@
 		},
 		{
 			"name": "bmc"
+		},
+		{
+			"name": "config"
 		},
 		{
 			"name": "db"

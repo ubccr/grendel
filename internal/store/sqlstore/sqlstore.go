@@ -18,6 +18,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/segmentio/ksuid"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/cast"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/store/migrations"
 	"github.com/ubccr/grendel/internal/store/sqlstore/db"
@@ -838,6 +839,50 @@ func (s *SqlStore) RestoreFrom(data model.DataDump) error {
 	}
 
 	return s.StoreHosts(data.Hosts)
+}
+func (s *SqlStore) UpdateConfig(key string, value any) error {
+	ctx := context.Background()
+
+	err := s.q.ConfigUpsert(ctx, s.rw, db.ConfigUpsertParams{
+		Key:   key,
+		Value: null.StringFrom(cast.ToString(value)),
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *SqlStore) WriteConfig(cfg map[string]string) error {
+	ctx := context.Background()
+
+	for k, v := range cfg {
+		err := s.q.ConfigUpsert(ctx, s.rw, db.ConfigUpsertParams{
+			Key:   k,
+			Value: null.StringFrom(cast.ToString(v)),
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *SqlStore) ReadConfig() (map[string]string, error) {
+	cfgMap := make(map[string]string)
+	ctx := context.Background()
+
+	cfg, err := s.q.ConfigList(ctx, s.ro)
+	if err != nil {
+		return cfgMap, err
+	}
+
+	for _, c := range cfg {
+		cfgMap[c.Key] = c.Value.String
+	}
+
+	return cfgMap, nil
 }
 
 func (s *SqlStore) GetRolesByRoute(method, path string) (*[]string, error) {

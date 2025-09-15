@@ -106,6 +106,15 @@ type Store interface {
 	// RestoreFrom restores the database using the provided data dump
 	RestoreFrom(data model.DataDump) error
 
+	// UpdateConfig writes the given key value pair to the DB
+	UpdateConfig(key string, value any) error
+
+	// WriteConfig writes all key value pairs to the DB
+	WriteConfig(cfg map[string]string) error
+
+	// ReadConfig returns all key value pairs from the DB
+	ReadConfig() (map[string]string, error)
+
 	// GetRolesByRoute returns all roles that have access to the provided method and path
 	GetRolesByRoute(method, path string) (*[]string, error)
 

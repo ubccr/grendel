@@ -141,6 +141,30 @@ type Invoker interface {
 	//
 	// GET /v1/bmc/metrics
 	GETV1BmcMetrics(ctx context.Context, params GETV1BmcMetricsParams) ([]RedfishMetricReport, error)
+	// GETV1ConfigGet invokes GET_/v1/config/get operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).ConfigGet`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Get configuration key value pairs.
+	//
+	// GET /v1/config/get
+	GETV1ConfigGet(ctx context.Context, params GETV1ConfigGetParams) (*ConfigGetResponse, error)
+	// GETV1ConfigGetFile invokes GET_/v1/config/get/file operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).ConfigGetFile`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Get DB configuration file.
+	//
+	// GET /v1/config/get/file
+	GETV1ConfigGetFile(ctx context.Context, params GETV1ConfigGetFileParams) (*ConfigGetFileResponse, error)
 	// GETV1DbDump invokes GET_/v1/db/dump operation.
 	//
 	// #### Controller:
@@ -260,6 +284,18 @@ type Invoker interface {
 	//
 	// PATCH /v1/auth/reset
 	PATCHV1AuthReset(ctx context.Context, request *AuthResetRequest, params PATCHV1AuthResetParams) (*GenericResponse, error)
+	// PATCHV1ConfigSet invokes PATCH_/v1/config/set operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).ConfigSet`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Set configuration key value pairs.
+	//
+	// PATCH /v1/config/set
+	PATCHV1ConfigSet(ctx context.Context, request *ConfigSetRequest, params PATCHV1ConfigSetParams) (*GenericResponse, error)
 	// PATCHV1NodesImage invokes PATCH_/v1/nodes/image operation.
 	//
 	// #### Controller:
@@ -1843,6 +1879,252 @@ func (c *Client) sendGETV1BmcMetrics(ctx context.Context, params GETV1BmcMetrics
 	return result, nil
 }
 
+// GETV1ConfigGet invokes GET_/v1/config/get operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).ConfigGet`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Get configuration key value pairs.
+//
+// GET /v1/config/get
+func (c *Client) GETV1ConfigGet(ctx context.Context, params GETV1ConfigGetParams) (*ConfigGetResponse, error) {
+	res, err := c.sendGETV1ConfigGet(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGETV1ConfigGet(ctx context.Context, params GETV1ConfigGetParams) (res *ConfigGetResponse, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/config/get"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "key" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "key",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Key.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, GETV1ConfigGetOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, GETV1ConfigGetOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGETV1ConfigGetResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GETV1ConfigGetFile invokes GET_/v1/config/get/file operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).ConfigGetFile`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Get DB configuration file.
+//
+// GET /v1/config/get/file
+func (c *Client) GETV1ConfigGetFile(ctx context.Context, params GETV1ConfigGetFileParams) (*ConfigGetFileResponse, error) {
+	res, err := c.sendGETV1ConfigGetFile(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGETV1ConfigGetFile(ctx context.Context, params GETV1ConfigGetFileParams) (res *ConfigGetFileResponse, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/config/get/file"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "type" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Type.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, GETV1ConfigGetFileOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, GETV1ConfigGetFileOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGETV1ConfigGetFileResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // GETV1DbDump invokes GET_/v1/db/dump operation.
 //
 // #### Controller:
@@ -3009,6 +3291,112 @@ func (c *Client) sendPATCHV1AuthReset(ctx context.Context, request *AuthResetReq
 	defer resp.Body.Close()
 
 	result, err := decodePATCHV1AuthResetResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// PATCHV1ConfigSet invokes PATCH_/v1/config/set operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).ConfigSet`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Set configuration key value pairs.
+//
+// PATCH /v1/config/set
+func (c *Client) PATCHV1ConfigSet(ctx context.Context, request *ConfigSetRequest, params PATCHV1ConfigSetParams) (*GenericResponse, error) {
+	res, err := c.sendPATCHV1ConfigSet(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendPATCHV1ConfigSet(ctx context.Context, request *ConfigSetRequest, params PATCHV1ConfigSetParams) (res *GenericResponse, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/config/set"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePATCHV1ConfigSetRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, PATCHV1ConfigSetOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, PATCHV1ConfigSetOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodePATCHV1ConfigSetResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

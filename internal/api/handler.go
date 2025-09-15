@@ -67,6 +67,7 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 	db := fuego.Group(v1, "/db", option.Middleware(h.authMiddleware), globalOptions)
 	bmc := fuego.Group(v1, "/bmc", option.Middleware(h.authMiddleware), globalOptions)
 	roles := fuego.Group(v1, "/roles", option.Middleware(h.authMiddleware), globalOptions)
+	config := fuego.Group(v1, "/config", option.Middleware(h.authMiddleware), globalOptions)
 
 	// Routes
 	fuego.Get(grendel, "/events", h.GetEvents)
@@ -182,6 +183,18 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 	fuego.Get(bmc, "/metrics", h.BmcMetricReports,
 		option.Description("Get metric reports by nodeset"),
 		filterNodes,
+	)
+
+	fuego.Get(config, "/get/file", h.ConfigGetFile,
+		option.Description("Get DB configuration file"),
+		option.Query("type", "viper config type, valid options: toml, json, yaml", param.Default("yaml")),
+	)
+	fuego.Get(config, "/get", h.ConfigGet,
+		option.Description("Get configuration key value pairs"),
+		option.Query("key", "Filter by specific keys", param.Example("key", "dns.forward")),
+	)
+	fuego.Patch(config, "/set", h.ConfigSet,
+		option.Description("Set configuration key value pairs"),
 	)
 
 	fuego.Get(roles, "", h.GetRoles,

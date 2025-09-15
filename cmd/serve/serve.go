@@ -12,6 +12,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -80,6 +81,27 @@ func init() {
 		}
 
 		cmd.Log.Infof("Using %s database path: %s", dbType, viper.GetString("dbpath"))
+
+		// pull config from DB
+		cfg, err := DB.ReadConfig()
+		if err != nil {
+			return err
+		}
+
+		// Only set values for keys that are not set elsewhere (DB is last in precedence)
+		var ignored []string
+		for k, v := range cfg {
+			if viper.IsSet(k) {
+				ignored = append(ignored, k)
+				continue
+			}
+
+			viper.Set(k, v)
+		}
+		if len(ignored) > 0 {
+			cmd.Log.Debugf("ignoring the following config key value pairs that are overriden by env var or local config file: %s", strings.Join(ignored, ", "))
+		}
+
 		return nil
 	}
 

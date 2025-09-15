@@ -570,6 +570,76 @@ func (s *BootImageProvisionTemplates) init() BootImageProvisionTemplates {
 	return m
 }
 
+// ConfigGetFileResponse schema.
+// Ref: #/components/schemas/ConfigGetFileResponse
+type ConfigGetFileResponse struct {
+	Config []byte `json:"config"`
+}
+
+// GetConfig returns the value of Config.
+func (s *ConfigGetFileResponse) GetConfig() []byte {
+	return s.Config
+}
+
+// SetConfig sets the value of Config.
+func (s *ConfigGetFileResponse) SetConfig(val []byte) {
+	s.Config = val
+}
+
+// ConfigGetResponse schema.
+// Ref: #/components/schemas/ConfigGetResponse
+type ConfigGetResponse struct {
+	Config OptConfigGetResponseConfig `json:"config"`
+}
+
+// GetConfig returns the value of Config.
+func (s *ConfigGetResponse) GetConfig() OptConfigGetResponseConfig {
+	return s.Config
+}
+
+// SetConfig sets the value of Config.
+func (s *ConfigGetResponse) SetConfig(val OptConfigGetResponseConfig) {
+	s.Config = val
+}
+
+type ConfigGetResponseConfig map[string]string
+
+func (s *ConfigGetResponseConfig) init() ConfigGetResponseConfig {
+	m := *s
+	if m == nil {
+		m = map[string]string{}
+		*s = m
+	}
+	return m
+}
+
+// ConfigSetRequest schema.
+// Ref: #/components/schemas/ConfigSetRequest
+type ConfigSetRequest struct {
+	UpdateConfig OptConfigSetRequestUpdateConfig `json:"update_config"`
+}
+
+// GetUpdateConfig returns the value of UpdateConfig.
+func (s *ConfigSetRequest) GetUpdateConfig() OptConfigSetRequestUpdateConfig {
+	return s.UpdateConfig
+}
+
+// SetUpdateConfig sets the value of UpdateConfig.
+func (s *ConfigSetRequest) SetUpdateConfig(val OptConfigSetRequestUpdateConfig) {
+	s.UpdateConfig = val
+}
+
+type ConfigSetRequestUpdateConfig map[string]string
+
+func (s *ConfigSetRequestUpdateConfig) init() ConfigSetRequestUpdateConfig {
+	m := *s
+	if m == nil {
+		m = map[string]string{}
+		*s = m
+	}
+	return m
+}
+
 type CookieAuth struct {
 	Token string
 }
@@ -3229,6 +3299,98 @@ func (o OptBool) Get() (v bool, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptBool) Or(d bool) bool {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptConfigGetResponseConfig returns new OptConfigGetResponseConfig with value set to v.
+func NewOptConfigGetResponseConfig(v ConfigGetResponseConfig) OptConfigGetResponseConfig {
+	return OptConfigGetResponseConfig{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptConfigGetResponseConfig is optional ConfigGetResponseConfig.
+type OptConfigGetResponseConfig struct {
+	Value ConfigGetResponseConfig
+	Set   bool
+}
+
+// IsSet returns true if OptConfigGetResponseConfig was set.
+func (o OptConfigGetResponseConfig) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptConfigGetResponseConfig) Reset() {
+	var v ConfigGetResponseConfig
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptConfigGetResponseConfig) SetTo(v ConfigGetResponseConfig) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptConfigGetResponseConfig) Get() (v ConfigGetResponseConfig, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptConfigGetResponseConfig) Or(d ConfigGetResponseConfig) ConfigGetResponseConfig {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptConfigSetRequestUpdateConfig returns new OptConfigSetRequestUpdateConfig with value set to v.
+func NewOptConfigSetRequestUpdateConfig(v ConfigSetRequestUpdateConfig) OptConfigSetRequestUpdateConfig {
+	return OptConfigSetRequestUpdateConfig{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptConfigSetRequestUpdateConfig is optional ConfigSetRequestUpdateConfig.
+type OptConfigSetRequestUpdateConfig struct {
+	Value ConfigSetRequestUpdateConfig
+	Set   bool
+}
+
+// IsSet returns true if OptConfigSetRequestUpdateConfig was set.
+func (o OptConfigSetRequestUpdateConfig) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptConfigSetRequestUpdateConfig) Reset() {
+	var v ConfigSetRequestUpdateConfig
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptConfigSetRequestUpdateConfig) SetTo(v ConfigSetRequestUpdateConfig) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptConfigSetRequestUpdateConfig) Get() (v ConfigSetRequestUpdateConfig, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptConfigSetRequestUpdateConfig) Or(d ConfigSetRequestUpdateConfig) ConfigSetRequestUpdateConfig {
 	if v, ok := o.Get(); ok {
 		return v
 	}

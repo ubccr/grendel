@@ -84,6 +84,20 @@ type GETV1BmcMetricsParams struct {
 	Accept OptString
 }
 
+// GETV1ConfigGetParams is parameters of GET_/v1/config/get operation.
+type GETV1ConfigGetParams struct {
+	// Filter by specific keys.
+	Key    OptString
+	Accept OptString
+}
+
+// GETV1ConfigGetFileParams is parameters of GET_/v1/config/get/file operation.
+type GETV1ConfigGetFileParams struct {
+	// Viper config type, valid options: toml, json, yaml.
+	Type   OptString
+	Accept OptString
+}
+
 // GETV1DbDumpParams is parameters of GET_/v1/db/dump operation.
 type GETV1DbDumpParams struct {
 	Accept OptString
@@ -145,6 +159,11 @@ type GETV1UsersParams struct {
 
 // PATCHV1AuthResetParams is parameters of PATCH_/v1/auth/reset operation.
 type PATCHV1AuthResetParams struct {
+	Accept OptString
+}
+
+// PATCHV1ConfigSetParams is parameters of PATCH_/v1/config/set operation.
+type PATCHV1ConfigSetParams struct {
 	Accept OptString
 }
 

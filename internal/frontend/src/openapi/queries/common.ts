@@ -2,7 +2,7 @@
 
 import { type Options } from "@hey-api/client-fetch";
 import { UseQueryResult } from "@tanstack/react-query";
-import { deleteV1AuthSignout, deleteV1BmcJobsJids, deleteV1BmcSel, deleteV1Images, deleteV1Nodes, deleteV1RolesNames, deleteV1UsersUsernames, getV1Bmc, getV1BmcJobs, getV1BmcMetrics, getV1DbDump, getV1GrendelEvents, getV1Images, getV1ImagesFind, getV1Nodes, getV1NodesFind, getV1NodesTokenInterface, getV1Roles, getV1Users, patchV1AuthReset, patchV1NodesImage, patchV1NodesProvision, patchV1NodesTagsAction, patchV1Roles, patchV1UsersUsernamesEnable, patchV1UsersUsernamesRole, postV1AuthSignin, postV1AuthSignup, postV1AuthToken, postV1BmcConfigureAuto, postV1BmcConfigureImport, postV1BmcPowerBmc, postV1BmcPowerOs, postV1DbRestore, postV1Images, postV1Nodes, postV1Roles, postV1Users } from "../requests/services.gen";
+import { deleteV1AuthSignout, deleteV1BmcJobsJids, deleteV1BmcSel, deleteV1Images, deleteV1Nodes, deleteV1RolesNames, deleteV1UsersUsernames, getV1Bmc, getV1BmcJobs, getV1BmcMetrics, getV1ConfigGet, getV1ConfigGetFile, getV1DbDump, getV1GrendelEvents, getV1Images, getV1ImagesFind, getV1Nodes, getV1NodesFind, getV1NodesTokenInterface, getV1Roles, getV1Users, patchV1AuthReset, patchV1ConfigSet, patchV1NodesImage, patchV1NodesProvision, patchV1NodesTagsAction, patchV1Roles, patchV1UsersUsernamesEnable, patchV1UsersUsernamesRole, postV1AuthSignin, postV1AuthSignup, postV1AuthToken, postV1BmcConfigureAuto, postV1BmcConfigureImport, postV1BmcPowerBmc, postV1BmcPowerOs, postV1DbRestore, postV1Images, postV1Nodes, postV1Roles, postV1Users } from "../requests/services.gen";
 export type GetV1BmcDefaultResponse = Awaited<ReturnType<typeof getV1Bmc>>["data"];
 export type GetV1BmcQueryResult<TData = GetV1BmcDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
 export const useGetV1BmcKey = "GetV1Bmc";
@@ -15,6 +15,14 @@ export type GetV1BmcMetricsDefaultResponse = Awaited<ReturnType<typeof getV1BmcM
 export type GetV1BmcMetricsQueryResult<TData = GetV1BmcMetricsDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
 export const useGetV1BmcMetricsKey = "GetV1BmcMetrics";
 export const UseGetV1BmcMetricsKeyFn = (clientOptions: Options<unknown, true> = {}, queryKey?: Array<unknown>) => [useGetV1BmcMetricsKey, ...(queryKey ?? [clientOptions])];
+export type GetV1ConfigGetDefaultResponse = Awaited<ReturnType<typeof getV1ConfigGet>>["data"];
+export type GetV1ConfigGetQueryResult<TData = GetV1ConfigGetDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
+export const useGetV1ConfigGetKey = "GetV1ConfigGet";
+export const UseGetV1ConfigGetKeyFn = (clientOptions: Options<unknown, true> = {}, queryKey?: Array<unknown>) => [useGetV1ConfigGetKey, ...(queryKey ?? [clientOptions])];
+export type GetV1ConfigGetFileDefaultResponse = Awaited<ReturnType<typeof getV1ConfigGetFile>>["data"];
+export type GetV1ConfigGetFileQueryResult<TData = GetV1ConfigGetFileDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
+export const useGetV1ConfigGetFileKey = "GetV1ConfigGetFile";
+export const UseGetV1ConfigGetFileKeyFn = (clientOptions: Options<unknown, true> = {}, queryKey?: Array<unknown>) => [useGetV1ConfigGetFileKey, ...(queryKey ?? [clientOptions])];
 export type GetV1DbDumpDefaultResponse = Awaited<ReturnType<typeof getV1DbDump>>["data"];
 export type GetV1DbDumpQueryResult<TData = GetV1DbDumpDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
 export const useGetV1DbDumpKey = "GetV1DbDump";
@@ -90,6 +98,9 @@ export const UsePostV1UsersKeyFn = (mutationKey?: Array<unknown>) => [usePostV1U
 export type PatchV1AuthResetMutationResult = Awaited<ReturnType<typeof patchV1AuthReset>>;
 export const usePatchV1AuthResetKey = "PatchV1AuthReset";
 export const UsePatchV1AuthResetKeyFn = (mutationKey?: Array<unknown>) => [usePatchV1AuthResetKey, ...(mutationKey ?? [])];
+export type PatchV1ConfigSetMutationResult = Awaited<ReturnType<typeof patchV1ConfigSet>>;
+export const usePatchV1ConfigSetKey = "PatchV1ConfigSet";
+export const UsePatchV1ConfigSetKeyFn = (mutationKey?: Array<unknown>) => [usePatchV1ConfigSetKey, ...(mutationKey ?? [])];
 export type PatchV1NodesImageMutationResult = Awaited<ReturnType<typeof patchV1NodesImage>>;
 export const usePatchV1NodesImageKey = "PatchV1NodesImage";
 export const UsePatchV1NodesImageKeyFn = (mutationKey?: Array<unknown>) => [usePatchV1NodesImageKey, ...(mutationKey ?? [])];

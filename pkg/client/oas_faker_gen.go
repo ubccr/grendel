@@ -312,6 +312,55 @@ func (s *BootImageProvisionTemplates) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *ConfigGetFileResponse) SetFake() {
+	{
+		{
+			s.Config = []byte("[]byte")
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *ConfigGetResponse) SetFake() {
+	{
+		{
+			s.Config.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *ConfigGetResponseConfig) SetFake() {
+	var (
+		elem string
+		m    map[string]string = s.init()
+	)
+	for i := 0; i < 0; i++ {
+		m[fmt.Sprintf("fake%d", i)] = elem
+	}
+}
+
+// SetFake set fake values.
+func (s *ConfigSetRequest) SetFake() {
+	{
+		{
+			s.UpdateConfig.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *ConfigSetRequestUpdateConfig) SetFake() {
+	var (
+		elem string
+		m    map[string]string = s.init()
+	)
+	for i := 0; i < 0; i++ {
+		m[fmt.Sprintf("fake%d", i)] = elem
+	}
+}
+
+// SetFake set fake values.
 func (s *DataDump) SetFake() {
 	{
 		{
@@ -1515,6 +1564,24 @@ func (s *OptBool) SetFake() {
 	var elem bool
 	{
 		elem = true
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptConfigGetResponseConfig) SetFake() {
+	var elem ConfigGetResponseConfig
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptConfigSetRequestUpdateConfig) SetFake() {
+	var elem ConfigSetRequestUpdateConfig
+	{
+		elem.SetFake()
 	}
 	s.SetTo(elem)
 }

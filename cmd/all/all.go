@@ -8,6 +8,7 @@ import (
 	_ "github.com/ubccr/grendel/cmd"
 	_ "github.com/ubccr/grendel/cmd/auth"
 	_ "github.com/ubccr/grendel/cmd/bmc"
+	_ "github.com/ubccr/grendel/cmd/config"
 	_ "github.com/ubccr/grendel/cmd/db"
 	_ "github.com/ubccr/grendel/cmd/discover"
 	_ "github.com/ubccr/grendel/cmd/image"

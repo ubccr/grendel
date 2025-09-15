@@ -130,6 +130,31 @@ export type BootImageAddRequest = {
 };
 
 /**
+ * ConfigGetFileResponse schema
+ */
+export type ConfigGetFileResponse = {
+    config?: string;
+};
+
+/**
+ * ConfigGetResponse schema
+ */
+export type ConfigGetResponse = {
+    config?: {
+        [key: string]: (string);
+    };
+};
+
+/**
+ * ConfigSetRequest schema
+ */
+export type ConfigSetRequest = {
+    update_config?: {
+        [key: string]: (string);
+    };
+};
+
+/**
  * DataDump schema
  */
 export type DataDump = {
@@ -840,6 +865,52 @@ export type DeleteV1BmcSelData = {
 export type DeleteV1BmcSelResponse = (Array<JobMessage>);
 
 export type DeleteV1BmcSelError = (HTTPError);
+
+export type GetV1ConfigGetData = {
+    headers?: {
+        Accept?: string;
+    };
+    query?: {
+        /**
+         * Filter by specific keys
+         */
+        key?: string;
+    };
+};
+
+export type GetV1ConfigGetResponse = (ConfigGetResponse);
+
+export type GetV1ConfigGetError = (HTTPError);
+
+export type GetV1ConfigGetFileData = {
+    headers?: {
+        Accept?: string;
+    };
+    query?: {
+        /**
+         * viper config type, valid options: toml, json, yaml
+         */
+        type?: string;
+    };
+};
+
+export type GetV1ConfigGetFileResponse = (ConfigGetFileResponse);
+
+export type GetV1ConfigGetFileError = (HTTPError);
+
+export type PatchV1ConfigSetData = {
+    /**
+     * Request body for api.ConfigSetRequest
+     */
+    body: ConfigSetRequest;
+    headers?: {
+        Accept?: string;
+    };
+};
+
+export type PatchV1ConfigSetResponse = (GenericResponse);
+
+export type PatchV1ConfigSetError = (HTTPError);
 
 export type GetV1DbDumpData = {
     headers?: {

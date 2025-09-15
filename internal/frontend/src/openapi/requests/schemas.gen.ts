@@ -248,6 +248,43 @@ export const BootImageAddRequestSchema = {
     type: 'object'
 } as const;
 
+export const ConfigGetFileResponseSchema = {
+    description: 'ConfigGetFileResponse schema',
+    properties: {
+        config: {
+            format: 'byte',
+            type: 'string'
+        }
+    },
+    type: 'object'
+} as const;
+
+export const ConfigGetResponseSchema = {
+    description: 'ConfigGetResponse schema',
+    properties: {
+        config: {
+            additionalProperties: {
+                type: 'string'
+            },
+            type: 'object'
+        }
+    },
+    type: 'object'
+} as const;
+
+export const ConfigSetRequestSchema = {
+    description: 'ConfigSetRequest schema',
+    properties: {
+        update_config: {
+            additionalProperties: {
+                type: 'string'
+            },
+            type: 'object'
+        }
+    },
+    type: 'object'
+} as const;
+
 export const DataDumpSchema = {
     description: 'DataDump schema',
     properties: {

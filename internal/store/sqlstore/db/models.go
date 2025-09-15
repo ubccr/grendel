@@ -17,6 +17,11 @@ type Arch struct {
 	Name string `json:"name"`
 }
 
+type Config struct {
+	Key   string      `json:"key"`
+	Value null.String `json:"value"`
+}
+
 type Initrd struct {
 	ID        int64     `json:"id"`
 	KernelID  int64     `json:"kernel_id"`

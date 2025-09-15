@@ -171,6 +171,70 @@ func TestBootImageProvisionTemplates_EncodeDecode(t *testing.T) {
 	typ2 = make(BootImageProvisionTemplates)
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestConfigGetFileResponse_EncodeDecode(t *testing.T) {
+	var typ ConfigGetFileResponse
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 ConfigGetFileResponse
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestConfigGetResponse_EncodeDecode(t *testing.T) {
+	var typ ConfigGetResponse
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 ConfigGetResponse
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestConfigGetResponseConfig_EncodeDecode(t *testing.T) {
+	var typ ConfigGetResponseConfig
+	typ = make(ConfigGetResponseConfig)
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 ConfigGetResponseConfig
+	typ2 = make(ConfigGetResponseConfig)
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestConfigSetRequest_EncodeDecode(t *testing.T) {
+	var typ ConfigSetRequest
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 ConfigSetRequest
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestConfigSetRequestUpdateConfig_EncodeDecode(t *testing.T) {
+	var typ ConfigSetRequestUpdateConfig
+	typ = make(ConfigSetRequestUpdateConfig)
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 ConfigSetRequestUpdateConfig
+	typ2 = make(ConfigSetRequestUpdateConfig)
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestDataDump_EncodeDecode(t *testing.T) {
 	var typ DataDump
 	typ.SetFake()
