@@ -39,7 +39,7 @@ function RouteComponent() {
               description: e.detail,
             });
           },
-        }
+        },
       );
     },
   });

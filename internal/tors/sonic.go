@@ -17,6 +17,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/ubccr/grendel/pkg/model"
 )
 
 const (
@@ -95,7 +97,7 @@ func (d *Sonic) getRequest(url string) (*http.Request, error) {
 	return req, nil
 }
 
-func (d *Sonic) GetMACTable() (MACTable, error) {
+func (d *Sonic) GetMACTable() (model.MACTable, error) {
 	url := d.URL(SONIC_RESTCONF_MACTABLE)
 	log.Infof("Requesting MAC table: %s", url)
 
@@ -126,7 +128,7 @@ func (d *Sonic) GetMACTable() (MACTable, error) {
 		return nil, err
 	}
 
-	macTable := make(MACTable, 0)
+	macTable := make(model.MACTable, 0)
 
 	for _, entry := range sMACTable.Root.Entry {
 		// Parse port number from interface.
@@ -148,7 +150,7 @@ func (d *Sonic) GetMACTable() (MACTable, error) {
 			continue
 		}
 
-		macTable[entry.MacAddress] = &MACTableEntry{
+		macTable[entry.MacAddress] = &model.MACTableEntry{
 			Ifname: iface,
 			Port:   port,
 			VLAN:   strconv.Itoa(entry.Vlan),
@@ -164,12 +166,12 @@ func (d *Sonic) GetMACTable() (MACTable, error) {
 
 type sonicLLDP struct {
 	Root struct {
-		iface []struct {
-			name      string
-			neighbors []struct {
-				neighbor struct {
-					id    string
-					state struct {
+		Interface []struct {
+			Name      string `json:"name"`
+			Neighbors struct {
+				Neighbor []struct {
+					Id    string `json:"id"`
+					State struct {
 						ChassisId         string `json:"chassis-id"`
 						ChassisidType     string `json:"chassis-id-type"`
 						Id                string
@@ -180,67 +182,65 @@ type sonicLLDP struct {
 						SystemDescription string `json:"system-description"`
 						SystemName        string `json:"system-name"`
 						Ttl               int
-					}
-				}
-			}
-		}
+					} `json:"state"`
+				} `json:"neighbor"`
+			} `json:"neighbors"`
+		} `json:"interface"`
 	} `json:"openconfig-lldp:interfaces"`
 }
 
-func (d *Sonic) GetInterfaceStatus() (InterfaceTable, error) {
+func (d *Sonic) GetInterfaceStatus() (model.InterfaceTable, error) {
 	return nil, errors.New("Interface Status not supported on SONiC")
 }
 
 // TODO:
-func (d *Sonic) GetLLDPNeighbors() (LLDPNeighbors, error) {
-	// var lldpRaw *sonicLLDP
-	// url := d.URL(SONIC_RESTCONF_LLDP)
-	// log.Infof("Requesting MAC table: %s", url)
+func (d *Sonic) GetLLDPNeighbors() (model.LLDPNeighbors, error) {
+	url := d.URL(SONIC_RESTCONF_LLDP)
+	log.Infof("Requesting LLDP info: %s", url)
 
-	// req, err := d.getRequest(url)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// res, err := d.client.Do(req)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// defer res.Body.Close()
+	req, err := d.getRequest(url)
+	if err != nil {
+		return nil, err
+	}
+	res, err := d.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
 
-	// if res.StatusCode == 500 {
-	// 	return nil, fmt.Errorf("failed to fetch mac table with HTTP status code: %d", res.StatusCode)
-	// }
+	if res.StatusCode == 500 {
+		return nil, fmt.Errorf("failed to fetch mac table with HTTP status code: %d", res.StatusCode)
+	}
 
-	// rawJson, err := io.ReadAll(res.Body)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	rawJson, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
 
-	// log.Debugf("Sonic json response: %s", rawJson)
+	var lldpRaw *sonicLLDP
+	err = json.Unmarshal(rawJson, &lldpRaw)
+	if err != nil {
+		return nil, err
+	}
 
-	// var sMACTable *sonicMacTable
-	// err = json.Unmarshal(rawJson, &sMACTable)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	o := make(model.LLDPNeighbors, 0)
 
-	// o := make(LLDPNeighbors, 0)
+	for _, iface := range lldpRaw.Root.Interface {
+		for _, n := range iface.Neighbors.Neighbor {
+			o[iface.Name] = &model.LLDP{
+				PortName:          iface.Name,
+				ChassisId:         n.State.ChassisId,
+				ChassisIdType:     n.State.ChassisidType,
+				ManagementAddress: n.State.ManagementAddress,
+				PortDescription:   n.State.PortDescription,
+				PortId:            n.State.PortId,
+				PortIdType:        n.State.PortIdType,
+				SystemDescription: n.State.SystemDescription,
+				SystemName:        n.State.SystemName,
+			}
+		}
+	}
 
-	// for _, iface := range lldpRaw.Root.iface {
-	// 	for _, n := range iface.neighbors {
-	// 		state := n.neighbor.state
-	// 		o[iface.name] = &LLDP{
-	// 			ChassisId:         state.ChassisId,
-	// 			ChassisIdType:     state.ChassisidType,
-	// 			ManagementAddress: state.ManagementAddress,
-	// 			PortDescription:   state.PortDescription,
-	// 			PortId:            state.PortId,
-	// 			PortIdType:        state.PortIdType,
-	// 			SystemDescription: state.SystemDescription,
-	// 			SystemName:        state.SystemName,
-	// 		}
-	// 	}
-	// }
-
-	return nil, errors.New("LLDPNeighbors not supported on SONiC")
+	return o, nil
+	// return nil, errors.New("LLDPNeighbors not supported on SONiC")
 }

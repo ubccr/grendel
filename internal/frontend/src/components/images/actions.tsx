@@ -23,11 +23,11 @@ export default function ImageActions({ images }: { images: string }) {
     undefined,
     {
       enabled: false,
-    }
+    },
   );
 
   return (
-    <div className="mt-4 grid sm:grid-cols-2 gap-4">
+    <div className="mt-4 grid gap-4 sm:grid-cols-2">
       <Card>
         <CardHeader>
           <CardTitle>Delete</CardTitle>
@@ -35,9 +35,7 @@ export default function ImageActions({ images }: { images: string }) {
         <CardFooter>
           <Dialog>
             <DialogTrigger asChild>
-              <Button size="sm" variant="destructive">
-                Delete
-              </Button>
+              <Button variant="destructive">Delete</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -51,7 +49,6 @@ export default function ImageActions({ images }: { images: string }) {
                 <DialogClose asChild>
                   <Button
                     variant="destructive"
-                    size="sm"
                     onClick={() =>
                       mutation_delete.mutate(
                         { query: { name: images } },
@@ -66,7 +63,7 @@ export default function ImageActions({ images }: { images: string }) {
                             toast.error(e.title, {
                               description: e.detail,
                             }),
-                        }
+                        },
                       )
                     }
                   >
@@ -74,9 +71,7 @@ export default function ImageActions({ images }: { images: string }) {
                   </Button>
                 </DialogClose>
                 <DialogClose asChild>
-                  <Button variant="outline" size="sm">
-                    Cancel
-                  </Button>
+                  <Button>Cancel</Button>
                 </DialogClose>
               </DialogFooter>
             </DialogContent>
@@ -90,13 +85,7 @@ export default function ImageActions({ images }: { images: string }) {
         <CardFooter>
           <Dialog>
             <DialogTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => images_query.refetch()}
-              >
-                Submit
-              </Button>
+              <Button onClick={() => images_query.refetch()}>Submit</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -105,7 +94,7 @@ export default function ImageActions({ images }: { images: string }) {
               <div className="max-h-[calc(70dvh)] overflow-scroll">
                 <div className="text-muted-foreground">
                   {images_query.isLoading ? (
-                    <LoaderCircle className="animate-spin mx-auto" />
+                    <LoaderCircle className="mx-auto animate-spin" />
                   ) : (
                     <pre>{JSON.stringify(images_query.data, null, 4)}</pre>
                   )}
@@ -114,11 +103,9 @@ export default function ImageActions({ images }: { images: string }) {
               <DialogFooter>
                 <Button
                   type="button"
-                  variant="outline"
-                  size="sm"
                   onClick={() => {
                     navigator.clipboard.writeText(
-                      JSON.stringify(images_query.data, null, 4)
+                      JSON.stringify(images_query.data, null, 4),
                     );
                     toast.success("Successfully copied JSON to clipboard");
                   }}

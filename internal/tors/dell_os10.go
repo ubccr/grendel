@@ -7,6 +7,7 @@ package tors
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -17,10 +18,13 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/ubccr/grendel/pkg/model"
 )
 
 const (
-	DELLOS10_RESTCONF_MACTABLE = "/restconf/data/dell-l2-mac:oper-params"
+	DELLOS10_RESTCONF_MACTABLE   = "/restconf/data/dell-l2-mac:oper-params"
+	DELLOS10_RESTCONF_Interfaces = "/restconf/data/interfaces-state/interface"
 )
 
 type DellOS10 struct {
@@ -43,6 +47,33 @@ type dellMacTableEntry struct {
 	MAC       string `json:"mac-addr"`
 	Status    string `json:"status"`
 	VLAN      string `json:"vlan"`
+}
+
+type dellIetfInterfaces struct {
+	Interfaces []dellIetfInterface `json:"ietf-interfaces:interface"`
+}
+
+type dellIetfInterface struct {
+	Name                    string                  `json:"name"`
+	DellLldpRemNeighborInfo dellLldpRemNeighborInfo `json:"dell-lldp:lldp-rem-neighbor-info"`
+	DellLldpRemMgmtAddr     dellLldpRemMgmtAddr     `json:"dell-lldp:rem-mgmt-addr"`
+}
+type dellLldpRemNeighborInfo struct {
+	Info []struct {
+		RemLldpChassisId        string `json:"rem-lldp-chassis-id"`
+		RemLldpChassisIdSubtype string `json:"rem-lldp-chassis-id-subtype"`
+		RemLldpPortId           string `json:"rem-lldp-port-id"`
+		RemLldpPortSubtype      string `json:"rem-lldp-port-subtype"`
+		RemSystemName           string `json:"rem-system-name"`
+		RemSystemDesc           string `json:"rem-system-desc"`
+		RemPortDesc             string `json:"rem-port-desc"`
+	} `json:"info"`
+}
+type dellLldpRemMgmtAddr struct {
+	Info []struct {
+		RemMgmtAddress     string `json:"rem-mgmt-address"`
+		RemMgmtAddrSubType string `json:"rem-mgmt-addr-sub-type"`
+	}
 }
 
 type dellRestconfError struct {
@@ -93,7 +124,7 @@ func (d *DellOS10) getRequest(url string) (*http.Request, error) {
 	return req, nil
 }
 
-func (d *DellOS10) GetMACTable() (MACTable, error) {
+func (d *DellOS10) GetMACTable() (model.MACTable, error) {
 	url := d.URL(DELLOS10_RESTCONF_MACTABLE)
 	log.Infof("Requesting MAC table: %s", url)
 
@@ -125,7 +156,7 @@ func (d *DellOS10) GetMACTable() (MACTable, error) {
 	}
 
 	if rec, ok := dmacTable["dell-l2-mac:oper-params"]; ok {
-		macTable := make(MACTable, 0)
+		macTable := make(model.MACTable, 0)
 
 		for _, entry := range rec.Entries {
 			// Parse port number from interface.
@@ -148,7 +179,7 @@ func (d *DellOS10) GetMACTable() (MACTable, error) {
 				continue
 			}
 
-			macTable[entry.MAC] = &MACTableEntry{
+			macTable[entry.MAC] = &model.MACTableEntry{
 				Ifname: entry.Ifname,
 				Port:   port,
 				VLAN:   entry.VLAN,
@@ -178,10 +209,110 @@ func (d *DellOS10) GetMACTable() (MACTable, error) {
 	return nil, errors.New("Failed to fetch mac table, unknown error")
 }
 
-func (d *DellOS10) GetLLDPNeighbors() (LLDPNeighbors, error) {
-	return nil, errors.New("LLDPNeighbors not supported on Dell OS10")
+func (d *DellOS10) GetLLDPNeighbors() (model.LLDPNeighbors, error) {
+	url := d.URL(DELLOS10_RESTCONF_Interfaces)
+	log.Infof("Requesting interfaces for LLDP info: %s", url)
+
+	req, err := d.getRequest(url)
+	if err != nil {
+		return nil, err
+	}
+	res, err := d.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode == 500 {
+		return nil, fmt.Errorf("Failed to fetch interfaces with HTTP status code: %d", res.StatusCode)
+	}
+
+	rawJson, err := io.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	// log.Debugf("DELLOS10 json response: %s", rawJson)
+
+	var dIetfInterfaces dellIetfInterfaces
+	err = json.Unmarshal(rawJson, &dIetfInterfaces)
+	if err != nil {
+		return nil, err
+	}
+	LldpTable := make(model.LLDPNeighbors, 0)
+
+	for _, iface := range dIetfInterfaces.Interfaces {
+		if len(iface.DellLldpRemNeighborInfo.Info) < 1 || len(iface.DellLldpRemMgmtAddr.Info) < 1 {
+			continue
+		}
+
+		neighborInfo := iface.DellLldpRemNeighborInfo.Info[0]
+		mgmtAddrInfo := iface.DellLldpRemMgmtAddr.Info[0]
+
+		var chassisId string
+		chassisIdType := neighborInfo.RemLldpChassisIdSubtype
+		if chassisIdType == "mac-address" {
+			// Dell encodes rem-lldp-chassis-id in base64 -> binary
+			bChassisId, err := base64.StdEncoding.DecodeString(neighborInfo.RemLldpChassisId)
+			if err != nil {
+				log.Warnf("failed to decode dell-lldp-rem-neighbor-info for port: %s, %s", iface.Name, err)
+			}
+
+			sChassisId := fmt.Sprintf("%x", bChassisId)
+
+			for idx, x := range sChassisId {
+				chassisId += string(x)
+				if idx%2 != 0 && idx < (len(sChassisId)-1) {
+					chassisId += ":"
+				}
+			}
+			chassisIdType = "MAC_ADDRESS"
+		}
+		mgmtAddr, err := base64.StdEncoding.DecodeString(mgmtAddrInfo.RemMgmtAddress)
+		if err != nil {
+			log.Warnf("failed to decode dell-lldp-rem-mgmt-address for port: %s", iface.Name)
+			continue
+		}
+		portId, err := base64.StdEncoding.DecodeString(neighborInfo.RemLldpPortId)
+		if err != nil {
+			log.Warnf("failed to decode dell-lldp-rem-port-id for port: %s", iface.Name)
+			continue
+		}
+
+		LldpTable[iface.Name] = &model.LLDP{
+			PortName:          iface.Name,
+			ChassisIdType:     chassisIdType,
+			ChassisId:         chassisId,
+			SystemName:        neighborInfo.RemSystemName,
+			SystemDescription: neighborInfo.RemSystemDesc,
+			ManagementAddress: string(mgmtAddr),
+			PortDescription:   neighborInfo.RemPortDesc,
+			PortId:            string(portId),
+			PortIdType:        neighborInfo.RemLldpPortSubtype,
+		}
+	}
+
+	log.Infof("Received %d entries", len(LldpTable))
+	return LldpTable, nil
+
+	// var derr map[string]map[string][]*dellRestconfError
+	// err = json.Unmarshal(rawJson, &derr)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// if erec, ok := derr["ietf-restconf:errors"]; ok {
+	// 	if rec, ok := erec["error"]; ok {
+	// 		if len(rec) > 0 {
+	// 			return nil, fmt.Errorf("Failed to fetch mac table: %s - %s", rec[0].Tag, rec[0].Message)
+	// 		}
+	// 	}
+	// }
+
+	// return nil, errors.New("Failed to fetch mac table, unknown error")
+	// return nil, errors.New("LLDPNeighbors not supported on Dell OS10")
 }
 
-func (d *DellOS10) GetInterfaceStatus() (InterfaceTable, error) {
+func (d *DellOS10) GetInterfaceStatus() (model.InterfaceTable, error) {
 	return nil, errors.New("Interface Status not supported on Dell OS10")
 }

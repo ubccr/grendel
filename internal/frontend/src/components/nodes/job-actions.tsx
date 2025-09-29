@@ -34,7 +34,7 @@ export default function JobActions({
         <CardFooter>
           <Dialog>
             <DialogTrigger asChild>
-              <Button size="sm" variant="destructive" disabled={jids === ""}>
+              <Button variant="destructive" disabled={jids === ""}>
                 {mutation_delete.isPending ? (
                   <LoaderCircle className="animate-spin" />
                 ) : (
@@ -54,7 +54,6 @@ export default function JobActions({
                 <DialogClose asChild>
                   <Button
                     variant="destructive"
-                    size="sm"
                     onClick={() =>
                       mutation_delete.mutate(
                         { path: { jids: jids }, query: { nodeset: nodes } },
@@ -69,7 +68,7 @@ export default function JobActions({
                             toast.error(e.title, {
                               description: e.detail,
                             }),
-                        }
+                        },
                       )
                     }
                     disabled={jids === ""}
@@ -78,9 +77,7 @@ export default function JobActions({
                   </Button>
                 </DialogClose>
                 <DialogClose asChild>
-                  <Button variant="outline" size="sm">
-                    Cancel
-                  </Button>
+                  <Button>Cancel</Button>
                 </DialogClose>
               </DialogFooter>
             </DialogContent>

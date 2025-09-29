@@ -46,7 +46,7 @@ export function UserProvider({ children, ...props }: UserProviderProps) {
           toast.warning("Session expired", {
             description: "Authentication token has expired, please login again",
           });
-        }, difference)
+        }, difference),
       );
     }
   }, [user]);

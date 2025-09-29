@@ -9,11 +9,12 @@ import { DataTableColumnHeader } from "@/components/data-table/header";
 import { Checkbox } from "@/components/ui/checkbox";
 import ActionsSheet from "@/components/actions-sheet";
 import ImageActions from "@/components/images/actions";
-import { useState } from "react";
-import { useGetV1ImagesSuspense } from "@/openapi/queries/suspense";
+import { useEffect, useState } from "react";
 import AuthRedirect from "@/auth";
 import SelectableCheckbox from "@/components/data-table/selectableCheckbox";
-import { QuerySuspense } from "@/components/query-suspense";
+import { Card, CardContent } from "@/components/ui/card";
+import { useGetV1Images } from "@/openapi/queries";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/images/")({
   component: RouteComponent,
@@ -22,17 +23,23 @@ export const Route = createFileRoute("/images/")({
 
 function RouteComponent() {
   return (
-    <div className="p-4">
-      <QuerySuspense>
-        <TableComponent />
-      </QuerySuspense>
+    <div>
+      <TableComponent />
     </div>
   );
 }
 
 function TableComponent() {
-  const { data, isSuccess } = useGetV1ImagesSuspense();
+  const { data, error, isFetching } = useGetV1Images();
   const [lastSelectedID, setLastSelectedID] = useState(0);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error.title, {
+        description: error.detail,
+      });
+    }
+  }, [error]);
 
   const columns: ColumnDef<BootImage>[] = [
     {
@@ -95,15 +102,16 @@ function TableComponent() {
   };
 
   return (
-    <div className="px-6">
-      {isSuccess && data != undefined && (
+    <Card>
+      <CardContent>
         <DataTable
           columns={columns}
-          data={data}
+          data={data ?? []}
           add={"/add/image"}
           Actions={actions}
+          progress={isFetching}
         />
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 }

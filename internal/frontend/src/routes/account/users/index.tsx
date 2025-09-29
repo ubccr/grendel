@@ -7,6 +7,7 @@ import {
 import { DataTableColumnHeader } from "@/components/data-table/header";
 import SelectableCheckbox from "@/components/data-table/selectableCheckbox";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useGetV1Users } from "@/openapi/queries";
 import { User } from "@/openapi/requests";
@@ -57,7 +58,7 @@ function RouteComponent() {
       ),
       cell: ({ row }) => {
         return (
-          <Badge variant="outline" className="rounded-sm">
+          <Badge variant="secondary" className="rounded-sm">
             {row.original.role}
           </Badge>
         );
@@ -70,7 +71,7 @@ function RouteComponent() {
       ),
       cell: ({ row }) => {
         return (
-          <Badge variant="outline" className="rounded-sm">
+          <Badge variant="secondary" className="rounded-sm">
             {row.original.enabled?.toString()}
           </Badge>
         );
@@ -113,10 +114,15 @@ function RouteComponent() {
     );
   };
   return (
-    <div className="px-5">
-      {users.isSuccess && users.data != undefined && (
-        <DataTable columns={columns} data={users.data} Actions={actions} />
-      )}
-    </div>
+    <Card>
+      <CardContent>
+        <DataTable
+          columns={columns}
+          data={users.data ?? []}
+          Actions={actions}
+          progress={users.isFetching}
+        />
+      </CardContent>
+    </Card>
   );
 }

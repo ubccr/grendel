@@ -3,6 +3,7 @@ import { DataTable } from "@/components/data-table/data-table";
 import { DataTableColumnHeader } from "@/components/data-table/header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -24,7 +25,15 @@ export const Route = createFileRoute("/events")({
 });
 
 function RouteComponent() {
-  const { data, isSuccess } = useGetV1GrendelEvents();
+  return (
+    <div>
+      <TableComponent />
+    </div>
+  );
+}
+
+function TableComponent() {
+  const { data, isFetching } = useGetV1GrendelEvents();
 
   const columns: ColumnDef<Event>[] = [
     {
@@ -35,7 +44,7 @@ function RouteComponent() {
       cell: ({ row }) => (
         <Badge
           className={"rounded-sm " + severityColor(row.original.Severity)}
-          variant="outline"
+          variant="secondary"
         >
           {row.original.Severity}
         </Badge>
@@ -73,8 +82,8 @@ function RouteComponent() {
         <div>
           {row.getCanExpand() ? (
             <Button
-              size="sm"
-              variant="outline"
+              size="icon"
+              variant="secondary"
               onClick={() => row.getCanExpand() && row.toggleExpanded()}
             >
               {row.getIsExpanded() ? <ChevronDown /> : <ChevronLeft />}
@@ -90,7 +99,7 @@ function RouteComponent() {
   const renderSubComponent = ({ row }: { row: Row<Event> }) => {
     const data = row.original.JobMessages;
     return (
-      <Table className="p-2 border">
+      <Table className="border p-2">
         <TableHeader>
           <TableRow>
             <TableHead>Status</TableHead>
@@ -105,7 +114,7 @@ function RouteComponent() {
               <TableRow key={i}>
                 <TableCell>
                   <Badge
-                    variant="outline"
+                    variant="secondary"
                     className={"rounded-sm " + severityColor(row.status)}
                   >
                     {row.status}
@@ -128,29 +137,19 @@ function RouteComponent() {
     return false;
   };
 
-  // const actions: DataTableActions<Event> = ({ table }) => {
-  //   const checked = table
-  //     .getSelectedRowModel()
-  //     .rows.map((v) => v.getAllCells()[1].getValue())
-  //     .join(",");
-  //   const length = table.getSelectedRowModel().rows.length;
-  //   return (
-  //     <ActionsSheet checked={checked} length={length}>
-  //       <NodeActions nodes={checked} length={length} />
-  //     </ActionsSheet>
-  //   );
-  // };
   return (
-    <div className="px-6">
-      {isSuccess && (
+    <Card>
+      <CardContent>
         <DataTable
           columns={columns}
           data={data ?? []}
           // Actions={actions}
           renderSubComponent={renderSubComponent}
           getRowCanExpand={getRowCanExpand}
+          progress={isFetching}
+          initialSorting={[{ id: "Time", desc: true }]}
         />
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 }

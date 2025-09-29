@@ -61,13 +61,13 @@ function PermissionForm({
               description: e.detail,
             });
           },
-        }
+        },
       );
     },
   });
 
   return (
-    <div className="p-4 flex justify-center">
+    <div className="flex justify-center p-4">
       <Card>
         <CardContent>
           <form
@@ -97,7 +97,7 @@ function PermissionForm({
                               onClick={() => {
                                 form.pushFieldValue(
                                   "unassigned_permission_list",
-                                  v
+                                  v,
                                 );
                                 field.removeValue(i);
                               }}
@@ -146,12 +146,7 @@ function PermissionForm({
           </form>
         </CardContent>
         <CardFooter>
-          <Button
-            type="submit"
-            size="sm"
-            // variant="outline"
-            form="permissionForm"
-          >
+          <Button type="submit" form="permissionForm">
             {isPending ? (
               <LoaderCircle className="animate-spin" />
             ) : (

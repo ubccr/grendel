@@ -37,6 +37,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../ui/tooltip";
+import { Progress } from "../ui/progress";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -46,6 +47,8 @@ interface DataTableProps<TData, TValue> {
   renderSubComponent?: (props: { row: Row<TData> }) => React.ReactElement;
   getRowCanExpand?: (row: Row<TData>) => boolean;
   initialVisibility?: VisibilityState;
+  initialSorting?: SortingState;
+  progress?: boolean;
 }
 
 export type DataTableActions<TData> = ({
@@ -62,11 +65,13 @@ export function DataTable<TData, TValue>({
   renderSubComponent,
   getRowCanExpand,
   initialVisibility,
+  initialSorting,
+  progress,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>(initialSorting ?? []);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-    initialVisibility ?? {}
+    initialVisibility ?? {},
   );
   const [rowSelection, setRowSelection] = useState({});
   const [pagination, setPagination] = useState({
@@ -104,11 +109,12 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center justify-between py-4">
-        <div className="flex gap-2"></div>
-        <div className="flex gap-2">
+      <div className="grid grid-cols-3 gap-2 p-2">
+        <div></div>
+        <div className="flex items-end"></div>
+        <div className="flex justify-end gap-2">
           {add && (
-            <Button variant="outline" size="sm" asChild>
+            <Button variant="secondary" asChild>
               <Link to={add}>
                 <Plus />
                 <span className="sr-only sm:not-sr-only">Add</span>
@@ -148,8 +154,8 @@ export function DataTable<TData, TValue>({
                               <TooltipTrigger asChild>
                                 <Button
                                   type="button"
-                                  size="sm"
-                                  variant="outline"
+                                  size="icon"
+                                  variant="secondary"
                                 >
                                   <Info />
                                 </Button>
@@ -204,13 +210,20 @@ export function DataTable<TData, TValue>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
                 })}
               </TableRow>
             ))}
+            {progress && (
+              <TableRow className="fixed">
+                <TableCell className="p-0" colSpan={columns.length}>
+                  <Progress className="fixed h-1" />
+                </TableCell>
+              </TableRow>
+            )}
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
@@ -221,7 +234,7 @@ export function DataTable<TData, TValue>({
                       <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext()
+                          cell.getContext(),
                         )}
                       </TableCell>
                     ))}

@@ -2059,6 +2059,110 @@ func (s *JobMessageRedfishErrorErrorMessageDotExtendedInfoItem) SetSeverity(val 
 	s.Severity = val
 }
 
+// LLDP schema.
+// Ref: #/components/schemas/LLDP
+type LLDP struct {
+	ChassisID         OptString `json:"chassis_id"`
+	ChassisIDType     OptString `json:"chassis_id_type"`
+	ManagementAddress OptString `json:"management_address"`
+	PortDescription   OptString `json:"port_description"`
+	PortID            OptString `json:"port_id"`
+	PortIDType        OptString `json:"port_id_type"`
+	PortName          OptString `json:"port_name"`
+	SystemDescription OptString `json:"system_description"`
+	SystemName        OptString `json:"system_name"`
+}
+
+// GetChassisID returns the value of ChassisID.
+func (s *LLDP) GetChassisID() OptString {
+	return s.ChassisID
+}
+
+// GetChassisIDType returns the value of ChassisIDType.
+func (s *LLDP) GetChassisIDType() OptString {
+	return s.ChassisIDType
+}
+
+// GetManagementAddress returns the value of ManagementAddress.
+func (s *LLDP) GetManagementAddress() OptString {
+	return s.ManagementAddress
+}
+
+// GetPortDescription returns the value of PortDescription.
+func (s *LLDP) GetPortDescription() OptString {
+	return s.PortDescription
+}
+
+// GetPortID returns the value of PortID.
+func (s *LLDP) GetPortID() OptString {
+	return s.PortID
+}
+
+// GetPortIDType returns the value of PortIDType.
+func (s *LLDP) GetPortIDType() OptString {
+	return s.PortIDType
+}
+
+// GetPortName returns the value of PortName.
+func (s *LLDP) GetPortName() OptString {
+	return s.PortName
+}
+
+// GetSystemDescription returns the value of SystemDescription.
+func (s *LLDP) GetSystemDescription() OptString {
+	return s.SystemDescription
+}
+
+// GetSystemName returns the value of SystemName.
+func (s *LLDP) GetSystemName() OptString {
+	return s.SystemName
+}
+
+// SetChassisID sets the value of ChassisID.
+func (s *LLDP) SetChassisID(val OptString) {
+	s.ChassisID = val
+}
+
+// SetChassisIDType sets the value of ChassisIDType.
+func (s *LLDP) SetChassisIDType(val OptString) {
+	s.ChassisIDType = val
+}
+
+// SetManagementAddress sets the value of ManagementAddress.
+func (s *LLDP) SetManagementAddress(val OptString) {
+	s.ManagementAddress = val
+}
+
+// SetPortDescription sets the value of PortDescription.
+func (s *LLDP) SetPortDescription(val OptString) {
+	s.PortDescription = val
+}
+
+// SetPortID sets the value of PortID.
+func (s *LLDP) SetPortID(val OptString) {
+	s.PortID = val
+}
+
+// SetPortIDType sets the value of PortIDType.
+func (s *LLDP) SetPortIDType(val OptString) {
+	s.PortIDType = val
+}
+
+// SetPortName sets the value of PortName.
+func (s *LLDP) SetPortName(val OptString) {
+	s.PortName = val
+}
+
+// SetSystemDescription sets the value of SystemDescription.
+func (s *LLDP) SetSystemDescription(val OptString) {
+	s.SystemDescription = val
+}
+
+// SetSystemName sets the value of SystemName.
+func (s *LLDP) SetSystemName(val OptString) {
+	s.SystemName = val
+}
+
 // NewNilBootImageAddRequestBootImagesItem returns new NilBootImageAddRequestBootImagesItem with value set to v.
 func NewNilBootImageAddRequestBootImagesItem(v BootImageAddRequestBootImagesItem) NilBootImageAddRequestBootImagesItem {
 	return NilBootImageAddRequestBootImagesItem{

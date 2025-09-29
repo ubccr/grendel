@@ -4969,6 +4969,205 @@ func (s *JobMessageRedfishErrorErrorMessageDotExtendedInfoItem) UnmarshalJSON(da
 	return s.Decode(d)
 }
 
+// Encode implements json.Marshaler.
+func (s *LLDP) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *LLDP) encodeFields(e *jx.Encoder) {
+	{
+		if s.ChassisID.Set {
+			e.FieldStart("chassis_id")
+			s.ChassisID.Encode(e)
+		}
+	}
+	{
+		if s.ChassisIDType.Set {
+			e.FieldStart("chassis_id_type")
+			s.ChassisIDType.Encode(e)
+		}
+	}
+	{
+		if s.ManagementAddress.Set {
+			e.FieldStart("management_address")
+			s.ManagementAddress.Encode(e)
+		}
+	}
+	{
+		if s.PortDescription.Set {
+			e.FieldStart("port_description")
+			s.PortDescription.Encode(e)
+		}
+	}
+	{
+		if s.PortID.Set {
+			e.FieldStart("port_id")
+			s.PortID.Encode(e)
+		}
+	}
+	{
+		if s.PortIDType.Set {
+			e.FieldStart("port_id_type")
+			s.PortIDType.Encode(e)
+		}
+	}
+	{
+		if s.PortName.Set {
+			e.FieldStart("port_name")
+			s.PortName.Encode(e)
+		}
+	}
+	{
+		if s.SystemDescription.Set {
+			e.FieldStart("system_description")
+			s.SystemDescription.Encode(e)
+		}
+	}
+	{
+		if s.SystemName.Set {
+			e.FieldStart("system_name")
+			s.SystemName.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfLLDP = [9]string{
+	0: "chassis_id",
+	1: "chassis_id_type",
+	2: "management_address",
+	3: "port_description",
+	4: "port_id",
+	5: "port_id_type",
+	6: "port_name",
+	7: "system_description",
+	8: "system_name",
+}
+
+// Decode decodes LLDP from json.
+func (s *LLDP) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode LLDP to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "chassis_id":
+			if err := func() error {
+				s.ChassisID.Reset()
+				if err := s.ChassisID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"chassis_id\"")
+			}
+		case "chassis_id_type":
+			if err := func() error {
+				s.ChassisIDType.Reset()
+				if err := s.ChassisIDType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"chassis_id_type\"")
+			}
+		case "management_address":
+			if err := func() error {
+				s.ManagementAddress.Reset()
+				if err := s.ManagementAddress.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"management_address\"")
+			}
+		case "port_description":
+			if err := func() error {
+				s.PortDescription.Reset()
+				if err := s.PortDescription.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"port_description\"")
+			}
+		case "port_id":
+			if err := func() error {
+				s.PortID.Reset()
+				if err := s.PortID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"port_id\"")
+			}
+		case "port_id_type":
+			if err := func() error {
+				s.PortIDType.Reset()
+				if err := s.PortIDType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"port_id_type\"")
+			}
+		case "port_name":
+			if err := func() error {
+				s.PortName.Reset()
+				if err := s.PortName.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"port_name\"")
+			}
+		case "system_description":
+			if err := func() error {
+				s.SystemDescription.Reset()
+				if err := s.SystemDescription.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"system_description\"")
+			}
+		case "system_name":
+			if err := func() error {
+				s.SystemName.Reset()
+				if err := s.SystemName.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"system_name\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode LLDP")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *LLDP) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *LLDP) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes BootImageAddRequestBootImagesItem as json.
 func (o NilBootImageAddRequestBootImagesItem) Encode(e *jx.Encoder) {
 	if o.Null {

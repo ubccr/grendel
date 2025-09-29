@@ -1,14 +1,13 @@
 import { useGetV1BmcJobs } from "@/openapi/queries";
 import ActionsSheet from "../actions-sheet";
 import JobActions from "./job-actions";
-import { LoaderCircle } from "lucide-react";
 import { DataTable, DataTableActions } from "../data-table/data-table";
 import { DataTableColumnHeader } from "../data-table/header";
 import SelectableCheckbox from "../data-table/selectableCheckbox";
 import { ColumnDef } from "@tanstack/react-table";
 import { RedfishJob } from "@/openapi/requests";
 import { useState } from "react";
-import { Checkbox } from "@radix-ui/react-checkbox";
+import { Checkbox } from "../ui/checkbox";
 
 export default function RedfishJobList({ nodes }: { nodes: string }) {
   const { data, isFetching } = useGetV1BmcJobs({
@@ -93,11 +92,11 @@ export default function RedfishJobList({ nodes }: { nodes: string }) {
 
   return (
     <div className="px-6">
-      {isFetching && <LoaderCircle className="animate-spin mx-auto" />}
       <DataTable
         columns={columns}
         data={nodeData?.jobs ?? []}
         Actions={actions}
+        progress={isFetching}
       />
     </div>
   );

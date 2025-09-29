@@ -797,6 +797,39 @@
 				},
 				"type": "object"
 			},
+			"LLDP": {
+				"description": "LLDP schema",
+				"properties": {
+					"chassis_id": {
+						"type": "string"
+					},
+					"chassis_id_type": {
+						"type": "string"
+					},
+					"management_address": {
+						"type": "string"
+					},
+					"port_description": {
+						"type": "string"
+					},
+					"port_id": {
+						"type": "string"
+					},
+					"port_id_type": {
+						"type": "string"
+					},
+					"port_name": {
+						"type": "string"
+					},
+					"system_description": {
+						"type": "string"
+					},
+					"system_name": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
 			"NodeAddRequest": {
 				"description": "NodeAddRequest schema",
 				"properties": {
@@ -3963,6 +3996,88 @@
 				]
 			}
 		},
+		"/v1/switch/{nodeset}/lldp": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).SwitchGetLLDP`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet switch LLDP info",
+				"operationId": "GET_/v1/switch/:nodeset/lldp",
+				"parameters": [
+					{
+						"description": "Filter by port name",
+						"examples": {
+							"ports": {
+								"value": "Et1,Et2"
+							}
+						},
+						"in": "query",
+						"name": "ports",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "nodeset",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/LLDP"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/LLDP"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "switch get l l d p",
+				"tags": [
+					"v1",
+					"switch"
+				]
+			}
+		},
 		"/v1/users": {
 			"get": {
 				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList all users",
@@ -4334,7 +4449,7 @@
 	"servers": [
 		{
 			"description": "local server",
-			"url": "http://127.0.0.1:8080"
+			"url": "http://0.0.0.0:8080"
 		}
 	],
 	"tags": [
@@ -4358,6 +4473,9 @@
 		},
 		{
 			"name": "roles"
+		},
+		{
+			"name": "switch"
 		},
 		{
 			"name": "users"

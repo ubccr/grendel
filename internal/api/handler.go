@@ -67,6 +67,7 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 	db := fuego.Group(v1, "/db", option.Middleware(h.authMiddleware), globalOptions)
 	bmc := fuego.Group(v1, "/bmc", option.Middleware(h.authMiddleware), globalOptions)
 	roles := fuego.Group(v1, "/roles", option.Middleware(h.authMiddleware), globalOptions)
+	sw := fuego.Group(v1, "/switch", option.Middleware(h.authMiddleware), globalOptions)
 
 	// Routes
 	fuego.Get(grendel, "/events", h.GetEvents)
@@ -182,6 +183,12 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 	fuego.Get(bmc, "/metrics", h.BmcMetricReports,
 		option.Description("Get metric reports by nodeset"),
 		filterNodes,
+	)
+
+	fuego.Get(sw, "/{nodeset}/lldp", h.SwitchGetLLDP,
+		option.Description("Get switch LLDP info"),
+		option.Query("ports", "Filter by port name", param.Example("ports", "Et1,Et2")),
+		// filterNodes,
 	)
 
 	fuego.Get(roles, "", h.GetRoles,

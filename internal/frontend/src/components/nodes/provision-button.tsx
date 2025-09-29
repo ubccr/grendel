@@ -26,8 +26,8 @@ export default function ProvisionIcon({ provision, name }: Props) {
         <LoaderCircle />
       ) : (
         <Button
-          size="sm"
-          variant="outline"
+          size="icon"
+          variant="secondary"
           type="button"
           className={ping ? "animate-pulse" : ""}
           onClick={() => {
@@ -42,7 +42,7 @@ export default function ProvisionIcon({ provision, name }: Props) {
                   toast.error(e.title, {
                     description: e.detail,
                   }),
-              }
+              },
             );
           }}
         >
