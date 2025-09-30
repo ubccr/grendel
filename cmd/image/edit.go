@@ -20,8 +20,9 @@ var (
 	editCmd = &cobra.Command{
 		Use:   "edit <name>...",
 		Short: "edit images",
-		Long:  `edit images`,
-		Args:  cobra.MinimumNArgs(1),
+		Long: `edit images
+WARNING: Do not edit the "id" field in the JSON`,
+		Args: cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
 			gc, err := cmd.NewOgenClient()
 			if err != nil {
@@ -49,7 +50,7 @@ var (
 			var check []client.NilBootImageAddRequestBootImagesItem
 			err = json.Unmarshal(newData, &check)
 			if err != nil {
-				return fmt.Errorf("Invalid JSON. Not saving changes: %w", err)
+				return fmt.Errorf("invalid json. not saving changes: %w", err)
 			}
 
 			storeReq := &client.BootImageAddRequest{

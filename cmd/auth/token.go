@@ -18,7 +18,7 @@ var (
 		Use:   "token <username> <role> <expire>",
 		Short: "Create an auth token",
 		Long: `Args:
-	username:	Username shown in logs, does not need to be a valid user in the DB.
+	username:	Username
 	role: 		Type of model.Role, valid options: disabled, user, admin.
 	expire: 	String parsed by time.ParseDuration, examples include: infinite, 8h, 30m, 20s.
 		`,

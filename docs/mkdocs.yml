@@ -44,7 +44,11 @@ nav:
     - Production Deployments: production.md
     - API: api.md
     - Publications: publications.md
+    - Boot Images:
+        - Creating an Image
+        - Provision Templates
     - Advanced:
         - Dynamic DHCP Router: advanced/router.md
         - HTTPS and Code Signing: advanced/https.md
         - Kickstarting Live Images: advanced/kslive.md
+        - iPXE: advanced/ipxe.MD

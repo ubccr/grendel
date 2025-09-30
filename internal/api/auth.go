@@ -35,7 +35,7 @@ type AuthResponse struct {
 }
 
 type AuthTokenRequest struct {
-	Username string `json:"username" description:"username shown in logs, does not need to be a valid user in the DB" example:"user1:CLI"`
+	Username string `json:"username" description:"username"`
 	Role     string `json:"role" description:"type of model.Role, valid options: disabled, user, admin" example:"admin"`
 	Expire   string `json:"expire" description:"string parsed by time.ParseDuration, examples include: infinite, 8h, 30m, 20s" example:"infinite"`
 }
@@ -100,7 +100,7 @@ func (h *Handler) AuthSignin(c fuego.ContextWithBody[AuthRequest]) (*AuthRespons
 		Name:     "Authorization",
 		Value:    "Bearer " + token,
 		Expires:  exp,
-		Secure:   true,
+		Secure:   viper.IsSet("api.cert"),
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 		Path:     "/",

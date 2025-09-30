@@ -20,7 +20,9 @@ var (
 	editCmd = &cobra.Command{
 		Use:   "edit {nodeset | all}",
 		Short: "edit nodes",
-		Args:  cobra.ExactArgs(1),
+		Long: `edit nodes
+WARNING: Do not edit the "id" or "uid" fields in the JSON`,
+		Args: cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
 			gc, err := cmd.NewOgenClient()
 			if err != nil {

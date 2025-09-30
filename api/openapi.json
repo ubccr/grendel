@@ -89,8 +89,7 @@
 						"type": "string"
 					},
 					"username": {
-						"description": "username shown in logs, does not need to be a valid user in the DB",
-						"example": "user1:CLI",
+						"description": "username",
 						"type": "string"
 					}
 				},
@@ -4334,7 +4333,7 @@
 	"servers": [
 		{
 			"description": "local server",
-			"url": "http://127.0.0.1:8080"
+			"url": "http://0.0.0.0:8080"
 		}
 	],
 	"tags": [
