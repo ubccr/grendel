@@ -1,8 +1,9 @@
 import AuthRedirect from "@/auth";
 import ImageForm from "@/components/images/form";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useTheme } from "@/hooks/theme-provider";
+import { themeToMonaco, useTheme } from "@/hooks/theme-provider";
 import { usePostV1Images } from "@/openapi/queries";
 import { Editor } from "@monaco-editor/react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -10,30 +11,42 @@ import { createFileRoute } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import z from "zod";
 
 export const Route = createFileRoute("/add/image")({
   component: RouteComponent,
+  validateSearch: z.object({
+    tab: z.string().optional().catch("form"),
+  }),
   beforeLoad: AuthRedirect,
 });
 
 function RouteComponent() {
+  const search = Route.useSearch();
+  const navigate = Route.useNavigate();
   return (
-    <div className="p-4">
-      <Tabs defaultValue="form" className="w-full">
-        <div className="text-center">
-          <TabsList>
-            <TabsTrigger value="form">Form</TabsTrigger>
-            <TabsTrigger value="json">JSON</TabsTrigger>
-          </TabsList>
-        </div>
-        <TabsContent value="form">
-          <ImageForm />
-        </TabsContent>
-        <TabsContent value="json">
-          <ImageImportJSON />
-        </TabsContent>
-      </Tabs>
-    </div>
+    <Card>
+      <CardContent>
+        <Tabs
+          className="w-full"
+          defaultValue={search.tab ?? "form"}
+          onValueChange={(v) => navigate({ search: { tab: v } })}
+        >
+          <div className="pt-2 text-center">
+            <TabsList>
+              <TabsTrigger value="form">Form</TabsTrigger>
+              <TabsTrigger value="json">JSON</TabsTrigger>
+            </TabsList>
+          </div>
+          <TabsContent value="form">
+            <ImageForm />
+          </TabsContent>
+          <TabsContent value="json">
+            <ImageImportJSON />
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -55,12 +68,10 @@ function ImageImportJSON() {
         value={text}
         defaultValue={JSON.stringify(defaultJson, null, 4)}
         onChange={(e) => setText(e ?? "")}
-        theme={theme == "dark" ? "vs-dark" : "light"}
+        theme={themeToMonaco(theme)}
       />
-      <div className="flex justify-end mt-2">
+      <div className="mt-2 flex justify-end">
         <Button
-          variant="outline"
-          size="sm"
           onClick={() =>
             storeImages.mutate(
               { body: JSON.parse(text) },
@@ -74,7 +85,7 @@ function ImageImportJSON() {
                     description: e.detail,
                   });
                 },
-              }
+              },
             )
           }
         >

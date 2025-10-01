@@ -54,7 +54,7 @@ function RouteComponent() {
               {},
               {
                 onError: (e) => toast.error(e.title, { description: e.detail }),
-              }
+              },
             );
             User.setUser(null);
             router.navigate({ to: "/" });
@@ -64,19 +64,19 @@ function RouteComponent() {
               description: e.detail,
             });
           },
-        }
+        },
       );
     },
   });
   return (
-    <div className="p-4 flex justify-center">
+    <div className="flex justify-center">
       <Card>
         <CardHeader>
           <CardTitle>Change Password</CardTitle>
           <CardContent>
             <form
               id="resetForm"
-              className="grid grid-cols-1 gap-4 mt-3"
+              className="mt-3 grid grid-cols-1 gap-4"
               onSubmit={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -131,7 +131,7 @@ function RouteComponent() {
             </form>
           </CardContent>
           <CardFooter>
-            <Button type="submit" form="resetForm" size="sm">
+            <Button type="submit" form="resetForm">
               Submit
             </Button>
           </CardFooter>

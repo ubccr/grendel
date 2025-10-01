@@ -4,32 +4,38 @@ import { useEffect, useState } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NodeForm from "@/components/nodes/form";
-import ActionsSheet from "@/components/actions-sheet";
-import NodeActions from "@/components/nodes/actions";
 import NodeRedfish from "@/components/nodes/redfish";
-import { Button } from "@/components/ui/button";
 import { LoaderCircle, RefreshCw } from "lucide-react";
-import { useGetV1NodesFindSuspense } from "@/openapi/queries/suspense";
 import AuthRedirect from "@/auth";
-import { useGetV1Bmc, useGetV1BmcMetrics } from "@/openapi/queries";
+import {
+  useGetV1Bmc,
+  useGetV1BmcMetrics,
+  useGetV1NodesFind,
+} from "@/openapi/queries";
 import { z } from "zod";
 import { TestLineChart } from "@/components/nodes/line-chart";
-import { QuerySuspense } from "@/components/query-suspense";
+import LldpTable from "@/components/nodes/lldp-table";
+import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { Card, CardContent } from "@/components/ui/card";
+import ActionsSheet from "@/components/actions-sheet";
+import { Button } from "@/components/ui/button";
+import NodeActions from "@/components/nodes/actions";
+import { Progress } from "@/components/ui/progress";
 
 export const Route = createFileRoute("/nodes/$node")({
   component: RouteComponent,
+  validateSearch: z.object({
+    tab: z.string().optional().catch("node"),
+  }),
   beforeLoad: AuthRedirect,
 });
 
 function RouteComponent() {
   return (
-    <>
-      <div className="p-4">
-        <QuerySuspense>
-          <Form />
-        </QuerySuspense>
-      </div>
-    </>
+    <div>
+      <Form />
+    </div>
   );
 }
 
@@ -48,8 +54,11 @@ type ChartData = {
 
 function Form() {
   const { node } = Route.useParams();
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
+
   const [chartData, setChartData] = useState<ChartDataMap>(new Map());
-  const grendel_host = useGetV1NodesFindSuspense({
+  const grendel_host = useGetV1NodesFind({
     query: { nodeset: node },
   });
   const redfish = useGetV1Bmc({ query: { nodeset: node } }, undefined, {
@@ -59,6 +68,14 @@ function Form() {
   const reports = useGetV1BmcMetrics({ query: { nodeset: node } }, undefined, {
     staleTime: 30 * 60 * 1000,
   });
+
+  useEffect(() => {
+    if (grendel_host.error) {
+      toast.error(grendel_host.error.title, {
+        description: grendel_host.error.detail,
+      });
+    }
+  }, [grendel_host.error]);
 
   // TODO: move logic into backend
 
@@ -97,7 +114,7 @@ function Form() {
               ...(prev?.data ?? []),
               {
                 Time: new Date(
-                  Date.parse(metric.Timestamp ?? "")
+                  Date.parse(metric.Timestamp ?? ""),
                 ).toLocaleTimeString("en-US", {
                   hour: "numeric",
                   minute: "numeric",
@@ -116,87 +133,105 @@ function Form() {
   }, [reports.isSuccess, reports.data]);
 
   return (
-    <div className="mx-auto">
-      <Tabs defaultValue="node" className="w-full">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <div className="hidden sm:block"></div>
-          <div className="sm:text-center">
-            <TabsList>
-              <TabsTrigger value="node">Node</TabsTrigger>
-              <TabsTrigger value="redfish">Redfish</TabsTrigger>
-              <TabsTrigger value="reports">Reports</TabsTrigger>
-            </TabsList>
-          </div>
-          <div className="text-end">
-            <div className="flex gap-2 justify-end">
-              <ActionsSheet checked={node} length={1}>
-                <NodeActions nodes={node} length={1} />
-              </ActionsSheet>
-              <Button
-                variant="outline"
-                size="sm"
-                type="button"
-                onClick={() => {
-                  grendel_host.refetch();
-                  redfish.refetch();
-                  reports.refetch();
-                }}
-              >
-                <RefreshCw
-                  className={
-                    grendel_host.isFetching || redfish.isFetching
-                      ? "animate-spin"
-                      : ""
-                  }
+    <Card>
+      <CardContent>
+        {(grendel_host.isFetching ||
+          redfish.isFetching ||
+          reports.isFetching) && <Progress className="h-1" />}
+        {grendel_host.data && grendel_host.data.length > 0 ? (
+          <div>
+            <Tabs
+              defaultValue={search.tab ?? "node"}
+              onValueChange={(v) => navigate({ search: { tab: v } })}
+            >
+              <div className="grid grid-cols-2 gap-3 pt-2 sm:grid-cols-3">
+                <div className="hidden sm:block"></div>
+                <div className="sm:text-center">
+                  <TabsList>
+                    <TabsTrigger value="node">Node</TabsTrigger>
+                    {grendel_host.data?.[0].tags?.includes("switch") ? (
+                      <TabsTrigger value="lldp">LLDP</TabsTrigger>
+                    ) : (
+                      <>
+                        <TabsTrigger value="redfish">Redfish</TabsTrigger>
+                        <TabsTrigger value="reports">Reports</TabsTrigger>
+                      </>
+                    )}
+                  </TabsList>
+                </div>
+                <div>
+                  <div className="flex justify-end gap-2">
+                    <ActionsSheet checked={node} length={1}>
+                      <NodeActions nodes={node} length={1} />
+                    </ActionsSheet>
+                    <Button
+                      variant="secondary"
+                      type="button"
+                      onClick={() => {
+                        grendel_host.refetch();
+                        redfish.refetch();
+                        reports.refetch();
+                      }}
+                    >
+                      <RefreshCw
+                        className={
+                          grendel_host.isFetching || redfish.isFetching
+                            ? "animate-spin"
+                            : ""
+                        }
+                      />
+                      <span className="sr-only md:not-sr-only">Refresh</span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              <TabsContent value="node">
+                <NodeForm
+                  data={grendel_host.data?.[0]}
+                  reset={grendel_host.isFetched}
                 />
-                <span className="md:not-sr-only sr-only">Refresh</span>
-              </Button>
-            </div>
+              </TabsContent>
+              <TabsContent value="redfish">
+                <NodeRedfish redfish={redfish} />
+              </TabsContent>
+              <TabsContent value="reports">
+                {reports.isFetching && (
+                  <div className="p-4">
+                    <LoaderCircle className="mx-auto animate-spin" />
+                  </div>
+                )}
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {Array.from(chartData).map(([, chart], i) => (
+                    <TestLineChart
+                      key={i}
+                      data={chart.data}
+                      XAxisKey={chart.xAxisKey}
+                      YAxisKey={chart.yAxisKey}
+                      title={chart.title}
+                      description={chart.description}
+                    />
+                  ))}
+                  {chartData.size === 0 && (
+                    <span className="text-muted-foreground col-span-4 p-4 text-center">
+                      No reports could be retrieved from the bmc. Please see our
+                      docs for help configuring custom metric reports.
+                    </span>
+                  )}
+                </div>
+              </TabsContent>
+              <TabsContent value="lldp">
+                <LldpTable node={node} />
+              </TabsContent>
+            </Tabs>
           </div>
-        </div>
-        <TabsContent value="node">
-          {grendel_host.data && grendel_host.data.length > 0 ? (
-            <NodeForm
-              data={grendel_host.data?.[0]}
-              reset={grendel_host.isFetched}
-            />
-          ) : (
-            <div className="flex justify-center">
-              <span className="text-center text-muted-foreground p-4">
-                404 Node not found.
-              </span>
-            </div>
-          )}
-        </TabsContent>
-        <TabsContent value="redfish">
-          <NodeRedfish redfish={redfish} />
-        </TabsContent>
-        <TabsContent value="reports">
-          {reports.isFetching && (
-            <div className="p-4">
-              <LoaderCircle className="animate-spin mx-auto" />
-            </div>
-          )}
-          <div className="grid sm:grid-cols-3 gap-4">
-            {Array.from(chartData).map(([, chart], i) => (
-              <TestLineChart
-                key={i}
-                data={chart.data}
-                XAxisKey={chart.xAxisKey}
-                YAxisKey={chart.yAxisKey}
-                title={chart.title}
-                description={chart.description}
-              />
-            ))}
-            {chartData.size === 0 && (
-              <span className="col-span-4 text-center text-muted-foreground p-4">
-                No reports could be retrieved from the bmc. Please see our docs
-                for help configuring custom metric reports.
-              </span>
-            )}
+        ) : (
+          <div className="flex justify-center">
+            <span className="text-muted-foreground p-4 text-center">
+              404 Node not found.
+            </span>
           </div>
-        </TabsContent>
-      </Tabs>
-    </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

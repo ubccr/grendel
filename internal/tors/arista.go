@@ -11,6 +11,7 @@ import (
 
 	"github.com/aristanetworks/goeapi"
 	"github.com/aristanetworks/goeapi/module"
+	"github.com/ubccr/grendel/pkg/model"
 )
 
 const (
@@ -30,8 +31,8 @@ func NewArista(host string, username, password string) (*Arista, error) {
 	return &Arista{client: node}, nil
 }
 
-func (a *Arista) GetInterfaceStatus() (InterfaceTable, error) {
-	interfaceTable := make(InterfaceTable, 0)
+func (a *Arista) GetInterfaceStatus() (model.InterfaceTable, error) {
+	interfaceTable := make(model.InterfaceTable, 0)
 	show := module.Show(a.client)
 	statusRes := show.ShowInterfaces()
 
@@ -45,7 +46,7 @@ func (a *Arista) GetInterfaceStatus() (InterfaceTable, error) {
 		if err != nil {
 			continue
 		}
-		interfaceTable[port] = &InterfaceStatus{
+		interfaceTable[port] = &model.InterfaceStatus{
 			Name:                v.Name,
 			LineProtocolStatus:  v.LineProtocolStatus,
 			InterfaceStatus:     v.InterfaceStatus,
@@ -60,8 +61,8 @@ func (a *Arista) GetInterfaceStatus() (InterfaceTable, error) {
 	return interfaceTable, nil
 }
 
-func (a *Arista) GetMACTable() (MACTable, error) {
-	macTable := make(MACTable, 0)
+func (a *Arista) GetMACTable() (model.MACTable, error) {
+	macTable := make(model.MACTable, 0)
 	show := module.Show(a.client)
 	macRes, err := show.ShowMACAddressTable()
 	if err != nil {
@@ -84,7 +85,7 @@ func (a *Arista) GetMACTable() (MACTable, error) {
 			log.Debugf("failed to parse mac address on interface: %s, mac: %s", m.Interface, m.MACAddress)
 			continue
 		}
-		macTable[m.MACAddress] = &MACTableEntry{
+		macTable[m.MACAddress] = &model.MACTableEntry{
 			Ifname: m.Interface,
 			VLAN:   strconv.Itoa(m.VlanID),
 			MAC:    mac,
@@ -137,7 +138,7 @@ func (s *ShowLLDPNeighborsDetail) GetCmd() string {
 	return "show lldp neighbors detail"
 }
 
-func (a *Arista) GetLLDPNeighbors() (LLDPNeighbors, error) {
+func (a *Arista) GetLLDPNeighbors() (model.LLDPNeighbors, error) {
 	cmd := &ShowLLDPNeighborsDetail{}
 
 	handle, err := a.client.GetHandle("json")
@@ -153,7 +154,7 @@ func (a *Arista) GetLLDPNeighbors() (LLDPNeighbors, error) {
 		return nil, err
 	}
 
-	lldp := make(LLDPNeighbors, 0)
+	lldp := make(model.LLDPNeighbors, 0)
 
 	for key, iface := range cmd.LLDPNeighbors {
 		// name := strings.Replace(key, "Ethernet", "", 1)
@@ -162,14 +163,23 @@ func (a *Arista) GetLLDPNeighbors() (LLDPNeighbors, error) {
 			if len(neighborInfo.ManagementAddresses) == 1 {
 				mgmtAddress = neighborInfo.ManagementAddresses[0].Address
 			}
+
+			chassisIdType := neighborInfo.ChassisIdType
+			if chassisIdType == "macAddress" {
+				chassisIdType = "MAC_ADDRESS"
+			}
+
+			var chassisId string
 			mac, err := net.ParseMAC(neighborInfo.ChassisId)
 			if err != nil {
-				log.Errorf("Failed to parse mac from switch lldp query. Switch:%s error:%s", key, err)
-				continue
+				log.Warnf("failed to parse lldp chassis id: %s", err)
 			}
-			lldp[key] = &LLDP{
-				ChassisId:         mac,
-				ChassisIdType:     neighborInfo.ChassisIdType,
+			chassisId = mac.String()
+
+			lldp[key] = &model.LLDP{
+				PortName:          key,
+				ChassisId:         chassisId,
+				ChassisIdType:     chassisIdType,
 				SystemName:        neighborInfo.SystemName,
 				SystemDescription: neighborInfo.SystemDescription,
 				ManagementAddress: mgmtAddress,

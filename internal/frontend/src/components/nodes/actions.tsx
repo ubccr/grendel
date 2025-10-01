@@ -70,7 +70,7 @@ export default function NodeActions({
     undefined,
     {
       enabled: false,
-    }
+    },
   );
 
   const mutation_power = usePostV1BmcPowerOs();
@@ -86,7 +86,7 @@ export default function NodeActions({
   const [provision, setProvision] = useState(false);
 
   return (
-    <div className="mt-4 grid sm:grid-cols-2 gap-4">
+    <div className="mt-4 grid gap-4 sm:grid-cols-2">
       <Card>
         <CardHeader>
           <CardTitle>Delete</CardTitle>
@@ -94,9 +94,7 @@ export default function NodeActions({
         <CardFooter>
           <Dialog>
             <DialogTrigger asChild>
-              <Button size="sm" variant="destructive">
-                Delete
-              </Button>
+              <Button variant="destructive">Delete</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -110,7 +108,6 @@ export default function NodeActions({
                 <DialogClose asChild>
                   <Button
                     variant="destructive"
-                    size="sm"
                     onClick={() =>
                       mutation_delete.mutate(
                         { query: { nodeset: nodes } },
@@ -125,7 +122,7 @@ export default function NodeActions({
                             toast.error(e.title, {
                               description: e.detail,
                             }),
-                        }
+                        },
                       )
                     }
                   >
@@ -133,9 +130,7 @@ export default function NodeActions({
                   </Button>
                 </DialogClose>
                 <DialogClose asChild>
-                  <Button variant="outline" size="sm">
-                    Cancel
-                  </Button>
+                  <Button>Cancel</Button>
                 </DialogClose>
               </DialogFooter>
             </DialogContent>
@@ -149,35 +144,23 @@ export default function NodeActions({
         <CardFooter>
           <Dialog>
             <DialogTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => hosts_query.refetch()}
-              >
-                Submit
-              </Button>
+              <Button onClick={() => hosts_query.refetch()}>Submit</Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-1/2">
               <DialogHeader>
-                <DialogTitle>Export JSON: {nodes}</DialogTitle>
+                <DialogTitle>Export JSON:</DialogTitle>
               </DialogHeader>
-              <div className="max-h-[calc(70dvh)] overflow-scroll">
-                <div className="text-muted-foreground">
-                  {hosts_query.isLoading ? (
-                    <LoaderCircle className="animate-spin mx-auto" />
-                  ) : (
-                    <pre>{JSON.stringify(hosts_query.data, null, 4)}</pre>
-                  )}
-                </div>
+              <div className="max-h-[80dvh]">
+                <pre className="text-muted-foreground max-h-full overflow-scroll">
+                  {JSON.stringify(hosts_query.data, null, 4)}
+                </pre>
               </div>
               <DialogFooter>
                 <Button
                   type="button"
-                  variant="outline"
-                  size="sm"
                   onClick={() => {
                     navigator.clipboard.writeText(
-                      JSON.stringify(hosts_query.data, null, 4)
+                      JSON.stringify(hosts_query.data, null, 4),
                     );
                     toast.success("Successfully copied JSON to clipboard");
                   }}
@@ -198,8 +181,6 @@ export default function NodeActions({
         </CardContent>
         <CardFooter>
           <Button
-            variant="outline"
-            size="sm"
             onClick={() =>
               mutation_provision.mutate(
                 { query: { nodeset: nodes }, body: { provision: provision } },
@@ -214,7 +195,7 @@ export default function NodeActions({
                     toast.error(e.title, {
                       description: e.detail,
                     }),
-                }
+                },
               )
             }
           >
@@ -234,8 +215,6 @@ export default function NodeActions({
         </CardContent>
         <CardFooter>
           <Button
-            variant="outline"
-            size="sm"
             onClick={() =>
               mutation_image.mutate(
                 {
@@ -253,7 +232,7 @@ export default function NodeActions({
                     toast.error(e.title, {
                       description: e.detail,
                     }),
-                }
+                },
               )
             }
           >
@@ -279,8 +258,6 @@ export default function NodeActions({
         </CardContent>
         <CardFooter>
           <Button
-            variant="outline"
-            size="sm"
             onClick={() =>
               mutation_tag.mutate(
                 {
@@ -299,7 +276,7 @@ export default function NodeActions({
                     toast.error(e.title, {
                       description: e.detail,
                     }),
-                }
+                },
               )
             }
           >
@@ -355,7 +332,7 @@ export default function NodeActions({
         <CardFooter>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button>
                 {mutation_power.isPending ? (
                   <LoaderCircle className="animate-spin" />
                 ) : (
@@ -376,7 +353,6 @@ export default function NodeActions({
                 <DialogClose asChild>
                   <Button
                     variant="destructive"
-                    size="sm"
                     onClick={() =>
                       mutation_power.mutate(
                         {
@@ -389,7 +365,7 @@ export default function NodeActions({
                         {
                           onSuccess: () => {
                             toast.success(
-                              "Successfully sent power command node(s)"
+                              "Successfully sent power command node(s)",
                             );
                           },
                           onError: () =>
@@ -397,9 +373,9 @@ export default function NodeActions({
                               "Failed to send power command to node(s)",
                               {
                                 // description: e.message,
-                              }
+                              },
                             ),
-                        }
+                        },
                       )
                     }
                   >
@@ -408,9 +384,7 @@ export default function NodeActions({
                 </DialogClose>
 
                 <DialogClose asChild>
-                  <Button variant="outline" size="sm">
-                    Cancel
-                  </Button>
+                  <Button>Cancel</Button>
                 </DialogClose>
               </DialogFooter>
             </DialogContent>
@@ -450,7 +424,7 @@ export default function NodeActions({
         <CardFooter>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button>
                 {mutation_configure_import.isPending ? (
                   <LoaderCircle className="animate-spin" />
                 ) : (
@@ -471,7 +445,6 @@ export default function NodeActions({
                 <DialogClose asChild>
                   <Button
                     variant="destructive"
-                    size="sm"
                     onClick={() =>
                       mutation_configure_import.mutate(
                         {
@@ -484,14 +457,14 @@ export default function NodeActions({
                         {
                           onSuccess: () => {
                             toast.success(
-                              "Successfully submitted bmc configure job"
+                              "Successfully submitted bmc configure job",
                             );
                           },
                           onError: (e) =>
                             toast.error(e.title, {
                               description: e.detail,
                             }),
-                        }
+                        },
                       )
                     }
                   >
@@ -500,9 +473,7 @@ export default function NodeActions({
                 </DialogClose>
 
                 <DialogClose asChild>
-                  <Button variant="outline" size="sm">
-                    Cancel
-                  </Button>
+                  <Button>Cancel</Button>
                 </DialogClose>
               </DialogFooter>
             </DialogContent>
@@ -517,7 +488,7 @@ export default function NodeActions({
         <CardFooter>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
+              <Button>
                 {mutation_power_bmc.isPending ? (
                   <LoaderCircle className="animate-spin" />
                 ) : (
@@ -538,7 +509,6 @@ export default function NodeActions({
                 <DialogClose asChild>
                   <Button
                     variant="destructive"
-                    size="sm"
                     onClick={() =>
                       mutation_power_bmc.mutate(
                         {
@@ -552,7 +522,7 @@ export default function NodeActions({
                             toast.error(e.title, {
                               description: e.detail,
                             }),
-                        }
+                        },
                       )
                     }
                   >
@@ -561,9 +531,7 @@ export default function NodeActions({
                 </DialogClose>
 
                 <DialogClose asChild>
-                  <Button variant="outline" size="sm">
-                    Cancel
-                  </Button>
+                  <Button>Cancel</Button>
                 </DialogClose>
               </DialogFooter>
             </DialogContent>
@@ -574,12 +542,10 @@ export default function NodeActions({
         <CardHeader>
           <CardTitle>View Jobs</CardTitle>
         </CardHeader>
-        <CardFooter>
+        <CardFooter className="flex gap-1">
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" disabled={length !== 1}>
-                Submit
-              </Button>
+              <Button disabled={length !== 1}>Submit</Button>
             </DialogTrigger>
             <DialogContent className="max-w-7xl">
               <DialogHeader>
@@ -593,7 +559,7 @@ export default function NodeActions({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="outline" size="sm">
+                <Button size="icon">
                   <Info />
                 </Button>
               </TooltipTrigger>
@@ -611,7 +577,7 @@ export default function NodeActions({
         <CardFooter>
           <Dialog>
             <DialogTrigger asChild>
-              <Button size="sm" variant="outline">
+              <Button>
                 {mutation_job_clear.isPending ? (
                   <LoaderCircle className="animate-spin" />
                 ) : (
@@ -630,7 +596,6 @@ export default function NodeActions({
                 <DialogClose asChild>
                   <Button
                     variant="destructive"
-                    size="sm"
                     onClick={() =>
                       mutation_job_clear.mutate(
                         {
@@ -640,7 +605,7 @@ export default function NodeActions({
                         {
                           onSuccess: () => {
                             toast.success(
-                              "Successfully cleared all jobs on node(s)"
+                              "Successfully cleared all jobs on node(s)",
                             );
                             queryClient.invalidateQueries();
                           },
@@ -648,7 +613,7 @@ export default function NodeActions({
                             toast.error(e.title, {
                               description: e.detail,
                             }),
-                        }
+                        },
                       )
                     }
                   >
@@ -656,9 +621,7 @@ export default function NodeActions({
                   </Button>
                 </DialogClose>
                 <DialogClose asChild>
-                  <Button variant="outline" size="sm">
-                    Cancel
-                  </Button>
+                  <Button>Cancel</Button>
                 </DialogClose>
               </DialogFooter>
             </DialogContent>

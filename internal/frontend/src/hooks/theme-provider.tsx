@@ -27,7 +27,7 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
+    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme,
   );
 
   useEffect(() => {
@@ -35,12 +35,15 @@ export function ThemeProvider({
 
     root.classList.remove("light", "dark");
 
-    // if (theme === "system") {
-    //     const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    if (theme === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
 
-    //     root.classList.add(systemTheme);
-    //     return;
-    // }
+      root.classList.add(systemTheme);
+      return;
+    }
 
     root.classList.add(theme);
   }, [theme]);
@@ -68,3 +71,19 @@ export const useTheme = () => {
 
   return context;
 };
+
+export function themeToMonaco(theme: Theme) {
+  switch (theme) {
+    case "dark":
+      return "vs-dark";
+    case "light":
+      return "light";
+    case "system":
+      return window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "vs-dark"
+        : "light";
+    default:
+      console.error("failed to match theme to monaco theme.", theme);
+      break;
+  }
+}

@@ -6,6 +6,7 @@ import {
 } from "@/components/data-table/data-table";
 import { DataTableColumnHeader } from "@/components/data-table/header";
 import SelectableCheckbox from "@/components/data-table/selectableCheckbox";
+import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useGetV1Roles } from "@/openapi/queries";
 import { GetRolesResponse } from "@/openapi/requests";
@@ -96,15 +97,16 @@ function RouteComponent() {
     );
   };
   return (
-    <div className="px-5">
-      {roles.isSuccess && roles.data?.roles != undefined && (
+    <Card>
+      <CardContent>
         <DataTable
           columns={columns}
-          data={roles.data.roles}
+          data={roles.data?.roles ?? []}
           Actions={actions}
           add="/add/role"
+          progress={roles.isFetching}
         />
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 }

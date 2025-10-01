@@ -1,7 +1,8 @@
-import { HeartPulse, LoaderCircle, Power } from "lucide-react";
+import { HeartPulse, Power } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { UseQueryResult } from "@tanstack/react-query";
 import { GetV1BmcResponse } from "@/openapi/requests";
+import { Progress } from "../ui/progress";
 
 export default function NodeRedfish({
   redfish,
@@ -10,15 +11,17 @@ export default function NodeRedfish({
 }) {
   return (
     <div>
-      {redfish.isFetching && <LoaderCircle className="animate-spin mx-auto" />}
+      {redfish.isFetching && <Progress className="h-1" />}
       {redfish.data && redfish.data.length > 0 ? (
-        <div className="grid sm:grid-cols-3 gap-4">
+        <div className="grid gap-4 sm:grid-cols-3">
           <Card>
             <CardHeader>
               <CardTitle>Hostname:</CardTitle>
             </CardHeader>
             <CardContent>
-              <span>{redfish.data?.[0]?.host_name}</span>
+              <span className="text-muted-foreground">
+                {redfish.data?.[0]?.host_name}
+              </span>
             </CardContent>
           </Card>
           <Card>
@@ -26,7 +29,9 @@ export default function NodeRedfish({
               <CardTitle>BIOS Version:</CardTitle>
             </CardHeader>
             <CardContent>
-              <span>{redfish.data?.[0]?.bios_version}</span>
+              <span className="text-muted-foreground">
+                {redfish.data?.[0]?.bios_version}
+              </span>
             </CardContent>
           </Card>
           <Card>
@@ -34,7 +39,9 @@ export default function NodeRedfish({
               <CardTitle>Serial Number:</CardTitle>
             </CardHeader>
             <CardContent>
-              <span>{redfish.data?.[0]?.serial_number}</span>
+              <span className="text-muted-foreground">
+                {redfish.data?.[0]?.serial_number}
+              </span>
             </CardContent>
           </Card>
           <Card>
@@ -42,7 +49,9 @@ export default function NodeRedfish({
               <CardTitle>Manufacturer:</CardTitle>
             </CardHeader>
             <CardContent>
-              <span>{redfish.data?.[0]?.manufacturer}</span>
+              <span className="text-muted-foreground">
+                {redfish.data?.[0]?.manufacturer}
+              </span>
             </CardContent>
           </Card>
           <Card>
@@ -50,7 +59,9 @@ export default function NodeRedfish({
               <CardTitle>Model:</CardTitle>
             </CardHeader>
             <CardContent>
-              <span>{redfish.data?.[0]?.model}</span>
+              <span className="text-muted-foreground">
+                {redfish.data?.[0]?.model}
+              </span>
             </CardContent>
           </Card>
           <Card>
@@ -65,7 +76,9 @@ export default function NodeRedfish({
                     : "text-red-600"
                 }
               />
-              <span>{redfish.data?.[0]?.power_status}</span>
+              <span className="text-muted-foreground">
+                {redfish.data?.[0]?.power_status}
+              </span>
             </CardContent>
           </Card>
           <Card>
@@ -76,7 +89,9 @@ export default function NodeRedfish({
               <HeartPulse
                 className={healthColor(redfish.data?.[0]?.health ?? "")}
               />
-              <span>{redfish.data?.[0]?.health}</span>
+              <span className="text-muted-foreground">
+                {redfish.data?.[0]?.health}
+              </span>
             </CardContent>
           </Card>
           <Card>
@@ -84,7 +99,9 @@ export default function NodeRedfish({
               <CardTitle>Total Memory:</CardTitle>
             </CardHeader>
             <CardContent>
-              <span>{redfish.data?.[0]?.total_memory} GB</span>
+              <span className="text-muted-foreground">
+                {redfish.data?.[0]?.total_memory} GB
+              </span>
             </CardContent>
           </Card>
           <Card>
@@ -92,7 +109,9 @@ export default function NodeRedfish({
               <CardTitle>Processor Count:</CardTitle>
             </CardHeader>
             <CardContent>
-              <span>{redfish.data?.[0]?.processor_count} Cores</span>
+              <span className="text-muted-foreground">
+                {redfish.data?.[0]?.processor_count} Cores
+              </span>
             </CardContent>
           </Card>
           <Card>
@@ -100,7 +119,9 @@ export default function NodeRedfish({
               <CardTitle>Boot Next:</CardTitle>
             </CardHeader>
             <CardContent>
-              <span>{redfish.data?.[0]?.boot_next}</span>
+              <span className="text-muted-foreground">
+                {redfish.data?.[0]?.boot_next}
+              </span>
             </CardContent>
           </Card>
           <Card>
@@ -108,13 +129,15 @@ export default function NodeRedfish({
               <CardTitle>Boot Order:</CardTitle>
             </CardHeader>
             <CardContent>
-              <span>{redfish.data?.[0]?.boot_order?.join(",")}</span>
+              <span className="text-muted-foreground">
+                {redfish.data?.[0]?.boot_order?.join(",")}
+              </span>
             </CardContent>
           </Card>
         </div>
       ) : (
         <div className="flex justify-center">
-          <span className="text-center text-muted-foreground p-4">
+          <span className="text-muted-foreground p-4 text-center">
             No redfish data could be retrieved from the node. Check the server
             logs for more details.
           </span>

@@ -1139,6 +1139,55 @@ func (s *JobMessageRedfishErrorErrorMessageDotExtendedInfoItem) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *LLDP) SetFake() {
+	{
+		{
+			s.ChassisID.SetFake()
+		}
+	}
+	{
+		{
+			s.ChassisIDType.SetFake()
+		}
+	}
+	{
+		{
+			s.ManagementAddress.SetFake()
+		}
+	}
+	{
+		{
+			s.PortDescription.SetFake()
+		}
+	}
+	{
+		{
+			s.PortID.SetFake()
+		}
+	}
+	{
+		{
+			s.PortIDType.SetFake()
+		}
+	}
+	{
+		{
+			s.PortName.SetFake()
+		}
+	}
+	{
+		{
+			s.SystemDescription.SetFake()
+		}
+	}
+	{
+		{
+			s.SystemName.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
 func (s *NilBootImageAddRequestBootImagesItem) SetFake() {
 	s.Null = true
 }

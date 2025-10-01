@@ -24,6 +24,7 @@ const (
 	GETV1NodesFindOperation              OperationName = "GETV1NodesFind"
 	GETV1NodesTokenInterfaceOperation    OperationName = "GETV1NodesTokenInterface"
 	GETV1RolesOperation                  OperationName = "GETV1Roles"
+	GETV1SwitchNodesetLldpOperation      OperationName = "GETV1SwitchNodesetLldp"
 	GETV1UsersOperation                  OperationName = "GETV1Users"
 	PATCHV1AuthResetOperation            OperationName = "PATCHV1AuthReset"
 	PATCHV1NodesImageOperation           OperationName = "PATCHV1NodesImage"

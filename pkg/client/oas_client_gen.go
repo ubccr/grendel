@@ -236,6 +236,18 @@ type Invoker interface {
 	//
 	// GET /v1/roles
 	GETV1Roles(ctx context.Context, params GETV1RolesParams) (*GetRolesResponse, error)
+	// GETV1SwitchNodesetLldp invokes GET_/v1/switch/:nodeset/lldp operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).SwitchGetLLDP`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Get switch LLDP info.
+	//
+	// GET /v1/switch/{nodeset}/lldp
+	GETV1SwitchNodesetLldp(ctx context.Context, params GETV1SwitchNodesetLldpParams) ([]LLDP, error)
 	// GETV1Users invokes GET_/v1/users operation.
 	//
 	// #### Controller:
@@ -2791,6 +2803,148 @@ func (c *Client) sendGETV1Roles(ctx context.Context, params GETV1RolesParams) (r
 	defer resp.Body.Close()
 
 	result, err := decodeGETV1RolesResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GETV1SwitchNodesetLldp invokes GET_/v1/switch/:nodeset/lldp operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).SwitchGetLLDP`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Get switch LLDP info.
+//
+// GET /v1/switch/{nodeset}/lldp
+func (c *Client) GETV1SwitchNodesetLldp(ctx context.Context, params GETV1SwitchNodesetLldpParams) ([]LLDP, error) {
+	res, err := c.sendGETV1SwitchNodesetLldp(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGETV1SwitchNodesetLldp(ctx context.Context, params GETV1SwitchNodesetLldpParams) (res []LLDP, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/v1/switch/"
+	{
+		// Encode "nodeset" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "nodeset",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.Nodeset))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/lldp"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "ports" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "ports",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Ports.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, GETV1SwitchNodesetLldpOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, GETV1SwitchNodesetLldpOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGETV1SwitchNodesetLldpResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

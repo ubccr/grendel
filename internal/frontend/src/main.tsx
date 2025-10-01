@@ -16,6 +16,9 @@ const router = createRouter({
   routeTree,
   basepath: "/ui",
   context: { auth: null },
+  scrollRestoration: true,
+  // defaultPreload: "intent",
+  // defaultPreloadStaleTime: 0,
 });
 
 // Register the router instance for type safety
@@ -59,7 +62,7 @@ createRoot(document.getElementById("root")!).render(
       </UserProvider>
       {/* <ReactQueryDevtools initialIsOpen={false} /> */}
     </QueryClientProvider>
-  </StrictMode>
+  </StrictMode>,
 );
 
 function InnerApp() {

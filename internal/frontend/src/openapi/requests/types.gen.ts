@@ -326,6 +326,21 @@ export type JobMessage = {
 };
 
 /**
+ * LLDP schema
+ */
+export type LLDP = {
+    chassis_id?: string;
+    chassis_id_type?: string;
+    management_address?: string;
+    port_description?: string;
+    port_id?: string;
+    port_id_type?: string;
+    port_name?: string;
+    system_description?: string;
+    system_name?: string;
+};
+
+/**
  * NodeAddRequest schema
  */
 export type NodeAddRequest = {
@@ -1149,6 +1164,25 @@ export type DeleteV1RolesNamesData = {
 export type DeleteV1RolesNamesResponse = (GenericResponse);
 
 export type DeleteV1RolesNamesError = (HTTPError);
+
+export type GetV1SwitchNodesetLldpData = {
+    headers?: {
+        Accept?: string;
+    };
+    path: {
+        nodeset: string;
+    };
+    query?: {
+        /**
+         * Filter by port name
+         */
+        ports?: string;
+    };
+};
+
+export type GetV1SwitchNodesetLldpResponse = (Array<LLDP>);
+
+export type GetV1SwitchNodesetLldpError = (HTTPError);
 
 export type GetV1UsersData = {
     headers?: {

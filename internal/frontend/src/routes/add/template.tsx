@@ -1,5 +1,5 @@
 import AuthRedirect from "@/auth";
-import { useTheme } from "@/hooks/theme-provider";
+import { themeToMonaco, useTheme } from "@/hooks/theme-provider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -119,7 +119,7 @@ function RouteComponent() {
                     onChange={(e) => field.handleChange(e ?? "")}
                     height="50vh"
                     language={form.getFieldValue("language")}
-                    theme={theme == "dark" ? "vs-dark" : "light"}
+                    theme={themeToMonaco(theme)}
                   />
                 </div>
               )}

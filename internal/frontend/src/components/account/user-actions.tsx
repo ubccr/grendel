@@ -46,7 +46,7 @@ export default function UserActions({ users }: { users: string }) {
   const mutation_enabled = usePatchV1UsersUsernamesEnable();
 
   return (
-    <div className="mt-4 grid sm:grid-cols-2 gap-4">
+    <div className="mt-4 grid gap-4 sm:grid-cols-2">
       <Card>
         <CardHeader>
           <CardTitle>Delete</CardTitle>
@@ -54,7 +54,7 @@ export default function UserActions({ users }: { users: string }) {
         <CardFooter>
           <Dialog>
             <DialogTrigger asChild>
-              <Button size="sm" variant="destructive">
+              <Button variant="destructive">
                 {mutation_delete.isPending ? (
                   <LoaderCircle className="animate-spin" />
                 ) : (
@@ -74,7 +74,6 @@ export default function UserActions({ users }: { users: string }) {
                 <DialogClose asChild>
                   <Button
                     variant="destructive"
-                    size="sm"
                     onClick={() =>
                       mutation_delete.mutate(
                         { path: { usernames: users } },
@@ -89,7 +88,7 @@ export default function UserActions({ users }: { users: string }) {
                             toast.error(e.title, {
                               description: e.detail,
                             }),
-                        }
+                        },
                       )
                     }
                   >
@@ -97,9 +96,7 @@ export default function UserActions({ users }: { users: string }) {
                   </Button>
                 </DialogClose>
                 <DialogClose asChild>
-                  <Button variant="outline" size="sm">
-                    Cancel
-                  </Button>
+                  <Button>Cancel</Button>
                 </DialogClose>
               </DialogFooter>
             </DialogContent>
@@ -130,8 +127,6 @@ export default function UserActions({ users }: { users: string }) {
         </CardContent>
         <CardFooter>
           <Button
-            variant="outline"
-            size="sm"
             onClick={() =>
               mutation_role.mutate(
                 {
@@ -149,7 +144,7 @@ export default function UserActions({ users }: { users: string }) {
                     toast.error(e.title, {
                       description: e.detail,
                     }),
-                }
+                },
               )
             }
           >
@@ -178,8 +173,6 @@ export default function UserActions({ users }: { users: string }) {
         </CardContent>
         <CardFooter>
           <Button
-            variant="outline"
-            size="sm"
             onClick={() =>
               mutation_enabled.mutate(
                 {
@@ -197,7 +190,7 @@ export default function UserActions({ users }: { users: string }) {
                     toast.error(e.title, {
                       description: e.detail,
                     }),
-                }
+                },
               )
             }
           >

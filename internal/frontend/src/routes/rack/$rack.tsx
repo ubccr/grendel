@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Table,
@@ -33,9 +33,10 @@ import {
 import ActionsSheet from "@/components/actions-sheet";
 import NodeActions from "@/components/nodes/actions";
 import { Host } from "@/openapi/requests";
-import { useGetV1NodesFindSuspense } from "@/openapi/queries/suspense";
 import AuthRedirect from "@/auth";
-import { QuerySuspense } from "@/components/query-suspense";
+import { Card, CardContent } from "@/components/ui/card";
+import { useGetV1NodesFind } from "@/openapi/queries";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/rack/$rack")({
   component: RouteComponent,
@@ -44,13 +45,9 @@ export const Route = createFileRoute("/rack/$rack")({
 
 function RouteComponent() {
   return (
-    <>
-      <div className="p-4">
-        <QuerySuspense>
-          <RackTable />
-        </QuerySuspense>
-      </div>
-    </>
+    <div>
+      <RackTable />
+    </div>
   );
 }
 
@@ -61,12 +58,20 @@ type rackArr = {
 
 function RackTable() {
   const { rack } = Route.useParams();
-  const { data, isSuccess } = useGetV1NodesFindSuspense({
+  const { data, isSuccess, error } = useGetV1NodesFind({
     query: { tags: rack },
   });
   const [view, setView] = useState(["provision", "tags", "bmc"]);
   const [checked, setChecked] = useState<string[]>([]);
   const fields = ["provision", "tags", "firmware", "boot image", "bmc"];
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error.title, {
+        description: error.detail,
+      });
+    }
+  }, [error]);
 
   const arr: Array<rackArr> = [];
   if (isSuccess) {
@@ -85,151 +90,165 @@ function RackTable() {
     }
   }
   return (
-    <div>
-      <Table>
-        <TableHeader className="*:text-center">
-          <TableRow className="*:my-auto *:text-center">
-            <TableHead className="w-16">u</TableHead>
-            <TableHead className="*:my-auto *:text-center grid grid-cols-3">
-              <div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Settings2 />
-                      <span className="sr-only sm:not-sr-only">View</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    {fields.map((col, i) => (
-                      <DropdownMenuCheckboxItem
-                        key={i}
-                        className="capitalize"
-                        checked={!!view.find((view) => view == col)}
-                        onCheckedChange={(value) =>
-                          value
-                            ? setView([...view, col])
-                            : setView(view.filter((view) => view != col))
-                        }
-                      >
-                        {col}
-                      </DropdownMenuCheckboxItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-              <span>Node</span>
-              <div>
-                <ActionsSheet
-                  checked={checked.join(",")}
-                  length={checked.length}
-                >
-                  <NodeActions
-                    nodes={checked.join(",")}
+    <Card>
+      <CardContent className="p-2">
+        <Table>
+          <TableHeader className="*:text-center">
+            <TableRow className="*:my-auto *:text-center">
+              <TableHead className="w-16">u</TableHead>
+              <TableHead className="grid grid-cols-3 *:my-auto *:text-center">
+                <div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="secondary">
+                        <Settings2 />
+                        <span className="sr-only sm:not-sr-only">View</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {fields.map((col, i) => (
+                        <DropdownMenuCheckboxItem
+                          key={i}
+                          className="capitalize"
+                          checked={!!view.find((view) => view == col)}
+                          onCheckedChange={(value) =>
+                            value
+                              ? setView([...view, col])
+                              : setView(view.filter((view) => view != col))
+                          }
+                        >
+                          {col}
+                        </DropdownMenuCheckboxItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                <span>Node</span>
+                <div>
+                  <ActionsSheet
+                    checked={checked.join(",")}
                     length={checked.length}
-                  />
-                </ActionsSheet>
-              </div>
-            </TableHead>
-            <TableHead className=" w-16 ">
-              <Checkbox />
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {arr.map((u, i) => (
-            <TableRow key={i} className="*:text-center">
-              <TableCell>{u.u}</TableCell>
-              <TableCell className={`grid grid-cols-${u.hosts.length} gap-4`}>
-                {u.hosts.map((host, i) => (
-                  <div
-                    key={i}
-                    className="grid grid-cols-1 gap-4 sm:grid-cols-3"
                   >
-                    <div className="flex justify-center gap-6 sm:justify-start">
-                      {!!view.find((col) => col === "provision") && (
-                        <ProvisionIcon
-                          provision={host.provision}
-                          name={host.name}
-                        />
-                      )}
-                      {!!view.find((col) => col === "firmware") && (
-                        <span className="my-auto">{host.firmware}</span>
-                      )}
-                    </div>
-                    <Link
-                      to={`/nodes/$node`}
-                      params={{ node: host.name ?? "unknown" }}
-                      className="my-auto"
+                    <NodeActions
+                      nodes={checked.join(",")}
+                      length={checked.length}
+                    />
+                  </ActionsSheet>
+                </div>
+              </TableHead>
+              <TableHead className="w-16">
+                <Checkbox
+                  onCheckedChange={(e) =>
+                    e ? setChecked(checkAll(arr)) : setChecked([])
+                  }
+                />
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {arr.map((u, i) => (
+              <TableRow key={i} className="*:text-center">
+                <TableCell>{u.u}</TableCell>
+                <TableCell className={`grid grid-cols-${u.hosts.length} gap-4`}>
+                  {u.hosts.map((host, i) => (
+                    <div
+                      key={i}
+                      className="grid grid-cols-1 gap-4 sm:grid-cols-3"
                     >
-                      {host.name}
-                    </Link>
-                    <div className="flex justify-center gap-6 sm:justify-end">
-                      {!!view.find((col) => col === "tags") && (
-                        <TagsList tags={host.tags ?? []} />
-                      )}
-                      {!!view.find((col) => col === "boot image") && (
-                        <span className="my-auto">{host.boot_image}</span>
-                      )}
-                      {!!view.find((col) => col === "bmc") && (
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Button
-                                variant="outline"
-                                type="button"
-                                size="sm"
-                                asChild
-                              >
-                                <Link
-                                  to={
-                                    "https://" +
+                      <div className="flex justify-center gap-6 sm:justify-start">
+                        {!!view.find((col) => col === "provision") && (
+                          <ProvisionIcon
+                            provision={host.provision}
+                            name={host.name}
+                          />
+                        )}
+                        {!!view.find((col) => col === "firmware") && (
+                          <span className="my-auto">{host.firmware}</span>
+                        )}
+                      </div>
+                      <Link
+                        to={`/nodes/$node`}
+                        params={{ node: host.name ?? "unknown" }}
+                        className="my-auto"
+                      >
+                        {host.name}
+                      </Link>
+                      <div className="flex justify-center gap-6 sm:justify-end">
+                        {!!view.find((col) => col === "tags") && (
+                          <TagsList tags={host.tags ?? []} />
+                        )}
+                        {!!view.find((col) => col === "boot image") && (
+                          <span className="my-auto">{host.boot_image}</span>
+                        )}
+                        {!!view.find((col) => col === "bmc") && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Button
+                                  variant="secondary"
+                                  type="button"
+                                  asChild
+                                >
+                                  <Link
+                                    to={
+                                      "https://" +
+                                      host.interfaces?.filter(
+                                        (v) => v?.bmc == true,
+                                      )?.[0]?.fqdn
+                                    }
+                                    target="_blank"
+                                  >
+                                    <ExternalLink />
+                                  </Link>
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <span>
+                                  https://
+                                  {
                                     host.interfaces?.filter(
-                                      (v) => v?.bmc == true
+                                      (v) => v?.bmc == true,
                                     )?.[0]?.fqdn
                                   }
-                                  target="_blank"
-                                >
-                                  <ExternalLink />
-                                </Link>
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <span>
-                                https://
-                                {
-                                  host.interfaces?.filter(
-                                    (v) => v?.bmc == true
-                                  )?.[0]?.fqdn
-                                }
-                              </span>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      )}
+                                </span>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </TableCell>
-              <TableCell>
-                <div className="flex gap-1">
-                  {u.hosts.map((host, i) => (
-                    <Checkbox
-                      key={i}
-                      onCheckedChange={(e) =>
-                        e
-                          ? setChecked([host.name ?? "unknown", ...checked])
-                          : setChecked(
-                              checked.filter((val) => val != host.name)
-                            )
-                      }
-                    />
                   ))}
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex justify-center gap-1">
+                    {u.hosts.map((host, i) => (
+                      <Checkbox
+                        key={i}
+                        onCheckedChange={(e) =>
+                          e
+                            ? setChecked([host.name ?? "unknown", ...checked])
+                            : setChecked(
+                                checked.filter((val) => val != host.name),
+                              )
+                        }
+                      />
+                    ))}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
+}
+
+function checkAll(arr: rackArr[]) {
+  const allHosts: Array<string> = [];
+  arr.forEach((racku) =>
+    racku.hosts.forEach((host) => host.name && allHosts.push(host.name)),
+  );
+
+  return allHosts;
 }

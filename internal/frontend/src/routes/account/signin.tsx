@@ -16,12 +16,12 @@ import { useUser } from "@/hooks/user-provider";
 import { usePostV1AuthSignin } from "@/openapi/queries";
 import { z } from "zod";
 
-export const LOGIN_REDIRECT_FALLBACK = "/ui";
+export const LOGIN_REDIRECT_FALLBACK = "/";
 
 export const Route = createFileRoute("/account/signin")({
   component: RouteComponent,
   validateSearch: z.object({
-    redirect: z.string().optional().catch(""),
+    redirect: z.string().optional(),
   }),
   // beforeLoad: ({ context, location})
 });
@@ -29,8 +29,9 @@ export const Route = createFileRoute("/account/signin")({
 function RouteComponent() {
   const { mutate, isPending } = usePostV1AuthSignin();
   const User = useUser();
-  const router = useRouter();
   const search = Route.useSearch();
+  const router = useRouter();
+  const navigate = Route.useNavigate();
 
   const form = useForm({
     defaultValues: {
@@ -48,14 +49,19 @@ function RouteComponent() {
               expire: e.data?.expire ?? 0,
             });
             toast.success("Successfully authenticated");
-            router.history.push(search.redirect ?? LOGIN_REDIRECT_FALLBACK);
+            router.invalidate().then(() => {
+              navigate({
+                to: search.redirect ?? LOGIN_REDIRECT_FALLBACK,
+                replace: true,
+              });
+            });
           },
           onError: (e) => {
             toast.error(e.title, {
               description: e.detail,
             });
           },
-        }
+        },
       );
     },
   });

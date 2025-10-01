@@ -805,6 +805,40 @@ export const JobMessageSchema = {
     type: 'object'
 } as const;
 
+export const LLDPSchema = {
+    description: 'LLDP schema',
+    properties: {
+        chassis_id: {
+            type: 'string'
+        },
+        chassis_id_type: {
+            type: 'string'
+        },
+        management_address: {
+            type: 'string'
+        },
+        port_description: {
+            type: 'string'
+        },
+        port_id: {
+            type: 'string'
+        },
+        port_id_type: {
+            type: 'string'
+        },
+        port_name: {
+            type: 'string'
+        },
+        system_description: {
+            type: 'string'
+        },
+        system_name: {
+            type: 'string'
+        }
+    },
+    type: 'object'
+} as const;
+
 export const NodeAddRequestSchema = {
     description: 'NodeAddRequest schema',
     properties: {

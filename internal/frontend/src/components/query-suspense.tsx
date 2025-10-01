@@ -32,12 +32,12 @@ export function QuerySuspense({ children }: { children: React.ReactNode }) {
                     Here's some debug information you can forward to your local
                     Wizard:
                   </h1>
-                  <pre className="text-left text-sm font-mono text-muted-foreground">
+                  <pre className="text-muted-foreground text-left font-mono text-sm">
                     {JSON.stringify(error, null, 4)}
                   </pre>
                 </CardContent>
                 <CardFooter>
-                  <Button type="button" size="sm" onClick={resetErrorBoundary}>
+                  <Button type="button" onClick={resetErrorBoundary}>
                     Retry
                   </Button>
                 </CardFooter>

@@ -21,7 +21,7 @@ export default function RoleActions({ roles }: { roles: string }) {
   const mutation_delete = useDeleteV1RolesNames();
 
   return (
-    <div className="mt-4 grid sm:grid-cols-2 gap-4">
+    <div className="mt-4 grid gap-4 sm:grid-cols-2">
       <Card>
         <CardHeader>
           <CardTitle>Delete</CardTitle>
@@ -29,7 +29,7 @@ export default function RoleActions({ roles }: { roles: string }) {
         <CardFooter>
           <Dialog>
             <DialogTrigger asChild>
-              <Button size="sm" variant="destructive">
+              <Button variant="destructive">
                 {mutation_delete.isPending ? (
                   <LoaderCircle className="animate-spin" />
                 ) : (
@@ -49,7 +49,6 @@ export default function RoleActions({ roles }: { roles: string }) {
                 <DialogClose asChild>
                   <Button
                     variant="destructive"
-                    size="sm"
                     onClick={() =>
                       mutation_delete.mutate(
                         { path: { names: roles } },
@@ -64,7 +63,7 @@ export default function RoleActions({ roles }: { roles: string }) {
                             toast.error(e.title, {
                               description: e.detail,
                             }),
-                        }
+                        },
                       )
                     }
                   >
@@ -72,9 +71,7 @@ export default function RoleActions({ roles }: { roles: string }) {
                   </Button>
                 </DialogClose>
                 <DialogClose asChild>
-                  <Button variant="outline" size="sm">
-                    Cancel
-                  </Button>
+                  <Button variant="secondary">Cancel</Button>
                 </DialogClose>
               </DialogFooter>
             </DialogContent>

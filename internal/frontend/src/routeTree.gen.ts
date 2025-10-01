@@ -8,370 +8,158 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as FloorplanRouteImport } from './routes/floorplan'
+import { Route as EventsRouteImport } from './routes/events'
+import { Route as SplatRouteImport } from './routes/$'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as TemplatesIndexRouteImport } from './routes/templates/index'
+import { Route as NodesIndexRouteImport } from './routes/nodes/index'
+import { Route as ImagesIndexRouteImport } from './routes/images/index'
+import { Route as TemplatesTemplateRouteImport } from './routes/templates/$template'
+import { Route as SearchInventoryRouteImport } from './routes/search/inventory'
+import { Route as RackRackRouteImport } from './routes/rack/$rack'
+import { Route as NodesNodeRouteImport } from './routes/nodes/$node'
+import { Route as ImagesImageRouteImport } from './routes/images/$image'
+import { Route as AddTemplateRouteImport } from './routes/add/template'
+import { Route as AddRoleRouteImport } from './routes/add/role'
+import { Route as AddNodeRouteImport } from './routes/add/node'
+import { Route as AddImageRouteImport } from './routes/add/image'
+import { Route as AccountTokenRouteImport } from './routes/account/token'
+import { Route as AccountSignupRouteImport } from './routes/account/signup'
+import { Route as AccountSigninRouteImport } from './routes/account/signin'
+import { Route as AccountResetRouteImport } from './routes/account/reset'
+import { Route as GroupsNodesIndexRouteImport } from './routes/groups/nodes/index'
+import { Route as AccountUsersIndexRouteImport } from './routes/account/users/index'
+import { Route as AccountRolesIndexRouteImport } from './routes/account/roles/index'
+import { Route as GroupsNodesGroupRouteImport } from './routes/groups/nodes/$group'
+import { Route as AccountRolesRoleRouteImport } from './routes/account/roles/$role'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as FloorplanImport } from './routes/floorplan'
-import { Route as EventsImport } from './routes/events'
-import { Route as SplatImport } from './routes/$'
-import { Route as IndexImport } from './routes/index'
-import { Route as TemplatesIndexImport } from './routes/templates/index'
-import { Route as NodesIndexImport } from './routes/nodes/index'
-import { Route as ImagesIndexImport } from './routes/images/index'
-import { Route as TemplatesTemplateImport } from './routes/templates/$template'
-import { Route as SearchInventoryImport } from './routes/search/inventory'
-import { Route as RackRackImport } from './routes/rack/$rack'
-import { Route as NodesNodeImport } from './routes/nodes/$node'
-import { Route as ImagesImageImport } from './routes/images/$image'
-import { Route as AddTemplateImport } from './routes/add/template'
-import { Route as AddRoleImport } from './routes/add/role'
-import { Route as AddNodeImport } from './routes/add/node'
-import { Route as AddImageImport } from './routes/add/image'
-import { Route as AccountTokenImport } from './routes/account/token'
-import { Route as AccountSignupImport } from './routes/account/signup'
-import { Route as AccountSigninImport } from './routes/account/signin'
-import { Route as AccountResetImport } from './routes/account/reset'
-import { Route as GroupsNodesIndexImport } from './routes/groups/nodes/index'
-import { Route as AccountUsersIndexImport } from './routes/account/users/index'
-import { Route as AccountRolesIndexImport } from './routes/account/roles/index'
-import { Route as GroupsNodesGroupImport } from './routes/groups/nodes/$group'
-import { Route as AccountRolesRoleImport } from './routes/account/roles/$role'
-
-// Create/Update Routes
-
-const FloorplanRoute = FloorplanImport.update({
+const FloorplanRoute = FloorplanRouteImport.update({
   id: '/floorplan',
   path: '/floorplan',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const EventsRoute = EventsImport.update({
+const EventsRoute = EventsRouteImport.update({
   id: '/events',
   path: '/events',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const SplatRoute = SplatImport.update({
+const SplatRoute = SplatRouteImport.update({
   id: '/$',
   path: '/$',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const TemplatesIndexRoute = TemplatesIndexImport.update({
+const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
   id: '/templates/',
   path: '/templates/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const NodesIndexRoute = NodesIndexImport.update({
+const NodesIndexRoute = NodesIndexRouteImport.update({
   id: '/nodes/',
   path: '/nodes/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const ImagesIndexRoute = ImagesIndexImport.update({
+const ImagesIndexRoute = ImagesIndexRouteImport.update({
   id: '/images/',
   path: '/images/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const TemplatesTemplateRoute = TemplatesTemplateImport.update({
+const TemplatesTemplateRoute = TemplatesTemplateRouteImport.update({
   id: '/templates/$template',
   path: '/templates/$template',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const SearchInventoryRoute = SearchInventoryImport.update({
+const SearchInventoryRoute = SearchInventoryRouteImport.update({
   id: '/search/inventory',
   path: '/search/inventory',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const RackRackRoute = RackRackImport.update({
+const RackRackRoute = RackRackRouteImport.update({
   id: '/rack/$rack',
   path: '/rack/$rack',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const NodesNodeRoute = NodesNodeImport.update({
+const NodesNodeRoute = NodesNodeRouteImport.update({
   id: '/nodes/$node',
   path: '/nodes/$node',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const ImagesImageRoute = ImagesImageImport.update({
+const ImagesImageRoute = ImagesImageRouteImport.update({
   id: '/images/$image',
   path: '/images/$image',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AddTemplateRoute = AddTemplateImport.update({
+const AddTemplateRoute = AddTemplateRouteImport.update({
   id: '/add/template',
   path: '/add/template',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AddRoleRoute = AddRoleImport.update({
+const AddRoleRoute = AddRoleRouteImport.update({
   id: '/add/role',
   path: '/add/role',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AddNodeRoute = AddNodeImport.update({
+const AddNodeRoute = AddNodeRouteImport.update({
   id: '/add/node',
   path: '/add/node',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AddImageRoute = AddImageImport.update({
+const AddImageRoute = AddImageRouteImport.update({
   id: '/add/image',
   path: '/add/image',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AccountTokenRoute = AccountTokenImport.update({
+const AccountTokenRoute = AccountTokenRouteImport.update({
   id: '/account/token',
   path: '/account/token',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AccountSignupRoute = AccountSignupImport.update({
+const AccountSignupRoute = AccountSignupRouteImport.update({
   id: '/account/signup',
   path: '/account/signup',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AccountSigninRoute = AccountSigninImport.update({
+const AccountSigninRoute = AccountSigninRouteImport.update({
   id: '/account/signin',
   path: '/account/signin',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AccountResetRoute = AccountResetImport.update({
+const AccountResetRoute = AccountResetRouteImport.update({
   id: '/account/reset',
   path: '/account/reset',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const GroupsNodesIndexRoute = GroupsNodesIndexImport.update({
+const GroupsNodesIndexRoute = GroupsNodesIndexRouteImport.update({
   id: '/groups/nodes/',
   path: '/groups/nodes/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AccountUsersIndexRoute = AccountUsersIndexImport.update({
+const AccountUsersIndexRoute = AccountUsersIndexRouteImport.update({
   id: '/account/users/',
   path: '/account/users/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AccountRolesIndexRoute = AccountRolesIndexImport.update({
+const AccountRolesIndexRoute = AccountRolesIndexRouteImport.update({
   id: '/account/roles/',
   path: '/account/roles/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const GroupsNodesGroupRoute = GroupsNodesGroupImport.update({
+const GroupsNodesGroupRoute = GroupsNodesGroupRouteImport.update({
   id: '/groups/nodes/$group',
   path: '/groups/nodes/$group',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AccountRolesRoleRoute = AccountRolesRoleImport.update({
+const AccountRolesRoleRoute = AccountRolesRoleRouteImport.update({
   id: '/account/roles/$role',
   path: '/account/roles/$role',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-// Populate the FileRoutesByPath interface
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/$': {
-      id: '/$'
-      path: '/$'
-      fullPath: '/$'
-      preLoaderRoute: typeof SplatImport
-      parentRoute: typeof rootRoute
-    }
-    '/events': {
-      id: '/events'
-      path: '/events'
-      fullPath: '/events'
-      preLoaderRoute: typeof EventsImport
-      parentRoute: typeof rootRoute
-    }
-    '/floorplan': {
-      id: '/floorplan'
-      path: '/floorplan'
-      fullPath: '/floorplan'
-      preLoaderRoute: typeof FloorplanImport
-      parentRoute: typeof rootRoute
-    }
-    '/account/reset': {
-      id: '/account/reset'
-      path: '/account/reset'
-      fullPath: '/account/reset'
-      preLoaderRoute: typeof AccountResetImport
-      parentRoute: typeof rootRoute
-    }
-    '/account/signin': {
-      id: '/account/signin'
-      path: '/account/signin'
-      fullPath: '/account/signin'
-      preLoaderRoute: typeof AccountSigninImport
-      parentRoute: typeof rootRoute
-    }
-    '/account/signup': {
-      id: '/account/signup'
-      path: '/account/signup'
-      fullPath: '/account/signup'
-      preLoaderRoute: typeof AccountSignupImport
-      parentRoute: typeof rootRoute
-    }
-    '/account/token': {
-      id: '/account/token'
-      path: '/account/token'
-      fullPath: '/account/token'
-      preLoaderRoute: typeof AccountTokenImport
-      parentRoute: typeof rootRoute
-    }
-    '/add/image': {
-      id: '/add/image'
-      path: '/add/image'
-      fullPath: '/add/image'
-      preLoaderRoute: typeof AddImageImport
-      parentRoute: typeof rootRoute
-    }
-    '/add/node': {
-      id: '/add/node'
-      path: '/add/node'
-      fullPath: '/add/node'
-      preLoaderRoute: typeof AddNodeImport
-      parentRoute: typeof rootRoute
-    }
-    '/add/role': {
-      id: '/add/role'
-      path: '/add/role'
-      fullPath: '/add/role'
-      preLoaderRoute: typeof AddRoleImport
-      parentRoute: typeof rootRoute
-    }
-    '/add/template': {
-      id: '/add/template'
-      path: '/add/template'
-      fullPath: '/add/template'
-      preLoaderRoute: typeof AddTemplateImport
-      parentRoute: typeof rootRoute
-    }
-    '/images/$image': {
-      id: '/images/$image'
-      path: '/images/$image'
-      fullPath: '/images/$image'
-      preLoaderRoute: typeof ImagesImageImport
-      parentRoute: typeof rootRoute
-    }
-    '/nodes/$node': {
-      id: '/nodes/$node'
-      path: '/nodes/$node'
-      fullPath: '/nodes/$node'
-      preLoaderRoute: typeof NodesNodeImport
-      parentRoute: typeof rootRoute
-    }
-    '/rack/$rack': {
-      id: '/rack/$rack'
-      path: '/rack/$rack'
-      fullPath: '/rack/$rack'
-      preLoaderRoute: typeof RackRackImport
-      parentRoute: typeof rootRoute
-    }
-    '/search/inventory': {
-      id: '/search/inventory'
-      path: '/search/inventory'
-      fullPath: '/search/inventory'
-      preLoaderRoute: typeof SearchInventoryImport
-      parentRoute: typeof rootRoute
-    }
-    '/templates/$template': {
-      id: '/templates/$template'
-      path: '/templates/$template'
-      fullPath: '/templates/$template'
-      preLoaderRoute: typeof TemplatesTemplateImport
-      parentRoute: typeof rootRoute
-    }
-    '/images/': {
-      id: '/images/'
-      path: '/images'
-      fullPath: '/images'
-      preLoaderRoute: typeof ImagesIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/nodes/': {
-      id: '/nodes/'
-      path: '/nodes'
-      fullPath: '/nodes'
-      preLoaderRoute: typeof NodesIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/templates/': {
-      id: '/templates/'
-      path: '/templates'
-      fullPath: '/templates'
-      preLoaderRoute: typeof TemplatesIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/account/roles/$role': {
-      id: '/account/roles/$role'
-      path: '/account/roles/$role'
-      fullPath: '/account/roles/$role'
-      preLoaderRoute: typeof AccountRolesRoleImport
-      parentRoute: typeof rootRoute
-    }
-    '/groups/nodes/$group': {
-      id: '/groups/nodes/$group'
-      path: '/groups/nodes/$group'
-      fullPath: '/groups/nodes/$group'
-      preLoaderRoute: typeof GroupsNodesGroupImport
-      parentRoute: typeof rootRoute
-    }
-    '/account/roles/': {
-      id: '/account/roles/'
-      path: '/account/roles'
-      fullPath: '/account/roles'
-      preLoaderRoute: typeof AccountRolesIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/account/users/': {
-      id: '/account/users/'
-      path: '/account/users'
-      fullPath: '/account/users'
-      preLoaderRoute: typeof AccountUsersIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/groups/nodes/': {
-      id: '/groups/nodes/'
-      path: '/groups/nodes'
-      fullPath: '/groups/nodes'
-      preLoaderRoute: typeof GroupsNodesIndexImport
-      parentRoute: typeof rootRoute
-    }
-  }
-}
-
-// Create and export the route tree
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -400,7 +188,6 @@ export interface FileRoutesByFullPath {
   '/account/users': typeof AccountUsersIndexRoute
   '/groups/nodes': typeof GroupsNodesIndexRoute
 }
-
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
@@ -428,9 +215,8 @@ export interface FileRoutesByTo {
   '/account/users': typeof AccountUsersIndexRoute
   '/groups/nodes': typeof GroupsNodesIndexRoute
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute
+  __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/events': typeof EventsRoute
@@ -457,7 +243,6 @@ export interface FileRoutesById {
   '/account/users/': typeof AccountUsersIndexRoute
   '/groups/nodes/': typeof GroupsNodesIndexRoute
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
@@ -542,7 +327,6 @@ export interface FileRouteTypes {
     | '/groups/nodes/'
   fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
@@ -569,6 +353,186 @@ export interface RootRouteChildren {
   AccountRolesIndexRoute: typeof AccountRolesIndexRoute
   AccountUsersIndexRoute: typeof AccountUsersIndexRoute
   GroupsNodesIndexRoute: typeof GroupsNodesIndexRoute
+}
+
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/floorplan': {
+      id: '/floorplan'
+      path: '/floorplan'
+      fullPath: '/floorplan'
+      preLoaderRoute: typeof FloorplanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$': {
+      id: '/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates/': {
+      id: '/templates/'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof TemplatesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nodes/': {
+      id: '/nodes/'
+      path: '/nodes'
+      fullPath: '/nodes'
+      preLoaderRoute: typeof NodesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/images/': {
+      id: '/images/'
+      path: '/images'
+      fullPath: '/images'
+      preLoaderRoute: typeof ImagesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates/$template': {
+      id: '/templates/$template'
+      path: '/templates/$template'
+      fullPath: '/templates/$template'
+      preLoaderRoute: typeof TemplatesTemplateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search/inventory': {
+      id: '/search/inventory'
+      path: '/search/inventory'
+      fullPath: '/search/inventory'
+      preLoaderRoute: typeof SearchInventoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rack/$rack': {
+      id: '/rack/$rack'
+      path: '/rack/$rack'
+      fullPath: '/rack/$rack'
+      preLoaderRoute: typeof RackRackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nodes/$node': {
+      id: '/nodes/$node'
+      path: '/nodes/$node'
+      fullPath: '/nodes/$node'
+      preLoaderRoute: typeof NodesNodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/images/$image': {
+      id: '/images/$image'
+      path: '/images/$image'
+      fullPath: '/images/$image'
+      preLoaderRoute: typeof ImagesImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/add/template': {
+      id: '/add/template'
+      path: '/add/template'
+      fullPath: '/add/template'
+      preLoaderRoute: typeof AddTemplateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/add/role': {
+      id: '/add/role'
+      path: '/add/role'
+      fullPath: '/add/role'
+      preLoaderRoute: typeof AddRoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/add/node': {
+      id: '/add/node'
+      path: '/add/node'
+      fullPath: '/add/node'
+      preLoaderRoute: typeof AddNodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/add/image': {
+      id: '/add/image'
+      path: '/add/image'
+      fullPath: '/add/image'
+      preLoaderRoute: typeof AddImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/token': {
+      id: '/account/token'
+      path: '/account/token'
+      fullPath: '/account/token'
+      preLoaderRoute: typeof AccountTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/signup': {
+      id: '/account/signup'
+      path: '/account/signup'
+      fullPath: '/account/signup'
+      preLoaderRoute: typeof AccountSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/signin': {
+      id: '/account/signin'
+      path: '/account/signin'
+      fullPath: '/account/signin'
+      preLoaderRoute: typeof AccountSigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/reset': {
+      id: '/account/reset'
+      path: '/account/reset'
+      fullPath: '/account/reset'
+      preLoaderRoute: typeof AccountResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/groups/nodes/': {
+      id: '/groups/nodes/'
+      path: '/groups/nodes'
+      fullPath: '/groups/nodes'
+      preLoaderRoute: typeof GroupsNodesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/users/': {
+      id: '/account/users/'
+      path: '/account/users'
+      fullPath: '/account/users'
+      preLoaderRoute: typeof AccountUsersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/roles/': {
+      id: '/account/roles/'
+      path: '/account/roles'
+      fullPath: '/account/roles'
+      preLoaderRoute: typeof AccountRolesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/groups/nodes/$group': {
+      id: '/groups/nodes/$group'
+      path: '/groups/nodes/$group'
+      fullPath: '/groups/nodes/$group'
+      preLoaderRoute: typeof GroupsNodesGroupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/roles/$role': {
+      id: '/account/roles/$role'
+      path: '/account/roles/$role'
+      fullPath: '/account/roles/$role'
+      preLoaderRoute: typeof AccountRolesRoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  }
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -598,119 +562,6 @@ const rootRouteChildren: RootRouteChildren = {
   AccountUsersIndexRoute: AccountUsersIndexRoute,
   GroupsNodesIndexRoute: GroupsNodesIndexRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/$",
-        "/events",
-        "/floorplan",
-        "/account/reset",
-        "/account/signin",
-        "/account/signup",
-        "/account/token",
-        "/add/image",
-        "/add/node",
-        "/add/role",
-        "/add/template",
-        "/images/$image",
-        "/nodes/$node",
-        "/rack/$rack",
-        "/search/inventory",
-        "/templates/$template",
-        "/images/",
-        "/nodes/",
-        "/templates/",
-        "/account/roles/$role",
-        "/groups/nodes/$group",
-        "/account/roles/",
-        "/account/users/",
-        "/groups/nodes/"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/$": {
-      "filePath": "$.tsx"
-    },
-    "/events": {
-      "filePath": "events.tsx"
-    },
-    "/floorplan": {
-      "filePath": "floorplan.tsx"
-    },
-    "/account/reset": {
-      "filePath": "account/reset.tsx"
-    },
-    "/account/signin": {
-      "filePath": "account/signin.tsx"
-    },
-    "/account/signup": {
-      "filePath": "account/signup.tsx"
-    },
-    "/account/token": {
-      "filePath": "account/token.tsx"
-    },
-    "/add/image": {
-      "filePath": "add/image.tsx"
-    },
-    "/add/node": {
-      "filePath": "add/node.tsx"
-    },
-    "/add/role": {
-      "filePath": "add/role.tsx"
-    },
-    "/add/template": {
-      "filePath": "add/template.tsx"
-    },
-    "/images/$image": {
-      "filePath": "images/$image.tsx"
-    },
-    "/nodes/$node": {
-      "filePath": "nodes/$node.tsx"
-    },
-    "/rack/$rack": {
-      "filePath": "rack/$rack.tsx"
-    },
-    "/search/inventory": {
-      "filePath": "search/inventory.tsx"
-    },
-    "/templates/$template": {
-      "filePath": "templates/$template.tsx"
-    },
-    "/images/": {
-      "filePath": "images/index.tsx"
-    },
-    "/nodes/": {
-      "filePath": "nodes/index.tsx"
-    },
-    "/templates/": {
-      "filePath": "templates/index.tsx"
-    },
-    "/account/roles/$role": {
-      "filePath": "account/roles/$role.tsx"
-    },
-    "/groups/nodes/$group": {
-      "filePath": "groups/nodes/$group.tsx"
-    },
-    "/account/roles/": {
-      "filePath": "account/roles/index.tsx"
-    },
-    "/account/users/": {
-      "filePath": "account/users/index.tsx"
-    },
-    "/groups/nodes/": {
-      "filePath": "groups/nodes/index.tsx"
-    }
-  }
-}
-ROUTE_MANIFEST_END */

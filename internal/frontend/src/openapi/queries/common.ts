@@ -2,7 +2,7 @@
 
 import { type Options } from "@hey-api/client-fetch";
 import { UseQueryResult } from "@tanstack/react-query";
-import { deleteV1AuthSignout, deleteV1BmcJobsJids, deleteV1BmcSel, deleteV1Images, deleteV1Nodes, deleteV1RolesNames, deleteV1UsersUsernames, getV1Bmc, getV1BmcJobs, getV1BmcMetrics, getV1DbDump, getV1GrendelEvents, getV1Images, getV1ImagesFind, getV1Nodes, getV1NodesFind, getV1NodesTokenInterface, getV1Roles, getV1Users, patchV1AuthReset, patchV1NodesImage, patchV1NodesProvision, patchV1NodesTagsAction, patchV1Roles, patchV1UsersUsernamesEnable, patchV1UsersUsernamesRole, postV1AuthSignin, postV1AuthSignup, postV1AuthToken, postV1BmcConfigureAuto, postV1BmcConfigureImport, postV1BmcPowerBmc, postV1BmcPowerOs, postV1DbRestore, postV1Images, postV1Nodes, postV1Roles, postV1Users } from "../requests/services.gen";
+import { deleteV1AuthSignout, deleteV1BmcJobsJids, deleteV1BmcSel, deleteV1Images, deleteV1Nodes, deleteV1RolesNames, deleteV1UsersUsernames, getV1Bmc, getV1BmcJobs, getV1BmcMetrics, getV1DbDump, getV1GrendelEvents, getV1Images, getV1ImagesFind, getV1Nodes, getV1NodesFind, getV1NodesTokenInterface, getV1Roles, getV1SwitchNodesetLldp, getV1Users, patchV1AuthReset, patchV1NodesImage, patchV1NodesProvision, patchV1NodesTagsAction, patchV1Roles, patchV1UsersUsernamesEnable, patchV1UsersUsernamesRole, postV1AuthSignin, postV1AuthSignup, postV1AuthToken, postV1BmcConfigureAuto, postV1BmcConfigureImport, postV1BmcPowerBmc, postV1BmcPowerOs, postV1DbRestore, postV1Images, postV1Nodes, postV1Roles, postV1Users } from "../requests/services.gen";
 export type GetV1BmcDefaultResponse = Awaited<ReturnType<typeof getV1Bmc>>["data"];
 export type GetV1BmcQueryResult<TData = GetV1BmcDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
 export const useGetV1BmcKey = "GetV1Bmc";
@@ -47,6 +47,10 @@ export type GetV1RolesDefaultResponse = Awaited<ReturnType<typeof getV1Roles>>["
 export type GetV1RolesQueryResult<TData = GetV1RolesDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
 export const useGetV1RolesKey = "GetV1Roles";
 export const UseGetV1RolesKeyFn = (clientOptions: Options<unknown, true> = {}, queryKey?: Array<unknown>) => [useGetV1RolesKey, ...(queryKey ?? [clientOptions])];
+export type GetV1SwitchNodesetLldpDefaultResponse = Awaited<ReturnType<typeof getV1SwitchNodesetLldp>>["data"];
+export type GetV1SwitchNodesetLldpQueryResult<TData = GetV1SwitchNodesetLldpDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
+export const useGetV1SwitchNodesetLldpKey = "GetV1SwitchNodesetLldp";
+export const UseGetV1SwitchNodesetLldpKeyFn = (clientOptions: Options<unknown, true>, queryKey?: Array<unknown>) => [useGetV1SwitchNodesetLldpKey, ...(queryKey ?? [clientOptions])];
 export type GetV1UsersDefaultResponse = Awaited<ReturnType<typeof getV1Users>>["data"];
 export type GetV1UsersQueryResult<TData = GetV1UsersDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
 export const useGetV1UsersKey = "GetV1Users";

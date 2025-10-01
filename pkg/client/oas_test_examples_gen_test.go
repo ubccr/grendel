@@ -499,6 +499,18 @@ func TestJobMessageRedfishErrorErrorMessageDotExtendedInfoItem_EncodeDecode(t *t
 	var typ2 JobMessageRedfishErrorErrorMessageDotExtendedInfoItem
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestLLDP_EncodeDecode(t *testing.T) {
+	var typ LLDP
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 LLDP
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestNodeAddRequest_EncodeDecode(t *testing.T) {
 	var typ NodeAddRequest
 	typ.SetFake()

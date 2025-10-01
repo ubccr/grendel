@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/alouca/gosnmp"
+	"github.com/ubccr/grendel/pkg/model"
 )
 
 const (
@@ -29,8 +30,8 @@ func NewGeneric(endpoint, community string) (*Generic, error) {
 	return g, nil
 }
 
-func (g *Generic) GetMACTable() (MACTable, error) {
-	macTable := make(MACTable, 0)
+func (g *Generic) GetMACTable() (model.MACTable, error) {
+	macTable := make(model.MACTable, 0)
 
 	client, err := gosnmp.NewGoSNMP(g.endpoint, g.community, gosnmp.Version2c, 15)
 	if err != nil {
@@ -69,7 +70,7 @@ func (g *Generic) GetMACTable() (MACTable, error) {
 			continue
 		}
 
-		macTable[macStr] = &MACTableEntry{
+		macTable[macStr] = &model.MACTableEntry{
 			Port: rec.Value.(int) - 1,
 			VLAN: key[0],
 			MAC:  mac,
@@ -80,9 +81,9 @@ func (g *Generic) GetMACTable() (MACTable, error) {
 	return macTable, nil
 }
 
-func (g *Generic) GetLLDPNeighbors() (LLDPNeighbors, error) {
+func (g *Generic) GetLLDPNeighbors() (model.LLDPNeighbors, error) {
 	return nil, errors.New("LLDP not supported with Generic switch type")
 }
-func (g *Generic) GetInterfaceStatus() (InterfaceTable, error) {
+func (g *Generic) GetInterfaceStatus() (model.InterfaceTable, error) {
 	return nil, errors.New("Interface status not supported with Generic switch type")
 }

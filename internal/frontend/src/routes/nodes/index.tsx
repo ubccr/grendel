@@ -8,14 +8,15 @@ import {
 import { DataTableColumnHeader } from "@/components/data-table/header";
 import { Checkbox } from "@/components/ui/checkbox";
 import ProvisionIcon from "@/components/nodes/provision-button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SelectableCheckbox from "@/components/data-table/selectableCheckbox";
 import TagsList from "@/components/tags";
 import NodeActions from "@/components/nodes/actions";
 import ActionsSheet from "@/components/actions-sheet";
-import { useGetV1NodesSuspense } from "@/openapi/queries/suspense";
 import AuthRedirect from "@/auth";
-import { QuerySuspense } from "@/components/query-suspense";
+import { Card, CardContent } from "@/components/ui/card";
+import { toast } from "sonner";
+import { useGetV1Nodes } from "@/openapi/queries";
 
 export const Route = createFileRoute("/nodes/")({
   component: RouteComponent,
@@ -24,17 +25,23 @@ export const Route = createFileRoute("/nodes/")({
 
 function RouteComponent() {
   return (
-    <div className="p-4">
-      <QuerySuspense>
-        <TableComponent />
-      </QuerySuspense>
+    <div>
+      <TableComponent />
     </div>
   );
 }
 
 function TableComponent() {
-  const { data, isSuccess } = useGetV1NodesSuspense();
+  const { data, error, isFetching } = useGetV1Nodes();
   const [lastSelectedID, setLastSelectedID] = useState(0);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error.title, {
+        description: error.detail,
+      });
+    }
+  }, [error]);
 
   const columns: ColumnDef<Host>[] = [
     {
@@ -187,11 +194,11 @@ function TableComponent() {
     );
   };
   return (
-    <div className="px-6">
-      {isSuccess && data != undefined && (
+    <Card>
+      <CardContent>
         <DataTable
           columns={columns}
-          data={data}
+          data={data ?? []}
           add={"/add/node"}
           Actions={actions}
           initialVisibility={{
@@ -199,8 +206,9 @@ function TableComponent() {
             interfaces_fqdn: false,
             interfaces_mac: false,
           }}
+          progress={isFetching}
         />
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 }

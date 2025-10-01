@@ -138,6 +138,14 @@ type GETV1RolesParams struct {
 	Accept OptString
 }
 
+// GETV1SwitchNodesetLldpParams is parameters of GET_/v1/switch/:nodeset/lldp operation.
+type GETV1SwitchNodesetLldpParams struct {
+	// Filter by port name.
+	Ports   OptString
+	Accept  OptString
+	Nodeset string
+}
+
 // GETV1UsersParams is parameters of GET_/v1/users operation.
 type GETV1UsersParams struct {
 	// Filter by usernames.

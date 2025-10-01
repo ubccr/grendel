@@ -189,7 +189,6 @@ function RouteComponent() {
           <DialogFooter>
             <Button
               type="button"
-              variant="outline"
               onClick={() => {
                 if (!mutate_token?.data?.data?.token) return;
                 navigator.clipboard.writeText(mutate_token?.data?.data?.token);

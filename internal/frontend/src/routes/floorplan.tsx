@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,9 +19,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Settings2 } from "lucide-react";
-import { useGetV1NodesSuspense } from "@/openapi/queries/suspense";
 import AuthRedirect from "@/auth";
-import { QuerySuspense } from "@/components/query-suspense";
+import { Card, CardContent } from "@/components/ui/card";
+import { useGetV1Nodes } from "@/openapi/queries";
+import { toast } from "sonner";
+import { Progress } from "@/components/ui/progress";
 
 export const Route = createFileRoute("/floorplan")({
   component: RouteComponent,
@@ -30,16 +32,14 @@ export const Route = createFileRoute("/floorplan")({
 
 function RouteComponent() {
   return (
-    <div className="p-4">
-      <QuerySuspense>
-        <TableComponent />
-      </QuerySuspense>
+    <div>
+      <TableComponent />
     </div>
   );
 }
 
 function TableComponent() {
-  const { data, isSuccess } = useGetV1NodesSuspense();
+  const { data, isSuccess, error, isFetching } = useGetV1Nodes();
   const rows = Array.from("fghijklmnopqrstuv");
   const cols: string[] = [];
   const [view, setView] = useState("rackName");
@@ -49,6 +49,12 @@ function TableComponent() {
       cols.push(`${x.toLocaleString(undefined, { minimumIntegerDigits: 2 })}`);
     }
   }
+
+  useEffect(() => {
+    if (error != null) {
+      toast.error(error.title, { description: error.detail });
+    }
+  }, [error]);
 
   const populated: Set<string> = new Set([]);
   const size: Map<string, number> = new Map();
@@ -68,63 +74,71 @@ function TableComponent() {
   });
 
   return (
-    <div className="flex justify-center">
-      <Table>
-        <TableHeader className="*:text-center">
-          <TableRow>
-            <TableHead className="w-12 border">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Settings2 />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56">
-                  <DropdownMenuLabel>Rack:</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuRadioGroup value={view} onValueChange={setView}>
-                    <DropdownMenuRadioItem value="rackName">
-                      Rack Name
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="nodeCount">
-                      Node Count
-                    </DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </TableHead>
-            {cols.map((col, i) => (
-              <TableHead key={i} className="border text-center">
-                {col}
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {rows.map((row, i) => (
-            <TableRow key={i} className="*:text-center">
-              <TableHead className="border">{row}</TableHead>
-              {cols.map((col, i) => {
-                const rack = row + col;
-                return (
-                  <TableCell key={i} className="border p-0">
-                    {populated.has(rack) && (
-                      <Link
-                        to={"/rack/$rack"}
-                        params={{ rack: rack }}
-                        className="hover:font-bold"
+    <div>
+      <Card>
+        <CardContent className="p-3">
+          {isFetching && <Progress />}
+          <Table>
+            <TableHeader className="*:text-center">
+              <TableRow>
+                <TableHead className="w-12 border">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="secondary" size="icon">
+                        <Settings2 />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56">
+                      <DropdownMenuLabel>Rack:</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuRadioGroup
+                        value={view}
+                        onValueChange={setView}
                       >
-                        {view === "rackName" && rack}
-                        {view === "nodeCount" && size.get(rack)}
-                      </Link>
-                    )}
-                  </TableCell>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                        <DropdownMenuRadioItem value="rackName">
+                          Rack Name
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="nodeCount">
+                          Node Count
+                        </DropdownMenuRadioItem>
+                      </DropdownMenuRadioGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableHead>
+                {cols.map((col, i) => (
+                  <TableHead key={i} className="border text-center">
+                    {col}
+                  </TableHead>
+                ))}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((row, i) => (
+                <TableRow key={i} className="*:text-center">
+                  <TableHead className="border">{row}</TableHead>
+                  {cols.map((col, i) => {
+                    const rack = row + col;
+                    return (
+                      <TableCell key={i} className="border p-0">
+                        {populated.has(rack) && (
+                          <Link
+                            to={"/rack/$rack"}
+                            params={{ rack: rack }}
+                            className="hover:font-bold"
+                          >
+                            {view === "rackName" && rack}
+                            {view === "nodeCount" && size.get(rack)}
+                          </Link>
+                        )}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }
