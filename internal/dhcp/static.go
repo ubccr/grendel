@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net"
 	"slices"
+	"strings"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/insomniacslk/dhcp/rfc1035label"
@@ -117,6 +118,21 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 		log.Debugf("Dell ZTP provision-url: %s", provisionURL)
 		resp.UpdateOption(dhcpv4.OptBootFileName(provisionURL))
 		// resp.UpdateOption(dhcpv4.Option{Code: dhcpv4.GenericOptionCode(239), Value: dhcpv4.String(provisionURL)})
+	}
+
+	if strings.HasPrefix(req.ClassIdentifier(), "Eaton") {
+		// Eaton ZTP
+		// See: https://www.eaton.com/content/dam/eaton/products/backup-power-ups-surge-it-power-distribution/power-management-software-connectivity/eaton-gigabit-network-card/network-m3/resources/eaton-zero-touch-provisioning-with-gigabit-network-interfaces-wp158004en.pdf
+
+		token, _ := model.NewBootToken(host.UID.String(), nic.MAC.String())
+		endpoints := provision.NewEndpoints(serverIP.String(), token)
+		configURL := endpoints.KickstartURL()
+		resp.UpdateOption(dhcpv4.Option{Code: dhcpv4.OptionVendorSpecificInformation, Value: dhcpv4.String(configURL)})
+
+		log.WithFields(logrus.Fields{
+			"ip":   nic.AddrString(),
+			"name": host.Name,
+		}).Info("Host is Eaton ZTP. Setting bootfile URL and config dhcp options")
 	}
 }
 
