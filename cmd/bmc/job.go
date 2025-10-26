@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/spf13/cobra"
@@ -49,7 +48,7 @@ var (
 
 			t := table.NewWriter()
 			t.SetOutputMirror(os.Stdout)
-			t.AppendHeader(table.Row{"Host", "Start Time", "Job Name", "State", "Progress", "Messages"})
+			t.AppendHeader(table.Row{"Host", "Job Name", "State", "Progress", "Messages"})
 			t.SetColumnConfigs([]table.ColumnConfig{
 				{
 					Name:      "Host",
@@ -62,24 +61,18 @@ var (
 			})
 
 			for _, hostJob := range res {
-				if len(hostJob.Jobs) == 0 {
+				if len(hostJob.Jobs.Value) == 0 {
 					t.AppendRow(table.Row{
-						hostJob.Name,
+						hostJob.Name.Value,
 					})
 				}
-				for _, job := range hostJob.Jobs {
+				for _, job := range hostJob.Jobs.Value {
 					messages := []string{}
 					for _, msg := range job.Value.Messages {
 						messages = append(messages, msg.Message.Value)
 					}
-					layout := "2006-01-02T15:04:05-07:00"
-					startTime, err := time.Parse(layout, job.Value.StartTime.Value)
-					if err != nil {
-						return err
-					}
 					t.AppendRow(table.Row{
 						hostJob.Name.Value,
-						startTime.Format(time.DateTime),
 						job.Value.Name.Value,
 						job.Value.JobState.Value,
 						fmt.Sprintf("%d%%", job.Value.PercentComplete.Value),

@@ -20,6 +20,7 @@ export const Route = createFileRoute("/add/role")({
 });
 
 function RouteComponent() {
+  const navigate = Route.useNavigate();
   const form = useForm({
     defaultValues: {
       name: "",
@@ -32,6 +33,10 @@ function RouteComponent() {
           onSuccess: ({ data }) => {
             toast.success(data?.title, {
               description: data?.detail,
+            });
+
+            navigate({
+              to: "/account/roles",
             });
           },
           onError: (e) => {

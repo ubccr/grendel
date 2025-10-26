@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import NodeForm from "@/components/nodes/form";
 import NodeRedfish from "@/components/nodes/redfish";
-import { LoaderCircle, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import AuthRedirect from "@/auth";
 import {
   useGetV1Bmc,
@@ -195,11 +195,6 @@ function Form() {
                 <NodeRedfish redfish={redfish} />
               </TabsContent>
               <TabsContent value="reports">
-                {reports.isFetching && (
-                  <div className="p-4">
-                    <LoaderCircle className="mx-auto animate-spin" />
-                  </div>
-                )}
                 <div className="grid gap-4 sm:grid-cols-3">
                   {Array.from(chartData).map(([, chart], i) => (
                     <TestLineChart

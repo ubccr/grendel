@@ -91,6 +91,58 @@ func (s *AuthSignupRequest) Validate() error {
 	return nil
 }
 
+func (s *BmcJobDeleteRequest) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.NodeJobList.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "node_job_list",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s BmcJobDeleteRequestNodeJobList) Validate() error {
+	var failures []validate.FieldError
+	for key, elem := range s {
+		if err := func() error {
+			if elem == nil {
+				return errors.New("nil is invalid value")
+			}
+			return nil
+		}(); err != nil {
+			failures = append(failures, validate.FieldError{
+				Name:  key,
+				Error: err,
+			})
+		}
+	}
+
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
 func (s *DataDump) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -845,29 +897,39 @@ func (s *RedfishJob) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		var failures []validate.FieldError
-		for i, elem := range s.Jobs {
+		if value, ok := s.Jobs.Get(); ok {
 			if err := func() error {
-				if value, ok := elem.Get(); ok {
+				if value == nil {
+					return errors.New("nil is invalid value")
+				}
+				var failures []validate.FieldError
+				for i, elem := range value {
 					if err := func() error {
-						if err := value.Validate(); err != nil {
-							return err
+						if value, ok := elem.Get(); ok {
+							if err := func() error {
+								if err := value.Validate(); err != nil {
+									return err
+								}
+								return nil
+							}(); err != nil {
+								return err
+							}
 						}
 						return nil
 					}(); err != nil {
-						return err
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
 					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
 				}
 				return nil
 			}(); err != nil {
-				failures = append(failures, validate.FieldError{
-					Name:  fmt.Sprintf("[%d]", i),
-					Error: err,
-				})
+				return err
 			}
-		}
-		if len(failures) > 0 {
-			return &validate.Error{Fields: failures}
 		}
 		return nil
 	}(); err != nil {

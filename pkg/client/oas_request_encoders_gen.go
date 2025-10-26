@@ -11,6 +11,20 @@ import (
 	ht "github.com/ogen-go/ogen/http"
 )
 
+func encodeDELETEV1BmcJobsRequest(
+	req *BmcJobDeleteRequest,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
 func encodePATCHV1AuthResetRequest(
 	req *AuthResetRequest,
 	r *http.Request,
@@ -167,6 +181,20 @@ func encodePOSTV1BmcConfigureImportRequest(
 
 func encodePOSTV1BmcPowerOsRequest(
 	req *BmcOsPowerBody,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodePOSTV1BmcUpgradeDellInstallfromrepoRequest(
+	req *BmcDellInstallFromRepoRequest,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"

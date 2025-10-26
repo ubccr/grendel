@@ -595,6 +595,188 @@ func (s *AuthTokenRequest) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *BmcDellInstallFromRepoRequest) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcDellInstallFromRepoRequest) encodeFields(e *jx.Encoder) {
+	{
+		if s.ApplyUpdate.Set {
+			e.FieldStart("ApplyUpdate")
+			s.ApplyUpdate.Encode(e)
+		}
+	}
+	{
+		if s.CatalogFile.Set {
+			e.FieldStart("CatalogFile")
+			s.CatalogFile.Encode(e)
+		}
+	}
+	{
+		if s.ClearJobQueue.Set {
+			e.FieldStart("ClearJobQueue")
+			s.ClearJobQueue.Encode(e)
+		}
+	}
+	{
+		if s.IPAddress.Set {
+			e.FieldStart("IPAddress")
+			s.IPAddress.Encode(e)
+		}
+	}
+	{
+		if s.IgnoreCertWarning.Set {
+			e.FieldStart("IgnoreCertWarning")
+			s.IgnoreCertWarning.Encode(e)
+		}
+	}
+	{
+		if s.RebootNeeded.Set {
+			e.FieldStart("RebootNeeded")
+			s.RebootNeeded.Encode(e)
+		}
+	}
+	{
+		if s.ShareName.Set {
+			e.FieldStart("ShareName")
+			s.ShareName.Encode(e)
+		}
+	}
+	{
+		if s.ShareType.Set {
+			e.FieldStart("ShareType")
+			s.ShareType.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcDellInstallFromRepoRequest = [8]string{
+	0: "ApplyUpdate",
+	1: "CatalogFile",
+	2: "ClearJobQueue",
+	3: "IPAddress",
+	4: "IgnoreCertWarning",
+	5: "RebootNeeded",
+	6: "ShareName",
+	7: "ShareType",
+}
+
+// Decode decodes BmcDellInstallFromRepoRequest from json.
+func (s *BmcDellInstallFromRepoRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcDellInstallFromRepoRequest to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "ApplyUpdate":
+			if err := func() error {
+				s.ApplyUpdate.Reset()
+				if err := s.ApplyUpdate.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ApplyUpdate\"")
+			}
+		case "CatalogFile":
+			if err := func() error {
+				s.CatalogFile.Reset()
+				if err := s.CatalogFile.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"CatalogFile\"")
+			}
+		case "ClearJobQueue":
+			if err := func() error {
+				s.ClearJobQueue.Reset()
+				if err := s.ClearJobQueue.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ClearJobQueue\"")
+			}
+		case "IPAddress":
+			if err := func() error {
+				s.IPAddress.Reset()
+				if err := s.IPAddress.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"IPAddress\"")
+			}
+		case "IgnoreCertWarning":
+			if err := func() error {
+				s.IgnoreCertWarning.Reset()
+				if err := s.IgnoreCertWarning.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"IgnoreCertWarning\"")
+			}
+		case "RebootNeeded":
+			if err := func() error {
+				s.RebootNeeded.Reset()
+				if err := s.RebootNeeded.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"RebootNeeded\"")
+			}
+		case "ShareName":
+			if err := func() error {
+				s.ShareName.Reset()
+				if err := s.ShareName.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ShareName\"")
+			}
+		case "ShareType":
+			if err := func() error {
+				s.ShareType.Reset()
+				if err := s.ShareType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ShareType\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcDellInstallFromRepoRequest")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcDellInstallFromRepoRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcDellInstallFromRepoRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *BmcImportConfigurationRequest) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -670,6 +852,137 @@ func (s *BmcImportConfigurationRequest) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *BmcImportConfigurationRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcJobDeleteRequest) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcJobDeleteRequest) encodeFields(e *jx.Encoder) {
+	{
+		if s.NodeJobList.Set {
+			e.FieldStart("node_job_list")
+			s.NodeJobList.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcJobDeleteRequest = [1]string{
+	0: "node_job_list",
+}
+
+// Decode decodes BmcJobDeleteRequest from json.
+func (s *BmcJobDeleteRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcJobDeleteRequest to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "node_job_list":
+			if err := func() error {
+				s.NodeJobList.Reset()
+				if err := s.NodeJobList.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"node_job_list\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcJobDeleteRequest")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcJobDeleteRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcJobDeleteRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s BmcJobDeleteRequestNodeJobList) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields implements json.Marshaler.
+func (s BmcJobDeleteRequestNodeJobList) encodeFields(e *jx.Encoder) {
+	for k, elem := range s {
+		e.FieldStart(k)
+
+		e.ArrStart()
+		for _, elem := range elem {
+			e.Str(elem)
+		}
+		e.ArrEnd()
+	}
+}
+
+// Decode decodes BmcJobDeleteRequestNodeJobList from json.
+func (s *BmcJobDeleteRequestNodeJobList) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcJobDeleteRequestNodeJobList to nil")
+	}
+	m := s.init()
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		var elem []string
+		if err := func() error {
+			elem = make([]string, 0)
+			if err := d.Arr(func(d *jx.Decoder) error {
+				var elemElem string
+				v, err := d.Str()
+				elemElem = string(v)
+				if err != nil {
+					return err
+				}
+				elem = append(elem, elemElem)
+				return nil
+			}); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return errors.Wrapf(err, "decode field %q", k)
+		}
+		m[string(k)] = elem
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcJobDeleteRequestNodeJobList")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s BmcJobDeleteRequestNodeJobList) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcJobDeleteRequestNodeJobList) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -2722,6 +3035,12 @@ func (s *EventJobMessagesItem) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *EventJobMessagesItem) encodeFields(e *jx.Encoder) {
 	{
+		if s.Data.Set {
+			e.FieldStart("data")
+			s.Data.Encode(e)
+		}
+	}
+	{
 		if s.Host.Set {
 			e.FieldStart("host")
 			s.Host.Encode(e)
@@ -2747,11 +3066,12 @@ func (s *EventJobMessagesItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfEventJobMessagesItem = [4]string{
-	0: "host",
-	1: "msg",
-	2: "redfish_error",
-	3: "status",
+var jsonFieldsNameOfEventJobMessagesItem = [5]string{
+	0: "data",
+	1: "host",
+	2: "msg",
+	3: "redfish_error",
+	4: "status",
 }
 
 // Decode decodes EventJobMessagesItem from json.
@@ -2762,6 +3082,16 @@ func (s *EventJobMessagesItem) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
+		case "data":
+			if err := func() error {
+				s.Data.Reset()
+				if err := s.Data.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"data\"")
+			}
 		case "host":
 			if err := func() error {
 				s.Host.Reset()
@@ -4540,6 +4870,12 @@ func (s *JobMessage) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *JobMessage) encodeFields(e *jx.Encoder) {
 	{
+		if s.Data.Set {
+			e.FieldStart("data")
+			s.Data.Encode(e)
+		}
+	}
+	{
 		if s.Host.Set {
 			e.FieldStart("host")
 			s.Host.Encode(e)
@@ -4565,11 +4901,12 @@ func (s *JobMessage) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfJobMessage = [4]string{
-	0: "host",
-	1: "msg",
-	2: "redfish_error",
-	3: "status",
+var jsonFieldsNameOfJobMessage = [5]string{
+	0: "data",
+	1: "host",
+	2: "msg",
+	3: "redfish_error",
+	4: "status",
 }
 
 // Decode decodes JobMessage from json.
@@ -4580,6 +4917,16 @@ func (s *JobMessage) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
+		case "data":
+			if err := func() error {
+				s.Data.Reset()
+				if err := s.Data.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"data\"")
+			}
 		case "host":
 			if err := func() error {
 				s.Host.Reset()
@@ -6820,6 +7167,40 @@ func (s *NodeTagsRequest) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes BmcJobDeleteRequestNodeJobList as json.
+func (o OptBmcJobDeleteRequestNodeJobList) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcJobDeleteRequestNodeJobList from json.
+func (o *OptBmcJobDeleteRequestNodeJobList) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptBmcJobDeleteRequestNodeJobList to nil")
+	}
+	o.Set = true
+	o.Value = make(BmcJobDeleteRequestNodeJobList)
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptBmcJobDeleteRequestNodeJobList) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptBmcJobDeleteRequestNodeJobList) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes bool as json.
 func (o OptBool) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -7596,6 +7977,67 @@ func (s *OptNilNilIntArray) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes []NilRedfishJobJobsItem as json.
+func (o OptNilNilRedfishJobJobsItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilRedfishJobJobsItem from json.
+func (o *OptNilNilRedfishJobJobsItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilRedfishJobJobsItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilRedfishJobJobsItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilRedfishJobJobsItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilRedfishJobJobsItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilRedfishJobJobsItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilRedfishJobJobsItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes []NilString as json.
 func (o OptNilNilStringArray) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -7653,6 +8095,55 @@ func (s OptNilNilStringArray) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptNilNilStringArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes RedfishSystemOemDell as json.
+func (o OptNilRedfishSystemOemDell) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes RedfishSystemOemDell from json.
+func (o *OptNilRedfishSystemOemDell) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilRedfishSystemOemDell to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v RedfishSystemOemDell
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilRedfishSystemOemDell) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilRedfishSystemOemDell) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -7833,105 +8324,6 @@ func (s OptRedfishJobJobsItemSchedule) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptRedfishJobJobsItemSchedule) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishSystemOem as json.
-func (o OptRedfishSystemOem) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishSystemOem from json.
-func (o *OptRedfishSystemOem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptRedfishSystemOem to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptRedfishSystemOem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptRedfishSystemOem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishSystemOemDell as json.
-func (o OptRedfishSystemOemDell) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishSystemOemDell from json.
-func (o *OptRedfishSystemOemDell) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptRedfishSystemOemDell to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptRedfishSystemOemDell) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptRedfishSystemOemDell) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishSystemOemDellDellSystem as json.
-func (o OptRedfishSystemOemDellDellSystem) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishSystemOemDellDellSystem from json.
-func (o *OptRedfishSystemOemDellDellSystem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptRedfishSystemOemDellDellSystem to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptRedfishSystemOemDellDellSystem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptRedfishSystemOemDellDellSystem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -8223,6 +8615,466 @@ func (s *PostRolesRequest) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *RedfishDellUpgradeFirmware) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *RedfishDellUpgradeFirmware) encodeFields(e *jx.Encoder) {
+	{
+		if s.Message.Set {
+			e.FieldStart("Message")
+			s.Message.Encode(e)
+		}
+	}
+	{
+		if s.Name.Set {
+			e.FieldStart("Name")
+			s.Name.Encode(e)
+		}
+	}
+	{
+		if s.Status.Set {
+			e.FieldStart("Status")
+			s.Status.Encode(e)
+		}
+	}
+	{
+		if s.UpdateCount.Set {
+			e.FieldStart("UpdateCount")
+			s.UpdateCount.Encode(e)
+		}
+	}
+	{
+		if s.UpdateList != nil {
+			e.FieldStart("UpdateList")
+			e.ArrStart()
+			for _, elem := range s.UpdateList {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.UpdateRebootType.Set {
+			e.FieldStart("UpdateRebootType")
+			s.UpdateRebootType.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfRedfishDellUpgradeFirmware = [6]string{
+	0: "Message",
+	1: "Name",
+	2: "Status",
+	3: "UpdateCount",
+	4: "UpdateList",
+	5: "UpdateRebootType",
+}
+
+// Decode decodes RedfishDellUpgradeFirmware from json.
+func (s *RedfishDellUpgradeFirmware) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode RedfishDellUpgradeFirmware to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "Message":
+			if err := func() error {
+				s.Message.Reset()
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Message\"")
+			}
+		case "Name":
+			if err := func() error {
+				s.Name.Reset()
+				if err := s.Name.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Name\"")
+			}
+		case "Status":
+			if err := func() error {
+				s.Status.Reset()
+				if err := s.Status.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Status\"")
+			}
+		case "UpdateCount":
+			if err := func() error {
+				s.UpdateCount.Reset()
+				if err := s.UpdateCount.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"UpdateCount\"")
+			}
+		case "UpdateList":
+			if err := func() error {
+				s.UpdateList = make([]RedfishDellUpgradeFirmwareUpdateListItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem RedfishDellUpgradeFirmwareUpdateListItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.UpdateList = append(s.UpdateList, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"UpdateList\"")
+			}
+		case "UpdateRebootType":
+			if err := func() error {
+				s.UpdateRebootType.Reset()
+				if err := s.UpdateRebootType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"UpdateRebootType\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode RedfishDellUpgradeFirmware")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *RedfishDellUpgradeFirmware) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *RedfishDellUpgradeFirmware) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.BaseLocation.Set {
+			e.FieldStart("BaseLocation")
+			s.BaseLocation.Encode(e)
+		}
+	}
+	{
+		if s.ComponentID.Set {
+			e.FieldStart("ComponentID")
+			s.ComponentID.Encode(e)
+		}
+	}
+	{
+		if s.ComponentInfoName.Set {
+			e.FieldStart("ComponentInfoName")
+			s.ComponentInfoName.Encode(e)
+		}
+	}
+	{
+		if s.ComponentInfoValue.Set {
+			e.FieldStart("ComponentInfoValue")
+			s.ComponentInfoValue.Encode(e)
+		}
+	}
+	{
+		if s.ComponentType.Set {
+			e.FieldStart("ComponentType")
+			s.ComponentType.Encode(e)
+		}
+	}
+	{
+		if s.Criticality.Set {
+			e.FieldStart("Criticality")
+			s.Criticality.Encode(e)
+		}
+	}
+	{
+		if s.DisplayName.Set {
+			e.FieldStart("DisplayName")
+			s.DisplayName.Encode(e)
+		}
+	}
+	{
+		if s.InstalledVersion.Set {
+			e.FieldStart("InstalledVersion")
+			s.InstalledVersion.Encode(e)
+		}
+	}
+	{
+		if s.JobID.Set {
+			e.FieldStart("JobID")
+			s.JobID.Encode(e)
+		}
+	}
+	{
+		if s.Name.Set {
+			e.FieldStart("Name")
+			s.Name.Encode(e)
+		}
+	}
+	{
+		if s.PackageName.Set {
+			e.FieldStart("PackageName")
+			s.PackageName.Encode(e)
+		}
+	}
+	{
+		if s.PackagePath.Set {
+			e.FieldStart("PackagePath")
+			s.PackagePath.Encode(e)
+		}
+	}
+	{
+		if s.PackageVersion.Set {
+			e.FieldStart("PackageVersion")
+			s.PackageVersion.Encode(e)
+		}
+	}
+	{
+		if s.RebootType.Set {
+			e.FieldStart("RebootType")
+			s.RebootType.Encode(e)
+		}
+	}
+	{
+		if s.Target.Set {
+			e.FieldStart("Target")
+			s.Target.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfRedfishDellUpgradeFirmwareUpdateListItem = [15]string{
+	0:  "BaseLocation",
+	1:  "ComponentID",
+	2:  "ComponentInfoName",
+	3:  "ComponentInfoValue",
+	4:  "ComponentType",
+	5:  "Criticality",
+	6:  "DisplayName",
+	7:  "InstalledVersion",
+	8:  "JobID",
+	9:  "Name",
+	10: "PackageName",
+	11: "PackagePath",
+	12: "PackageVersion",
+	13: "RebootType",
+	14: "Target",
+}
+
+// Decode decodes RedfishDellUpgradeFirmwareUpdateListItem from json.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode RedfishDellUpgradeFirmwareUpdateListItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "BaseLocation":
+			if err := func() error {
+				s.BaseLocation.Reset()
+				if err := s.BaseLocation.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"BaseLocation\"")
+			}
+		case "ComponentID":
+			if err := func() error {
+				s.ComponentID.Reset()
+				if err := s.ComponentID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ComponentID\"")
+			}
+		case "ComponentInfoName":
+			if err := func() error {
+				s.ComponentInfoName.Reset()
+				if err := s.ComponentInfoName.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ComponentInfoName\"")
+			}
+		case "ComponentInfoValue":
+			if err := func() error {
+				s.ComponentInfoValue.Reset()
+				if err := s.ComponentInfoValue.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ComponentInfoValue\"")
+			}
+		case "ComponentType":
+			if err := func() error {
+				s.ComponentType.Reset()
+				if err := s.ComponentType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ComponentType\"")
+			}
+		case "Criticality":
+			if err := func() error {
+				s.Criticality.Reset()
+				if err := s.Criticality.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Criticality\"")
+			}
+		case "DisplayName":
+			if err := func() error {
+				s.DisplayName.Reset()
+				if err := s.DisplayName.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"DisplayName\"")
+			}
+		case "InstalledVersion":
+			if err := func() error {
+				s.InstalledVersion.Reset()
+				if err := s.InstalledVersion.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"InstalledVersion\"")
+			}
+		case "JobID":
+			if err := func() error {
+				s.JobID.Reset()
+				if err := s.JobID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"JobID\"")
+			}
+		case "Name":
+			if err := func() error {
+				s.Name.Reset()
+				if err := s.Name.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Name\"")
+			}
+		case "PackageName":
+			if err := func() error {
+				s.PackageName.Reset()
+				if err := s.PackageName.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"PackageName\"")
+			}
+		case "PackagePath":
+			if err := func() error {
+				s.PackagePath.Reset()
+				if err := s.PackagePath.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"PackagePath\"")
+			}
+		case "PackageVersion":
+			if err := func() error {
+				s.PackageVersion.Reset()
+				if err := s.PackageVersion.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"PackageVersion\"")
+			}
+		case "RebootType":
+			if err := func() error {
+				s.RebootType.Reset()
+				if err := s.RebootType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"RebootType\"")
+			}
+		case "Target":
+			if err := func() error {
+				s.Target.Reset()
+				if err := s.Target.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Target\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode RedfishDellUpgradeFirmwareUpdateListItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *RedfishJob) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -8232,13 +9084,9 @@ func (s *RedfishJob) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *RedfishJob) encodeFields(e *jx.Encoder) {
 	{
-		if s.Jobs != nil {
+		if s.Jobs.Set {
 			e.FieldStart("jobs")
-			e.ArrStart()
-			for _, elem := range s.Jobs {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+			s.Jobs.Encode(e)
 		}
 	}
 	{
@@ -8264,15 +9112,8 @@ func (s *RedfishJob) Decode(d *jx.Decoder) error {
 		switch string(k) {
 		case "jobs":
 			if err := func() error {
-				s.Jobs = make([]NilRedfishJobJobsItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem NilRedfishJobJobsItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.Jobs = append(s.Jobs, elem)
-					return nil
-				}); err != nil {
+				s.Jobs.Reset()
+				if err := s.Jobs.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -9731,9 +10572,9 @@ func (s *RedfishSystem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Oem.Set {
-			e.FieldStart("oem")
-			s.Oem.Encode(e)
+		if s.OemDell.Set {
+			e.FieldStart("oem_dell")
+			s.OemDell.Encode(e)
 		}
 	}
 	{
@@ -9771,7 +10612,7 @@ var jsonFieldsNameOfRedfishSystem = [13]string{
 	5:  "manufacturer",
 	6:  "model",
 	7:  "name",
-	8:  "oem",
+	8:  "oem_dell",
 	9:  "power_status",
 	10: "processor_count",
 	11: "serial_number",
@@ -9875,15 +10716,15 @@ func (s *RedfishSystem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"name\"")
 			}
-		case "oem":
+		case "oem_dell":
 			if err := func() error {
-				s.Oem.Reset()
-				if err := s.Oem.Decode(d); err != nil {
+				s.OemDell.Reset()
+				if err := s.OemDell.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"oem\"")
+				return errors.Wrap(err, "decode field \"oem_dell\"")
 			}
 		case "power_status":
 			if err := func() error {
@@ -9950,69 +10791,6 @@ func (s *RedfishSystem) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
-func (s *RedfishSystemOem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishSystemOem) encodeFields(e *jx.Encoder) {
-	{
-		if s.Dell.Set {
-			e.FieldStart("Dell")
-			s.Dell.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishSystemOem = [1]string{
-	0: "Dell",
-}
-
-// Decode decodes RedfishSystemOem from json.
-func (s *RedfishSystemOem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishSystemOem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "Dell":
-			if err := func() error {
-				s.Dell.Reset()
-				if err := s.Dell.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Dell\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishSystemOem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishSystemOem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishSystemOem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
 func (s *RedfishSystemOemDell) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -10022,68 +10800,161 @@ func (s *RedfishSystemOemDell) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *RedfishSystemOemDell) encodeFields(e *jx.Encoder) {
 	{
-		if s.DellSystem.Set {
-			e.FieldStart("DellSystem")
-			s.DellSystem.Encode(e)
+		if s.OdataDotContext.Set {
+			e.FieldStart("@odata.context")
+			s.OdataDotContext.Encode(e)
 		}
 	}
-}
-
-var jsonFieldsNameOfRedfishSystemOemDell = [1]string{
-	0: "DellSystem",
-}
-
-// Decode decodes RedfishSystemOemDell from json.
-func (s *RedfishSystemOemDell) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishSystemOemDell to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "DellSystem":
-			if err := func() error {
-				s.DellSystem.Reset()
-				if err := s.DellSystem.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"DellSystem\"")
-			}
-		default:
-			return d.Skip()
+	{
+		if s.OdataDotID.Set {
+			e.FieldStart("@odata.id")
+			s.OdataDotID.Encode(e)
 		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishSystemOemDell")
 	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishSystemOemDell) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishSystemOemDell) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishSystemOemDellDellSystem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishSystemOemDellDellSystem) encodeFields(e *jx.Encoder) {
+	{
+		if s.OdataDotType.Set {
+			e.FieldStart("@odata.type")
+			s.OdataDotType.Encode(e)
+		}
+	}
+	{
+		if s.BIOSReleaseDate.Set {
+			e.FieldStart("BIOSReleaseDate")
+			s.BIOSReleaseDate.Encode(e)
+		}
+	}
+	{
+		if s.BaseBoardChassisSlot.Set {
+			e.FieldStart("BaseBoardChassisSlot")
+			s.BaseBoardChassisSlot.Encode(e)
+		}
+	}
+	{
+		if s.BatteryRollupStatus.Set {
+			e.FieldStart("BatteryRollupStatus")
+			s.BatteryRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.BladeGeometry.Set {
+			e.FieldStart("BladeGeometry")
+			s.BladeGeometry.Encode(e)
+		}
+	}
+	{
+		if s.CMCIP.Set {
+			e.FieldStart("CMCIP")
+			s.CMCIP.Encode(e)
+		}
+	}
+	{
+		if s.CPURollupStatus.Set {
+			e.FieldStart("CPURollupStatus")
+			s.CPURollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.ChassisModel.Set {
+			e.FieldStart("ChassisModel")
+			s.ChassisModel.Encode(e)
+		}
+	}
+	{
+		if s.ChassisName.Set {
+			e.FieldStart("ChassisName")
+			s.ChassisName.Encode(e)
+		}
+	}
+	{
+		if s.ChassisServiceTag.Set {
+			e.FieldStart("ChassisServiceTag")
+			s.ChassisServiceTag.Encode(e)
+		}
+	}
+	{
+		if s.ChassisSystemHeightUnit.Set {
+			e.FieldStart("ChassisSystemHeightUnit")
+			s.ChassisSystemHeightUnit.Encode(e)
+		}
+	}
+	{
+		if s.CurrentRollupStatus.Set {
+			e.FieldStart("CurrentRollupStatus")
+			s.CurrentRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.Description.Set {
+			e.FieldStart("Description")
+			s.Description.Encode(e)
+		}
+	}
+	{
+		if s.EstimatedExhaustTemperatureCelsius.Set {
+			e.FieldStart("EstimatedExhaustTemperatureCelsius")
+			s.EstimatedExhaustTemperatureCelsius.Encode(e)
+		}
+	}
+	{
+		if s.EstimatedSystemAirflowCFM.Set {
+			e.FieldStart("EstimatedSystemAirflowCFM")
+			s.EstimatedSystemAirflowCFM.Encode(e)
+		}
+	}
+	{
+		if s.ExpressServiceCode.Set {
+			e.FieldStart("ExpressServiceCode")
+			s.ExpressServiceCode.Encode(e)
+		}
+	}
+	{
+		if s.FanRollupStatus.Set {
+			e.FieldStart("FanRollupStatus")
+			s.FanRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.IDSDMRollupStatus.Set {
+			e.FieldStart("IDSDMRollupStatus")
+			s.IDSDMRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.ID.Set {
+			e.FieldStart("Id")
+			s.ID.Encode(e)
+		}
+	}
+	{
+		if s.IntrusionRollupStatus.Set {
+			e.FieldStart("IntrusionRollupStatus")
+			s.IntrusionRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.IsOEMBranded.Set {
+			e.FieldStart("IsOEMBranded")
+			s.IsOEMBranded.Encode(e)
+		}
+	}
+	{
+		if s.LastSystemInventoryTime.Set {
+			e.FieldStart("LastSystemInventoryTime")
+			s.LastSystemInventoryTime.Encode(e)
+		}
+	}
+	{
+		if s.LastUpdateTime.Set {
+			e.FieldStart("LastUpdateTime")
+			s.LastUpdateTime.Encode(e)
+		}
+	}
+	{
+		if s.LicensingRollupStatus.Set {
+			e.FieldStart("LicensingRollupStatus")
+			s.LicensingRollupStatus.Encode(e)
+		}
+	}
 	{
 		if s.ManagedSystemSize.Set {
 			e.FieldStart("ManagedSystemSize")
@@ -10109,29 +10980,476 @@ func (s *RedfishSystemOemDellDellSystem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.MemoryOperationMode.Set {
+			e.FieldStart("MemoryOperationMode")
+			s.MemoryOperationMode.Encode(e)
+		}
+	}
+	{
+		if s.Name.Set {
+			e.FieldStart("Name")
+			s.Name.Encode(e)
+		}
+	}
+	{
+		if s.NodeID.Set {
+			e.FieldStart("NodeID")
+			s.NodeID.Encode(e)
+		}
+	}
+	{
+		if s.PSRollupStatus.Set {
+			e.FieldStart("PSRollupStatus")
+			s.PSRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.PlatformGUID.Set {
+			e.FieldStart("PlatformGUID")
+			s.PlatformGUID.Encode(e)
+		}
+	}
+	{
+		if s.PopulatedDIMMSlots.Set {
+			e.FieldStart("PopulatedDIMMSlots")
+			s.PopulatedDIMMSlots.Encode(e)
+		}
+	}
+	{
+		if s.PopulatedPCIeSlots.Set {
+			e.FieldStart("PopulatedPCIeSlots")
+			s.PopulatedPCIeSlots.Encode(e)
+		}
+	}
+	{
+		if s.PowerCapEnabledState.Set {
+			e.FieldStart("PowerCapEnabledState")
+			s.PowerCapEnabledState.Encode(e)
+		}
+	}
+	{
+		if s.SDCardRollupStatus.Set {
+			e.FieldStart("SDCardRollupStatus")
+			s.SDCardRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.SELRollupStatus.Set {
+			e.FieldStart("SELRollupStatus")
+			s.SELRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.ServerAllocationWatts.Set {
+			e.FieldStart("ServerAllocationWatts")
+			s.ServerAllocationWatts.Encode(e)
+		}
+	}
+	{
+		if s.StorageRollupStatus.Set {
+			e.FieldStart("StorageRollupStatus")
+			s.StorageRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.SysMemErrorMethodology.Set {
+			e.FieldStart("SysMemErrorMethodology")
+			s.SysMemErrorMethodology.Encode(e)
+		}
+	}
+	{
+		if s.SysMemFailOverState.Set {
+			e.FieldStart("SysMemFailOverState")
+			s.SysMemFailOverState.Encode(e)
+		}
+	}
+	{
+		if s.SysMemLocation.Set {
+			e.FieldStart("SysMemLocation")
+			s.SysMemLocation.Encode(e)
+		}
+	}
+	{
+		if s.SysMemPrimaryStatus.Set {
+			e.FieldStart("SysMemPrimaryStatus")
+			s.SysMemPrimaryStatus.Encode(e)
+		}
+	}
+	{
+		if s.SystemGeneration.Set {
+			e.FieldStart("SystemGeneration")
+			s.SystemGeneration.Encode(e)
+		}
+	}
+	{
 		if s.SystemID.Set {
 			e.FieldStart("SystemID")
 			s.SystemID.Encode(e)
 		}
 	}
+	{
+		if s.SystemRevision.Set {
+			e.FieldStart("SystemRevision")
+			s.SystemRevision.Encode(e)
+		}
+	}
+	{
+		if s.TempRollupStatus.Set {
+			e.FieldStart("TempRollupStatus")
+			s.TempRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.TempStatisticsRollupStatus.Set {
+			e.FieldStart("TempStatisticsRollupStatus")
+			s.TempStatisticsRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.UUID.Set {
+			e.FieldStart("UUID")
+			s.UUID.Encode(e)
+		}
+	}
+	{
+		if s.VoltRollupStatus.Set {
+			e.FieldStart("VoltRollupStatus")
+			s.VoltRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.SmbiosGUID.Set {
+			e.FieldStart("smbiosGUID")
+			s.SmbiosGUID.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfRedfishSystemOemDellDellSystem = [5]string{
-	0: "ManagedSystemSize",
-	1: "MaxCPUSockets",
-	2: "MaxDIMMSlots",
-	3: "MaxPCIeSlots",
-	4: "SystemID",
+var jsonFieldsNameOfRedfishSystemOemDell = [54]string{
+	0:  "@odata.context",
+	1:  "@odata.id",
+	2:  "@odata.type",
+	3:  "BIOSReleaseDate",
+	4:  "BaseBoardChassisSlot",
+	5:  "BatteryRollupStatus",
+	6:  "BladeGeometry",
+	7:  "CMCIP",
+	8:  "CPURollupStatus",
+	9:  "ChassisModel",
+	10: "ChassisName",
+	11: "ChassisServiceTag",
+	12: "ChassisSystemHeightUnit",
+	13: "CurrentRollupStatus",
+	14: "Description",
+	15: "EstimatedExhaustTemperatureCelsius",
+	16: "EstimatedSystemAirflowCFM",
+	17: "ExpressServiceCode",
+	18: "FanRollupStatus",
+	19: "IDSDMRollupStatus",
+	20: "Id",
+	21: "IntrusionRollupStatus",
+	22: "IsOEMBranded",
+	23: "LastSystemInventoryTime",
+	24: "LastUpdateTime",
+	25: "LicensingRollupStatus",
+	26: "ManagedSystemSize",
+	27: "MaxCPUSockets",
+	28: "MaxDIMMSlots",
+	29: "MaxPCIeSlots",
+	30: "MemoryOperationMode",
+	31: "Name",
+	32: "NodeID",
+	33: "PSRollupStatus",
+	34: "PlatformGUID",
+	35: "PopulatedDIMMSlots",
+	36: "PopulatedPCIeSlots",
+	37: "PowerCapEnabledState",
+	38: "SDCardRollupStatus",
+	39: "SELRollupStatus",
+	40: "ServerAllocationWatts",
+	41: "StorageRollupStatus",
+	42: "SysMemErrorMethodology",
+	43: "SysMemFailOverState",
+	44: "SysMemLocation",
+	45: "SysMemPrimaryStatus",
+	46: "SystemGeneration",
+	47: "SystemID",
+	48: "SystemRevision",
+	49: "TempRollupStatus",
+	50: "TempStatisticsRollupStatus",
+	51: "UUID",
+	52: "VoltRollupStatus",
+	53: "smbiosGUID",
 }
 
-// Decode decodes RedfishSystemOemDellDellSystem from json.
-func (s *RedfishSystemOemDellDellSystem) Decode(d *jx.Decoder) error {
+// Decode decodes RedfishSystemOemDell from json.
+func (s *RedfishSystemOemDell) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode RedfishSystemOemDellDellSystem to nil")
+		return errors.New("invalid: unable to decode RedfishSystemOemDell to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
+		case "@odata.context":
+			if err := func() error {
+				s.OdataDotContext.Reset()
+				if err := s.OdataDotContext.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"@odata.context\"")
+			}
+		case "@odata.id":
+			if err := func() error {
+				s.OdataDotID.Reset()
+				if err := s.OdataDotID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"@odata.id\"")
+			}
+		case "@odata.type":
+			if err := func() error {
+				s.OdataDotType.Reset()
+				if err := s.OdataDotType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"@odata.type\"")
+			}
+		case "BIOSReleaseDate":
+			if err := func() error {
+				s.BIOSReleaseDate.Reset()
+				if err := s.BIOSReleaseDate.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"BIOSReleaseDate\"")
+			}
+		case "BaseBoardChassisSlot":
+			if err := func() error {
+				s.BaseBoardChassisSlot.Reset()
+				if err := s.BaseBoardChassisSlot.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"BaseBoardChassisSlot\"")
+			}
+		case "BatteryRollupStatus":
+			if err := func() error {
+				s.BatteryRollupStatus.Reset()
+				if err := s.BatteryRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"BatteryRollupStatus\"")
+			}
+		case "BladeGeometry":
+			if err := func() error {
+				s.BladeGeometry.Reset()
+				if err := s.BladeGeometry.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"BladeGeometry\"")
+			}
+		case "CMCIP":
+			if err := func() error {
+				s.CMCIP.Reset()
+				if err := s.CMCIP.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"CMCIP\"")
+			}
+		case "CPURollupStatus":
+			if err := func() error {
+				s.CPURollupStatus.Reset()
+				if err := s.CPURollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"CPURollupStatus\"")
+			}
+		case "ChassisModel":
+			if err := func() error {
+				s.ChassisModel.Reset()
+				if err := s.ChassisModel.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ChassisModel\"")
+			}
+		case "ChassisName":
+			if err := func() error {
+				s.ChassisName.Reset()
+				if err := s.ChassisName.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ChassisName\"")
+			}
+		case "ChassisServiceTag":
+			if err := func() error {
+				s.ChassisServiceTag.Reset()
+				if err := s.ChassisServiceTag.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ChassisServiceTag\"")
+			}
+		case "ChassisSystemHeightUnit":
+			if err := func() error {
+				s.ChassisSystemHeightUnit.Reset()
+				if err := s.ChassisSystemHeightUnit.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ChassisSystemHeightUnit\"")
+			}
+		case "CurrentRollupStatus":
+			if err := func() error {
+				s.CurrentRollupStatus.Reset()
+				if err := s.CurrentRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"CurrentRollupStatus\"")
+			}
+		case "Description":
+			if err := func() error {
+				s.Description.Reset()
+				if err := s.Description.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Description\"")
+			}
+		case "EstimatedExhaustTemperatureCelsius":
+			if err := func() error {
+				s.EstimatedExhaustTemperatureCelsius.Reset()
+				if err := s.EstimatedExhaustTemperatureCelsius.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"EstimatedExhaustTemperatureCelsius\"")
+			}
+		case "EstimatedSystemAirflowCFM":
+			if err := func() error {
+				s.EstimatedSystemAirflowCFM.Reset()
+				if err := s.EstimatedSystemAirflowCFM.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"EstimatedSystemAirflowCFM\"")
+			}
+		case "ExpressServiceCode":
+			if err := func() error {
+				s.ExpressServiceCode.Reset()
+				if err := s.ExpressServiceCode.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ExpressServiceCode\"")
+			}
+		case "FanRollupStatus":
+			if err := func() error {
+				s.FanRollupStatus.Reset()
+				if err := s.FanRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"FanRollupStatus\"")
+			}
+		case "IDSDMRollupStatus":
+			if err := func() error {
+				s.IDSDMRollupStatus.Reset()
+				if err := s.IDSDMRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"IDSDMRollupStatus\"")
+			}
+		case "Id":
+			if err := func() error {
+				s.ID.Reset()
+				if err := s.ID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Id\"")
+			}
+		case "IntrusionRollupStatus":
+			if err := func() error {
+				s.IntrusionRollupStatus.Reset()
+				if err := s.IntrusionRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"IntrusionRollupStatus\"")
+			}
+		case "IsOEMBranded":
+			if err := func() error {
+				s.IsOEMBranded.Reset()
+				if err := s.IsOEMBranded.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"IsOEMBranded\"")
+			}
+		case "LastSystemInventoryTime":
+			if err := func() error {
+				s.LastSystemInventoryTime.Reset()
+				if err := s.LastSystemInventoryTime.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"LastSystemInventoryTime\"")
+			}
+		case "LastUpdateTime":
+			if err := func() error {
+				s.LastUpdateTime.Reset()
+				if err := s.LastUpdateTime.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"LastUpdateTime\"")
+			}
+		case "LicensingRollupStatus":
+			if err := func() error {
+				s.LicensingRollupStatus.Reset()
+				if err := s.LicensingRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"LicensingRollupStatus\"")
+			}
 		case "ManagedSystemSize":
 			if err := func() error {
 				s.ManagedSystemSize.Reset()
@@ -10172,6 +11490,176 @@ func (s *RedfishSystemOemDellDellSystem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"MaxPCIeSlots\"")
 			}
+		case "MemoryOperationMode":
+			if err := func() error {
+				s.MemoryOperationMode.Reset()
+				if err := s.MemoryOperationMode.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"MemoryOperationMode\"")
+			}
+		case "Name":
+			if err := func() error {
+				s.Name.Reset()
+				if err := s.Name.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Name\"")
+			}
+		case "NodeID":
+			if err := func() error {
+				s.NodeID.Reset()
+				if err := s.NodeID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"NodeID\"")
+			}
+		case "PSRollupStatus":
+			if err := func() error {
+				s.PSRollupStatus.Reset()
+				if err := s.PSRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"PSRollupStatus\"")
+			}
+		case "PlatformGUID":
+			if err := func() error {
+				s.PlatformGUID.Reset()
+				if err := s.PlatformGUID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"PlatformGUID\"")
+			}
+		case "PopulatedDIMMSlots":
+			if err := func() error {
+				s.PopulatedDIMMSlots.Reset()
+				if err := s.PopulatedDIMMSlots.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"PopulatedDIMMSlots\"")
+			}
+		case "PopulatedPCIeSlots":
+			if err := func() error {
+				s.PopulatedPCIeSlots.Reset()
+				if err := s.PopulatedPCIeSlots.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"PopulatedPCIeSlots\"")
+			}
+		case "PowerCapEnabledState":
+			if err := func() error {
+				s.PowerCapEnabledState.Reset()
+				if err := s.PowerCapEnabledState.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"PowerCapEnabledState\"")
+			}
+		case "SDCardRollupStatus":
+			if err := func() error {
+				s.SDCardRollupStatus.Reset()
+				if err := s.SDCardRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"SDCardRollupStatus\"")
+			}
+		case "SELRollupStatus":
+			if err := func() error {
+				s.SELRollupStatus.Reset()
+				if err := s.SELRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"SELRollupStatus\"")
+			}
+		case "ServerAllocationWatts":
+			if err := func() error {
+				s.ServerAllocationWatts.Reset()
+				if err := s.ServerAllocationWatts.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ServerAllocationWatts\"")
+			}
+		case "StorageRollupStatus":
+			if err := func() error {
+				s.StorageRollupStatus.Reset()
+				if err := s.StorageRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"StorageRollupStatus\"")
+			}
+		case "SysMemErrorMethodology":
+			if err := func() error {
+				s.SysMemErrorMethodology.Reset()
+				if err := s.SysMemErrorMethodology.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"SysMemErrorMethodology\"")
+			}
+		case "SysMemFailOverState":
+			if err := func() error {
+				s.SysMemFailOverState.Reset()
+				if err := s.SysMemFailOverState.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"SysMemFailOverState\"")
+			}
+		case "SysMemLocation":
+			if err := func() error {
+				s.SysMemLocation.Reset()
+				if err := s.SysMemLocation.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"SysMemLocation\"")
+			}
+		case "SysMemPrimaryStatus":
+			if err := func() error {
+				s.SysMemPrimaryStatus.Reset()
+				if err := s.SysMemPrimaryStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"SysMemPrimaryStatus\"")
+			}
+		case "SystemGeneration":
+			if err := func() error {
+				s.SystemGeneration.Reset()
+				if err := s.SystemGeneration.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"SystemGeneration\"")
+			}
 		case "SystemID":
 			if err := func() error {
 				s.SystemID.Reset()
@@ -10182,26 +11670,86 @@ func (s *RedfishSystemOemDellDellSystem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"SystemID\"")
 			}
+		case "SystemRevision":
+			if err := func() error {
+				s.SystemRevision.Reset()
+				if err := s.SystemRevision.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"SystemRevision\"")
+			}
+		case "TempRollupStatus":
+			if err := func() error {
+				s.TempRollupStatus.Reset()
+				if err := s.TempRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"TempRollupStatus\"")
+			}
+		case "TempStatisticsRollupStatus":
+			if err := func() error {
+				s.TempStatisticsRollupStatus.Reset()
+				if err := s.TempStatisticsRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"TempStatisticsRollupStatus\"")
+			}
+		case "UUID":
+			if err := func() error {
+				s.UUID.Reset()
+				if err := s.UUID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"UUID\"")
+			}
+		case "VoltRollupStatus":
+			if err := func() error {
+				s.VoltRollupStatus.Reset()
+				if err := s.VoltRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"VoltRollupStatus\"")
+			}
+		case "smbiosGUID":
+			if err := func() error {
+				s.SmbiosGUID.Reset()
+				if err := s.SmbiosGUID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"smbiosGUID\"")
+			}
 		default:
 			return d.Skip()
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode RedfishSystemOemDellDellSystem")
+		return errors.Wrap(err, "decode RedfishSystemOemDell")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishSystemOemDellDellSystem) MarshalJSON() ([]byte, error) {
+func (s *RedfishSystemOemDell) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishSystemOemDellDellSystem) UnmarshalJSON(data []byte) error {
+func (s *RedfishSystemOemDell) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

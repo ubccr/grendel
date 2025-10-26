@@ -33,6 +33,18 @@ type Invoker interface {
 	//
 	// DELETE /v1/auth/signout
 	DELETEV1AuthSignout(ctx context.Context, params DELETEV1AuthSignoutParams) (*GenericResponse, error)
+	// DELETEV1BmcJobs invokes DELETE_/v1/bmc/jobs operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobDeleteMany`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Delete redfish jobs from many node(s).
+	//
+	// DELETE /v1/bmc/jobs
+	DELETEV1BmcJobs(ctx context.Context, request *BmcJobDeleteRequest, params DELETEV1BmcJobsParams) ([]JobMessage, error)
 	// DELETEV1BmcJobsJids invokes DELETE_/v1/bmc/jobs/:jids operation.
 	//
 	// #### Controller:
@@ -141,6 +153,18 @@ type Invoker interface {
 	//
 	// GET /v1/bmc/metrics
 	GETV1BmcMetrics(ctx context.Context, params GETV1BmcMetricsParams) ([]RedfishMetricReport, error)
+	// GETV1BmcUpgradeDellRepo invokes GET_/v1/bmc/upgrade/dell/repo operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcDellGetRepoUpdateList`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Fetch which packages can be upgraded.
+	//
+	// GET /v1/bmc/upgrade/dell/repo
+	GETV1BmcUpgradeDellRepo(ctx context.Context, params GETV1BmcUpgradeDellRepoParams) ([]RedfishDellUpgradeFirmware, error)
 	// GETV1DbDump invokes GET_/v1/db/dump operation.
 	//
 	// #### Controller:
@@ -426,6 +450,18 @@ type Invoker interface {
 	//
 	// POST /v1/bmc/power/os
 	POSTV1BmcPowerOs(ctx context.Context, request *BmcOsPowerBody, params POSTV1BmcPowerOsParams) ([]JobMessage, error)
+	// POSTV1BmcUpgradeDellInstallfromrepo invokes POST_/v1/bmc/upgrade/dell/installfromrepo operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcDellInstallFromRepo`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Request iDRAC to download the latest firmware catalog and compare firmware versions.
+	//
+	// POST /v1/bmc/upgrade/dell/installfromrepo
+	POSTV1BmcUpgradeDellInstallfromrepo(ctx context.Context, request *BmcDellInstallFromRepoRequest, params POSTV1BmcUpgradeDellInstallfromrepoParams) ([]JobMessage, error)
 	// POSTV1DbRestore invokes POST_/v1/db/restore operation.
 	//
 	// #### Controller:
@@ -625,6 +661,158 @@ func (c *Client) sendDELETEV1AuthSignout(ctx context.Context, params DELETEV1Aut
 	defer resp.Body.Close()
 
 	result, err := decodeDELETEV1AuthSignoutResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// DELETEV1BmcJobs invokes DELETE_/v1/bmc/jobs operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobDeleteMany`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Delete redfish jobs from many node(s).
+//
+// DELETE /v1/bmc/jobs
+func (c *Client) DELETEV1BmcJobs(ctx context.Context, request *BmcJobDeleteRequest, params DELETEV1BmcJobsParams) ([]JobMessage, error) {
+	res, err := c.sendDELETEV1BmcJobs(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendDELETEV1BmcJobs(ctx context.Context, request *BmcJobDeleteRequest, params DELETEV1BmcJobsParams) (res []JobMessage, err error) {
+	// Validate request before sending.
+	if err := func() error {
+		if err := request.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return res, errors.Wrap(err, "validate")
+	}
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/bmc/jobs"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "nodeset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "nodeset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Nodeset.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "tags" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "tags",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Tags.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "DELETE", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeDELETEV1BmcJobsRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, DELETEV1BmcJobsOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, DELETEV1BmcJobsOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeDELETEV1BmcJobsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -1848,6 +2036,146 @@ func (c *Client) sendGETV1BmcMetrics(ctx context.Context, params GETV1BmcMetrics
 	defer resp.Body.Close()
 
 	result, err := decodeGETV1BmcMetricsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GETV1BmcUpgradeDellRepo invokes GET_/v1/bmc/upgrade/dell/repo operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).BmcDellGetRepoUpdateList`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Fetch which packages can be upgraded.
+//
+// GET /v1/bmc/upgrade/dell/repo
+func (c *Client) GETV1BmcUpgradeDellRepo(ctx context.Context, params GETV1BmcUpgradeDellRepoParams) ([]RedfishDellUpgradeFirmware, error) {
+	res, err := c.sendGETV1BmcUpgradeDellRepo(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGETV1BmcUpgradeDellRepo(ctx context.Context, params GETV1BmcUpgradeDellRepoParams) (res []RedfishDellUpgradeFirmware, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/bmc/upgrade/dell/repo"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "nodeset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "nodeset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Nodeset.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "tags" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "tags",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Tags.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, GETV1BmcUpgradeDellRepoOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, GETV1BmcUpgradeDellRepoOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGETV1BmcUpgradeDellRepoResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -4879,6 +5207,149 @@ func (c *Client) sendPOSTV1BmcPowerOs(ctx context.Context, request *BmcOsPowerBo
 	defer resp.Body.Close()
 
 	result, err := decodePOSTV1BmcPowerOsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// POSTV1BmcUpgradeDellInstallfromrepo invokes POST_/v1/bmc/upgrade/dell/installfromrepo operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).BmcDellInstallFromRepo`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Request iDRAC to download the latest firmware catalog and compare firmware versions.
+//
+// POST /v1/bmc/upgrade/dell/installfromrepo
+func (c *Client) POSTV1BmcUpgradeDellInstallfromrepo(ctx context.Context, request *BmcDellInstallFromRepoRequest, params POSTV1BmcUpgradeDellInstallfromrepoParams) ([]JobMessage, error) {
+	res, err := c.sendPOSTV1BmcUpgradeDellInstallfromrepo(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendPOSTV1BmcUpgradeDellInstallfromrepo(ctx context.Context, request *BmcDellInstallFromRepoRequest, params POSTV1BmcUpgradeDellInstallfromrepoParams) (res []JobMessage, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/bmc/upgrade/dell/installfromrepo"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "nodeset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "nodeset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Nodeset.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "tags" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "tags",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Tags.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePOSTV1BmcUpgradeDellInstallfromrepoRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, POSTV1BmcUpgradeDellInstallfromrepoOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, POSTV1BmcUpgradeDellInstallfromrepoOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodePOSTV1BmcUpgradeDellInstallfromrepoResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

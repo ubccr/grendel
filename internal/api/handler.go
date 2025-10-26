@@ -172,6 +172,10 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 		),
 		filterNodes,
 	)
+	fuego.Delete(bmc, "/jobs", h.BmcJobDeleteMany,
+		option.Description("Delete redfish jobs from many node(s)"),
+		filterNodes,
+	)
 	fuego.Post(bmc, "/configure/auto", h.BmcAutoConfigure,
 		option.Description("Set BMC to autoconfigure"),
 		filterNodes,
@@ -182,6 +186,16 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 	)
 	fuego.Get(bmc, "/metrics", h.BmcMetricReports,
 		option.Description("Get metric reports by nodeset"),
+		filterNodes,
+	)
+
+	fuego.Post(bmc, "/upgrade/dell/installfromrepo", h.BmcDellInstallFromRepo,
+		option.Description("Request iDRAC to download the latest firmware catalog and compare firmware versions."),
+		filterNodes,
+	)
+
+	fuego.Get(bmc, "/upgrade/dell/repo", h.BmcDellGetRepoUpdateList,
+		option.Description("Fetch which packages can be upgraded"),
 		filterNodes,
 	)
 

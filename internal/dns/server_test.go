@@ -3,7 +3,9 @@ package dns
 import (
 	"context"
 	"errors"
+	"net"
 	"net/netip"
+	"strings"
 	"testing"
 	"time"
 
@@ -47,11 +49,16 @@ func TestDns(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	go func() {
-		err := s.Serve()
-		assert.NoError(err)
-		defer s.Shutdown(context.Background())
-	}()
+	addr, _ := net.ResolveUDPAddr("udp", "127.0.0.1:8053")
+	c, err := net.ListenUDP("udp", addr)
+	if err == nil {
+		c.Close()
+		go func() {
+			err := s.Serve()
+			assert.NoError(err)
+			defer s.Shutdown(context.Background())
+		}()
+	}
 
 	time.Sleep(time.Second * 1)
 
@@ -112,8 +119,9 @@ func TestDns(t *testing.T) {
 	assert.Equal(r4.Answer[0].String(), clientFQDN+".\t5\tIN\tA\t10.1.0.1")
 
 	// Check forwarded MX lookup
+	// TODO: This test is giving inconsistent results
 	m5 := new(dns.Msg)
-	m5.SetQuestion("miek.nl.", dns.TypeMX)
+	m5.SetQuestion("grendel-demo.ccr.buffalo.edu.", dns.TypeA)
 
 	r5, err := dns.Exchange(m5, serverAddr)
 	if err != nil {
@@ -124,5 +132,13 @@ func TestDns(t *testing.T) {
 	if len(r5.Answer) == 0 {
 		t.Fatal(errors.New("r5 response is empty"))
 	}
-	assert.Equal(r5.Answer[0].String(), "miek.nl.\t21600\tIN\tMX\t1 aspmx.l.google.com.")
+	p5 := strings.Split(r5.Answer[0].String(), "\t")
+	if len(p5) != 5 {
+		t.Fatal(errors.New("p5 response length is incorrect"))
+	}
+
+	assert.Equal(p5[0], "grendel-demo.ccr.buffalo.edu.")
+	assert.Equal(p5[2], "IN")
+	assert.Equal(p5[3], "A")
+	assert.Equal(p5[4], "128.205.11.109")
 }

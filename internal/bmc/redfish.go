@@ -5,14 +5,13 @@
 package bmc
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
-	"strings"
 	"time"
 
 	"github.com/spf13/viper"
+	"github.com/stmcginnis/gofish/oem/dell"
 	"github.com/stmcginnis/gofish/redfish"
 	"github.com/ubccr/grendel/internal/util"
 	"github.com/ubccr/grendel/pkg/model"
@@ -77,8 +76,15 @@ func (r *Redfish) GetSystem() (*model.RedfishSystem, error) {
 	}
 
 	sys := ss[0]
-	var oem model.RedfishSystemOEM
-	json.Unmarshal(sys.OEM, &oem)
+
+	var dcs *dell.ComputerSystem
+	if sys.Manufacturer == "Dell Inc." {
+		dcs, err = dell.FromComputerSystem(ss[0])
+		if err != nil {
+			return nil, err
+		}
+
+	}
 
 	system := &model.RedfishSystem{
 		HostName:       sys.HostName,
@@ -92,102 +98,10 @@ func (r *Redfish) GetSystem() (*model.RedfishSystem, error) {
 		ProcessorCount: sys.ProcessorSummary.LogicalProcessorCount,
 		BootNext:       sys.Boot.BootNext,
 		BootOrder:      sys.Boot.BootOrder,
-		OEM:            oem,
+		OEMDell:        dcs.OEMSystem,
 	}
 
 	return system, nil
-}
-func (r *Redfish) GetFirmware() (map[string]CurrentFirmware, error) {
-	us, err := r.service.UpdateService()
-	if err != nil {
-		return nil, err
-	}
-	firmwareInventories, err := us.FirmwareInventories()
-	if err != nil {
-		return nil, err
-	}
-
-	layout := "2006-01-02T15:04:05Z"
-	firmware := make(map[string]CurrentFirmware, 0)
-	for _, firmwareInventory := range firmwareInventories {
-		// Dell lists Current, Installed, and Previous firmwares. We only want "Installed" firmware
-		if strings.Contains(firmwareInventory.ID, "Previous-") || strings.Contains(firmwareInventory.ID, "Current-") {
-			continue
-		}
-		// Figuring out which version is the newest is a PITA, firmwareInvnetory.VersionSchema may allow us to
-		// use the version string, except as of testing, Dell and Lenovo both don't fill out the field
-		// So use use the newest released firmware...
-		prevReleaseStr := firmware[firmwareInventory.SoftwareID].ReleaseDate
-		if prevReleaseStr != "" && prevReleaseStr != "00:00:00Z" {
-			prevReleaseTime, err := time.Parse(layout, prevReleaseStr)
-			if err != nil {
-				return nil, err
-			}
-			releaseTime, err := time.Parse(layout, firmwareInventory.ReleaseDate)
-			if err != nil {
-				return nil, err
-			}
-
-			if releaseTime.Before(prevReleaseTime) {
-				continue
-			}
-		}
-		firmware[firmwareInventory.SoftwareID] = CurrentFirmware{
-			ID:          firmwareInventory.ID,
-			Name:        firmwareInventory.Name,
-			ReleaseDate: firmwareInventory.ReleaseDate,
-			SoftwareID:  firmwareInventory.SoftwareID,
-			Updatable:   firmwareInventory.Updateable,
-			Version:     firmwareInventory.Version,
-		}
-	}
-
-	return firmware, nil
-}
-
-func (r *Redfish) UpdateFirmware(target string) error {
-	us, err := r.service.UpdateService()
-	if err != nil {
-		return err
-	}
-
-	rawScheme := viper.GetString("provision.scheme")
-	scheme := strings.ToUpper(rawScheme)
-	protocol := redfish.HTTPTransferProtocolType
-	if scheme == "HTTPS" {
-		protocol = redfish.HTTPSTransferProtocolType
-	}
-
-	// This should probably be a function?
-	rawip, err := util.GetFirstExternalIPFromInterfaces()
-	if err != nil {
-		return err
-	}
-
-	ip := rawip.String()
-	lip, port, err := net.SplitHostPort(viper.GetString("provision.listen"))
-	if err != nil {
-		return err
-	}
-
-	if lip != "0.0.0.0" {
-		ip = fmt.Sprintf("%s:%s", lip, port)
-	}
-
-	cip := viper.GetString("bmc.config_share_ip")
-	if cip != "" {
-		ip = cip
-	}
-	//
-
-	params := redfish.SimpleUpdateParameters{
-		ForceUpdate: false,
-		// Targets: []string{""},
-		TransferProtocol: protocol,
-		ImageURI:         fmt.Sprintf("%s%s", ip, target),
-	}
-
-	return us.SimpleUpdate(&params)
 }
 
 func (r *Redfish) GetJobInfo(jid string) (*redfish.Job, error) {
@@ -335,28 +249,23 @@ func (r *Redfish) BmcAutoConfigure() error {
 	return r.service.Patch("/redfish/v1/Managers/iDRAC.Embedded.1/Attributes", p)
 }
 
-func (r *Redfish) BmcImportConfiguration(shutdownType, path, file string) (string, error) {
-	// TODO: Submit PR to gofish to support this natively?
+func (r *Redfish) BmcImportConfiguration(st, path, file string) (string, error) {
+	shareType := dell.HTTPISCShareType
 
-	type shareParameters struct {
-		Target                   []string
-		ShareType                string
-		IPAddress                string
-		FileName                 string
-		ShareName                string
-		PortNumber               string
-		IgnoreCertificateWarning string
-	}
-	type payload struct {
-		HostPowerState  string
-		ShutdownType    string
-		ImportBuffer    string
-		ShareParameters shareParameters
+	if viper.IsSet("provision.cert") {
+		shareType = dell.HTTPSISCShareType
 	}
 
-	// viper.SetDefault("provision.scheme", "http")
-	rawScheme := viper.GetString("provision.scheme")
-	scheme := strings.ToUpper(rawScheme)
+	shutdownType := dell.NoRebootISCShutdownType
+
+	switch st {
+	case "Forced":
+		shutdownType = dell.ForcedISCShutdownType
+	case "Graceful":
+		shutdownType = dell.GracefulISCShutdownType
+	case "NoReboot":
+		shutdownType = dell.NoRebootISCShutdownType
+	}
 
 	rawip, err := util.GetFirstExternalIPFromInterfaces()
 	if err != nil {
@@ -378,47 +287,42 @@ func (r *Redfish) BmcImportConfiguration(shutdownType, path, file string) (strin
 		ip = cip
 	}
 
-	// viper.SetDefault("bmc.config_ignore_certificate_warning", "Disabled")
-	icw := viper.GetString("bmc.config_ignore_certificate_warning")
+	icw := dell.DisabledISCIgnoreCertificateWarning
+	if viper.GetString("bmc.config_ignore_certificate_warning") == "Enabled" {
+		icw = dell.EnabledISCIgnoreCertificateWarning
+	}
 
-	log.Debugf("Import system config debug info: scheme=%s ip=%s port=%s file=%s path=%s icw=%s", scheme, ip, port, file, path, icw)
+	log.Debugf("Import system config debug info: scheme=%s ip=%s port=%s file=%s path=%s icw=%s", shareType, ip, port, file, path, icw)
 
-	p := payload{
-		HostPowerState: "On",
+	body := dell.ImportSystemConfigurationBody{
+		// ExecutionMode:  dell.DefaultExecutionMode,
+		HostPowerState: dell.OnISCHostPowerState,
 		ShutdownType:   shutdownType,
-		ShareParameters: shareParameters{
-			Target:                   []string{"ALL"},
-			ShareType:                scheme,
+		ShareParameters: dell.ShareParameters{
+			Target:                   "ALL",
+			ShareType:                shareType,
 			IPAddress:                ip,
-			PortNumber:               port,
-			FileName:                 file,
 			ShareName:                path,
+			FileName:                 file,
 			IgnoreCertificateWarning: icw,
 		},
 	}
 
-	err = r.service.Post("/redfish/v1/Managers/iDRAC.Embedded.1/Actions/Oem/EID_674_Manager.ImportSystemConfiguration", p)
+	m, err := r.service.Managers()
 	if err != nil {
 		return "", err
 	}
 
-	// Get job ID
-	j, err := r.service.JobService()
+	dm, err := dell.FromManager(m[0])
 	if err != nil {
 		return "", err
 	}
 
-	jobs, err := j.Jobs()
+	j, err := dm.ImportSystemConfiguration(&body)
 	if err != nil {
 		return "", err
 	}
-
-	for _, job := range jobs {
-		if job.Name == "Import Configuration" && job.JobState == redfish.RunningJobState {
-			return job.ID, nil
-		}
-	}
-	return "", errors.New("failed to find job")
+	return j.ID, nil
 }
 
 func (r *Redfish) BmcGetJob(id string) (*redfish.Job, error) {
@@ -449,4 +353,95 @@ func (r *Redfish) BmcGetMetricReports() ([]*redfish.MetricReport, error) {
 	mr, err := ts.MetricReports()
 
 	return mr, err
+}
+
+func (r *Redfish) DellInstallFromRepo(body dell.InstallFromRepoBody) (*redfish.Job, error) {
+	s, err := r.service.Systems()
+	if err != nil {
+		return nil, err
+	}
+	js, err := r.service.JobService()
+	if err != nil {
+		return nil, err
+	}
+
+	ds, err := dell.FromComputerSystem(s[0])
+	if err != nil {
+		return nil, err
+	}
+	sis, err := ds.SoftwareInstallationService()
+	if err != nil {
+		return nil, err
+	}
+
+	djob, err := sis.InstallFromRepository(&body)
+	if err != nil {
+		return nil, err
+	}
+	jid := djob.ID
+
+	jobList, err := js.Jobs()
+	if err != nil {
+		return nil, err
+	}
+	var job *redfish.Job
+	for _, j := range jobList {
+		if j.ID == jid {
+			continue
+		}
+
+		job = j
+		break
+	}
+
+	if body.ApplyUpdate == dell.ApplyUpdateTrue {
+		return job, nil
+	}
+
+	for range 10 {
+		jobList, err := js.Jobs()
+		if err != nil {
+			return nil, err
+		}
+
+		for _, j := range jobList {
+			if j.ID != jid {
+				continue
+			}
+
+			job = j
+			break
+		}
+
+		if job.PercentComplete == 100 {
+			break
+		}
+
+		time.Sleep(time.Second * 5)
+	}
+
+	if job.PercentComplete != 100 {
+		return job, errors.New("timed out waiting for update job to complete")
+	}
+
+	return job, nil
+}
+
+func (r *Redfish) DellGetRepoUpdateList() (*dell.UpdateList, error) {
+	s, err := r.service.Systems()
+	if err != nil {
+		return nil, err
+	}
+
+	ds, err := dell.FromComputerSystem(s[0])
+	if err != nil {
+		return nil, err
+	}
+	sis, err := ds.SoftwareInstallationService()
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := sis.GetRepoBasedUpdateList()
+	return res, err
 }

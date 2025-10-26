@@ -160,7 +160,7 @@ func (s *Server) mainHandler4(peer *net.UDPAddr, req *dhcpv4.DHCPv4, oob *ipv4.C
 		}
 	default:
 		log.Warnf("DHCP Unhandled message type: %v", mt)
-		log.Debugf(resp.Summary())
+		log.Debugln(resp.Summary())
 		return
 	}
 
@@ -184,7 +184,7 @@ func (s *Server) mainHandler4(peer *net.UDPAddr, req *dhcpv4.DHCPv4, oob *ipv4.C
 	}
 
 	log.Debugf("Sending DHCPv4 packet response")
-	log.Debugf(resp.Summary())
+	log.Debugln(resp.Summary())
 
 	if _, err := s.conn.WriteTo(resp.ToBytes(), woob, peer); err != nil {
 		log.Printf("DHCP write to %v failed: %v", peer, err)

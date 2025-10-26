@@ -4,7 +4,10 @@
 
 package model
 
-import "github.com/stmcginnis/gofish/redfish"
+import (
+	"github.com/stmcginnis/gofish/oem/dell"
+	"github.com/stmcginnis/gofish/redfish"
+)
 
 type OSPower struct {
 	Hosts       string                           `json:"hosts"`
@@ -19,12 +22,13 @@ type JobMessage struct {
 	Host         string       `json:"host"`
 	Msg          string       `json:"msg"`
 	RedfishError RedfishError `json:"redfish_error"`
+	Data         string       `json:"data"`
 }
 
 type RedfishJobList []RedfishJob
 type RedfishJob struct {
 	Host string         `json:"name"`
-	Jobs []*redfish.Job `json:"jobs"`
+	Jobs []*redfish.Job `json:"jobs" oai3:"nullable"`
 }
 
 type RedfishMetricReportList []RedfishMetricReport
@@ -35,31 +39,29 @@ type RedfishMetricReport struct {
 
 type RedfishSystemList []RedfishSystem
 type RedfishSystem struct {
-	Name           string           `json:"name"`
-	HostName       string           `json:"host_name"`
-	BIOSVersion    string           `json:"bios_version"`
-	SerialNumber   string           `json:"serial_number"`
-	Manufacturer   string           `json:"manufacturer"`
-	Model          string           `json:"model"`
-	PowerStatus    string           `json:"power_status"`
-	Health         string           `json:"health"`
-	TotalMemory    float32          `json:"total_memory"`
-	ProcessorCount int              `json:"processor_count"`
-	BootNext       string           `json:"boot_next"`
-	BootOrder      []string         `json:"boot_order"`
-	OEM            RedfishSystemOEM `json:"oem"`
+	Name           string         `json:"name"`
+	HostName       string         `json:"host_name"`
+	BIOSVersion    string         `json:"bios_version"`
+	SerialNumber   string         `json:"serial_number"`
+	Manufacturer   string         `json:"manufacturer"`
+	Model          string         `json:"model"`
+	PowerStatus    string         `json:"power_status"`
+	Health         string         `json:"health"`
+	TotalMemory    float32        `json:"total_memory"`
+	ProcessorCount int            `json:"processor_count"`
+	BootNext       string         `json:"boot_next"`
+	BootOrder      []string       `json:"boot_order"`
+	OEMDell        dell.OEMSystem `json:"oem_dell" oai3:"nullable"`
 }
 
-type RedfishSystemOEM struct {
-	Dell struct {
-		DellSystem struct {
-			ManagedSystemSize string `json:"ManagedSystemSize"`
-			MaxCPUSockets     int    `json:"MaxCPUSockets"`
-			MaxDIMMSlots      int    `json:"MaxDIMMSlots"`
-			MaxPCIeSlots      int    `json:"MaxPCIeSlots"`
-			SystemID          int    `json:"SystemID"`
-		} `json:"DellSystem"`
-	} `json:"Dell"`
+type RedfishDellUpgradeFirmwareList []RedfishDellUpgradeFirmware
+type RedfishDellUpgradeFirmware struct {
+	Name             string
+	Status           string
+	Message          string
+	UpdateCount      int
+	UpdateRebootType string
+	UpdateList       dell.UpdateList //`oai3:"nullable"`
 }
 
 // TODO: verify correct json parsing

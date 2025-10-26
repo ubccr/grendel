@@ -4,254 +4,152 @@
 
 package bmc
 
-// import (
-// 	"encoding/xml"
-// 	"fmt"
-// 	"io"
-// 	"os"
-// 	"strings"
-// 	"time"
+import (
+	"context"
+	"fmt"
+	"os"
+	"strings"
 
-// 	"github.com/jedib0t/go-pretty/v6/progress"
-// 	"github.com/jedib0t/go-pretty/v6/table"
-// 	"github.com/jedib0t/go-pretty/v6/text"
-// 	"github.com/spf13/cobra"
-// 	"github.com/ubccr/grendel/internal/bmc"
-// 	"golang.org/x/net/html/charset"
-// 	"golang.org/x/sync/errgroup"
-// )
+	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
+	"github.com/spf13/cobra"
+	"github.com/ubccr/grendel/cmd"
+	"github.com/ubccr/grendel/pkg/client"
+)
 
-// var (
-// 	firmwareCmd = &cobra.Command{
-// 		Use:   "firmware",
-// 		Short: "BMC Firmware commands",
-// 		Long:  `BMC Firmware commands`,
-// 	}
+var (
+	firmwareCmd = &cobra.Command{
+		Use:   "firmware",
+		Short: "BMC Firmware commands",
+		Long:  `BMC Firmware commands`,
+	}
 
-// 	firmwareCheckCmd = &cobra.Command{
-// 		Use:   "check",
-// 		Short: "Check for updates on Dell servers",
-// 		Long:  `Check for updates on Dell servers`,
-// 		RunE: func(command *cobra.Command, args []string) error {
-// 			return runFirmwareCheck()
-// 		},
-// 	}
-// 	firmwareCheckShort            bool
-// 	firmwareCheckCatalog          string
-// 	firmwareCheckCatalogDownload  bool
-// 	firmwareCheckFirmwareDownload string
+	firmwareCheckCmd = &cobra.Command{
+		Use:   "check <nodeset>",
+		Short: "Check for updates on Dell servers",
+		Long: `Check for updates on Dell servers
+Must run bmc upgrade <nodeset> to populate firmware data`,
+		Args: cobra.ExactArgs(1),
+		RunE: func(command *cobra.Command, args []string) error {
+			gc, err := cmd.NewOgenClient()
+			if err != nil {
+				return err
+			}
 
-// 	firmwareUpgradeCmd = &cobra.Command{
-// 		Use:   "upgrade",
-// 		Short: "Upgrade firmware packages",
-// 		Long:  "Upgrade firmware packages via Redfish Simple Update. BMC upgrades MUST be done separately from other updates as it will cancel any other scheduled or in progress upgrades. It is recommended to clear any old jobs from the BMC with the 'grendel bmc job clear' command first. Upgrades that require a reboot will show as a 'scheduled' job which will require a reboot to start the upgrade, the 'grendel bmc power cycle' command can be used to reboot the host.",
-// 		RunE: func(command *cobra.Command, args []string) error {
-// 			return runFirmwareUpgrade()
-// 		},
-// 	}
-// 	firmwareUpgradePackages []string
-// 	firmwareUpgradePath     string
-// )
+			nodeset := args[0]
 
-// func init() {
-// 	bmcCmd.AddCommand(firmwareCmd)
-// 	firmwareCmd.AddCommand(firmwareCheckCmd)
-// 	firmwareCmd.AddCommand(firmwareUpgradeCmd)
+			if nodeset == "all" {
+				nodeset = ""
+			}
 
-// 	firmwareCheckCmd.Flags().BoolVar(&firmwareCheckShort, "short", false, "Only display componets with an update available")
-// 	firmwareCheckCmd.Flags().StringVar(&firmwareCheckCatalog, "catalog", "/var/lib/grendel/repo/bmc/dell/Catalog.xml", "Path to catalog.xml from downloads.dell.com")
-// 	firmwareCheckCmd.Flags().BoolVar(&firmwareCheckCatalogDownload, "catalog-download", false, "Auto download latest catalog from downloads.dell.com. Uses --catalog path as download location")
-// 	firmwareCheckCmd.Flags().StringVar(&firmwareCheckFirmwareDownload, "firmware-download", "", "Path to a directory firmware will be downloaded, leaving this blank will not download the firmware. EX: /var/lib/grendel/repo/bmc")
+			params := client.GETV1BmcUpgradeDellRepoParams{
+				Nodeset: client.NewOptString(nodeset),
+				Tags:    client.NewOptString(strings.Join(tags, ",")),
+			}
+			res, err := gc.GETV1BmcUpgradeDellRepo(context.Background(), params)
+			if err != nil {
+				return cmd.NewApiError(err)
+			}
 
-// 	firmwareUpgradeCmd.Flags().StringSliceVar(&firmwareUpgradePackages, "packages", []string{}, "Path from repo endpoint to update files. (required) EX: --packages /repo/bmc/dell/idrac_fw_v7.10.0.0.EXE,/repo/bmc/dell/bios_fw_2.1.8.EXE")
-// 	firmwareUpgradeCmd.Flags().StringVar(&firmwareUpgradePath, "path", "", "Optional directory to packages, can be used to avoid rewriting /repo/bmc/dell for updating multiple packages EX: --path /repo/bmc/dell --packages idrac_fw_v7.10.0.0.EXE,bios_fw_2.1.8.EXE")
-// 	firmwareUpgradeCmd.MarkFlagRequired("packages")
-// }
+			t := table.NewWriter()
+			t.SetOutputMirror(os.Stdout)
+			t.AppendHeader(table.Row{"Host", "Component", "Current Version", "Latest Version", "Reboot Required"})
+			t.SetColumnConfigs([]table.ColumnConfig{
+				{
+					Name:      "Host",
+					AutoMerge: true,
+				},
+			})
 
-// func runFirmwareCheck() error {
-// 	pw := progress.NewWriter()
-// 	pw.SetOutputWriter(os.Stdout)
-// 	go pw.Render()
+			for _, host := range res {
+				if host.Status.Value != "success" {
+					fmt.Printf("%s\t%s\n", host.Name.Value, host.Message.Value)
+				}
+				for _, fw := range host.UpdateList {
+					t.AppendRow(table.Row{
+						host.Name.Value,
+						fw.DisplayName.Value,
+						fw.InstalledVersion.Value,
+						colorVersion(fw.InstalledVersion.Value, fw.PackageVersion.Value),
+						fw.RebootType.Value,
+					}, table.RowConfig{AutoMerge: true})
+				}
+				t.AppendSeparator()
+			}
 
-// 	pw.SetStyle(progress.StyleDefault)
-// 	pw.Style().Colors = progress.StyleColorsExample
-// 	pw.Style().Options.PercentFormat = "%4.1f%%"
+			t.AppendSeparator()
 
-// 	if firmwareCheckCatalogDownload {
-// 		fmt.Printf("Downloading catalog from %s to %s\n", bmc.Dell_Catalog_Download_location, firmwareCheckCatalog)
-// 		err := bmc.DownloadFirmware(bmc.Dell_Catalog_Download_location, firmwareCheckCatalog, "Dell LC Catalog", "", pw)
-// 		if err != nil {
-// 			return err
-// 		}
-// 	}
+			t.SetStyle(table.StyleLight)
+			t.Render()
 
-// 	job := bmc.NewJob()
-// 	hostsFirmware, err := job.GetFirmware(hostList)
-// 	if err != nil {
-// 		return err
-// 	}
+			return nil
+		},
+	}
 
-// 	file, err := os.Open(firmwareCheckCatalog)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer file.Close()
+	firmwareUpgradeApplyUpdate       bool
+	firmwareUpgradeCatalogFile       string
+	firmwareUpgradeIpAddress         string
+	firmwareUpgradeIgnoreCertWarning bool
+	firmwareUpgradeRebootNeeded      bool
+	firmwareUpgradeClearJobs         bool
+	firmwareUpgradeShareName         string
+	firmwareUpgradeShareType         string
+	firmwareUpgradeCmd               = &cobra.Command{
+		Use:   "upgrade <nodeset>",
+		Short: "Upgrade firmware on Dell servers",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(command *cobra.Command, args []string) error {
+			gc, err := cmd.NewOgenClient()
+			if err != nil {
+				return err
+			}
+			nodeset := args[0]
 
-// 	nr, err := charset.NewReader(file, "utf-16")
-// 	if err != nil {
-// 		return err
-// 	}
+			req := client.BmcDellInstallFromRepoRequest{
+				ApplyUpdate:       client.NewOptBool(firmwareUpgradeApplyUpdate),
+				CatalogFile:       client.NewOptString(firmwareUpgradeCatalogFile),
+				IPAddress:         client.NewOptString(firmwareUpgradeIpAddress),
+				IgnoreCertWarning: client.NewOptBool(firmwareUpgradeIgnoreCertWarning),
+				RebootNeeded:      client.NewOptBool(firmwareUpgradeRebootNeeded),
+				ShareName:         client.NewOptString(firmwareUpgradeShareName),
+				ShareType:         client.NewOptString(firmwareUpgradeShareType),
+			}
+			params := client.POSTV1BmcUpgradeDellInstallfromrepoParams{
+				Nodeset: client.NewOptString(nodeset),
+				Tags:    client.NewOptString(strings.Join(tags, ",")),
+			}
+			res, err := gc.POSTV1BmcUpgradeDellInstallfromrepo(context.Background(), &req, params)
+			if err != nil {
+				return cmd.NewApiError(err)
+			}
 
-// 	var catalog bmc.DellCatalog
+			for _, jobMessage := range res {
+				fmt.Printf("%s\t %s\t %s\n", jobMessage.Host.Value, jobMessage.Status.Value, jobMessage.Msg.Value)
+			}
 
-// 	decoder := xml.NewDecoder(nr)
-// 	decoder.CharsetReader = func(label string, input io.Reader) (io.Reader, error) {
-// 		return input, nil
-// 	}
+			return nil
+		},
+	}
+)
 
-// 	err = decoder.Decode(&catalog)
-// 	if err != nil {
-// 		return err
-// 	}
+func colorVersion(v1, v2 string) string {
+	if v1 != v2 {
+		return text.FgHiRed.Sprint(v2)
+	}
+	return text.FgHiGreen.Sprint(v1)
+}
 
-// 	updateCatalog := make(map[string][]bmc.SoftwareComponents, 0)
+func init() {
+	bmcCmd.AddCommand(firmwareCmd)
+	firmwareCmd.AddCommand(firmwareCheckCmd)
+	firmwareCmd.AddCommand(firmwareUpgradeCmd)
 
-// 	for _, softwareComponent := range catalog.SoftwareComponents {
-// 		// skip OS drivers
-// 		if softwareComponent.ComponentType == "Driver" {
-// 			continue
-// 		}
-// 		for _, supportedSystem := range softwareComponent.SupportedSystems {
-// 			for _, brand := range supportedSystem.Brand {
-// 				for _, model := range brand.Model {
-// 					updateCatalog[model.SystemID] = append(updateCatalog[model.SystemID], softwareComponent)
-// 				}
-// 			}
-// 		}
-// 	}
-// 	t := table.NewWriter()
-// 	t.SetOutputMirror(os.Stdout)
-// 	t.AppendHeader(table.Row{"Host", "Component", "Current Version", "Latest Version", "Reboot Required"})
-// 	t.SetColumnConfigs([]table.ColumnConfig{
-// 		{
-// 			Name:      "Host",
-// 			AutoMerge: true,
-// 		},
-// 	})
-
-// 	downloadFirmware := make(map[string]string, 0)
-// 	for _, host := range hostsFirmware {
-// 		for componentID, firmware := range host.CurrentFirmwares {
-// 			latestFirmwares := []bmc.SoftwareComponents{}
-// 			for _, softwareComponent := range updateCatalog[host.SystemID] {
-// 				for _, device := range softwareComponent.SupportedDevices.Device {
-// 					if device.ComponentID == componentID {
-// 						latestFirmwares = append(latestFirmwares, softwareComponent)
-// 					}
-// 				}
-// 			}
-// 			latest := bmc.SoftwareComponents{}
-// 			layout := "2006-01-02T15:04:05-07:00"
-// 			for _, latestFirmware := range latestFirmwares {
-// 				if latest.DateTime != "" {
-// 					prevTime, err := time.Parse(layout, latest.DateTime)
-// 					if err != nil {
-// 						return err
-// 					}
-// 					newTime, err := time.Parse(layout, latestFirmware.DateTime)
-// 					if err != nil {
-// 						return err
-// 					}
-// 					if !prevTime.Before(newTime) {
-// 						continue
-// 					}
-// 				}
-// 				latest = latestFirmware
-// 			}
-
-// 			// --short
-// 			if firmwareCheckShort && (firmware.Version == latest.VendorVersion || latest.VendorVersion == "") {
-// 				continue
-// 			}
-// 			method := strings.ToLower(catalog.BaseLocationAccessProtocols)
-
-// 			path := fmt.Sprintf("%s://%s/%s", method, catalog.BaseLocation, latest.Path)
-
-// 			if firmware.Version != latest.VendorVersion {
-// 				downloadFirmware[latest.HashMD5] = path
-// 			}
-// 			t.AppendRow(table.Row{
-// 				host.Name,
-// 				firmware.Name,
-// 				firmware.Version,
-// 				colorVersion(firmware.Version, latest.VendorVersion),
-// 				latest.RebootRequired,
-// 			}, table.RowConfig{AutoMerge: true})
-// 		}
-// 		t.AppendSeparator()
-// 	}
-
-// 	t.SetStyle(table.StyleLight)
-// 	t.Render()
-
-// 	if firmwareCheckFirmwareDownload != "" {
-// 		time.Sleep(time.Second)
-// 		for i := 3; i > 0; i-- {
-// 			fmt.Printf("Firmware auto-download will begin in: %d second(s)\n", i)
-// 			time.Sleep(time.Second)
-// 		}
-
-// 		eg := errgroup.Group{}
-// 		for sum, url := range downloadFirmware {
-// 			u := url
-// 			s := sum
-// 			urlArr := strings.Split(url, "/")
-// 			name := urlArr[len(urlArr)-1]
-// 			path := fmt.Sprintf("%s/%s", firmwareCheckFirmwareDownload, name)
-
-// 			eg.Go(func() error {
-// 				return bmc.DownloadFirmware(u, path, name, s, pw)
-// 			})
-// 		}
-// 		err := eg.Wait()
-// 		if err != nil {
-// 			return err
-// 		}
-// 	}
-
-// 	for pw.IsRenderInProgress() {
-// 		if pw.LengthActive() == 0 {
-// 			pw.Stop()
-// 		}
-// 		time.Sleep(time.Millisecond * 100)
-// 	}
-
-// 	return nil
-// }
-
-// func colorVersion(v1, v2 string) string {
-// 	if v1 != v2 {
-// 		return text.FgHiRed.Sprint(v2)
-// 	}
-// 	return text.FgHiGreen.Sprint(v1)
-// }
-
-// func runFirmwareUpgrade() error {
-// 	if firmwareUpgradePath != "" {
-// 		for i, firmwareUpgradePackage := range firmwareUpgradePackages {
-// 			firmwareUpgradePackages[i] = fmt.Sprintf("%s/%s", firmwareUpgradePath, firmwareUpgradePackage)
-// 		}
-// 	}
-
-// 	job := bmc.NewJob()
-// 	hosts, err := job.UpdateFirmware(hostList, firmwareUpgradePackages)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	for _, host := range hosts {
-// 		fmt.Printf("%s\t %s\t %s\n", host.Host, host.Status, host.Msg)
-// 	}
-
-// 	return nil
-// }
+	firmwareUpgradeCmd.Flags().BoolVarP(&firmwareUpgradeApplyUpdate, "apply-update", "a", false, "By default only check for updates, do not queue them. Pass this flag to apply available updates.")
+	firmwareUpgradeCmd.Flags().StringVar(&firmwareUpgradeCatalogFile, "catalog-file", "", "Update catalog name. Defaults to Catalog.xml")
+	firmwareUpgradeCmd.Flags().StringVarP(&firmwareUpgradeIpAddress, "ip-address", "i", "downloads.dell.com", "IP or Domain name of share")
+	firmwareUpgradeCmd.Flags().BoolVar(&firmwareUpgradeIgnoreCertWarning, "ignore-cert-warning", true, "Pass this flag to ignore invalid certs")
+	firmwareUpgradeCmd.Flags().BoolVarP(&firmwareUpgradeRebootNeeded, "reboot", "r", false, "Reboot arg will immediately reboot the node when needed")
+	firmwareUpgradeCmd.Flags().BoolVar(&firmwareUpgradeClearJobs, "clear-jobs", false, "Clear all jobs in the job queue before upgrading. apply-update must be true")
+	firmwareUpgradeCmd.Flags().StringVar(&firmwareUpgradeShareName, "share-name", "", "")
+	firmwareUpgradeCmd.Flags().StringVar(&firmwareUpgradeShareType, "share-type", "HTTPS", "Valid options: HTTPS, HTTP, NFS, or CIFS")
+}

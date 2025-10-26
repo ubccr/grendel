@@ -115,7 +115,7 @@ type Store interface {
 	// GetRoleByName returns a role by name
 	GetRolesByName(name string) (*model.RoleView, error)
 
-	// GePermissions returns all permissions
+	// GetPermissions returns all permissions
 	GetPermissions() (model.PermissionList, error)
 
 	// AddRole adds a new role and optionally sets the same permissions as the inherited role

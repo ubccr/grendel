@@ -50,7 +50,7 @@ type AuthResetRequest struct {
 }
 
 var (
-	expireDuration = time.Duration(8) * time.Hour
+	expireDuration = 8 * time.Hour
 )
 
 func (h *Handler) AuthSignin(c fuego.ContextWithBody[AuthRequest]) (*AuthResponse, error) {
