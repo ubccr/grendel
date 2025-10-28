@@ -149,7 +149,7 @@ func (s *Server) staticHandler4(host *model.Host, serverIP net.IP, req, resp *dh
 		"name":         host.Name,
 		"dhcp_message": req.MessageType().String(),
 	}).Info("Found host")
-	log.Debugf(req.Summary())
+	log.Debugln(req.Summary())
 
 	resp.YourIPAddr = nic.ToStdAddr()
 	resp.UpdateOption(dhcpv4.OptSubnetMask(nic.Netmask()))

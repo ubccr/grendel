@@ -5,8 +5,10 @@ import {
   getCoreRowModel,
   getExpandedRowModel,
   getFilteredRowModel,
+  getGroupedRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  GroupingState,
   Row,
   SortingState,
   useReactTable,
@@ -28,7 +30,7 @@ import { Input } from "../ui/input";
 import { DataTablePagination } from "./pagination";
 import { DataTableViewOptions } from "./view-options";
 import { Button } from "../ui/button";
-import { Info, Plus } from "lucide-react";
+import { ChevronDown, ChevronLeft, Info, Plus, RefreshCw } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { TagsInput } from "../tags-input";
 import {
@@ -49,6 +51,8 @@ interface DataTableProps<TData, TValue> {
   initialVisibility?: VisibilityState;
   initialSorting?: SortingState;
   progress?: boolean;
+  refresh?: () => void;
+  initialGrouping?: GroupingState;
 }
 
 export type DataTableActions<TData> = ({
@@ -67,6 +71,8 @@ export function DataTable<TData, TValue>({
   initialVisibility,
   initialSorting,
   progress,
+  refresh,
+  initialGrouping,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>(initialSorting ?? []);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -78,6 +84,9 @@ export function DataTable<TData, TValue>({
     pageIndex: 0, //initial page index
     pageSize: 10, //default page size
   });
+  const [grouping, setGrouping] = useState<GroupingState>(
+    initialGrouping ?? [],
+  );
 
   const table = useReactTable({
     data,
@@ -97,6 +106,11 @@ export function DataTable<TData, TValue>({
     getExpandedRowModel: getExpandedRowModel(),
     getRowCanExpand: getRowCanExpand,
     enableRowSelection: true,
+    enableSubRowSelection: true,
+    enableMultiRowSelection: true,
+    getGroupedRowModel: getGroupedRowModel(),
+    groupedColumnMode: "reorder",
+    onGroupingChange: setGrouping,
     // getRowId: (row) => row.name, // TODO: ?
     state: {
       sorting,
@@ -104,6 +118,7 @@ export function DataTable<TData, TValue>({
       columnVisibility,
       rowSelection,
       pagination,
+      grouping,
     },
   });
 
@@ -119,6 +134,12 @@ export function DataTable<TData, TValue>({
                 <Plus />
                 <span className="sr-only sm:not-sr-only">Add</span>
               </Link>
+            </Button>
+          )}
+          {refresh && (
+            <Button variant="secondary" onClick={refresh}>
+              <RefreshCw />
+              <span className="sr-only sm:not-sr-only">Refresh</span>
             </Button>
           )}
           <DataTableViewOptions table={table} />
@@ -218,9 +239,9 @@ export function DataTable<TData, TValue>({
               </TableRow>
             ))}
             {progress && (
-              <TableRow className="fixed">
+              <TableRow>
                 <TableCell className="p-0" colSpan={columns.length}>
-                  <Progress className="fixed h-1" />
+                  <Progress className="h-1" />
                 </TableCell>
               </TableRow>
             )}
@@ -232,23 +253,52 @@ export function DataTable<TData, TValue>({
                   <TableRow data-state={row.getIsSelected() && "selected"}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
+                        {cell.getIsGrouped() ? (
+                          <div className="flex justify-between gap-2">
+                            {/*({row.subRows.length}){" "}*/}
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}{" "}
+                            <Button
+                              onClick={row.getToggleExpandedHandler()}
+                              size="icon"
+                              variant="secondary"
+                              className="size-6"
+                            >
+                              {row.getIsExpanded() ? (
+                                <ChevronDown />
+                              ) : (
+                                <ChevronLeft />
+                              )}
+                            </Button>
+                          </div>
+                        ) : cell.getIsAggregated() ? (
+                          flexRender(
+                            cell.column.columnDef.aggregatedCell,
+                            cell.getContext(),
+                          )
+                        ) : cell.getIsPlaceholder() ? null : (
+                          flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )
                         )}
                       </TableCell>
                     ))}
                   </TableRow>
-                  {row.getIsExpanded() && renderSubComponent != undefined && (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                    >
-                      <TableCell colSpan={row.getVisibleCells().length}>
-                        {renderSubComponent({ row })}
-                      </TableCell>
-                    </TableRow>
-                  )}
+                  {row.getCanExpand() &&
+                    row.getIsExpanded() &&
+                    renderSubComponent != undefined && (
+                      <TableRow
+                        key={row.id}
+                        data-state={row.getIsSelected() && "selected"}
+                      >
+                        <TableCell colSpan={row.getVisibleCells().length}>
+                          {renderSubComponent({ row })}
+                        </TableCell>
+                      </TableRow>
+                    )}
                 </React.Fragment>
               ))
             ) : (

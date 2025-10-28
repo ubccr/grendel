@@ -103,7 +103,7 @@ func (s *PXEServer) pxeHandler4(peer *net.UDPAddr, req *dhcpv4.DHCPv4, oob *ipv4
 	}
 
 	s.log.Debugf("Received DHCPv4 packet")
-	s.log.Debugf(req.Summary())
+	s.log.Debugln(req.Summary())
 
 	if req.OpCode != dhcpv4.OpcodeBootRequest {
 		s.log.Warningf("not a BootRequest, ignoring")
@@ -169,7 +169,7 @@ func (s *PXEServer) pxeHandler4(peer *net.UDPAddr, req *dhcpv4.DHCPv4, oob *ipv4
 	}
 
 	s.log.Debugf("Sending response")
-	s.log.Debugf(resp.Summary())
+	s.log.Debugln(resp.Summary())
 
 	if _, err := s.conn.WriteTo(resp.ToBytes(), woob, peer); err != nil {
 		s.log.Errorf("UDP write to %v failed: %v", peer, err)

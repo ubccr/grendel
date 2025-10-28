@@ -42,7 +42,7 @@ func (s *Server) bootingHandler4(host *model.Host, serverIP net.IP, req, resp *d
 		"name":     host.Name,
 		"firmware": fwtype.String(),
 	}).Info("Got valid PXE boot request")
-	log.Debugf(req.Summary())
+	log.Debugln(req.Summary())
 
 	// This logic was adopted from pixiecore
 	// https://github.com/danderson/netboot/tree/master/pixiecore

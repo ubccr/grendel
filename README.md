@@ -15,6 +15,7 @@ to 1500 nodes.
 ## Key Features
 
 * Web based frontend
+  * [Frontend demo](https://grendel-demo.ccr.buffalo.edu) User/pass = `grendel-demo`
 * DHCP/PXE/TFTP provisioning
 * DNS forward and reverse resolution
 * Automatic host discovery

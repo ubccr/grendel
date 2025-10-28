@@ -98,7 +98,8 @@ func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		if !slices.Contains(*validRoles, claims.role) || !slices.Contains(*validRoles, user.Role) {
+		if (!slices.Contains(*validRoles, claims.role) || !slices.Contains(*validRoles, user.Role)) && !viper.GetBool("api.dev") {
+
 			err := fuego.HTTPError{
 				Status: http.StatusForbidden,
 				Err:    fmt.Errorf("account does not have the required permissions to access this endpoint: user=%s, method=%s, path=%s, role=%s, validRoles=%s", claims.username, r.Method, r.URL.Path, claims.role, strings.Join(*validRoles, ",")),

@@ -11,15 +11,13 @@ import { Hammer } from "lucide-react";
 import React from "react";
 import { toast } from "sonner";
 
-export default function ActionsSheet({
-  checked,
-  length,
-  children,
-}: {
+type props = {
   checked: string;
   length: number;
   children: React.ReactNode;
-}) {
+};
+
+export default function ActionsSheet({ checked, length, children }: props) {
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -38,7 +36,6 @@ export default function ActionsSheet({
       <SheetContent className="max-h-dvh w-full overflow-x-scroll sm:max-w-2xl">
         <SheetHeader>
           <SheetTitle>Actions:</SheetTitle>
-          {/* TODO: add copy button */}
           <Button
             size="sm"
             variant="secondary"

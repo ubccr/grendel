@@ -173,12 +173,12 @@ func snoopDHCP(req *dhcpv4.DHCPv4) {
 
 func traceDHCP(req *dhcpv4.DHCPv4) {
 	log.Debugf("Received DHCPv4 packet")
-	log.Debugf(req.Summary())
+	log.Debugln(req.Summary())
 }
 
 func (d *discoveryDHCP) handler(req *dhcpv4.DHCPv4) {
 	log.Debugf("Received DHCPv4 packet")
-	log.Debugf(req.Summary())
+	log.Debugln(req.Summary())
 
 	if req.OpCode != dhcpv4.OpcodeBootRequest {
 		log.Warningf("not a BootRequest, ignoring")

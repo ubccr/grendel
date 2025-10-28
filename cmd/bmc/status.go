@@ -18,6 +18,7 @@ import (
 
 var (
 	statusLong bool
+	statusOEM  bool
 	statusCmd  = &cobra.Command{
 		Use:   "status {nodeset | all}",
 		Short: "Check BMC status",
@@ -43,16 +44,24 @@ var (
 				return cmd.NewApiError(err)
 			}
 
+			output := make([]client.RedfishSystem, len(res))
+			for i, v := range res {
+				if !statusOEM {
+					v.OemDell.Reset()
+				}
+				output[i] = v
+			}
+
 			if statusLong {
 				enc := json.NewEncoder(os.Stdout)
 				enc.SetIndent("", "    ")
 
-				err := enc.Encode(res)
+				err := enc.Encode(output)
 				if err != nil {
 					return err
 				}
 			} else {
-				for _, o := range res {
+				for _, o := range output {
 
 					if !statusLong {
 						fmt.Printf("%s\t %s\t %s\t %s\n", o.Name.Value, o.PowerStatus.Value, o.SerialNumber.Value, o.BiosVersion.Value)
@@ -69,5 +78,6 @@ var (
 
 func init() {
 	statusCmd.Flags().BoolVar(&statusLong, "long", false, "Display long format")
+	statusCmd.Flags().BoolVar(&statusOEM, "oem", false, "Display oem info")
 	bmcCmd.AddCommand(statusCmd)
 }

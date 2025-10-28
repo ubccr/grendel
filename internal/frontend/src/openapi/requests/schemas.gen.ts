@@ -96,6 +96,43 @@ export const AuthTokenRequestSchema = {
     type: 'object'
 } as const;
 
+export const BmcDellInstallFromRepoRequestSchema = {
+    description: 'BmcDellInstallFromRepoRequest schema',
+    properties: {
+        ApplyUpdate: {
+            description: 'ApplyUpdate false will only check for firmware upgrades. true will queue the update installs as a job.',
+            type: 'boolean'
+        },
+        CatalogFile: {
+            type: 'string'
+        },
+        ClearJobQueue: {
+            description: 'clear job queue before submitting request. ApplyUpdate must be true',
+            type: 'boolean'
+        },
+        IPAddress: {
+            description: 'domain name or IP address of share',
+            type: 'string'
+        },
+        IgnoreCertWarning: {
+            description: 'false = share needs valid HTTPS cert, true = allow invalid certs',
+            type: 'boolean'
+        },
+        RebootNeeded: {
+            description: 'false = do not reboot node automatically, jobs will queue as scheduled and wait until next boot. true = reboot when needed',
+            type: 'boolean'
+        },
+        ShareName: {
+            type: 'string'
+        },
+        ShareType: {
+            description: 'type of share',
+            type: 'string'
+        }
+    },
+    type: 'object'
+} as const;
+
 export const BmcImportConfigurationRequestSchema = {
     description: 'BmcImportConfigurationRequest schema',
     properties: {
@@ -108,6 +145,23 @@ export const BmcImportConfigurationRequestSchema = {
             description: 'options include: NoReboot, Graceful, Forced',
             example: 'Graceful',
             type: 'string'
+        }
+    },
+    type: 'object'
+} as const;
+
+export const BmcJobDeleteRequestSchema = {
+    description: 'BmcJobDeleteRequest schema',
+    properties: {
+        node_job_list: {
+            additionalProperties: {
+                items: {
+                    type: 'string'
+                },
+                type: 'array'
+            },
+            description: "Map with Node and Redfish Job IDs. Use 'JID_CLEARALL' to clear all jobs",
+            type: 'object'
         }
     },
     type: 'object'
@@ -439,6 +493,9 @@ export const EventSchema = {
         JobMessages: {
             items: {
                 properties: {
+                    data: {
+                        type: 'string'
+                    },
                     host: {
                         type: 'string'
                     },
@@ -746,6 +803,9 @@ export const HostSchema = {
 export const JobMessageSchema = {
     description: 'JobMessage schema',
     properties: {
+        data: {
+            type: 'string'
+        },
         host: {
             type: 'string'
         },
@@ -1053,6 +1113,81 @@ export const PostRolesRequestSchema = {
     type: 'object'
 } as const;
 
+export const RedfishDellUpgradeFirmwareSchema = {
+    description: 'RedfishDellUpgradeFirmware schema',
+    properties: {
+        Message: {
+            type: 'string'
+        },
+        Name: {
+            type: 'string'
+        },
+        Status: {
+            type: 'string'
+        },
+        UpdateCount: {
+            type: 'integer'
+        },
+        UpdateList: {
+            items: {
+                properties: {
+                    BaseLocation: {
+                        type: 'string'
+                    },
+                    ComponentID: {
+                        type: 'string'
+                    },
+                    ComponentInfoName: {
+                        type: 'string'
+                    },
+                    ComponentInfoValue: {
+                        type: 'string'
+                    },
+                    ComponentType: {
+                        type: 'string'
+                    },
+                    Criticality: {
+                        type: 'string'
+                    },
+                    DisplayName: {
+                        type: 'string'
+                    },
+                    InstalledVersion: {
+                        type: 'string'
+                    },
+                    JobID: {
+                        type: 'string'
+                    },
+                    Name: {
+                        type: 'string'
+                    },
+                    PackageName: {
+                        type: 'string'
+                    },
+                    PackagePath: {
+                        type: 'string'
+                    },
+                    PackageVersion: {
+                        type: 'string'
+                    },
+                    RebootType: {
+                        type: 'string'
+                    },
+                    Target: {
+                        type: 'string'
+                    }
+                },
+                type: 'object'
+            },
+            type: 'array'
+        },
+        UpdateRebootType: {
+            type: 'string'
+        }
+    },
+    type: 'object'
+} as const;
+
 export const RedfishJobSchema = {
     description: 'RedfishJob schema',
     properties: {
@@ -1230,6 +1365,7 @@ export const RedfishJobSchema = {
                 },
                 type: 'object'
             },
+            nullable: true,
             type: 'array'
         },
         name: {
@@ -1337,32 +1473,170 @@ export const RedfishSystemSchema = {
         name: {
             type: 'string'
         },
-        oem: {
+        oem_dell: {
+            nullable: true,
             properties: {
-                Dell: {
-                    properties: {
-                        DellSystem: {
-                            properties: {
-                                ManagedSystemSize: {
-                                    type: 'string'
-                                },
-                                MaxCPUSockets: {
-                                    type: 'integer'
-                                },
-                                MaxDIMMSlots: {
-                                    type: 'integer'
-                                },
-                                MaxPCIeSlots: {
-                                    type: 'integer'
-                                },
-                                SystemID: {
-                                    type: 'integer'
-                                }
-                            },
-                            type: 'object'
-                        }
-                    },
-                    type: 'object'
+                '@odata.context': {
+                    type: 'string'
+                },
+                '@odata.id': {
+                    type: 'string'
+                },
+                '@odata.type': {
+                    type: 'string'
+                },
+                BIOSReleaseDate: {
+                    type: 'string'
+                },
+                BaseBoardChassisSlot: {
+                    type: 'string'
+                },
+                BatteryRollupStatus: {
+                    type: 'string'
+                },
+                BladeGeometry: {
+                    type: 'string'
+                },
+                CMCIP: {
+                    type: 'string'
+                },
+                CPURollupStatus: {
+                    type: 'string'
+                },
+                ChassisModel: {
+                    type: 'string'
+                },
+                ChassisName: {
+                    type: 'string'
+                },
+                ChassisServiceTag: {
+                    type: 'string'
+                },
+                ChassisSystemHeightUnit: {
+                    type: 'integer'
+                },
+                CurrentRollupStatus: {
+                    type: 'string'
+                },
+                Description: {
+                    type: 'string'
+                },
+                EstimatedExhaustTemperatureCelsius: {
+                    type: 'integer'
+                },
+                EstimatedSystemAirflowCFM: {
+                    type: 'integer'
+                },
+                ExpressServiceCode: {
+                    type: 'string'
+                },
+                FanRollupStatus: {
+                    type: 'string'
+                },
+                IDSDMRollupStatus: {
+                    type: 'string'
+                },
+                Id: {
+                    type: 'string'
+                },
+                IntrusionRollupStatus: {
+                    type: 'string'
+                },
+                IsOEMBranded: {
+                    type: 'string'
+                },
+                LastSystemInventoryTime: {
+                    type: 'string'
+                },
+                LastUpdateTime: {
+                    type: 'string'
+                },
+                LicensingRollupStatus: {
+                    type: 'string'
+                },
+                ManagedSystemSize: {
+                    type: 'string'
+                },
+                MaxCPUSockets: {
+                    type: 'integer'
+                },
+                MaxDIMMSlots: {
+                    type: 'integer'
+                },
+                MaxPCIeSlots: {
+                    type: 'integer'
+                },
+                MemoryOperationMode: {
+                    type: 'string'
+                },
+                Name: {
+                    type: 'string'
+                },
+                NodeID: {
+                    type: 'string'
+                },
+                PSRollupStatus: {
+                    type: 'string'
+                },
+                PlatformGUID: {
+                    type: 'string'
+                },
+                PopulatedDIMMSlots: {
+                    type: 'integer'
+                },
+                PopulatedPCIeSlots: {
+                    type: 'integer'
+                },
+                PowerCapEnabledState: {
+                    type: 'string'
+                },
+                SDCardRollupStatus: {
+                    type: 'string'
+                },
+                SELRollupStatus: {
+                    type: 'string'
+                },
+                ServerAllocationWatts: {
+                    type: 'integer'
+                },
+                StorageRollupStatus: {
+                    type: 'string'
+                },
+                SysMemErrorMethodology: {
+                    type: 'string'
+                },
+                SysMemFailOverState: {
+                    type: 'string'
+                },
+                SysMemLocation: {
+                    type: 'string'
+                },
+                SysMemPrimaryStatus: {
+                    type: 'string'
+                },
+                SystemGeneration: {
+                    type: 'string'
+                },
+                SystemID: {
+                    type: 'integer'
+                },
+                SystemRevision: {
+                    type: 'string'
+                },
+                TempRollupStatus: {
+                    type: 'string'
+                },
+                TempStatisticsRollupStatus: {
+                    type: 'string'
+                },
+                UUID: {
+                    type: 'string'
+                },
+                VoltRollupStatus: {
+                    type: 'string'
+                },
+                smbiosGUID: {
+                    type: 'string'
                 }
             },
             type: 'object'

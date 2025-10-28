@@ -298,7 +298,7 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
             placeholder={placeholder}
             onClick={() => setActiveIndex(-1)}
             className={cn(
-              "placeholder:text-muted-foreground h-7 min-w-fit flex-1 border-none px-1 outline-0 focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-0",
+              "placeholder:text-muted-foreground h-7 min-w-fit flex-1 border-none px-1 shadow-none outline-0 focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-0",
               activeIndex !== -1 && "caret-transparent",
             )}
           />

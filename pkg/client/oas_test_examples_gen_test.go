@@ -83,6 +83,18 @@ func TestAuthTokenRequest_EncodeDecode(t *testing.T) {
 	var typ2 AuthTokenRequest
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestBmcDellInstallFromRepoRequest_EncodeDecode(t *testing.T) {
+	var typ BmcDellInstallFromRepoRequest
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcDellInstallFromRepoRequest
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestBmcImportConfigurationRequest_EncodeDecode(t *testing.T) {
 	var typ BmcImportConfigurationRequest
 	typ.SetFake()
@@ -93,6 +105,32 @@ func TestBmcImportConfigurationRequest_EncodeDecode(t *testing.T) {
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
 	var typ2 BmcImportConfigurationRequest
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcJobDeleteRequest_EncodeDecode(t *testing.T) {
+	var typ BmcJobDeleteRequest
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcJobDeleteRequest
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcJobDeleteRequestNodeJobList_EncodeDecode(t *testing.T) {
+	var typ BmcJobDeleteRequestNodeJobList
+	typ = make(BmcJobDeleteRequestNodeJobList)
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcJobDeleteRequestNodeJobList
+	typ2 = make(BmcJobDeleteRequestNodeJobList)
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestBmcOsPowerBody_EncodeDecode(t *testing.T) {
@@ -655,6 +693,30 @@ func TestPostRolesRequest_EncodeDecode(t *testing.T) {
 	var typ2 PostRolesRequest
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestRedfishDellUpgradeFirmware_EncodeDecode(t *testing.T) {
+	var typ RedfishDellUpgradeFirmware
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 RedfishDellUpgradeFirmware
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestRedfishDellUpgradeFirmwareUpdateListItem_EncodeDecode(t *testing.T) {
+	var typ RedfishDellUpgradeFirmwareUpdateListItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 RedfishDellUpgradeFirmwareUpdateListItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestRedfishJob_EncodeDecode(t *testing.T) {
 	var typ RedfishJob
 	typ.SetFake()
@@ -763,18 +825,6 @@ func TestRedfishSystem_EncodeDecode(t *testing.T) {
 	var typ2 RedfishSystem
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
-func TestRedfishSystemOem_EncodeDecode(t *testing.T) {
-	var typ RedfishSystemOem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishSystemOem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
 func TestRedfishSystemOemDell_EncodeDecode(t *testing.T) {
 	var typ RedfishSystemOemDell
 	typ.SetFake()
@@ -785,18 +835,6 @@ func TestRedfishSystemOemDell_EncodeDecode(t *testing.T) {
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
 	var typ2 RedfishSystemOemDell
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishSystemOemDellDellSystem_EncodeDecode(t *testing.T) {
-	var typ RedfishSystemOemDellDellSystem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishSystemOemDellDellSystem
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestUser_EncodeDecode(t *testing.T) {

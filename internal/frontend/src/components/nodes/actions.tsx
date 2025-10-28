@@ -28,15 +28,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { Copy, Info, LoaderCircle } from "lucide-react";
+import { Copy, LoaderCircle } from "lucide-react";
 import { Label } from "../ui/label";
 import RedfishJobList from "./job-table";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
 import {
   useDeleteV1BmcJobsJids,
   useDeleteV1Nodes,
@@ -49,6 +43,7 @@ import {
   usePostV1BmcPowerOs,
 } from "@/openapi/queries";
 import { Input } from "../ui/input";
+import DellFirmwareUpgrade from "./dell-upgrade/table";
 
 export default function NodeActions({
   nodes,
@@ -545,29 +540,17 @@ export default function NodeActions({
         <CardFooter className="flex gap-1">
           <Dialog>
             <DialogTrigger asChild>
-              <Button disabled={length !== 1}>Submit</Button>
+              <Button disabled={length === 0}>Open</Button>
             </DialogTrigger>
             <DialogContent className="max-w-7xl">
               <DialogHeader>
-                <DialogTitle>Job List: {nodes}</DialogTitle>
+                <DialogTitle>Job List</DialogTitle>
               </DialogHeader>
               <div className="max-h-[calc(90dvh)] overflow-scroll">
                 <RedfishJobList nodes={nodes} />
               </div>
             </DialogContent>
           </Dialog>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button size="icon">
-                  <Info />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                Currently only querying one node at a time is supported
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
         </CardFooter>
       </Card>
       <Card>
@@ -577,11 +560,11 @@ export default function NodeActions({
         <CardFooter>
           <Dialog>
             <DialogTrigger asChild>
-              <Button>
+              <Button disabled={nodes === ""}>
                 {mutation_job_clear.isPending ? (
                   <LoaderCircle className="animate-spin" />
                 ) : (
-                  <span>Submit</span>
+                  <span>Open</span>
                 )}
               </Button>
             </DialogTrigger>
@@ -624,6 +607,34 @@ export default function NodeActions({
                   <Button>Cancel</Button>
                 </DialogClose>
               </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </CardFooter>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Dell Firmware Upgrade</CardTitle>
+        </CardHeader>
+        <CardFooter className="flex gap-1">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button disabled={nodes === ""}>Open</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-7xl">
+              <DialogHeader>
+                <DialogTitle>Dell Firmware Upgrade</DialogTitle>
+                <DialogDescription>
+                  Submit an "Upgrade Firmware" request in the Actions with
+                  "Apply Update" = False to populate table with firmware list.
+                  <br />
+                  Then review the packages, select which nodes you want to
+                  upgrade, and submit another "Upgrade Firmware" request with
+                  "Apply Update" = True
+                </DialogDescription>
+              </DialogHeader>
+              <div className="max-h-[calc(90dvh)] overflow-scroll">
+                <DellFirmwareUpgrade nodes={nodes} />
+              </div>
             </DialogContent>
           </Dialog>
         </CardFooter>

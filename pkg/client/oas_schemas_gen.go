@@ -200,6 +200,107 @@ func (s *AuthTokenRequest) SetUsername(val OptString) {
 	s.Username = val
 }
 
+// BmcDellInstallFromRepoRequest schema.
+// Ref: #/components/schemas/BmcDellInstallFromRepoRequest
+type BmcDellInstallFromRepoRequest struct {
+	// ApplyUpdate false will only check for firmware upgrades. true will queue the update installs as a
+	// job.
+	ApplyUpdate OptBool   `json:"ApplyUpdate"`
+	CatalogFile OptString `json:"CatalogFile"`
+	// Clear job queue before submitting request. ApplyUpdate must be true.
+	ClearJobQueue OptBool `json:"ClearJobQueue"`
+	// Domain name or IP address of share.
+	IPAddress OptString `json:"IPAddress"`
+	// False = share needs valid HTTPS cert, true = allow invalid certs.
+	IgnoreCertWarning OptBool `json:"IgnoreCertWarning"`
+	// False = do not reboot node automatically, jobs will queue as scheduled and wait until next boot.
+	// true = reboot when needed.
+	RebootNeeded OptBool   `json:"RebootNeeded"`
+	ShareName    OptString `json:"ShareName"`
+	// Type of share.
+	ShareType OptString `json:"ShareType"`
+}
+
+// GetApplyUpdate returns the value of ApplyUpdate.
+func (s *BmcDellInstallFromRepoRequest) GetApplyUpdate() OptBool {
+	return s.ApplyUpdate
+}
+
+// GetCatalogFile returns the value of CatalogFile.
+func (s *BmcDellInstallFromRepoRequest) GetCatalogFile() OptString {
+	return s.CatalogFile
+}
+
+// GetClearJobQueue returns the value of ClearJobQueue.
+func (s *BmcDellInstallFromRepoRequest) GetClearJobQueue() OptBool {
+	return s.ClearJobQueue
+}
+
+// GetIPAddress returns the value of IPAddress.
+func (s *BmcDellInstallFromRepoRequest) GetIPAddress() OptString {
+	return s.IPAddress
+}
+
+// GetIgnoreCertWarning returns the value of IgnoreCertWarning.
+func (s *BmcDellInstallFromRepoRequest) GetIgnoreCertWarning() OptBool {
+	return s.IgnoreCertWarning
+}
+
+// GetRebootNeeded returns the value of RebootNeeded.
+func (s *BmcDellInstallFromRepoRequest) GetRebootNeeded() OptBool {
+	return s.RebootNeeded
+}
+
+// GetShareName returns the value of ShareName.
+func (s *BmcDellInstallFromRepoRequest) GetShareName() OptString {
+	return s.ShareName
+}
+
+// GetShareType returns the value of ShareType.
+func (s *BmcDellInstallFromRepoRequest) GetShareType() OptString {
+	return s.ShareType
+}
+
+// SetApplyUpdate sets the value of ApplyUpdate.
+func (s *BmcDellInstallFromRepoRequest) SetApplyUpdate(val OptBool) {
+	s.ApplyUpdate = val
+}
+
+// SetCatalogFile sets the value of CatalogFile.
+func (s *BmcDellInstallFromRepoRequest) SetCatalogFile(val OptString) {
+	s.CatalogFile = val
+}
+
+// SetClearJobQueue sets the value of ClearJobQueue.
+func (s *BmcDellInstallFromRepoRequest) SetClearJobQueue(val OptBool) {
+	s.ClearJobQueue = val
+}
+
+// SetIPAddress sets the value of IPAddress.
+func (s *BmcDellInstallFromRepoRequest) SetIPAddress(val OptString) {
+	s.IPAddress = val
+}
+
+// SetIgnoreCertWarning sets the value of IgnoreCertWarning.
+func (s *BmcDellInstallFromRepoRequest) SetIgnoreCertWarning(val OptBool) {
+	s.IgnoreCertWarning = val
+}
+
+// SetRebootNeeded sets the value of RebootNeeded.
+func (s *BmcDellInstallFromRepoRequest) SetRebootNeeded(val OptBool) {
+	s.RebootNeeded = val
+}
+
+// SetShareName sets the value of ShareName.
+func (s *BmcDellInstallFromRepoRequest) SetShareName(val OptString) {
+	s.ShareName = val
+}
+
+// SetShareType sets the value of ShareType.
+func (s *BmcDellInstallFromRepoRequest) SetShareType(val OptString) {
+	s.ShareType = val
+}
+
 // BmcImportConfigurationRequest schema.
 // Ref: #/components/schemas/BmcImportConfigurationRequest
 type BmcImportConfigurationRequest struct {
@@ -227,6 +328,35 @@ func (s *BmcImportConfigurationRequest) SetFile(val OptString) {
 // SetShutdownType sets the value of ShutdownType.
 func (s *BmcImportConfigurationRequest) SetShutdownType(val OptString) {
 	s.ShutdownType = val
+}
+
+// BmcJobDeleteRequest schema.
+// Ref: #/components/schemas/BmcJobDeleteRequest
+type BmcJobDeleteRequest struct {
+	// Map with Node and Redfish Job IDs. Use 'JID_CLEARALL' to clear all jobs.
+	NodeJobList OptBmcJobDeleteRequestNodeJobList `json:"node_job_list"`
+}
+
+// GetNodeJobList returns the value of NodeJobList.
+func (s *BmcJobDeleteRequest) GetNodeJobList() OptBmcJobDeleteRequestNodeJobList {
+	return s.NodeJobList
+}
+
+// SetNodeJobList sets the value of NodeJobList.
+func (s *BmcJobDeleteRequest) SetNodeJobList(val OptBmcJobDeleteRequestNodeJobList) {
+	s.NodeJobList = val
+}
+
+// Map with Node and Redfish Job IDs. Use 'JID_CLEARALL' to clear all jobs.
+type BmcJobDeleteRequestNodeJobList map[string][]string
+
+func (s *BmcJobDeleteRequestNodeJobList) init() BmcJobDeleteRequestNodeJobList {
+	m := *s
+	if m == nil {
+		m = map[string][]string{}
+		*s = m
+	}
+	return m
 }
 
 // BmcOsPowerBody schema.
@@ -1105,10 +1235,16 @@ func (s *Event) SetUser(val OptString) {
 }
 
 type EventJobMessagesItem struct {
+	Data         OptString                           `json:"data"`
 	Host         OptString                           `json:"host"`
 	Msg          OptString                           `json:"msg"`
 	RedfishError OptEventJobMessagesItemRedfishError `json:"redfish_error"`
 	Status       OptString                           `json:"status"`
+}
+
+// GetData returns the value of Data.
+func (s *EventJobMessagesItem) GetData() OptString {
+	return s.Data
 }
 
 // GetHost returns the value of Host.
@@ -1129,6 +1265,11 @@ func (s *EventJobMessagesItem) GetRedfishError() OptEventJobMessagesItemRedfishE
 // GetStatus returns the value of Status.
 func (s *EventJobMessagesItem) GetStatus() OptString {
 	return s.Status
+}
+
+// SetData sets the value of Data.
+func (s *EventJobMessagesItem) SetData(val OptString) {
+	s.Data = val
 }
 
 // SetHost sets the value of Host.
@@ -1883,10 +2024,16 @@ func (s *HostInterfacesItem) SetVlan(val OptString) {
 // JobMessage schema.
 // Ref: #/components/schemas/JobMessage
 type JobMessage struct {
+	Data         OptString                 `json:"data"`
 	Host         OptString                 `json:"host"`
 	Msg          OptString                 `json:"msg"`
 	RedfishError OptJobMessageRedfishError `json:"redfish_error"`
 	Status       OptString                 `json:"status"`
+}
+
+// GetData returns the value of Data.
+func (s *JobMessage) GetData() OptString {
+	return s.Data
 }
 
 // GetHost returns the value of Host.
@@ -1907,6 +2054,11 @@ func (s *JobMessage) GetRedfishError() OptJobMessageRedfishError {
 // GetStatus returns the value of Status.
 func (s *JobMessage) GetStatus() OptString {
 	return s.Status
+}
+
+// SetData sets the value of Data.
+func (s *JobMessage) SetData(val OptString) {
+	s.Data = val
 }
 
 // SetHost sets the value of Host.
@@ -3194,6 +3346,52 @@ func (s *NodeTagsRequest) SetTags(val OptString) {
 	s.Tags = val
 }
 
+// NewOptBmcJobDeleteRequestNodeJobList returns new OptBmcJobDeleteRequestNodeJobList with value set to v.
+func NewOptBmcJobDeleteRequestNodeJobList(v BmcJobDeleteRequestNodeJobList) OptBmcJobDeleteRequestNodeJobList {
+	return OptBmcJobDeleteRequestNodeJobList{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptBmcJobDeleteRequestNodeJobList is optional BmcJobDeleteRequestNodeJobList.
+type OptBmcJobDeleteRequestNodeJobList struct {
+	Value BmcJobDeleteRequestNodeJobList
+	Set   bool
+}
+
+// IsSet returns true if OptBmcJobDeleteRequestNodeJobList was set.
+func (o OptBmcJobDeleteRequestNodeJobList) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptBmcJobDeleteRequestNodeJobList) Reset() {
+	var v BmcJobDeleteRequestNodeJobList
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptBmcJobDeleteRequestNodeJobList) SetTo(v BmcJobDeleteRequestNodeJobList) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptBmcJobDeleteRequestNodeJobList) Get() (v BmcJobDeleteRequestNodeJobList, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptBmcJobDeleteRequestNodeJobList) Or(d BmcJobDeleteRequestNodeJobList) BmcJobDeleteRequestNodeJobList {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptBool returns new OptBool with value set to v.
 func NewOptBool(v bool) OptBool {
 	return OptBool{
@@ -4160,6 +4358,69 @@ func (o OptNilNilIntArray) Or(d []NilInt) []NilInt {
 	return d
 }
 
+// NewOptNilNilRedfishJobJobsItemArray returns new OptNilNilRedfishJobJobsItemArray with value set to v.
+func NewOptNilNilRedfishJobJobsItemArray(v []NilRedfishJobJobsItem) OptNilNilRedfishJobJobsItemArray {
+	return OptNilNilRedfishJobJobsItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilNilRedfishJobJobsItemArray is optional nullable []NilRedfishJobJobsItem.
+type OptNilNilRedfishJobJobsItemArray struct {
+	Value []NilRedfishJobJobsItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilNilRedfishJobJobsItemArray was set.
+func (o OptNilNilRedfishJobJobsItemArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilNilRedfishJobJobsItemArray) Reset() {
+	var v []NilRedfishJobJobsItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilNilRedfishJobJobsItemArray) SetTo(v []NilRedfishJobJobsItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilNilRedfishJobJobsItemArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilNilRedfishJobJobsItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []NilRedfishJobJobsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilNilRedfishJobJobsItemArray) Get() (v []NilRedfishJobJobsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilNilRedfishJobJobsItemArray) Or(d []NilRedfishJobJobsItem) []NilRedfishJobJobsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilNilStringArray returns new OptNilNilStringArray with value set to v.
 func NewOptNilNilStringArray(v []NilString) OptNilNilStringArray {
 	return OptNilNilStringArray{
@@ -4217,6 +4478,69 @@ func (o OptNilNilStringArray) Get() (v []NilString, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilNilStringArray) Or(d []NilString) []NilString {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilRedfishSystemOemDell returns new OptNilRedfishSystemOemDell with value set to v.
+func NewOptNilRedfishSystemOemDell(v RedfishSystemOemDell) OptNilRedfishSystemOemDell {
+	return OptNilRedfishSystemOemDell{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilRedfishSystemOemDell is optional nullable RedfishSystemOemDell.
+type OptNilRedfishSystemOemDell struct {
+	Value RedfishSystemOemDell
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilRedfishSystemOemDell was set.
+func (o OptNilRedfishSystemOemDell) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilRedfishSystemOemDell) Reset() {
+	var v RedfishSystemOemDell
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilRedfishSystemOemDell) SetTo(v RedfishSystemOemDell) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilRedfishSystemOemDell) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilRedfishSystemOemDell) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v RedfishSystemOemDell
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilRedfishSystemOemDell) Get() (v RedfishSystemOemDell, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilRedfishSystemOemDell) Or(d RedfishSystemOemDell) RedfishSystemOemDell {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4441,144 +4765,6 @@ func (o OptRedfishJobJobsItemSchedule) Or(d RedfishJobJobsItemSchedule) RedfishJ
 	return d
 }
 
-// NewOptRedfishSystemOem returns new OptRedfishSystemOem with value set to v.
-func NewOptRedfishSystemOem(v RedfishSystemOem) OptRedfishSystemOem {
-	return OptRedfishSystemOem{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptRedfishSystemOem is optional RedfishSystemOem.
-type OptRedfishSystemOem struct {
-	Value RedfishSystemOem
-	Set   bool
-}
-
-// IsSet returns true if OptRedfishSystemOem was set.
-func (o OptRedfishSystemOem) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptRedfishSystemOem) Reset() {
-	var v RedfishSystemOem
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptRedfishSystemOem) SetTo(v RedfishSystemOem) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptRedfishSystemOem) Get() (v RedfishSystemOem, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptRedfishSystemOem) Or(d RedfishSystemOem) RedfishSystemOem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptRedfishSystemOemDell returns new OptRedfishSystemOemDell with value set to v.
-func NewOptRedfishSystemOemDell(v RedfishSystemOemDell) OptRedfishSystemOemDell {
-	return OptRedfishSystemOemDell{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptRedfishSystemOemDell is optional RedfishSystemOemDell.
-type OptRedfishSystemOemDell struct {
-	Value RedfishSystemOemDell
-	Set   bool
-}
-
-// IsSet returns true if OptRedfishSystemOemDell was set.
-func (o OptRedfishSystemOemDell) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptRedfishSystemOemDell) Reset() {
-	var v RedfishSystemOemDell
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptRedfishSystemOemDell) SetTo(v RedfishSystemOemDell) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptRedfishSystemOemDell) Get() (v RedfishSystemOemDell, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptRedfishSystemOemDell) Or(d RedfishSystemOemDell) RedfishSystemOemDell {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptRedfishSystemOemDellDellSystem returns new OptRedfishSystemOemDellDellSystem with value set to v.
-func NewOptRedfishSystemOemDellDellSystem(v RedfishSystemOemDellDellSystem) OptRedfishSystemOemDellDellSystem {
-	return OptRedfishSystemOemDellDellSystem{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptRedfishSystemOemDellDellSystem is optional RedfishSystemOemDellDellSystem.
-type OptRedfishSystemOemDellDellSystem struct {
-	Value RedfishSystemOemDellDellSystem
-	Set   bool
-}
-
-// IsSet returns true if OptRedfishSystemOemDellDellSystem was set.
-func (o OptRedfishSystemOemDellDellSystem) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptRedfishSystemOemDellDellSystem) Reset() {
-	var v RedfishSystemOemDellDellSystem
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptRedfishSystemOemDellDellSystem) SetTo(v RedfishSystemOemDellDellSystem) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptRedfishSystemOemDellDellSystem) Get() (v RedfishSystemOemDellDellSystem, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptRedfishSystemOemDellDellSystem) Or(d RedfishSystemOemDellDellSystem) RedfishSystemOemDellDellSystem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
 	return OptString{
@@ -4704,15 +4890,254 @@ func (s *PostRolesRequest) SetRole(val OptString) {
 	s.Role = val
 }
 
+// RedfishDellUpgradeFirmware schema.
+// Ref: #/components/schemas/RedfishDellUpgradeFirmware
+type RedfishDellUpgradeFirmware struct {
+	Message          OptString                                  `json:"Message"`
+	Name             OptString                                  `json:"Name"`
+	Status           OptString                                  `json:"Status"`
+	UpdateCount      OptInt                                     `json:"UpdateCount"`
+	UpdateList       []RedfishDellUpgradeFirmwareUpdateListItem `json:"UpdateList"`
+	UpdateRebootType OptString                                  `json:"UpdateRebootType"`
+}
+
+// GetMessage returns the value of Message.
+func (s *RedfishDellUpgradeFirmware) GetMessage() OptString {
+	return s.Message
+}
+
+// GetName returns the value of Name.
+func (s *RedfishDellUpgradeFirmware) GetName() OptString {
+	return s.Name
+}
+
+// GetStatus returns the value of Status.
+func (s *RedfishDellUpgradeFirmware) GetStatus() OptString {
+	return s.Status
+}
+
+// GetUpdateCount returns the value of UpdateCount.
+func (s *RedfishDellUpgradeFirmware) GetUpdateCount() OptInt {
+	return s.UpdateCount
+}
+
+// GetUpdateList returns the value of UpdateList.
+func (s *RedfishDellUpgradeFirmware) GetUpdateList() []RedfishDellUpgradeFirmwareUpdateListItem {
+	return s.UpdateList
+}
+
+// GetUpdateRebootType returns the value of UpdateRebootType.
+func (s *RedfishDellUpgradeFirmware) GetUpdateRebootType() OptString {
+	return s.UpdateRebootType
+}
+
+// SetMessage sets the value of Message.
+func (s *RedfishDellUpgradeFirmware) SetMessage(val OptString) {
+	s.Message = val
+}
+
+// SetName sets the value of Name.
+func (s *RedfishDellUpgradeFirmware) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetStatus sets the value of Status.
+func (s *RedfishDellUpgradeFirmware) SetStatus(val OptString) {
+	s.Status = val
+}
+
+// SetUpdateCount sets the value of UpdateCount.
+func (s *RedfishDellUpgradeFirmware) SetUpdateCount(val OptInt) {
+	s.UpdateCount = val
+}
+
+// SetUpdateList sets the value of UpdateList.
+func (s *RedfishDellUpgradeFirmware) SetUpdateList(val []RedfishDellUpgradeFirmwareUpdateListItem) {
+	s.UpdateList = val
+}
+
+// SetUpdateRebootType sets the value of UpdateRebootType.
+func (s *RedfishDellUpgradeFirmware) SetUpdateRebootType(val OptString) {
+	s.UpdateRebootType = val
+}
+
+type RedfishDellUpgradeFirmwareUpdateListItem struct {
+	BaseLocation       OptString `json:"BaseLocation"`
+	ComponentID        OptString `json:"ComponentID"`
+	ComponentInfoName  OptString `json:"ComponentInfoName"`
+	ComponentInfoValue OptString `json:"ComponentInfoValue"`
+	ComponentType      OptString `json:"ComponentType"`
+	Criticality        OptString `json:"Criticality"`
+	DisplayName        OptString `json:"DisplayName"`
+	InstalledVersion   OptString `json:"InstalledVersion"`
+	JobID              OptString `json:"JobID"`
+	Name               OptString `json:"Name"`
+	PackageName        OptString `json:"PackageName"`
+	PackagePath        OptString `json:"PackagePath"`
+	PackageVersion     OptString `json:"PackageVersion"`
+	RebootType         OptString `json:"RebootType"`
+	Target             OptString `json:"Target"`
+}
+
+// GetBaseLocation returns the value of BaseLocation.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) GetBaseLocation() OptString {
+	return s.BaseLocation
+}
+
+// GetComponentID returns the value of ComponentID.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) GetComponentID() OptString {
+	return s.ComponentID
+}
+
+// GetComponentInfoName returns the value of ComponentInfoName.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) GetComponentInfoName() OptString {
+	return s.ComponentInfoName
+}
+
+// GetComponentInfoValue returns the value of ComponentInfoValue.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) GetComponentInfoValue() OptString {
+	return s.ComponentInfoValue
+}
+
+// GetComponentType returns the value of ComponentType.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) GetComponentType() OptString {
+	return s.ComponentType
+}
+
+// GetCriticality returns the value of Criticality.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) GetCriticality() OptString {
+	return s.Criticality
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) GetDisplayName() OptString {
+	return s.DisplayName
+}
+
+// GetInstalledVersion returns the value of InstalledVersion.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) GetInstalledVersion() OptString {
+	return s.InstalledVersion
+}
+
+// GetJobID returns the value of JobID.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) GetJobID() OptString {
+	return s.JobID
+}
+
+// GetName returns the value of Name.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) GetName() OptString {
+	return s.Name
+}
+
+// GetPackageName returns the value of PackageName.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) GetPackageName() OptString {
+	return s.PackageName
+}
+
+// GetPackagePath returns the value of PackagePath.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) GetPackagePath() OptString {
+	return s.PackagePath
+}
+
+// GetPackageVersion returns the value of PackageVersion.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) GetPackageVersion() OptString {
+	return s.PackageVersion
+}
+
+// GetRebootType returns the value of RebootType.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) GetRebootType() OptString {
+	return s.RebootType
+}
+
+// GetTarget returns the value of Target.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) GetTarget() OptString {
+	return s.Target
+}
+
+// SetBaseLocation sets the value of BaseLocation.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) SetBaseLocation(val OptString) {
+	s.BaseLocation = val
+}
+
+// SetComponentID sets the value of ComponentID.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) SetComponentID(val OptString) {
+	s.ComponentID = val
+}
+
+// SetComponentInfoName sets the value of ComponentInfoName.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) SetComponentInfoName(val OptString) {
+	s.ComponentInfoName = val
+}
+
+// SetComponentInfoValue sets the value of ComponentInfoValue.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) SetComponentInfoValue(val OptString) {
+	s.ComponentInfoValue = val
+}
+
+// SetComponentType sets the value of ComponentType.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) SetComponentType(val OptString) {
+	s.ComponentType = val
+}
+
+// SetCriticality sets the value of Criticality.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) SetCriticality(val OptString) {
+	s.Criticality = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) SetDisplayName(val OptString) {
+	s.DisplayName = val
+}
+
+// SetInstalledVersion sets the value of InstalledVersion.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) SetInstalledVersion(val OptString) {
+	s.InstalledVersion = val
+}
+
+// SetJobID sets the value of JobID.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) SetJobID(val OptString) {
+	s.JobID = val
+}
+
+// SetName sets the value of Name.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetPackageName sets the value of PackageName.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) SetPackageName(val OptString) {
+	s.PackageName = val
+}
+
+// SetPackagePath sets the value of PackagePath.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) SetPackagePath(val OptString) {
+	s.PackagePath = val
+}
+
+// SetPackageVersion sets the value of PackageVersion.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) SetPackageVersion(val OptString) {
+	s.PackageVersion = val
+}
+
+// SetRebootType sets the value of RebootType.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) SetRebootType(val OptString) {
+	s.RebootType = val
+}
+
+// SetTarget sets the value of Target.
+func (s *RedfishDellUpgradeFirmwareUpdateListItem) SetTarget(val OptString) {
+	s.Target = val
+}
+
 // RedfishJob schema.
 // Ref: #/components/schemas/RedfishJob
 type RedfishJob struct {
-	Jobs []NilRedfishJobJobsItem `json:"jobs"`
-	Name OptString               `json:"name"`
+	Jobs OptNilNilRedfishJobJobsItemArray `json:"jobs"`
+	Name OptString                        `json:"name"`
 }
 
 // GetJobs returns the value of Jobs.
-func (s *RedfishJob) GetJobs() []NilRedfishJobJobsItem {
+func (s *RedfishJob) GetJobs() OptNilNilRedfishJobJobsItemArray {
 	return s.Jobs
 }
 
@@ -4722,7 +5147,7 @@ func (s *RedfishJob) GetName() OptString {
 }
 
 // SetJobs sets the value of Jobs.
-func (s *RedfishJob) SetJobs(val []NilRedfishJobJobsItem) {
+func (s *RedfishJob) SetJobs(val OptNilNilRedfishJobJobsItemArray) {
 	s.Jobs = val
 }
 
@@ -5395,19 +5820,19 @@ func (s *RedfishMetricReportReportsItemMetricValuesItem) SetTimestamp(val OptStr
 // RedfishSystem schema.
 // Ref: #/components/schemas/RedfishSystem
 type RedfishSystem struct {
-	BiosVersion    OptString           `json:"bios_version"`
-	BootNext       OptString           `json:"boot_next"`
-	BootOrder      []string            `json:"boot_order"`
-	Health         OptString           `json:"health"`
-	HostName       OptString           `json:"host_name"`
-	Manufacturer   OptString           `json:"manufacturer"`
-	Model          OptString           `json:"model"`
-	Name           OptString           `json:"name"`
-	Oem            OptRedfishSystemOem `json:"oem"`
-	PowerStatus    OptString           `json:"power_status"`
-	ProcessorCount OptInt              `json:"processor_count"`
-	SerialNumber   OptString           `json:"serial_number"`
-	TotalMemory    OptFloat32          `json:"total_memory"`
+	BiosVersion    OptString                  `json:"bios_version"`
+	BootNext       OptString                  `json:"boot_next"`
+	BootOrder      []string                   `json:"boot_order"`
+	Health         OptString                  `json:"health"`
+	HostName       OptString                  `json:"host_name"`
+	Manufacturer   OptString                  `json:"manufacturer"`
+	Model          OptString                  `json:"model"`
+	Name           OptString                  `json:"name"`
+	OemDell        OptNilRedfishSystemOemDell `json:"oem_dell"`
+	PowerStatus    OptString                  `json:"power_status"`
+	ProcessorCount OptInt                     `json:"processor_count"`
+	SerialNumber   OptString                  `json:"serial_number"`
+	TotalMemory    OptFloat32                 `json:"total_memory"`
 }
 
 // GetBiosVersion returns the value of BiosVersion.
@@ -5450,9 +5875,9 @@ func (s *RedfishSystem) GetName() OptString {
 	return s.Name
 }
 
-// GetOem returns the value of Oem.
-func (s *RedfishSystem) GetOem() OptRedfishSystemOem {
-	return s.Oem
+// GetOemDell returns the value of OemDell.
+func (s *RedfishSystem) GetOemDell() OptNilRedfishSystemOemDell {
+	return s.OemDell
 }
 
 // GetPowerStatus returns the value of PowerStatus.
@@ -5515,9 +5940,9 @@ func (s *RedfishSystem) SetName(val OptString) {
 	s.Name = val
 }
 
-// SetOem sets the value of Oem.
-func (s *RedfishSystem) SetOem(val OptRedfishSystemOem) {
-	s.Oem = val
+// SetOemDell sets the value of OemDell.
+func (s *RedfishSystem) SetOemDell(val OptNilRedfishSystemOemDell) {
+	s.OemDell = val
 }
 
 // SetPowerStatus sets the value of PowerStatus.
@@ -5540,90 +5965,601 @@ func (s *RedfishSystem) SetTotalMemory(val OptFloat32) {
 	s.TotalMemory = val
 }
 
-type RedfishSystemOem struct {
-	Dell OptRedfishSystemOemDell `json:"Dell"`
-}
-
-// GetDell returns the value of Dell.
-func (s *RedfishSystemOem) GetDell() OptRedfishSystemOemDell {
-	return s.Dell
-}
-
-// SetDell sets the value of Dell.
-func (s *RedfishSystemOem) SetDell(val OptRedfishSystemOemDell) {
-	s.Dell = val
-}
-
 type RedfishSystemOemDell struct {
-	DellSystem OptRedfishSystemOemDellDellSystem `json:"DellSystem"`
+	OdataDotContext                    OptString `json:"@odata.context"`
+	OdataDotID                         OptString `json:"@odata.id"`
+	OdataDotType                       OptString `json:"@odata.type"`
+	BIOSReleaseDate                    OptString `json:"BIOSReleaseDate"`
+	BaseBoardChassisSlot               OptString `json:"BaseBoardChassisSlot"`
+	BatteryRollupStatus                OptString `json:"BatteryRollupStatus"`
+	BladeGeometry                      OptString `json:"BladeGeometry"`
+	CMCIP                              OptString `json:"CMCIP"`
+	CPURollupStatus                    OptString `json:"CPURollupStatus"`
+	ChassisModel                       OptString `json:"ChassisModel"`
+	ChassisName                        OptString `json:"ChassisName"`
+	ChassisServiceTag                  OptString `json:"ChassisServiceTag"`
+	ChassisSystemHeightUnit            OptInt    `json:"ChassisSystemHeightUnit"`
+	CurrentRollupStatus                OptString `json:"CurrentRollupStatus"`
+	Description                        OptString `json:"Description"`
+	EstimatedExhaustTemperatureCelsius OptInt    `json:"EstimatedExhaustTemperatureCelsius"`
+	EstimatedSystemAirflowCFM          OptInt    `json:"EstimatedSystemAirflowCFM"`
+	ExpressServiceCode                 OptString `json:"ExpressServiceCode"`
+	FanRollupStatus                    OptString `json:"FanRollupStatus"`
+	IDSDMRollupStatus                  OptString `json:"IDSDMRollupStatus"`
+	ID                                 OptString `json:"Id"`
+	IntrusionRollupStatus              OptString `json:"IntrusionRollupStatus"`
+	IsOEMBranded                       OptString `json:"IsOEMBranded"`
+	LastSystemInventoryTime            OptString `json:"LastSystemInventoryTime"`
+	LastUpdateTime                     OptString `json:"LastUpdateTime"`
+	LicensingRollupStatus              OptString `json:"LicensingRollupStatus"`
+	ManagedSystemSize                  OptString `json:"ManagedSystemSize"`
+	MaxCPUSockets                      OptInt    `json:"MaxCPUSockets"`
+	MaxDIMMSlots                       OptInt    `json:"MaxDIMMSlots"`
+	MaxPCIeSlots                       OptInt    `json:"MaxPCIeSlots"`
+	MemoryOperationMode                OptString `json:"MemoryOperationMode"`
+	Name                               OptString `json:"Name"`
+	NodeID                             OptString `json:"NodeID"`
+	PSRollupStatus                     OptString `json:"PSRollupStatus"`
+	PlatformGUID                       OptString `json:"PlatformGUID"`
+	PopulatedDIMMSlots                 OptInt    `json:"PopulatedDIMMSlots"`
+	PopulatedPCIeSlots                 OptInt    `json:"PopulatedPCIeSlots"`
+	PowerCapEnabledState               OptString `json:"PowerCapEnabledState"`
+	SDCardRollupStatus                 OptString `json:"SDCardRollupStatus"`
+	SELRollupStatus                    OptString `json:"SELRollupStatus"`
+	ServerAllocationWatts              OptInt    `json:"ServerAllocationWatts"`
+	StorageRollupStatus                OptString `json:"StorageRollupStatus"`
+	SysMemErrorMethodology             OptString `json:"SysMemErrorMethodology"`
+	SysMemFailOverState                OptString `json:"SysMemFailOverState"`
+	SysMemLocation                     OptString `json:"SysMemLocation"`
+	SysMemPrimaryStatus                OptString `json:"SysMemPrimaryStatus"`
+	SystemGeneration                   OptString `json:"SystemGeneration"`
+	SystemID                           OptInt    `json:"SystemID"`
+	SystemRevision                     OptString `json:"SystemRevision"`
+	TempRollupStatus                   OptString `json:"TempRollupStatus"`
+	TempStatisticsRollupStatus         OptString `json:"TempStatisticsRollupStatus"`
+	UUID                               OptString `json:"UUID"`
+	VoltRollupStatus                   OptString `json:"VoltRollupStatus"`
+	SmbiosGUID                         OptString `json:"smbiosGUID"`
 }
 
-// GetDellSystem returns the value of DellSystem.
-func (s *RedfishSystemOemDell) GetDellSystem() OptRedfishSystemOemDellDellSystem {
-	return s.DellSystem
+// GetOdataDotContext returns the value of OdataDotContext.
+func (s *RedfishSystemOemDell) GetOdataDotContext() OptString {
+	return s.OdataDotContext
 }
 
-// SetDellSystem sets the value of DellSystem.
-func (s *RedfishSystemOemDell) SetDellSystem(val OptRedfishSystemOemDellDellSystem) {
-	s.DellSystem = val
+// GetOdataDotID returns the value of OdataDotID.
+func (s *RedfishSystemOemDell) GetOdataDotID() OptString {
+	return s.OdataDotID
 }
 
-type RedfishSystemOemDellDellSystem struct {
-	ManagedSystemSize OptString `json:"ManagedSystemSize"`
-	MaxCPUSockets     OptInt    `json:"MaxCPUSockets"`
-	MaxDIMMSlots      OptInt    `json:"MaxDIMMSlots"`
-	MaxPCIeSlots      OptInt    `json:"MaxPCIeSlots"`
-	SystemID          OptInt    `json:"SystemID"`
+// GetOdataDotType returns the value of OdataDotType.
+func (s *RedfishSystemOemDell) GetOdataDotType() OptString {
+	return s.OdataDotType
+}
+
+// GetBIOSReleaseDate returns the value of BIOSReleaseDate.
+func (s *RedfishSystemOemDell) GetBIOSReleaseDate() OptString {
+	return s.BIOSReleaseDate
+}
+
+// GetBaseBoardChassisSlot returns the value of BaseBoardChassisSlot.
+func (s *RedfishSystemOemDell) GetBaseBoardChassisSlot() OptString {
+	return s.BaseBoardChassisSlot
+}
+
+// GetBatteryRollupStatus returns the value of BatteryRollupStatus.
+func (s *RedfishSystemOemDell) GetBatteryRollupStatus() OptString {
+	return s.BatteryRollupStatus
+}
+
+// GetBladeGeometry returns the value of BladeGeometry.
+func (s *RedfishSystemOemDell) GetBladeGeometry() OptString {
+	return s.BladeGeometry
+}
+
+// GetCMCIP returns the value of CMCIP.
+func (s *RedfishSystemOemDell) GetCMCIP() OptString {
+	return s.CMCIP
+}
+
+// GetCPURollupStatus returns the value of CPURollupStatus.
+func (s *RedfishSystemOemDell) GetCPURollupStatus() OptString {
+	return s.CPURollupStatus
+}
+
+// GetChassisModel returns the value of ChassisModel.
+func (s *RedfishSystemOemDell) GetChassisModel() OptString {
+	return s.ChassisModel
+}
+
+// GetChassisName returns the value of ChassisName.
+func (s *RedfishSystemOemDell) GetChassisName() OptString {
+	return s.ChassisName
+}
+
+// GetChassisServiceTag returns the value of ChassisServiceTag.
+func (s *RedfishSystemOemDell) GetChassisServiceTag() OptString {
+	return s.ChassisServiceTag
+}
+
+// GetChassisSystemHeightUnit returns the value of ChassisSystemHeightUnit.
+func (s *RedfishSystemOemDell) GetChassisSystemHeightUnit() OptInt {
+	return s.ChassisSystemHeightUnit
+}
+
+// GetCurrentRollupStatus returns the value of CurrentRollupStatus.
+func (s *RedfishSystemOemDell) GetCurrentRollupStatus() OptString {
+	return s.CurrentRollupStatus
+}
+
+// GetDescription returns the value of Description.
+func (s *RedfishSystemOemDell) GetDescription() OptString {
+	return s.Description
+}
+
+// GetEstimatedExhaustTemperatureCelsius returns the value of EstimatedExhaustTemperatureCelsius.
+func (s *RedfishSystemOemDell) GetEstimatedExhaustTemperatureCelsius() OptInt {
+	return s.EstimatedExhaustTemperatureCelsius
+}
+
+// GetEstimatedSystemAirflowCFM returns the value of EstimatedSystemAirflowCFM.
+func (s *RedfishSystemOemDell) GetEstimatedSystemAirflowCFM() OptInt {
+	return s.EstimatedSystemAirflowCFM
+}
+
+// GetExpressServiceCode returns the value of ExpressServiceCode.
+func (s *RedfishSystemOemDell) GetExpressServiceCode() OptString {
+	return s.ExpressServiceCode
+}
+
+// GetFanRollupStatus returns the value of FanRollupStatus.
+func (s *RedfishSystemOemDell) GetFanRollupStatus() OptString {
+	return s.FanRollupStatus
+}
+
+// GetIDSDMRollupStatus returns the value of IDSDMRollupStatus.
+func (s *RedfishSystemOemDell) GetIDSDMRollupStatus() OptString {
+	return s.IDSDMRollupStatus
+}
+
+// GetID returns the value of ID.
+func (s *RedfishSystemOemDell) GetID() OptString {
+	return s.ID
+}
+
+// GetIntrusionRollupStatus returns the value of IntrusionRollupStatus.
+func (s *RedfishSystemOemDell) GetIntrusionRollupStatus() OptString {
+	return s.IntrusionRollupStatus
+}
+
+// GetIsOEMBranded returns the value of IsOEMBranded.
+func (s *RedfishSystemOemDell) GetIsOEMBranded() OptString {
+	return s.IsOEMBranded
+}
+
+// GetLastSystemInventoryTime returns the value of LastSystemInventoryTime.
+func (s *RedfishSystemOemDell) GetLastSystemInventoryTime() OptString {
+	return s.LastSystemInventoryTime
+}
+
+// GetLastUpdateTime returns the value of LastUpdateTime.
+func (s *RedfishSystemOemDell) GetLastUpdateTime() OptString {
+	return s.LastUpdateTime
+}
+
+// GetLicensingRollupStatus returns the value of LicensingRollupStatus.
+func (s *RedfishSystemOemDell) GetLicensingRollupStatus() OptString {
+	return s.LicensingRollupStatus
 }
 
 // GetManagedSystemSize returns the value of ManagedSystemSize.
-func (s *RedfishSystemOemDellDellSystem) GetManagedSystemSize() OptString {
+func (s *RedfishSystemOemDell) GetManagedSystemSize() OptString {
 	return s.ManagedSystemSize
 }
 
 // GetMaxCPUSockets returns the value of MaxCPUSockets.
-func (s *RedfishSystemOemDellDellSystem) GetMaxCPUSockets() OptInt {
+func (s *RedfishSystemOemDell) GetMaxCPUSockets() OptInt {
 	return s.MaxCPUSockets
 }
 
 // GetMaxDIMMSlots returns the value of MaxDIMMSlots.
-func (s *RedfishSystemOemDellDellSystem) GetMaxDIMMSlots() OptInt {
+func (s *RedfishSystemOemDell) GetMaxDIMMSlots() OptInt {
 	return s.MaxDIMMSlots
 }
 
 // GetMaxPCIeSlots returns the value of MaxPCIeSlots.
-func (s *RedfishSystemOemDellDellSystem) GetMaxPCIeSlots() OptInt {
+func (s *RedfishSystemOemDell) GetMaxPCIeSlots() OptInt {
 	return s.MaxPCIeSlots
 }
 
+// GetMemoryOperationMode returns the value of MemoryOperationMode.
+func (s *RedfishSystemOemDell) GetMemoryOperationMode() OptString {
+	return s.MemoryOperationMode
+}
+
+// GetName returns the value of Name.
+func (s *RedfishSystemOemDell) GetName() OptString {
+	return s.Name
+}
+
+// GetNodeID returns the value of NodeID.
+func (s *RedfishSystemOemDell) GetNodeID() OptString {
+	return s.NodeID
+}
+
+// GetPSRollupStatus returns the value of PSRollupStatus.
+func (s *RedfishSystemOemDell) GetPSRollupStatus() OptString {
+	return s.PSRollupStatus
+}
+
+// GetPlatformGUID returns the value of PlatformGUID.
+func (s *RedfishSystemOemDell) GetPlatformGUID() OptString {
+	return s.PlatformGUID
+}
+
+// GetPopulatedDIMMSlots returns the value of PopulatedDIMMSlots.
+func (s *RedfishSystemOemDell) GetPopulatedDIMMSlots() OptInt {
+	return s.PopulatedDIMMSlots
+}
+
+// GetPopulatedPCIeSlots returns the value of PopulatedPCIeSlots.
+func (s *RedfishSystemOemDell) GetPopulatedPCIeSlots() OptInt {
+	return s.PopulatedPCIeSlots
+}
+
+// GetPowerCapEnabledState returns the value of PowerCapEnabledState.
+func (s *RedfishSystemOemDell) GetPowerCapEnabledState() OptString {
+	return s.PowerCapEnabledState
+}
+
+// GetSDCardRollupStatus returns the value of SDCardRollupStatus.
+func (s *RedfishSystemOemDell) GetSDCardRollupStatus() OptString {
+	return s.SDCardRollupStatus
+}
+
+// GetSELRollupStatus returns the value of SELRollupStatus.
+func (s *RedfishSystemOemDell) GetSELRollupStatus() OptString {
+	return s.SELRollupStatus
+}
+
+// GetServerAllocationWatts returns the value of ServerAllocationWatts.
+func (s *RedfishSystemOemDell) GetServerAllocationWatts() OptInt {
+	return s.ServerAllocationWatts
+}
+
+// GetStorageRollupStatus returns the value of StorageRollupStatus.
+func (s *RedfishSystemOemDell) GetStorageRollupStatus() OptString {
+	return s.StorageRollupStatus
+}
+
+// GetSysMemErrorMethodology returns the value of SysMemErrorMethodology.
+func (s *RedfishSystemOemDell) GetSysMemErrorMethodology() OptString {
+	return s.SysMemErrorMethodology
+}
+
+// GetSysMemFailOverState returns the value of SysMemFailOverState.
+func (s *RedfishSystemOemDell) GetSysMemFailOverState() OptString {
+	return s.SysMemFailOverState
+}
+
+// GetSysMemLocation returns the value of SysMemLocation.
+func (s *RedfishSystemOemDell) GetSysMemLocation() OptString {
+	return s.SysMemLocation
+}
+
+// GetSysMemPrimaryStatus returns the value of SysMemPrimaryStatus.
+func (s *RedfishSystemOemDell) GetSysMemPrimaryStatus() OptString {
+	return s.SysMemPrimaryStatus
+}
+
+// GetSystemGeneration returns the value of SystemGeneration.
+func (s *RedfishSystemOemDell) GetSystemGeneration() OptString {
+	return s.SystemGeneration
+}
+
 // GetSystemID returns the value of SystemID.
-func (s *RedfishSystemOemDellDellSystem) GetSystemID() OptInt {
+func (s *RedfishSystemOemDell) GetSystemID() OptInt {
 	return s.SystemID
 }
 
+// GetSystemRevision returns the value of SystemRevision.
+func (s *RedfishSystemOemDell) GetSystemRevision() OptString {
+	return s.SystemRevision
+}
+
+// GetTempRollupStatus returns the value of TempRollupStatus.
+func (s *RedfishSystemOemDell) GetTempRollupStatus() OptString {
+	return s.TempRollupStatus
+}
+
+// GetTempStatisticsRollupStatus returns the value of TempStatisticsRollupStatus.
+func (s *RedfishSystemOemDell) GetTempStatisticsRollupStatus() OptString {
+	return s.TempStatisticsRollupStatus
+}
+
+// GetUUID returns the value of UUID.
+func (s *RedfishSystemOemDell) GetUUID() OptString {
+	return s.UUID
+}
+
+// GetVoltRollupStatus returns the value of VoltRollupStatus.
+func (s *RedfishSystemOemDell) GetVoltRollupStatus() OptString {
+	return s.VoltRollupStatus
+}
+
+// GetSmbiosGUID returns the value of SmbiosGUID.
+func (s *RedfishSystemOemDell) GetSmbiosGUID() OptString {
+	return s.SmbiosGUID
+}
+
+// SetOdataDotContext sets the value of OdataDotContext.
+func (s *RedfishSystemOemDell) SetOdataDotContext(val OptString) {
+	s.OdataDotContext = val
+}
+
+// SetOdataDotID sets the value of OdataDotID.
+func (s *RedfishSystemOemDell) SetOdataDotID(val OptString) {
+	s.OdataDotID = val
+}
+
+// SetOdataDotType sets the value of OdataDotType.
+func (s *RedfishSystemOemDell) SetOdataDotType(val OptString) {
+	s.OdataDotType = val
+}
+
+// SetBIOSReleaseDate sets the value of BIOSReleaseDate.
+func (s *RedfishSystemOemDell) SetBIOSReleaseDate(val OptString) {
+	s.BIOSReleaseDate = val
+}
+
+// SetBaseBoardChassisSlot sets the value of BaseBoardChassisSlot.
+func (s *RedfishSystemOemDell) SetBaseBoardChassisSlot(val OptString) {
+	s.BaseBoardChassisSlot = val
+}
+
+// SetBatteryRollupStatus sets the value of BatteryRollupStatus.
+func (s *RedfishSystemOemDell) SetBatteryRollupStatus(val OptString) {
+	s.BatteryRollupStatus = val
+}
+
+// SetBladeGeometry sets the value of BladeGeometry.
+func (s *RedfishSystemOemDell) SetBladeGeometry(val OptString) {
+	s.BladeGeometry = val
+}
+
+// SetCMCIP sets the value of CMCIP.
+func (s *RedfishSystemOemDell) SetCMCIP(val OptString) {
+	s.CMCIP = val
+}
+
+// SetCPURollupStatus sets the value of CPURollupStatus.
+func (s *RedfishSystemOemDell) SetCPURollupStatus(val OptString) {
+	s.CPURollupStatus = val
+}
+
+// SetChassisModel sets the value of ChassisModel.
+func (s *RedfishSystemOemDell) SetChassisModel(val OptString) {
+	s.ChassisModel = val
+}
+
+// SetChassisName sets the value of ChassisName.
+func (s *RedfishSystemOemDell) SetChassisName(val OptString) {
+	s.ChassisName = val
+}
+
+// SetChassisServiceTag sets the value of ChassisServiceTag.
+func (s *RedfishSystemOemDell) SetChassisServiceTag(val OptString) {
+	s.ChassisServiceTag = val
+}
+
+// SetChassisSystemHeightUnit sets the value of ChassisSystemHeightUnit.
+func (s *RedfishSystemOemDell) SetChassisSystemHeightUnit(val OptInt) {
+	s.ChassisSystemHeightUnit = val
+}
+
+// SetCurrentRollupStatus sets the value of CurrentRollupStatus.
+func (s *RedfishSystemOemDell) SetCurrentRollupStatus(val OptString) {
+	s.CurrentRollupStatus = val
+}
+
+// SetDescription sets the value of Description.
+func (s *RedfishSystemOemDell) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetEstimatedExhaustTemperatureCelsius sets the value of EstimatedExhaustTemperatureCelsius.
+func (s *RedfishSystemOemDell) SetEstimatedExhaustTemperatureCelsius(val OptInt) {
+	s.EstimatedExhaustTemperatureCelsius = val
+}
+
+// SetEstimatedSystemAirflowCFM sets the value of EstimatedSystemAirflowCFM.
+func (s *RedfishSystemOemDell) SetEstimatedSystemAirflowCFM(val OptInt) {
+	s.EstimatedSystemAirflowCFM = val
+}
+
+// SetExpressServiceCode sets the value of ExpressServiceCode.
+func (s *RedfishSystemOemDell) SetExpressServiceCode(val OptString) {
+	s.ExpressServiceCode = val
+}
+
+// SetFanRollupStatus sets the value of FanRollupStatus.
+func (s *RedfishSystemOemDell) SetFanRollupStatus(val OptString) {
+	s.FanRollupStatus = val
+}
+
+// SetIDSDMRollupStatus sets the value of IDSDMRollupStatus.
+func (s *RedfishSystemOemDell) SetIDSDMRollupStatus(val OptString) {
+	s.IDSDMRollupStatus = val
+}
+
+// SetID sets the value of ID.
+func (s *RedfishSystemOemDell) SetID(val OptString) {
+	s.ID = val
+}
+
+// SetIntrusionRollupStatus sets the value of IntrusionRollupStatus.
+func (s *RedfishSystemOemDell) SetIntrusionRollupStatus(val OptString) {
+	s.IntrusionRollupStatus = val
+}
+
+// SetIsOEMBranded sets the value of IsOEMBranded.
+func (s *RedfishSystemOemDell) SetIsOEMBranded(val OptString) {
+	s.IsOEMBranded = val
+}
+
+// SetLastSystemInventoryTime sets the value of LastSystemInventoryTime.
+func (s *RedfishSystemOemDell) SetLastSystemInventoryTime(val OptString) {
+	s.LastSystemInventoryTime = val
+}
+
+// SetLastUpdateTime sets the value of LastUpdateTime.
+func (s *RedfishSystemOemDell) SetLastUpdateTime(val OptString) {
+	s.LastUpdateTime = val
+}
+
+// SetLicensingRollupStatus sets the value of LicensingRollupStatus.
+func (s *RedfishSystemOemDell) SetLicensingRollupStatus(val OptString) {
+	s.LicensingRollupStatus = val
+}
+
 // SetManagedSystemSize sets the value of ManagedSystemSize.
-func (s *RedfishSystemOemDellDellSystem) SetManagedSystemSize(val OptString) {
+func (s *RedfishSystemOemDell) SetManagedSystemSize(val OptString) {
 	s.ManagedSystemSize = val
 }
 
 // SetMaxCPUSockets sets the value of MaxCPUSockets.
-func (s *RedfishSystemOemDellDellSystem) SetMaxCPUSockets(val OptInt) {
+func (s *RedfishSystemOemDell) SetMaxCPUSockets(val OptInt) {
 	s.MaxCPUSockets = val
 }
 
 // SetMaxDIMMSlots sets the value of MaxDIMMSlots.
-func (s *RedfishSystemOemDellDellSystem) SetMaxDIMMSlots(val OptInt) {
+func (s *RedfishSystemOemDell) SetMaxDIMMSlots(val OptInt) {
 	s.MaxDIMMSlots = val
 }
 
 // SetMaxPCIeSlots sets the value of MaxPCIeSlots.
-func (s *RedfishSystemOemDellDellSystem) SetMaxPCIeSlots(val OptInt) {
+func (s *RedfishSystemOemDell) SetMaxPCIeSlots(val OptInt) {
 	s.MaxPCIeSlots = val
 }
 
+// SetMemoryOperationMode sets the value of MemoryOperationMode.
+func (s *RedfishSystemOemDell) SetMemoryOperationMode(val OptString) {
+	s.MemoryOperationMode = val
+}
+
+// SetName sets the value of Name.
+func (s *RedfishSystemOemDell) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetNodeID sets the value of NodeID.
+func (s *RedfishSystemOemDell) SetNodeID(val OptString) {
+	s.NodeID = val
+}
+
+// SetPSRollupStatus sets the value of PSRollupStatus.
+func (s *RedfishSystemOemDell) SetPSRollupStatus(val OptString) {
+	s.PSRollupStatus = val
+}
+
+// SetPlatformGUID sets the value of PlatformGUID.
+func (s *RedfishSystemOemDell) SetPlatformGUID(val OptString) {
+	s.PlatformGUID = val
+}
+
+// SetPopulatedDIMMSlots sets the value of PopulatedDIMMSlots.
+func (s *RedfishSystemOemDell) SetPopulatedDIMMSlots(val OptInt) {
+	s.PopulatedDIMMSlots = val
+}
+
+// SetPopulatedPCIeSlots sets the value of PopulatedPCIeSlots.
+func (s *RedfishSystemOemDell) SetPopulatedPCIeSlots(val OptInt) {
+	s.PopulatedPCIeSlots = val
+}
+
+// SetPowerCapEnabledState sets the value of PowerCapEnabledState.
+func (s *RedfishSystemOemDell) SetPowerCapEnabledState(val OptString) {
+	s.PowerCapEnabledState = val
+}
+
+// SetSDCardRollupStatus sets the value of SDCardRollupStatus.
+func (s *RedfishSystemOemDell) SetSDCardRollupStatus(val OptString) {
+	s.SDCardRollupStatus = val
+}
+
+// SetSELRollupStatus sets the value of SELRollupStatus.
+func (s *RedfishSystemOemDell) SetSELRollupStatus(val OptString) {
+	s.SELRollupStatus = val
+}
+
+// SetServerAllocationWatts sets the value of ServerAllocationWatts.
+func (s *RedfishSystemOemDell) SetServerAllocationWatts(val OptInt) {
+	s.ServerAllocationWatts = val
+}
+
+// SetStorageRollupStatus sets the value of StorageRollupStatus.
+func (s *RedfishSystemOemDell) SetStorageRollupStatus(val OptString) {
+	s.StorageRollupStatus = val
+}
+
+// SetSysMemErrorMethodology sets the value of SysMemErrorMethodology.
+func (s *RedfishSystemOemDell) SetSysMemErrorMethodology(val OptString) {
+	s.SysMemErrorMethodology = val
+}
+
+// SetSysMemFailOverState sets the value of SysMemFailOverState.
+func (s *RedfishSystemOemDell) SetSysMemFailOverState(val OptString) {
+	s.SysMemFailOverState = val
+}
+
+// SetSysMemLocation sets the value of SysMemLocation.
+func (s *RedfishSystemOemDell) SetSysMemLocation(val OptString) {
+	s.SysMemLocation = val
+}
+
+// SetSysMemPrimaryStatus sets the value of SysMemPrimaryStatus.
+func (s *RedfishSystemOemDell) SetSysMemPrimaryStatus(val OptString) {
+	s.SysMemPrimaryStatus = val
+}
+
+// SetSystemGeneration sets the value of SystemGeneration.
+func (s *RedfishSystemOemDell) SetSystemGeneration(val OptString) {
+	s.SystemGeneration = val
+}
+
 // SetSystemID sets the value of SystemID.
-func (s *RedfishSystemOemDellDellSystem) SetSystemID(val OptInt) {
+func (s *RedfishSystemOemDell) SetSystemID(val OptInt) {
 	s.SystemID = val
+}
+
+// SetSystemRevision sets the value of SystemRevision.
+func (s *RedfishSystemOemDell) SetSystemRevision(val OptString) {
+	s.SystemRevision = val
+}
+
+// SetTempRollupStatus sets the value of TempRollupStatus.
+func (s *RedfishSystemOemDell) SetTempRollupStatus(val OptString) {
+	s.TempRollupStatus = val
+}
+
+// SetTempStatisticsRollupStatus sets the value of TempStatisticsRollupStatus.
+func (s *RedfishSystemOemDell) SetTempStatisticsRollupStatus(val OptString) {
+	s.TempStatisticsRollupStatus = val
+}
+
+// SetUUID sets the value of UUID.
+func (s *RedfishSystemOemDell) SetUUID(val OptString) {
+	s.UUID = val
+}
+
+// SetVoltRollupStatus sets the value of VoltRollupStatus.
+func (s *RedfishSystemOemDell) SetVoltRollupStatus(val OptString) {
+	s.VoltRollupStatus = val
+}
+
+// SetSmbiosGUID sets the value of SmbiosGUID.
+func (s *RedfishSystemOemDell) SetSmbiosGUID(val OptString) {
+	s.SmbiosGUID = val
 }
 
 // User schema.

@@ -60,6 +60,38 @@ export type AuthTokenRequest = {
 };
 
 /**
+ * BmcDellInstallFromRepoRequest schema
+ */
+export type BmcDellInstallFromRepoRequest = {
+    /**
+     * ApplyUpdate false will only check for firmware upgrades. true will queue the update installs as a job.
+     */
+    ApplyUpdate?: boolean;
+    CatalogFile?: string;
+    /**
+     * clear job queue before submitting request. ApplyUpdate must be true
+     */
+    ClearJobQueue?: boolean;
+    /**
+     * domain name or IP address of share
+     */
+    IPAddress?: string;
+    /**
+     * false = share needs valid HTTPS cert, true = allow invalid certs
+     */
+    IgnoreCertWarning?: boolean;
+    /**
+     * false = do not reboot node automatically, jobs will queue as scheduled and wait until next boot. true = reboot when needed
+     */
+    RebootNeeded?: boolean;
+    ShareName?: string;
+    /**
+     * type of share
+     */
+    ShareType?: string;
+};
+
+/**
  * BmcImportConfigurationRequest schema
  */
 export type BmcImportConfigurationRequest = {
@@ -71,6 +103,18 @@ export type BmcImportConfigurationRequest = {
      * options include: NoReboot, Graceful, Forced
      */
     shutdown_type?: string;
+};
+
+/**
+ * BmcJobDeleteRequest schema
+ */
+export type BmcJobDeleteRequest = {
+    /**
+     * Map with Node and Redfish Job IDs. Use 'JID_CLEARALL' to clear all jobs
+     */
+    node_job_list?: {
+        [key: string]: Array<(string)>;
+    };
 };
 
 /**
@@ -186,6 +230,7 @@ export type DataDump = {
  */
 export type Event = {
     JobMessages?: Array<{
+        data?: string;
         host?: string;
         msg?: string;
         redfish_error?: {
@@ -305,6 +350,7 @@ export type Host = {
  * JobMessage schema
  */
 export type JobMessage = {
+    data?: string;
     host?: string;
     msg?: string;
     redfish_error?: {
@@ -430,6 +476,34 @@ export type PostRolesRequest = {
 };
 
 /**
+ * RedfishDellUpgradeFirmware schema
+ */
+export type RedfishDellUpgradeFirmware = {
+    Message?: string;
+    Name?: string;
+    Status?: string;
+    UpdateCount?: number;
+    UpdateList?: Array<{
+        BaseLocation?: string;
+        ComponentID?: string;
+        ComponentInfoName?: string;
+        ComponentInfoValue?: string;
+        ComponentType?: string;
+        Criticality?: string;
+        DisplayName?: string;
+        InstalledVersion?: string;
+        JobID?: string;
+        Name?: string;
+        PackageName?: string;
+        PackagePath?: string;
+        PackageVersion?: string;
+        RebootType?: string;
+        Target?: string;
+    }>;
+    UpdateRebootType?: string;
+};
+
+/**
  * RedfishJob schema
  */
 export type RedfishJob = {
@@ -477,7 +551,7 @@ export type RedfishJob = {
         };
         StartTime?: string;
         StepOrder?: Array<((string) | null)> | null;
-    } | null)>;
+    } | null)> | null;
     name?: string;
 };
 
@@ -519,17 +593,62 @@ export type RedfishSystem = {
     manufacturer?: string;
     model?: string;
     name?: string;
-    oem?: {
-        Dell?: {
-            DellSystem?: {
-                ManagedSystemSize?: string;
-                MaxCPUSockets?: number;
-                MaxDIMMSlots?: number;
-                MaxPCIeSlots?: number;
-                SystemID?: number;
-            };
-        };
-    };
+    oem_dell?: {
+        '@odata.context'?: string;
+        '@odata.id'?: string;
+        '@odata.type'?: string;
+        BIOSReleaseDate?: string;
+        BaseBoardChassisSlot?: string;
+        BatteryRollupStatus?: string;
+        BladeGeometry?: string;
+        CMCIP?: string;
+        CPURollupStatus?: string;
+        ChassisModel?: string;
+        ChassisName?: string;
+        ChassisServiceTag?: string;
+        ChassisSystemHeightUnit?: number;
+        CurrentRollupStatus?: string;
+        Description?: string;
+        EstimatedExhaustTemperatureCelsius?: number;
+        EstimatedSystemAirflowCFM?: number;
+        ExpressServiceCode?: string;
+        FanRollupStatus?: string;
+        IDSDMRollupStatus?: string;
+        Id?: string;
+        IntrusionRollupStatus?: string;
+        IsOEMBranded?: string;
+        LastSystemInventoryTime?: string;
+        LastUpdateTime?: string;
+        LicensingRollupStatus?: string;
+        ManagedSystemSize?: string;
+        MaxCPUSockets?: number;
+        MaxDIMMSlots?: number;
+        MaxPCIeSlots?: number;
+        MemoryOperationMode?: string;
+        Name?: string;
+        NodeID?: string;
+        PSRollupStatus?: string;
+        PlatformGUID?: string;
+        PopulatedDIMMSlots?: number;
+        PopulatedPCIeSlots?: number;
+        PowerCapEnabledState?: string;
+        SDCardRollupStatus?: string;
+        SELRollupStatus?: string;
+        ServerAllocationWatts?: number;
+        StorageRollupStatus?: string;
+        SysMemErrorMethodology?: string;
+        SysMemFailOverState?: string;
+        SysMemLocation?: string;
+        SysMemPrimaryStatus?: string;
+        SystemGeneration?: string;
+        SystemID?: number;
+        SystemRevision?: string;
+        TempRollupStatus?: string;
+        TempStatisticsRollupStatus?: string;
+        UUID?: string;
+        VoltRollupStatus?: string;
+        smbiosGUID?: string;
+    } | null;
     power_status?: string;
     processor_count?: number;
     serial_number?: string;
@@ -717,6 +836,30 @@ export type PostV1BmcConfigureImportResponse = (Array<JobMessage>);
 
 export type PostV1BmcConfigureImportError = (HTTPError);
 
+export type DeleteV1BmcJobsData = {
+    /**
+     * Request body for api.BmcJobDeleteRequest
+     */
+    body: BmcJobDeleteRequest;
+    headers?: {
+        Accept?: string;
+    };
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+    };
+};
+
+export type DeleteV1BmcJobsResponse = (Array<JobMessage>);
+
+export type DeleteV1BmcJobsError = (HTTPError);
+
 export type GetV1BmcJobsData = {
     headers?: {
         Accept?: string;
@@ -846,6 +989,50 @@ export type DeleteV1BmcSelData = {
 export type DeleteV1BmcSelResponse = (Array<JobMessage>);
 
 export type DeleteV1BmcSelError = (HTTPError);
+
+export type PostV1BmcUpgradeDellInstallfromrepoData = {
+    /**
+     * Request body for api.BmcDellInstallFromRepoRequest
+     */
+    body: BmcDellInstallFromRepoRequest;
+    headers?: {
+        Accept?: string;
+    };
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+    };
+};
+
+export type PostV1BmcUpgradeDellInstallfromrepoResponse = (Array<JobMessage>);
+
+export type PostV1BmcUpgradeDellInstallfromrepoError = (HTTPError);
+
+export type GetV1BmcUpgradeDellRepoData = {
+    headers?: {
+        Accept?: string;
+    };
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+    };
+};
+
+export type GetV1BmcUpgradeDellRepoResponse = (Array<RedfishDellUpgradeFirmware>);
+
+export type GetV1BmcUpgradeDellRepoError = (HTTPError);
 
 export type GetV1DbDumpData = {
     headers?: {

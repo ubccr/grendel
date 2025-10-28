@@ -13,17 +13,15 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { LoaderCircle } from "lucide-react";
-import { useDeleteV1BmcJobsJids, useGetV1BmcJobsKey } from "@/openapi/queries";
+import { useDeleteV1BmcJobs, useGetV1BmcJobsKey } from "@/openapi/queries";
 
 export default function JobActions({
-  nodes,
-  jids,
+  checked,
 }: {
-  nodes: string;
-  jids: string;
+  checked: Map<string, string[]>;
 }) {
   const queryClient = useQueryClient();
-  const mutation_delete = useDeleteV1BmcJobsJids();
+  const mutation_delete = useDeleteV1BmcJobs();
 
   return (
     <div className="mt-4 grid grid-cols-2 gap-4">
@@ -34,7 +32,7 @@ export default function JobActions({
         <CardFooter>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="destructive" disabled={jids === ""}>
+              <Button variant="destructive" disabled={checked.size < 1}>
                 {mutation_delete.isPending ? (
                   <LoaderCircle className="animate-spin" />
                 ) : (
@@ -46,17 +44,18 @@ export default function JobActions({
               <DialogHeader>
                 <DialogTitle>Are you sure?</DialogTitle>
                 <DialogDescription className="break-all">
-                  WARNING: Selected jobs: ({jids}) will be removed from node: (
-                  {nodes})!
+                  WARNING: Selected jobs will be deleted!
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
                 <DialogClose asChild>
                   <Button
                     variant="destructive"
-                    onClick={() =>
+                    onClick={() => {
+                      const b: any = {};
+                      checked.forEach((v, k) => (b[k] = v));
                       mutation_delete.mutate(
-                        { path: { jids: jids }, query: { nodeset: nodes } },
+                        { body: { node_job_list: b } },
                         {
                           onSuccess: () => {
                             toast.success("Successfully deleted job(s)");
@@ -69,9 +68,9 @@ export default function JobActions({
                               description: e.detail,
                             }),
                         },
-                      )
-                    }
-                    disabled={jids === ""}
+                      );
+                    }}
+                    disabled={checked.size < 1}
                   >
                     Confirm
                   </Button>

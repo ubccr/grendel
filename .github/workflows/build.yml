@@ -43,6 +43,9 @@ jobs:
           go-version-file: "go.mod"
 
       - name: Run tests
+        run: go test ./...
+
+      - name: Run tests
         run: go test ./... -json > tests.json
 
       - name: Generate test report

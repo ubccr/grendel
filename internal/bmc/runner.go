@@ -10,6 +10,7 @@ import (
 
 	"github.com/korovkin/limiter"
 	"github.com/spf13/viper"
+	"github.com/stmcginnis/gofish/oem/dell"
 	"github.com/stmcginnis/gofish/redfish"
 	"github.com/ubccr/grendel/pkg/model"
 )
@@ -107,89 +108,6 @@ func (r *jobRunner) RunBmcStatus(host *model.Host, ch chan model.JobMessage) {
 
 		m.Status = "success"
 		m.Msg = string(output)
-	})
-}
-
-func (r *jobRunner) RunGetFirmware(host *model.Host, ch chan model.JobMessage) {
-	r.limit.Execute(func() {
-		m := model.JobMessage{Status: "error", Host: host.Name}
-		defer func() { ch <- m }()
-
-		data := Firmware{}
-		bmc := host.InterfaceBMC()
-		ip := ""
-		if bmc != nil {
-			ip = bmc.AddrString()
-		} else {
-			m.Msg = "failed to find bmc interface to query"
-			return
-		}
-		r, err := NewRedfishClient(ip, r.user, r.pass, r.insecure)
-		if err != nil {
-			m.Msg = fmt.Sprintf("%s", err)
-			return
-		}
-
-		defer r.client.Logout()
-
-		data.CurrentFirmwares, err = r.GetFirmware()
-		if err != nil {
-			m.Msg = fmt.Sprintf("%s", err)
-			return
-		}
-
-		if r.service.Vendor == "Dell" {
-			sys, err := r.GetSystem()
-			if err != nil {
-				m.Msg = fmt.Sprintf("%s", err)
-				return
-			}
-			data.SystemID = fmt.Sprintf("%04X", sys.OEM.Dell.DellSystem.SystemID)
-		}
-
-		data.Name = host.Name
-		output, err := json.Marshal(data)
-		if err != nil {
-			m.Msg = fmt.Sprintf("%s", err)
-			return
-		}
-
-		m.Status = "success"
-		m.Msg = string(output)
-	})
-}
-
-func (jr *jobRunner) RunUpdateFirmware(host *model.Host, ch chan model.JobMessage, firmwarePaths []string) {
-	jr.limit.Execute(func() {
-		m := model.JobMessage{Status: "error", Host: host.Name}
-		defer func() { ch <- m }()
-
-		bmc := host.InterfaceBMC()
-		ip := ""
-		if bmc != nil {
-			ip = bmc.AddrString()
-		} else {
-			m.Msg = "failed to find bmc interface to query"
-			return
-		}
-		r, err := NewRedfishClient(ip, jr.user, jr.pass, jr.insecure)
-		if err != nil {
-			m.Msg = fmt.Sprintf("%s", err)
-			return
-		}
-
-		defer r.client.Logout()
-
-		for _, firmwarePath := range firmwarePaths {
-			err := r.UpdateFirmware(firmwarePath)
-			if err != nil {
-				m.Msg = fmt.Sprintf("%s", err)
-				return
-			}
-		}
-
-		m.Status = "success"
-		m.Msg = "Submitted update job(s) to BMC"
 	})
 }
 
@@ -428,6 +346,82 @@ func (r *jobRunner) RunBmcGetMetricReports(host *model.Host, ch chan model.JobMe
 		}
 
 		output, err := json.Marshal(reports)
+		if err != nil {
+			m.Msg = err.Error()
+			return
+		}
+
+		m.Status = "success"
+		m.Msg = string(output)
+	})
+}
+
+func (jr *jobRunner) RunDellInstallFromRepo(host *model.Host, ch chan model.JobMessage, installBody dell.InstallFromRepoBody) {
+	jr.limit.Execute(func() {
+		m := model.JobMessage{Status: "error", Host: host.Name}
+		defer func() { ch <- m }()
+
+		bmc := host.InterfaceBMC()
+		ip := ""
+		if bmc != nil {
+			ip = bmc.AddrString()
+		} else {
+			m.Msg = "failed to find bmc interface to query"
+			return
+		}
+		r, err := NewRedfishClient(ip, jr.user, jr.pass, jr.insecure)
+		if err != nil {
+			m.Msg = fmt.Sprintf("%s", err)
+			return
+		}
+
+		defer r.client.Logout()
+
+		res, err := r.DellInstallFromRepo(installBody)
+		if err != nil {
+			m.Msg = fmt.Sprintf("%s", err)
+			return
+		}
+		output, err := json.Marshal(res)
+		if err != nil {
+			m.Msg = err.Error()
+			return
+		}
+
+		m.Status = "success"
+		m.Msg = "successfully queued firmware update job"
+		m.Data = string(output)
+	})
+}
+
+func (jr *jobRunner) RunDellGetRepoUpdateList(host *model.Host, ch chan model.JobMessage) {
+	jr.limit.Execute(func() {
+		m := model.JobMessage{Status: "error", Host: host.Name}
+		defer func() { ch <- m }()
+
+		bmc := host.InterfaceBMC()
+		ip := ""
+		if bmc != nil {
+			ip = bmc.AddrString()
+		} else {
+			m.Msg = "failed to find bmc interface to query"
+			return
+		}
+		r, err := NewRedfishClient(ip, jr.user, jr.pass, jr.insecure)
+		if err != nil {
+			m.Msg = fmt.Sprintf("%s", err)
+			return
+		}
+
+		defer r.client.Logout()
+
+		ul, err := r.DellGetRepoUpdateList()
+		if err != nil {
+			m.Msg = err.Error()
+			return
+		}
+
+		output, err := json.Marshal(ul)
 		if err != nil {
 			m.Msg = err.Error()
 			return

@@ -7,6 +7,15 @@ type DELETEV1AuthSignoutParams struct {
 	Accept OptString
 }
 
+// DELETEV1BmcJobsParams is parameters of DELETE_/v1/bmc/jobs operation.
+type DELETEV1BmcJobsParams struct {
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags   OptString
+	Accept OptString
+}
+
 // DELETEV1BmcJobsJidsParams is parameters of DELETE_/v1/bmc/jobs/:jids operation.
 type DELETEV1BmcJobsJidsParams struct {
 	// Redfish Job IDs. Use 'JID_CLEARALL' to clear all jobs.
@@ -77,6 +86,15 @@ type GETV1BmcJobsParams struct {
 
 // GETV1BmcMetricsParams is parameters of GET_/v1/bmc/metrics operation.
 type GETV1BmcMetricsParams struct {
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags   OptString
+	Accept OptString
+}
+
+// GETV1BmcUpgradeDellRepoParams is parameters of GET_/v1/bmc/upgrade/dell/repo operation.
+type GETV1BmcUpgradeDellRepoParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
 	Nodeset OptString
 	// Filter by tags. Minimum of one query parameter is required.
@@ -250,6 +268,15 @@ type POSTV1BmcPowerBmcParams struct {
 
 // POSTV1BmcPowerOsParams is parameters of POST_/v1/bmc/power/os operation.
 type POSTV1BmcPowerOsParams struct {
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags   OptString
+	Accept OptString
+}
+
+// POSTV1BmcUpgradeDellInstallfromrepoParams is parameters of POST_/v1/bmc/upgrade/dell/installfromrepo operation.
+type POSTV1BmcUpgradeDellInstallfromrepoParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
 	Nodeset OptString
 	// Filter by tags. Minimum of one query parameter is required.

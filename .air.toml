@@ -1,11 +1,11 @@
 root = "."
 testdata_dir = "testdata"
-tmp_dir = "tmp"
+tmp_dir = ""
 
 [build]
   args_bin = []
-  bin = "./tmp/main"
-  cmd = "go build -o ./tmp/main ."
+  bin = "./grendel"
+  cmd = "go build -o ./grendel ."
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata"]
   exclude_file = []
@@ -36,7 +36,7 @@ tmp_dir = "tmp"
 
 [log]
   main_only = true
-  silent = false
+  silent = true
   time = false
 
 [misc]
@@ -48,5 +48,5 @@ tmp_dir = "tmp"
   proxy_port = 0
 
 [screen]
-  clear_on_rebuild = false
+  clear_on_rebuild = true
   keep_scroll = true

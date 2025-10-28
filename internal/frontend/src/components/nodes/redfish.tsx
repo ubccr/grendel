@@ -2,7 +2,6 @@ import { HeartPulse, Power } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { UseQueryResult } from "@tanstack/react-query";
 import { GetV1BmcResponse } from "@/openapi/requests";
-import { Progress } from "../ui/progress";
 
 export default function NodeRedfish({
   redfish,
@@ -11,7 +10,6 @@ export default function NodeRedfish({
 }) {
   return (
     <div>
-      {redfish.isFetching && <Progress className="h-1" />}
       {redfish.data && redfish.data.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-3">
           <Card>

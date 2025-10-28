@@ -2,7 +2,7 @@
 
 import { type Options } from "@hey-api/client-fetch";
 import { UseQueryResult } from "@tanstack/react-query";
-import { deleteV1AuthSignout, deleteV1BmcJobsJids, deleteV1BmcSel, deleteV1Images, deleteV1Nodes, deleteV1RolesNames, deleteV1UsersUsernames, getV1Bmc, getV1BmcJobs, getV1BmcMetrics, getV1DbDump, getV1GrendelEvents, getV1Images, getV1ImagesFind, getV1Nodes, getV1NodesFind, getV1NodesTokenInterface, getV1Roles, getV1SwitchNodesetLldp, getV1Users, patchV1AuthReset, patchV1NodesImage, patchV1NodesProvision, patchV1NodesTagsAction, patchV1Roles, patchV1UsersUsernamesEnable, patchV1UsersUsernamesRole, postV1AuthSignin, postV1AuthSignup, postV1AuthToken, postV1BmcConfigureAuto, postV1BmcConfigureImport, postV1BmcPowerBmc, postV1BmcPowerOs, postV1DbRestore, postV1Images, postV1Nodes, postV1Roles, postV1Users } from "../requests/services.gen";
+import { deleteV1AuthSignout, deleteV1BmcJobs, deleteV1BmcJobsJids, deleteV1BmcSel, deleteV1Images, deleteV1Nodes, deleteV1RolesNames, deleteV1UsersUsernames, getV1Bmc, getV1BmcJobs, getV1BmcMetrics, getV1BmcUpgradeDellRepo, getV1DbDump, getV1GrendelEvents, getV1Images, getV1ImagesFind, getV1Nodes, getV1NodesFind, getV1NodesTokenInterface, getV1Roles, getV1SwitchNodesetLldp, getV1Users, patchV1AuthReset, patchV1NodesImage, patchV1NodesProvision, patchV1NodesTagsAction, patchV1Roles, patchV1UsersUsernamesEnable, patchV1UsersUsernamesRole, postV1AuthSignin, postV1AuthSignup, postV1AuthToken, postV1BmcConfigureAuto, postV1BmcConfigureImport, postV1BmcPowerBmc, postV1BmcPowerOs, postV1BmcUpgradeDellInstallfromrepo, postV1DbRestore, postV1Images, postV1Nodes, postV1Roles, postV1Users } from "../requests/services.gen";
 export type GetV1BmcDefaultResponse = Awaited<ReturnType<typeof getV1Bmc>>["data"];
 export type GetV1BmcQueryResult<TData = GetV1BmcDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
 export const useGetV1BmcKey = "GetV1Bmc";
@@ -15,6 +15,10 @@ export type GetV1BmcMetricsDefaultResponse = Awaited<ReturnType<typeof getV1BmcM
 export type GetV1BmcMetricsQueryResult<TData = GetV1BmcMetricsDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
 export const useGetV1BmcMetricsKey = "GetV1BmcMetrics";
 export const UseGetV1BmcMetricsKeyFn = (clientOptions: Options<unknown, true> = {}, queryKey?: Array<unknown>) => [useGetV1BmcMetricsKey, ...(queryKey ?? [clientOptions])];
+export type GetV1BmcUpgradeDellRepoDefaultResponse = Awaited<ReturnType<typeof getV1BmcUpgradeDellRepo>>["data"];
+export type GetV1BmcUpgradeDellRepoQueryResult<TData = GetV1BmcUpgradeDellRepoDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
+export const useGetV1BmcUpgradeDellRepoKey = "GetV1BmcUpgradeDellRepo";
+export const UseGetV1BmcUpgradeDellRepoKeyFn = (clientOptions: Options<unknown, true> = {}, queryKey?: Array<unknown>) => [useGetV1BmcUpgradeDellRepoKey, ...(queryKey ?? [clientOptions])];
 export type GetV1DbDumpDefaultResponse = Awaited<ReturnType<typeof getV1DbDump>>["data"];
 export type GetV1DbDumpQueryResult<TData = GetV1DbDumpDefaultResponse, TError = unknown> = UseQueryResult<TData, TError>;
 export const useGetV1DbDumpKey = "GetV1DbDump";
@@ -76,6 +80,9 @@ export const UsePostV1BmcPowerBmcKeyFn = (mutationKey?: Array<unknown>) => [useP
 export type PostV1BmcPowerOsMutationResult = Awaited<ReturnType<typeof postV1BmcPowerOs>>;
 export const usePostV1BmcPowerOsKey = "PostV1BmcPowerOs";
 export const UsePostV1BmcPowerOsKeyFn = (mutationKey?: Array<unknown>) => [usePostV1BmcPowerOsKey, ...(mutationKey ?? [])];
+export type PostV1BmcUpgradeDellInstallfromrepoMutationResult = Awaited<ReturnType<typeof postV1BmcUpgradeDellInstallfromrepo>>;
+export const usePostV1BmcUpgradeDellInstallfromrepoKey = "PostV1BmcUpgradeDellInstallfromrepo";
+export const UsePostV1BmcUpgradeDellInstallfromrepoKeyFn = (mutationKey?: Array<unknown>) => [usePostV1BmcUpgradeDellInstallfromrepoKey, ...(mutationKey ?? [])];
 export type PostV1DbRestoreMutationResult = Awaited<ReturnType<typeof postV1DbRestore>>;
 export const usePostV1DbRestoreKey = "PostV1DbRestore";
 export const UsePostV1DbRestoreKeyFn = (mutationKey?: Array<unknown>) => [usePostV1DbRestoreKey, ...(mutationKey ?? [])];
@@ -115,6 +122,9 @@ export const UsePatchV1UsersUsernamesRoleKeyFn = (mutationKey?: Array<unknown>) 
 export type DeleteV1AuthSignoutMutationResult = Awaited<ReturnType<typeof deleteV1AuthSignout>>;
 export const useDeleteV1AuthSignoutKey = "DeleteV1AuthSignout";
 export const UseDeleteV1AuthSignoutKeyFn = (mutationKey?: Array<unknown>) => [useDeleteV1AuthSignoutKey, ...(mutationKey ?? [])];
+export type DeleteV1BmcJobsMutationResult = Awaited<ReturnType<typeof deleteV1BmcJobs>>;
+export const useDeleteV1BmcJobsKey = "DeleteV1BmcJobs";
+export const UseDeleteV1BmcJobsKeyFn = (mutationKey?: Array<unknown>) => [useDeleteV1BmcJobsKey, ...(mutationKey ?? [])];
 export type DeleteV1BmcJobsJidsMutationResult = Awaited<ReturnType<typeof deleteV1BmcJobsJids>>;
 export const useDeleteV1BmcJobsJidsKey = "DeleteV1BmcJobsJids";
 export const UseDeleteV1BmcJobsJidsKeyFn = (mutationKey?: Array<unknown>) => [useDeleteV1BmcJobsJidsKey, ...(mutationKey ?? [])];
