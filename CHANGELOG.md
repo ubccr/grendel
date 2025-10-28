@@ -1,5 +1,15 @@
 # Grendel Changelog
 
+## [0.2.4] - 2025-10-28
+
+- Bump dependencies
+- ui: modified job table to display multiple nodes at once
+- ui: added Dell firmware update table & actions
+- ui: updated theme switcher to use a radio group
+- cli: added Dell firmware check
+- cli: added Dell firmware upgrade
+- api: added api.dev config option to bypass RBAC
+
 ## [0.2.3] - 2025-08-09
 
 - Fix rename node bug
@@ -279,4 +289,5 @@
 [0.2.1]: https://github.com/ubccr/grendel/releases/tag/v0.2.1
 [0.2.2]: https://github.com/ubccr/grendel/releases/tag/v0.2.2
 [0.2.3]: https://github.com/ubccr/grendel/releases/tag/v0.2.3
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.3...HEAD
+[0.2.4]: https://github.com/ubccr/grendel/releases/tag/v0.2.4
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.4...HEAD
