@@ -11,6 +11,7 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/getkin/kin-openapi/openapi3gen"
 	"github.com/go-fuego/fuego"
@@ -140,6 +141,9 @@ func (s *Server) Serve() error {
 		log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
 		return s.server.RunTLS(s.CertFile, s.KeyFile)
 	}
+
+	// Fix >30s handlers from returning an empty body
+	s.server.Server.WriteTimeout = time.Minute * 5
 
 	if s.SocketPath == "" {
 		log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)

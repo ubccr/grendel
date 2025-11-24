@@ -1454,8 +1454,10 @@ export const RedfishSystemSchema = {
         },
         boot_order: {
             items: {
+                nullable: true,
                 type: 'string'
             },
+            nullable: true,
             type: 'array'
         },
         health: {

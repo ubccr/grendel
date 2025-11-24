@@ -10532,13 +10532,9 @@ func (s *RedfishSystem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.BootOrder != nil {
+		if s.BootOrder.Set {
 			e.FieldStart("boot_order")
-			e.ArrStart()
-			for _, elem := range s.BootOrder {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.BootOrder.Encode(e)
 		}
 	}
 	{
@@ -10649,17 +10645,8 @@ func (s *RedfishSystem) Decode(d *jx.Decoder) error {
 			}
 		case "boot_order":
 			if err := func() error {
-				s.BootOrder = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.BootOrder = append(s.BootOrder, elem)
-					return nil
-				}); err != nil {
+				s.BootOrder.Reset()
+				if err := s.BootOrder.Decode(d); err != nil {
 					return err
 				}
 				return nil
