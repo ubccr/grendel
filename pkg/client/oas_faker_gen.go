@@ -2314,14 +2314,7 @@ func (s *RedfishSystem) SetFake() {
 	}
 	{
 		{
-			s.BootOrder = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.BootOrder = append(s.BootOrder, elem)
-			}
+			s.BootOrder.SetFake()
 		}
 	}
 	{

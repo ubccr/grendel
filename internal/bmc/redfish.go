@@ -45,6 +45,9 @@ func (r *Redfish) PowerControl(resetType redfish.ResetType, bootOverride redfish
 
 // bootOverride will set the boot override target
 func (r *Redfish) bootOverride(bootOption redfish.BootSourceOverrideTarget) error {
+	if bootOption == redfish.NoneBootSourceOverrideTarget {
+		return nil
+	}
 
 	boot := redfish.Boot{
 		BootSourceOverrideTarget:  bootOption,
@@ -77,13 +80,9 @@ func (r *Redfish) GetSystem() (*model.RedfishSystem, error) {
 
 	sys := ss[0]
 
-	var dcs *dell.ComputerSystem
-	if sys.Manufacturer == "Dell Inc." {
-		dcs, err = dell.FromComputerSystem(ss[0])
-		if err != nil {
-			return nil, err
-		}
-
+	dcs, err := dell.FromComputerSystem(ss[0])
+	if err != nil {
+		return nil, err
 	}
 
 	system := &model.RedfishSystem{

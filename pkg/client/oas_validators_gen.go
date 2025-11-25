@@ -1186,6 +1186,24 @@ func (s *RedfishSystem) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
+		if value, ok := s.BootOrder.Get(); ok {
+			if err := func() error {
+				if value == nil {
+					return errors.New("nil is invalid value")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "boot_order",
+			Error: err,
+		})
+	}
+	if err := func() error {
 		if value, ok := s.TotalMemory.Get(); ok {
 			if err := func() error {
 				if err := (validate.Float{}).Validate(float64(value)); err != nil {

@@ -587,7 +587,7 @@ export type RedfishMetricReport = {
 export type RedfishSystem = {
     bios_version?: string;
     boot_next?: string;
-    boot_order?: Array<(string)>;
+    boot_order?: Array<((string) | null)> | null;
     health?: string;
     host_name?: string;
     manufacturer?: string;

@@ -50,7 +50,7 @@ type RedfishSystem struct {
 	TotalMemory    float32        `json:"total_memory"`
 	ProcessorCount int            `json:"processor_count"`
 	BootNext       string         `json:"boot_next"`
-	BootOrder      []string       `json:"boot_order"`
+	BootOrder      []string       `json:"boot_order" oai3:"nullable"`
 	OEMDell        dell.OEMSystem `json:"oem_dell" oai3:"nullable"`
 }
 

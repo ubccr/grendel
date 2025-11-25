@@ -5822,7 +5822,7 @@ func (s *RedfishMetricReportReportsItemMetricValuesItem) SetTimestamp(val OptStr
 type RedfishSystem struct {
 	BiosVersion    OptString                  `json:"bios_version"`
 	BootNext       OptString                  `json:"boot_next"`
-	BootOrder      []string                   `json:"boot_order"`
+	BootOrder      OptNilNilStringArray       `json:"boot_order"`
 	Health         OptString                  `json:"health"`
 	HostName       OptString                  `json:"host_name"`
 	Manufacturer   OptString                  `json:"manufacturer"`
@@ -5846,7 +5846,7 @@ func (s *RedfishSystem) GetBootNext() OptString {
 }
 
 // GetBootOrder returns the value of BootOrder.
-func (s *RedfishSystem) GetBootOrder() []string {
+func (s *RedfishSystem) GetBootOrder() OptNilNilStringArray {
 	return s.BootOrder
 }
 
@@ -5911,7 +5911,7 @@ func (s *RedfishSystem) SetBootNext(val OptString) {
 }
 
 // SetBootOrder sets the value of BootOrder.
-func (s *RedfishSystem) SetBootOrder(val []string) {
+func (s *RedfishSystem) SetBootOrder(val OptNilNilStringArray) {
 	s.BootOrder = val
 }
 
