@@ -1,5 +1,11 @@
 # Grendel Changelog
 
+## [0.2.5] - 2025-11-24
+
+- Fix firmware update table select all checkbox only selecting one page at a time
+- Fix large API requests would timeout and return an empty body
+- Fix bmc power commands no longer send bootOption: None if no boot option is passed
+
 ## [0.2.4] - 2025-10-28
 
 - Bump dependencies
@@ -290,4 +296,5 @@
 [0.2.2]: https://github.com/ubccr/grendel/releases/tag/v0.2.2
 [0.2.3]: https://github.com/ubccr/grendel/releases/tag/v0.2.3
 [0.2.4]: https://github.com/ubccr/grendel/releases/tag/v0.2.4
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.4...HEAD
+[0.2.5]: https://github.com/ubccr/grendel/releases/tag/v0.2.5
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.5...HEAD
