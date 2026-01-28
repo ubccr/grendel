@@ -1,5 +1,3 @@
-import AuthRedirect from "@/auth";
-import { themeToMonaco, useTheme } from "@/hooks/theme-provider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { themeToMonaco, useTheme } from "@/hooks/theme-provider";
+import AuthRedirect from "@/lib/auth";
 import { Editor } from "@monaco-editor/react";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute } from "@tanstack/react-router";
@@ -58,10 +58,7 @@ function RouteComponent() {
               children={(field) => (
                 <div>
                   <Label>Type:</Label>
-                  <Select
-                    value={field.state.value}
-                    onValueChange={(e) => field.handleChange(e)}
-                  >
+                  <Select value={field.state.value} onValueChange={(e) => field.handleChange(e)}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -93,10 +90,7 @@ function RouteComponent() {
               children={(field) => (
                 <div>
                   <Label>Language:</Label>
-                  <Select
-                    value={field.state.value}
-                    onValueChange={(e) => field.handleChange(e)}
-                  >
+                  <Select value={field.state.value} onValueChange={(e) => field.handleChange(e)}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>

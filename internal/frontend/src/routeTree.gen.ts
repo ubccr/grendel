@@ -9,17 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as FloorplanRouteImport } from './routes/floorplan'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TemplatesIndexRouteImport } from './routes/templates/index'
+import { Route as RacksIndexRouteImport } from './routes/racks/index'
 import { Route as NodesIndexRouteImport } from './routes/nodes/index'
 import { Route as ImagesIndexRouteImport } from './routes/images/index'
 import { Route as TemplatesTemplateRouteImport } from './routes/templates/$template'
 import { Route as SearchInventoryRouteImport } from './routes/search/inventory'
-import { Route as RackRackRouteImport } from './routes/rack/$rack'
-import { Route as NodesNodeRouteImport } from './routes/nodes/$node'
+import { Route as RacksRackRouteImport } from './routes/racks/$rack'
 import { Route as ImagesImageRouteImport } from './routes/images/$image'
 import { Route as AddTemplateRouteImport } from './routes/add/template'
 import { Route as AddRoleRouteImport } from './routes/add/role'
@@ -29,17 +28,16 @@ import { Route as AccountTokenRouteImport } from './routes/account/token'
 import { Route as AccountSignupRouteImport } from './routes/account/signup'
 import { Route as AccountSigninRouteImport } from './routes/account/signin'
 import { Route as AccountResetRouteImport } from './routes/account/reset'
-import { Route as GroupsNodesIndexRouteImport } from './routes/groups/nodes/index'
+import { Route as NodesNodeRouteRouteImport } from './routes/nodes/$node/route'
 import { Route as AccountUsersIndexRouteImport } from './routes/account/users/index'
 import { Route as AccountRolesIndexRouteImport } from './routes/account/roles/index'
-import { Route as GroupsNodesGroupRouteImport } from './routes/groups/nodes/$group'
+import { Route as NodesJobsNodesRouteImport } from './routes/nodes/jobs/$nodes'
+import { Route as NodesDellFirmwareNodesRouteImport } from './routes/nodes/dell-firmware/$nodes'
+import { Route as NodesNodeRedfishRouteImport } from './routes/nodes/$node/redfish'
+import { Route as NodesNodeNodeRouteImport } from './routes/nodes/$node/node'
+import { Route as NodesNodeLldpRouteImport } from './routes/nodes/$node/lldp'
 import { Route as AccountRolesRoleRouteImport } from './routes/account/roles/$role'
 
-const FloorplanRoute = FloorplanRouteImport.update({
-  id: '/floorplan',
-  path: '/floorplan',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const EventsRoute = EventsRouteImport.update({
   id: '/events',
   path: '/events',
@@ -58,6 +56,11 @@ const IndexRoute = IndexRouteImport.update({
 const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
   id: '/templates/',
   path: '/templates/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RacksIndexRoute = RacksIndexRouteImport.update({
+  id: '/racks/',
+  path: '/racks/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NodesIndexRoute = NodesIndexRouteImport.update({
@@ -80,14 +83,9 @@ const SearchInventoryRoute = SearchInventoryRouteImport.update({
   path: '/search/inventory',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RackRackRoute = RackRackRouteImport.update({
-  id: '/rack/$rack',
-  path: '/rack/$rack',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NodesNodeRoute = NodesNodeRouteImport.update({
-  id: '/nodes/$node',
-  path: '/nodes/$node',
+const RacksRackRoute = RacksRackRouteImport.update({
+  id: '/racks/$rack',
+  path: '/racks/$rack',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ImagesImageRoute = ImagesImageRouteImport.update({
@@ -135,9 +133,9 @@ const AccountResetRoute = AccountResetRouteImport.update({
   path: '/account/reset',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GroupsNodesIndexRoute = GroupsNodesIndexRouteImport.update({
-  id: '/groups/nodes/',
-  path: '/groups/nodes/',
+const NodesNodeRouteRoute = NodesNodeRouteRouteImport.update({
+  id: '/nodes/$node',
+  path: '/nodes/$node',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountUsersIndexRoute = AccountUsersIndexRouteImport.update({
@@ -150,10 +148,30 @@ const AccountRolesIndexRoute = AccountRolesIndexRouteImport.update({
   path: '/account/roles/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GroupsNodesGroupRoute = GroupsNodesGroupRouteImport.update({
-  id: '/groups/nodes/$group',
-  path: '/groups/nodes/$group',
+const NodesJobsNodesRoute = NodesJobsNodesRouteImport.update({
+  id: '/nodes/jobs/$nodes',
+  path: '/nodes/jobs/$nodes',
   getParentRoute: () => rootRouteImport,
+} as any)
+const NodesDellFirmwareNodesRoute = NodesDellFirmwareNodesRouteImport.update({
+  id: '/nodes/dell-firmware/$nodes',
+  path: '/nodes/dell-firmware/$nodes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NodesNodeRedfishRoute = NodesNodeRedfishRouteImport.update({
+  id: '/redfish',
+  path: '/redfish',
+  getParentRoute: () => NodesNodeRouteRoute,
+} as any)
+const NodesNodeNodeRoute = NodesNodeNodeRouteImport.update({
+  id: '/node',
+  path: '/node',
+  getParentRoute: () => NodesNodeRouteRoute,
+} as any)
+const NodesNodeLldpRoute = NodesNodeLldpRouteImport.update({
+  id: '/lldp',
+  path: '/lldp',
+  getParentRoute: () => NodesNodeRouteRoute,
 } as any)
 const AccountRolesRoleRoute = AccountRolesRoleRouteImport.update({
   id: '/account/roles/$role',
@@ -165,7 +183,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/events': typeof EventsRoute
-  '/floorplan': typeof FloorplanRoute
+  '/nodes/$node': typeof NodesNodeRouteRouteWithChildren
   '/account/reset': typeof AccountResetRoute
   '/account/signin': typeof AccountSigninRoute
   '/account/signup': typeof AccountSignupRoute
@@ -175,24 +193,27 @@ export interface FileRoutesByFullPath {
   '/add/role': typeof AddRoleRoute
   '/add/template': typeof AddTemplateRoute
   '/images/$image': typeof ImagesImageRoute
-  '/nodes/$node': typeof NodesNodeRoute
-  '/rack/$rack': typeof RackRackRoute
+  '/racks/$rack': typeof RacksRackRoute
   '/search/inventory': typeof SearchInventoryRoute
   '/templates/$template': typeof TemplatesTemplateRoute
-  '/images': typeof ImagesIndexRoute
-  '/nodes': typeof NodesIndexRoute
-  '/templates': typeof TemplatesIndexRoute
+  '/images/': typeof ImagesIndexRoute
+  '/nodes/': typeof NodesIndexRoute
+  '/racks/': typeof RacksIndexRoute
+  '/templates/': typeof TemplatesIndexRoute
   '/account/roles/$role': typeof AccountRolesRoleRoute
-  '/groups/nodes/$group': typeof GroupsNodesGroupRoute
-  '/account/roles': typeof AccountRolesIndexRoute
-  '/account/users': typeof AccountUsersIndexRoute
-  '/groups/nodes': typeof GroupsNodesIndexRoute
+  '/nodes/$node/lldp': typeof NodesNodeLldpRoute
+  '/nodes/$node/node': typeof NodesNodeNodeRoute
+  '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
+  '/nodes/dell-firmware/$nodes': typeof NodesDellFirmwareNodesRoute
+  '/nodes/jobs/$nodes': typeof NodesJobsNodesRoute
+  '/account/roles/': typeof AccountRolesIndexRoute
+  '/account/users/': typeof AccountUsersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/events': typeof EventsRoute
-  '/floorplan': typeof FloorplanRoute
+  '/nodes/$node': typeof NodesNodeRouteRouteWithChildren
   '/account/reset': typeof AccountResetRoute
   '/account/signin': typeof AccountSigninRoute
   '/account/signup': typeof AccountSignupRoute
@@ -202,25 +223,28 @@ export interface FileRoutesByTo {
   '/add/role': typeof AddRoleRoute
   '/add/template': typeof AddTemplateRoute
   '/images/$image': typeof ImagesImageRoute
-  '/nodes/$node': typeof NodesNodeRoute
-  '/rack/$rack': typeof RackRackRoute
+  '/racks/$rack': typeof RacksRackRoute
   '/search/inventory': typeof SearchInventoryRoute
   '/templates/$template': typeof TemplatesTemplateRoute
   '/images': typeof ImagesIndexRoute
   '/nodes': typeof NodesIndexRoute
+  '/racks': typeof RacksIndexRoute
   '/templates': typeof TemplatesIndexRoute
   '/account/roles/$role': typeof AccountRolesRoleRoute
-  '/groups/nodes/$group': typeof GroupsNodesGroupRoute
+  '/nodes/$node/lldp': typeof NodesNodeLldpRoute
+  '/nodes/$node/node': typeof NodesNodeNodeRoute
+  '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
+  '/nodes/dell-firmware/$nodes': typeof NodesDellFirmwareNodesRoute
+  '/nodes/jobs/$nodes': typeof NodesJobsNodesRoute
   '/account/roles': typeof AccountRolesIndexRoute
   '/account/users': typeof AccountUsersIndexRoute
-  '/groups/nodes': typeof GroupsNodesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/events': typeof EventsRoute
-  '/floorplan': typeof FloorplanRoute
+  '/nodes/$node': typeof NodesNodeRouteRouteWithChildren
   '/account/reset': typeof AccountResetRoute
   '/account/signin': typeof AccountSigninRoute
   '/account/signup': typeof AccountSignupRoute
@@ -230,18 +254,21 @@ export interface FileRoutesById {
   '/add/role': typeof AddRoleRoute
   '/add/template': typeof AddTemplateRoute
   '/images/$image': typeof ImagesImageRoute
-  '/nodes/$node': typeof NodesNodeRoute
-  '/rack/$rack': typeof RackRackRoute
+  '/racks/$rack': typeof RacksRackRoute
   '/search/inventory': typeof SearchInventoryRoute
   '/templates/$template': typeof TemplatesTemplateRoute
   '/images/': typeof ImagesIndexRoute
   '/nodes/': typeof NodesIndexRoute
+  '/racks/': typeof RacksIndexRoute
   '/templates/': typeof TemplatesIndexRoute
   '/account/roles/$role': typeof AccountRolesRoleRoute
-  '/groups/nodes/$group': typeof GroupsNodesGroupRoute
+  '/nodes/$node/lldp': typeof NodesNodeLldpRoute
+  '/nodes/$node/node': typeof NodesNodeNodeRoute
+  '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
+  '/nodes/dell-firmware/$nodes': typeof NodesDellFirmwareNodesRoute
+  '/nodes/jobs/$nodes': typeof NodesJobsNodesRoute
   '/account/roles/': typeof AccountRolesIndexRoute
   '/account/users/': typeof AccountUsersIndexRoute
-  '/groups/nodes/': typeof GroupsNodesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -249,7 +276,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/events'
-    | '/floorplan'
+    | '/nodes/$node'
     | '/account/reset'
     | '/account/signin'
     | '/account/signup'
@@ -259,24 +286,27 @@ export interface FileRouteTypes {
     | '/add/role'
     | '/add/template'
     | '/images/$image'
-    | '/nodes/$node'
-    | '/rack/$rack'
+    | '/racks/$rack'
     | '/search/inventory'
     | '/templates/$template'
-    | '/images'
-    | '/nodes'
-    | '/templates'
+    | '/images/'
+    | '/nodes/'
+    | '/racks/'
+    | '/templates/'
     | '/account/roles/$role'
-    | '/groups/nodes/$group'
-    | '/account/roles'
-    | '/account/users'
-    | '/groups/nodes'
+    | '/nodes/$node/lldp'
+    | '/nodes/$node/node'
+    | '/nodes/$node/redfish'
+    | '/nodes/dell-firmware/$nodes'
+    | '/nodes/jobs/$nodes'
+    | '/account/roles/'
+    | '/account/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/$'
     | '/events'
-    | '/floorplan'
+    | '/nodes/$node'
     | '/account/reset'
     | '/account/signin'
     | '/account/signup'
@@ -286,24 +316,27 @@ export interface FileRouteTypes {
     | '/add/role'
     | '/add/template'
     | '/images/$image'
-    | '/nodes/$node'
-    | '/rack/$rack'
+    | '/racks/$rack'
     | '/search/inventory'
     | '/templates/$template'
     | '/images'
     | '/nodes'
+    | '/racks'
     | '/templates'
     | '/account/roles/$role'
-    | '/groups/nodes/$group'
+    | '/nodes/$node/lldp'
+    | '/nodes/$node/node'
+    | '/nodes/$node/redfish'
+    | '/nodes/dell-firmware/$nodes'
+    | '/nodes/jobs/$nodes'
     | '/account/roles'
     | '/account/users'
-    | '/groups/nodes'
   id:
     | '__root__'
     | '/'
     | '/$'
     | '/events'
-    | '/floorplan'
+    | '/nodes/$node'
     | '/account/reset'
     | '/account/signin'
     | '/account/signup'
@@ -313,25 +346,28 @@ export interface FileRouteTypes {
     | '/add/role'
     | '/add/template'
     | '/images/$image'
-    | '/nodes/$node'
-    | '/rack/$rack'
+    | '/racks/$rack'
     | '/search/inventory'
     | '/templates/$template'
     | '/images/'
     | '/nodes/'
+    | '/racks/'
     | '/templates/'
     | '/account/roles/$role'
-    | '/groups/nodes/$group'
+    | '/nodes/$node/lldp'
+    | '/nodes/$node/node'
+    | '/nodes/$node/redfish'
+    | '/nodes/dell-firmware/$nodes'
+    | '/nodes/jobs/$nodes'
     | '/account/roles/'
     | '/account/users/'
-    | '/groups/nodes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
   EventsRoute: typeof EventsRoute
-  FloorplanRoute: typeof FloorplanRoute
+  NodesNodeRouteRoute: typeof NodesNodeRouteRouteWithChildren
   AccountResetRoute: typeof AccountResetRoute
   AccountSigninRoute: typeof AccountSigninRoute
   AccountSignupRoute: typeof AccountSignupRoute
@@ -341,29 +377,22 @@ export interface RootRouteChildren {
   AddRoleRoute: typeof AddRoleRoute
   AddTemplateRoute: typeof AddTemplateRoute
   ImagesImageRoute: typeof ImagesImageRoute
-  NodesNodeRoute: typeof NodesNodeRoute
-  RackRackRoute: typeof RackRackRoute
+  RacksRackRoute: typeof RacksRackRoute
   SearchInventoryRoute: typeof SearchInventoryRoute
   TemplatesTemplateRoute: typeof TemplatesTemplateRoute
   ImagesIndexRoute: typeof ImagesIndexRoute
   NodesIndexRoute: typeof NodesIndexRoute
+  RacksIndexRoute: typeof RacksIndexRoute
   TemplatesIndexRoute: typeof TemplatesIndexRoute
   AccountRolesRoleRoute: typeof AccountRolesRoleRoute
-  GroupsNodesGroupRoute: typeof GroupsNodesGroupRoute
+  NodesDellFirmwareNodesRoute: typeof NodesDellFirmwareNodesRoute
+  NodesJobsNodesRoute: typeof NodesJobsNodesRoute
   AccountRolesIndexRoute: typeof AccountRolesIndexRoute
   AccountUsersIndexRoute: typeof AccountUsersIndexRoute
-  GroupsNodesIndexRoute: typeof GroupsNodesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/floorplan': {
-      id: '/floorplan'
-      path: '/floorplan'
-      fullPath: '/floorplan'
-      preLoaderRoute: typeof FloorplanRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/events': {
       id: '/events'
       path: '/events'
@@ -388,21 +417,28 @@ declare module '@tanstack/react-router' {
     '/templates/': {
       id: '/templates/'
       path: '/templates'
-      fullPath: '/templates'
+      fullPath: '/templates/'
       preLoaderRoute: typeof TemplatesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/racks/': {
+      id: '/racks/'
+      path: '/racks'
+      fullPath: '/racks/'
+      preLoaderRoute: typeof RacksIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/nodes/': {
       id: '/nodes/'
       path: '/nodes'
-      fullPath: '/nodes'
+      fullPath: '/nodes/'
       preLoaderRoute: typeof NodesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/images/': {
       id: '/images/'
       path: '/images'
-      fullPath: '/images'
+      fullPath: '/images/'
       preLoaderRoute: typeof ImagesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -420,18 +456,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchInventoryRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/rack/$rack': {
-      id: '/rack/$rack'
-      path: '/rack/$rack'
-      fullPath: '/rack/$rack'
-      preLoaderRoute: typeof RackRackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/nodes/$node': {
-      id: '/nodes/$node'
-      path: '/nodes/$node'
-      fullPath: '/nodes/$node'
-      preLoaderRoute: typeof NodesNodeRouteImport
+    '/racks/$rack': {
+      id: '/racks/$rack'
+      path: '/racks/$rack'
+      fullPath: '/racks/$rack'
+      preLoaderRoute: typeof RacksRackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/images/$image': {
@@ -497,33 +526,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountResetRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/groups/nodes/': {
-      id: '/groups/nodes/'
-      path: '/groups/nodes'
-      fullPath: '/groups/nodes'
-      preLoaderRoute: typeof GroupsNodesIndexRouteImport
+    '/nodes/$node': {
+      id: '/nodes/$node'
+      path: '/nodes/$node'
+      fullPath: '/nodes/$node'
+      preLoaderRoute: typeof NodesNodeRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account/users/': {
       id: '/account/users/'
       path: '/account/users'
-      fullPath: '/account/users'
+      fullPath: '/account/users/'
       preLoaderRoute: typeof AccountUsersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account/roles/': {
       id: '/account/roles/'
       path: '/account/roles'
-      fullPath: '/account/roles'
+      fullPath: '/account/roles/'
       preLoaderRoute: typeof AccountRolesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/groups/nodes/$group': {
-      id: '/groups/nodes/$group'
-      path: '/groups/nodes/$group'
-      fullPath: '/groups/nodes/$group'
-      preLoaderRoute: typeof GroupsNodesGroupRouteImport
+    '/nodes/jobs/$nodes': {
+      id: '/nodes/jobs/$nodes'
+      path: '/nodes/jobs/$nodes'
+      fullPath: '/nodes/jobs/$nodes'
+      preLoaderRoute: typeof NodesJobsNodesRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/nodes/dell-firmware/$nodes': {
+      id: '/nodes/dell-firmware/$nodes'
+      path: '/nodes/dell-firmware/$nodes'
+      fullPath: '/nodes/dell-firmware/$nodes'
+      preLoaderRoute: typeof NodesDellFirmwareNodesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nodes/$node/redfish': {
+      id: '/nodes/$node/redfish'
+      path: '/redfish'
+      fullPath: '/nodes/$node/redfish'
+      preLoaderRoute: typeof NodesNodeRedfishRouteImport
+      parentRoute: typeof NodesNodeRouteRoute
+    }
+    '/nodes/$node/node': {
+      id: '/nodes/$node/node'
+      path: '/node'
+      fullPath: '/nodes/$node/node'
+      preLoaderRoute: typeof NodesNodeNodeRouteImport
+      parentRoute: typeof NodesNodeRouteRoute
+    }
+    '/nodes/$node/lldp': {
+      id: '/nodes/$node/lldp'
+      path: '/lldp'
+      fullPath: '/nodes/$node/lldp'
+      preLoaderRoute: typeof NodesNodeLldpRouteImport
+      parentRoute: typeof NodesNodeRouteRoute
     }
     '/account/roles/$role': {
       id: '/account/roles/$role'
@@ -535,11 +592,27 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface NodesNodeRouteRouteChildren {
+  NodesNodeLldpRoute: typeof NodesNodeLldpRoute
+  NodesNodeNodeRoute: typeof NodesNodeNodeRoute
+  NodesNodeRedfishRoute: typeof NodesNodeRedfishRoute
+}
+
+const NodesNodeRouteRouteChildren: NodesNodeRouteRouteChildren = {
+  NodesNodeLldpRoute: NodesNodeLldpRoute,
+  NodesNodeNodeRoute: NodesNodeNodeRoute,
+  NodesNodeRedfishRoute: NodesNodeRedfishRoute,
+}
+
+const NodesNodeRouteRouteWithChildren = NodesNodeRouteRoute._addFileChildren(
+  NodesNodeRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
   EventsRoute: EventsRoute,
-  FloorplanRoute: FloorplanRoute,
+  NodesNodeRouteRoute: NodesNodeRouteRouteWithChildren,
   AccountResetRoute: AccountResetRoute,
   AccountSigninRoute: AccountSigninRoute,
   AccountSignupRoute: AccountSignupRoute,
@@ -549,18 +622,18 @@ const rootRouteChildren: RootRouteChildren = {
   AddRoleRoute: AddRoleRoute,
   AddTemplateRoute: AddTemplateRoute,
   ImagesImageRoute: ImagesImageRoute,
-  NodesNodeRoute: NodesNodeRoute,
-  RackRackRoute: RackRackRoute,
+  RacksRackRoute: RacksRackRoute,
   SearchInventoryRoute: SearchInventoryRoute,
   TemplatesTemplateRoute: TemplatesTemplateRoute,
   ImagesIndexRoute: ImagesIndexRoute,
   NodesIndexRoute: NodesIndexRoute,
+  RacksIndexRoute: RacksIndexRoute,
   TemplatesIndexRoute: TemplatesIndexRoute,
   AccountRolesRoleRoute: AccountRolesRoleRoute,
-  GroupsNodesGroupRoute: GroupsNodesGroupRoute,
+  NodesDellFirmwareNodesRoute: NodesDellFirmwareNodesRoute,
+  NodesJobsNodesRoute: NodesJobsNodesRoute,
   AccountRolesIndexRoute: AccountRolesIndexRoute,
   AccountUsersIndexRoute: AccountUsersIndexRoute,
-  GroupsNodesIndexRoute: GroupsNodesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

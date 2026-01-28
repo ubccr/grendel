@@ -13,7 +13,6 @@ import (
 	"github.com/ubccr/grendel/pkg/nodeset"
 )
 
-
 func (h *Handler) SwitchGetLLDP(c fuego.ContextNoBody) (*model.SwitchLLDPList, error) {
 	filter := c.QueryParam("ports")
 	csf := []string{}
@@ -60,7 +59,7 @@ func (h *Handler) SwitchGetLLDP(c fuego.ContextNoBody) (*model.SwitchLLDPList, e
 		return nil, fuego.HTTPError{
 			Err:    err,
 			Title:  "Error",
-			Detail: "failed to create network switch query",
+			Detail: err.Error(),
 		}
 	}
 

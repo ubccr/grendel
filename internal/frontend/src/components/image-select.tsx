@@ -1,15 +1,10 @@
-import { useGetV1Images } from "@/openapi/queries";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
+import { getV1ImagesOptions } from "@/client/@tanstack/react-query.gen";
+import { useQuery } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 
 export default function ImageSelect() {
-  const images = useGetV1Images();
+  const images = useQuery(getV1ImagesOptions());
   return (
     <Select>
       <SelectTrigger className="w-[180px]">

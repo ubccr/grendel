@@ -28,10 +28,8 @@ export default function SelectableCheckbox<T>({
         if (e.shiftKey) {
           const { rows, rowsById } = table.getPrePaginationRowModel();
 
-          const rangeStart =
-            lastSelectedID > row.index ? row.index : lastSelectedID;
-          const rangeEnd =
-            rangeStart === row.index ? lastSelectedID : row.index;
+          const rangeStart = lastSelectedID > row.index ? row.index : lastSelectedID;
+          const rangeEnd = rangeStart === row.index ? lastSelectedID : row.index;
           const rowsToToggle = rows.filter(
             (_row) => rangeStart <= _row.index && rangeEnd >= _row.index,
           );

@@ -1,19 +1,14 @@
+import { postV1AuthSigninMutation } from "@/client/@tanstack/react-query.gen";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useForm } from "@tanstack/react-form";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { toast } from "sonner";
-import { LoaderCircle } from "lucide-react";
 import { useUser } from "@/hooks/user-provider";
-import { usePostV1AuthSignin } from "@/openapi/queries";
+import { useForm } from "@tanstack/react-form";
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { LoaderCircle } from "lucide-react";
+import { toast } from "sonner";
 import { z } from "zod";
 
 export const LOGIN_REDIRECT_FALLBACK = "/";
@@ -27,7 +22,7 @@ export const Route = createFileRoute("/account/signin")({
 });
 
 function RouteComponent() {
-  const { mutate, isPending } = usePostV1AuthSignin();
+  const { mutate, isPending } = useMutation(postV1AuthSigninMutation());
   const User = useUser();
   const search = Route.useSearch();
   const router = useRouter();
@@ -42,11 +37,11 @@ function RouteComponent() {
       mutate(
         { body: { username: value.username, password: value.password } },
         {
-          onSuccess: (e) => {
+          onSuccess: (data) => {
             User.setUser({
-              username: e.data?.username ?? "",
-              role: e.data?.role ?? "",
-              expire: e.data?.expire ?? 0,
+              username: data?.username ?? "",
+              role: data?.role ?? "",
+              expire: data?.expire ?? 0,
             });
             toast.success("Successfully authenticated");
             router.invalidate().then(() => {
@@ -110,11 +105,7 @@ function RouteComponent() {
           </CardContent>
           <CardFooter>
             <Button type="submit">
-              {isPending ? (
-                <LoaderCircle className="animate-spin" />
-              ) : (
-                <span>Submit</span>
-              )}
+              {isPending ? <LoaderCircle className="animate-spin" /> : <span>Submit</span>}
             </Button>
           </CardFooter>
         </Card>

@@ -1,11 +1,4 @@
 import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-} from "../ui/field";
-import {
   Select,
   SelectContent,
   SelectGroup,
@@ -13,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from "../ui/field";
 import { useFieldContext } from "./form-context";
 
 type props = {
@@ -34,18 +28,16 @@ export function SelectField({ label, placeholder, description, items }: props) {
         {description && <FieldDescription>{description}</FieldDescription>}
         {isInvalid && <FieldError errors={field.state.meta.errors} />}
       </FieldContent>
-      <Select
-        name={field.name}
-        value={field.state.value}
-        onValueChange={field.handleChange}
-      >
+      <Select name={field.name} value={field.state.value} onValueChange={field.handleChange}>
         <SelectTrigger aria-invalid={isInvalid}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
             {itemArray.map(([k, v]) => (
-              <SelectItem value={k}>{v}</SelectItem>
+              <SelectItem key={k} value={k}>
+                {v}
+              </SelectItem>
             ))}
           </SelectGroup>
         </SelectContent>

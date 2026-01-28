@@ -1,46 +1,36 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ExternalLink, Plus, X } from "lucide-react";
+import { Host } from "@/client";
 import { Button } from "@/components/ui/button";
-import { Host } from "@/openapi/requests";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { ExternalLink, Plus, X } from "lucide-react";
 
-import { useForm } from "@tanstack/react-form";
+import { postV1NodesMutation } from "@/client/@tanstack/react-query.gen";
 import { TagsInput } from "@/components/tags-input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useForm } from "@tanstack/react-form";
+import { useMutation } from "@tanstack/react-query";
 import { Info, LoaderCircle } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
-import { usePostV1Nodes } from "@/openapi/queries";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
-export default function NodeForm({
-  data,
-  reset,
-}: {
-  data?: Host;
-  reset?: boolean;
-}) {
-  const storeHosts = usePostV1Nodes();
-  const queryClient = useQueryClient();
+export default function NodeForm({ data, reset }: { data?: Host; reset?: boolean }) {
+  const { mutateAsync, isPending } = useMutation(postV1NodesMutation());
+  const router = useRouter();
 
   const form = useForm({
     defaultValues: data,
     onSubmit: async ({ value }) => {
       if (value != undefined) {
-        await storeHosts.mutateAsync(
+        await mutateAsync(
           { body: { node_list: [value] } },
           {
-            onSuccess: (e) => {
-              toast.success(e.data?.title, { description: e.data?.detail });
-              queryClient.invalidateQueries();
+            onSuccess: (data) => {
+              toast.success(data?.title, { description: data?.detail });
+              router.invalidate();
             },
             onError: (e) => {
               console.log(e);
@@ -68,16 +58,17 @@ export default function NodeForm({
       }}
     >
       <div className="flex justify-between">
-      <span>Node:</span>
-      <Button type="submit">
-        {!storeHosts.isPending && <span>Submit</span>}
-        {storeHosts.isPending && (
-          <>
-            <LoaderCircle className="animate-spin" />
-            <span className="sr-only">Loading</span>
-          </>
-        )}
-      </Button>
+        <span>Node:</span>
+        <Button type="submit">
+          {isPending ? (
+            <>
+              <LoaderCircle className="animate-spin" />
+              <span className="sr-only">Loading</span>
+            </>
+          ) : (
+            <span>Submit</span>
+          )}
+        </Button>
       </div>
       <div className="grid grid-cols-1 gap-6">
         <form.Field
@@ -131,21 +122,16 @@ export default function NodeForm({
                   </PopoverTrigger>
                   <PopoverContent>
                     <span className="text-md">
-                      Both keys and key value pairs are accepted. Key value
-                      pairs should be separated by "=".
+                      Both keys and key value pairs are accepted. Key value pairs should be
+                      separated by "=".
                     </span>
                     <br />
-                    <span className="text-sm font-light">
-                      Example key only: "dell"
-                    </span>
+                    <span className="text-sm font-light">Example key only: "dell"</span>
+                    <br />
+                    <span className="text-sm font-light">Example key value pair: "brand=dell"</span>
                     <br />
                     <span className="text-sm font-light">
-                      Example key value pair: "brand=dell"
-                    </span>
-                    <br />
-                    <span className="text-sm font-light">
-                      Example key value pair with namespace:
-                      "grendel:brand=dell"
+                      Example key value pair with namespace: "grendel:brand=dell"
                     </span>
                   </PopoverContent>
                 </Popover>
@@ -163,11 +149,7 @@ export default function NodeForm({
             {(field) => (
               <>
                 <div className="mb-2">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => field.pushValue({})}
-                  >
+                  <Button type="button" variant="secondary" onClick={() => field.pushValue({})}>
                     <Plus />
                     <span>Add Interface</span>
                   </Button>
@@ -186,10 +168,7 @@ export default function NodeForm({
                               disabled={!iface?.fqdn}
                               asChild
                             >
-                              <Link
-                                target="_blank"
-                                to={"https://" + iface?.fqdn}
-                              >
+                              <Link target="_blank" to={"https://" + iface?.fqdn}>
                                 <ExternalLink />
                                 <span className="sr-only">Go to FQDN</span>
                               </Link>
@@ -226,9 +205,7 @@ export default function NodeForm({
                               onClick={() => field.removeValue(i)}
                             >
                               <X />
-                              <span className="sr-only">
-                                Delete Interface {i + 1}
-                              </span>
+                              <span className="sr-only">Delete Interface {i + 1}</span>
                             </Button>
                           </div>
                         </CardTitle>
@@ -241,9 +218,7 @@ export default function NodeForm({
                                 <Label>FQDN:</Label>
                                 <Input
                                   value={subField.state.value ?? ""}
-                                  onChange={(e) =>
-                                    subField.handleChange(e.target.value)
-                                  }
+                                  onChange={(e) => subField.handleChange(e.target.value)}
                                 />
                               </div>
                             )}
@@ -254,9 +229,7 @@ export default function NodeForm({
                                 <Label>IP:</Label>
                                 <Input
                                   value={subField.state.value as string}
-                                  onChange={(e) =>
-                                    subField.handleChange(e.target.value)
-                                  }
+                                  onChange={(e) => subField.handleChange(e.target.value)}
                                 />
                               </div>
                             )}
@@ -267,9 +240,7 @@ export default function NodeForm({
                                 <Label>Name:</Label>
                                 <Input
                                   value={subField.state.value ?? ""}
-                                  onChange={(e) =>
-                                    subField.handleChange(e.target.value)
-                                  }
+                                  onChange={(e) => subField.handleChange(e.target.value)}
                                 />
                               </div>
                             )}
@@ -280,9 +251,7 @@ export default function NodeForm({
                                 <Label>MAC:</Label>
                                 <Input
                                   value={subField.state.value ?? ""}
-                                  onChange={(e) =>
-                                    subField.handleChange(e.target.value)
-                                  }
+                                  onChange={(e) => subField.handleChange(e.target.value)}
                                 />
                               </div>
                             )}
@@ -293,9 +262,7 @@ export default function NodeForm({
                                 <Label>VLAN:</Label>
                                 <Input
                                   value={subField.state.value ?? ""}
-                                  onChange={(e) =>
-                                    subField.handleChange(e.target.value)
-                                  }
+                                  onChange={(e) => subField.handleChange(e.target.value)}
                                 />
                               </div>
                             )}
@@ -307,9 +274,7 @@ export default function NodeForm({
                                 <Input
                                   type="number"
                                   value={subField.state.value ?? ""}
-                                  onChange={(e) =>
-                                    subField.handleChange(+e.target.value)
-                                  }
+                                  onChange={(e) => subField.handleChange(+e.target.value)}
                                 />
                               </div>
                             )}
@@ -321,9 +286,7 @@ export default function NodeForm({
                                 <Switch
                                   checked={subField.state.value ?? false}
                                   onBlur={subField.handleBlur}
-                                  onCheckedChange={(e) =>
-                                    subField.handleChange(e)
-                                  }
+                                  onCheckedChange={(e) => subField.handleChange(e)}
                                 />
                               </div>
                             )}

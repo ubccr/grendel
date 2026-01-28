@@ -1,4 +1,5 @@
-import AuthRedirect from "@/auth";
+import type { Event } from "@/client";
+import { getV1GrendelEvents } from "@/client";
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTableColumnHeader } from "@/components/data-table/header";
 import { Badge } from "@/components/ui/badge";
@@ -12,49 +13,34 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import AuthRedirect from "@/lib/auth";
 import { severityColor } from "@/lib/utils";
-import { useGetV1GrendelEvents } from "@/openapi/queries";
-import { Event } from "@/openapi/requests";
 import { createFileRoute } from "@tanstack/react-router";
-import { ColumnDef, Row } from "@tanstack/react-table";
+import type { ColumnDef, Row } from "@tanstack/react-table";
 import { ChevronDown, ChevronLeft } from "lucide-react";
 
 export const Route = createFileRoute("/events")({
-  component: RouteComponent,
+  component: TableComponent,
   beforeLoad: AuthRedirect,
+  loader: () => getV1GrendelEvents(),
 });
 
-function RouteComponent() {
-  return (
-    <div>
-      <TableComponent />
-    </div>
-  );
-}
-
 function TableComponent() {
-  const { data, isFetching } = useGetV1GrendelEvents();
+  const events = Route.useLoaderData();
 
   const columns: ColumnDef<Event>[] = [
     {
       accessorKey: "Severity",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Severity" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Severity" />,
       cell: ({ row }) => (
-        <Badge
-          className={"rounded-sm " + severityColor(row.original.Severity)}
-          variant="secondary"
-        >
+        <Badge className={`rounded-sm ${severityColor(row.original.Severity)}`} variant="secondary">
           {row.original.Severity}
         </Badge>
       ),
     },
     {
       accessorKey: "Time",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Time" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Time" />,
       cell: ({ row }) => {
         const time = row.original?.Time;
         return <span>{new Date(time ?? "").toLocaleString()}</span>;
@@ -62,22 +48,16 @@ function TableComponent() {
     },
     {
       accessorKey: "User",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="User" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="User" />,
     },
     {
       accessorKey: "Message",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Message" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Message" />,
     },
     {
       id: "expand",
       enableColumnFilter: false,
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Expand" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Expand" />,
       cell: ({ row }) => (
         <div>
           {row.getCanExpand() ? (
@@ -109,24 +89,18 @@ function TableComponent() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data &&
-            data.map((row, i) => (
-              <TableRow key={i}>
-                <TableCell>
-                  <Badge
-                    variant="secondary"
-                    className={"rounded-sm " + severityColor(row.status)}
-                  >
-                    {row.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>{row.host}</TableCell>
-                <TableCell>{row.msg}</TableCell>
-                <TableCell>
-                  {row.redfish_error?.code && JSON.stringify(row.redfish_error)}
-                </TableCell>
-              </TableRow>
-            ))}
+          {data?.map((row) => (
+            <TableRow key={row.host}>
+              <TableCell>
+                <Badge variant="secondary" className={`rounded-sm ${severityColor(row.status)}`}>
+                  {row.status}
+                </Badge>
+              </TableCell>
+              <TableCell>{row.host}</TableCell>
+              <TableCell>{row.msg}</TableCell>
+              <TableCell>{row.redfish_error?.code && JSON.stringify(row.redfish_error)}</TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     );
@@ -142,11 +116,11 @@ function TableComponent() {
       <CardContent>
         <DataTable
           columns={columns}
-          data={data ?? []}
+          data={events.data ?? []}
           // Actions={actions}
           renderSubComponent={renderSubComponent}
           getRowCanExpand={getRowCanExpand}
-          progress={isFetching}
+          // progress={isFetching}
           initialSorting={[{ id: "Time", desc: true }]}
         />
       </CardContent>

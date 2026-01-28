@@ -1,18 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { postV1NodesMutation } from "@/client/@tanstack/react-query.gen";
 import NodeForm from "@/components/nodes/form";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Editor } from "@monaco-editor/react";
-import { useTheme } from "@/hooks/theme-provider";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTheme } from "@/hooks/theme-provider";
+import AuthRedirect from "@/lib/auth";
+import { Editor } from "@monaco-editor/react";
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
-import { LoaderCircle } from "lucide-react";
-import { usePostV1Nodes } from "@/openapi/queries";
-import AuthRedirect from "@/auth";
-import { themeToMonaco } from "../../hooks/theme-provider";
-import { Card, CardContent } from "@/components/ui/card";
 import z from "zod";
+import { themeToMonaco } from "../../hooks/theme-provider";
 
 export const Route = createFileRoute("/add/node")({
   component: RouteComponent,
@@ -58,9 +58,8 @@ const defaultJson = {
 
 function NodeImportJSON() {
   const { theme } = useTheme();
-  const storeHosts = usePostV1Nodes();
+  const { mutate, isPending } = useMutation(postV1NodesMutation());
   const [text, setText] = useState("");
-  const queryClient = useQueryClient();
 
   return (
     <div>
@@ -75,14 +74,13 @@ function NodeImportJSON() {
       <div className="mt-2 flex justify-end">
         <Button
           onClick={() =>
-            storeHosts.mutate(
+            mutate(
               { body: JSON.parse(text) },
               {
-                onSuccess: (e) => {
-                  toast.success(e.data?.title, {
-                    description: e.data?.detail,
+                onSuccess: (data) => {
+                  toast.success(data?.title, {
+                    description: data?.detail,
                   });
-                  queryClient.invalidateQueries();
                 },
                 onError: (e) => {
                   toast.error(e.title, {
@@ -93,11 +91,7 @@ function NodeImportJSON() {
             )
           }
         >
-          {storeHosts.isPending ? (
-            <LoaderCircle className="animate-spin" />
-          ) : (
-            <span>Submit</span>
-          )}
+          {isPending ? <LoaderCircle className="animate-spin" /> : <span>Submit</span>}
         </Button>
       </div>
     </div>

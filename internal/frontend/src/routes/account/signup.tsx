@@ -1,3 +1,4 @@
+import { postV1AuthSignupMutation } from "@/client/@tanstack/react-query.gen";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,8 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUser } from "@/hooks/user-provider";
-import { usePostV1AuthSignup } from "@/openapi/queries";
 import { useForm } from "@tanstack/react-form";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -22,7 +23,7 @@ export const Route = createFileRoute("/account/signup")({
 });
 
 function RouteComponent() {
-  const { mutate, isPending } = usePostV1AuthSignup();
+  const { mutate, isPending } = useMutation(postV1AuthSignupMutation());
   const User = useUser();
   const router = useRouter();
 
@@ -40,10 +41,10 @@ function RouteComponent() {
       mutate(
         { body: { username: value.username, password: value.password } },
         {
-          onSuccess: (e) => {
+          onSuccess: (data) => {
             User.setUser({
-              username: e.data?.username ?? "",
-              role: e.data?.role ?? "",
+              username: data?.username ?? "",
+              role: data?.role ?? "",
               expire: 0,
             });
             toast.success("Successfully created an account");
@@ -72,8 +73,7 @@ function RouteComponent() {
           <CardHeader>
             <CardTitle>Create an Account:</CardTitle>
             <CardDescription>
-              New to Grendel? Create your account then ask your administrator to
-              enable it
+              New to Grendel? Create your account then ask your administrator to enable it
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -121,11 +121,7 @@ function RouteComponent() {
           </CardContent>
           <CardFooter>
             <Button type="submit">
-              {isPending ? (
-                <LoaderCircle className="animate-spin" />
-              ) : (
-                <span>Submit</span>
-              )}
+              {isPending ? <LoaderCircle className="animate-spin" /> : <span>Submit</span>}
             </Button>
           </CardFooter>
         </Card>

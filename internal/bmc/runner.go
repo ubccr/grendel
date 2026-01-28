@@ -11,7 +11,7 @@ import (
 	"github.com/korovkin/limiter"
 	"github.com/spf13/viper"
 	"github.com/stmcginnis/gofish/oem/dell"
-	"github.com/stmcginnis/gofish/redfish"
+	"github.com/stmcginnis/gofish/schemas"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -39,7 +39,7 @@ func (r *jobRunner) Wait() {
 	r.limit.Wait()
 }
 
-func (r *jobRunner) RunPowerControl(host *model.Host, ch chan model.JobMessage, bootOverride redfish.BootSourceOverrideTarget, powerOption redfish.ResetType) {
+func (r *jobRunner) RunPowerControl(host *model.Host, ch chan model.JobMessage, bootOverride schemas.BootSource, powerOption schemas.ResetType) {
 	r.limit.Execute(func() {
 		m := model.JobMessage{Status: "error", Host: host.Name}
 		defer func() { ch <- m }()

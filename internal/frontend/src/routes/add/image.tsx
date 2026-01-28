@@ -1,12 +1,12 @@
-import AuthRedirect from "@/auth";
+import { postV1ImagesMutation } from "@/client/@tanstack/react-query.gen";
 import ImageForm from "@/components/images/form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { themeToMonaco, useTheme } from "@/hooks/theme-provider";
-import { usePostV1Images } from "@/openapi/queries";
+import AuthRedirect from "@/lib/auth";
 import { Editor } from "@monaco-editor/react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
@@ -24,6 +24,7 @@ export const Route = createFileRoute("/add/image")({
 function RouteComponent() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
+
   return (
     <Card>
       <CardContent>
@@ -56,9 +57,8 @@ const defaultJson = {
 
 function ImageImportJSON() {
   const { theme } = useTheme();
-  const storeImages = usePostV1Images();
+  const { mutate, isPending } = useMutation(postV1ImagesMutation());
   const [text, setText] = useState("");
-  const queryClient = useQueryClient();
 
   return (
     <div>
@@ -73,12 +73,11 @@ function ImageImportJSON() {
       <div className="mt-2 flex justify-end">
         <Button
           onClick={() =>
-            storeImages.mutate(
+            mutate(
               { body: JSON.parse(text) },
               {
-                onSuccess: (e) => {
-                  toast.success(e.data?.title, { description: e.data?.detail });
-                  queryClient.invalidateQueries();
+                onSuccess: (data) => {
+                  toast.success(data?.title, { description: data?.detail });
                 },
                 onError: (e) => {
                   toast.error(e.title, {
@@ -89,11 +88,7 @@ function ImageImportJSON() {
             )
           }
         >
-          {storeImages.isPending ? (
-            <LoaderCircle className="animate-spin" />
-          ) : (
-            <span>Submit</span>
-          )}
+          {isPending ? <LoaderCircle className="animate-spin" /> : <span>Submit</span>}
         </Button>
       </div>
     </div>

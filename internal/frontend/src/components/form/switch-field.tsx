@@ -1,10 +1,4 @@
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-} from "../ui/field";
+import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from "../ui/field";
 import { Switch } from "../ui/switch";
 import { useFieldContext } from "./form-context";
 

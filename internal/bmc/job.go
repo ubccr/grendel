@@ -12,7 +12,7 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/stmcginnis/gofish/oem/dell"
-	"github.com/stmcginnis/gofish/redfish"
+	"github.com/stmcginnis/gofish/schemas"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -47,7 +47,7 @@ func FormatOutput(output chan model.JobMessage) (model.JobMessageList, error) {
 	return arr, nil
 }
 
-func (j *Job) PowerControl(hostList model.HostList, bootOption redfish.BootSourceOverrideTarget, powerOption redfish.ResetType) (model.JobMessageList, error) {
+func (j *Job) PowerControl(hostList model.HostList, bootOption schemas.BootSource, powerOption schemas.ResetType) (model.JobMessageList, error) {
 	runner := newJobRunner(j)
 
 	ch := make(chan model.JobMessage, len(hostList))

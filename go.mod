@@ -4,8 +4,6 @@ go 1.24.0
 
 replace github.com/go-fuego/fuego v0.18.0 => github.com/jafurlan/fuego v0.0.0-20250213180027-eda7f4ee24b9
 
-replace github.com/stmcginnis/gofish => github.com/jafurlan/gofish v0.0.0-20251026051747-697a9f3dd89a
-
 require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
 	github.com/Pallinder/go-randomdata v1.2.0
@@ -45,7 +43,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
-	github.com/stmcginnis/gofish v0.20.0
+	github.com/stmcginnis/gofish v0.20.1-0.20260203173523-22b2013b7c28
 	github.com/stretchr/testify v1.10.0
 	github.com/tidwall/gjson v1.18.0
 	github.com/tidwall/sjson v1.2.5

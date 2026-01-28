@@ -1,12 +1,12 @@
 import {
   ClipboardList,
-  Grid3x3,
   Home,
   Images,
   Plus,
   SearchIcon,
   Server,
   ShieldUser,
+  SquareMenu,
   UserPen,
 } from "lucide-react";
 
@@ -40,9 +40,9 @@ export function AppSidebar() {
           icon: Home,
         },
         {
-          title: "Floorplan",
-          url: "/floorplan",
-          icon: Grid3x3,
+          title: "Racks",
+          url: "/racks",
+          icon: SquareMenu,
         },
         {
           title: "Nodes",
@@ -108,18 +108,13 @@ export function AppSidebar() {
       <SidebarContent>
         {items.map((group, g) => (
           <SidebarGroup key={g}>
-            {group.label && (
-              <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
-            )}
+            {group.label && <SidebarGroupLabel>{group.label}</SidebarGroupLabel>}
             <SidebarGroupContent>
               <SidebarMenu>
                 {group.items.map((item, x) => (
                   <SidebarMenuItem key={x}>
                     <SidebarMenuButton asChild>
-                      <Link
-                        to={item.url}
-                        activeProps={{ className: "font-bold border" }}
-                      >
+                      <Link to={item.url} activeProps={{ className: "font-bold border" }}>
                         <item.icon />
                         <span>{item.title}</span>
                       </Link>

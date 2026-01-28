@@ -1,25 +1,21 @@
-import { BootImage } from "@/openapi/requests";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { useQueryClient } from "@tanstack/react-query";
+import { BootImage } from "@/client";
+import { postV1ImagesMutation } from "@/client/@tanstack/react-query.gen";
 import { useForm } from "@tanstack/react-form";
-import { toast } from "sonner";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import { Switch } from "../ui/switch";
-import { Button } from "../ui/button";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "@tanstack/react-router";
 import { LoaderCircle, Plus, X } from "lucide-react";
-import { usePostV1Images } from "@/openapi/queries";
 import { useEffect } from "react";
+import { toast } from "sonner";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
 
-export default function ImageForm({
-  data,
-  reset,
-}: {
-  data?: BootImage;
-  reset?: boolean;
-}) {
-  const storeImages = usePostV1Images();
-  const queryClient = useQueryClient();
+export default function ImageForm({ data, reset }: { data?: BootImage; reset?: boolean }) {
+  const router = useRouter();
+
+  const storeImages = useMutation(postV1ImagesMutation());
 
   const form = useForm({
     defaultValues: data,
@@ -28,9 +24,9 @@ export default function ImageForm({
         await storeImages.mutateAsync(
           { body: { boot_images: [value] } },
           {
-            onSuccess: (e) => {
-              toast.success(e.data?.title, { description: e.data?.detail });
-              queryClient.invalidateQueries();
+            onSuccess: (data) => {
+              toast.success(data?.title, { description: data?.detail });
+              router.invalidate();
             },
             onError: (e) => {
               toast.error(e.title, {
@@ -128,9 +124,7 @@ export default function ImageForm({
                   <Button
                     type="button"
                     variant="secondary"
-                    onClick={() =>
-                      field.setValue({ ...field.state.value, "": "" })
-                    }
+                    onClick={() => field.setValue({ ...field.state.value, "": "" })}
                   >
                     <Plus />
                     <span>Add Template</span>
@@ -153,9 +147,7 @@ export default function ImageForm({
                               }}
                             >
                               <X />
-                              <span className="sr-only">
-                                Delete Template {i + 1}
-                              </span>
+                              <span className="sr-only">Delete Template {i + 1}</span>
                             </Button>
                           </div>
                         </CardTitle>
@@ -202,11 +194,7 @@ export default function ImageForm({
             {(field) => (
               <>
                 <div className="mb-2">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => field.pushValue("")}
-                  >
+                  <Button type="button" variant="secondary" onClick={() => field.pushValue("")}>
                     <Plus />
                     <span>Add Initrd</span>
                   </Button>
@@ -250,9 +238,7 @@ export default function ImageForm({
                               onClick={() => field.removeValue(i)}
                             >
                               <X />
-                              <span className="sr-only">
-                                Delete Initrd {i + 1}
-                              </span>
+                              <span className="sr-only">Delete Initrd {i + 1}</span>
                             </Button>
                           </div>
                         </CardTitle>
@@ -263,9 +249,7 @@ export default function ImageForm({
                             <Input
                               placeholder="path"
                               value={rd}
-                              onChange={(e) =>
-                                field.replaceValue(i, e.target.value)
-                              }
+                              onChange={(e) => field.replaceValue(i, e.target.value)}
                             />
                           </div>
                         </div>

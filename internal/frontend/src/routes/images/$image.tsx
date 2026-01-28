@@ -1,66 +1,49 @@
-import { createFileRoute } from "@tanstack/react-router";
-import ImageForm from "@/components/images/form";
-import AuthRedirect from "@/auth";
-import ImageActions from "@/components/images/actions";
+import { getV1ImagesFind } from "@/client";
 import ActionsSheet from "@/components/actions-sheet";
-import { useEffect } from "react";
-import { toast } from "sonner";
-import { useGetV1ImagesFind } from "@/openapi/queries";
+import ImagesDeleteAction from "@/components/actions/images/delete";
+import ImagesExportAction from "@/components/actions/images/export";
+import ImageForm from "@/components/images/form";
 import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import AuthRedirect from "@/lib/auth";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/images/$image")({
-  component: RouteComponent,
+  component: Form,
   beforeLoad: AuthRedirect,
+  loader: ({ params: { image } }) => getV1ImagesFind({ query: { names: image } }),
 });
 
-function RouteComponent() {
-  return (
-    <div>
-      <Form />
-    </div>
-  );
-}
-
 function Form() {
-  const { image } = Route.useParams();
-  const image_query = useGetV1ImagesFind({ query: { names: image } });
-
-  useEffect(() => {
-    if (image_query.error) {
-      toast.error(image_query.error.title, {
-        description: image_query.error.detail,
-      });
-    }
-  }, [image_query.error]);
+  const image = Route.useLoaderData();
+  const imageName = Route.useParams().image;
 
   return (
     <Card>
       <CardContent>
-        {image_query.isFetching && <Progress className="h-1" />}
-        {image_query.data && image_query.data.length === 1 ? (
+        {image.data && image.data.length === 1 ? (
           <div>
             <div className="grid grid-cols-2 gap-3 pt-2 sm:grid-cols-3">
               <div className="hidden sm:block"></div>
               <div></div>
               <div className="flex justify-end gap-2">
-                <ActionsSheet checked={image} length={1}>
-                  <ImageActions images={image} />
+                <ActionsSheet checked={imageName} length={1}>
+                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                    <ImagesDeleteAction images={imageName} />
+                    <ImagesExportAction images={imageName} />
+                  </div>
                 </ActionsSheet>
               </div>
             </div>
             <div className="pt-2">
               <ImageForm
-                data={image_query.data?.[0]}
-                reset={image_query.isFetched}
+                data={image.data?.[0]}
+                // reset={image.isFetched}
               />
             </div>
           </div>
         ) : (
           <div className="flex justify-center">
-            <span className="text-muted-foreground p-4 text-center">
-              404 Image not found.
-            </span>
+            <span className="p-4 text-center text-muted-foreground">404 Image not found.</span>
           </div>
         )}
       </CardContent>
