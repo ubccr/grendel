@@ -12,15 +12,15 @@ import (
 
 	"github.com/go-fuego/fuego"
 	"github.com/stmcginnis/gofish/oem/dell"
-	"github.com/stmcginnis/gofish/redfish"
+	"github.com/stmcginnis/gofish/schemas"
 	"github.com/ubccr/grendel/internal/bmc"
 	"github.com/ubccr/grendel/pkg/model"
 	"github.com/ubccr/grendel/pkg/nodeset"
 )
 
 type BmcOsPowerBody struct {
-	BootOption  redfish.BootSourceOverrideTarget `json:"boot_option" description:"string of type redfish.BootSourceOverrideTarget. Common options include: None, Pxe, BiosSetup, Utilities, Diags" example:"Pxe"`
-	PowerOption redfish.ResetType                `json:"power_option" description:"string of type redfish.ResetType. Common options include: On, ForceOn, ForceOff, ForceRestart, GracefulRestart, GracefulShutdown, PowerCycle" example:"PowerCycle"`
+	BootOption  schemas.BootSource `json:"boot_option" description:"string of type schemas.BootSourceOverrideTarget. Common options include: None, Pxe, BiosSetup, Utilities, Diags" example:"Pxe"`
+	PowerOption schemas.ResetType  `json:"power_option" description:"string of type schemas.ResetType. Common options include: On, ForceOn, ForceOff, ForceRestart, GracefulRestart, GracefulShutdown, PowerCycle" example:"PowerCycle"`
 }
 type BmcImportConfigurationRequest struct {
 	ShutdownType string `json:"shutdown_type" description:"options include: NoReboot, Graceful, Forced" example:"Graceful"`

@@ -11,14 +11,15 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+	"github.com/stmcginnis/gofish"
 	"github.com/stmcginnis/gofish/oem/dell"
-	"github.com/stmcginnis/gofish/redfish"
+	"github.com/stmcginnis/gofish/schemas"
 	"github.com/ubccr/grendel/internal/util"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
 // Power will change the hosts power state
-func (r *Redfish) PowerControl(resetType redfish.ResetType, bootOverride redfish.BootSourceOverrideTarget) error {
+func (r *Redfish) PowerControl(resetType schemas.ResetType, bootOverride schemas.BootSource) error {
 	ss, err := r.service.Systems()
 	if err != nil {
 		return err
@@ -30,12 +31,11 @@ func (r *Redfish) PowerControl(resetType redfish.ResetType, bootOverride redfish
 	}
 
 	for _, s := range ss {
-		if s.PowerState == redfish.OffPowerState && resetType == redfish.ForceRestartResetType {
-			resetType = redfish.OnResetType
+		if s.PowerState == schemas.OffPowerState && resetType == schemas.ForceRestartResetType {
+			resetType = schemas.OnResetType
 		}
 
-		err := s.Reset(resetType)
-		if err != nil {
+		if _, err := s.Reset(resetType); err != nil {
 			return err
 		}
 	}
@@ -44,14 +44,14 @@ func (r *Redfish) PowerControl(resetType redfish.ResetType, bootOverride redfish
 }
 
 // bootOverride will set the boot override target
-func (r *Redfish) bootOverride(bootOption redfish.BootSourceOverrideTarget) error {
-	if bootOption == redfish.NoneBootSourceOverrideTarget {
+func (r *Redfish) bootOverride(bootOption schemas.BootSource) error {
+	if bootOption == schemas.NoneBootSource {
 		return nil
 	}
 
-	boot := redfish.Boot{
+	boot := schemas.Boot{
 		BootSourceOverrideTarget:  bootOption,
-		BootSourceOverrideEnabled: redfish.OnceBootSourceOverrideEnabled,
+		BootSourceOverrideEnabled: schemas.OnceBootSourceOverrideEnabled,
 	}
 
 	ss, err := r.service.Systems()
@@ -60,7 +60,7 @@ func (r *Redfish) bootOverride(bootOption redfish.BootSourceOverrideTarget) erro
 	}
 
 	for _, s := range ss {
-		err := s.SetBoot(boot)
+		err := s.SetBoot(&boot)
 		if err != nil {
 			return err
 		}
@@ -87,14 +87,14 @@ func (r *Redfish) GetSystem() (*model.RedfishSystem, error) {
 
 	system := &model.RedfishSystem{
 		HostName:       sys.HostName,
-		BIOSVersion:    sys.BIOSVersion,
+		BIOSVersion:    sys.BiosVersion,
 		SerialNumber:   sys.SKU,
 		Manufacturer:   sys.Manufacturer,
 		Model:          sys.Model,
 		PowerStatus:    string(sys.PowerState),
 		Health:         string(sys.Status.Health),
-		TotalMemory:    sys.MemorySummary.TotalSystemMemoryGiB,
-		ProcessorCount: sys.ProcessorSummary.LogicalProcessorCount,
+		TotalMemory:    float32(gofish.Deref(sys.MemorySummary.TotalSystemMemoryGiB)),
+		ProcessorCount: int(gofish.Deref(sys.ProcessorSummary.LogicalProcessorCount)),
 		BootNext:       sys.Boot.BootNext,
 		BootOrder:      sys.Boot.BootOrder,
 		OEMDell:        dcs.OEMSystem,
@@ -103,7 +103,7 @@ func (r *Redfish) GetSystem() (*model.RedfishSystem, error) {
 	return system, nil
 }
 
-func (r *Redfish) GetJobInfo(jid string) (*redfish.Job, error) {
+func (r *Redfish) GetJobInfo(jid string) (*schemas.Job, error) {
 	js, err := r.service.JobService()
 	if err != nil {
 		return nil, err
@@ -123,7 +123,7 @@ func (r *Redfish) GetJobInfo(jid string) (*redfish.Job, error) {
 	return nil, fmt.Errorf("unable to find job with JID: %s", jid)
 }
 
-func (r *Redfish) GetJobs() ([]*redfish.Job, error) {
+func (r *Redfish) GetJobs() ([]*schemas.Job, error) {
 	js, err := r.service.JobService()
 	if err != nil {
 		return nil, err
@@ -166,8 +166,8 @@ func (r *Redfish) ClearJobs(ids []string) error {
 	return nil
 }
 
-func (r *Redfish) GetTaskInfo(tid string) (*redfish.Task, error) {
-	ts, err := r.service.TaskService()
+func (r *Redfish) GetTaskInfo(tid string) (*schemas.Task, error) {
+	ts, err := r.service.Tasks()
 	if err != nil {
 		return nil, err
 	}
@@ -194,8 +194,7 @@ func (r *Redfish) PowerCycleBmc() error {
 	}
 
 	for _, m := range ms {
-		err := m.Reset(redfish.GracefulRestartResetType)
-		if err != nil {
+		if _, err := m.Reset(schemas.GracefulRestartResetType); err != nil {
 			return err
 		}
 	}
@@ -219,8 +218,7 @@ func (r *Redfish) ClearSel() error {
 
 			// fmt.Printf("\nID: %s\n Type: %s\n Name: %s\n\n", l.ID, l.LogEntryType, l.Name)
 			if l.ID == "Sel" || l.ID == "Log1" || len(ls) == 1 {
-				err := l.ClearLog()
-				if err != nil {
+				if _, err := l.ClearLog(""); err != nil {
 					return err
 				}
 			}
@@ -324,7 +322,7 @@ func (r *Redfish) BmcImportConfiguration(st, path, file string) (string, error) 
 	return j.ID, nil
 }
 
-func (r *Redfish) BmcGetJob(id string) (*redfish.Job, error) {
+func (r *Redfish) BmcGetJob(id string) (*schemas.Job, error) {
 	j, err := r.service.JobService()
 	if err != nil {
 		return nil, err
@@ -343,7 +341,7 @@ func (r *Redfish) BmcGetJob(id string) (*redfish.Job, error) {
 	return nil, errors.New("failed to find job")
 }
 
-func (r *Redfish) BmcGetMetricReports() ([]*redfish.MetricReport, error) {
+func (r *Redfish) BmcGetMetricReports() ([]*schemas.MetricReport, error) {
 	ts, err := r.service.TelemetryService()
 	if err != nil {
 		return nil, err
@@ -354,7 +352,7 @@ func (r *Redfish) BmcGetMetricReports() ([]*redfish.MetricReport, error) {
 	return mr, err
 }
 
-func (r *Redfish) DellInstallFromRepo(body dell.InstallFromRepoBody) (*redfish.Job, error) {
+func (r *Redfish) DellInstallFromRepo(body dell.InstallFromRepoBody) (*schemas.Job, error) {
 	s, err := r.service.Systems()
 	if err != nil {
 		return nil, err
@@ -383,7 +381,7 @@ func (r *Redfish) DellInstallFromRepo(body dell.InstallFromRepoBody) (*redfish.J
 	if err != nil {
 		return nil, err
 	}
-	var job *redfish.Job
+	var job *schemas.Job
 	for _, j := range jobList {
 		if j.ID == jid {
 			continue
@@ -412,14 +410,14 @@ func (r *Redfish) DellInstallFromRepo(body dell.InstallFromRepoBody) (*redfish.J
 			break
 		}
 
-		if job.PercentComplete == 100 {
+		if gofish.Deref(job.PercentComplete) == 100 {
 			break
 		}
 
 		time.Sleep(time.Second * 5)
 	}
 
-	if job.PercentComplete != 100 {
+	if gofish.Deref(job.PercentComplete) != 100 {
 		return job, errors.New("timed out waiting for update job to complete")
 	}
 

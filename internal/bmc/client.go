@@ -6,7 +6,7 @@ package bmc
 
 import (
 	"github.com/stmcginnis/gofish"
-	"github.com/stmcginnis/gofish/redfish"
+	"github.com/stmcginnis/gofish/schemas"
 )
 
 type Redfish struct {
@@ -31,7 +31,7 @@ type CurrentFirmware struct {
 
 type FirmwareUpdate struct {
 	Firmware
-	Jobs map[string]*redfish.Job
+	Jobs map[string]*schemas.Job
 }
 
 func NewRedfishClient(ip, user, pass string, insecure bool) (*Redfish, error) {

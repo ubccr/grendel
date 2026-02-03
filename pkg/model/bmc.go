@@ -6,13 +6,13 @@ package model
 
 import (
 	"github.com/stmcginnis/gofish/oem/dell"
-	"github.com/stmcginnis/gofish/redfish"
+	"github.com/stmcginnis/gofish/schemas"
 )
 
 type OSPower struct {
-	Hosts       string                           `json:"hosts"`
-	PowerOption redfish.ResetType                `json:"power_option"`
-	BootOption  redfish.BootSourceOverrideTarget `json:"boot_option"`
+	Hosts       string             `json:"hosts"`
+	PowerOption schemas.ResetType  `json:"power_option"`
+	BootOption  schemas.BootSource `json:"boot_option"`
 }
 
 type JobMessageList []JobMessage
@@ -28,13 +28,13 @@ type JobMessage struct {
 type RedfishJobList []RedfishJob
 type RedfishJob struct {
 	Host string         `json:"name"`
-	Jobs []*redfish.Job `json:"jobs" oai3:"nullable"`
+	Jobs []*schemas.Job `json:"jobs" oai3:"nullable"`
 }
 
 type RedfishMetricReportList []RedfishMetricReport
 type RedfishMetricReport struct {
 	Name    string                  `json:"name"`
-	Reports []*redfish.MetricReport `json:"reports"`
+	Reports []*schemas.MetricReport `json:"reports"`
 }
 
 type RedfishSystemList []RedfishSystem
