@@ -43,7 +43,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.20.1
-	github.com/stmcginnis/gofish v0.20.1-0.20260203173523-22b2013b7c28
+	github.com/stmcginnis/gofish v0.21.1
 	github.com/stretchr/testify v1.10.0
 	github.com/tidwall/gjson v1.18.0
 	github.com/tidwall/sjson v1.2.5
