@@ -1,5 +1,18 @@
 # Grendel Changelog
 
+## [0.2.6] - 2026-02-23
+
+- frontend: deprecated floorplan page
+- frontend: added rack page - groups nodes with the tag rack=foo
+- frontend: added using search parameters for data table filter state
+- frontend: added animated loading component
+- frontend: fixed component reload on window refocus with Actions sheet
+- frontend: fixed cursor type when hovering many clickable items
+- frontend: changed api client to heyapi/openapi-ts
+- frontend: updated deps
+- added oxc for linting and formatting
+- merge gofish changes from #116
+
 ## [0.2.5] - 2025-11-24
 
 - Fix firmware update table select all checkbox only selecting one page at a time
@@ -297,4 +310,5 @@
 [0.2.3]: https://github.com/ubccr/grendel/releases/tag/v0.2.3
 [0.2.4]: https://github.com/ubccr/grendel/releases/tag/v0.2.4
 [0.2.5]: https://github.com/ubccr/grendel/releases/tag/v0.2.5
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.5...HEAD
+[0.2.6]: https://github.com/ubccr/grendel/releases/tag/v0.2.6
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.6...HEAD
