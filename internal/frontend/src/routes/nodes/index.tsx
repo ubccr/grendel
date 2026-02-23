@@ -1,47 +1,29 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Host } from "@/openapi/requests";
-import { ColumnDef } from "@tanstack/react-table";
-import {
-  DataTable,
-  DataTableActions,
-} from "@/components/data-table/data-table";
-import { DataTableColumnHeader } from "@/components/data-table/header";
-import { Checkbox } from "@/components/ui/checkbox";
-import ProvisionIcon from "@/components/nodes/provision-button";
-import { useEffect, useState } from "react";
-import SelectableCheckbox from "@/components/data-table/selectableCheckbox";
-import TagsList from "@/components/tags";
-import NodeActions from "@/components/nodes/actions";
+import { getV1Nodes, Host } from "@/client";
 import ActionsSheet from "@/components/actions-sheet";
-import AuthRedirect from "@/auth";
+import NodeActions from "@/components/actions/nodes";
+import { DataTable, DataTableActions } from "@/components/data-table/data-table";
+import { DataTableColumnHeader } from "@/components/data-table/header";
+import SelectableCheckbox from "@/components/data-table/selectableCheckbox";
+import ProvisionIcon from "@/components/nodes/provision-button";
+import TagsList from "@/components/tags";
 import { Card, CardContent } from "@/components/ui/card";
-import { toast } from "sonner";
-import { useGetV1Nodes } from "@/openapi/queries";
+import { Checkbox } from "@/components/ui/checkbox";
+import AuthRedirect from "@/lib/auth";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ColumnDef } from "@tanstack/react-table";
+import { useState } from "react";
 
 export const Route = createFileRoute("/nodes/")({
-  component: RouteComponent,
+  component: TableComponent,
   beforeLoad: AuthRedirect,
+  loader: () => getV1Nodes(),
 });
 
-function RouteComponent() {
-  return (
-    <div>
-      <TableComponent />
-    </div>
-  );
-}
-
 function TableComponent() {
-  const { data, error, isFetching } = useGetV1Nodes();
-  const [lastSelectedID, setLastSelectedID] = useState(0);
+  const { data } = Route.useLoaderData();
+  const { isFetching } = Route.useMatch();
 
-  useEffect(() => {
-    if (error) {
-      toast.error(error.title, {
-        description: error.detail,
-      });
-    }
-  }, [error]);
+  const [lastSelectedID, setLastSelectedID] = useState(0);
 
   const columns: ColumnDef<Host>[] = [
     {
@@ -64,14 +46,12 @@ function TableComponent() {
     },
     {
       accessorKey: "name",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Name" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
       cell: ({ row }) => {
         const name = row.original?.name;
         return (
           <Link
-            to={"/nodes/$node"}
+            to={"/nodes/$node/node"}
             params={{ node: name ?? "unknown" }}
             className="hover:underline"
           >
@@ -82,27 +62,22 @@ function TableComponent() {
     },
     {
       accessorKey: "provision",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Provision" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Provision" />,
       cell: ({ row }) => (
-        <ProvisionIcon
-          provision={row.original?.provision}
-          name={row.original?.name}
-        />
+        <ProvisionIcon provision={row.original?.provision} name={row.original?.name} />
       ),
+      filterFn: (row, columId, filterValue) => {
+        const val = row.getValue(columId) as boolean;
+        return `${val}`.includes(filterValue);
+      },
     },
     {
       accessorKey: "boot_image",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Boot Image" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Boot Image" />,
     },
     {
       accessorKey: "tags",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Tags" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Tags" />,
       cell: ({ row }) => {
         const tags = row.original?.tags;
         return <TagsList tags={tags ?? []} />;
@@ -116,12 +91,10 @@ function TableComponent() {
           if (filterTag.startsWith("!")) {
             return !row.original?.tags.includes(filterTag.substring(1));
           } else if (filterTag.startsWith("=") || filterTag.endsWith("=")) {
-            const match =
-              row.original?.tags.filter((tag) => tag.includes(filterTag)) ?? [];
+            const match = row.original?.tags.filter((tag) => tag.includes(filterTag)) ?? [];
             return match.length > 0;
           } else if (filterTag.startsWith(":") || filterTag.endsWith(":")) {
-            const match =
-              row.original?.tags.filter((tag) => tag.includes(filterTag)) ?? [];
+            const match = row.original?.tags.filter((tag) => tag.includes(filterTag)) ?? [];
             return match.length > 0;
           }
 
@@ -133,9 +106,7 @@ function TableComponent() {
     },
     {
       accessorKey: "interfaces.ip",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="IP Addresses" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="IP Addresses" />,
       cell: ({ row }) => {
         const data = row.original.interfaces?.map((iface) => iface?.ip);
         return <span>{data?.join(" ")}</span>;
@@ -149,9 +120,7 @@ function TableComponent() {
     },
     {
       accessorKey: "interfaces.fqdn",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="FQDNs" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="FQDNs" />,
       cell: ({ row }) => {
         const data = row.original.interfaces?.map((iface) => iface?.fqdn);
         return <span>{data?.join(" ")}</span>;
@@ -165,9 +134,7 @@ function TableComponent() {
     },
     {
       accessorKey: "interfaces.mac",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="MACs" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="MACs" />,
       cell: ({ row }) => {
         const data = row.original.interfaces?.map((iface) => iface?.mac);
         return <span>{data?.join(" ")}</span>;
@@ -189,7 +156,7 @@ function TableComponent() {
     const length = table.getSelectedRowModel().rows.length;
     return (
       <ActionsSheet checked={checked} length={length}>
-        <NodeActions nodes={checked} length={length} />
+        <NodeActions nodes={checked} />
       </ActionsSheet>
     );
   };
@@ -206,7 +173,7 @@ function TableComponent() {
             interfaces_fqdn: false,
             interfaces_mac: false,
           }}
-          progress={isFetching}
+          progress={isFetching !== false}
         />
       </CardContent>
     </Card>

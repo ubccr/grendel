@@ -1,6 +1,11 @@
-import { UserRound } from "lucide-react";
-import { SidebarTrigger } from "./ui/sidebar";
+import { deleteV1AuthSignoutMutation } from "@/client/@tanstack/react-query.gen";
 import { useUser } from "@/hooks/user-provider";
+import { useMutation } from "@tanstack/react-query";
+import { Link, useRouter } from "@tanstack/react-router";
+import { UserRound } from "lucide-react";
+import { toast } from "sonner";
+import { ThemeSwitch } from "./theme-switch";
+import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,21 +15,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Link } from "@tanstack/react-router";
-import { useDeleteV1AuthSignout } from "@/openapi/queries";
-import { toast } from "sonner";
-import { Button } from "./ui/button";
-import { ThemeSwitch } from "./theme-switch";
-import { useRouter } from "@tanstack/react-router";
+import { SidebarTrigger } from "./ui/sidebar";
 
 export default function Header() {
   const { user, setUser } = useUser();
   const router = useRouter();
-  const logout_mutation = useDeleteV1AuthSignout();
+  const { mutate } = useMutation(deleteV1AuthSignoutMutation());
 
   return (
     <div className="p-2 px-0">
-      <div className="border-sidebar-border bg-sidebar flex justify-between gap-3 rounded-md border p-1 align-middle">
+      <div className="flex justify-between gap-3 rounded-md border border-sidebar-border bg-sidebar p-1 align-middle">
         <SidebarTrigger className="my-auto" />
         <div className="flex gap-2">
           <ThemeSwitch />
@@ -40,38 +40,36 @@ export default function Header() {
           ) : (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="bg-secondary text-primary flex aspect-square size-9 items-center justify-center rounded-lg">
+                <div className="flex aspect-square size-9 cursor-pointer items-center justify-center rounded-lg bg-secondary text-primary">
                   <UserRound className="size-4" />
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="start">
                 <div className="flex gap-3 p-2">
-                  <div className="bg-secondary text-primary flex aspect-square size-11 items-center justify-center rounded-lg">
+                  <div className="flex aspect-square size-11 items-center justify-center rounded-lg bg-secondary text-primary">
                     <UserRound className="size-4" />
                   </div>
                   <div className="flex flex-col">
                     <span className="">{user?.username}</span>
-                    <span className="text-muted-foreground text-sm">
-                      {user?.role}
-                    </span>
+                    <span className="text-sm text-muted-foreground">{user?.role}</span>
                   </div>
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel>Account</DropdownMenuLabel>
                 <DropdownMenuGroup>
-                  <DropdownMenuItem className="text-muted-foreground" asChild>
+                  <DropdownMenuItem className="cursor-pointer text-muted-foreground" asChild>
                     <Link to="/account/token">API Token</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-muted-foreground" asChild>
+                  <DropdownMenuItem className="cursor-pointer text-muted-foreground" asChild>
                     <Link to="/account/reset">Change Password</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    className="text-muted-foreground"
+                    className="cursor-pointer text-muted-foreground"
                     onClick={() => {
-                      logout_mutation.mutate(
+                      mutate(
                         {},
                         {
-                          onSuccess: ({ data }) => {
+                          onSuccess: (data) => {
                             setUser(null);
                             toast.success(data?.title, {
                               description: data?.detail,

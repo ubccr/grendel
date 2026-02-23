@@ -1,4 +1,4 @@
-import AuthRedirect from "@/auth";
+import { postV1AuthTokenMutation } from "@/client/@tanstack/react-query.gen";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,8 +19,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { usePostV1AuthToken } from "@/openapi/queries";
+import AuthRedirect from "@/lib/auth";
 import { useForm } from "@tanstack/react-form";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Copy, LoaderCircle } from "lucide-react";
 import { useState } from "react";
@@ -38,14 +39,13 @@ const reqSchema = z.object({
   username: z.string(),
   role: z.string(),
   expire: z.string().regex(EXPIRE_REGEX, {
-    message:
-      "Invalid duration. Follow the Go time.ParseDuration sytax, ex: 30m",
+    message: "Invalid duration. Follow the Go time.ParseDuration sytax, ex: 30m",
   }),
 });
 
 function RouteComponent() {
   const [resDialog, setResDialog] = useState(false);
-  const mutate_token = usePostV1AuthToken();
+  const { mutate, isPending, data } = useMutation(postV1AuthTokenMutation());
 
   const form = useForm({
     defaultValues: {
@@ -57,7 +57,7 @@ function RouteComponent() {
       onSubmit: reqSchema,
     },
     onSubmit: async ({ value }) => {
-      mutate_token.mutate(
+      mutate(
         {
           body: {
             username: value.username,
@@ -75,7 +75,7 @@ function RouteComponent() {
               description: e.detail,
             });
           },
-        }
+        },
       );
     },
   });
@@ -93,8 +93,8 @@ function RouteComponent() {
           <CardHeader>
             <CardTitle>Create an API Token:</CardTitle>
             <CardDescription>
-              API Tokens can be used to authenticate the CLI or custom
-              applications that integrate with Grendel.
+              API Tokens can be used to authenticate the CLI or custom applications that integrate
+              with Grendel.
               <br />
               <br />
               Valid options:
@@ -103,8 +103,7 @@ function RouteComponent() {
               <br />
               Role: string, built in roles: "admin", "user", "read-only"
               <br />
-              Expire: duration before token expires, ex "8h", "1h", "30m",
-              "infinite"
+              Expire: duration before token expires, ex "8h", "1h", "30m", "infinite"
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -167,11 +166,7 @@ function RouteComponent() {
           </CardContent>
           <CardFooter>
             <Button type="submit">
-              {mutate_token.isPending ? (
-                <LoaderCircle className="animate-spin" />
-              ) : (
-                <span>Submit</span>
-              )}
+              {isPending ? <LoaderCircle className="animate-spin" /> : <span>Submit</span>}
             </Button>
           </CardFooter>
         </Card>
@@ -181,17 +176,15 @@ function RouteComponent() {
           <DialogHeader>
             <DialogTitle>API Token:</DialogTitle>
             <DialogDescription>
-              <ScrollArea className="break-all">
-                {mutate_token?.data?.data?.token}
-              </ScrollArea>
+              <ScrollArea className="break-all">{data?.token}</ScrollArea>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button
               type="button"
               onClick={() => {
-                if (!mutate_token?.data?.data?.token) return;
-                navigator.clipboard.writeText(mutate_token?.data?.data?.token);
+                if (!data?.token) return;
+                navigator.clipboard.writeText(data?.token);
                 toast.success("Successfully copied token to clipboard");
               }}
             >

@@ -23,10 +23,7 @@ export function ThemeSwitch() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuRadioGroup
-          value={theme}
-          onValueChange={(e) => setTheme(e as Theme)}
-        >
+        <DropdownMenuRadioGroup value={theme} onValueChange={(e) => setTheme(e as Theme)}>
           <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="system">System</DropdownMenuRadioItem>

@@ -1,12 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
-
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -25,6 +19,7 @@ function Index() {
               className="text-primary"
               href="https://grendel.readthedocs.io/en/latest/"
               target="_blank"
+              rel="noreferrer"
             >
               Docs
             </a>

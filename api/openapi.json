@@ -168,12 +168,12 @@
 				"description": "BmcOsPowerBody schema",
 				"properties": {
 					"boot_option": {
-						"description": "string of type redfish.BootSourceOverrideTarget. Common options include: None, Pxe, BiosSetup, Utilities, Diags",
+						"description": "string of type schemas.BootSourceOverrideTarget. Common options include: None, Pxe, BiosSetup, Utilities, Diags",
 						"example": "Pxe",
 						"type": "string"
 					},
 					"power_option": {
-						"description": "string of type redfish.ResetType. Common options include: On, ForceOn, ForceOff, ForceRestart, GracefulRestart, GracefulShutdown, PowerCycle",
+						"description": "string of type schemas.ResetType. Common options include: On, ForceOn, ForceOff, ForceRestart, GracefulRestart, GracefulShutdown, PowerCycle",
 						"example": "PowerCycle",
 						"type": "string"
 					}
@@ -1176,51 +1176,9 @@
 						"items": {
 							"nullable": true,
 							"properties": {
-								"@odata.context": {
-									"type": "string"
-								},
-								"@odata.id": {
-									"type": "string"
-								},
-								"@odata.type": {
-									"type": "string"
-								},
-								"CreatedBy": {
-									"type": "string"
-								},
-								"Description": {
-									"type": "string"
-								},
-								"EndTime": {
-									"type": "string"
-								},
-								"EstimatedDuration": {
-									"type": "string"
-								},
-								"HidePayload": {
-									"type": "boolean"
-								},
-								"Id": {
-									"type": "string"
-								},
-								"JobState": {
-									"type": "string"
-								},
-								"JobStatus": {
-									"type": "string"
-								},
-								"MaxExecutionTime": {
-									"type": "string"
-								},
-								"Messages": {
+								"@Message.ExtendedInfo": {
 									"items": {
 										"properties": {
-											"@odata.id": {
-												"type": "string"
-											},
-											"Id": {
-												"type": "string"
-											},
 											"Message": {
 												"type": "string"
 											},
@@ -1233,9 +1191,10 @@
 											"MessageId": {
 												"type": "string"
 											},
-											"Name": {
+											"MessageSeverity": {
 												"type": "string"
 											},
+											"Oem": {},
 											"RelatedProperties": {
 												"items": {
 													"nullable": true,
@@ -1247,7 +1206,306 @@
 											"Resolution": {
 												"type": "string"
 											},
+											"ResolutionSteps": {
+												"items": {
+													"properties": {
+														"ActionParameters": {
+															"items": {
+																"properties": {
+																	"AllowableNumbers": {
+																		"items": {
+																			"type": "string"
+																		},
+																		"type": "array"
+																	},
+																	"AllowablePattern": {
+																		"type": "string"
+																	},
+																	"AllowableValueDescriptions": {
+																		"items": {
+																			"type": "string"
+																		},
+																		"type": "array"
+																	},
+																	"AllowableValues": {
+																		"items": {
+																			"type": "string"
+																		},
+																		"type": "array"
+																	},
+																	"ArraySizeMaximum": {
+																		"nullable": true,
+																		"type": "integer"
+																	},
+																	"ArraySizeMinimum": {
+																		"nullable": true,
+																		"type": "integer"
+																	},
+																	"DataType": {
+																		"type": "string"
+																	},
+																	"DefaultValue": {
+																		"type": "string"
+																	},
+																	"MaximumValue": {
+																		"format": "double",
+																		"nullable": true,
+																		"type": "number"
+																	},
+																	"MinimumValue": {
+																		"format": "double",
+																		"nullable": true,
+																		"type": "number"
+																	},
+																	"Name": {
+																		"type": "string"
+																	},
+																	"NoDefaultValue": {
+																		"type": "boolean"
+																	},
+																	"ObjectDataType": {
+																		"type": "string"
+																	},
+																	"Required": {
+																		"type": "boolean"
+																	}
+																},
+																"type": "object"
+															},
+															"type": "array"
+														},
+														"ActionURI": {
+															"type": "string"
+														},
+														"Oem": {},
+														"Priority": {
+															"minimum": 0,
+															"nullable": true,
+															"type": "integer"
+														},
+														"ResolutionType": {
+															"type": "string"
+														},
+														"RetryCount": {
+															"minimum": 0,
+															"nullable": true,
+															"type": "integer"
+														},
+														"RetryIntervalSeconds": {
+															"minimum": 0,
+															"nullable": true,
+															"type": "integer"
+														},
+														"TargetComponentURI": {
+															"type": "string"
+														}
+													},
+													"type": "object"
+												},
+												"type": "array"
+											},
 											"Severity": {
+												"type": "string"
+											},
+											"UserAuthenticationSource": {
+												"type": "string"
+											},
+											"Username": {
+												"type": "string"
+											}
+										},
+										"type": "object"
+									},
+									"type": "array"
+								},
+								"@odata.context": {
+									"type": "string"
+								},
+								"@odata.etag": {
+									"type": "string"
+								},
+								"@odata.id": {
+									"type": "string"
+								},
+								"@odata.type": {
+									"type": "string"
+								},
+								"CreatedBy": {
+									"type": "string"
+								},
+								"CreationTime": {
+									"type": "string"
+								},
+								"Description": {
+									"type": "string"
+								},
+								"EndTime": {
+									"type": "string"
+								},
+								"EstimatedCompletionTime": {
+									"type": "string"
+								},
+								"EstimatedDuration": {
+									"type": "string"
+								},
+								"HidePayload": {
+									"type": "boolean"
+								},
+								"Id": {
+									"type": "string"
+								},
+								"JobPriority": {
+									"minimum": 0,
+									"nullable": true,
+									"type": "integer"
+								},
+								"JobState": {
+									"type": "string"
+								},
+								"JobStatus": {
+									"type": "string"
+								},
+								"JobType": {
+									"type": "string"
+								},
+								"MaxExecutionTime": {
+									"type": "string"
+								},
+								"Messages": {
+									"items": {
+										"properties": {
+											"Message": {
+												"type": "string"
+											},
+											"MessageArgs": {
+												"items": {
+													"type": "string"
+												},
+												"type": "array"
+											},
+											"MessageId": {
+												"type": "string"
+											},
+											"MessageSeverity": {
+												"type": "string"
+											},
+											"Oem": {},
+											"RelatedProperties": {
+												"items": {
+													"nullable": true,
+													"type": "string"
+												},
+												"nullable": true,
+												"type": "array"
+											},
+											"Resolution": {
+												"type": "string"
+											},
+											"ResolutionSteps": {
+												"items": {
+													"properties": {
+														"ActionParameters": {
+															"items": {
+																"properties": {
+																	"AllowableNumbers": {
+																		"items": {
+																			"type": "string"
+																		},
+																		"type": "array"
+																	},
+																	"AllowablePattern": {
+																		"type": "string"
+																	},
+																	"AllowableValueDescriptions": {
+																		"items": {
+																			"type": "string"
+																		},
+																		"type": "array"
+																	},
+																	"AllowableValues": {
+																		"items": {
+																			"type": "string"
+																		},
+																		"type": "array"
+																	},
+																	"ArraySizeMaximum": {
+																		"nullable": true,
+																		"type": "integer"
+																	},
+																	"ArraySizeMinimum": {
+																		"nullable": true,
+																		"type": "integer"
+																	},
+																	"DataType": {
+																		"type": "string"
+																	},
+																	"DefaultValue": {
+																		"type": "string"
+																	},
+																	"MaximumValue": {
+																		"format": "double",
+																		"nullable": true,
+																		"type": "number"
+																	},
+																	"MinimumValue": {
+																		"format": "double",
+																		"nullable": true,
+																		"type": "number"
+																	},
+																	"Name": {
+																		"type": "string"
+																	},
+																	"NoDefaultValue": {
+																		"type": "boolean"
+																	},
+																	"ObjectDataType": {
+																		"type": "string"
+																	},
+																	"Required": {
+																		"type": "boolean"
+																	}
+																},
+																"type": "object"
+															},
+															"type": "array"
+														},
+														"ActionURI": {
+															"type": "string"
+														},
+														"Oem": {},
+														"Priority": {
+															"minimum": 0,
+															"nullable": true,
+															"type": "integer"
+														},
+														"ResolutionType": {
+															"type": "string"
+														},
+														"RetryCount": {
+															"minimum": 0,
+															"nullable": true,
+															"type": "integer"
+														},
+														"RetryIntervalSeconds": {
+															"minimum": 0,
+															"nullable": true,
+															"type": "integer"
+														},
+														"TargetComponentURI": {
+															"type": "string"
+														}
+													},
+													"type": "object"
+												},
+												"type": "array"
+											},
+											"Severity": {
+												"type": "string"
+											},
+											"UserAuthenticationSource": {
+												"type": "string"
+											},
+											"Username": {
 												"type": "string"
 											}
 										},
@@ -1257,6 +1515,11 @@
 								},
 								"Name": {
 									"type": "string"
+								},
+								"Oem": {},
+								"Parameters": {
+									"additionalProperties": {},
+									"type": "object"
 								},
 								"Payload": {
 									"properties": {
@@ -1281,7 +1544,13 @@
 									"type": "object"
 								},
 								"PercentComplete": {
+									"minimum": 0,
+									"nullable": true,
 									"type": "integer"
+								},
+								"RawData": {
+									"format": "byte",
+									"type": "string"
 								},
 								"Schedule": {
 									"properties": {
@@ -1324,7 +1593,11 @@
 											"type": "string"
 										},
 										"MaxOccurrences": {
+											"nullable": true,
 											"type": "integer"
+										},
+										"Name": {
+											"type": "string"
 										},
 										"RecurrenceInterval": {
 											"type": "string"
@@ -1365,6 +1638,148 @@
 						"items": {
 							"nullable": true,
 							"properties": {
+								"@Message.ExtendedInfo": {
+									"items": {
+										"properties": {
+											"Message": {
+												"type": "string"
+											},
+											"MessageArgs": {
+												"items": {
+													"type": "string"
+												},
+												"type": "array"
+											},
+											"MessageId": {
+												"type": "string"
+											},
+											"MessageSeverity": {
+												"type": "string"
+											},
+											"Oem": {},
+											"RelatedProperties": {
+												"items": {
+													"nullable": true,
+													"type": "string"
+												},
+												"nullable": true,
+												"type": "array"
+											},
+											"Resolution": {
+												"type": "string"
+											},
+											"ResolutionSteps": {
+												"items": {
+													"properties": {
+														"ActionParameters": {
+															"items": {
+																"properties": {
+																	"AllowableNumbers": {
+																		"items": {
+																			"type": "string"
+																		},
+																		"type": "array"
+																	},
+																	"AllowablePattern": {
+																		"type": "string"
+																	},
+																	"AllowableValueDescriptions": {
+																		"items": {
+																			"type": "string"
+																		},
+																		"type": "array"
+																	},
+																	"AllowableValues": {
+																		"items": {
+																			"type": "string"
+																		},
+																		"type": "array"
+																	},
+																	"ArraySizeMaximum": {
+																		"nullable": true,
+																		"type": "integer"
+																	},
+																	"ArraySizeMinimum": {
+																		"nullable": true,
+																		"type": "integer"
+																	},
+																	"DataType": {
+																		"type": "string"
+																	},
+																	"DefaultValue": {
+																		"type": "string"
+																	},
+																	"MaximumValue": {
+																		"format": "double",
+																		"nullable": true,
+																		"type": "number"
+																	},
+																	"MinimumValue": {
+																		"format": "double",
+																		"nullable": true,
+																		"type": "number"
+																	},
+																	"Name": {
+																		"type": "string"
+																	},
+																	"NoDefaultValue": {
+																		"type": "boolean"
+																	},
+																	"ObjectDataType": {
+																		"type": "string"
+																	},
+																	"Required": {
+																		"type": "boolean"
+																	}
+																},
+																"type": "object"
+															},
+															"type": "array"
+														},
+														"ActionURI": {
+															"type": "string"
+														},
+														"Oem": {},
+														"Priority": {
+															"minimum": 0,
+															"nullable": true,
+															"type": "integer"
+														},
+														"ResolutionType": {
+															"type": "string"
+														},
+														"RetryCount": {
+															"minimum": 0,
+															"nullable": true,
+															"type": "integer"
+														},
+														"RetryIntervalSeconds": {
+															"minimum": 0,
+															"nullable": true,
+															"type": "integer"
+														},
+														"TargetComponentURI": {
+															"type": "string"
+														}
+													},
+													"type": "object"
+												},
+												"type": "array"
+											},
+											"Severity": {
+												"type": "string"
+											},
+											"UserAuthenticationSource": {
+												"type": "string"
+											},
+											"Username": {
+												"type": "string"
+											}
+										},
+										"type": "object"
+									},
+									"type": "array"
+								},
 								"@odata.context": {
 									"type": "string"
 								},
@@ -1389,7 +1804,7 @@
 								"MetricValues": {
 									"items": {
 										"properties": {
-											"MetricID": {
+											"MetricId": {
 												"type": "string"
 											},
 											"MetricProperty": {
@@ -1411,6 +1826,9 @@
 									"type": "string"
 								},
 								"Oem": {},
+								"ReportSequence": {
+									"type": "string"
+								},
 								"Timestamp": {
 									"type": "string"
 								}
@@ -1457,7 +1875,154 @@
 					"oem_dell": {
 						"nullable": true,
 						"properties": {
+							"@Message.ExtendedInfo": {
+								"items": {
+									"properties": {
+										"Message": {
+											"type": "string"
+										},
+										"MessageArgs": {
+											"items": {
+												"type": "string"
+											},
+											"type": "array"
+										},
+										"MessageId": {
+											"type": "string"
+										},
+										"MessageSeverity": {
+											"type": "string"
+										},
+										"Oem": {},
+										"RelatedProperties": {
+											"items": {
+												"nullable": true,
+												"type": "string"
+											},
+											"nullable": true,
+											"type": "array"
+										},
+										"Resolution": {
+											"type": "string"
+										},
+										"ResolutionSteps": {
+											"items": {
+												"properties": {
+													"ActionParameters": {
+														"items": {
+															"properties": {
+																"AllowableNumbers": {
+																	"items": {
+																		"type": "string"
+																	},
+																	"type": "array"
+																},
+																"AllowablePattern": {
+																	"type": "string"
+																},
+																"AllowableValueDescriptions": {
+																	"items": {
+																		"type": "string"
+																	},
+																	"type": "array"
+																},
+																"AllowableValues": {
+																	"items": {
+																		"type": "string"
+																	},
+																	"type": "array"
+																},
+																"ArraySizeMaximum": {
+																	"nullable": true,
+																	"type": "integer"
+																},
+																"ArraySizeMinimum": {
+																	"nullable": true,
+																	"type": "integer"
+																},
+																"DataType": {
+																	"type": "string"
+																},
+																"DefaultValue": {
+																	"type": "string"
+																},
+																"MaximumValue": {
+																	"format": "double",
+																	"nullable": true,
+																	"type": "number"
+																},
+																"MinimumValue": {
+																	"format": "double",
+																	"nullable": true,
+																	"type": "number"
+																},
+																"Name": {
+																	"type": "string"
+																},
+																"NoDefaultValue": {
+																	"type": "boolean"
+																},
+																"ObjectDataType": {
+																	"type": "string"
+																},
+																"Required": {
+																	"type": "boolean"
+																}
+															},
+															"type": "object"
+														},
+														"type": "array"
+													},
+													"ActionURI": {
+														"type": "string"
+													},
+													"Oem": {},
+													"Priority": {
+														"minimum": 0,
+														"nullable": true,
+														"type": "integer"
+													},
+													"ResolutionType": {
+														"type": "string"
+													},
+													"RetryCount": {
+														"minimum": 0,
+														"nullable": true,
+														"type": "integer"
+													},
+													"RetryIntervalSeconds": {
+														"minimum": 0,
+														"nullable": true,
+														"type": "integer"
+													},
+													"TargetComponentURI": {
+														"type": "string"
+													}
+												},
+												"type": "object"
+											},
+											"type": "array"
+										},
+										"Severity": {
+											"type": "string"
+										},
+										"UserAuthenticationSource": {
+											"type": "string"
+										},
+										"Username": {
+											"type": "string"
+										}
+									},
+									"type": "object"
+								},
+								"nullable": true,
+								"type": "array"
+							},
 							"@odata.context": {
+								"type": "string"
+							},
+							"@odata.etag": {
+								"nullable": true,
 								"type": "string"
 							},
 							"@odata.id": {
@@ -1556,6 +2121,7 @@
 							"NodeID": {
 								"type": "string"
 							},
+							"Oem": {},
 							"PSRollupStatus": {
 								"type": "string"
 							},

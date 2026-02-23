@@ -37,19 +37,7 @@ interface TagsInputContextProps {
 const TagInputContext = React.createContext<TagsInputContextProps | null>(null);
 
 export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
-  (
-    {
-      value,
-      onValueChange,
-      placeholder,
-      maxItems,
-      minItems,
-      className,
-      dir,
-      ...props
-    },
-    ref,
-  ) => {
+  ({ value, onValueChange, placeholder, maxItems, minItems, className, dir, ...props }, ref) => {
     const [activeIndex, setActiveIndex] = React.useState(-1);
     const [inputValue, setInputValue] = React.useState("");
     const [disableInput, setDisableInput] = React.useState(false);
@@ -144,24 +132,18 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
         e.stopPropagation();
 
         const moveNext = () => {
-          const nextIndex =
-            activeIndex + 1 > value.length - 1 ? -1 : activeIndex + 1;
+          const nextIndex = activeIndex + 1 > value.length - 1 ? -1 : activeIndex + 1;
           setActiveIndex(nextIndex);
         };
 
         const movePrev = () => {
-          const prevIndex =
-            activeIndex - 1 < 0 ? value.length - 1 : activeIndex - 1;
+          const prevIndex = activeIndex - 1 < 0 ? value.length - 1 : activeIndex - 1;
           setActiveIndex(prevIndex);
         };
 
         const moveCurrent = () => {
           const newIndex =
-            activeIndex - 1 <= 0
-              ? value.length - 1 === 0
-                ? -1
-                : 0
-              : activeIndex - 1;
+            activeIndex - 1 <= 0 ? (value.length - 1 === 0 ? -1 : 0) : activeIndex - 1;
           setActiveIndex(newIndex);
         };
         const target = e.currentTarget;
@@ -230,12 +212,9 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
       e.stopPropagation();
     }, []);
 
-    const handleChange = React.useCallback(
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-        setInputValue(e.currentTarget.value);
-      },
-      [],
-    );
+    const handleChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+      setInputValue(e.currentTarget.value);
+    }, []);
 
     return (
       <TagInputContext.Provider
@@ -253,7 +232,7 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
           ref={ref}
           dir={dir}
           className={cn(
-            "border-input ring-muted flex flex-wrap items-center gap-1 overflow-hidden rounded-lg border p-1 ring-1",
+            "flex flex-wrap items-center gap-1 overflow-hidden rounded-lg border border-input p-1 ring-1 ring-muted",
             {
               "focus-within:ring-ring": activeIndex === -1,
             },
@@ -267,7 +246,7 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
               aria-disabled={disableButton}
               data-active={activeIndex === index}
               className={cn(
-                "data-[active='true']:ring-muted-foreground border-input relative flex items-center gap-1 truncate rounded border px-1 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 data-[active='true']:ring-2",
+                "relative flex items-center gap-1 truncate rounded border border-input px-1 aria-disabled:cursor-not-allowed aria-disabled:opacity-50 data-[active='true']:ring-2 data-[active='true']:ring-muted-foreground",
               )}
               variant={"secondary"}
             >
@@ -282,7 +261,7 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
                 className="disabled:cursor-not-allowed"
               >
                 <span className="sr-only">Remove {item} option</span>
-                <RemoveIcon className="hover:stroke-destructive h-4 w-4" />
+                <RemoveIcon className="h-4 w-4 hover:stroke-destructive" />
               </button>
             </Badge>
           ))}
@@ -298,7 +277,7 @@ export const TagsInput = React.forwardRef<HTMLDivElement, TagsInputProps>(
             placeholder={placeholder}
             onClick={() => setActiveIndex(-1)}
             className={cn(
-              "placeholder:text-muted-foreground h-7 min-w-fit flex-1 border-none px-1 shadow-none outline-0 focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-0",
+              "h-7 min-w-fit flex-1 border-none px-1 shadow-none outline-0 placeholder:text-muted-foreground focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-0",
               activeIndex !== -1 && "caret-transparent",
             )}
           />

@@ -1,26 +1,29 @@
-import UserActions from "@/components/account/user-actions";
+import { getV1Users, User } from "@/client";
 import ActionsSheet from "@/components/actions-sheet";
-import {
-  DataTable,
-  DataTableActions,
-} from "@/components/data-table/data-table";
+import UsersDeleteAction from "@/components/actions/users/delete";
+import UsersEnabledAction from "@/components/actions/users/enabled";
+import UsersRoleAction from "@/components/actions/users/role";
+import { DataTable, DataTableActions } from "@/components/data-table/data-table";
 import { DataTableColumnHeader } from "@/components/data-table/header";
 import SelectableCheckbox from "@/components/data-table/selectableCheckbox";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useGetV1Users } from "@/openapi/queries";
-import { User } from "@/openapi/requests";
+import AuthRedirect from "@/lib/auth";
 import { createFileRoute } from "@tanstack/react-router";
 import { ColumnDef } from "@tanstack/react-table";
 import { useState } from "react";
 
 export const Route = createFileRoute("/account/users/")({
   component: RouteComponent,
+  beforeLoad: AuthRedirect,
+  loader: () => getV1Users(),
 });
 
 function RouteComponent() {
-  const users = useGetV1Users();
+  const { isFetching } = Route.useMatch();
+  const { data } = Route.useLoaderData();
+
   const [lastSelectedID, setLastSelectedID] = useState(0);
 
   const columns: ColumnDef<User>[] = [
@@ -44,18 +47,14 @@ function RouteComponent() {
     },
     {
       accessorKey: "username",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Username" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Username" />,
       cell: ({ row }) => {
         return <span>{row.original.username}</span>;
       },
     },
     {
       accessorKey: "role",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Role" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Role" />,
       cell: ({ row }) => {
         return (
           <Badge variant="secondary" className="rounded-sm">
@@ -66,9 +65,7 @@ function RouteComponent() {
     },
     {
       accessorKey: "enabled",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Enabled" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Enabled" />,
       cell: ({ row }) => {
         return (
           <Badge variant="secondary" className="rounded-sm">
@@ -79,9 +76,7 @@ function RouteComponent() {
     },
     {
       accessorKey: "modified_at",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Modified At" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Modified At" />,
       cell: ({ row }) => {
         const date = new Date(row.original.modified_at ?? "");
         return <span>{date.toLocaleString()}</span>;
@@ -89,9 +84,7 @@ function RouteComponent() {
     },
     {
       accessorKey: "created_at",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Created At" />
-      ),
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Created At" />,
       cell: ({ row }) => {
         const date = new Date(row.original.created_at ?? "");
         return <span>{date.toLocaleString()}</span>;
@@ -105,11 +98,12 @@ function RouteComponent() {
       .rows.map((v) => v.getAllCells()[1].getValue())
       .join(",");
     return (
-      <ActionsSheet
-        checked={checked}
-        length={table.getSelectedRowModel().rows.length}
-      >
-        <UserActions users={checked} />
+      <ActionsSheet checked={checked} length={table.getSelectedRowModel().rows.length}>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <UsersDeleteAction users={checked} />
+          <UsersRoleAction users={checked} />
+          <UsersEnabledAction users={checked} />
+        </div>
       </ActionsSheet>
     );
   };
@@ -118,9 +112,9 @@ function RouteComponent() {
       <CardContent>
         <DataTable
           columns={columns}
-          data={users.data ?? []}
+          data={data ?? []}
           Actions={actions}
-          progress={users.isFetching}
+          progress={isFetching !== false}
         />
       </CardContent>
     </Card>

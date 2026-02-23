@@ -362,10 +362,10 @@ func (s *BmcJobDeleteRequestNodeJobList) init() BmcJobDeleteRequestNodeJobList {
 // BmcOsPowerBody schema.
 // Ref: #/components/schemas/BmcOsPowerBody
 type BmcOsPowerBody struct {
-	// String of type redfish.BootSourceOverrideTarget. Common options include: None, Pxe, BiosSetup,
+	// String of type schemas.BootSourceOverrideTarget. Common options include: None, Pxe, BiosSetup,
 	// Utilities, Diags.
 	BootOption OptString `json:"boot_option"`
-	// String of type redfish.ResetType. Common options include: On, ForceOn, ForceOff, ForceRestart,
+	// String of type schemas.ResetType. Common options include: On, ForceOn, ForceOff, ForceRestart,
 	// GracefulRestart, GracefulShutdown, PowerCycle.
 	PowerOption OptString `json:"power_option"`
 }
@@ -4041,6 +4041,69 @@ func (o OptNilDataDumpImagesItemProvisionTemplates) Or(d DataDumpImagesItemProvi
 	return d
 }
 
+// NewOptNilFloat64 returns new OptNilFloat64 with value set to v.
+func NewOptNilFloat64(v float64) OptNilFloat64 {
+	return OptNilFloat64{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilFloat64 is optional nullable float64.
+type OptNilFloat64 struct {
+	Value float64
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilFloat64 was set.
+func (o OptNilFloat64) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilFloat64) Reset() {
+	var v float64
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilFloat64) SetTo(v float64) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilFloat64) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilFloat64) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v float64
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilFloat64) Get() (v float64, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilFloat64) Or(d float64) float64 {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilHTTPErrorErrorsItemArray returns new OptNilHTTPErrorErrorsItemArray with value set to v.
 func NewOptNilHTTPErrorErrorsItemArray(v []HTTPErrorErrorsItem) OptNilHTTPErrorErrorsItemArray {
 	return OptNilHTTPErrorErrorsItemArray{
@@ -4547,6 +4610,69 @@ func (o OptNilRedfishSystemOemDell) Or(d RedfishSystemOemDell) RedfishSystemOemD
 	return d
 }
 
+// NewOptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray returns new OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray with value set to v.
+func NewOptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray(v []RedfishSystemOemDellMessageDotExtendedInfoItem) OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray {
+	return OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray is optional nullable []RedfishSystemOemDellMessageDotExtendedInfoItem.
+type OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray struct {
+	Value []RedfishSystemOemDellMessageDotExtendedInfoItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray was set.
+func (o OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) Reset() {
+	var v []RedfishSystemOemDellMessageDotExtendedInfoItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) SetTo(v []RedfishSystemOemDellMessageDotExtendedInfoItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []RedfishSystemOemDellMessageDotExtendedInfoItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) Get() (v []RedfishSystemOemDellMessageDotExtendedInfoItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) Or(d []RedfishSystemOemDellMessageDotExtendedInfoItem) []RedfishSystemOemDellMessageDotExtendedInfoItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilString returns new OptNilString with value set to v.
 func NewOptNilString(v string) OptNilString {
 	return OptNilString{
@@ -4667,6 +4793,52 @@ func (o OptNilStringArray) Get() (v []string, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilStringArray) Or(d []string) []string {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptRedfishJobJobsItemParameters returns new OptRedfishJobJobsItemParameters with value set to v.
+func NewOptRedfishJobJobsItemParameters(v RedfishJobJobsItemParameters) OptRedfishJobJobsItemParameters {
+	return OptRedfishJobJobsItemParameters{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptRedfishJobJobsItemParameters is optional RedfishJobJobsItemParameters.
+type OptRedfishJobJobsItemParameters struct {
+	Value RedfishJobJobsItemParameters
+	Set   bool
+}
+
+// IsSet returns true if OptRedfishJobJobsItemParameters was set.
+func (o OptRedfishJobJobsItemParameters) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptRedfishJobJobsItemParameters) Reset() {
+	var v RedfishJobJobsItemParameters
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptRedfishJobJobsItemParameters) SetTo(v RedfishJobJobsItemParameters) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptRedfishJobJobsItemParameters) Get() (v RedfishJobJobsItemParameters, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptRedfishJobJobsItemParameters) Or(d RedfishJobJobsItemParameters) RedfishJobJobsItemParameters {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -5157,30 +5329,49 @@ func (s *RedfishJob) SetName(val OptString) {
 }
 
 type RedfishJobJobsItem struct {
-	OdataDotContext   OptString                        `json:"@odata.context"`
-	OdataDotID        OptString                        `json:"@odata.id"`
-	OdataDotType      OptString                        `json:"@odata.type"`
-	CreatedBy         OptString                        `json:"CreatedBy"`
-	Description       OptString                        `json:"Description"`
-	EndTime           OptString                        `json:"EndTime"`
-	EstimatedDuration OptString                        `json:"EstimatedDuration"`
-	HidePayload       OptBool                          `json:"HidePayload"`
-	ID                OptString                        `json:"Id"`
-	JobState          OptString                        `json:"JobState"`
-	JobStatus         OptString                        `json:"JobStatus"`
-	MaxExecutionTime  OptString                        `json:"MaxExecutionTime"`
-	Messages          []RedfishJobJobsItemMessagesItem `json:"Messages"`
-	Name              OptString                        `json:"Name"`
-	Payload           OptRedfishJobJobsItemPayload     `json:"Payload"`
-	PercentComplete   OptInt                           `json:"PercentComplete"`
-	Schedule          OptRedfishJobJobsItemSchedule    `json:"Schedule"`
-	StartTime         OptString                        `json:"StartTime"`
-	StepOrder         OptNilNilStringArray             `json:"StepOrder"`
+	MessageDotExtendedInfo  []RedfishJobJobsItemMessageDotExtendedInfoItem `json:"@Message.ExtendedInfo"`
+	OdataDotContext         OptString                                      `json:"@odata.context"`
+	OdataDotEtag            OptString                                      `json:"@odata.etag"`
+	OdataDotID              OptString                                      `json:"@odata.id"`
+	OdataDotType            OptString                                      `json:"@odata.type"`
+	CreatedBy               OptString                                      `json:"CreatedBy"`
+	CreationTime            OptString                                      `json:"CreationTime"`
+	Description             OptString                                      `json:"Description"`
+	EndTime                 OptString                                      `json:"EndTime"`
+	EstimatedCompletionTime OptString                                      `json:"EstimatedCompletionTime"`
+	EstimatedDuration       OptString                                      `json:"EstimatedDuration"`
+	HidePayload             OptBool                                        `json:"HidePayload"`
+	ID                      OptString                                      `json:"Id"`
+	JobPriority             OptNilInt                                      `json:"JobPriority"`
+	JobState                OptString                                      `json:"JobState"`
+	JobStatus               OptString                                      `json:"JobStatus"`
+	JobType                 OptString                                      `json:"JobType"`
+	MaxExecutionTime        OptString                                      `json:"MaxExecutionTime"`
+	Messages                []RedfishJobJobsItemMessagesItem               `json:"Messages"`
+	Name                    OptString                                      `json:"Name"`
+	Oem                     jx.Raw                                         `json:"Oem"`
+	Parameters              OptRedfishJobJobsItemParameters                `json:"Parameters"`
+	Payload                 OptRedfishJobJobsItemPayload                   `json:"Payload"`
+	PercentComplete         OptNilInt                                      `json:"PercentComplete"`
+	RawData                 []byte                                         `json:"RawData"`
+	Schedule                OptRedfishJobJobsItemSchedule                  `json:"Schedule"`
+	StartTime               OptString                                      `json:"StartTime"`
+	StepOrder               OptNilNilStringArray                           `json:"StepOrder"`
+}
+
+// GetMessageDotExtendedInfo returns the value of MessageDotExtendedInfo.
+func (s *RedfishJobJobsItem) GetMessageDotExtendedInfo() []RedfishJobJobsItemMessageDotExtendedInfoItem {
+	return s.MessageDotExtendedInfo
 }
 
 // GetOdataDotContext returns the value of OdataDotContext.
 func (s *RedfishJobJobsItem) GetOdataDotContext() OptString {
 	return s.OdataDotContext
+}
+
+// GetOdataDotEtag returns the value of OdataDotEtag.
+func (s *RedfishJobJobsItem) GetOdataDotEtag() OptString {
+	return s.OdataDotEtag
 }
 
 // GetOdataDotID returns the value of OdataDotID.
@@ -5198,6 +5389,11 @@ func (s *RedfishJobJobsItem) GetCreatedBy() OptString {
 	return s.CreatedBy
 }
 
+// GetCreationTime returns the value of CreationTime.
+func (s *RedfishJobJobsItem) GetCreationTime() OptString {
+	return s.CreationTime
+}
+
 // GetDescription returns the value of Description.
 func (s *RedfishJobJobsItem) GetDescription() OptString {
 	return s.Description
@@ -5206,6 +5402,11 @@ func (s *RedfishJobJobsItem) GetDescription() OptString {
 // GetEndTime returns the value of EndTime.
 func (s *RedfishJobJobsItem) GetEndTime() OptString {
 	return s.EndTime
+}
+
+// GetEstimatedCompletionTime returns the value of EstimatedCompletionTime.
+func (s *RedfishJobJobsItem) GetEstimatedCompletionTime() OptString {
+	return s.EstimatedCompletionTime
 }
 
 // GetEstimatedDuration returns the value of EstimatedDuration.
@@ -5223,6 +5424,11 @@ func (s *RedfishJobJobsItem) GetID() OptString {
 	return s.ID
 }
 
+// GetJobPriority returns the value of JobPriority.
+func (s *RedfishJobJobsItem) GetJobPriority() OptNilInt {
+	return s.JobPriority
+}
+
 // GetJobState returns the value of JobState.
 func (s *RedfishJobJobsItem) GetJobState() OptString {
 	return s.JobState
@@ -5231,6 +5437,11 @@ func (s *RedfishJobJobsItem) GetJobState() OptString {
 // GetJobStatus returns the value of JobStatus.
 func (s *RedfishJobJobsItem) GetJobStatus() OptString {
 	return s.JobStatus
+}
+
+// GetJobType returns the value of JobType.
+func (s *RedfishJobJobsItem) GetJobType() OptString {
+	return s.JobType
 }
 
 // GetMaxExecutionTime returns the value of MaxExecutionTime.
@@ -5248,14 +5459,29 @@ func (s *RedfishJobJobsItem) GetName() OptString {
 	return s.Name
 }
 
+// GetOem returns the value of Oem.
+func (s *RedfishJobJobsItem) GetOem() jx.Raw {
+	return s.Oem
+}
+
+// GetParameters returns the value of Parameters.
+func (s *RedfishJobJobsItem) GetParameters() OptRedfishJobJobsItemParameters {
+	return s.Parameters
+}
+
 // GetPayload returns the value of Payload.
 func (s *RedfishJobJobsItem) GetPayload() OptRedfishJobJobsItemPayload {
 	return s.Payload
 }
 
 // GetPercentComplete returns the value of PercentComplete.
-func (s *RedfishJobJobsItem) GetPercentComplete() OptInt {
+func (s *RedfishJobJobsItem) GetPercentComplete() OptNilInt {
 	return s.PercentComplete
+}
+
+// GetRawData returns the value of RawData.
+func (s *RedfishJobJobsItem) GetRawData() []byte {
+	return s.RawData
 }
 
 // GetSchedule returns the value of Schedule.
@@ -5273,9 +5499,19 @@ func (s *RedfishJobJobsItem) GetStepOrder() OptNilNilStringArray {
 	return s.StepOrder
 }
 
+// SetMessageDotExtendedInfo sets the value of MessageDotExtendedInfo.
+func (s *RedfishJobJobsItem) SetMessageDotExtendedInfo(val []RedfishJobJobsItemMessageDotExtendedInfoItem) {
+	s.MessageDotExtendedInfo = val
+}
+
 // SetOdataDotContext sets the value of OdataDotContext.
 func (s *RedfishJobJobsItem) SetOdataDotContext(val OptString) {
 	s.OdataDotContext = val
+}
+
+// SetOdataDotEtag sets the value of OdataDotEtag.
+func (s *RedfishJobJobsItem) SetOdataDotEtag(val OptString) {
+	s.OdataDotEtag = val
 }
 
 // SetOdataDotID sets the value of OdataDotID.
@@ -5293,6 +5529,11 @@ func (s *RedfishJobJobsItem) SetCreatedBy(val OptString) {
 	s.CreatedBy = val
 }
 
+// SetCreationTime sets the value of CreationTime.
+func (s *RedfishJobJobsItem) SetCreationTime(val OptString) {
+	s.CreationTime = val
+}
+
 // SetDescription sets the value of Description.
 func (s *RedfishJobJobsItem) SetDescription(val OptString) {
 	s.Description = val
@@ -5301,6 +5542,11 @@ func (s *RedfishJobJobsItem) SetDescription(val OptString) {
 // SetEndTime sets the value of EndTime.
 func (s *RedfishJobJobsItem) SetEndTime(val OptString) {
 	s.EndTime = val
+}
+
+// SetEstimatedCompletionTime sets the value of EstimatedCompletionTime.
+func (s *RedfishJobJobsItem) SetEstimatedCompletionTime(val OptString) {
+	s.EstimatedCompletionTime = val
 }
 
 // SetEstimatedDuration sets the value of EstimatedDuration.
@@ -5318,6 +5564,11 @@ func (s *RedfishJobJobsItem) SetID(val OptString) {
 	s.ID = val
 }
 
+// SetJobPriority sets the value of JobPriority.
+func (s *RedfishJobJobsItem) SetJobPriority(val OptNilInt) {
+	s.JobPriority = val
+}
+
 // SetJobState sets the value of JobState.
 func (s *RedfishJobJobsItem) SetJobState(val OptString) {
 	s.JobState = val
@@ -5326,6 +5577,11 @@ func (s *RedfishJobJobsItem) SetJobState(val OptString) {
 // SetJobStatus sets the value of JobStatus.
 func (s *RedfishJobJobsItem) SetJobStatus(val OptString) {
 	s.JobStatus = val
+}
+
+// SetJobType sets the value of JobType.
+func (s *RedfishJobJobsItem) SetJobType(val OptString) {
+	s.JobType = val
 }
 
 // SetMaxExecutionTime sets the value of MaxExecutionTime.
@@ -5343,14 +5599,29 @@ func (s *RedfishJobJobsItem) SetName(val OptString) {
 	s.Name = val
 }
 
+// SetOem sets the value of Oem.
+func (s *RedfishJobJobsItem) SetOem(val jx.Raw) {
+	s.Oem = val
+}
+
+// SetParameters sets the value of Parameters.
+func (s *RedfishJobJobsItem) SetParameters(val OptRedfishJobJobsItemParameters) {
+	s.Parameters = val
+}
+
 // SetPayload sets the value of Payload.
 func (s *RedfishJobJobsItem) SetPayload(val OptRedfishJobJobsItemPayload) {
 	s.Payload = val
 }
 
 // SetPercentComplete sets the value of PercentComplete.
-func (s *RedfishJobJobsItem) SetPercentComplete(val OptInt) {
+func (s *RedfishJobJobsItem) SetPercentComplete(val OptNilInt) {
 	s.PercentComplete = val
+}
+
+// SetRawData sets the value of RawData.
+func (s *RedfishJobJobsItem) SetRawData(val []byte) {
+	s.RawData = val
 }
 
 // SetSchedule sets the value of Schedule.
@@ -5368,26 +5639,390 @@ func (s *RedfishJobJobsItem) SetStepOrder(val OptNilNilStringArray) {
 	s.StepOrder = val
 }
 
+type RedfishJobJobsItemMessageDotExtendedInfoItem struct {
+	Message                  OptString                                                         `json:"Message"`
+	MessageArgs              []string                                                          `json:"MessageArgs"`
+	MessageId                OptString                                                         `json:"MessageId"`
+	MessageSeverity          OptString                                                         `json:"MessageSeverity"`
+	Oem                      jx.Raw                                                            `json:"Oem"`
+	RelatedProperties        OptNilNilStringArray                                              `json:"RelatedProperties"`
+	Resolution               OptString                                                         `json:"Resolution"`
+	ResolutionSteps          []RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem `json:"ResolutionSteps"`
+	Severity                 OptString                                                         `json:"Severity"`
+	UserAuthenticationSource OptString                                                         `json:"UserAuthenticationSource"`
+	Username                 OptString                                                         `json:"Username"`
+}
+
+// GetMessage returns the value of Message.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) GetMessage() OptString {
+	return s.Message
+}
+
+// GetMessageArgs returns the value of MessageArgs.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) GetMessageArgs() []string {
+	return s.MessageArgs
+}
+
+// GetMessageId returns the value of MessageId.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) GetMessageId() OptString {
+	return s.MessageId
+}
+
+// GetMessageSeverity returns the value of MessageSeverity.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) GetMessageSeverity() OptString {
+	return s.MessageSeverity
+}
+
+// GetOem returns the value of Oem.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) GetOem() jx.Raw {
+	return s.Oem
+}
+
+// GetRelatedProperties returns the value of RelatedProperties.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) GetRelatedProperties() OptNilNilStringArray {
+	return s.RelatedProperties
+}
+
+// GetResolution returns the value of Resolution.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) GetResolution() OptString {
+	return s.Resolution
+}
+
+// GetResolutionSteps returns the value of ResolutionSteps.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) GetResolutionSteps() []RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem {
+	return s.ResolutionSteps
+}
+
+// GetSeverity returns the value of Severity.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) GetSeverity() OptString {
+	return s.Severity
+}
+
+// GetUserAuthenticationSource returns the value of UserAuthenticationSource.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) GetUserAuthenticationSource() OptString {
+	return s.UserAuthenticationSource
+}
+
+// GetUsername returns the value of Username.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) GetUsername() OptString {
+	return s.Username
+}
+
+// SetMessage sets the value of Message.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetMessage(val OptString) {
+	s.Message = val
+}
+
+// SetMessageArgs sets the value of MessageArgs.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetMessageArgs(val []string) {
+	s.MessageArgs = val
+}
+
+// SetMessageId sets the value of MessageId.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetMessageId(val OptString) {
+	s.MessageId = val
+}
+
+// SetMessageSeverity sets the value of MessageSeverity.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetMessageSeverity(val OptString) {
+	s.MessageSeverity = val
+}
+
+// SetOem sets the value of Oem.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetOem(val jx.Raw) {
+	s.Oem = val
+}
+
+// SetRelatedProperties sets the value of RelatedProperties.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetRelatedProperties(val OptNilNilStringArray) {
+	s.RelatedProperties = val
+}
+
+// SetResolution sets the value of Resolution.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetResolution(val OptString) {
+	s.Resolution = val
+}
+
+// SetResolutionSteps sets the value of ResolutionSteps.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetResolutionSteps(val []RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) {
+	s.ResolutionSteps = val
+}
+
+// SetSeverity sets the value of Severity.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetSeverity(val OptString) {
+	s.Severity = val
+}
+
+// SetUserAuthenticationSource sets the value of UserAuthenticationSource.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetUserAuthenticationSource(val OptString) {
+	s.UserAuthenticationSource = val
+}
+
+// SetUsername sets the value of Username.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetUsername(val OptString) {
+	s.Username = val
+}
+
+type RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem struct {
+	ActionParameters     []RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem `json:"ActionParameters"`
+	ActionURI            OptString                                                                             `json:"ActionURI"`
+	Oem                  jx.Raw                                                                                `json:"Oem"`
+	Priority             OptNilInt                                                                             `json:"Priority"`
+	ResolutionType       OptString                                                                             `json:"ResolutionType"`
+	RetryCount           OptNilInt                                                                             `json:"RetryCount"`
+	RetryIntervalSeconds OptNilInt                                                                             `json:"RetryIntervalSeconds"`
+	TargetComponentURI   OptString                                                                             `json:"TargetComponentURI"`
+}
+
+// GetActionParameters returns the value of ActionParameters.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) GetActionParameters() []RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
+	return s.ActionParameters
+}
+
+// GetActionURI returns the value of ActionURI.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) GetActionURI() OptString {
+	return s.ActionURI
+}
+
+// GetOem returns the value of Oem.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) GetOem() jx.Raw {
+	return s.Oem
+}
+
+// GetPriority returns the value of Priority.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) GetPriority() OptNilInt {
+	return s.Priority
+}
+
+// GetResolutionType returns the value of ResolutionType.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) GetResolutionType() OptString {
+	return s.ResolutionType
+}
+
+// GetRetryCount returns the value of RetryCount.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) GetRetryCount() OptNilInt {
+	return s.RetryCount
+}
+
+// GetRetryIntervalSeconds returns the value of RetryIntervalSeconds.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) GetRetryIntervalSeconds() OptNilInt {
+	return s.RetryIntervalSeconds
+}
+
+// GetTargetComponentURI returns the value of TargetComponentURI.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) GetTargetComponentURI() OptString {
+	return s.TargetComponentURI
+}
+
+// SetActionParameters sets the value of ActionParameters.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) SetActionParameters(val []RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) {
+	s.ActionParameters = val
+}
+
+// SetActionURI sets the value of ActionURI.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) SetActionURI(val OptString) {
+	s.ActionURI = val
+}
+
+// SetOem sets the value of Oem.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) SetOem(val jx.Raw) {
+	s.Oem = val
+}
+
+// SetPriority sets the value of Priority.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) SetPriority(val OptNilInt) {
+	s.Priority = val
+}
+
+// SetResolutionType sets the value of ResolutionType.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) SetResolutionType(val OptString) {
+	s.ResolutionType = val
+}
+
+// SetRetryCount sets the value of RetryCount.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) SetRetryCount(val OptNilInt) {
+	s.RetryCount = val
+}
+
+// SetRetryIntervalSeconds sets the value of RetryIntervalSeconds.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) SetRetryIntervalSeconds(val OptNilInt) {
+	s.RetryIntervalSeconds = val
+}
+
+// SetTargetComponentURI sets the value of TargetComponentURI.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) SetTargetComponentURI(val OptString) {
+	s.TargetComponentURI = val
+}
+
+type RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem struct {
+	AllowableNumbers           []string      `json:"AllowableNumbers"`
+	AllowablePattern           OptString     `json:"AllowablePattern"`
+	AllowableValueDescriptions []string      `json:"AllowableValueDescriptions"`
+	AllowableValues            []string      `json:"AllowableValues"`
+	ArraySizeMaximum           OptNilInt     `json:"ArraySizeMaximum"`
+	ArraySizeMinimum           OptNilInt     `json:"ArraySizeMinimum"`
+	DataType                   OptString     `json:"DataType"`
+	DefaultValue               OptString     `json:"DefaultValue"`
+	MaximumValue               OptNilFloat64 `json:"MaximumValue"`
+	MinimumValue               OptNilFloat64 `json:"MinimumValue"`
+	Name                       OptString     `json:"Name"`
+	NoDefaultValue             OptBool       `json:"NoDefaultValue"`
+	ObjectDataType             OptString     `json:"ObjectDataType"`
+	Required                   OptBool       `json:"Required"`
+}
+
+// GetAllowableNumbers returns the value of AllowableNumbers.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableNumbers() []string {
+	return s.AllowableNumbers
+}
+
+// GetAllowablePattern returns the value of AllowablePattern.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowablePattern() OptString {
+	return s.AllowablePattern
+}
+
+// GetAllowableValueDescriptions returns the value of AllowableValueDescriptions.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValueDescriptions() []string {
+	return s.AllowableValueDescriptions
+}
+
+// GetAllowableValues returns the value of AllowableValues.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValues() []string {
+	return s.AllowableValues
+}
+
+// GetArraySizeMaximum returns the value of ArraySizeMaximum.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetArraySizeMaximum() OptNilInt {
+	return s.ArraySizeMaximum
+}
+
+// GetArraySizeMinimum returns the value of ArraySizeMinimum.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetArraySizeMinimum() OptNilInt {
+	return s.ArraySizeMinimum
+}
+
+// GetDataType returns the value of DataType.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetDataType() OptString {
+	return s.DataType
+}
+
+// GetDefaultValue returns the value of DefaultValue.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetDefaultValue() OptString {
+	return s.DefaultValue
+}
+
+// GetMaximumValue returns the value of MaximumValue.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetMaximumValue() OptNilFloat64 {
+	return s.MaximumValue
+}
+
+// GetMinimumValue returns the value of MinimumValue.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetMinimumValue() OptNilFloat64 {
+	return s.MinimumValue
+}
+
+// GetName returns the value of Name.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetName() OptString {
+	return s.Name
+}
+
+// GetNoDefaultValue returns the value of NoDefaultValue.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetNoDefaultValue() OptBool {
+	return s.NoDefaultValue
+}
+
+// GetObjectDataType returns the value of ObjectDataType.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetObjectDataType() OptString {
+	return s.ObjectDataType
+}
+
+// GetRequired returns the value of Required.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetRequired() OptBool {
+	return s.Required
+}
+
+// SetAllowableNumbers sets the value of AllowableNumbers.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableNumbers(val []string) {
+	s.AllowableNumbers = val
+}
+
+// SetAllowablePattern sets the value of AllowablePattern.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowablePattern(val OptString) {
+	s.AllowablePattern = val
+}
+
+// SetAllowableValueDescriptions sets the value of AllowableValueDescriptions.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValueDescriptions(val []string) {
+	s.AllowableValueDescriptions = val
+}
+
+// SetAllowableValues sets the value of AllowableValues.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValues(val []string) {
+	s.AllowableValues = val
+}
+
+// SetArraySizeMaximum sets the value of ArraySizeMaximum.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetArraySizeMaximum(val OptNilInt) {
+	s.ArraySizeMaximum = val
+}
+
+// SetArraySizeMinimum sets the value of ArraySizeMinimum.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetArraySizeMinimum(val OptNilInt) {
+	s.ArraySizeMinimum = val
+}
+
+// SetDataType sets the value of DataType.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetDataType(val OptString) {
+	s.DataType = val
+}
+
+// SetDefaultValue sets the value of DefaultValue.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetDefaultValue(val OptString) {
+	s.DefaultValue = val
+}
+
+// SetMaximumValue sets the value of MaximumValue.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetMaximumValue(val OptNilFloat64) {
+	s.MaximumValue = val
+}
+
+// SetMinimumValue sets the value of MinimumValue.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetMinimumValue(val OptNilFloat64) {
+	s.MinimumValue = val
+}
+
+// SetName sets the value of Name.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetNoDefaultValue sets the value of NoDefaultValue.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetNoDefaultValue(val OptBool) {
+	s.NoDefaultValue = val
+}
+
+// SetObjectDataType sets the value of ObjectDataType.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetObjectDataType(val OptString) {
+	s.ObjectDataType = val
+}
+
+// SetRequired sets the value of Required.
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetRequired(val OptBool) {
+	s.Required = val
+}
+
 type RedfishJobJobsItemMessagesItem struct {
-	OdataDotID        OptString            `json:"@odata.id"`
-	ID                OptString            `json:"Id"`
-	Message           OptString            `json:"Message"`
-	MessageArgs       []string             `json:"MessageArgs"`
-	MessageId         OptString            `json:"MessageId"`
-	Name              OptString            `json:"Name"`
-	RelatedProperties OptNilNilStringArray `json:"RelatedProperties"`
-	Resolution        OptString            `json:"Resolution"`
-	Severity          OptString            `json:"Severity"`
-}
-
-// GetOdataDotID returns the value of OdataDotID.
-func (s *RedfishJobJobsItemMessagesItem) GetOdataDotID() OptString {
-	return s.OdataDotID
-}
-
-// GetID returns the value of ID.
-func (s *RedfishJobJobsItemMessagesItem) GetID() OptString {
-	return s.ID
+	Message                  OptString                                           `json:"Message"`
+	MessageArgs              []string                                            `json:"MessageArgs"`
+	MessageId                OptString                                           `json:"MessageId"`
+	MessageSeverity          OptString                                           `json:"MessageSeverity"`
+	Oem                      jx.Raw                                              `json:"Oem"`
+	RelatedProperties        OptNilNilStringArray                                `json:"RelatedProperties"`
+	Resolution               OptString                                           `json:"Resolution"`
+	ResolutionSteps          []RedfishJobJobsItemMessagesItemResolutionStepsItem `json:"ResolutionSteps"`
+	Severity                 OptString                                           `json:"Severity"`
+	UserAuthenticationSource OptString                                           `json:"UserAuthenticationSource"`
+	Username                 OptString                                           `json:"Username"`
 }
 
 // GetMessage returns the value of Message.
@@ -5405,9 +6040,14 @@ func (s *RedfishJobJobsItemMessagesItem) GetMessageId() OptString {
 	return s.MessageId
 }
 
-// GetName returns the value of Name.
-func (s *RedfishJobJobsItemMessagesItem) GetName() OptString {
-	return s.Name
+// GetMessageSeverity returns the value of MessageSeverity.
+func (s *RedfishJobJobsItemMessagesItem) GetMessageSeverity() OptString {
+	return s.MessageSeverity
+}
+
+// GetOem returns the value of Oem.
+func (s *RedfishJobJobsItemMessagesItem) GetOem() jx.Raw {
+	return s.Oem
 }
 
 // GetRelatedProperties returns the value of RelatedProperties.
@@ -5420,19 +6060,24 @@ func (s *RedfishJobJobsItemMessagesItem) GetResolution() OptString {
 	return s.Resolution
 }
 
+// GetResolutionSteps returns the value of ResolutionSteps.
+func (s *RedfishJobJobsItemMessagesItem) GetResolutionSteps() []RedfishJobJobsItemMessagesItemResolutionStepsItem {
+	return s.ResolutionSteps
+}
+
 // GetSeverity returns the value of Severity.
 func (s *RedfishJobJobsItemMessagesItem) GetSeverity() OptString {
 	return s.Severity
 }
 
-// SetOdataDotID sets the value of OdataDotID.
-func (s *RedfishJobJobsItemMessagesItem) SetOdataDotID(val OptString) {
-	s.OdataDotID = val
+// GetUserAuthenticationSource returns the value of UserAuthenticationSource.
+func (s *RedfishJobJobsItemMessagesItem) GetUserAuthenticationSource() OptString {
+	return s.UserAuthenticationSource
 }
 
-// SetID sets the value of ID.
-func (s *RedfishJobJobsItemMessagesItem) SetID(val OptString) {
-	s.ID = val
+// GetUsername returns the value of Username.
+func (s *RedfishJobJobsItemMessagesItem) GetUsername() OptString {
+	return s.Username
 }
 
 // SetMessage sets the value of Message.
@@ -5450,9 +6095,14 @@ func (s *RedfishJobJobsItemMessagesItem) SetMessageId(val OptString) {
 	s.MessageId = val
 }
 
-// SetName sets the value of Name.
-func (s *RedfishJobJobsItemMessagesItem) SetName(val OptString) {
-	s.Name = val
+// SetMessageSeverity sets the value of MessageSeverity.
+func (s *RedfishJobJobsItemMessagesItem) SetMessageSeverity(val OptString) {
+	s.MessageSeverity = val
+}
+
+// SetOem sets the value of Oem.
+func (s *RedfishJobJobsItemMessagesItem) SetOem(val jx.Raw) {
+	s.Oem = val
 }
 
 // SetRelatedProperties sets the value of RelatedProperties.
@@ -5465,9 +6115,283 @@ func (s *RedfishJobJobsItemMessagesItem) SetResolution(val OptString) {
 	s.Resolution = val
 }
 
+// SetResolutionSteps sets the value of ResolutionSteps.
+func (s *RedfishJobJobsItemMessagesItem) SetResolutionSteps(val []RedfishJobJobsItemMessagesItemResolutionStepsItem) {
+	s.ResolutionSteps = val
+}
+
 // SetSeverity sets the value of Severity.
 func (s *RedfishJobJobsItemMessagesItem) SetSeverity(val OptString) {
 	s.Severity = val
+}
+
+// SetUserAuthenticationSource sets the value of UserAuthenticationSource.
+func (s *RedfishJobJobsItemMessagesItem) SetUserAuthenticationSource(val OptString) {
+	s.UserAuthenticationSource = val
+}
+
+// SetUsername sets the value of Username.
+func (s *RedfishJobJobsItemMessagesItem) SetUsername(val OptString) {
+	s.Username = val
+}
+
+type RedfishJobJobsItemMessagesItemResolutionStepsItem struct {
+	ActionParameters     []RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem `json:"ActionParameters"`
+	ActionURI            OptString                                                               `json:"ActionURI"`
+	Oem                  jx.Raw                                                                  `json:"Oem"`
+	Priority             OptNilInt                                                               `json:"Priority"`
+	ResolutionType       OptString                                                               `json:"ResolutionType"`
+	RetryCount           OptNilInt                                                               `json:"RetryCount"`
+	RetryIntervalSeconds OptNilInt                                                               `json:"RetryIntervalSeconds"`
+	TargetComponentURI   OptString                                                               `json:"TargetComponentURI"`
+}
+
+// GetActionParameters returns the value of ActionParameters.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) GetActionParameters() []RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem {
+	return s.ActionParameters
+}
+
+// GetActionURI returns the value of ActionURI.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) GetActionURI() OptString {
+	return s.ActionURI
+}
+
+// GetOem returns the value of Oem.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) GetOem() jx.Raw {
+	return s.Oem
+}
+
+// GetPriority returns the value of Priority.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) GetPriority() OptNilInt {
+	return s.Priority
+}
+
+// GetResolutionType returns the value of ResolutionType.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) GetResolutionType() OptString {
+	return s.ResolutionType
+}
+
+// GetRetryCount returns the value of RetryCount.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) GetRetryCount() OptNilInt {
+	return s.RetryCount
+}
+
+// GetRetryIntervalSeconds returns the value of RetryIntervalSeconds.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) GetRetryIntervalSeconds() OptNilInt {
+	return s.RetryIntervalSeconds
+}
+
+// GetTargetComponentURI returns the value of TargetComponentURI.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) GetTargetComponentURI() OptString {
+	return s.TargetComponentURI
+}
+
+// SetActionParameters sets the value of ActionParameters.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) SetActionParameters(val []RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) {
+	s.ActionParameters = val
+}
+
+// SetActionURI sets the value of ActionURI.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) SetActionURI(val OptString) {
+	s.ActionURI = val
+}
+
+// SetOem sets the value of Oem.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) SetOem(val jx.Raw) {
+	s.Oem = val
+}
+
+// SetPriority sets the value of Priority.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) SetPriority(val OptNilInt) {
+	s.Priority = val
+}
+
+// SetResolutionType sets the value of ResolutionType.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) SetResolutionType(val OptString) {
+	s.ResolutionType = val
+}
+
+// SetRetryCount sets the value of RetryCount.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) SetRetryCount(val OptNilInt) {
+	s.RetryCount = val
+}
+
+// SetRetryIntervalSeconds sets the value of RetryIntervalSeconds.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) SetRetryIntervalSeconds(val OptNilInt) {
+	s.RetryIntervalSeconds = val
+}
+
+// SetTargetComponentURI sets the value of TargetComponentURI.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) SetTargetComponentURI(val OptString) {
+	s.TargetComponentURI = val
+}
+
+type RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem struct {
+	AllowableNumbers           []string      `json:"AllowableNumbers"`
+	AllowablePattern           OptString     `json:"AllowablePattern"`
+	AllowableValueDescriptions []string      `json:"AllowableValueDescriptions"`
+	AllowableValues            []string      `json:"AllowableValues"`
+	ArraySizeMaximum           OptNilInt     `json:"ArraySizeMaximum"`
+	ArraySizeMinimum           OptNilInt     `json:"ArraySizeMinimum"`
+	DataType                   OptString     `json:"DataType"`
+	DefaultValue               OptString     `json:"DefaultValue"`
+	MaximumValue               OptNilFloat64 `json:"MaximumValue"`
+	MinimumValue               OptNilFloat64 `json:"MinimumValue"`
+	Name                       OptString     `json:"Name"`
+	NoDefaultValue             OptBool       `json:"NoDefaultValue"`
+	ObjectDataType             OptString     `json:"ObjectDataType"`
+	Required                   OptBool       `json:"Required"`
+}
+
+// GetAllowableNumbers returns the value of AllowableNumbers.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetAllowableNumbers() []string {
+	return s.AllowableNumbers
+}
+
+// GetAllowablePattern returns the value of AllowablePattern.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetAllowablePattern() OptString {
+	return s.AllowablePattern
+}
+
+// GetAllowableValueDescriptions returns the value of AllowableValueDescriptions.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetAllowableValueDescriptions() []string {
+	return s.AllowableValueDescriptions
+}
+
+// GetAllowableValues returns the value of AllowableValues.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetAllowableValues() []string {
+	return s.AllowableValues
+}
+
+// GetArraySizeMaximum returns the value of ArraySizeMaximum.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetArraySizeMaximum() OptNilInt {
+	return s.ArraySizeMaximum
+}
+
+// GetArraySizeMinimum returns the value of ArraySizeMinimum.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetArraySizeMinimum() OptNilInt {
+	return s.ArraySizeMinimum
+}
+
+// GetDataType returns the value of DataType.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetDataType() OptString {
+	return s.DataType
+}
+
+// GetDefaultValue returns the value of DefaultValue.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetDefaultValue() OptString {
+	return s.DefaultValue
+}
+
+// GetMaximumValue returns the value of MaximumValue.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetMaximumValue() OptNilFloat64 {
+	return s.MaximumValue
+}
+
+// GetMinimumValue returns the value of MinimumValue.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetMinimumValue() OptNilFloat64 {
+	return s.MinimumValue
+}
+
+// GetName returns the value of Name.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetName() OptString {
+	return s.Name
+}
+
+// GetNoDefaultValue returns the value of NoDefaultValue.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetNoDefaultValue() OptBool {
+	return s.NoDefaultValue
+}
+
+// GetObjectDataType returns the value of ObjectDataType.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetObjectDataType() OptString {
+	return s.ObjectDataType
+}
+
+// GetRequired returns the value of Required.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetRequired() OptBool {
+	return s.Required
+}
+
+// SetAllowableNumbers sets the value of AllowableNumbers.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetAllowableNumbers(val []string) {
+	s.AllowableNumbers = val
+}
+
+// SetAllowablePattern sets the value of AllowablePattern.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetAllowablePattern(val OptString) {
+	s.AllowablePattern = val
+}
+
+// SetAllowableValueDescriptions sets the value of AllowableValueDescriptions.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetAllowableValueDescriptions(val []string) {
+	s.AllowableValueDescriptions = val
+}
+
+// SetAllowableValues sets the value of AllowableValues.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetAllowableValues(val []string) {
+	s.AllowableValues = val
+}
+
+// SetArraySizeMaximum sets the value of ArraySizeMaximum.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetArraySizeMaximum(val OptNilInt) {
+	s.ArraySizeMaximum = val
+}
+
+// SetArraySizeMinimum sets the value of ArraySizeMinimum.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetArraySizeMinimum(val OptNilInt) {
+	s.ArraySizeMinimum = val
+}
+
+// SetDataType sets the value of DataType.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetDataType(val OptString) {
+	s.DataType = val
+}
+
+// SetDefaultValue sets the value of DefaultValue.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetDefaultValue(val OptString) {
+	s.DefaultValue = val
+}
+
+// SetMaximumValue sets the value of MaximumValue.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetMaximumValue(val OptNilFloat64) {
+	s.MaximumValue = val
+}
+
+// SetMinimumValue sets the value of MinimumValue.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetMinimumValue(val OptNilFloat64) {
+	s.MinimumValue = val
+}
+
+// SetName sets the value of Name.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetNoDefaultValue sets the value of NoDefaultValue.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetNoDefaultValue(val OptBool) {
+	s.NoDefaultValue = val
+}
+
+// SetObjectDataType sets the value of ObjectDataType.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetObjectDataType(val OptString) {
+	s.ObjectDataType = val
+}
+
+// SetRequired sets the value of Required.
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetRequired(val OptBool) {
+	s.Required = val
+}
+
+type RedfishJobJobsItemParameters map[string]jx.Raw
+
+func (s *RedfishJobJobsItemParameters) init() RedfishJobJobsItemParameters {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
 }
 
 type RedfishJobJobsItemPayload struct {
@@ -5524,7 +6448,8 @@ type RedfishJobJobsItemSchedule struct {
 	EnabledMonthsOfYear OptNilNilStringArray `json:"EnabledMonthsOfYear"`
 	InitialStartTime    OptString            `json:"InitialStartTime"`
 	Lifetime            OptString            `json:"Lifetime"`
-	MaxOccurrences      OptInt               `json:"MaxOccurrences"`
+	MaxOccurrences      OptNilInt            `json:"MaxOccurrences"`
+	Name                OptString            `json:"Name"`
 	RecurrenceInterval  OptString            `json:"RecurrenceInterval"`
 }
 
@@ -5559,8 +6484,13 @@ func (s *RedfishJobJobsItemSchedule) GetLifetime() OptString {
 }
 
 // GetMaxOccurrences returns the value of MaxOccurrences.
-func (s *RedfishJobJobsItemSchedule) GetMaxOccurrences() OptInt {
+func (s *RedfishJobJobsItemSchedule) GetMaxOccurrences() OptNilInt {
 	return s.MaxOccurrences
+}
+
+// GetName returns the value of Name.
+func (s *RedfishJobJobsItemSchedule) GetName() OptString {
+	return s.Name
 }
 
 // GetRecurrenceInterval returns the value of RecurrenceInterval.
@@ -5599,8 +6529,13 @@ func (s *RedfishJobJobsItemSchedule) SetLifetime(val OptString) {
 }
 
 // SetMaxOccurrences sets the value of MaxOccurrences.
-func (s *RedfishJobJobsItemSchedule) SetMaxOccurrences(val OptInt) {
+func (s *RedfishJobJobsItemSchedule) SetMaxOccurrences(val OptNilInt) {
 	s.MaxOccurrences = val
+}
+
+// SetName sets the value of Name.
+func (s *RedfishJobJobsItemSchedule) SetName(val OptString) {
+	s.Name = val
 }
 
 // SetRecurrenceInterval sets the value of RecurrenceInterval.
@@ -5636,17 +6571,24 @@ func (s *RedfishMetricReport) SetReports(val []NilRedfishMetricReportReportsItem
 }
 
 type RedfishMetricReportReportsItem struct {
-	OdataDotContext OptString                                        `json:"@odata.context"`
-	OdataDotEtag    OptString                                        `json:"@odata.etag"`
-	OdataDotID      OptString                                        `json:"@odata.id"`
-	OdataDotType    OptString                                        `json:"@odata.type"`
-	Context         OptString                                        `json:"Context"`
-	Description     OptString                                        `json:"Description"`
-	ID              OptString                                        `json:"Id"`
-	MetricValues    []RedfishMetricReportReportsItemMetricValuesItem `json:"MetricValues"`
-	Name            OptString                                        `json:"Name"`
-	Oem             jx.Raw                                           `json:"Oem"`
-	Timestamp       OptString                                        `json:"Timestamp"`
+	MessageDotExtendedInfo []RedfishMetricReportReportsItemMessageDotExtendedInfoItem `json:"@Message.ExtendedInfo"`
+	OdataDotContext        OptString                                                  `json:"@odata.context"`
+	OdataDotEtag           OptString                                                  `json:"@odata.etag"`
+	OdataDotID             OptString                                                  `json:"@odata.id"`
+	OdataDotType           OptString                                                  `json:"@odata.type"`
+	Context                OptString                                                  `json:"Context"`
+	Description            OptString                                                  `json:"Description"`
+	ID                     OptString                                                  `json:"Id"`
+	MetricValues           []RedfishMetricReportReportsItemMetricValuesItem           `json:"MetricValues"`
+	Name                   OptString                                                  `json:"Name"`
+	Oem                    jx.Raw                                                     `json:"Oem"`
+	ReportSequence         OptString                                                  `json:"ReportSequence"`
+	Timestamp              OptString                                                  `json:"Timestamp"`
+}
+
+// GetMessageDotExtendedInfo returns the value of MessageDotExtendedInfo.
+func (s *RedfishMetricReportReportsItem) GetMessageDotExtendedInfo() []RedfishMetricReportReportsItemMessageDotExtendedInfoItem {
+	return s.MessageDotExtendedInfo
 }
 
 // GetOdataDotContext returns the value of OdataDotContext.
@@ -5699,9 +6641,19 @@ func (s *RedfishMetricReportReportsItem) GetOem() jx.Raw {
 	return s.Oem
 }
 
+// GetReportSequence returns the value of ReportSequence.
+func (s *RedfishMetricReportReportsItem) GetReportSequence() OptString {
+	return s.ReportSequence
+}
+
 // GetTimestamp returns the value of Timestamp.
 func (s *RedfishMetricReportReportsItem) GetTimestamp() OptString {
 	return s.Timestamp
+}
+
+// SetMessageDotExtendedInfo sets the value of MessageDotExtendedInfo.
+func (s *RedfishMetricReportReportsItem) SetMessageDotExtendedInfo(val []RedfishMetricReportReportsItemMessageDotExtendedInfoItem) {
+	s.MessageDotExtendedInfo = val
 }
 
 // SetOdataDotContext sets the value of OdataDotContext.
@@ -5754,22 +6706,399 @@ func (s *RedfishMetricReportReportsItem) SetOem(val jx.Raw) {
 	s.Oem = val
 }
 
+// SetReportSequence sets the value of ReportSequence.
+func (s *RedfishMetricReportReportsItem) SetReportSequence(val OptString) {
+	s.ReportSequence = val
+}
+
 // SetTimestamp sets the value of Timestamp.
 func (s *RedfishMetricReportReportsItem) SetTimestamp(val OptString) {
 	s.Timestamp = val
 }
 
+type RedfishMetricReportReportsItemMessageDotExtendedInfoItem struct {
+	Message                  OptString                                                                     `json:"Message"`
+	MessageArgs              []string                                                                      `json:"MessageArgs"`
+	MessageId                OptString                                                                     `json:"MessageId"`
+	MessageSeverity          OptString                                                                     `json:"MessageSeverity"`
+	Oem                      jx.Raw                                                                        `json:"Oem"`
+	RelatedProperties        OptNilNilStringArray                                                          `json:"RelatedProperties"`
+	Resolution               OptString                                                                     `json:"Resolution"`
+	ResolutionSteps          []RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem `json:"ResolutionSteps"`
+	Severity                 OptString                                                                     `json:"Severity"`
+	UserAuthenticationSource OptString                                                                     `json:"UserAuthenticationSource"`
+	Username                 OptString                                                                     `json:"Username"`
+}
+
+// GetMessage returns the value of Message.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) GetMessage() OptString {
+	return s.Message
+}
+
+// GetMessageArgs returns the value of MessageArgs.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) GetMessageArgs() []string {
+	return s.MessageArgs
+}
+
+// GetMessageId returns the value of MessageId.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) GetMessageId() OptString {
+	return s.MessageId
+}
+
+// GetMessageSeverity returns the value of MessageSeverity.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) GetMessageSeverity() OptString {
+	return s.MessageSeverity
+}
+
+// GetOem returns the value of Oem.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) GetOem() jx.Raw {
+	return s.Oem
+}
+
+// GetRelatedProperties returns the value of RelatedProperties.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) GetRelatedProperties() OptNilNilStringArray {
+	return s.RelatedProperties
+}
+
+// GetResolution returns the value of Resolution.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) GetResolution() OptString {
+	return s.Resolution
+}
+
+// GetResolutionSteps returns the value of ResolutionSteps.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) GetResolutionSteps() []RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem {
+	return s.ResolutionSteps
+}
+
+// GetSeverity returns the value of Severity.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) GetSeverity() OptString {
+	return s.Severity
+}
+
+// GetUserAuthenticationSource returns the value of UserAuthenticationSource.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) GetUserAuthenticationSource() OptString {
+	return s.UserAuthenticationSource
+}
+
+// GetUsername returns the value of Username.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) GetUsername() OptString {
+	return s.Username
+}
+
+// SetMessage sets the value of Message.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetMessage(val OptString) {
+	s.Message = val
+}
+
+// SetMessageArgs sets the value of MessageArgs.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetMessageArgs(val []string) {
+	s.MessageArgs = val
+}
+
+// SetMessageId sets the value of MessageId.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetMessageId(val OptString) {
+	s.MessageId = val
+}
+
+// SetMessageSeverity sets the value of MessageSeverity.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetMessageSeverity(val OptString) {
+	s.MessageSeverity = val
+}
+
+// SetOem sets the value of Oem.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetOem(val jx.Raw) {
+	s.Oem = val
+}
+
+// SetRelatedProperties sets the value of RelatedProperties.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetRelatedProperties(val OptNilNilStringArray) {
+	s.RelatedProperties = val
+}
+
+// SetResolution sets the value of Resolution.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetResolution(val OptString) {
+	s.Resolution = val
+}
+
+// SetResolutionSteps sets the value of ResolutionSteps.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetResolutionSteps(val []RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) {
+	s.ResolutionSteps = val
+}
+
+// SetSeverity sets the value of Severity.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetSeverity(val OptString) {
+	s.Severity = val
+}
+
+// SetUserAuthenticationSource sets the value of UserAuthenticationSource.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetUserAuthenticationSource(val OptString) {
+	s.UserAuthenticationSource = val
+}
+
+// SetUsername sets the value of Username.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetUsername(val OptString) {
+	s.Username = val
+}
+
+type RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem struct {
+	ActionParameters     []RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem `json:"ActionParameters"`
+	ActionURI            OptString                                                                                         `json:"ActionURI"`
+	Oem                  jx.Raw                                                                                            `json:"Oem"`
+	Priority             OptNilInt                                                                                         `json:"Priority"`
+	ResolutionType       OptString                                                                                         `json:"ResolutionType"`
+	RetryCount           OptNilInt                                                                                         `json:"RetryCount"`
+	RetryIntervalSeconds OptNilInt                                                                                         `json:"RetryIntervalSeconds"`
+	TargetComponentURI   OptString                                                                                         `json:"TargetComponentURI"`
+}
+
+// GetActionParameters returns the value of ActionParameters.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) GetActionParameters() []RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
+	return s.ActionParameters
+}
+
+// GetActionURI returns the value of ActionURI.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) GetActionURI() OptString {
+	return s.ActionURI
+}
+
+// GetOem returns the value of Oem.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) GetOem() jx.Raw {
+	return s.Oem
+}
+
+// GetPriority returns the value of Priority.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) GetPriority() OptNilInt {
+	return s.Priority
+}
+
+// GetResolutionType returns the value of ResolutionType.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) GetResolutionType() OptString {
+	return s.ResolutionType
+}
+
+// GetRetryCount returns the value of RetryCount.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) GetRetryCount() OptNilInt {
+	return s.RetryCount
+}
+
+// GetRetryIntervalSeconds returns the value of RetryIntervalSeconds.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) GetRetryIntervalSeconds() OptNilInt {
+	return s.RetryIntervalSeconds
+}
+
+// GetTargetComponentURI returns the value of TargetComponentURI.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) GetTargetComponentURI() OptString {
+	return s.TargetComponentURI
+}
+
+// SetActionParameters sets the value of ActionParameters.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) SetActionParameters(val []RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) {
+	s.ActionParameters = val
+}
+
+// SetActionURI sets the value of ActionURI.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) SetActionURI(val OptString) {
+	s.ActionURI = val
+}
+
+// SetOem sets the value of Oem.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) SetOem(val jx.Raw) {
+	s.Oem = val
+}
+
+// SetPriority sets the value of Priority.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) SetPriority(val OptNilInt) {
+	s.Priority = val
+}
+
+// SetResolutionType sets the value of ResolutionType.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) SetResolutionType(val OptString) {
+	s.ResolutionType = val
+}
+
+// SetRetryCount sets the value of RetryCount.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) SetRetryCount(val OptNilInt) {
+	s.RetryCount = val
+}
+
+// SetRetryIntervalSeconds sets the value of RetryIntervalSeconds.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) SetRetryIntervalSeconds(val OptNilInt) {
+	s.RetryIntervalSeconds = val
+}
+
+// SetTargetComponentURI sets the value of TargetComponentURI.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) SetTargetComponentURI(val OptString) {
+	s.TargetComponentURI = val
+}
+
+type RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem struct {
+	AllowableNumbers           []string      `json:"AllowableNumbers"`
+	AllowablePattern           OptString     `json:"AllowablePattern"`
+	AllowableValueDescriptions []string      `json:"AllowableValueDescriptions"`
+	AllowableValues            []string      `json:"AllowableValues"`
+	ArraySizeMaximum           OptNilInt     `json:"ArraySizeMaximum"`
+	ArraySizeMinimum           OptNilInt     `json:"ArraySizeMinimum"`
+	DataType                   OptString     `json:"DataType"`
+	DefaultValue               OptString     `json:"DefaultValue"`
+	MaximumValue               OptNilFloat64 `json:"MaximumValue"`
+	MinimumValue               OptNilFloat64 `json:"MinimumValue"`
+	Name                       OptString     `json:"Name"`
+	NoDefaultValue             OptBool       `json:"NoDefaultValue"`
+	ObjectDataType             OptString     `json:"ObjectDataType"`
+	Required                   OptBool       `json:"Required"`
+}
+
+// GetAllowableNumbers returns the value of AllowableNumbers.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableNumbers() []string {
+	return s.AllowableNumbers
+}
+
+// GetAllowablePattern returns the value of AllowablePattern.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowablePattern() OptString {
+	return s.AllowablePattern
+}
+
+// GetAllowableValueDescriptions returns the value of AllowableValueDescriptions.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValueDescriptions() []string {
+	return s.AllowableValueDescriptions
+}
+
+// GetAllowableValues returns the value of AllowableValues.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValues() []string {
+	return s.AllowableValues
+}
+
+// GetArraySizeMaximum returns the value of ArraySizeMaximum.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetArraySizeMaximum() OptNilInt {
+	return s.ArraySizeMaximum
+}
+
+// GetArraySizeMinimum returns the value of ArraySizeMinimum.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetArraySizeMinimum() OptNilInt {
+	return s.ArraySizeMinimum
+}
+
+// GetDataType returns the value of DataType.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetDataType() OptString {
+	return s.DataType
+}
+
+// GetDefaultValue returns the value of DefaultValue.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetDefaultValue() OptString {
+	return s.DefaultValue
+}
+
+// GetMaximumValue returns the value of MaximumValue.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetMaximumValue() OptNilFloat64 {
+	return s.MaximumValue
+}
+
+// GetMinimumValue returns the value of MinimumValue.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetMinimumValue() OptNilFloat64 {
+	return s.MinimumValue
+}
+
+// GetName returns the value of Name.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetName() OptString {
+	return s.Name
+}
+
+// GetNoDefaultValue returns the value of NoDefaultValue.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetNoDefaultValue() OptBool {
+	return s.NoDefaultValue
+}
+
+// GetObjectDataType returns the value of ObjectDataType.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetObjectDataType() OptString {
+	return s.ObjectDataType
+}
+
+// GetRequired returns the value of Required.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetRequired() OptBool {
+	return s.Required
+}
+
+// SetAllowableNumbers sets the value of AllowableNumbers.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableNumbers(val []string) {
+	s.AllowableNumbers = val
+}
+
+// SetAllowablePattern sets the value of AllowablePattern.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowablePattern(val OptString) {
+	s.AllowablePattern = val
+}
+
+// SetAllowableValueDescriptions sets the value of AllowableValueDescriptions.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValueDescriptions(val []string) {
+	s.AllowableValueDescriptions = val
+}
+
+// SetAllowableValues sets the value of AllowableValues.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValues(val []string) {
+	s.AllowableValues = val
+}
+
+// SetArraySizeMaximum sets the value of ArraySizeMaximum.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetArraySizeMaximum(val OptNilInt) {
+	s.ArraySizeMaximum = val
+}
+
+// SetArraySizeMinimum sets the value of ArraySizeMinimum.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetArraySizeMinimum(val OptNilInt) {
+	s.ArraySizeMinimum = val
+}
+
+// SetDataType sets the value of DataType.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetDataType(val OptString) {
+	s.DataType = val
+}
+
+// SetDefaultValue sets the value of DefaultValue.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetDefaultValue(val OptString) {
+	s.DefaultValue = val
+}
+
+// SetMaximumValue sets the value of MaximumValue.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetMaximumValue(val OptNilFloat64) {
+	s.MaximumValue = val
+}
+
+// SetMinimumValue sets the value of MinimumValue.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetMinimumValue(val OptNilFloat64) {
+	s.MinimumValue = val
+}
+
+// SetName sets the value of Name.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetNoDefaultValue sets the value of NoDefaultValue.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetNoDefaultValue(val OptBool) {
+	s.NoDefaultValue = val
+}
+
+// SetObjectDataType sets the value of ObjectDataType.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetObjectDataType(val OptString) {
+	s.ObjectDataType = val
+}
+
+// SetRequired sets the value of Required.
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetRequired(val OptBool) {
+	s.Required = val
+}
+
 type RedfishMetricReportReportsItemMetricValuesItem struct {
-	MetricID       OptString `json:"MetricID"`
+	MetricId       OptString `json:"MetricId"`
 	MetricProperty OptString `json:"MetricProperty"`
 	MetricValue    OptString `json:"MetricValue"`
 	Oem            jx.Raw    `json:"Oem"`
 	Timestamp      OptString `json:"Timestamp"`
 }
 
-// GetMetricID returns the value of MetricID.
-func (s *RedfishMetricReportReportsItemMetricValuesItem) GetMetricID() OptString {
-	return s.MetricID
+// GetMetricId returns the value of MetricId.
+func (s *RedfishMetricReportReportsItemMetricValuesItem) GetMetricId() OptString {
+	return s.MetricId
 }
 
 // GetMetricProperty returns the value of MetricProperty.
@@ -5792,9 +7121,9 @@ func (s *RedfishMetricReportReportsItemMetricValuesItem) GetTimestamp() OptStrin
 	return s.Timestamp
 }
 
-// SetMetricID sets the value of MetricID.
-func (s *RedfishMetricReportReportsItemMetricValuesItem) SetMetricID(val OptString) {
-	s.MetricID = val
+// SetMetricId sets the value of MetricId.
+func (s *RedfishMetricReportReportsItemMetricValuesItem) SetMetricId(val OptString) {
+	s.MetricId = val
 }
 
 // SetMetricProperty sets the value of MetricProperty.
@@ -5966,65 +7295,78 @@ func (s *RedfishSystem) SetTotalMemory(val OptFloat32) {
 }
 
 type RedfishSystemOemDell struct {
-	OdataDotContext                    OptString `json:"@odata.context"`
-	OdataDotID                         OptString `json:"@odata.id"`
-	OdataDotType                       OptString `json:"@odata.type"`
-	BIOSReleaseDate                    OptString `json:"BIOSReleaseDate"`
-	BaseBoardChassisSlot               OptString `json:"BaseBoardChassisSlot"`
-	BatteryRollupStatus                OptString `json:"BatteryRollupStatus"`
-	BladeGeometry                      OptString `json:"BladeGeometry"`
-	CMCIP                              OptString `json:"CMCIP"`
-	CPURollupStatus                    OptString `json:"CPURollupStatus"`
-	ChassisModel                       OptString `json:"ChassisModel"`
-	ChassisName                        OptString `json:"ChassisName"`
-	ChassisServiceTag                  OptString `json:"ChassisServiceTag"`
-	ChassisSystemHeightUnit            OptInt    `json:"ChassisSystemHeightUnit"`
-	CurrentRollupStatus                OptString `json:"CurrentRollupStatus"`
-	Description                        OptString `json:"Description"`
-	EstimatedExhaustTemperatureCelsius OptInt    `json:"EstimatedExhaustTemperatureCelsius"`
-	EstimatedSystemAirflowCFM          OptInt    `json:"EstimatedSystemAirflowCFM"`
-	ExpressServiceCode                 OptString `json:"ExpressServiceCode"`
-	FanRollupStatus                    OptString `json:"FanRollupStatus"`
-	IDSDMRollupStatus                  OptString `json:"IDSDMRollupStatus"`
-	ID                                 OptString `json:"Id"`
-	IntrusionRollupStatus              OptString `json:"IntrusionRollupStatus"`
-	IsOEMBranded                       OptString `json:"IsOEMBranded"`
-	LastSystemInventoryTime            OptString `json:"LastSystemInventoryTime"`
-	LastUpdateTime                     OptString `json:"LastUpdateTime"`
-	LicensingRollupStatus              OptString `json:"LicensingRollupStatus"`
-	ManagedSystemSize                  OptString `json:"ManagedSystemSize"`
-	MaxCPUSockets                      OptInt    `json:"MaxCPUSockets"`
-	MaxDIMMSlots                       OptInt    `json:"MaxDIMMSlots"`
-	MaxPCIeSlots                       OptInt    `json:"MaxPCIeSlots"`
-	MemoryOperationMode                OptString `json:"MemoryOperationMode"`
-	Name                               OptString `json:"Name"`
-	NodeID                             OptString `json:"NodeID"`
-	PSRollupStatus                     OptString `json:"PSRollupStatus"`
-	PlatformGUID                       OptString `json:"PlatformGUID"`
-	PopulatedDIMMSlots                 OptInt    `json:"PopulatedDIMMSlots"`
-	PopulatedPCIeSlots                 OptInt    `json:"PopulatedPCIeSlots"`
-	PowerCapEnabledState               OptString `json:"PowerCapEnabledState"`
-	SDCardRollupStatus                 OptString `json:"SDCardRollupStatus"`
-	SELRollupStatus                    OptString `json:"SELRollupStatus"`
-	ServerAllocationWatts              OptInt    `json:"ServerAllocationWatts"`
-	StorageRollupStatus                OptString `json:"StorageRollupStatus"`
-	SysMemErrorMethodology             OptString `json:"SysMemErrorMethodology"`
-	SysMemFailOverState                OptString `json:"SysMemFailOverState"`
-	SysMemLocation                     OptString `json:"SysMemLocation"`
-	SysMemPrimaryStatus                OptString `json:"SysMemPrimaryStatus"`
-	SystemGeneration                   OptString `json:"SystemGeneration"`
-	SystemID                           OptInt    `json:"SystemID"`
-	SystemRevision                     OptString `json:"SystemRevision"`
-	TempRollupStatus                   OptString `json:"TempRollupStatus"`
-	TempStatisticsRollupStatus         OptString `json:"TempStatisticsRollupStatus"`
-	UUID                               OptString `json:"UUID"`
-	VoltRollupStatus                   OptString `json:"VoltRollupStatus"`
-	SmbiosGUID                         OptString `json:"smbiosGUID"`
+	MessageDotExtendedInfo             OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray `json:"@Message.ExtendedInfo"`
+	OdataDotContext                    OptString                                                 `json:"@odata.context"`
+	OdataDotEtag                       OptNilString                                              `json:"@odata.etag"`
+	OdataDotID                         OptString                                                 `json:"@odata.id"`
+	OdataDotType                       OptString                                                 `json:"@odata.type"`
+	BIOSReleaseDate                    OptString                                                 `json:"BIOSReleaseDate"`
+	BaseBoardChassisSlot               OptString                                                 `json:"BaseBoardChassisSlot"`
+	BatteryRollupStatus                OptString                                                 `json:"BatteryRollupStatus"`
+	BladeGeometry                      OptString                                                 `json:"BladeGeometry"`
+	CMCIP                              OptString                                                 `json:"CMCIP"`
+	CPURollupStatus                    OptString                                                 `json:"CPURollupStatus"`
+	ChassisModel                       OptString                                                 `json:"ChassisModel"`
+	ChassisName                        OptString                                                 `json:"ChassisName"`
+	ChassisServiceTag                  OptString                                                 `json:"ChassisServiceTag"`
+	ChassisSystemHeightUnit            OptInt                                                    `json:"ChassisSystemHeightUnit"`
+	CurrentRollupStatus                OptString                                                 `json:"CurrentRollupStatus"`
+	Description                        OptString                                                 `json:"Description"`
+	EstimatedExhaustTemperatureCelsius OptInt                                                    `json:"EstimatedExhaustTemperatureCelsius"`
+	EstimatedSystemAirflowCFM          OptInt                                                    `json:"EstimatedSystemAirflowCFM"`
+	ExpressServiceCode                 OptString                                                 `json:"ExpressServiceCode"`
+	FanRollupStatus                    OptString                                                 `json:"FanRollupStatus"`
+	IDSDMRollupStatus                  OptString                                                 `json:"IDSDMRollupStatus"`
+	ID                                 OptString                                                 `json:"Id"`
+	IntrusionRollupStatus              OptString                                                 `json:"IntrusionRollupStatus"`
+	IsOEMBranded                       OptString                                                 `json:"IsOEMBranded"`
+	LastSystemInventoryTime            OptString                                                 `json:"LastSystemInventoryTime"`
+	LastUpdateTime                     OptString                                                 `json:"LastUpdateTime"`
+	LicensingRollupStatus              OptString                                                 `json:"LicensingRollupStatus"`
+	ManagedSystemSize                  OptString                                                 `json:"ManagedSystemSize"`
+	MaxCPUSockets                      OptInt                                                    `json:"MaxCPUSockets"`
+	MaxDIMMSlots                       OptInt                                                    `json:"MaxDIMMSlots"`
+	MaxPCIeSlots                       OptInt                                                    `json:"MaxPCIeSlots"`
+	MemoryOperationMode                OptString                                                 `json:"MemoryOperationMode"`
+	Name                               OptString                                                 `json:"Name"`
+	NodeID                             OptString                                                 `json:"NodeID"`
+	Oem                                jx.Raw                                                    `json:"Oem"`
+	PSRollupStatus                     OptString                                                 `json:"PSRollupStatus"`
+	PlatformGUID                       OptString                                                 `json:"PlatformGUID"`
+	PopulatedDIMMSlots                 OptInt                                                    `json:"PopulatedDIMMSlots"`
+	PopulatedPCIeSlots                 OptInt                                                    `json:"PopulatedPCIeSlots"`
+	PowerCapEnabledState               OptString                                                 `json:"PowerCapEnabledState"`
+	SDCardRollupStatus                 OptString                                                 `json:"SDCardRollupStatus"`
+	SELRollupStatus                    OptString                                                 `json:"SELRollupStatus"`
+	ServerAllocationWatts              OptInt                                                    `json:"ServerAllocationWatts"`
+	StorageRollupStatus                OptString                                                 `json:"StorageRollupStatus"`
+	SysMemErrorMethodology             OptString                                                 `json:"SysMemErrorMethodology"`
+	SysMemFailOverState                OptString                                                 `json:"SysMemFailOverState"`
+	SysMemLocation                     OptString                                                 `json:"SysMemLocation"`
+	SysMemPrimaryStatus                OptString                                                 `json:"SysMemPrimaryStatus"`
+	SystemGeneration                   OptString                                                 `json:"SystemGeneration"`
+	SystemID                           OptInt                                                    `json:"SystemID"`
+	SystemRevision                     OptString                                                 `json:"SystemRevision"`
+	TempRollupStatus                   OptString                                                 `json:"TempRollupStatus"`
+	TempStatisticsRollupStatus         OptString                                                 `json:"TempStatisticsRollupStatus"`
+	UUID                               OptString                                                 `json:"UUID"`
+	VoltRollupStatus                   OptString                                                 `json:"VoltRollupStatus"`
+	SmbiosGUID                         OptString                                                 `json:"smbiosGUID"`
+}
+
+// GetMessageDotExtendedInfo returns the value of MessageDotExtendedInfo.
+func (s *RedfishSystemOemDell) GetMessageDotExtendedInfo() OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray {
+	return s.MessageDotExtendedInfo
 }
 
 // GetOdataDotContext returns the value of OdataDotContext.
 func (s *RedfishSystemOemDell) GetOdataDotContext() OptString {
 	return s.OdataDotContext
+}
+
+// GetOdataDotEtag returns the value of OdataDotEtag.
+func (s *RedfishSystemOemDell) GetOdataDotEtag() OptNilString {
+	return s.OdataDotEtag
 }
 
 // GetOdataDotID returns the value of OdataDotID.
@@ -6187,6 +7529,11 @@ func (s *RedfishSystemOemDell) GetNodeID() OptString {
 	return s.NodeID
 }
 
+// GetOem returns the value of Oem.
+func (s *RedfishSystemOemDell) GetOem() jx.Raw {
+	return s.Oem
+}
+
 // GetPSRollupStatus returns the value of PSRollupStatus.
 func (s *RedfishSystemOemDell) GetPSRollupStatus() OptString {
 	return s.PSRollupStatus
@@ -6292,9 +7639,19 @@ func (s *RedfishSystemOemDell) GetSmbiosGUID() OptString {
 	return s.SmbiosGUID
 }
 
+// SetMessageDotExtendedInfo sets the value of MessageDotExtendedInfo.
+func (s *RedfishSystemOemDell) SetMessageDotExtendedInfo(val OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) {
+	s.MessageDotExtendedInfo = val
+}
+
 // SetOdataDotContext sets the value of OdataDotContext.
 func (s *RedfishSystemOemDell) SetOdataDotContext(val OptString) {
 	s.OdataDotContext = val
+}
+
+// SetOdataDotEtag sets the value of OdataDotEtag.
+func (s *RedfishSystemOemDell) SetOdataDotEtag(val OptNilString) {
+	s.OdataDotEtag = val
 }
 
 // SetOdataDotID sets the value of OdataDotID.
@@ -6457,6 +7814,11 @@ func (s *RedfishSystemOemDell) SetNodeID(val OptString) {
 	s.NodeID = val
 }
 
+// SetOem sets the value of Oem.
+func (s *RedfishSystemOemDell) SetOem(val jx.Raw) {
+	s.Oem = val
+}
+
 // SetPSRollupStatus sets the value of PSRollupStatus.
 func (s *RedfishSystemOemDell) SetPSRollupStatus(val OptString) {
 	s.PSRollupStatus = val
@@ -6560,6 +7922,378 @@ func (s *RedfishSystemOemDell) SetVoltRollupStatus(val OptString) {
 // SetSmbiosGUID sets the value of SmbiosGUID.
 func (s *RedfishSystemOemDell) SetSmbiosGUID(val OptString) {
 	s.SmbiosGUID = val
+}
+
+type RedfishSystemOemDellMessageDotExtendedInfoItem struct {
+	Message                  OptString                                                           `json:"Message"`
+	MessageArgs              []string                                                            `json:"MessageArgs"`
+	MessageId                OptString                                                           `json:"MessageId"`
+	MessageSeverity          OptString                                                           `json:"MessageSeverity"`
+	Oem                      jx.Raw                                                              `json:"Oem"`
+	RelatedProperties        OptNilNilStringArray                                                `json:"RelatedProperties"`
+	Resolution               OptString                                                           `json:"Resolution"`
+	ResolutionSteps          []RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem `json:"ResolutionSteps"`
+	Severity                 OptString                                                           `json:"Severity"`
+	UserAuthenticationSource OptString                                                           `json:"UserAuthenticationSource"`
+	Username                 OptString                                                           `json:"Username"`
+}
+
+// GetMessage returns the value of Message.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) GetMessage() OptString {
+	return s.Message
+}
+
+// GetMessageArgs returns the value of MessageArgs.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) GetMessageArgs() []string {
+	return s.MessageArgs
+}
+
+// GetMessageId returns the value of MessageId.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) GetMessageId() OptString {
+	return s.MessageId
+}
+
+// GetMessageSeverity returns the value of MessageSeverity.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) GetMessageSeverity() OptString {
+	return s.MessageSeverity
+}
+
+// GetOem returns the value of Oem.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) GetOem() jx.Raw {
+	return s.Oem
+}
+
+// GetRelatedProperties returns the value of RelatedProperties.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) GetRelatedProperties() OptNilNilStringArray {
+	return s.RelatedProperties
+}
+
+// GetResolution returns the value of Resolution.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) GetResolution() OptString {
+	return s.Resolution
+}
+
+// GetResolutionSteps returns the value of ResolutionSteps.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) GetResolutionSteps() []RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem {
+	return s.ResolutionSteps
+}
+
+// GetSeverity returns the value of Severity.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) GetSeverity() OptString {
+	return s.Severity
+}
+
+// GetUserAuthenticationSource returns the value of UserAuthenticationSource.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) GetUserAuthenticationSource() OptString {
+	return s.UserAuthenticationSource
+}
+
+// GetUsername returns the value of Username.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) GetUsername() OptString {
+	return s.Username
+}
+
+// SetMessage sets the value of Message.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetMessage(val OptString) {
+	s.Message = val
+}
+
+// SetMessageArgs sets the value of MessageArgs.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetMessageArgs(val []string) {
+	s.MessageArgs = val
+}
+
+// SetMessageId sets the value of MessageId.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetMessageId(val OptString) {
+	s.MessageId = val
+}
+
+// SetMessageSeverity sets the value of MessageSeverity.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetMessageSeverity(val OptString) {
+	s.MessageSeverity = val
+}
+
+// SetOem sets the value of Oem.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetOem(val jx.Raw) {
+	s.Oem = val
+}
+
+// SetRelatedProperties sets the value of RelatedProperties.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetRelatedProperties(val OptNilNilStringArray) {
+	s.RelatedProperties = val
+}
+
+// SetResolution sets the value of Resolution.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetResolution(val OptString) {
+	s.Resolution = val
+}
+
+// SetResolutionSteps sets the value of ResolutionSteps.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetResolutionSteps(val []RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) {
+	s.ResolutionSteps = val
+}
+
+// SetSeverity sets the value of Severity.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetSeverity(val OptString) {
+	s.Severity = val
+}
+
+// SetUserAuthenticationSource sets the value of UserAuthenticationSource.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetUserAuthenticationSource(val OptString) {
+	s.UserAuthenticationSource = val
+}
+
+// SetUsername sets the value of Username.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetUsername(val OptString) {
+	s.Username = val
+}
+
+type RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem struct {
+	ActionParameters     []RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem `json:"ActionParameters"`
+	ActionURI            OptString                                                                               `json:"ActionURI"`
+	Oem                  jx.Raw                                                                                  `json:"Oem"`
+	Priority             OptNilInt                                                                               `json:"Priority"`
+	ResolutionType       OptString                                                                               `json:"ResolutionType"`
+	RetryCount           OptNilInt                                                                               `json:"RetryCount"`
+	RetryIntervalSeconds OptNilInt                                                                               `json:"RetryIntervalSeconds"`
+	TargetComponentURI   OptString                                                                               `json:"TargetComponentURI"`
+}
+
+// GetActionParameters returns the value of ActionParameters.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) GetActionParameters() []RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
+	return s.ActionParameters
+}
+
+// GetActionURI returns the value of ActionURI.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) GetActionURI() OptString {
+	return s.ActionURI
+}
+
+// GetOem returns the value of Oem.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) GetOem() jx.Raw {
+	return s.Oem
+}
+
+// GetPriority returns the value of Priority.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) GetPriority() OptNilInt {
+	return s.Priority
+}
+
+// GetResolutionType returns the value of ResolutionType.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) GetResolutionType() OptString {
+	return s.ResolutionType
+}
+
+// GetRetryCount returns the value of RetryCount.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) GetRetryCount() OptNilInt {
+	return s.RetryCount
+}
+
+// GetRetryIntervalSeconds returns the value of RetryIntervalSeconds.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) GetRetryIntervalSeconds() OptNilInt {
+	return s.RetryIntervalSeconds
+}
+
+// GetTargetComponentURI returns the value of TargetComponentURI.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) GetTargetComponentURI() OptString {
+	return s.TargetComponentURI
+}
+
+// SetActionParameters sets the value of ActionParameters.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetActionParameters(val []RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) {
+	s.ActionParameters = val
+}
+
+// SetActionURI sets the value of ActionURI.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetActionURI(val OptString) {
+	s.ActionURI = val
+}
+
+// SetOem sets the value of Oem.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetOem(val jx.Raw) {
+	s.Oem = val
+}
+
+// SetPriority sets the value of Priority.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetPriority(val OptNilInt) {
+	s.Priority = val
+}
+
+// SetResolutionType sets the value of ResolutionType.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetResolutionType(val OptString) {
+	s.ResolutionType = val
+}
+
+// SetRetryCount sets the value of RetryCount.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetRetryCount(val OptNilInt) {
+	s.RetryCount = val
+}
+
+// SetRetryIntervalSeconds sets the value of RetryIntervalSeconds.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetRetryIntervalSeconds(val OptNilInt) {
+	s.RetryIntervalSeconds = val
+}
+
+// SetTargetComponentURI sets the value of TargetComponentURI.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetTargetComponentURI(val OptString) {
+	s.TargetComponentURI = val
+}
+
+type RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem struct {
+	AllowableNumbers           []string      `json:"AllowableNumbers"`
+	AllowablePattern           OptString     `json:"AllowablePattern"`
+	AllowableValueDescriptions []string      `json:"AllowableValueDescriptions"`
+	AllowableValues            []string      `json:"AllowableValues"`
+	ArraySizeMaximum           OptNilInt     `json:"ArraySizeMaximum"`
+	ArraySizeMinimum           OptNilInt     `json:"ArraySizeMinimum"`
+	DataType                   OptString     `json:"DataType"`
+	DefaultValue               OptString     `json:"DefaultValue"`
+	MaximumValue               OptNilFloat64 `json:"MaximumValue"`
+	MinimumValue               OptNilFloat64 `json:"MinimumValue"`
+	Name                       OptString     `json:"Name"`
+	NoDefaultValue             OptBool       `json:"NoDefaultValue"`
+	ObjectDataType             OptString     `json:"ObjectDataType"`
+	Required                   OptBool       `json:"Required"`
+}
+
+// GetAllowableNumbers returns the value of AllowableNumbers.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableNumbers() []string {
+	return s.AllowableNumbers
+}
+
+// GetAllowablePattern returns the value of AllowablePattern.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowablePattern() OptString {
+	return s.AllowablePattern
+}
+
+// GetAllowableValueDescriptions returns the value of AllowableValueDescriptions.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValueDescriptions() []string {
+	return s.AllowableValueDescriptions
+}
+
+// GetAllowableValues returns the value of AllowableValues.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValues() []string {
+	return s.AllowableValues
+}
+
+// GetArraySizeMaximum returns the value of ArraySizeMaximum.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetArraySizeMaximum() OptNilInt {
+	return s.ArraySizeMaximum
+}
+
+// GetArraySizeMinimum returns the value of ArraySizeMinimum.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetArraySizeMinimum() OptNilInt {
+	return s.ArraySizeMinimum
+}
+
+// GetDataType returns the value of DataType.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetDataType() OptString {
+	return s.DataType
+}
+
+// GetDefaultValue returns the value of DefaultValue.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetDefaultValue() OptString {
+	return s.DefaultValue
+}
+
+// GetMaximumValue returns the value of MaximumValue.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetMaximumValue() OptNilFloat64 {
+	return s.MaximumValue
+}
+
+// GetMinimumValue returns the value of MinimumValue.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetMinimumValue() OptNilFloat64 {
+	return s.MinimumValue
+}
+
+// GetName returns the value of Name.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetName() OptString {
+	return s.Name
+}
+
+// GetNoDefaultValue returns the value of NoDefaultValue.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetNoDefaultValue() OptBool {
+	return s.NoDefaultValue
+}
+
+// GetObjectDataType returns the value of ObjectDataType.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetObjectDataType() OptString {
+	return s.ObjectDataType
+}
+
+// GetRequired returns the value of Required.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetRequired() OptBool {
+	return s.Required
+}
+
+// SetAllowableNumbers sets the value of AllowableNumbers.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableNumbers(val []string) {
+	s.AllowableNumbers = val
+}
+
+// SetAllowablePattern sets the value of AllowablePattern.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowablePattern(val OptString) {
+	s.AllowablePattern = val
+}
+
+// SetAllowableValueDescriptions sets the value of AllowableValueDescriptions.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValueDescriptions(val []string) {
+	s.AllowableValueDescriptions = val
+}
+
+// SetAllowableValues sets the value of AllowableValues.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValues(val []string) {
+	s.AllowableValues = val
+}
+
+// SetArraySizeMaximum sets the value of ArraySizeMaximum.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetArraySizeMaximum(val OptNilInt) {
+	s.ArraySizeMaximum = val
+}
+
+// SetArraySizeMinimum sets the value of ArraySizeMinimum.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetArraySizeMinimum(val OptNilInt) {
+	s.ArraySizeMinimum = val
+}
+
+// SetDataType sets the value of DataType.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetDataType(val OptString) {
+	s.DataType = val
+}
+
+// SetDefaultValue sets the value of DefaultValue.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetDefaultValue(val OptString) {
+	s.DefaultValue = val
+}
+
+// SetMaximumValue sets the value of MaximumValue.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetMaximumValue(val OptNilFloat64) {
+	s.MaximumValue = val
+}
+
+// SetMinimumValue sets the value of MinimumValue.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetMinimumValue(val OptNilFloat64) {
+	s.MinimumValue = val
+}
+
+// SetName sets the value of Name.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetNoDefaultValue sets the value of NoDefaultValue.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetNoDefaultValue(val OptBool) {
+	s.NoDefaultValue = val
+}
+
+// SetObjectDataType sets the value of ObjectDataType.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetObjectDataType(val OptString) {
+	s.ObjectDataType = val
+}
+
+// SetRequired sets the value of Required.
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetRequired(val OptBool) {
+	s.Required = val
 }
 
 // User schema.

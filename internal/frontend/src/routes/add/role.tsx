@@ -1,5 +1,5 @@
-import { useForm } from "@tanstack/react-form";
-import { createFileRoute } from "@tanstack/react-router";
+import { postV1RolesMutation } from "@/client/@tanstack/react-query.gen";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,10 +8,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { usePostV1Roles } from "@/openapi/queries";
-import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { useForm } from "@tanstack/react-form";
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 
@@ -21,6 +22,8 @@ export const Route = createFileRoute("/add/role")({
 
 function RouteComponent() {
   const navigate = Route.useNavigate();
+  const { mutate, isPending } = useMutation(postV1RolesMutation());
+
   const form = useForm({
     defaultValues: {
       name: "",
@@ -30,7 +33,7 @@ function RouteComponent() {
       mutate(
         { body: { role: value.name, inherited_role: value.inherit } },
         {
-          onSuccess: ({ data }) => {
+          onSuccess: (data) => {
             toast.success(data?.title, {
               description: data?.detail,
             });
@@ -48,7 +51,6 @@ function RouteComponent() {
       );
     },
   });
-  const { mutate, isPending } = usePostV1Roles();
   return (
     <div className="flex justify-center">
       <form
@@ -63,8 +65,8 @@ function RouteComponent() {
           <CardHeader>
             <CardTitle>Add a Role:</CardTitle>
             <CardDescription>
-              New Roles can be created from an inherited role, which will copy
-              all permissions into the new role.
+              New Roles can be created from an inherited role, which will copy all permissions into
+              the new role.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -97,11 +99,7 @@ function RouteComponent() {
           </CardContent>
           <CardFooter>
             <Button type="submit">
-              {isPending ? (
-                <LoaderCircle className="animate-spin" />
-              ) : (
-                <span>Submit</span>
-              )}
+              {isPending ? <LoaderCircle className="animate-spin" /> : <span>Submit</span>}
             </Button>
           </CardFooter>
         </Card>

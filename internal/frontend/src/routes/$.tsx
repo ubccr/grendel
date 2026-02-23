@@ -1,9 +1,4 @@
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -18,9 +13,7 @@ function RouteComponent() {
         <CardHeader>
           <CardTitle>404: Not Found</CardTitle>
           <Separator />
-          <CardDescription>
-            How did you end up here? Who sent you!?!
-          </CardDescription>
+          <CardDescription>How did you end up here? Who sent you!?!</CardDescription>
         </CardHeader>
       </Card>
     </div>

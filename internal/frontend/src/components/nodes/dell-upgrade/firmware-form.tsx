@@ -1,21 +1,17 @@
-import { Button } from "@/components/ui/button";
-import {
-  useGetV1BmcUpgradeDellRepoKey,
-  usePostV1BmcUpgradeDellInstallfromrepo,
-} from "@/openapi/queries";
-import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
-import { LoaderCircle } from "lucide-react";
-import {
-  Field,
-  FieldGroup,
-  FieldSeparator,
-  FieldSet,
-} from "@/components/ui/field";
+import { BmcDellInstallFromRepoRequest } from "@/client";
+import { postV1BmcUpgradeDellInstallfromrepoMutation } from "@/client/@tanstack/react-query.gen";
 import { useAppForm } from "@/components/form/form-context";
-import { BmcDellInstallFromRepoRequest } from "@/openapi/requests";
+import { Button } from "@/components/ui/button";
+import { Field, FieldGroup, FieldSeparator, FieldSet } from "@/components/ui/field";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "@tanstack/react-router";
+import { LoaderCircle } from "lucide-react";
+import { toast } from "sonner";
 
 export default function FirmwareForm({ nodes }: { nodes: string }) {
+  const router = useRouter();
+  const mutation = useMutation(postV1BmcUpgradeDellInstallfromrepoMutation());
+
   const defaultValues: BmcDellInstallFromRepoRequest = {
     IgnoreCertWarning: true,
     IPAddress: "downloads.dell.com",
@@ -34,9 +30,7 @@ export default function FirmwareForm({ nodes }: { nodes: string }) {
             toast.success("Success", {
               description: "successfully sent request",
             });
-            queryClient.invalidateQueries({
-              queryKey: [useGetV1BmcUpgradeDellRepoKey],
-            });
+            router.invalidate();
           },
           onError: (e) =>
             toast.error(e.title, {
@@ -46,8 +40,6 @@ export default function FirmwareForm({ nodes }: { nodes: string }) {
       );
     },
   });
-  const mutation = usePostV1BmcUpgradeDellInstallfromrepo();
-  const queryClient = useQueryClient();
 
   const defaultShareTypes = new Map<string, string>([
     ["HTTP", "HTTP"],
@@ -80,10 +72,7 @@ export default function FirmwareForm({ nodes }: { nodes: string }) {
           <form.AppField
             name="IPAddress"
             children={(field) => (
-              <field.TextField
-                label="IP Address"
-                description="IP address for the remote share."
-              />
+              <field.TextField label="IP Address" description="IP address for the remote share." />
             )}
           />
           <form.AppField
@@ -143,11 +132,7 @@ export default function FirmwareForm({ nodes }: { nodes: string }) {
           />
           <Field className="justify-end" orientation="responsive">
             <Button type="submit">
-              {mutation.isPending ? (
-                <LoaderCircle className="animate-spin" />
-              ) : (
-                <span>Submit</span>
-              )}
+              {mutation.isPending ? <LoaderCircle className="animate-spin" /> : <span>Submit</span>}
             </Button>
           </Field>
         </FieldGroup>

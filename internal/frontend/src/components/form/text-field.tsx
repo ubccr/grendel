@@ -1,10 +1,4 @@
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-} from "../ui/field";
+import { Field, FieldContent, FieldDescription, FieldError, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { useFieldContext } from "./form-context";
 
@@ -15,12 +9,7 @@ type props = {
   autoComplete?: React.HTMLInputAutoCompleteAttribute;
 };
 
-export function TextField({
-  label,
-  placeholder,
-  description,
-  autoComplete,
-}: props) {
+export function TextField({ label, placeholder, description, autoComplete }: props) {
   const field = useFieldContext<string>();
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 

@@ -6,10 +6,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Button } from "./ui/button";
+import { useRouter } from "@tanstack/react-router";
 import { Hammer } from "lucide-react";
 import React from "react";
 import { toast } from "sonner";
+import { Button } from "./ui/button";
 
 type props = {
   checked: string;
@@ -18,15 +19,16 @@ type props = {
 };
 
 export default function ActionsSheet({ checked, length, children }: props) {
+  const router = useRouter();
   return (
-    <Sheet>
+    <Sheet onOpenChange={(open) => !open && router.invalidate()}>
       <SheetTrigger asChild>
         <Button variant="secondary" className="relative">
           <Hammer />
           <span className="sr-only md:not-sr-only">Actions</span>
           {length > 0 && (
             <span className="absolute -top-1 -right-1 flex size-4">
-              <span className="relative inline-flex size-full justify-center rounded-full bg-sky-500 text-xs text-black">
+              <span className="relative inline-flex size-full justify-center rounded-full bg-sky-400 text-xs text-black">
                 {Math.abs(length).toString().length > 2 ? "-" : length}
               </span>
             </span>

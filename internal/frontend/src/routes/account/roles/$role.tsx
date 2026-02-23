@@ -1,68 +1,33 @@
+import { getV1Roles, patchV1Roles } from "@/client";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { useGetV1Roles, usePatchV1Roles } from "@/openapi/queries";
-import { GetRolesResponse } from "@/openapi/requests";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import ApiToast from "@/lib/api-toast";
+import AuthRedirect from "@/lib/auth";
 import { useForm } from "@tanstack/react-form";
-import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { LoaderCircle } from "lucide-react";
-import { toast } from "sonner";
 
 export const Route = createFileRoute("/account/roles/$role")({
   component: RouteComponent,
+  beforeLoad: AuthRedirect,
+  loader: ({ params: { role } }) => getV1Roles({ query: { name: role } }),
 });
 
 function RouteComponent() {
-  const { role } = Route.useParams();
-  const role_query = useGetV1Roles({ query: { name: role } });
-
-  return (
-    <div>
-      {role_query.data?.roles?.[0] != undefined && (
-        <PermissionForm role={role_query.data?.roles[0]} />
-      )}
-    </div>
-  );
-}
-
-function PermissionForm({
-  role,
-}: {
-  role: NonNullable<GetRolesResponse["roles"]>[number];
-}) {
-  const { mutate, isPending } = usePatchV1Roles();
-  const queryClient = useQueryClient();
+  const role = Route.useLoaderData();
 
   const form = useForm({
     defaultValues: {
-      name: role.name ?? "",
-      permission_list: role.permission_list ?? [],
-      unassigned_permission_list: role.unassigned_permission_list ?? [],
+      name: role.data?.roles?.[0].name ?? "",
+      permission_list: role.data?.roles?.[0].permission_list ?? [],
+      unassigned_permission_list: role.data?.roles?.[0].unassigned_permission_list ?? [],
     },
-    onSubmit(props) {
+    async onSubmit(props) {
       const v = props.value;
-      mutate(
-        { body: { role: v.name, permission_list: v.permission_list } },
-        {
-          onSuccess: ({ data }) => {
-            toast.success(data?.title, {
-              description: data?.detail,
-            });
-            queryClient.invalidateQueries();
-          },
-          onError: (e) => {
-            toast.error(e.title, {
-              description: e.detail,
-            });
-          },
-        },
-      );
+      const res = await patchV1Roles({
+        body: { role: v.name, permission_list: v.permission_list },
+      });
+
+      ApiToast(res);
     },
   });
 
@@ -95,10 +60,7 @@ function PermissionForm({
                               type="button"
                               className="hover:font-medium"
                               onClick={() => {
-                                form.pushFieldValue(
-                                  "unassigned_permission_list",
-                                  v,
-                                );
+                                form.pushFieldValue("unassigned_permission_list", v);
                                 field.removeValue(i);
                               }}
                             >
@@ -113,9 +75,7 @@ function PermissionForm({
               </Card>
               <Card>
                 <CardHeader>
-                  <CardTitle className="mx-auto">
-                    Unassigned Permissions:
-                  </CardTitle>
+                  <CardTitle className="mx-auto">Unassigned Permissions:</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <form.Field
@@ -147,11 +107,11 @@ function PermissionForm({
         </CardContent>
         <CardFooter>
           <Button type="submit" form="permissionForm">
-            {isPending ? (
+            {/*{form. ? (
               <LoaderCircle className="animate-spin" />
-            ) : (
-              <span>Submit</span>
-            )}
+            ) : (*/}
+            <span>Submit</span>
+            {/*)}*/}
           </Button>
         </CardFooter>
       </Card>

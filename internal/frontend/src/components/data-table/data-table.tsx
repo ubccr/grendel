@@ -25,21 +25,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Link, useNavigate, useRouter, useSearch } from "@tanstack/react-router";
+import { ChevronDown, ChevronLeft, Info, Plus, RefreshCw } from "lucide-react";
 import React, { JSX, useState } from "react";
+import { TagsInput } from "../tags-input";
+import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { Progress } from "../ui/progress";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { DataTablePagination } from "./pagination";
 import { DataTableViewOptions } from "./view-options";
-import { Button } from "../ui/button";
-import { ChevronDown, ChevronLeft, Info, Plus, RefreshCw } from "lucide-react";
-import { Link } from "@tanstack/react-router";
-import { TagsInput } from "../tags-input";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
-import { Progress } from "../ui/progress";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -55,11 +50,7 @@ interface DataTableProps<TData, TValue> {
   initialGrouping?: GroupingState;
 }
 
-export type DataTableActions<TData> = ({
-  table,
-}: {
-  table: TanstackTable<TData>;
-}) => JSX.Element;
+export type DataTableActions<TData> = ({ table }: { table: TanstackTable<TData> }) => JSX.Element;
 
 export function DataTable<TData, TValue>({
   columns,
@@ -74,19 +65,26 @@ export function DataTable<TData, TValue>({
   refresh,
   initialGrouping,
 }: DataTableProps<TData, TValue>) {
+  const navigate = useNavigate();
+  const router = useRouter();
+  const search = useSearch({ strict: false });
+
   const [sorting, setSorting] = useState<SortingState>(initialSorting ?? []);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
+    Object.keys(search).map((key) => {
+      // @ts-expect-error strongly typed search parameters only exist per route, this is a component found in multiple routes
+      return { id: key, value: search[key] as string };
+    }) ?? [],
+  );
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
     initialVisibility ?? {},
   );
   const [rowSelection, setRowSelection] = useState({});
   const [pagination, setPagination] = useState({
     pageIndex: 0, //initial page index
-    pageSize: 10, //default page size
+    pageSize: 20, //default page size
   });
-  const [grouping, setGrouping] = useState<GroupingState>(
-    initialGrouping ?? [],
-  );
+  const [grouping, setGrouping] = useState<GroupingState>(initialGrouping ?? []);
 
   const table = useReactTable({
     data,
@@ -136,8 +134,14 @@ export function DataTable<TData, TValue>({
               </Link>
             </Button>
           )}
-          {refresh && (
+          {/* use passed refresh func (tanstack query) or fallback to route cache invalidation*/}
+          {refresh ? (
             <Button variant="secondary" onClick={refresh}>
+              <RefreshCw />
+              <span className="sr-only sm:not-sr-only">Refresh</span>
+            </Button>
+          ) : (
+            <Button variant="secondary" onClick={() => router.invalidate()}>
               <RefreshCw />
               <span className="sr-only sm:not-sr-only">Refresh</span>
             </Button>
@@ -161,38 +165,34 @@ export function DataTable<TData, TValue>({
                           <TagsInput
                             placeholder="Filter tags"
                             className="w-full"
-                            value={
-                              (table
-                                .getColumn("tags")
-                                ?.getFilterValue() as string[]) ?? []
-                            }
-                            onValueChange={(val) =>
-                              table.getColumn("tags")?.setFilterValue(val)
-                            }
+                            value={(table.getColumn("tags")?.getFilterValue() as string[]) ?? []}
+                            onValueChange={(val) => {
+                              navigate({
+                                to: ".",
+                                search: (prev) => ({
+                                  ...prev,
+                                  [header.id]: val,
+                                }),
+                                replace: true,
+                              });
+                              table.getColumn("tags")?.setFilterValue(val);
+                            }}
                           />
                           <Tooltip>
                             <TooltipProvider>
                               <TooltipTrigger asChild>
-                                <Button
-                                  type="button"
-                                  size="icon"
-                                  variant="secondary"
-                                >
+                                <Button type="button" size="icon" variant="secondary">
                                   <Info />
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
                                 Valid search operators include: <br />
-                                "example" filters for rows that contain example
-                                tag <br />
-                                "!example" filters for rows that do not contain
-                                example tag <br />
+                                "example" filters for rows that contain example tag <br />
+                                "!example" filters for rows that do not contain example tag <br />
                                 "key=" matches any value with key <br />
                                 "=value" matches any key with value <br />
-                                "namespace:" matches any key and value in a
-                                namespace <br />
-                                ":key" matches any namespace and value with that
-                                key <br />
+                                "namespace:" matches any key and value in a namespace <br />
+                                ":key" matches any namespace and value with that key <br />
                               </TooltipContent>
                             </TooltipProvider>
                           </Tooltip>
@@ -205,16 +205,18 @@ export function DataTable<TData, TValue>({
                       <TableHead key={header.id}>
                         <Input
                           placeholder={`Filter ${header.id}`}
-                          value={
-                            table
-                              .getColumn(header.id)
-                              ?.getFilterValue() as string
-                          }
-                          onChange={(e) =>
-                            table
-                              .getColumn(header.id)
-                              ?.setFilterValue(e.target.value)
-                          }
+                          value={table.getColumn(header.id)?.getFilterValue() as string}
+                          onChange={(e) => {
+                            navigate({
+                              to: ".",
+                              search: (prev) => ({
+                                ...prev,
+                                [header.id]: e.target.value,
+                              }),
+                              replace: true,
+                            });
+                            table.getColumn(header.id)?.setFilterValue(e.target.value);
+                          }}
                         />
                       </TableHead>
                     );
@@ -229,10 +231,7 @@ export function DataTable<TData, TValue>({
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                        : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   );
                 })}
@@ -256,57 +255,36 @@ export function DataTable<TData, TValue>({
                         {cell.getIsGrouped() ? (
                           <div className="flex justify-between gap-2">
                             {/*({row.subRows.length}){" "}*/}
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}{" "}
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}{" "}
                             <Button
                               onClick={row.getToggleExpandedHandler()}
                               size="icon"
                               variant="secondary"
                               className="size-6"
                             >
-                              {row.getIsExpanded() ? (
-                                <ChevronDown />
-                              ) : (
-                                <ChevronLeft />
-                              )}
+                              {row.getIsExpanded() ? <ChevronDown /> : <ChevronLeft />}
                             </Button>
                           </div>
                         ) : cell.getIsAggregated() ? (
-                          flexRender(
-                            cell.column.columnDef.aggregatedCell,
-                            cell.getContext(),
-                          )
+                          flexRender(cell.column.columnDef.aggregatedCell, cell.getContext())
                         ) : cell.getIsPlaceholder() ? null : (
-                          flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )
+                          flexRender(cell.column.columnDef.cell, cell.getContext())
                         )}
                       </TableCell>
                     ))}
                   </TableRow>
-                  {row.getCanExpand() &&
-                    row.getIsExpanded() &&
-                    renderSubComponent != undefined && (
-                      <TableRow
-                        key={row.id}
-                        data-state={row.getIsSelected() && "selected"}
-                      >
-                        <TableCell colSpan={row.getVisibleCells().length}>
-                          {renderSubComponent({ row })}
-                        </TableCell>
-                      </TableRow>
-                    )}
+                  {row.getCanExpand() && row.getIsExpanded() && renderSubComponent != undefined && (
+                    <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                      <TableCell colSpan={row.getVisibleCells().length}>
+                        {renderSubComponent({ row })}
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </React.Fragment>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
+                <TableCell colSpan={columns.length} className="h-24 text-center">
                   No results.
                 </TableCell>
               </TableRow>

@@ -1,26 +1,26 @@
-import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  deleteV1AuthSignoutMutation,
+  patchV1AuthResetMutation,
+} from "@/client/@tanstack/react-query.gen";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUser } from "@/hooks/user-provider";
-import { useDeleteV1AuthSignout, usePatchV1AuthReset } from "@/openapi/queries";
+import AuthRedirect from "@/lib/auth";
 import { useForm } from "@tanstack/react-form";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/account/reset")({
   component: RouteComponent,
+  beforeLoad: AuthRedirect,
 });
 
 function RouteComponent() {
-  const { mutate } = usePatchV1AuthReset();
-  const logout = useDeleteV1AuthSignout();
+  const { mutate } = useMutation(patchV1AuthResetMutation());
+  const logout = useMutation(deleteV1AuthSignoutMutation());
   const User = useUser();
   const router = useRouter();
 
@@ -46,7 +46,7 @@ function RouteComponent() {
           },
         },
         {
-          onSuccess: ({ data }) => {
+          onSuccess: (data) => {
             toast.success(data?.title, {
               description: data?.detail,
             });

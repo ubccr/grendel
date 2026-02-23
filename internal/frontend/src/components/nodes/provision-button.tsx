@@ -1,9 +1,9 @@
+import { patchV1NodesProvisionMutation } from "@/client/@tanstack/react-query.gen";
+import { useMutation } from "@tanstack/react-query";
 import { LoaderCircle, Zap, ZapOff } from "lucide-react";
-import { Button } from "../ui/button";
-import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
-import { usePatchV1NodesProvision } from "@/openapi/queries";
+import { Button } from "../ui/button";
 
 type Props = {
   name?: string;
@@ -11,14 +11,8 @@ type Props = {
 };
 
 export default function ProvisionIcon({ provision, name }: Props) {
-  const mutate_provision = usePatchV1NodesProvision();
-  const queryClient = useQueryClient();
-
-  const [ping, setPing] = useState(false);
-
-  useEffect(() => {
-    if (ping) setTimeout(() => setPing(false), 2000);
-  }, [ping]);
+  const { mutate, isPending } = useMutation(patchV1NodesProvisionMutation());
+  const [localProvision, setLocalProvision] = useState(provision);
 
   return (
     <>
@@ -29,14 +23,13 @@ export default function ProvisionIcon({ provision, name }: Props) {
           size="icon"
           variant="secondary"
           type="button"
-          className={ping ? "animate-pulse" : ""}
+          className={isPending ? "animate-pulse" : ""}
           onClick={() => {
-            setPing(true);
-            mutate_provision.mutate(
-              { query: { nodeset: name }, body: { provision: !provision } },
+            mutate(
+              { query: { nodeset: name }, body: { provision: !localProvision } },
               {
                 onSuccess: () => {
-                  queryClient.invalidateQueries();
+                  setLocalProvision(!localProvision);
                 },
                 onError: (e) =>
                   toast.error(e.title, {
@@ -46,8 +39,11 @@ export default function ProvisionIcon({ provision, name }: Props) {
             );
           }}
         >
-          {provision && <Zap className="text-green-600" />}
-          {!provision && <ZapOff className="text-red-600" />}
+          {localProvision ? (
+            <Zap className="text-green-600" />
+          ) : (
+            <ZapOff className="text-red-600" />
+          )}
         </Button>
       )}
     </>

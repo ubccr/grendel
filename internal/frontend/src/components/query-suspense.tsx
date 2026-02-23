@@ -1,12 +1,5 @@
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import React from "react";
@@ -23,16 +16,14 @@ export function QuerySuspense({ children }: { children: React.ReactNode }) {
                 <CardHeader>
                   <CardTitle>Oops, something has gone wrong!</CardTitle>
                   <CardDescription>
-                    Seems like you've ran into the mysterious "runtime error"{" "}
-                    <br /> ooo, spooky
+                    Seems like you've ran into the mysterious "runtime error" <br /> ooo, spooky
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <h1 className="text-md text-muted-foreground">
-                    Here's some debug information you can forward to your local
-                    Wizard:
+                    Here's some debug information you can forward to your local Wizard:
                   </h1>
-                  <pre className="text-muted-foreground text-left font-mono text-sm">
+                  <pre className="text-left font-mono text-sm text-muted-foreground">
                     {JSON.stringify(error, null, 4)}
                   </pre>
                 </CardContent>

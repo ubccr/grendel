@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "ignorePatterns": ["*.gen.*", "**/components/ui/*", "**/components/animate-ui/*"],
+  "experimentalTailwindcss": {
+    "stylesheet": "./src/main.css",
+    "attributes": ["class", "className"],
+    "functions": ["clsx", "cn"],
+    "preserveWhitespace": true
+  }
+}

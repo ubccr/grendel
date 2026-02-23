@@ -741,6 +741,42 @@ func TestRedfishJobJobsItem_EncodeDecode(t *testing.T) {
 	var typ2 RedfishJobJobsItem
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestRedfishJobJobsItemMessageDotExtendedInfoItem_EncodeDecode(t *testing.T) {
+	var typ RedfishJobJobsItemMessageDotExtendedInfoItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 RedfishJobJobsItemMessageDotExtendedInfoItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem_EncodeDecode(t *testing.T) {
+	var typ RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem_EncodeDecode(t *testing.T) {
+	var typ RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestRedfishJobJobsItemMessagesItem_EncodeDecode(t *testing.T) {
 	var typ RedfishJobJobsItemMessagesItem
 	typ.SetFake()
@@ -751,6 +787,44 @@ func TestRedfishJobJobsItemMessagesItem_EncodeDecode(t *testing.T) {
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
 	var typ2 RedfishJobJobsItemMessagesItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestRedfishJobJobsItemMessagesItemResolutionStepsItem_EncodeDecode(t *testing.T) {
+	var typ RedfishJobJobsItemMessagesItemResolutionStepsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 RedfishJobJobsItemMessagesItemResolutionStepsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem_EncodeDecode(t *testing.T) {
+	var typ RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestRedfishJobJobsItemParameters_EncodeDecode(t *testing.T) {
+	var typ RedfishJobJobsItemParameters
+	typ = make(RedfishJobJobsItemParameters)
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 RedfishJobJobsItemParameters
+	typ2 = make(RedfishJobJobsItemParameters)
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestRedfishJobJobsItemPayload_EncodeDecode(t *testing.T) {
@@ -801,6 +875,42 @@ func TestRedfishMetricReportReportsItem_EncodeDecode(t *testing.T) {
 	var typ2 RedfishMetricReportReportsItem
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestRedfishMetricReportReportsItemMessageDotExtendedInfoItem_EncodeDecode(t *testing.T) {
+	var typ RedfishMetricReportReportsItemMessageDotExtendedInfoItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 RedfishMetricReportReportsItemMessageDotExtendedInfoItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem_EncodeDecode(t *testing.T) {
+	var typ RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem_EncodeDecode(t *testing.T) {
+	var typ RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestRedfishMetricReportReportsItemMetricValuesItem_EncodeDecode(t *testing.T) {
 	var typ RedfishMetricReportReportsItemMetricValuesItem
 	typ.SetFake()
@@ -835,6 +945,42 @@ func TestRedfishSystemOemDell_EncodeDecode(t *testing.T) {
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
 	var typ2 RedfishSystemOemDell
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestRedfishSystemOemDellMessageDotExtendedInfoItem_EncodeDecode(t *testing.T) {
+	var typ RedfishSystemOemDellMessageDotExtendedInfoItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 RedfishSystemOemDellMessageDotExtendedInfoItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem_EncodeDecode(t *testing.T) {
+	var typ RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem_EncodeDecode(t *testing.T) {
+	var typ RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestUser_EncodeDecode(t *testing.T) {

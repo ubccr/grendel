@@ -1,55 +1,56 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./main.css";
+import { client } from "./client/client.gen.ts";
 import { ThemeProvider } from "./hooks/theme-provider.tsx";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { client } from "./openapi/requests/services.gen.ts";
-import { broadcastQueryClient } from "@tanstack/query-broadcast-client-experimental";
+import "./main.css";
 
-// Import the generated route tree
-import { routeTree } from "./routeTree.gen";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { DefaultNotFound } from "./components/default-not-found.tsx";
+import { DefaultErrorComponent } from "./components/error.tsx";
+import { Loading } from "./components/loading.tsx";
 import { UserProvider, useUser } from "./hooks/user-provider.tsx";
+import { routeTree } from "./routeTree.gen";
 
-// Create a new router instance
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+
+const queryClient = new QueryClient();
+queryClient.setDefaultOptions({
+  queries: {
+    retry: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  },
+});
+
 const router = createRouter({
   routeTree,
   basepath: "/ui",
-  context: { auth: null },
+  context: {
+    auth: null,
+    // queryClient: queryClient
+  },
   scrollRestoration: true,
-  // defaultPreload: "intent",
-  // defaultPreloadStaleTime: 0,
+  defaultPreload: "intent",
+  defaultPendingMs: 800,
+  defaultViewTransition: true,
+  defaultErrorComponent: (props) => <DefaultErrorComponent {...props} />,
+  defaultNotFoundComponent: (props) => <DefaultNotFound {...props} />,
+  defaultPendingComponent: () => <Loading />,
+  defaultStaleTime: 10_000,
 });
 
-// Register the router instance for type safety
 declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
   }
 }
 
-const queryClient = new QueryClient();
-
 client.setConfig({
   baseUrl: `${window.location.origin}`,
-  throwOnError: true, // If you want to handle errors on `onError` callback of `useQuery` and `useMutation`, set this to `true`
-});
-
-// client.interceptors.request.use((config) => {
-//   // Add your request interceptor logic here
-//   return config;
-// });
-
-// client.interceptors.response.use((response) => {
-//   // Add your response interceptor logic here
-//   return response;
-// });
-
-queryClient.setDefaultOptions({ queries: { retry: false } });
-
-// TODO: look into server side websocket syncing
-broadcastQueryClient({
-  queryClient,
+  throwOnError: true,
 });
 
 createRoot(document.getElementById("root")!).render(
@@ -60,8 +61,9 @@ createRoot(document.getElementById("root")!).render(
           <InnerApp />
         </ThemeProvider>
       </UserProvider>
-      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
+    <TanStackRouterDevtools router={router} initialIsOpen={false} />
   </StrictMode>,
 );
 
