@@ -31,7 +31,7 @@ export default function UsersRoleAction({ users }: { users: string }) {
           <LoaderCircle className="animate-spin" />
         ) : (
           <Select onValueChange={(e) => setUserRole(e)}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-45">
               <SelectValue placeholder="Action" />
             </SelectTrigger>
             <SelectContent>

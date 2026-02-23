@@ -23,7 +23,7 @@ export default function UsersEnabledAction({ users }: { users: string }) {
       </CardHeader>
       <CardContent className="grid grid-cols-1 gap-2">
         <Select onValueChange={(e) => setUserEnabled(e)}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-45">
             <SelectValue placeholder="Enabled" />
           </SelectTrigger>
           <SelectContent>

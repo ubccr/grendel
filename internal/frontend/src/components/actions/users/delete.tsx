@@ -25,8 +25,8 @@ export default function UsersDeleteAction({ users }: { users: string }) {
       <CardFooter>
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="destructive">
-              {isPending ? <LoaderCircle className="animate-spin" /> : <span>Delete</span>}
+            <Button>
+              {isPending ? <LoaderCircle className="animate-spin" /> : <span>Submit</span>}
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -57,7 +57,7 @@ export default function UsersDeleteAction({ users }: { users: string }) {
                     )
                   }
                 >
-                  Confirm
+                  Delete
                 </Button>
               </DialogClose>
               <DialogClose asChild>

@@ -25,15 +25,15 @@ export default function ImagesDeleteAction({ images }: { images: string }) {
       <CardFooter>
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="destructive">
-              {isPending ? <LoaderCircle className="animate-spin" /> : <span>Delete</span>}
+            <Button>
+              {isPending ? <LoaderCircle className="animate-spin" /> : <span>Submit</span>}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Are you sure?</DialogTitle>
               <DialogDescription>
-                WARNING: Selected images: ({images}) will be permanently removed from Grendel!
+                WARNING: Selected images will be permanently removed from Grendel!
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
@@ -57,7 +57,7 @@ export default function ImagesDeleteAction({ images }: { images: string }) {
                     )
                   }
                 >
-                  Confirm
+                  Delete
                 </Button>
               </DialogClose>
               <DialogClose asChild>

@@ -7,11 +7,18 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import AuthRedirect from "@/lib/auth";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ChevronsUpDown, Copy, Info, Zap, ZapOff } from "lucide-react";
+import { ChevronsUpDown, Copy, Info, SquareMenu, Zap, ZapOff } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
@@ -128,7 +135,7 @@ function RouteComponent() {
           </CardContent>
         </Card>
       </div>
-      {data &&
+      {data && data?.size > 0 ? (
         Array.from(data.entries())
           .sort()
           .filter(([key]) => key.includes(searchName))
@@ -230,7 +237,24 @@ function RouteComponent() {
                 </div>
               </CardContent>
             </Card>
-          ))}
+          ))
+      ) : (
+        <Card>
+          <CardContent>
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <SquareMenu />
+                </EmptyMedia>
+                <EmptyTitle>No Racks Found</EmptyTitle>
+                <EmptyDescription>
+                  Try tagging nodes in the same rack with "rack=a01"
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
