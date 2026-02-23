@@ -5,7 +5,3 @@
   Computing. In Practice and Experience in Advanced Research Computing (PEARC
   ’20). Association for Computing Machinery, New York, NY, USA, 13–18.
   DOI: https://doi.org/10.1145/3311790.3396637
-
-* PEARC ’20 Paper Presentation:
-  [video](https://www.acsu.buffalo.edu/~aebruno2/talks/grendel-pearc20.mp4) |
-  [slides](https://www.acsu.buffalo.edu/~aebruno2/talks/grendel)

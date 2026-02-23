@@ -173,11 +173,6 @@ Use "grendel [command] --help" for more information about a command.
   ’20). Association for Computing Machinery, New York, NY, USA, 13–18.
   DOI: https://doi.org/10.1145/3311790.3396637
 
-- PEARC ’20 Paper Presentation:
-  [video](https://www.acsu.buffalo.edu/~aebruno2/talks/grendel-pearc20.mp4) |
-  [slides](https://www.acsu.buffalo.edu/~aebruno2/talks/grendel)
-
-
 ## Acknowledgments
 
 PXE booting is based on [Pixiecore](https://github.com/danderson/netboot/tree/master/pixiecore) by Dave
