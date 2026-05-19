@@ -35,9 +35,13 @@ func (h *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 
 	qname := h.Name(r)
 	answers := []dns.RR{}
+	queryType := h.QType(r)
 
-	log.Debugf("Got query %s", qname)
-	switch h.QType(r) {
+	log.WithFields(logrus.Fields{
+		"query": qname,
+		"type":  dns.TypeToString[queryType],
+	}).Debug("Got DNS query")
+	switch queryType {
 	case dns.TypePTR:
 		names, err := h.db.ReverseResolve(util.ExtractAddressFromReverse(qname))
 		if err != nil {
@@ -74,8 +78,23 @@ func (h *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		} else {
 			m = fwm
 		}
+
+	} else if queryType == dns.TypeAAAA || queryType == dns.TypeMX {
+		// Handle returning AAAA if IPv4 record exists
+		ips, err := h.db.ResolveIPv4(qname)
+		if err != nil {
+			log.WithFields(logrus.Fields{
+				"qname": qname,
+				"err":   err,
+			}).Error("Failed to resolve FQDN during AAAA or MX query")
+		}
+
+		if len(ips) > 0 {
+			m.SetRcode(r, dns.RcodeSuccess)
+		} else {
+			m.SetRcode(r, dns.RcodeNameError)
+		}
 	} else {
-		// XXX consider sending back NXDOMAIN here
 		m.SetRcode(r, dns.RcodeNameError)
 	}
 
