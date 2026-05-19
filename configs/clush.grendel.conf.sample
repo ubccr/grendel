@@ -1,0 +1,5 @@
+[grendel]
+map: grendel node show all --tags $GROUP | jq '.[] | select(.name | contains("cpn")) | .name' -r
+all: grendel node show all | jq '.[] | select(.name | contains("cpn")) | .name' -r | grep cpn
+list: grendel node show all | jq '.[] | select(.name | contains("cpn")) | .tags.[] | select(. | contains(":") | not)' -r
+reverse: grendel node show $NODE | jq '.[].tags.[] | select(. | contains(":") | not)' -r
