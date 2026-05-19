@@ -1,0 +1,39 @@
+{
+  "features": {
+    "ghcr.io/devcontainers/features/go:1": {
+      "version": "1.26.2",
+    },
+    "ghcr.io/devcontainers/features/node:2": {
+      "version": "v24.15.0",
+      "pnpmVersion": "none",
+    },
+    "ghcr.io/devcontainers/features/python:1": {},
+    "ghcr.io/devcontainer-community/devcontainer-features/astral.sh-uv:1": {
+      "version": "0.11.15",
+      "shellautocompletion": true,
+    },
+  },
+  "name": "Grendel",
+  "image": "mcr.microsoft.com/devcontainers/go:2-1.26-trixie",
+  "appPort": ["3000:3000", "8080:8080", "8443:8443"],
+  "portsAttributes": {
+    "3000": {
+      "label": "Frontend dev server",
+    },
+    "8080": {
+      "label": "Provision server",
+    },
+    "8443": {
+      "label": "API server",
+    },
+  },
+  "postCreateCommand": [
+    "corepack enable",
+    "corepack install -g yarn@1.22.22",
+    "sudo apt update",
+    "sudo apt install vim liblzma-dev xz-utils gcc-aarch64-linux-gnu",
+    "go mod download",
+    "go install github.com/air-verse/air@1.65.2",
+    "cd internal/frontend && yarn install",
+  ],
+}

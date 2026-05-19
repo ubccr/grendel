@@ -47,7 +47,7 @@ func (s *Server) imageFileHandler(filePath string, rf io.ReaderFrom) error {
 	case strings.HasPrefix(fileType, "initrd-"):
 		i, err := strconv.Atoi(fileType[7:])
 		if err != nil || i < 0 || i >= len(bootImage.InitrdPaths) {
-			return fmt.Errorf("no initrd with ID %q", i)
+			return fmt.Errorf("no initrd with ID %d", i)
 		}
 		initrd := bootImage.InitrdPaths[i]
 		return s.sendFile(initrd, rf)
