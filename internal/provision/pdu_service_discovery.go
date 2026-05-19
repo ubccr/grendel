@@ -14,6 +14,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Deprecated: merged with stanadard service-discovery endpoint
 func (h *Handler) PDUServiceDiscovery(c echo.Context) error {
 	tag := c.Param("tag")
 	if tag == "" {
@@ -52,17 +53,20 @@ func (h *Handler) PDUServiceDiscovery(c echo.Context) error {
 		maps.Copy(labels, allLabels)
 
 		for _, tag := range h.Tags {
-			if strings.Contains(tag, "panel") {
-				labels["panel"] = strings.Replace(tag, "panel:", "", 1)
-			} else if strings.Contains(tag, "rack_type") {
-				labels["rack_type"] = strings.Replace(tag, "rack_type:", "", 1)
-			} else if strings.Contains(tag, "generation") {
-				labels["generation"] = strings.Replace(tag, "generation:", "", 1)
+			nsKey, value, _ := strings.Cut(tag, "=")
+			namespace, key, _ := strings.Cut(nsKey, ":")
+
+			if namespace != "metrics" || key == "" {
+				continue
 			}
-		}
-		nameSlice := strings.Split(h.Name, "-")
-		if len(nameSlice) > 1 {
-			labels["rack"] = nameSlice[1]
+
+			if value == "$rack" {
+				if nameParts := strings.Split(h.Name, "-"); len(nameParts) > 1 {
+					value = nameParts[1]
+				}
+			}
+
+			labels[key] = value
 		}
 
 		nodeExporter := &promServiceDiscovery{
