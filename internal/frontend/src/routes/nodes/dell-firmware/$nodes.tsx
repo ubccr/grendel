@@ -148,7 +148,7 @@ function RouteComponent() {
       .join(",");
     const length = table.getSelectedRowModel().rows.length;
     return (
-      <ActionsSheet checked={checked} length={length}>
+      <ActionsSheet type="node" checked={checked} length={length}>
         <FirmwareUpgradeAction nodes={checked} />
       </ActionsSheet>
     );

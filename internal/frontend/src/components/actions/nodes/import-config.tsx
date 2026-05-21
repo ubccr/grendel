@@ -1,4 +1,5 @@
 import { postV1BmcConfigureImportMutation } from "@/client/@tanstack/react-query.gen";
+import NodesetView from "@/components/nodeset-view";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -65,12 +66,12 @@ export default function NodesImportConfigAction({ nodes }: { nodes: string }) {
               {isPending ? <LoaderCircle className="animate-spin" /> : <span>Submit</span>}
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-h-dvh overflow-scroll">
             <DialogHeader>
               <DialogTitle>Are you sure?</DialogTitle>
               <DialogDescription>
                 Shutdown Type: {shutdownType}, Filename: {file} <br />
-                Nodes: {nodes}
+                <NodesetView nodes={nodes} />
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>

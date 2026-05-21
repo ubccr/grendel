@@ -11,14 +11,16 @@ import { Hammer } from "lucide-react";
 import React from "react";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
+import NodesetView from "./nodeset-view";
 
 type props = {
   checked: string;
   length: number;
   children: React.ReactNode;
+  type?: "other" | "node";
 };
 
-export default function ActionsSheet({ checked, length, children }: props) {
+export default function ActionsSheet({ checked, length, children, type = "other" }: props) {
   const router = useRouter();
   return (
     <Sheet onOpenChange={(open) => !open && router.invalidate()}>
@@ -38,19 +40,25 @@ export default function ActionsSheet({ checked, length, children }: props) {
       <SheetContent className="max-h-dvh w-full overflow-x-scroll sm:max-w-2xl">
         <SheetHeader>
           <SheetTitle>Actions:</SheetTitle>
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={() => {
-              navigator.clipboard.writeText(checked);
-              toast.success("Successfully copied item(s)");
-            }}
-          >
-            Copy {length} Selected item(s):
-          </Button>{" "}
-          <SheetDescription className="max-h-36 overflow-y-scroll rounded-md p-2">
-            {checked}
-          </SheetDescription>
+          {type === "other" ? (
+            <>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => {
+                  navigator.clipboard.writeText(checked);
+                  toast.success("Successfully copied item(s)");
+                }}
+              >
+                Copy {length} Selected item(s):
+              </Button>
+              <SheetDescription className="max-h-36 overflow-y-scroll rounded-md p-2">
+                {checked}
+              </SheetDescription>
+            </>
+          ) : (
+            <NodesetView nodes={checked} size="sm" />
+          )}
         </SheetHeader>
         {children}
       </SheetContent>

@@ -1,4 +1,5 @@
 import { postV1BmcPowerOsMutation } from "@/client/@tanstack/react-query.gen";
+import NodesetView from "@/components/nodeset-view";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -12,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -19,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { parseNodeSet } from "@/lib/nodeset";
 import { useMutation } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
@@ -74,12 +77,12 @@ export default function NodesOsPowerAction({ nodes }: { nodes: string }) {
               {isPending ? <LoaderCircle className="animate-spin" /> : <span>Submit</span>}
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-h-dvh overflow-scroll">
             <DialogHeader>
               <DialogTitle>Are you sure?</DialogTitle>
               <DialogDescription>
                 Power Option: {powerOption}, Boot Option: {bootOption} <br />
-                Nodes: {nodes}
+                <NodesetView nodes={nodes} />
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>

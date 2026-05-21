@@ -83,7 +83,7 @@ function RouteComponent() {
 
           <div>
             <div className="flex justify-end gap-2">
-              <ActionsSheet checked={nodeName} length={1}>
+              <ActionsSheet type="node" checked={nodeName} length={1}>
                 <NodeActions nodes={nodeName} />
               </ActionsSheet>
               <Button variant="secondary" type="button" onClick={() => router.invalidate()}>

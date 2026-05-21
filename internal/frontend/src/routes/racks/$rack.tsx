@@ -96,7 +96,7 @@ function RackTable() {
                 </div>
                 <span>Node</span>
                 <div>
-                  <ActionsSheet checked={checked.join(",")} length={checked.length}>
+                  <ActionsSheet type="node" checked={checked.join(",")} length={checked.length}>
                     <NodeActions nodes={checked.join(",")} />
                   </ActionsSheet>
                 </div>
