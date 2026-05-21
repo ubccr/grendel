@@ -27,7 +27,7 @@ const initialState: UserProviderState = {
 const UserProviderContext = createContext<UserProviderState>(initialState);
 
 export function UserProvider({ children, ...props }: UserProviderProps) {
-  const [id, setId] = useState<NodeJS.Timeout | undefined>(undefined);
+  const [id, setId] = useState<ReturnType<typeof setInterval> | undefined>(undefined);
   const [user, setUser] = useState<User>(() => {
     const user = localStorage.getItem(userStorageKey);
     if (user == null) return null;

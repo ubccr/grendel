@@ -42,12 +42,10 @@ func NewRedfishClient(ip, user, pass string, insecure bool) (*Redfish, error) {
 	endpoint := "https://" + ip
 
 	config := gofish.ClientConfig{
-		Endpoint:            endpoint,
-		Username:            user,
-		Password:            pass,
-		Insecure:            insecure,
-		TLSHandshakeTimeout: 5,
-		NoModifyTransport:   true,
+		Endpoint: endpoint,
+		Username: user,
+		Password: pass,
+		Insecure: insecure,
 		HTTPClient: &http.Client{
 			Timeout: viper.GetDuration("bmc.gofish.client_timeout"),
 			Transport: &http.Transport{
