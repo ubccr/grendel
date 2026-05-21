@@ -1,5 +1,4 @@
-//go:build assets
-// +build assets
+//go:build pxe
 
 package firmware
 

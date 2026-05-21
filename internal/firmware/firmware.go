@@ -22,15 +22,6 @@ const (
 	GRENDEL
 )
 
-var (
-	ipxeBin      []byte
-	efi386Bin    []byte
-	efi64Bin     []byte
-	snpBinX86_64 []byte
-	snpBinArm64  []byte
-	undiBin      []byte
-)
-
 // buildToStringMap maps a Build to a binary build name
 var BuildToStringMap = map[Build]string{
 	IPXE:          "ipxe.pxe",
