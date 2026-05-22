@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import AuthRedirect from "@/lib/auth";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ColumnDef } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
 
@@ -90,6 +90,18 @@ function RouteComponent() {
           />
         </div>
       ),
+      cell: ({ row }) => {
+        const name = row.original?.Name;
+        return (
+          <Link
+            to={"/nodes/$node/node"}
+            params={{ node: name ?? "unknown" }}
+            className="hover:underline"
+          >
+            {name}
+          </Link>
+        );
+      },
     },
     {
       accessorKey: "Id",

@@ -1,6 +1,7 @@
 import { getV1BmcUpgradeDellRepo, RedfishDellUpgradeFirmware } from "@/client";
 import ActionsSheet from "@/components/actions-sheet";
 import FirmwareUpgradeAction from "@/components/actions/firmware/upgrade";
+import NodesJobsAction from "@/components/actions/nodes/jobs";
 import { DataTable, DataTableActions } from "@/components/data-table/data-table";
 import { DataTableColumnHeader } from "@/components/data-table/header";
 import SelectableCheckbox from "@/components/data-table/selectableCheckbox";
@@ -17,7 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import AuthRedirect from "@/lib/auth";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { ChevronDown, ChevronLeft, CircleAlert, OctagonAlert, TriangleAlert } from "lucide-react";
 import { useState } from "react";
@@ -57,6 +58,18 @@ function RouteComponent() {
     {
       accessorKey: "Name",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Node" />,
+      cell: ({ row }) => {
+        const name = row.original?.Name;
+        return (
+          <Link
+            to={"/nodes/$node/node"}
+            params={{ node: name ?? "unknown" }}
+            className="hover:underline"
+          >
+            {name}
+          </Link>
+        );
+      },
     },
     {
       accessorKey: "Status",
@@ -149,7 +162,10 @@ function RouteComponent() {
     const length = table.getSelectedRowModel().rows.length;
     return (
       <ActionsSheet type="node" checked={checked} length={length}>
-        <FirmwareUpgradeAction nodes={checked} />
+        <div className="mt-4 grid gap-4 sm:grid-cols-1">
+          <FirmwareUpgradeAction nodes={checked} />
+          <NodesJobsAction nodes={checked} />
+        </div>
       </ActionsSheet>
     );
   };
