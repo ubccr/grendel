@@ -17,9 +17,10 @@ import (
 
 var (
 	showCmd = &cobra.Command{
-		Use:   "show {nodeset | all]",
-		Short: "Show nodes",
-		Args:  cobra.ExactArgs(1),
+		Use:               "show {nodeset | all]",
+		Short:             "Show nodes",
+		Args:              cobra.ExactArgs(1),
+		ValidArgsFunction: nodesetCompletion,
 		RunE: func(command *cobra.Command, args []string) error {
 			gc, err := cmd.NewOgenClient()
 			if err != nil {
