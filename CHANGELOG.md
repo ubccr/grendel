@@ -1,5 +1,22 @@
 # Grendel Changelog
 
+## [0.2.7] - 2026-05-25
+
+- api: fixed image deletion not working
+- added node names as links in firmware update & job pages
+- added open job page to firmware update action list
+- fixed root component scroll
+- added `node list` and `image list` commands
+- migrated frontend to pnpm
+- fixed multiple UI scrollbars
+- added nodeset parsing to UI
+- fixed dialog overflows
+- fixed write timeout only increased for http api listener
+- fixed CLI auth token help text
+- fixed DNS returning NXDOMAIN for AAAA queries when an A record exists
+- added prometheus service discovery tag passthrough
+- update deps
+
 ## [0.2.6] - 2026-02-23
 
 - frontend: deprecated floorplan page
@@ -311,4 +328,5 @@
 [0.2.4]: https://github.com/ubccr/grendel/releases/tag/v0.2.4
 [0.2.5]: https://github.com/ubccr/grendel/releases/tag/v0.2.5
 [0.2.6]: https://github.com/ubccr/grendel/releases/tag/v0.2.6
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.6...HEAD
+[0.2.7]: https://github.com/ubccr/grendel/releases/tag/v0.2.7
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.7...HEAD
