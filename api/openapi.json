@@ -5569,7 +5569,7 @@
 	"servers": [
 		{
 			"description": "local server",
-			"url": "http://0.0.0.0:8080"
+			"url": "https://127.0.0.1:8080"
 		}
 	],
 	"tags": [

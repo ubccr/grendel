@@ -11,7 +11,7 @@ export default function Root() {
     <>
       <SidebarProvider className="h-dvh max-h-dvh">
         <AppSidebar />
-        <SidebarInset className="overflow-scroll pr-2">
+        <SidebarInset className="overflow-y-scroll pr-2">
           <Header />
           <Outlet />
           <Toaster richColors theme={theme.theme} />

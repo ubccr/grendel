@@ -18,6 +18,7 @@ builds:
       - sqlite_omit_load_extension
       - osusergo
       - netgo
+      - pxe
 archives:
   - formats:
       - tar.gz

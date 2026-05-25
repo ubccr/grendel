@@ -4,14 +4,21 @@
 
 package bmc
 
-import "github.com/spf13/viper"
+import (
+	"time"
 
-const (
-	delay  = 1
-	fanout = 5
+	"github.com/spf13/viper"
 )
 
 func init() {
-	viper.SetDefault("bmc.delay", delay)
-	viper.SetDefault("bmc.fanout", fanout)
+	viper.SetDefault("bmc.delay", 1)
+	viper.SetDefault("bmc.fanout", 5)
+
+	viper.SetDefault("bmc.gofish.max_concurrent_requests", 1)
+	viper.SetDefault("bmc.gofish.reuse_connections", false)
+	viper.SetDefault("bmc.gofish.client_timeout", time.Second*60)
+	viper.SetDefault("bmc.gofish.dial_timeout", time.Second*5)
+	viper.SetDefault("bmc.gofish.dial_keep_alive_timeout", time.Second*30)
+	viper.SetDefault("bmc.gofish.tls_handshake_timeout", time.Second*10)
+	viper.SetDefault("bmc.gofish.idle_conn_timeout", time.Second*90)
 }

@@ -1,18 +1,18 @@
 site_name: Grendel
-docs_dir: 'pages'
-site_description: 'Bare metal provision system for high performance Linux clusters'
-site_url: 'https://github.com/ubccr/grendel'
-copyright: 'Copyright &copy; 2019 Center for Computational Research, University at Buffalo'
-repo_name: 'ubccr/grendel'
-repo_url: 'https://github.com/ubccr/grendel'
-edit_uri: ''
+docs_dir: "pages"
+site_description: "Bare metal provision system for high performance Linux clusters"
+site_url: "https://github.com/ubccr/grendel"
+copyright: "Copyright &copy; 2019 Center for Computational Research, University at Buffalo"
+repo_name: "ubccr/grendel"
+repo_url: "https://github.com/ubccr/grendel"
+edit_uri: ""
 
 theme:
-  name: 'material'
+  name: "material"
   palette:
-    primary: 'black'
-  logo: 'images/logo.png'
-  favicon: 'images/favicon.png'
+    primary: "black"
+  logo: "images/logo.png"
+  favicon: "images/favicon.png"
 
 markdown_extensions:
   - footnotes
@@ -34,17 +34,19 @@ markdown_extensions:
 
 plugins:
   - render_swagger:
-      allow_arbitrary_locations : true
+      allow_arbitrary_locations: true
 
 nav:
-    - What is Grendel?: index.md
-    - Installation: install.md
-    - Quick Start: quickstart.md
-    - Background: background.md
-    - Production Deployments: production.md
-    - API: api.md
-    - Publications: publications.md
-    - Advanced:
-        - Dynamic DHCP Router: advanced/router.md
-        - HTTPS and Code Signing: advanced/https.md
-        - Kickstarting Live Images: advanced/kslive.md
+  - What is Grendel?: index.md
+  - Installation: install.md
+  - Quick Start: quickstart.md
+  - Background: background.md
+  - Production Deployments: production.md
+  - API: api.md
+  - Publications: publications.md
+  - Advanced:
+      - Dynamic DHCP Router: advanced/router.md
+      - HTTPS and Code Signing: advanced/https.md
+      - Kickstarting Live Images: advanced/kslive.md
+  - Integrations:
+      - ClusterShell: integrations/clush.md

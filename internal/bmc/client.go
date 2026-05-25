@@ -5,6 +5,10 @@
 package bmc
 
 import (
+	"net"
+	"net/http"
+
+	"github.com/spf13/viper"
 	"github.com/stmcginnis/gofish"
 	"github.com/stmcginnis/gofish/schemas"
 )
@@ -42,6 +46,19 @@ func NewRedfishClient(ip, user, pass string, insecure bool) (*Redfish, error) {
 		Username: user,
 		Password: pass,
 		Insecure: insecure,
+		HTTPClient: &http.Client{
+			Timeout: viper.GetDuration("bmc.gofish.client_timeout"),
+			Transport: &http.Transport{
+				DialContext: (&net.Dialer{
+					Timeout:   viper.GetDuration("bmc.gofish.dial_timeout"),
+					KeepAlive: viper.GetDuration("bmc.gofish.dial_keep_alive_timeout"),
+				}).DialContext,
+				TLSHandshakeTimeout: viper.GetDuration("bmc.gofish.tls_handshake_timeout"),
+				IdleConnTimeout:     viper.GetDuration("bmc.gofish.idle_conn_timeout"),
+			},
+		},
+		MaxConcurrentRequests: viper.GetInt64("bmc.max_concurrent_request"),
+		ReuseConnections:      viper.GetBool("bmc.reuse_connections"),
 	}
 
 	client, err := gofish.Connect(config)

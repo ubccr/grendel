@@ -42,7 +42,7 @@ const MotionGrid = ({
   ...props
 }: MotionGridProps) => {
   const [index, setIndex] = React.useState(0);
-  const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
 
   React.useEffect(() => {
     if (!animate || frames.length === 0) return;

@@ -18,6 +18,17 @@ var (
 		Use:   "tag {nodeset | all} <tags>...",
 		Short: "Tag nodes",
 		Args:  cobra.MinimumNArgs(2),
+		ValidArgsFunction: func(command *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			switch len(args) {
+			case 0:
+				return nodesetCompletion(command, args, toComplete)
+			case 1:
+				return tagCompletion(command, args, toComplete)
+			default:
+				return nil, cobra.ShellCompDirectiveNoFileComp
+
+			}
+		},
 		RunE: func(command *cobra.Command, args []string) error {
 			gc, err := cmd.NewOgenClient()
 			if err != nil {

@@ -226,7 +226,7 @@ func (h *Handler) File(c echo.Context) error {
 		initrdBaseName := strings.TrimSuffix(fileType, ".sig")
 		i, err := strconv.Atoi(initrdBaseName[7:])
 		if err != nil || i < 0 || i >= len(bootImage.InitrdPaths) {
-			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("no initrd with ID %q", i))
+			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("no initrd with ID %d", i))
 		}
 		initrd := bootImage.InitrdPaths[i]
 		if strings.HasSuffix(fileType, ".sig") {

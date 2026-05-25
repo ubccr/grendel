@@ -36,7 +36,7 @@ func newJobRunner(j *Job) *jobRunner {
 }
 
 func (r *jobRunner) Wait() {
-	r.limit.Wait()
+	r.limit.WaitAndClose()
 }
 
 func (r *jobRunner) RunPowerControl(host *model.Host, ch chan model.JobMessage, bootOverride schemas.BootSource, powerOption schemas.ResetType) {

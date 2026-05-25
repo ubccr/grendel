@@ -136,14 +136,15 @@ func (s *Server) Serve() error {
 	}
 
 	h.SetupRoutes(s.server)
+
+	// Fix >30s handlers from returning an empty body
+	s.server.Server.WriteTimeout = time.Minute * 5
+
 	if s.CertFile != "" && s.KeyFile != "" {
 		s.Scheme = "https"
 		log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
 		return s.server.RunTLS(s.CertFile, s.KeyFile)
 	}
-
-	// Fix >30s handlers from returning an empty body
-	s.server.Server.WriteTimeout = time.Minute * 5
 
 	if s.SocketPath == "" {
 		log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)

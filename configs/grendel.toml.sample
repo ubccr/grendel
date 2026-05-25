@@ -39,10 +39,10 @@ listen = "0.0.0.0:80"
 
 # Set static hostname for grendel (should match SSL certificate and resolve in DNS)
 #hostname = "my.host.name"
- 
+
 # Path to ssl cert (.crt file)
 #cert = "/path/to/cert/file/hostname.crt"
- 
+
 # Path to ssl key (.key file)
 #key = "/path/to/cert/file/hostname.key"
 
@@ -110,7 +110,7 @@ router_octet4 = 0
 # "10.17.41.254/23" will check if host IP falls in the network prefix
 # 10.17.40.0/23 and if so set the dhcp gateway/router to 10.17.41.254.
 #
-#subnets = [ 
+#subnets = [
 #    {gateway = "10.17.41.254/23",  dns = "10.17.40.248", mtu="1500"}
 # ]
 
@@ -200,11 +200,22 @@ fanout = 20
 delay = 1
 
 # IP sent to the BMC for import system config, should be an IP of the provision
-# server which is reachable by the BMCs  
+# server which is reachable by the BMCs
 #config_share_ip = "0.0.0.0"
 # Import System Config setting: Set to "Enabled" if using a self signed
 # certificate on the provision server
 #config_ignore_certificate_warning = "Disabled"
+
+[bmc.gofish]
+# Advanced gofish connection options. See https://github.com/ubccr/grendel/blob/main/internal/bmc/client.go#L40 for implementation details
+max_concurrent_requests = 1
+reuse_connections = false
+
+client_timeout = "60s"
+dial_timeout = "5s"
+dial_keep_alive_timeout = "30s"
+tls_handshake_timeout = "10s"
+idle_conn_timeout = "90s"
 
 #------------------------------------------------------------------------------
 # Automatic Host Discovery Config

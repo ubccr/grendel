@@ -1,0 +1,12 @@
+allowBuilds:
+  esbuild: true
+
+minimumReleaseAge: 10080
+minimumReleaseAgeStrict: true
+minimumReleaseAgeIgnoreMissingTime: false
+blockExoticSubdeps: true
+strictPeerDependencies: true
+autoInstallPeers: false
+lockfileIncludeTarballUrl: true
+verifyDepsBeforeRun: error
+engineStrict: true

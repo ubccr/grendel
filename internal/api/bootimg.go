@@ -87,7 +87,7 @@ func (h *Handler) BootImageFind(c fuego.ContextNoBody) (model.BootImageList, err
 }
 
 func (h *Handler) BootImageDelete(c fuego.ContextNoBody) (*GenericResponse, error) {
-	names := strings.Split(c.QueryParam("name"), ",")
+	names := strings.Split(c.QueryParam("names"), ",")
 
 	err := h.DB.DeleteBootImages(names)
 	if err != nil {

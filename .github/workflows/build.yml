@@ -5,7 +5,7 @@ on:
     paths-ignore:
       - "docs/**"
       - "*.md"
-    branches-ignore: main
+    branches-ignore: ["main"]
 
 permissions:
   contents: write

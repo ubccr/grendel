@@ -129,40 +129,27 @@ In another terminal window run the following commands:
 $ qemu-system-x86_64 -m 2048 -boot n -device e1000,netdev=net0,mac=DE:AD:BE:EF:12:8C -netdev tap,id=net0,ifname=tap0,script=no
 ```
 
-## Hacking
+## Development
 
-Building Grendel requires Go v1.23 or greater. Building iPXE requires packages
-lzma-sdk-devel, xz-devel, and gcc-aarch64-linux-gnu:
+Building Grendel requires Go v1.26 or greater:
 
 ```
-$ git clone --recursive https://github.com/ubccr/grendel
-$ cd grendel/firmware
-$ make build
-$ make bindata
-$ cd ..
-$ go build .
-$ ./grendel help
-Bare Metal Provisioning for HPC
+git clone https://github.com/ubccr/grendel
+cd grendel
+go build .
+./grendel --help
+```
 
-Usage:
-  grendel [command]
+Production builds will require building the iPXE submodule:
 
-Available Commands:
-  bmc         Query BMC devices
-  discover    Auto-discover commands
-  help        Help about any command
-  host        Host commands
-  image       Boot Image commands
-  serve       Run services
-
-Flags:
-  -c, --config string     config file
-      --debug             Enable debug messages
-      --endpoint string   Grendel API endpoint (default "grendel-api.socket")
-  -h, --help              help for grendel
-      --verbose           Enable verbose messages
-
-Use "grendel [command] --help" for more information about a command.
+>[!NOTE]
+Our makefile is only compatible with amd64 and requires the following packages to be installed: `build-essential liblzma-dev xz-utils gcc-aarch64-linux-gnu`
+```
+git submodule update --init --recursive
+cd internal/firmware
+make build
+cd -
+go build -tags pxe .
 ```
 
 ## Publications
