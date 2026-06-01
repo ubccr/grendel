@@ -17,7 +17,7 @@ from 200 to 1500 nodes.
 * Automatic host discovery
 * Diskful and Stateless (Live image) provisioning
 * BMC/iDRAC control via RedFish and IPMI
-* Authorized provisioning using [Branca](https://branca.io/) tokens
+* Authorized provisioning using Branca tokens
 * Rest API
 * Easy installation (single binary with no deps)
 
