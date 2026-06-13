@@ -26,6 +26,7 @@ var (
 				return err
 			}
 
+			var nodes []client.NilNodeAddRequestNodeListItem
 			for _, name := range args {
 				file, err := os.Open(name)
 				if err != nil {
@@ -33,27 +34,23 @@ var (
 				}
 				defer file.Close()
 
-				var nodes []client.NilNodeAddRequestNodeListItem
-				if err := json.NewDecoder(file).Decode(&nodes); err != nil {
+				var node []client.NilNodeAddRequestNodeListItem
+				if err := json.NewDecoder(file).Decode(&node); err != nil {
 					return err
 				}
 
-				req := &client.NodeAddRequest{
-					NodeList: nodes,
-				}
-				params := client.POSTV1NodesParams{}
-				res, err := gc.POSTV1Nodes(context.Background(), req, params)
-				if err != nil {
-					return cmd.NewApiError(err)
-				}
-
-				err = cmd.NewApiResponse(res)
-				if err != nil {
-					return err
-				}
+				nodes = append(nodes, node...)
 			}
-			return nil
+			req := &client.NodeAddRequest{
+				NodeList: nodes,
+			}
+			params := client.POSTV1NodesParams{}
+			res, err := gc.POSTV1Nodes(context.Background(), req, params)
+			if err != nil {
+				return cmd.NewApiError(err)
+			}
 
+			return cmd.NewApiResponse(res)
 		},
 	}
 )

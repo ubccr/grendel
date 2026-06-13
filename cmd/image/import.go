@@ -27,6 +27,7 @@ var (
 				return err
 			}
 
+			var images []client.NilBootImageAddRequestBootImagesItem
 			for _, name := range args {
 				file, err := os.Open(name)
 				if err != nil {
@@ -36,23 +37,24 @@ var (
 
 				cmd.Log.Infof("Processing file: %s", name)
 
-				var images []client.NilBootImageAddRequestBootImagesItem
-				if err := json.NewDecoder(file).Decode(&images); err != nil {
+				var image []client.NilBootImageAddRequestBootImagesItem
+				if err := json.NewDecoder(file).Decode(&image); err != nil {
 					return err
 				}
 
-				req := &client.BootImageAddRequest{
-					BootImages: images,
-				}
-				params := client.POSTV1ImagesParams{}
-				res, err := gc.POSTV1Images(context.Background(), req, params)
-				if err != nil {
-					return cmd.NewApiError(err)
-				}
-
-				return cmd.NewApiResponse(res)
+				images = append(images, image...)
 			}
-			return nil
+
+			req := &client.BootImageAddRequest{
+				BootImages: images,
+			}
+			params := client.POSTV1ImagesParams{}
+			res, err := gc.POSTV1Images(context.Background(), req, params)
+			if err != nil {
+				return cmd.NewApiError(err)
+			}
+
+			return cmd.NewApiResponse(res)
 
 		},
 	}
