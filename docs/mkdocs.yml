@@ -45,6 +45,9 @@ nav:
   - Web UI & API: web-ui-api.md
   - API Reference: api.md
   - Publications: publications.md
+  - Boot Images:
+      - Creating an Image: bootImages/images.md
+      - Provision Templates: bootImages/templates.md
   - Advanced:
       - Dynamic DHCP Router: advanced/router.md
       - HTTPS and Code Signing: advanced/https.md
