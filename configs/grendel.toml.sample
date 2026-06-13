@@ -23,12 +23,6 @@ dbpath = ":memory:"
 #
 loggers = {cli="on", tftp="off", dhcp="on", dns="off", provision="on", api="on", pxe="off"}
 
-#
-# Admin ssh public keys. These are used in provision templates and elsewhere for
-# administrative ssh access
-#
-admin_ssh_pubkeys = []
-
 #------------------------------------------------------------------------------
 # HTTP Provision Server
 #------------------------------------------------------------------------------
@@ -52,9 +46,6 @@ token_ttl = 3600
 # Can generate secret with `openssl rand -hex 16`
 #secret = "_provisioning_secret_here_"
 
-# Hashed root password used in kickstart template
-root_password = ""
-
 # Default OS image name
 default_image = ""
 
@@ -70,6 +61,12 @@ prometheus_sd_refresh_interval = 3600
 # Enable netbox render config support
 # netbox_token=""
 # netbox_url=""
+
+# Here is where you can pass extra variables into provision templates
+# They can be accessed like so: {{ $.extra_vars.root_password }}
+[provision.extra_vars]
+# root_password = ""
+# ssh_keys = ["ssh-rsa..."]
 
 #------------------------------------------------------------------------------
 # DHCP Server

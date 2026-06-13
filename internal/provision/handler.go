@@ -160,15 +160,14 @@ func (h *Handler) verifyClaims(c echo.Context) (*model.BootImage, *model.Host, *
 		"headers": c.Request().Header,
 	}).Debug("HTTP request headers")
 
-	data := map[string]interface{}{
-		"token":           c.Param("token"),
-		"endpoints":       endpoints,
-		"bootimage":       bootImage,
-		"nic":             nic,
-		"host":            host,
-		"headers":         c.Request().Header,
-		"rootpw":          viper.GetString("provision.root_password"),
-		"adminSSHPubKeys": viper.GetStringSlice("admin_ssh_pubkeys"),
+	data := map[string]any{
+		"token":      c.Param("token"),
+		"endpoints":  endpoints,
+		"bootimage":  bootImage,
+		"nic":        nic,
+		"host":       host,
+		"headers":    c.Request().Header,
+		"extra_vars": viper.GetStringMap("provision.extra_vars"),
 	}
 
 	return bootImage, host, nic, data, nil

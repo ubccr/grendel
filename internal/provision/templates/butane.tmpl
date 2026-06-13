@@ -1,14 +1,14 @@
 variant: flatcar
 version: 1.0.0
 passwd:
-{{- with $.rootpw }}
+{{- with $.extra_vars.root_password }}
     - name: root
       password_hash: {{ . }}
 {{ end }}
-{{- with $.adminSSHPubKeys }}
+{{- with $.extra_vars.ssh_keys }}
     - name: core
       ssh_authorized_keys:
-      {{- range $i, $key := $.adminSSHPubKeys }}
+      {{- range $i, $key := . }}
         - "{{ $key }}"
       {{- end }}
 {{ end }}

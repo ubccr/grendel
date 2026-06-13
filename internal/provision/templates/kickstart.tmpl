@@ -15,7 +15,7 @@ bootloader --timeout=10
 %include /tmp/diskpart.cfg
 text
 
-{{ with $.rootpw }}
+{{ with $.extra_vars.root_password }}
 rootpw --iscrypted {{ . }}
 {{ end }}
 
