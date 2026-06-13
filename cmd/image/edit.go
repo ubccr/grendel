@@ -7,7 +7,8 @@ package image
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"errors"
+	"slices"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -28,40 +29,53 @@ var (
 				return err
 			}
 
-			params := client.GETV1ImagesFindParams{
+			p := client.GETV1ImagesFindParams{
 				Names: client.NewOptString(strings.Join(args, ",")),
 			}
-			imageList, err := gc.GETV1ImagesFind(context.Background(), params)
+			originalImages, err := gc.GETV1ImagesFind(context.Background(), p)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
 
-			data, err := json.MarshalIndent(imageList, "", "    ")
+			originalText, err := json.MarshalIndent(originalImages, "", "    ")
 			if err != nil {
 				return err
 			}
 
-			newData, err := util.CaptureInputFromEditor(data)
+			var response *client.GenericResponse
+			err = util.EditLoop(originalText, func(editedText []byte) error {
+				var editedJson []client.NilBootImageAddRequestBootImagesItem
+				err = json.Unmarshal(editedText, &editedJson)
+				if err != nil {
+					return err
+				}
+
+				// Verify IDs
+				for _, originalImage := range originalImages {
+					if !slices.ContainsFunc(editedJson, func(editedJson client.NilBootImageAddRequestBootImagesItem) bool {
+						return editedJson.Value.ID.Value == originalImage.ID.Value
+					}) {
+						return errors.New("failed to save, id field cannot be modified")
+					}
+				}
+
+				response, err = gc.POSTV1Images(context.Background(), &client.BootImageAddRequest{
+					BootImages: editedJson,
+				}, client.POSTV1ImagesParams{})
+				if err != nil {
+					return err
+				}
+
+				return nil
+			})
 			if err != nil {
 				return err
 			}
 
-			var check []client.NilBootImageAddRequestBootImagesItem
-			err = json.Unmarshal(newData, &check)
-			if err != nil {
-				return fmt.Errorf("Invalid JSON. Not saving changes: %w", err)
+			if response != nil {
+				return cmd.NewApiResponse(response)
 			}
-
-			storeReq := &client.BootImageAddRequest{
-				BootImages: check,
-			}
-			storeParams := client.POSTV1ImagesParams{}
-			storeRes, err := gc.POSTV1Images(context.Background(), storeReq, storeParams)
-			if err != nil {
-				return cmd.NewApiError(err)
-			}
-
-			return cmd.NewApiResponse(storeRes)
+			return nil
 		},
 	}
 )

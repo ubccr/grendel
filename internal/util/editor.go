@@ -5,9 +5,12 @@
 package util
 
 import (
-	"io/ioutil"
+	"bufio"
+	"bytes"
+	"fmt"
 	"os"
 	"os/exec"
+	"slices"
 	"strings"
 )
 
@@ -61,8 +64,8 @@ func OpenFileInEditor(filename string) error {
 // CaptureInputFromEditor opens a temporary file with data in a text editor and
 // returns the written bytes on success or an error on failure. It handles
 // deletion of the temporary file behind the scenes.
-func CaptureInputFromEditor(data []byte) ([]byte, error) {
-	file, err := ioutil.TempFile(os.TempDir(), "*")
+func captureInputFromEditor(data []byte) ([]byte, error) {
+	file, err := os.CreateTemp(os.TempDir(), "grendel-*.jsonc")
 	if err != nil {
 		return []byte{}, err
 	}
@@ -86,10 +89,55 @@ func CaptureInputFromEditor(data []byte) ([]byte, error) {
 		return []byte{}, err
 	}
 
-	bytes, err := ioutil.ReadFile(filename)
+	bytes, err := os.ReadFile(filename)
 	if err != nil {
 		return []byte{}, err
 	}
 
 	return bytes, nil
+}
+
+// EditLoop calls CaptureInputFromEditor until the validate function does not return an error
+// Errors will be append to the top of the file as a comment and are stripped prior to validation
+func EditLoop(data []byte, validate func(stripped []byte) error) error {
+	original := data
+	for {
+		edited, err := captureInputFromEditor(data)
+		if err != nil {
+			return err
+		}
+		editedStripped, err := stripComments(edited)
+		if err != nil {
+			return err
+		}
+
+		// exit if no changes
+		if bytes.Equal(bytes.TrimSpace(editedStripped), bytes.TrimSpace(original)) {
+			return nil
+		}
+
+		if err := validate(editedStripped); err != nil {
+			data = slices.Insert(editedStripped, 0, fmt.Appendf(nil, "// Error: %s\n", err)...)
+			continue
+		}
+		return nil
+	}
+}
+
+func stripComments(data []byte) ([]byte, error) {
+	scanner := bufio.NewScanner(bytes.NewReader(data))
+
+	uncommented := make([]byte, 0)
+	for scanner.Scan() {
+		if !strings.HasPrefix(scanner.Text(), "//") {
+			uncommented = slices.Concat(uncommented, scanner.Bytes(), []byte("\n"))
+		}
+	}
+
+	err := scanner.Err()
+	if err != nil {
+		return nil, err
+	}
+
+	return uncommented, nil
 }
