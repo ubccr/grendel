@@ -357,6 +357,10 @@ func (s *SqlStore) StoreHosts(hosts model.HostList) error {
 			nicIDs = append(nicIDs, bi.ID)
 		}
 
+		if len(nicIDs) == 0 {
+			nicIDs = append(nicIDs, 0)
+		}
+
 		// Delete any nics that were removed
 		err = s.q.NicUpsertDelete(ctx, tx, db.NicUpsertDeleteParams{
 			NodeID: node.ID,
