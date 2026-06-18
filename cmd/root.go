@@ -10,7 +10,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	golog "log"
 	"net"
 	"net/http"
@@ -141,7 +141,7 @@ func SetupLogging() error {
 	} else {
 		Log.Logger.SetLevel(logrus.WarnLevel)
 	}
-	golog.SetOutput(ioutil.Discard)
+	golog.SetOutput(io.Discard)
 
 	if cfgFileUsed != "" {
 		Log.Infof("Using config file: %s", cfgFileUsed)
