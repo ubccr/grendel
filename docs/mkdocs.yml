@@ -42,7 +42,8 @@ nav:
   - Quick Start: quickstart.md
   - Background: background.md
   - Production Deployments: production.md
-  - API: api.md
+  - Web UI & API: web-ui-api.md
+  - API Reference: api.md
   - Publications: publications.md
   - Advanced:
       - Dynamic DHCP Router: advanced/router.md
