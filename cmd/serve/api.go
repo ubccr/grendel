@@ -6,7 +6,6 @@ package serve
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -17,7 +16,7 @@ import (
 )
 
 func init() {
-	apiCmd.PersistentFlags().String("api-listen", fmt.Sprintf("127.0.0.1:%d", api.DefaultPort), "address to listen on")
+	apiCmd.PersistentFlags().String("api-listen", "", "address to listen on")
 	viper.BindPFlag("api.listen", apiCmd.PersistentFlags().Lookup("api-listen"))
 	apiCmd.PersistentFlags().String("api-socket", "", "path to unix socket")
 	viper.BindPFlag("api.socket_path", apiCmd.PersistentFlags().Lookup("api-socket"))
@@ -57,10 +56,6 @@ func serveAPI(t *tomb.Tomb) error {
 	apiServer.CertFile = viper.GetString("api.cert")
 	apiServer.CORS = viper.GetBool("api.cors")
 	apiServer.SwaggerUI = viper.GetBool("api.swagger_ui")
-
-	if viper.IsSet("api.listen") && !viper.IsSet("client.api_key") {
-		cmd.Log.Warn("client.api_key is not set, CLI authentication will not work. Either bind the API to a unix socket or signup for an account in the web ui and create a token")
-	}
 
 	t.Go(func() error {
 		time.Sleep(1 * time.Second)

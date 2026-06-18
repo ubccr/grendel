@@ -9,8 +9,11 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/http"
 	"os"
+	"os/user"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/getkin/kin-openapi/openapi3gen"
@@ -18,6 +21,7 @@ import (
 	"github.com/ubccr/grendel/internal/logger"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/util"
+	"golang.org/x/sys/unix"
 )
 
 var log = logger.GetLogger("API")
@@ -33,6 +37,7 @@ type Server struct {
 	Hostname      string
 	DB            store.Store
 	server        *fuego.Server
+	socketServer  *http.Server
 	SwaggerUI     bool
 	CORS          bool
 }
@@ -40,7 +45,7 @@ type Server struct {
 func NewServer(db store.Store, socket, address string) (*Server, error) {
 	s := &Server{Scheme: "http", DB: db, SocketPath: socket}
 
-	if socket != "" {
+	if address == "" {
 		return s, nil
 	}
 
@@ -87,29 +92,7 @@ func NewServer(db store.Store, socket, address string) (*Server, error) {
 }
 
 func (s *Server) Serve() error {
-
-	var listen func(*fuego.Server)
-
-	if s.SocketPath != "" {
-		os.Remove(s.SocketPath)
-		unixListener, err := net.Listen("unix", s.SocketPath)
-		if err != nil {
-			return err
-		}
-
-		if err := os.Chmod(s.SocketPath, 0770); err != nil {
-			return err
-		}
-		log.Printf("Listening on unix domain socket: %s", s.SocketPath)
-		listen = fuego.WithListener(unixListener)
-	} else {
-		addr := fmt.Sprintf("%s:%d", s.ListenAddress, s.Port)
-
-		listen = fuego.WithAddr(addr)
-	}
-
 	s.server = fuego.NewServer(
-		listen,
 		fuego.WithEngineOptions(
 			fuego.WithOpenAPIGeneratorOptions(
 				openapi3gen.UseAllExportedFields(),
@@ -140,16 +123,45 @@ func (s *Server) Serve() error {
 	// Fix >30s handlers from returning an empty body
 	s.server.Server.WriteTimeout = time.Minute * 5
 
-	if s.CertFile != "" && s.KeyFile != "" {
-		s.Scheme = "https"
-		log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
-		return s.server.RunTLS(s.CertFile, s.KeyFile)
+	// UNIX listener
+	if s.SocketPath != "" {
+		os.Remove(s.SocketPath)
+		unixListener, err := net.Listen("unix", s.SocketPath)
+		if err != nil {
+			return err
+		}
+
+		if err := os.Chmod(s.SocketPath, 0770); err != nil {
+			return err
+		}
+		log.Infof("Listening on %s://%s", "unix", s.SocketPath)
+		s.socketServer = &http.Server{
+			Handler:     blockWebUI(s.server.Mux),
+			ConnContext: unixPeerConnContext,
+		}
+		go func() {
+			err := s.socketServer.Serve(unixListener)
+			if err != nil {
+				log.Errorf("failed to start unix listener: %s", err)
+			}
+		}()
 	}
 
-	if s.SocketPath == "" {
-		log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
+	// TCP listener
+	if s.ListenAddress != nil {
+		s.server.Addr = fmt.Sprintf("%s:%d", s.ListenAddress, s.Port)
+
+		if s.CertFile != "" && s.KeyFile != "" {
+			s.Scheme = "https"
+			log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
+			return s.server.RunTLS(s.CertFile, s.KeyFile)
+		} else {
+			return s.server.Run()
+		}
+
 	}
-	return s.server.Run()
+
+	return nil
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {
@@ -158,4 +170,43 @@ func (s *Server) Shutdown(ctx context.Context) error {
 
 	}
 	return errors.New("failed to create api server")
+}
+
+func blockWebUI(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" || strings.HasPrefix(r.URL.Path, "/ui") {
+			http.NotFound(w, r)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+// Set username context on UNIX listener requests
+func unixPeerConnContext(ctx context.Context, c net.Conn) context.Context {
+	uc, ok := c.(*net.UnixConn)
+	if !ok {
+		return ctx
+	}
+	raw, err := uc.SyscallConn()
+	if err != nil {
+		return ctx
+	}
+
+	var cred *unix.Ucred
+	var sockErr error
+	err = raw.Control(func(fd uintptr) {
+		cred, sockErr = unix.GetsockoptUcred(int(fd), unix.SOL_SOCKET, unix.SO_PEERCRED)
+	})
+	if err != nil || sockErr != nil {
+		return ctx
+	}
+
+	name := strconv.FormatUint(uint64(cred.Uid), 10)
+	u, err := user.LookupId(name)
+	if err == nil {
+		name = u.Username
+	}
+
+	return context.WithValue(ctx, ContextKeyUsername, "unix:"+name)
 }
