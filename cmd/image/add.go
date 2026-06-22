@@ -18,7 +18,6 @@ var (
 	cmdline            string
 	initrd             []string
 	kernel             string
-	liveimg            string
 	provisionTemplates []string
 	verify             bool
 	newCmd             = &cobra.Command{
@@ -47,7 +46,6 @@ var (
 					Cmdline:            client.NewOptString(cmdline),
 					Initrd:             initrd,
 					Kernel:             client.NewOptString(kernel),
-					Liveimg:            client.NewOptString(liveimg),
 					ProvisionTemplates: client.NewOptNilBootImageAddRequestBootImagesItemProvisionTemplates(provisionTemplatesMap),
 					Verify:             client.NewOptBool(verify),
 				}),
@@ -72,7 +70,6 @@ func init() {
 	newCmd.PersistentFlags().StringVar(&cmdline, "cmdline", "", "Kernel Command Line")
 	newCmd.PersistentFlags().StringArrayVar(&initrd, "initrd", []string{}, "Path to Initrd images. Can be passed multiple times")
 	newCmd.PersistentFlags().StringVar(&kernel, "kernel", "", "Path to Kernel")
-	newCmd.PersistentFlags().StringVar(&liveimg, "liveimg", "", "Path to Live Image")
 	newCmd.PersistentFlags().StringArrayVar(&provisionTemplates, "provision-template", []string{}, "Provision template map. Example: kickstart=/var/lib/grendel/templates/ubuntu-kickstart.tmpl  Can be passed multiple times")
 	newCmd.PersistentFlags().BoolVar(&verify, "verify", false, "Verify the image through iPXE on boot. Requires a .sig file for the kernel & initrd in the same directory")
 

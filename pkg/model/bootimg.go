@@ -22,7 +22,7 @@ type BootImage struct {
 	Name               string            `json:"name" validate:"required"`
 	KernelPath         string            `json:"kernel" validate:"required"`
 	InitrdPaths        []string          `json:"initrd"`
-	LiveImage          string            `json:"liveimg"`
+	LiveImage          string            `json:"liveimg"` // Deprecated: not stored since sql migration
 	CommandLine        string            `json:"cmdline"`
 	Verify             bool              `json:"verify"`
 	ProvisionTemplates map[string]string `json:"provision_templates" oai3:"nullable"`

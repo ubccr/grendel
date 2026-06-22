@@ -239,7 +239,6 @@ func TestKickstart(t *testing.T) {
 	if assert.NoError(TokenRequired(h.Kickstart)(c)) {
 		assert.Equal(http.StatusOK, rec.Code)
 		assert.Contains(rec.Body.String(), "install")
-		assert.Contains(rec.Body.String(), "liveimg --url=")
 	}
 }
 

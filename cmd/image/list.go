@@ -55,7 +55,7 @@ var (
 				for k, v := range image.ProvisionTemplates.Value {
 					provisionTemplates = append(provisionTemplates, fmt.Sprintf("\"%s\": \"%s\"", k, v.Value))
 				}
-				fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\n", image.Name, image.Kernel, strings.Join(image.Initrd, ","), image.Liveimg.Value, strings.Join(provisionTemplates, ","))
+				fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", image.Name, image.Kernel, strings.Join(image.Initrd, ","), strings.Join(provisionTemplates, ","))
 			}
 
 			return w.Flush()

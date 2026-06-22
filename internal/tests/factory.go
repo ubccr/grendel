@@ -21,7 +21,6 @@ var TestBootImageJSON = []byte(`{
 	"initrd": [
 		"/var/grendel/images/centos7/ccr-initrd.img"
 	],
-	"liveimg": "/var/grendel/images/compute-node/compute-node-squashfs.img",
 	"cmdline": "console=tty0 console=ttyS0 BOOTIF=$mac rd.neednet=1 ip=dhcp ks=$kickstart network ksdevice=bootif ks.device=bootif inst.stage2=$repo/centos7"
 }`)
 
