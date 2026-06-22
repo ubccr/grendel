@@ -202,7 +202,7 @@ func (n *NetInterface) Gateway() netip.Addr {
 		}
 	}
 
-	if viper.IsSet("dhcp.router_octet4") {
+	if n.IP.IsValid() && viper.IsSet("dhcp.router_octet4") {
 		lastIP := netipx.PrefixLastIP(n.IP)
 		ip4 := lastIP.As4()
 		ip4[3] = uint8(viper.GetInt("dhcp.router_octet4"))
