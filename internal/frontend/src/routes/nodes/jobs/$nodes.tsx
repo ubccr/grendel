@@ -32,7 +32,6 @@ function RouteComponent() {
 
   const [lastSelectedID, setLastSelectedID] = useState(0);
   const [nodeJobList, setNodeJobList] = useState<Array<nodeJob>>([]);
-
   useEffect(() => {
     const list: Array<nodeJob> = [];
 
@@ -91,14 +90,14 @@ function RouteComponent() {
         </div>
       ),
       cell: ({ row }) => {
-        const name = row.original?.Name;
+        const node = row.original?.Node;
         return (
           <Link
             to={"/nodes/$node/node"}
-            params={{ node: name ?? "unknown" }}
+            params={{ node: node ?? "unknown" }}
             className="hover:underline"
           >
-            {name}
+            {node}
           </Link>
         );
       },
