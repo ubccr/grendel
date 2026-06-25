@@ -97,6 +97,9 @@ proxy_only = false
 # off by default.
 router_octet4 = 0
 
+# Default netmask
+netmask = 24
+
 # Hard code a static default gateway. (Not set by default)
 #gateway = ""
 
@@ -178,6 +181,9 @@ cors = false
 # Example if binding the API over tcp: api_endpoint = "http://localhost:8080"
 api_endpoint = "/var/lib/grendel/grendel-api.socket"
 
+# JWT for client auth when using TCP
+#api_key = ""
+
 # Verify ssl certs? false (yes) true (no)
 insecure = false
 
@@ -189,6 +195,7 @@ user = ""
 password = ""
 switch_admin_username = "admin"
 switch_admin_password = ""
+switch_admin_password_salt = ""
 
 # Allow unsigned https certs for redfish queries
 insecure = true
