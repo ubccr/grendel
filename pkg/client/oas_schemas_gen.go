@@ -653,6 +653,7 @@ func (s *CookieAuth) SetToken(val string) {
 type DataDump struct {
 	Hosts  []NilDataDumpHostsItem  `json:"Hosts"`
 	Images []NilDataDumpImagesItem `json:"Images"`
+	Roles  []DataDumpRolesItem     `json:"Roles"`
 	Users  []DataDumpUsersItem     `json:"Users"`
 }
 
@@ -664,6 +665,11 @@ func (s *DataDump) GetHosts() []NilDataDumpHostsItem {
 // GetImages returns the value of Images.
 func (s *DataDump) GetImages() []NilDataDumpImagesItem {
 	return s.Images
+}
+
+// GetRoles returns the value of Roles.
+func (s *DataDump) GetRoles() []DataDumpRolesItem {
+	return s.Roles
 }
 
 // GetUsers returns the value of Users.
@@ -679,6 +685,11 @@ func (s *DataDump) SetHosts(val []NilDataDumpHostsItem) {
 // SetImages sets the value of Images.
 func (s *DataDump) SetImages(val []NilDataDumpImagesItem) {
 	s.Images = val
+}
+
+// SetRoles sets the value of Roles.
+func (s *DataDump) SetRoles(val []DataDumpRolesItem) {
+	s.Roles = val
 }
 
 // SetUsers sets the value of Users.
@@ -1092,6 +1103,92 @@ func (s *DataDumpImagesItemProvisionTemplates) init() DataDumpImagesItemProvisio
 		*s = m
 	}
 	return m
+}
+
+type DataDumpRolesItem struct {
+	Name                     OptString                                       `json:"name"`
+	PermissionList           []DataDumpRolesItemPermissionListItem           `json:"permission_list"`
+	UnassignedPermissionList []DataDumpRolesItemUnassignedPermissionListItem `json:"unassigned_permission_list"`
+}
+
+// GetName returns the value of Name.
+func (s *DataDumpRolesItem) GetName() OptString {
+	return s.Name
+}
+
+// GetPermissionList returns the value of PermissionList.
+func (s *DataDumpRolesItem) GetPermissionList() []DataDumpRolesItemPermissionListItem {
+	return s.PermissionList
+}
+
+// GetUnassignedPermissionList returns the value of UnassignedPermissionList.
+func (s *DataDumpRolesItem) GetUnassignedPermissionList() []DataDumpRolesItemUnassignedPermissionListItem {
+	return s.UnassignedPermissionList
+}
+
+// SetName sets the value of Name.
+func (s *DataDumpRolesItem) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetPermissionList sets the value of PermissionList.
+func (s *DataDumpRolesItem) SetPermissionList(val []DataDumpRolesItemPermissionListItem) {
+	s.PermissionList = val
+}
+
+// SetUnassignedPermissionList sets the value of UnassignedPermissionList.
+func (s *DataDumpRolesItem) SetUnassignedPermissionList(val []DataDumpRolesItemUnassignedPermissionListItem) {
+	s.UnassignedPermissionList = val
+}
+
+type DataDumpRolesItemPermissionListItem struct {
+	Method OptString `json:"method"`
+	Path   OptString `json:"path"`
+}
+
+// GetMethod returns the value of Method.
+func (s *DataDumpRolesItemPermissionListItem) GetMethod() OptString {
+	return s.Method
+}
+
+// GetPath returns the value of Path.
+func (s *DataDumpRolesItemPermissionListItem) GetPath() OptString {
+	return s.Path
+}
+
+// SetMethod sets the value of Method.
+func (s *DataDumpRolesItemPermissionListItem) SetMethod(val OptString) {
+	s.Method = val
+}
+
+// SetPath sets the value of Path.
+func (s *DataDumpRolesItemPermissionListItem) SetPath(val OptString) {
+	s.Path = val
+}
+
+type DataDumpRolesItemUnassignedPermissionListItem struct {
+	Method OptString `json:"method"`
+	Path   OptString `json:"path"`
+}
+
+// GetMethod returns the value of Method.
+func (s *DataDumpRolesItemUnassignedPermissionListItem) GetMethod() OptString {
+	return s.Method
+}
+
+// GetPath returns the value of Path.
+func (s *DataDumpRolesItemUnassignedPermissionListItem) GetPath() OptString {
+	return s.Path
+}
+
+// SetMethod sets the value of Method.
+func (s *DataDumpRolesItemUnassignedPermissionListItem) SetMethod(val OptString) {
+	s.Method = val
+}
+
+// SetPath sets the value of Path.
+func (s *DataDumpRolesItemUnassignedPermissionListItem) SetPath(val OptString) {
+	s.Path = val
 }
 
 type DataDumpUsersItem struct {

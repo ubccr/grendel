@@ -5,6 +5,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/go-fuego/fuego"
@@ -35,7 +36,7 @@ func (h *Handler) Restore(c fuego.ContextWithBody[model.DataDump]) (*GenericResp
 
 	return &GenericResponse{
 		Title:  "Success",
-		Detail: fmt.Sprintf("restored db: hosts=%d images=%d users=%d", len(body.Hosts), len(body.Images), len(body.Users)),
+		Detail: fmt.Sprintf("restored db: hosts=%d images=%d users=%d roles=%d", len(body.Hosts), len(body.Images), len(body.Users), len(body.Roles)),
 	}, nil
 }
 
@@ -45,7 +46,7 @@ func (h *Handler) Dump(c fuego.ContextNoBody) (*model.DataDump, error) {
 		return nil, fuego.HTTPError{
 			Err:    err,
 			Title:  "Error",
-			Detail: "failed to restore db",
+			Detail: "failed to dump nodes from db",
 		}
 	}
 	imageList, err := h.DB.BootImages()
@@ -53,7 +54,7 @@ func (h *Handler) Dump(c fuego.ContextNoBody) (*model.DataDump, error) {
 		return nil, fuego.HTTPError{
 			Err:    err,
 			Title:  "Error",
-			Detail: "failed to restore db",
+			Detail: "failed to dump boot images from db",
 		}
 	}
 	userList, err := h.DB.GetUsers()
@@ -61,7 +62,24 @@ func (h *Handler) Dump(c fuego.ContextNoBody) (*model.DataDump, error) {
 		return nil, fuego.HTTPError{
 			Err:    err,
 			Title:  "Error",
-			Detail: "failed to restore db",
+			Detail: "failed to dump users from db",
+		}
+	}
+
+	roleList, err := h.DB.GetRoles()
+	if err != nil {
+		return nil, fuego.HTTPError{
+			Err:    err,
+			Title:  "Error",
+			Detail: "failed to dump roles from db",
+		}
+	}
+	userCreatedRoles := make(model.RoleViewList, 0)
+
+	for _, role := range roleList {
+		_, err := model.RoleFromString(role.Name)
+		if errors.Is(err, model.ErrInvalidRole) {
+			userCreatedRoles = append(userCreatedRoles, role)
 		}
 	}
 
@@ -69,6 +87,7 @@ func (h *Handler) Dump(c fuego.ContextNoBody) (*model.DataDump, error) {
 		Hosts:  nodeList,
 		Images: imageList,
 		Users:  userList,
+		Roles:  userCreatedRoles,
 	}
 
 	return dump, nil

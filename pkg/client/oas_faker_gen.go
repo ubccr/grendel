@@ -373,6 +373,18 @@ func (s *DataDump) SetFake() {
 	}
 	{
 		{
+			s.Roles = nil
+			for i := 0; i < 0; i++ {
+				var elem DataDumpRolesItem
+				{
+					elem.SetFake()
+				}
+				s.Roles = append(s.Roles, elem)
+			}
+		}
+	}
+	{
+		{
 			s.Users = nil
 			for i := 0; i < 0; i++ {
 				var elem DataDumpUsersItem
@@ -612,6 +624,67 @@ func (s *DataDumpImagesItemProvisionTemplates) SetFake() {
 	)
 	for i := 0; i < 0; i++ {
 		m[fmt.Sprintf("fake%d", i)] = elem
+	}
+}
+
+// SetFake set fake values.
+func (s *DataDumpRolesItem) SetFake() {
+	{
+		{
+			s.Name.SetFake()
+		}
+	}
+	{
+		{
+			s.PermissionList = nil
+			for i := 0; i < 0; i++ {
+				var elem DataDumpRolesItemPermissionListItem
+				{
+					elem.SetFake()
+				}
+				s.PermissionList = append(s.PermissionList, elem)
+			}
+		}
+	}
+	{
+		{
+			s.UnassignedPermissionList = nil
+			for i := 0; i < 0; i++ {
+				var elem DataDumpRolesItemUnassignedPermissionListItem
+				{
+					elem.SetFake()
+				}
+				s.UnassignedPermissionList = append(s.UnassignedPermissionList, elem)
+			}
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *DataDumpRolesItemPermissionListItem) SetFake() {
+	{
+		{
+			s.Method.SetFake()
+		}
+	}
+	{
+		{
+			s.Path.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *DataDumpRolesItemUnassignedPermissionListItem) SetFake() {
+	{
+		{
+			s.Method.SetFake()
+		}
+	}
+	{
+		{
+			s.Path.SetFake()
+		}
 	}
 }
 

@@ -1737,6 +1737,16 @@ func (s *DataDump) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.Roles != nil {
+			e.FieldStart("Roles")
+			e.ArrStart()
+			for _, elem := range s.Roles {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
 		if s.Users != nil {
 			e.FieldStart("Users")
 			e.ArrStart()
@@ -1748,10 +1758,11 @@ func (s *DataDump) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfDataDump = [3]string{
+var jsonFieldsNameOfDataDump = [4]string{
 	0: "Hosts",
 	1: "Images",
-	2: "Users",
+	2: "Roles",
+	3: "Users",
 }
 
 // Decode decodes DataDump from json.
@@ -1795,6 +1806,23 @@ func (s *DataDump) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"Images\"")
+			}
+		case "Roles":
+			if err := func() error {
+				s.Roles = make([]DataDumpRolesItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem DataDumpRolesItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Roles = append(s.Roles, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Roles\"")
 			}
 		case "Users":
 			if err := func() error {
@@ -2714,6 +2742,285 @@ func (s DataDumpImagesItemProvisionTemplates) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *DataDumpImagesItemProvisionTemplates) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *DataDumpRolesItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *DataDumpRolesItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Name.Set {
+			e.FieldStart("name")
+			s.Name.Encode(e)
+		}
+	}
+	{
+		if s.PermissionList != nil {
+			e.FieldStart("permission_list")
+			e.ArrStart()
+			for _, elem := range s.PermissionList {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.UnassignedPermissionList != nil {
+			e.FieldStart("unassigned_permission_list")
+			e.ArrStart()
+			for _, elem := range s.UnassignedPermissionList {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+}
+
+var jsonFieldsNameOfDataDumpRolesItem = [3]string{
+	0: "name",
+	1: "permission_list",
+	2: "unassigned_permission_list",
+}
+
+// Decode decodes DataDumpRolesItem from json.
+func (s *DataDumpRolesItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode DataDumpRolesItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "name":
+			if err := func() error {
+				s.Name.Reset()
+				if err := s.Name.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"name\"")
+			}
+		case "permission_list":
+			if err := func() error {
+				s.PermissionList = make([]DataDumpRolesItemPermissionListItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem DataDumpRolesItemPermissionListItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.PermissionList = append(s.PermissionList, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"permission_list\"")
+			}
+		case "unassigned_permission_list":
+			if err := func() error {
+				s.UnassignedPermissionList = make([]DataDumpRolesItemUnassignedPermissionListItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem DataDumpRolesItemUnassignedPermissionListItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.UnassignedPermissionList = append(s.UnassignedPermissionList, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"unassigned_permission_list\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode DataDumpRolesItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *DataDumpRolesItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *DataDumpRolesItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *DataDumpRolesItemPermissionListItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *DataDumpRolesItemPermissionListItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Method.Set {
+			e.FieldStart("method")
+			s.Method.Encode(e)
+		}
+	}
+	{
+		if s.Path.Set {
+			e.FieldStart("path")
+			s.Path.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfDataDumpRolesItemPermissionListItem = [2]string{
+	0: "method",
+	1: "path",
+}
+
+// Decode decodes DataDumpRolesItemPermissionListItem from json.
+func (s *DataDumpRolesItemPermissionListItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode DataDumpRolesItemPermissionListItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "method":
+			if err := func() error {
+				s.Method.Reset()
+				if err := s.Method.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"method\"")
+			}
+		case "path":
+			if err := func() error {
+				s.Path.Reset()
+				if err := s.Path.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"path\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode DataDumpRolesItemPermissionListItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *DataDumpRolesItemPermissionListItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *DataDumpRolesItemPermissionListItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *DataDumpRolesItemUnassignedPermissionListItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *DataDumpRolesItemUnassignedPermissionListItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Method.Set {
+			e.FieldStart("method")
+			s.Method.Encode(e)
+		}
+	}
+	{
+		if s.Path.Set {
+			e.FieldStart("path")
+			s.Path.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfDataDumpRolesItemUnassignedPermissionListItem = [2]string{
+	0: "method",
+	1: "path",
+}
+
+// Decode decodes DataDumpRolesItemUnassignedPermissionListItem from json.
+func (s *DataDumpRolesItemUnassignedPermissionListItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode DataDumpRolesItemUnassignedPermissionListItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "method":
+			if err := func() error {
+				s.Method.Reset()
+				if err := s.Method.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"method\"")
+			}
+		case "path":
+			if err := func() error {
+				s.Path.Reset()
+				if err := s.Path.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"path\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode DataDumpRolesItemUnassignedPermissionListItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *DataDumpRolesItemUnassignedPermissionListItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *DataDumpRolesItemUnassignedPermissionListItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
