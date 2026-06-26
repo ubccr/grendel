@@ -179,7 +179,10 @@ func (h *Handler) Ipxe(c echo.Context) error {
 		return err
 	}
 
-	log.Infof("Sending iPXE script to boot host %s with image %s", host.Name, bootImage.Name)
+	tmplName, ok := bootImage.ProvisionTemplates["ipxe"]
+	if !ok {
+		tmplName = "ipxe.tmpl"
+	}
 
 	commandLine := bootImage.CommandLine
 
@@ -199,7 +202,8 @@ func (h *Handler) Ipxe(c echo.Context) error {
 
 	data["commandLine"] = commandLine
 
-	return c.Render(http.StatusOK, "ipxe.tmpl", data)
+	log.Infof("iPXE script requested: script=%s host=%s boot_image=%s", tmplName, host.Name, bootImage.Name)
+	return c.Render(http.StatusOK, tmplName, data)
 }
 
 func (h *Handler) File(c echo.Context) error {
