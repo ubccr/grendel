@@ -10,7 +10,6 @@ import (
 	_ "embed"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -46,6 +45,7 @@ var butaneTmpl string
 // Template functions
 var funcMap = template.FuncMap{
 	"hasTag":                 hasTag,
+	"indent":                 indent,
 	"Split":                  Split,
 	"Join":                   Join,
 	"Contains":               Contains,
@@ -204,7 +204,7 @@ func NetBoxRenderConfig(name string) string {
 	}
 	defer res.Body.Close()
 
-	text, err := ioutil.ReadAll(res.Body)
+	text, err := io.ReadAll(res.Body)
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"name": name,
@@ -214,4 +214,9 @@ func NetBoxRenderConfig(name string) string {
 	}
 
 	return string(text)
+}
+
+func indent(spaces int, v string) string {
+	pad := strings.Repeat(" ", spaces)
+	return pad + strings.ReplaceAll(v, "\n", "\n"+pad)
 }
