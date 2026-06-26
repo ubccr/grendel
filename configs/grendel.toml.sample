@@ -15,7 +15,7 @@ dbtype = "sqlite"
 # Path database file. Defaults to ":memory:" which uses in-memory store. Change
 # this to a filepath for persisent storage.
 #
-dbpath = ":memory:"
+dbpath = "/var/lib/grendel/db/grendel.sqlite3"
 
 #
 # By default, all loggers are on. You can turn off logging for specific
