@@ -38,8 +38,9 @@ func (h *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	queryType := h.QType(r)
 
 	log.WithFields(logrus.Fields{
-		"query": qname,
-		"type":  dns.TypeToString[queryType],
+		"query":  qname,
+		"type":   dns.TypeToString[queryType],
+		"client": w.RemoteAddr(),
 	}).Debug("Got DNS query")
 	switch queryType {
 	case dns.TypePTR:
