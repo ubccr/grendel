@@ -52,6 +52,9 @@ default_image = ""
 # Path to repo directory
 repo_dir = "/var/lib/grendel/repo"
 
+# Path to templates directory
+templates_dir = "/var/lib/grendel/templates"
+
 # Enable prometheus service discover endpoint
 enable_prometheus_sd = false
 

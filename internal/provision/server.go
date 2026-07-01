@@ -7,7 +7,6 @@ package provision
 import (
 	"context"
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -36,6 +35,7 @@ type Server struct {
 	KeyFile       string
 	CertFile      string
 	RepoDir       string
+	TemplatesDir  string
 	DB            store.Store
 	httpServer    *http.Server
 }
@@ -97,6 +97,11 @@ func newEcho() (*echo.Echo, error) {
 		return nil, err
 	}
 
+	err = renderer.Watch(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
 	e.Renderer = renderer
 
 	return e, nil
@@ -135,19 +140,13 @@ func (s *Server) Serve(defaultImageName string) error {
 		return err
 	}
 
-	routeList, err := json.MarshalIndent(e.Routes(), "", "  ")
-	if err != nil {
-		return err
-	}
-	log.Infof("Routes in order: %s", routeList)
-
-	log.Infof("Using repo dir: %s", s.RepoDir)
-
 	if len(s.RepoDir) > 0 {
 		log.Infof("Using repo dir: %s", s.RepoDir)
 		e.Static("/repo", s.RepoDir)
-		//fs := http.FileServer(http.Dir(s.RepoDir))
-		//e.GET("/repo/*", echo.WrapHandler(http.StripPrefix("/repo/", fs)))
+	}
+
+	if len(s.TemplatesDir) > 0 {
+		log.Infof("Using templates dir: %s", s.TemplatesDir)
 	}
 
 	h, err := NewHandler(s.DB, defaultImageName)
@@ -163,6 +162,8 @@ func (s *Server) Serve(defaultImageName string) error {
 		WriteTimeout: 60 * time.Minute,
 		IdleTimeout:  120 * time.Second,
 	}
+
+	s.Scheme = "http"
 
 	if s.CertFile != "" && s.KeyFile != "" {
 		cfg := &tls.Config{
@@ -195,12 +196,10 @@ func (s *Server) Serve(defaultImageName string) error {
 
 		s.Scheme = "https"
 		httpServer.Addr = fmt.Sprintf("%s:%d", s.ListenAddress, s.Port)
-	} else {
-		s.Scheme = "http"
 	}
 
 	s.httpServer = httpServer
-	log.Infof("Listening on %s://%s:%d", s.Scheme, s.ListenAddress, s.Port)
+
 	if err := e.StartServer(httpServer); err != nil && err != http.ErrServerClosed {
 		return err
 	}

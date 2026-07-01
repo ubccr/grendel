@@ -96,13 +96,13 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 }
 
 func (h *Handler) Index(c echo.Context) error {
-	resp := map[string]interface{}{
+	resp := map[string]any{
 		"status": "up",
 	}
 	return c.JSON(http.StatusOK, resp)
 }
 
-func (h *Handler) verifyClaims(c echo.Context) (*model.BootImage, *model.Host, *model.NetInterface, map[string]interface{}, error) {
+func (h *Handler) verifyClaims(c echo.Context) (*model.BootImage, *model.Host, *model.NetInterface, map[string]any, error) {
 	claims := c.Get(ContextKeyToken).(*model.BootClaims)
 
 	log.Debugf("Got valid boot claims: %v", claims)
@@ -279,7 +279,7 @@ func (h *Handler) Complete(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to unprovision host").SetInternal(err)
 	}
 
-	resp := map[string]interface{}{
+	resp := map[string]any{
 		"status": "ok",
 	}
 	return c.JSON(http.StatusOK, resp)
@@ -334,7 +334,9 @@ func (h *Handler) Ignition(c echo.Context) error {
 }
 
 func (h *Handler) ProvisionTemplate(c echo.Context) error {
-	bootImage, host, _, data, err := h.verifyClaims(c)
+	templateName := c.Param("name")
+
+	bootImage, node, _, data, err := h.verifyClaims(c)
 	if err != nil {
 		return err
 	}
@@ -343,28 +345,28 @@ func (h *Handler) ProvisionTemplate(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, "")
 	}
 
-	tmplName, ok := bootImage.ProvisionTemplates[c.Param("name")]
+	template, ok := bootImage.ProvisionTemplates[templateName]
 	if !ok {
 		return echo.NewHTTPError(http.StatusNotFound, "")
 	}
 
-	log.Infof("Sending provision template %s to host %s", c.Param("name"), host.Name)
-	return c.Render(http.StatusOK, tmplName, data)
+	log.WithFields(logrus.Fields{"template": templateName, "node": node.Name}).Info("Sending provision template")
+	return c.Render(http.StatusOK, template, data)
 }
 
 func (h *Handler) BmcTemplate(c echo.Context) error {
-	_, host, _, data, err := h.verifyClaims(c)
+	_, node, _, data, err := h.verifyClaims(c)
 	if err != nil {
 		return err
 	}
 
-	tmplName := c.Param("name")
-	if tmplName == "" {
+	templateName := c.Param("name")
+	if templateName == "" {
 		return echo.NewHTTPError(http.StatusNotFound, "")
 	}
 
-	log.Infof("Sending bmc template %s to host %s", c.Param("name"), host.Name)
-	return c.Render(http.StatusOK, tmplName, data)
+	log.WithFields(logrus.Fields{"template": templateName, "node": node.Name}).Info("Sending bmc template")
+	return c.Render(http.StatusOK, templateName, data)
 }
 
 func (h *Handler) Proxmox(c echo.Context) error {

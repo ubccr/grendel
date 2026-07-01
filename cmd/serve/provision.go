@@ -26,6 +26,8 @@ func init() {
 	viper.BindPFlag("provision.default_image", provisionCmd.Flags().Lookup("default-image"))
 	provisionCmd.Flags().String("repo-dir", "", "path to repo dir")
 	viper.BindPFlag("provision.repo_dir", provisionCmd.Flags().Lookup("repo-dir"))
+	provisionCmd.Flags().String("templates-dir", "", "path to templates dir")
+	viper.BindPFlag("provision.templates_dir", provisionCmd.Flags().Lookup("templates-dir"))
 
 	serveCmd.AddCommand(provisionCmd)
 }
@@ -57,6 +59,7 @@ func serveProvision(t *tomb.Tomb) error {
 	srv.KeyFile = viper.GetString("provision.key")
 	srv.CertFile = viper.GetString("provision.cert")
 	srv.RepoDir = viper.GetString("provision.repo_dir")
+	srv.TemplatesDir = viper.GetString("provision.templates_dir")
 
 	t.Go(func() error {
 		time.Sleep(1 * time.Second)
