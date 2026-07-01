@@ -6,9 +6,9 @@ users:
     groups: users, admin
     shell: /bin/bash
     sudo: ALL=(ALL) NOPASSWD:ALL
-{{- with $.adminSSHPubKeys }}
+{{- with $.extra_vars.ssh_keys }}
     ssh_authorized_keys:
-   {{- range $i, $key := $.adminSSHPubKeys }}
+   {{- range $i, $key := . }}
       - {{ $key }}
    {{- end }}
 {{ end }}

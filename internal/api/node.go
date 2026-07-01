@@ -7,6 +7,7 @@ package api
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"slices"
 	"strings"
 
@@ -265,12 +266,21 @@ func (h *Handler) NodeBootToken(c fuego.ContextNoBody) (*NodeBootTokenResponse, 
 			nic = node.BootInterface()
 		}
 
+		if node.UID.String() == "" || nic.MAC.String() == "" {
+			return nil, fuego.HTTPError{
+				Status: http.StatusBadRequest,
+				Err:    errors.New("node has invalid data. Missing UID or NIC MAC address"),
+				Title:  "Error",
+				Detail: "failed to generate token",
+			}
+		}
+
 		token, err := model.NewBootToken(node.UID.String(), nic.MAC.String())
 		if err != nil {
 			return nil, fuego.HTTPError{
 				Err:    err,
 				Title:  "Error",
-				Detail: "failed to generate boot token",
+				Detail: "failed to generate token",
 			}
 		}
 

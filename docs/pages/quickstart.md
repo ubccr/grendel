@@ -66,7 +66,6 @@ Then create the following JSON file `boot-image.json`:
     "initrd": [
         "ubuntu-focal-initramfs.img"
     ],
-    "liveimg": "ubuntu-focal-squashfs.img",
     "cmdline": "root=live:$liveimg BOOTIF=$mac rd.neednet=1 ip=dhcp"
 }]
 ```

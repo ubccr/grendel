@@ -283,6 +283,42 @@ func TestDataDumpImagesItemProvisionTemplates_EncodeDecode(t *testing.T) {
 	typ2 = make(DataDumpImagesItemProvisionTemplates)
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestDataDumpRolesItem_EncodeDecode(t *testing.T) {
+	var typ DataDumpRolesItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 DataDumpRolesItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestDataDumpRolesItemPermissionListItem_EncodeDecode(t *testing.T) {
+	var typ DataDumpRolesItemPermissionListItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 DataDumpRolesItemPermissionListItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestDataDumpRolesItemUnassignedPermissionListItem_EncodeDecode(t *testing.T) {
+	var typ DataDumpRolesItemUnassignedPermissionListItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 DataDumpRolesItemUnassignedPermissionListItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestDataDumpUsersItem_EncodeDecode(t *testing.T) {
 	var typ DataDumpUsersItem
 	typ.SetFake()

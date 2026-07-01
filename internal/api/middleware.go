@@ -7,6 +7,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"slices"
 	"strings"
@@ -19,7 +20,8 @@ import (
 func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// skip auth if bound to unix socket
-		if viper.IsSet("api.socket_path") {
+		addr, ok := r.Context().Value(http.LocalAddrContextKey).(net.Addr)
+		if ok && addr.Network() == "unix" {
 			next.ServeHTTP(w, r)
 			return
 		}

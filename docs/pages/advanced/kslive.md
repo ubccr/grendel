@@ -53,7 +53,6 @@ appropriate URLs for your situation.
         "/repo/centos/7.7.1908/os/x86_64/images/pxeboot/initrd.img"
     ],
     "cmdline": "ks={{ $.endpoints.KickstartURL }} network ksdevice=bootif ks.device=bootif inst.stage2={{ $.endpoints.RepoURL }}/centos/7.7.1908/os/x86_64",
-    "liveimg": "/images/compute-node.squashfs"
 }]
 ```
 
@@ -72,7 +71,6 @@ installation source, for example:
 
 ```
 install
-liveimg --url="http://192.168.10.254/boot/file/liveimg
 
 lang en_US.UTF-8
 selinux --disabled

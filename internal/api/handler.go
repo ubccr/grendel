@@ -30,9 +30,7 @@ func NewHandler(db store.Store) (*Handler, error) {
 }
 
 func (h *Handler) SetupRoutes(s *fuego.Server) {
-
-	// enable frontend if api is listening on tcp socket
-	if viper.IsSet("api.listen") {
+	if viper.GetBool("api.web_ui") {
 		fuego.Handle(s, "/ui/", setupFrontend())
 		fuego.Handle(s, "/{$}", http.RedirectHandler("/ui", http.StatusMovedPermanently))
 	}

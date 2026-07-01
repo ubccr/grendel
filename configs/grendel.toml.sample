@@ -15,19 +15,13 @@ dbtype = "sqlite"
 # Path database file. Defaults to ":memory:" which uses in-memory store. Change
 # this to a filepath for persisent storage.
 #
-dbpath = ":memory:"
+dbpath = "/var/lib/grendel/db/grendel.sqlite3"
 
 #
 # By default, all loggers are on. You can turn off logging for specific
 # services here.
 #
 loggers = {cli="on", tftp="off", dhcp="on", dns="off", provision="on", api="on", pxe="off"}
-
-#
-# Admin ssh public keys. These are used in provision templates and elsewhere for
-# administrative ssh access
-#
-admin_ssh_pubkeys = []
 
 #------------------------------------------------------------------------------
 # HTTP Provision Server
@@ -52,14 +46,14 @@ token_ttl = 3600
 # Can generate secret with `openssl rand -hex 16`
 #secret = "_provisioning_secret_here_"
 
-# Hashed root password used in kickstart template
-root_password = ""
-
 # Default OS image name
 default_image = ""
 
 # Path to repo directory
 repo_dir = "/var/lib/grendel/repo"
+
+# Path to templates directory
+templates_dir = "/var/lib/grendel/templates"
 
 # Enable prometheus service discover endpoint
 enable_prometheus_sd = false
@@ -70,6 +64,12 @@ prometheus_sd_refresh_interval = 3600
 # Enable netbox render config support
 # netbox_token=""
 # netbox_url=""
+
+# Here is where you can pass extra variables into provision templates
+# They can be accessed like so: {{ $.extra_vars.root_password }}
+[provision.extra_vars]
+# root_password = ""
+# ssh_keys = ["ssh-rsa..."]
 
 #------------------------------------------------------------------------------
 # DHCP Server
@@ -99,6 +99,9 @@ proxy_only = false
 # set the router option in the dhcp response to 10.104.13.254. This setting is
 # off by default.
 router_octet4 = 0
+
+# Default netmask
+netmask = 24
 
 # Hard code a static default gateway. (Not set by default)
 #gateway = ""
@@ -144,14 +147,13 @@ listen = "0.0.0.0:4011"
 #------------------------------------------------------------------------------
 [api]
 # API server listen config:
-# Set either socket_path or listen
 
 # socket_path will bind the api server to a unix socket
-# Authentication and the frontend will be disabled
 socket_path = "grendel-api.socket"
 
 # listen will bind the api server to a tcp socket
 # If possible, always bind the address to an internal mgmt network
+# all TCP requests will have authentication and RBAC enforced
 #listen = "0.0.0.0:8080"
 
 # Required for auth to work across restarts
@@ -162,6 +164,10 @@ socket_path = "grendel-api.socket"
 # You should always use https if listening over tcp
 #key = "/etc/grendel/api/hostname.key"
 #cert = "/etc/grendel/api/hostname.crt"
+
+# Enables or disables Web UI
+# Only served on tcp listener
+web_ui = false
 
 # Development settings:
 # Swagger API browser, requires CORS = true to test api routes
@@ -178,6 +184,9 @@ cors = false
 # Example if binding the API over tcp: api_endpoint = "http://localhost:8080"
 api_endpoint = "/var/lib/grendel/grendel-api.socket"
 
+# JWT for client auth when using TCP
+#api_key = ""
+
 # Verify ssl certs? false (yes) true (no)
 insecure = false
 
@@ -189,6 +198,7 @@ user = ""
 password = ""
 switch_admin_username = "admin"
 switch_admin_password = ""
+switch_admin_password_salt = ""
 
 # Allow unsigned https certs for redfish queries
 insecure = true

@@ -8,10 +8,11 @@ cleanInstall() {
                 -c 'Grendel server' grendel
     fi
 
-    mkdir -p /var/lib/grendel/images /var/lib/grendel/repo /var/lib/grendel/templates
-    chown grendel:grendel /var/lib/grendel /var/lib/grendel/images /var/lib/grendel/repo /var/lib/grendel/templates
-    chmod 755 /var/lib/grendel
+    mkdir -p /var/lib/grendel/images /var/lib/grendel/repo /var/lib/grendel/templates /var/lib/grendel/db
+    chown grendel:grendel /var/lib/grendel /var/lib/grendel/images /var/lib/grendel/repo /var/lib/grendel/templates /var/lib/grendel/db
+    chmod 2755 /var/lib/grendel
     chmod 775 /var/lib/grendel/images /var/lib/grendel/repo /var/lib/grendel/templates
+    chmod 660 /var/lib/grendel/db
 
     if [ -f "/etc/grendel/grendel.toml" ]; then
         chmod 660 /etc/grendel/grendel.toml

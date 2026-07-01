@@ -448,6 +448,45 @@
 						},
 						"type": "array"
 					},
+					"Roles": {
+						"items": {
+							"properties": {
+								"name": {
+									"type": "string"
+								},
+								"permission_list": {
+									"items": {
+										"properties": {
+											"method": {
+												"type": "string"
+											},
+											"path": {
+												"type": "string"
+											}
+										},
+										"type": "object"
+									},
+									"type": "array"
+								},
+								"unassigned_permission_list": {
+									"items": {
+										"properties": {
+											"method": {
+												"type": "string"
+											},
+											"path": {
+												"type": "string"
+											}
+										},
+										"type": "object"
+									},
+									"type": "array"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					},
 					"Users": {
 						"items": {
 							"properties": {

@@ -10,7 +10,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	golog "log"
 	"net"
 	"net/http"
@@ -31,7 +31,6 @@ import (
 
 var (
 	cfgFile     string
-	cfgFileUsed string
 	apiEndPoint string
 	debug       bool
 	verbose     bool
@@ -141,11 +140,9 @@ func SetupLogging() error {
 	} else {
 		Log.Logger.SetLevel(logrus.WarnLevel)
 	}
-	golog.SetOutput(ioutil.Discard)
+	golog.SetOutput(io.Discard)
 
-	if cfgFileUsed != "" {
-		Log.Infof("Using config file: %s", cfgFileUsed)
-	}
+	Log.Infof("Using config file: %s", viper.ConfigFileUsed())
 
 	Root.SilenceUsage = true
 	Root.SilenceErrors = true
@@ -170,7 +167,7 @@ func initConfig() {
 		viper.AddConfigPath("/etc/grendel/")
 		viper.AddConfigPath(home)
 		viper.AddConfigPath(cwd)
-		viper.SetConfigName("grendel")
+		viper.SetConfigName("grendel.toml")
 		viper.SetConfigType("toml")
 	}
 
@@ -178,8 +175,11 @@ func initConfig() {
 	viper.SetEnvPrefix("grendel")
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
-	if err := viper.ReadInConfig(); err == nil {
-		cfgFileUsed = viper.ConfigFileUsed()
+	err := viper.ReadInConfig()
+	if errors.As(err, &viper.ConfigFileNotFoundError{}) {
+		Log.Warn(err)
+	} else if err != nil {
+		Log.Errorln(err)
 	}
 
 	if !viper.IsSet("api.secret") {
@@ -191,7 +191,7 @@ func initConfig() {
 		viper.Set("api.secret", secret)
 	}
 
-	err := config.ParseConfigs()
+	err = config.ParseConfigs()
 	if err != nil {
 		Log.Fatal(err)
 	}

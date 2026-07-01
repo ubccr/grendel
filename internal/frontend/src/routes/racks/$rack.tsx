@@ -112,7 +112,7 @@ function RackTable() {
             {arr.map((u, i) => (
               <TableRow key={i} className="*:text-center">
                 <TableCell>{u.u}</TableCell>
-                <TableCell className={`grid-cols- grid${u.hosts.length} gap-4`}>
+                <TableCell className={`grid-cols-${u.hosts.length} grid gap-4`}>
                   {u.hosts.map((host, i) => (
                     <div key={i} className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                       <div className="flex justify-center gap-6 sm:justify-start">

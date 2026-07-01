@@ -6,27 +6,30 @@ package provision
 
 import (
 	"bytes"
+	"context"
 	"crypto/sha256"
 	_ "embed"
+	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"path"
 	"path/filepath"
 	"strings"
+	"sync/atomic"
 	"text/template"
+	"time"
 
 	"github.com/GehirnInc/crypt"
 	_ "github.com/GehirnInc/crypt/sha256_crypt"
 	_ "github.com/GehirnInc/crypt/sha512_crypt"
 	"github.com/coreos/butane/config"
 	"github.com/coreos/butane/config/common"
+	"github.com/fsnotify/fsnotify"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/pkg/model"
 )
-
-const defaultTemplateGlob = "/var/lib/grendel/templates/*.tmpl"
 
 //go:embed templates/ipxe.tmpl
 var ipxeTmpl string
@@ -46,6 +49,7 @@ var butaneTmpl string
 // Template functions
 var funcMap = template.FuncMap{
 	"hasTag":                 hasTag,
+	"indent":                 indent,
 	"Split":                  Split,
 	"Join":                   Join,
 	"Contains":               Contains,
@@ -61,10 +65,17 @@ var funcMap = template.FuncMap{
 }
 
 type TemplateRenderer struct {
-	templates *template.Template
+	templates atomic.Pointer[template.Template]
 }
 
 func NewTemplateRenderer() (*TemplateRenderer, error) {
+	t := &TemplateRenderer{
+		templates: atomic.Pointer[template.Template]{},
+	}
+	return t, t.reload()
+}
+
+func buildTemplates() (*template.Template, error) {
 	tmpl, err := template.New("ipxe.tmpl").Funcs(funcMap).Parse(ipxeTmpl)
 	if err != nil {
 		return nil, err
@@ -90,27 +101,97 @@ func NewTemplateRenderer() (*TemplateRenderer, error) {
 		return nil, err
 	}
 
-	matches, err := filepath.Glob(defaultTemplateGlob)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(matches) > 0 {
-		tmpl, err = tmpl.Funcs(funcMap).ParseGlob(defaultTemplateGlob)
+	if viper.IsSet("provision.templates_dir") {
+		glob := path.Join(viper.GetString("provision.templates_dir"), "*.tmpl")
+		tmpl, err = tmpl.Funcs(funcMap).ParseGlob(glob)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	t := &TemplateRenderer{
-		templates: tmpl,
-	}
-
-	return t, nil
+	log.Debug(tmpl.DefinedTemplates())
+	return tmpl, nil
 }
 
-func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	if viewContext, isMap := data.(map[string]interface{}); isMap {
+func (t *TemplateRenderer) reload() error {
+	tmpl, err := buildTemplates()
+	if err != nil {
+		return err
+	}
+
+	t.templates.Store(tmpl)
+	return nil
+}
+
+func (t *TemplateRenderer) Watch(ctx context.Context) error {
+	if !viper.IsSet("provision.templates_dir") {
+		return nil
+	}
+
+	w, err := fsnotify.NewWatcher()
+	if err != nil {
+		return err
+	}
+
+	err = w.Add(viper.GetString("provision.templates_dir"))
+	if err != nil {
+		return fmt.Errorf("failed to monitor template directory: %w", err)
+	}
+
+	go func() {
+		defer w.Close()
+
+		var debounce *time.Timer
+		var debounceChan <-chan time.Time
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+
+			case event, ok := <-w.Events:
+				if !ok {
+					return
+				}
+
+				if filepath.Ext(event.Name) != ".tmpl" {
+					continue
+				}
+				if !event.Has(fsnotify.Write | fsnotify.Create | fsnotify.Remove | fsnotify.Rename) {
+					continue
+				}
+
+				if debounce == nil {
+					debounce = time.NewTimer(300 * time.Millisecond)
+					debounceChan = debounce.C
+					continue
+				}
+
+				debounce.Reset(300 * time.Millisecond)
+
+			case <-debounceChan:
+				err := t.reload()
+				if err != nil {
+					log.WithError(err).Error("template hot reload failed")
+					return
+				}
+
+				log.Info("Successfully hot reloaded templates")
+
+			case err, ok := <-w.Errors:
+				if !ok {
+					return
+				}
+				log.WithError(err).Warn("failed to watch template directory")
+			}
+		}
+	}()
+
+	return nil
+}
+
+func (t *TemplateRenderer) Render(w io.Writer, name string, data any, c echo.Context) error {
+	if viewContext, isMap := data.(map[string]any); isMap {
 		viewContext["reverse"] = c.Echo().Reverse
 	}
 
@@ -119,10 +200,14 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
 	}
 
-	return t.templates.ExecuteTemplate(w, name, data)
+	test := t.templates.Load()
+	if test != nil {
+		return test.ExecuteTemplate(w, name, data)
+	}
+	return errors.New("failed to load templates")
 }
 
-func (t *TemplateRenderer) RenderIgnition(code int, name string, data interface{}, c echo.Context) error {
+func (t *TemplateRenderer) RenderIgnition(code int, name string, data any, c echo.Context) error {
 	buf := new(bytes.Buffer)
 	err := t.Render(buf, name, data, c)
 	if err != nil {
@@ -204,7 +289,7 @@ func NetBoxRenderConfig(name string) string {
 	}
 	defer res.Body.Close()
 
-	text, err := ioutil.ReadAll(res.Body)
+	text, err := io.ReadAll(res.Body)
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"name": name,
@@ -214,4 +299,9 @@ func NetBoxRenderConfig(name string) string {
 	}
 
 	return string(text)
+}
+
+func indent(spaces int, v string) string {
+	pad := strings.Repeat(" ", spaces)
+	return pad + strings.ReplaceAll(v, "\n", "\n"+pad)
 }

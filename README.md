@@ -148,6 +148,7 @@ Our makefile is only compatible with amd64 and requires the following packages t
 git submodule update --init --recursive
 cd internal/firmware
 make build
+make bindata
 cd -
 go build -tags pxe .
 ```

@@ -8,4 +8,5 @@ type DataDump struct {
 	Users  []User        `json:"Users"`
 	Hosts  HostList      `json:"Hosts"`
 	Images BootImageList `json:"Images"`
+	Roles  RoleViewList  `json:"Roles"`
 }

@@ -7,7 +7,7 @@ package node
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"errors"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -32,42 +32,88 @@ var (
 			if args[0] == "all" {
 				nodeset = ""
 			}
-			req := client.GETV1NodesFindParams{
+
+			p := client.GETV1NodesFindParams{
 				Nodeset: client.NewOptString(nodeset),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-
-			res, err := gc.GETV1NodesFind(context.Background(), req)
+			originalNodes, err := gc.GETV1NodesFind(context.Background(), p)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
 
-			data, err := json.MarshalIndent(res, "", "    ")
+			originalText, err := json.MarshalIndent(originalNodes, "", "    ")
 			if err != nil {
 				return err
 			}
 
-			newData, err := util.CaptureInputFromEditor(data)
+			var response *client.GenericResponse
+			err = util.EditLoop(originalText, func(editedText []byte) error {
+				var editedJson []client.NilNodeAddRequestNodeListItem
+				err = json.Unmarshal(editedText, &editedJson)
+				if err != nil {
+					return err
+				}
+
+				// Verify IDs
+				for _, originalNode := range originalNodes {
+					for _, editedNode := range editedJson {
+						if originalNode.Name.Value != editedNode.Value.Name.Value {
+							continue
+						}
+						// Compare node ID
+						if originalNode.ID.Value != editedNode.Value.ID.Value {
+							return errors.New("failed to save, id field cannot be modified")
+						}
+
+						// Compare interface IDs
+						for _, originalInterface := range originalNode.Interfaces {
+							found := false
+							for _, editedInterfaces := range editedNode.Value.Interfaces {
+								if originalInterface.Value.ID != editedInterfaces.Value.ID {
+									continue
+								}
+								found = true
+							}
+							// Only error if ID is BOTH not found and no interfaces were removed (allow iface delete)
+							if !found && (len(originalNode.Interfaces) == len(editedNode.Value.Interfaces)) {
+								return errors.New("failed to save, interface id fields cannot be modified")
+							}
+						}
+
+						// Compare bond IDs
+						for _, originalBond := range originalNode.Bonds {
+							found := false
+							for _, editedBonds := range editedNode.Value.Bonds {
+								if originalBond.Value.ID != editedBonds.Value.ID {
+									continue
+								}
+								found = true
+							}
+							if !found && (len(originalNode.Bonds) == len(editedNode.Value.Bonds)) {
+								return errors.New("failed to save, bond id fields cannot be modified")
+							}
+						}
+					}
+				}
+
+				response, err = gc.POSTV1Nodes(context.Background(), &client.NodeAddRequest{
+					NodeList: editedJson,
+				}, client.POSTV1NodesParams{})
+				if err != nil {
+					return err
+				}
+
+				return nil
+			})
 			if err != nil {
 				return err
 			}
 
-			var check []client.NilNodeAddRequestNodeListItem
-			err = json.Unmarshal(newData, &check)
-			if err != nil {
-				return fmt.Errorf("Invalid JSON. Not saving changes: %w", err)
+			if response != nil {
+				return cmd.NewApiResponse(response)
 			}
-
-			storeReq := &client.NodeAddRequest{
-				NodeList: check,
-			}
-			params := client.POSTV1NodesParams{}
-			storeRes, err := gc.POSTV1Nodes(context.Background(), storeReq, params)
-			if err != nil {
-				return cmd.NewApiError(err)
-			}
-
-			return cmd.NewApiResponse(storeRes)
+			return nil
 		},
 	}
 )

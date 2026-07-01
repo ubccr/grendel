@@ -39,7 +39,7 @@ export const Route = createFileRoute("/racks/")({
     }
     const racks: Map<string, RackData> = new Map();
     res.data.forEach((node) => {
-      const rackTag = node.tags?.find((v) => v.includes("rack="));
+      const rackTag = node.tags?.find((v) => v.startsWith("rack="));
       if (!rackTag) {
         return;
       }

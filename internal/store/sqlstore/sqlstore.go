@@ -357,6 +357,10 @@ func (s *SqlStore) StoreHosts(hosts model.HostList) error {
 			nicIDs = append(nicIDs, bi.ID)
 		}
 
+		if len(nicIDs) == 0 {
+			nicIDs = append(nicIDs, 0)
+		}
+
 		// Delete any nics that were removed
 		err = s.q.NicUpsertDelete(ctx, tx, db.NicUpsertDeleteParams{
 			NodeID: node.ID,
@@ -824,10 +828,35 @@ func (s *SqlStore) BootImages() (model.BootImageList, error) {
 // RestoreFrom restores the database using the provided data dump
 func (s *SqlStore) RestoreFrom(data model.DataDump) error {
 	ctx := context.Background()
+
+	for _, role := range data.Roles {
+		rid, err := s.q.RoleAdd(ctx, s.rw, role.Name)
+		if err != nil {
+			return err
+		}
+		for _, permission := range role.PermissionList {
+
+			pid, err := s.q.RoleFetchPermissionId(ctx, s.ro, db.RoleFetchPermissionIdParams{
+				Method: permission.Method,
+				Path:   permission.Path,
+			})
+			if err != nil {
+				return err
+			}
+
+			err = s.q.RoleUpsertPermission(ctx, s.rw, db.RoleUpsertPermissionParams{RoleID: rid, PermissionID: pid})
+			if err != nil {
+				return err
+			}
+
+		}
+	}
+
 	for _, user := range data.Users {
 		_, err := s.q.UserCreate(ctx, s.rw, db.UserCreateParams{
 			Username:     user.Username,
 			Role:         user.Role,
+			Enabled:      user.Enabled,
 			PasswordHash: string(user.PasswordHash),
 		})
 		if err != nil {

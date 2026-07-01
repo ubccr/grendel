@@ -93,13 +93,15 @@ export default function ImageForm({ data, reset }: { data?: BootImage; reset?: b
         <form.Field
           name="verify"
           children={(field) => (
-            <div className="flex items-center space-x-2">
+            <div>
               <Label>Verify:</Label>
-              <Switch
-                checked={field.state.value ?? false}
-                onBlur={field.handleBlur}
-                onCheckedChange={(e) => field.handleChange(e)}
-              />
+              <div className="flex h-9 items-center">
+                <Switch
+                  checked={field.state.value ?? false}
+                  onBlur={field.handleBlur}
+                  onCheckedChange={(e) => field.handleChange(e)}
+                />
+              </div>
             </div>
           )}
         />

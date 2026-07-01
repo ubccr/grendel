@@ -61,14 +61,14 @@ autoinstall:
         groups: users, admin
         shell: /bin/bash
         sudo: ALL=(ALL) NOPASSWD:ALL
-{{- with $.adminSSHPubKeys }}
+{{- with $.extra_vars.ssh_keys }}
         ssh_authorized_keys:
-       {{- range $i, $key := $.adminSSHPubKeys }}
+       {{- range $i, $key := . }}
           - {{ $key }}
        {{- end }}
 {{ end }}
   late-commands:
     - curl -X POST {{ $.endpoints.CompleteURL }}
-{{- with .rootpw }}
+{{- with $.extra_vars.root_password }}
     - curtin in-target --target=/target -- usermod -p '{{ . }}' root
 {{ end }}
