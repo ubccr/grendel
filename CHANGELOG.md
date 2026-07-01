@@ -1,5 +1,47 @@
 # Grendel Changelog
 
+## [0.2.8] - 2026-07-01
+> [!WARNING]
+> Provision templates using these variables will need to be updated: `provision.root_password` & `admin_ssh_pubkeys` -> `provision.extra_vars.`
+>
+> The provision templates directory is no longer hardcoded, set with: `provision.templates_dir` = `/var/lib/grendel/templates`
+
+api:
+- added the ability to listen on both UNIX and TCP sockets
+- changed web toggle from on tcp listen to `api.web_ui`
+- fixed last NIC deletion
+
+cli:
+- added node & image `add` commands
+- added `node interface` subcommand
+- reworked edit workflow to drop back into buffer on error
+- restricted immutable id field changes in edit commands
+- fixed invalid TOML parsing silently failing
+- added user created roles in db export and import
+
+provision:
+- moved & renamed rootpw & admin_ssh_pubkeys variables into `provision.extra_vars`
+- removed liveimg references
+- added indent template function
+- added ipxe script override with `ipxe` template name
+- added template hot reloading
+
+docs:
+- added API & Web UI setup page
+- added boot image page
+- added boot template page
+
+frontend:
+- fixed multi node per u spacing in rack page
+- fixed verify switch spacing in image form
+- fixed job page node names
+
+misc:
+- bumped iPXE to latest commit
+- added missing config variables to sample TOML
+- defaulted RPM & DEB installs to use file based DB
+- added client ip to dns request debug logs
+
 ## [0.2.7] - 2026-05-25
 
 - api: fixed image deletion not working
@@ -329,4 +371,5 @@
 [0.2.5]: https://github.com/ubccr/grendel/releases/tag/v0.2.5
 [0.2.6]: https://github.com/ubccr/grendel/releases/tag/v0.2.6
 [0.2.7]: https://github.com/ubccr/grendel/releases/tag/v0.2.7
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.7...HEAD
+[0.2.8]: https://github.com/ubccr/grendel/releases/tag/v0.2.8
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.8...HEAD
