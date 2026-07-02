@@ -74,7 +74,7 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@hey-api/openapi-ts": "0.97.1",
+    "@hey-api/openapi-ts": "0.97.3",
     "@tailwindcss/postcss": "^4.0.15",
     "@tanstack/react-query-devtools": "^5.91.2",
     "@tanstack/react-router-devtools": "^1.132.23",
