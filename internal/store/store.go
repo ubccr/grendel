@@ -6,6 +6,7 @@
 package store
 
 import (
+	"context"
 	"net"
 
 	"github.com/ubccr/grendel/internal/logger"
@@ -98,10 +99,10 @@ type Store interface {
 	LoadHostFromMAC(mac string) (*model.Host, error)
 
 	// ResolveIPv4 returns the list of IPv4 addresses with the given FQDN
-	ResolveIPv4(fqdn string) ([]net.IP, error)
+	ResolveIPv4(ctx context.Context, fqdn string) ([]net.IP, error)
 
 	// ReverseResolve returns the list of FQDNs for the given IP
-	ReverseResolve(ip string) ([]string, error)
+	ReverseResolve(ctx context.Context, ip string) ([]string, error)
 
 	// RestoreFrom restores the database using the provided data dump
 	RestoreFrom(data model.DataDump) error

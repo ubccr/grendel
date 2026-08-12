@@ -21,6 +21,9 @@ var sqlMigrations embed.FS
 type Migrator struct {
 	mg     *migrate.Migrate
 	source source.Driver
+
+	// db is retained so pre-checks can read the pre-migration schema.
+	db *sql.DB
 }
 
 func New(db *sql.DB) (*Migrator, error) {
@@ -39,7 +42,7 @@ func New(db *sql.DB) (*Migrator, error) {
 		return nil, fmt.Errorf("Failed to create migrate instance: %w", err)
 	}
 
-	return &Migrator{mg: mg, source: source}, nil
+	return &Migrator{mg: mg, source: source, db: db}, nil
 }
 
 func (m *Migrator) Version() (uint, bool, error) {
@@ -52,6 +55,10 @@ func (m *Migrator) Version() (uint, bool, error) {
 }
 
 func (m *Migrator) Migrate() error {
+	if cur, _, err := m.Version(); err == nil || err == ErrNilVersion {
+		runPreChecks(m.db, cur)
+	}
+
 	err := m.mg.Migrate(SchemaVersion)
 	if err != nil && err == migrate.ErrNoChange {
 		return ErrNoChange

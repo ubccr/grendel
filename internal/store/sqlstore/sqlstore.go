@@ -18,6 +18,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/segmentio/ksuid"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/store/migrations"
 	"github.com/ubccr/grendel/internal/store/sqlstore/db"
@@ -35,8 +36,11 @@ type SqlStore struct {
 }
 
 // New returns a new SqlStore using the given database filename. For memory only you can provide `:memory:`
-func New(filename string, config ...Config) (*SqlStore, error) {
-	cfg := configDefault(config...)
+func New(filename string) (*SqlStore, error) {
+	cfg := Config{
+		Driver:       defaultDriver,
+		MaxReadConns: viper.GetInt("database.max_read_conns"),
+	}
 
 	rw, err := sql.Open(cfg.Driver, cfg.DataSourceName(filename, true))
 	if err != nil {
@@ -78,6 +82,10 @@ func New(filename string, config ...Config) (*SqlStore, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		// Cap the read pool. Forces read requests to queue instead of waste system resources on file descriptors and threads
+		ro.SetMaxOpenConns(cfg.MaxReadConns)
+		ro.SetMaxIdleConns(cfg.MaxReadConns)
 	} else {
 		ro = rw
 	}
@@ -308,20 +316,25 @@ func (s *SqlStore) StoreHosts(hosts model.HostList) error {
 		// Upsert network interfaces
 		nicIDs := make([]int64, 0)
 		for _, n := range h.Interfaces {
+			if err := validateFQDN(h.Name, n.Name, n.FQDN); err != nil {
+				return err
+			}
+
 			nt := model.NicTypeEthernet
 			if n.BMC {
 				nt = model.NicTypeBMC
 			}
 			nc, err := s.q.NicUpsert(ctx, tx, db.NicUpsertParams{
-				ID:      null.NewInt(n.ID, n.ID != 0),
-				NodeID:  node.ID,
-				NicType: nt.String(),
-				Name:    null.NewString(n.Name, len(n.Name) != 0),
-				IP:      null.NewString(n.IP.String(), n.IP.IsValid()),
-				MAC:     null.NewString(n.MAC.String(), n.MAC != nil),
-				FQDN:    null.NewString(n.FQDN, len(n.FQDN) != 0),
-				VLAN:    null.NewString(n.VLAN, len(n.VLAN) != 0),
-				MTU:     null.NewInt(int64(n.MTU), n.MTU != 0),
+				ID:        null.NewInt(n.ID, n.ID != 0),
+				NodeID:    node.ID,
+				NicType:   nt.String(),
+				Name:      null.NewString(n.Name, len(n.Name) != 0),
+				IP:        null.NewString(n.IP.Addr().String(), n.IP.IsValid()),
+				PrefixLen: null.NewInt(int64(n.IP.Bits()), n.IP.IsValid()),
+				MAC:       null.NewString(n.MAC.String(), n.MAC != nil),
+				FQDN:      null.NewString(n.FQDN, len(n.FQDN) != 0),
+				VLAN:      null.NewString(n.VLAN, len(n.VLAN) != 0),
+				MTU:       null.NewInt(int64(n.MTU), n.MTU != 0),
 			})
 			if err != nil {
 				return err
@@ -331,6 +344,10 @@ func (s *SqlStore) StoreHosts(hosts model.HostList) error {
 
 		// Upsert bond interfaces
 		for _, n := range h.Bonds {
+			if err := validateFQDN(h.Name, n.Name, n.FQDN); err != nil {
+				return err
+			}
+
 			peers := null.NewString("", false)
 			if len(n.Peers) > 0 {
 				pj, err := json.Marshal(&n.Peers)
@@ -340,16 +357,17 @@ func (s *SqlStore) StoreHosts(hosts model.HostList) error {
 				peers.SetValid(string(pj))
 			}
 			bi, err := s.q.NicUpsert(ctx, tx, db.NicUpsertParams{
-				ID:      null.NewInt(n.ID, n.ID != 0),
-				NodeID:  node.ID,
-				NicType: model.NicTypeBond.String(),
-				Name:    null.NewString(n.Name, len(n.Name) != 0),
-				IP:      null.NewString(n.IP.String(), n.IP.IsValid()),
-				FQDN:    null.NewString(n.FQDN, len(n.FQDN) != 0),
-				VLAN:    null.NewString(n.VLAN, len(n.VLAN) != 0),
-				MTU:     null.NewInt(int64(n.MTU), n.MTU != 0),
-				MAC:     null.NewString(n.MAC.String(), n.MAC != nil),
-				Peers:   peers,
+				ID:        null.NewInt(n.ID, n.ID != 0),
+				NodeID:    node.ID,
+				NicType:   model.NicTypeBond.String(),
+				Name:      null.NewString(n.Name, len(n.Name) != 0),
+				IP:        null.NewString(n.IP.Addr().String(), n.IP.IsValid()),
+				PrefixLen: null.NewInt(int64(n.IP.Bits()), n.IP.IsValid()),
+				FQDN:      null.NewString(n.FQDN, len(n.FQDN) != 0),
+				VLAN:      null.NewString(n.VLAN, len(n.VLAN) != 0),
+				MTU:       null.NewInt(int64(n.MTU), n.MTU != 0),
+				MAC:       null.NewString(n.MAC.String(), n.MAC != nil),
+				Peers:     peers,
 			})
 			if err != nil {
 				return err
@@ -380,18 +398,6 @@ func (s *SqlStore) DeleteHosts(ns *nodeset.NodeSet) error {
 	return s.q.NodeDelete(context.Background(), s.rw, ns.Iterator().StringSlice())
 }
 
-func (s *SqlStore) findNodeFromParams(params db.NodeFindParams) (*model.Host, error) {
-	nodeView, err := s.q.NodeFind(context.Background(), s.ro, params)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, store.ErrNotFound
-		}
-		return nil, err
-	}
-
-	return &nodeView.Host, nil
-}
-
 // LoadHostFromName returns the Host with the given name
 func (s *SqlStore) LoadHostFromName(name string) (*model.Host, error) {
 	nodeView, err := s.q.NodeFetchByName(context.Background(), s.ro, name)
@@ -419,63 +425,48 @@ func (s *SqlStore) LoadHostFromID(uid string) (*model.Host, error) {
 }
 
 // ResolveIPv4 returns the list of IPv4 addresses with the given FQDN
-func (s *SqlStore) ResolveIPv4(fqdn string) ([]net.IP, error) {
-	if len(fqdn) == 0 {
+func (s *SqlStore) ResolveIPv4(ctx context.Context, fqdn string) ([]net.IP, error) {
+	fqdnNormalized := strings.TrimSuffix(util.Normalize(fqdn), ".")
+	if fqdnNormalized == "" {
 		return nil, errors.New("invalid fqdn")
 	}
-	fqdnString := strings.TrimSuffix(util.Normalize(fqdn), ".")
-	ips := make([]net.IP, 0)
 
-	rows, err := s.q.NodeResolve(context.Background(), s.ro, db.NodeResolveParams{FilterFQDN: 1, FQDN: fqdnString})
+	rows, err := s.q.NodeResolveFQDN(ctx, s.ro, null.StringFrom(fqdnNormalized))
 	if err != nil {
 		return nil, err
 	}
 
+	ips := make([]net.IP, 0, len(rows))
 	for _, row := range rows {
-		// TODO: consider refactor data model to store fqdn as an array? for
-		// now this code ensures only exact fqdn exact matches are returned, as
-		// the sql fetches rows with like %% because of the comma separated string
-		exatcMatch := false
-		for _, name := range strings.Split(row.FQDN.String, ",") {
-			if strings.ToLower(name) == fqdnString {
-				exatcMatch = true
-				break
-			}
-		}
-		if !exatcMatch {
+		addr, err := netip.ParseAddr(row.String)
+		if err != nil || !addr.IsValid() {
 			continue
 		}
-
-		ip, _ := netip.ParsePrefix(row.IP.String)
-		if ip.IsValid() {
-			ips = append(ips, net.IP(ip.Addr().AsSlice()))
-		}
+		ips = append(ips, net.IP(addr.AsSlice()))
 	}
 
 	return ips, nil
 }
 
 // ReverseResolve returns the list of FQDNs for the given IP
-func (s *SqlStore) ReverseResolve(ip string) ([]string, error) {
+func (s *SqlStore) ReverseResolve(ctx context.Context, ip string) ([]string, error) {
 	if len(ip) == 0 {
 		return nil, errors.New("invalid ip")
 	}
-	fqdn := make([]string, 0)
 
-	rows, err := s.q.NodeResolve(context.Background(), s.ro, db.NodeResolveParams{FilterIP: 1, IP: ip})
+	rows, err := s.q.NodeResolveIP(ctx, s.ro, null.StringFrom(ip))
 	if err != nil {
 		return nil, err
 	}
 
+	fqdns := make([]string, 0, len(rows))
 	for _, row := range rows {
-		names := strings.Split(row.FQDN.String, ",")
-		for _, name := range names {
-			fqdn = append(fqdn, name)
-			break
+		if row.Valid && row.String != "" {
+			fqdns = append(fqdns, row.String)
 		}
 	}
 
-	return fqdn, nil
+	return fqdns, nil
 }
 
 // LoadHostFromMAC returns the Host that has a network interface with the give MAC address
@@ -483,7 +474,16 @@ func (s *SqlStore) LoadHostFromMAC(mac string) (*model.Host, error) {
 	if len(mac) == 0 {
 		return nil, errors.New("invalid mac")
 	}
-	return s.findNodeFromParams(db.NodeFindParams{FilterMAC: 1, MAC: null.StringFrom(mac)})
+
+	nodeView, err := s.q.NodeFindMAC(context.Background(), s.ro, null.StringFrom(mac))
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, store.ErrNotFound
+		}
+		return nil, err
+	}
+
+	return &nodeView.Host, nil
 }
 
 // Hosts returns a list of all the hosts
@@ -1008,4 +1008,13 @@ func (s *SqlStore) UpdateRolePermissions(role string, permissions model.Permissi
 func (s *SqlStore) Close() error {
 	s.ro.Close()
 	return s.rw.Close()
+}
+
+// validateFQDN rejects the old comma separated multi-name idiom. An interface has exactly one FQDN, and DNS lookups are exact matches against it
+func validateFQDN(node, ifname, fqdn string) error {
+	if !strings.Contains(fqdn, ",") {
+		return nil
+	}
+
+	return fmt.Errorf("Interfaces must contain a single FQDN. node=%s interface=%s fqdn=%q", node, ifname, fqdn)
 }

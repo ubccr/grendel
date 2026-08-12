@@ -5,8 +5,11 @@
 package dns
 
 import (
+	"context"
+	"errors"
 	"net"
 	"strings"
+	"time"
 
 	"github.com/miekg/dns"
 	"github.com/sirupsen/logrus"
@@ -16,14 +19,22 @@ import (
 )
 
 type handler struct {
-	db  store.Store
-	ttl uint32
+	db      store.Store
+	ttl     uint32
+	timeout time.Duration
 }
 
 func NewHandler(db store.Store, ttl uint32) (*handler, error) {
+	timeout := viper.GetDuration("dns.query_timeout")
+	// A zero timeout would expire every context immediately.
+	if timeout <= 0 {
+		timeout = defaultQueryTimeout
+	}
+
 	h := &handler{
-		db:  db,
-		ttl: ttl,
+		db:      db,
+		ttl:     ttl,
+		timeout: timeout,
 	}
 
 	return h, nil
@@ -32,6 +43,9 @@ func NewHandler(db store.Store, ttl uint32) (*handler, error) {
 func (h *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 	m := new(dns.Msg)
 	m.SetReply(r)
+
+	ctx, cancel := context.WithTimeout(context.Background(), h.timeout)
+	defer cancel()
 
 	qname := h.Name(r)
 	answers := []dns.RR{}
@@ -42,10 +56,13 @@ func (h *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		"type":   dns.TypeToString[queryType],
 		"client": w.RemoteAddr(),
 	}).Debug("Got DNS query")
+
+	var queryErr error
 	switch queryType {
 	case dns.TypePTR:
-		names, err := h.db.ReverseResolve(util.ExtractAddressFromReverse(qname))
+		names, err := h.db.ReverseResolve(ctx, util.ExtractAddressFromReverse(qname))
 		if err != nil {
+			queryErr = err
 			log.WithFields(logrus.Fields{
 				"qname": qname,
 				"err":   err,
@@ -53,8 +70,9 @@ func (h *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		}
 		answers = h.ptr(qname, h.ttl, names)
 	case dns.TypeA:
-		ips, err := h.db.ResolveIPv4(qname)
+		ips, err := h.db.ResolveIPv4(ctx, qname)
 		if err != nil {
+			queryErr = err
 			log.WithFields(logrus.Fields{
 				"qname": qname,
 				"err":   err,
@@ -63,13 +81,22 @@ func (h *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		answers = a(qname, h.ttl, ips)
 	}
 
+	// Answer SERVFAIL rather than going silent. A dropped response makes the client retransmit
+	if errors.Is(queryErr, context.DeadlineExceeded) {
+		m.SetRcode(r, dns.RcodeServerFailure)
+		if err := w.WriteMsg(m); err != nil {
+			log.WithError(err).Warn("Failed to write DNS response")
+		}
+		return
+	}
+
 	fwAddr := viper.GetString("dns.forward")
 	if len(answers) != 0 {
 		m.Authoritative = true
 		m.Answer = answers
 		m.SetRcode(r, dns.RcodeSuccess)
 	} else if len(answers) == 0 && fwAddr != "" {
-		fwm, err := dns.Exchange(r, fwAddr)
+		fwm, err := dns.ExchangeContext(ctx, r, fwAddr)
 		if err != nil {
 			log.WithFields(logrus.Fields{
 				"qname": qname,
@@ -82,7 +109,7 @@ func (h *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 
 	} else if queryType == dns.TypeAAAA || queryType == dns.TypeMX {
 		// Handle returning AAAA if IPv4 record exists
-		ips, err := h.db.ResolveIPv4(qname)
+		ips, err := h.db.ResolveIPv4(ctx, qname)
 		if err != nil {
 			log.WithFields(logrus.Fields{
 				"qname": qname,
@@ -99,7 +126,9 @@ func (h *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		m.SetRcode(r, dns.RcodeNameError)
 	}
 
-	w.WriteMsg(m)
+	if err := w.WriteMsg(m); err != nil {
+		log.WithError(err).Warn("Failed to write DNS response")
+	}
 }
 
 // The code below was adopted from the hosts plugin from coredns

@@ -16,28 +16,23 @@ select * from node_view where uid = @uid;
 -- name: NodeFetchByName :one
 select * from node_view where name = @name;
 
--- name: NodeFind :one
-select n.* 
+-- name: NodeFindMAC :one
+select n.*
 from node_view as n
 join nic as nc
 on nc.node_id = n.id
-where 
-  case 
-    when cast(@filter_mac as integer) then nc.mac = @mac
-    when cast(@filter_ip as integer) then nc.ip = @ip
-    else 0
-  end
+where nc.mac = @mac
 limit 1;
 
--- name: NodeResolve :many
-select nc.fqdn, nc.ip 
+-- name: NodeResolveFQDN :many
+select nc.ip
 from nic as nc
-where 
-  case 
-    when cast(@filter_fqdn as integer) then lower(nc.fqdn) like concat('%', cast(@fqdn as text), '%')
-    when cast(@filter_ip as integer) then substring(nc.ip, 0, instr(nc.ip, '/')) = cast(@ip as text)
-    else 0
-  end;
+where lower(nc.fqdn) = @fqdn;
+
+-- name: NodeResolveIP :many
+select nc.fqdn
+from nic as nc
+where nc.ip = @ip;
 
 -- name: NodeAll :many
 select * from node_view;
@@ -51,20 +46,20 @@ select id from tag
 where key in (sqlc.slice(tags));
 
 -- name: NodeFindNodeset :many
-select * from node_view 
+select * from node_view
 where name in (sqlc.slice(nodeset));
 
 -- name: NodeFindTags :many
-select 
+select
   n.name as name,
   count(distinct(t.key)) as cnt
 from
   node as n
 join node_tag as nt
-  on nt.node_id = n.id 
+  on nt.node_id = n.id
 join tag as t
-  on nt.tag_id = t.id 
-where 
+  on nt.tag_id = t.id
+where
   t.key in (sqlc.slice(tags))
 group by name;
 
