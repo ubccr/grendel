@@ -101,7 +101,7 @@ var (
 					NodeList: editedJson,
 				}, client.POSTV1NodesParams{})
 				if err != nil {
-					return err
+					return cmd.NewApiError(err)
 				}
 
 				return nil

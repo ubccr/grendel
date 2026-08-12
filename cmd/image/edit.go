@@ -63,7 +63,7 @@ var (
 					BootImages: editedJson,
 				}, client.POSTV1ImagesParams{})
 				if err != nil {
-					return err
+					return cmd.NewApiError(err)
 				}
 
 				return nil
