@@ -12,7 +12,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"path"
 	"path/filepath"
 	"strings"
 	"sync/atomic"
@@ -102,10 +101,19 @@ func buildTemplates() (*template.Template, error) {
 	}
 
 	if viper.IsSet("provision.templates_dir") {
-		glob := path.Join(viper.GetString("provision.templates_dir"), "*.tmpl")
-		tmpl, err = tmpl.Funcs(funcMap).ParseGlob(glob)
+		dir := filepath.Join(viper.GetString("provision.templates_dir"), "*.tmpl")
+		matches, err := filepath.Glob(dir)
 		if err != nil {
 			return nil, err
+		}
+
+		if len(matches) == 0 {
+			log.WithField("dir", dir).Warn("no additional templates found in provision.templates_dir")
+		} else {
+			tmpl, err = tmpl.Funcs(funcMap).ParseGlob(dir)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
