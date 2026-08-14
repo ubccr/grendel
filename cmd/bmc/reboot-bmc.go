@@ -5,7 +5,6 @@
 package bmc
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
@@ -20,13 +19,6 @@ var (
 		Short: "Reboot the BMC",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-
-			var err error
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			nodeset := args[0]
 			if args[0] == "all" {
 				nodeset = ""
@@ -35,7 +27,7 @@ var (
 				Nodeset: client.NewOptString(nodeset),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			res, err := gc.POSTV1BmcPowerBmc(context.Background(), params)
+			res, err := cmd.API.POSTV1BmcPowerBmc(command.Context(), params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

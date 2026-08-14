@@ -5,7 +5,6 @@
 package node
 
 import (
-	"context"
 	"encoding/json"
 	"os"
 	"strings"
@@ -22,11 +21,6 @@ var (
 		Args:              cobra.ExactArgs(1),
 		ValidArgsFunction: nodesetCompletion,
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			nodeset := args[0]
 			if args[0] == "all" {
 				nodeset = ""
@@ -35,7 +29,7 @@ var (
 				Nodeset: client.NewOptString(nodeset),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			res, err := gc.GETV1NodesFind(context.Background(), req)
+			res, err := cmd.API.GETV1NodesFind(command.Context(), req)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

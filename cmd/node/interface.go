@@ -6,7 +6,6 @@
 package node
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 
@@ -26,16 +25,11 @@ var (
 		Short: "delete an interface on a node",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			req := client.GETV1NodesFindParams{
 				Nodeset: client.NewOptString(args[0]),
 			}
 
-			res, err := gc.GETV1NodesFind(context.Background(), req)
+			res, err := cmd.API.GETV1NodesFind(command.Context(), req)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
@@ -68,7 +62,7 @@ var (
 				NodeList: decodedJson,
 			}
 			params := client.POSTV1NodesParams{}
-			storeRes, err := gc.POSTV1Nodes(context.Background(), &storeReq, params)
+			storeRes, err := cmd.API.POSTV1Nodes(command.Context(), &storeReq, params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
@@ -89,11 +83,6 @@ var (
 		Short: "add a new interface to a node",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			newIface := client.NewNilHostInterfacesItem(client.HostInterfacesItem{
 				Bmc:    client.NewOptBool(interfaceAddBmc),
 				Fqdn:   client.NewOptString(interfaceAddFqdn),
@@ -108,7 +97,7 @@ var (
 				Nodeset: client.NewOptString(args[0]),
 			}
 
-			res, err := gc.GETV1NodesFind(context.Background(), req)
+			res, err := cmd.API.GETV1NodesFind(command.Context(), req)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
@@ -134,7 +123,7 @@ var (
 				NodeList: decodedJson,
 			}
 			params := client.POSTV1NodesParams{}
-			storeRes, err := gc.POSTV1Nodes(context.Background(), &storeReq, params)
+			storeRes, err := cmd.API.POSTV1Nodes(command.Context(), &storeReq, params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

@@ -5,7 +5,6 @@
 package image
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"slices"
@@ -24,15 +23,10 @@ var (
 		Long:  `edit images`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			p := client.GETV1ImagesFindParams{
 				Names: client.NewOptString(strings.Join(args, ",")),
 			}
-			originalImages, err := gc.GETV1ImagesFind(context.Background(), p)
+			originalImages, err := cmd.API.GETV1ImagesFind(command.Context(), p)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
@@ -59,7 +53,7 @@ var (
 					}
 				}
 
-				response, err = gc.POSTV1Images(context.Background(), &client.BootImageAddRequest{
+				response, err = cmd.API.POSTV1Images(command.Context(), &client.BootImageAddRequest{
 					BootImages: editedJson,
 				}, client.POSTV1ImagesParams{})
 				if err != nil {

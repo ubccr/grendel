@@ -5,7 +5,6 @@
 package db
 
 import (
-	"context"
 	"encoding/json"
 	"os"
 
@@ -21,13 +20,8 @@ var (
 		Long:  `Dump database`,
 		Args:  cobra.ExactArgs(0),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			params := client.GETV1DbDumpParams{}
-			res, err := gc.GETV1DbDump(context.Background(), params)
+			res, err := cmd.API.GETV1DbDump(command.Context(), params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

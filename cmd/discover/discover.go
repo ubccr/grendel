@@ -69,6 +69,13 @@ func init() {
 			return err
 		}
 
+		// This hook shadows the root PersistentPreRunE, so cmd.API has to be built here as well or it stays nil for every discover subcommand.
+		gc, err := cmd.NewOgenClient()
+		if err != nil {
+			return err
+		}
+		cmd.API = gc
+
 		subnet = net.IPv4(0, 0, 0, 0)
 		if subnetStr != "" {
 			subnet = net.ParseIP(subnetStr)

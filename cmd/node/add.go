@@ -6,8 +6,6 @@
 package node
 
 import (
-	"context"
-
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/pkg/client"
@@ -23,11 +21,6 @@ var (
 		Short: "add node",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			newNode := []client.NilNodeAddRequestNodeListItem{
 				client.NewNilNodeAddRequestNodeListItem(client.NodeAddRequestNodeListItem{
 					Name:      client.NewOptString(args[0]),
@@ -42,7 +35,7 @@ var (
 				NodeList: newNode,
 			}
 			params := client.POSTV1NodesParams{}
-			storeRes, err := gc.POSTV1Nodes(context.Background(), storeReq, params)
+			storeRes, err := cmd.API.POSTV1Nodes(command.Context(), storeReq, params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

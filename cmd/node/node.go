@@ -5,7 +5,6 @@
 package node
 
 import (
-	"context"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -30,12 +29,6 @@ func init() {
 }
 
 func nodesetCompletion(command *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	gc, err := cmd.NewOgenClient()
-	if err != nil {
-		cobra.CompErrorln(err.Error())
-		return nil, cobra.ShellCompDirectiveError
-	}
-
 	tags, err := command.Flags().GetStringSlice("tags")
 	if err != nil {
 		cobra.CompErrorln(err.Error())
@@ -45,7 +38,7 @@ func nodesetCompletion(command *cobra.Command, args []string, toComplete string)
 	req := client.GETV1NodesFindParams{
 		Tags: client.NewOptString(strings.Join(tags, ",")),
 	}
-	res, err := gc.GETV1NodesFind(context.Background(), req)
+	res, err := cmd.API.GETV1NodesFind(command.Context(), req)
 	if err != nil {
 		cobra.CompErrorln(err.Error())
 		return nil, cobra.ShellCompDirectiveError
@@ -60,16 +53,10 @@ func nodesetCompletion(command *cobra.Command, args []string, toComplete string)
 }
 
 func tagCompletion(command *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	gc, err := cmd.NewOgenClient()
-	if err != nil {
-		cobra.CompErrorln(err.Error())
-		return nil, cobra.ShellCompDirectiveError
-	}
-
 	req := client.GETV1NodesFindParams{
 		Nodeset: client.NewOptString(args[0]),
 	}
-	res, err := gc.GETV1NodesFind(context.Background(), req)
+	res, err := cmd.API.GETV1NodesFind(command.Context(), req)
 	if err != nil {
 		cobra.CompErrorln(err.Error())
 		return nil, cobra.ShellCompDirectiveError

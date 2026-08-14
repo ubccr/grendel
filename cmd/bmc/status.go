@@ -5,7 +5,6 @@
 package bmc
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -25,12 +24,6 @@ var (
 		Long:  `Check BMC status`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			var err error
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			nodeset := args[0]
 			if args[0] == "all" {
 				nodeset = ""
@@ -39,7 +32,7 @@ var (
 				Nodeset: client.NewOptString(nodeset),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			res, err := gc.GETV1Bmc(context.Background(), params)
+			res, err := cmd.API.GETV1Bmc(command.Context(), params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

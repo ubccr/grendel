@@ -5,7 +5,6 @@
 package bmc
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -27,12 +26,6 @@ var (
 		Short: "List all redfish jobs on the BMC",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			var err error
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			nodeset := args[0]
 			if args[0] == "all" {
 				nodeset = ""
@@ -41,7 +34,7 @@ var (
 				Nodeset: client.NewOptString(nodeset),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			res, err := gc.GETV1BmcJobs(context.Background(), params)
+			res, err := cmd.API.GETV1BmcJobs(command.Context(), params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
@@ -94,15 +87,10 @@ var (
 		Long:  `Clear all jobs or by JID. Defaults to JID_CLEARALL to clear all jobs`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			if len(args) == 1 {
-				args = append(args, "JID_CLEARALL")
+			jids := args[1:]
+			if len(jids) == 0 {
+				jids = []string{"JID_CLEARALL"}
 			}
-			var err error
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			nodeset := args[0]
 			if args[0] == "all" {
 				nodeset = ""
@@ -110,9 +98,9 @@ var (
 			params := client.DELETEV1BmcJobsJidsParams{
 				Nodeset: client.NewOptString(nodeset),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
-				Jids:    strings.Join(args, ","),
+				Jids:    strings.Join(jids, ","),
 			}
-			res, err := gc.DELETEV1BmcJobsJids(context.Background(), params)
+			res, err := cmd.API.DELETEV1BmcJobsJids(command.Context(), params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

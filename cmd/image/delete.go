@@ -6,7 +6,6 @@
 package image
 
 import (
-	"context"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -21,15 +20,10 @@ var (
 		Long:  `Delete images`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			params := client.DELETEV1ImagesParams{
 				Names: client.NewOptString(strings.Join(args, ",")),
 			}
-			res, err := gc.DELETEV1Images(context.Background(), params)
+			res, err := cmd.API.DELETEV1Images(command.Context(), params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

@@ -5,7 +5,6 @@
 package status
 
 import (
-	"context"
 	"fmt"
 	"net/netip"
 	"sort"
@@ -29,16 +28,11 @@ var (
 		Long:  `Show IP segmentation`,
 		Args:  cobra.MinimumNArgs(0),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			req := client.GETV1NodesFindParams{
 				Nodeset: client.NewOptString(strings.Join(nodes, ",")),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			hostList, err := gc.GETV1NodesFind(context.Background(), req)
+			hostList, err := cmd.API.GETV1NodesFind(command.Context(), req)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

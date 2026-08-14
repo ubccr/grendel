@@ -5,7 +5,6 @@
 package bmc
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
@@ -22,12 +21,6 @@ var (
 		Long:  "Valid redfish.ResetType options: On, ForceOn, ForceOff, ForceRestart, GracefulRestart, GracefulShutdown, PowerCycle",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(command *cobra.Command, args []string) error {
-			var err error
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			// shorthand option syntax
 			powerOption := ""
 			switch args[0] {
@@ -54,7 +47,7 @@ var (
 				Nodeset: client.NewOptString(nodeset),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			res, err := gc.POSTV1BmcPowerOs(context.Background(), req, params)
+			res, err := cmd.API.POSTV1BmcPowerOs(command.Context(), req, params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

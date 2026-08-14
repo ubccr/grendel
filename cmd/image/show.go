@@ -5,7 +5,6 @@
 package image
 
 import (
-	"context"
 	"encoding/json"
 	"os"
 	"strings"
@@ -22,14 +21,9 @@ var (
 		Long:  `Show images`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			if strings.ToLower(args[0]) == "all" {
 				params := client.GETV1ImagesParams{}
-				res, err := gc.GETV1Images(context.Background(), params)
+				res, err := cmd.API.GETV1Images(command.Context(), params)
 				if err != nil {
 					return cmd.NewApiError(err)
 				}
@@ -38,7 +32,7 @@ var (
 				params := client.GETV1ImagesFindParams{
 					Names: client.NewOptString(strings.Join(args, ",")),
 				}
-				res, err := gc.GETV1ImagesFind(context.Background(), params)
+				res, err := cmd.API.GETV1ImagesFind(command.Context(), params)
 				if err != nil {
 					return cmd.NewApiError(err)
 				}

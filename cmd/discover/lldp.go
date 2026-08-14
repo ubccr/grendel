@@ -5,7 +5,6 @@
 package discover
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"text/tabwriter"
@@ -23,16 +22,11 @@ var (
 		Short: "Query LLDP port info from a switch",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			p := client.GETV1SwitchNodesetLldpParams{
 				Nodeset: args[0],
 				Ports:   client.NewOptString(lldpPorts),
 			}
-			res, err := gc.GETV1SwitchNodesetLldp(context.Background(), p)
+			res, err := cmd.API.GETV1SwitchNodesetLldp(command.Context(), p)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

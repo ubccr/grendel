@@ -5,7 +5,6 @@
 package bmc
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
@@ -24,11 +23,6 @@ var (
 		Short: "Set iDRAC to Auto configure",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			nodeset := args[0]
 			if args[0] == "all" {
 				nodeset = ""
@@ -37,7 +31,7 @@ var (
 				Nodeset: client.NewOptString(nodeset),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			res, err := gc.POSTV1BmcConfigureAuto(context.Background(), params)
+			res, err := cmd.API.POSTV1BmcConfigureAuto(command.Context(), params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
@@ -56,13 +50,8 @@ var (
 	shutdownType:	action bmc should take, NoReboot will wait for the node to be rebooted manually before applying. Any other type WILL REBOOT THE NODE.
 	filename:	idrac config file relative to grendel template folder.
 		`,
-		Args: cobra.ExactArgs(1),
+		Args: cobra.ExactArgs(3),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			nodeset := args[0]
 			if args[0] == "all" {
 				nodeset = ""
@@ -75,7 +64,7 @@ var (
 				Nodeset: client.NewOptString(nodeset),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			res, err := gc.POSTV1BmcConfigureImport(context.Background(), req, params)
+			res, err := cmd.API.POSTV1BmcConfigureImport(command.Context(), req, params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

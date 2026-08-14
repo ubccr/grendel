@@ -5,7 +5,6 @@
 package auth
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -30,18 +29,13 @@ var (
 		Short: "show user(s)",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			filter := args[0]
 
 			params := client.GETV1UsersParams{}
 			if filter != "all" {
 				params.Usernames = client.NewOptString(filter)
 			}
-			res, err := gc.GETV1Users(context.Background(), params)
+			res, err := cmd.API.GETV1Users(command.Context(), params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
@@ -61,18 +55,13 @@ var (
 		Short: "Edit a users role",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			req := &client.UserRoleRequest{
 				Role: client.NewOptString(args[1]),
 			}
 			params := client.PATCHV1UsersUsernamesRoleParams{
 				Usernames: args[0],
 			}
-			res, err := gc.PATCHV1UsersUsernamesRole(context.Background(), req, params)
+			res, err := cmd.API.PATCHV1UsersUsernamesRole(command.Context(), req, params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
@@ -85,11 +74,6 @@ var (
 		Short: "Enable or disable a user",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			b, err := strconv.ParseBool(args[1])
 			if err != nil {
 				return err
@@ -101,7 +85,7 @@ var (
 			params := client.PATCHV1UsersUsernamesEnableParams{
 				Usernames: args[0],
 			}
-			res, err := gc.PATCHV1UsersUsernamesEnable(context.Background(), req, params)
+			res, err := cmd.API.PATCHV1UsersUsernamesEnable(command.Context(), req, params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
@@ -114,11 +98,6 @@ var (
 		Short: "Add a new user",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			m := initialUserAddModel()
 
 			pr := tea.NewProgram(m)
@@ -141,7 +120,7 @@ var (
 					Username: args[0],
 				}
 				params := client.POSTV1AuthSignupParams{}
-				res, err := gc.POSTV1AuthSignup(context.Background(), req, params)
+				res, err := cmd.API.POSTV1AuthSignup(command.Context(), req, params)
 				if err != nil {
 					return cmd.NewApiError(err)
 				}
@@ -158,15 +137,10 @@ var (
 		Short: "Delete user(s)",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			params := client.DELETEV1UsersUsernamesParams{
 				Usernames: strings.Join(args, ","),
 			}
-			res, err := gc.DELETEV1UsersUsernames(context.Background(), params)
+			res, err := cmd.API.DELETEV1UsersUsernames(command.Context(), params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

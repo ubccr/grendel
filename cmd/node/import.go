@@ -5,7 +5,6 @@
 package node
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -21,11 +20,6 @@ var (
 		Short: "import nodes",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			var nodes []client.NilNodeAddRequestNodeListItem
 			for _, name := range args {
 				file, err := os.Open(name)
@@ -45,7 +39,7 @@ var (
 				NodeList: nodes,
 			}
 			params := client.POSTV1NodesParams{}
-			res, err := gc.POSTV1Nodes(context.Background(), req, params)
+			res, err := cmd.API.POSTV1Nodes(command.Context(), req, params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

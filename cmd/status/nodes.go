@@ -5,7 +5,6 @@
 package status
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
@@ -31,19 +30,14 @@ var (
 		Long:  `Detailed node status`,
 		Args:  cobra.NoArgs,
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			defaultImage := viper.GetString("provision.default_image")
-			inputTags := strings.Join(args, ",")
+			inputTags := strings.Join(tags, ",")
 
 			req := client.GETV1NodesFindParams{
 				Nodeset: client.NewOptString(strings.Join(nodes, ",")),
-				Tags:    client.NewOptString(strings.Join(tags, ",")),
+				Tags:    client.NewOptString(inputTags),
 			}
-			hostList, err := gc.GETV1NodesFind(context.Background(), req)
+			hostList, err := cmd.API.GETV1NodesFind(command.Context(), req)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

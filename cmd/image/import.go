@@ -5,7 +5,6 @@
 package image
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -22,11 +21,6 @@ var (
 		Long:  `import images`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			var images []client.NilBootImageAddRequestBootImagesItem
 			for _, name := range args {
 				file, err := os.Open(name)
@@ -49,7 +43,7 @@ var (
 				BootImages: images,
 			}
 			params := client.POSTV1ImagesParams{}
-			res, err := gc.POSTV1Images(context.Background(), req, params)
+			res, err := cmd.API.POSTV1Images(command.Context(), req, params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

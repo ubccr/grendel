@@ -5,7 +5,6 @@
 package image
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
@@ -25,11 +24,6 @@ var (
 		Short: "add image",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			provisionTemplatesMap := make(client.BootImageAddRequestBootImagesItemProvisionTemplates, 0)
 			for _, str := range provisionTemplates {
 				kv := strings.Split(str, "=")
@@ -56,7 +50,7 @@ var (
 			}
 			storeParams := client.POSTV1ImagesParams{}
 
-			storeRes, err := gc.POSTV1Images(context.Background(), storeReq, storeParams)
+			storeRes, err := cmd.API.POSTV1Images(command.Context(), storeReq, storeParams)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

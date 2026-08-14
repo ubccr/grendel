@@ -5,7 +5,6 @@
 package auth
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -24,18 +23,13 @@ var (
 		`,
 		Args: cobra.MinimumNArgs(3),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			req := &client.AuthTokenRequest{
 				Username: client.NewOptString(args[0]),
 				Role:     client.NewOptString(args[1]),
 				Expire:   client.NewOptString(args[2]),
 			}
 			params := client.POSTV1AuthTokenParams{}
-			res, err := gc.POSTV1AuthToken(context.Background(), req, params)
+			res, err := cmd.API.POSTV1AuthToken(command.Context(), req, params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

@@ -15,7 +15,9 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	homedir "github.com/mitchellh/go-homedir"
@@ -30,21 +32,33 @@ import (
 )
 
 var (
-	cfgFile     string
-	apiEndPoint string
-	debug       bool
-	verbose     bool
+	cfgFile string
+	debug   bool
+	verbose bool
+	API     *client.Client
 
 	Log  = logger.GetLogger("CLI")
 	Root = &cobra.Command{
 		Use:     "grendel",
 		Version: api.Version,
 		Short:   "Bare Metal Provisioning for HPC",
+		Long: `Syntax Legend:
+  < >   Required parameter
+  [ ]   Optional parameter
+  ...   Multiple parameters
+  |     Mutually Exclusive
+`,
 	}
 )
 
 func Execute() {
-	if err := Root.Execute(); err != nil {
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	if err := Root.ExecuteContext(ctx); err != nil {
+		if ctx.Err() != nil {
+			os.Exit(130)
+		}
 		Log.Fatal(err)
 	}
 }
@@ -59,7 +73,19 @@ func init() {
 	viper.BindPFlag("client.api_endpoint", Root.PersistentFlags().Lookup("endpoint"))
 
 	Root.PersistentPreRunE = func(command *cobra.Command, args []string) error {
-		return SetupLogging()
+		err := SetupLogging()
+		if err != nil {
+			return err
+		}
+
+		// Note that cobra's __complete command sets DisableFlagParsing, completions resolve the endpoint from the config file and env only, and an inline --endpoint or --config is ignored.
+		gc, err := NewOgenClient()
+		if err != nil {
+			return err
+		}
+		API = gc
+
+		return nil
 	}
 }
 

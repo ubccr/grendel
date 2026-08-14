@@ -5,7 +5,6 @@
 package db
 
 import (
-	"context"
 	"fmt"
 	"os"
 
@@ -24,11 +23,6 @@ var (
 		Long:  `Restore database`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			for _, name := range args {
 				file, err := os.ReadFile(name)
 				if err != nil {
@@ -68,7 +62,7 @@ var (
 				}
 
 				params := client.POSTV1DbRestoreParams{}
-				res, err := gc.POSTV1DbRestore(context.Background(), &dump, params)
+				res, err := cmd.API.POSTV1DbRestore(command.Context(), &dump, params)
 				if err != nil {
 					return cmd.NewApiError(err)
 				}

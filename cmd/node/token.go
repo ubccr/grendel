@@ -5,7 +5,6 @@
 package node
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
@@ -31,11 +30,6 @@ var (
 			}
 		},
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			nodeset := args[0]
 			if args[0] == "all" {
 				nodeset = ""
@@ -45,7 +39,7 @@ var (
 				Nodeset:   client.NewOptString(nodeset),
 				Tags:      client.NewOptString(strings.Join(tags, ",")),
 			}
-			res, err := gc.GETV1NodesTokenInterface(context.Background(), params)
+			res, err := cmd.API.GETV1NodesTokenInterface(command.Context(), params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

@@ -5,7 +5,6 @@
 package bmc
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -31,11 +30,6 @@ var (
 Must run bmc upgrade <nodeset> to populate firmware data`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			nodeset := args[0]
 
 			if nodeset == "all" {
@@ -46,7 +40,7 @@ Must run bmc upgrade <nodeset> to populate firmware data`,
 				Nodeset: client.NewOptString(nodeset),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			res, err := gc.GETV1BmcUpgradeDellRepo(context.Background(), params)
+			res, err := cmd.API.GETV1BmcUpgradeDellRepo(command.Context(), params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
@@ -99,10 +93,6 @@ Must run bmc upgrade <nodeset> to populate firmware data`,
 		Short: "Upgrade firmware on Dell servers",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
 			nodeset := args[0]
 
 			req := client.BmcDellInstallFromRepoRequest{
@@ -118,7 +108,7 @@ Must run bmc upgrade <nodeset> to populate firmware data`,
 				Nodeset: client.NewOptString(nodeset),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			res, err := gc.POSTV1BmcUpgradeDellInstallfromrepo(context.Background(), &req, params)
+			res, err := cmd.API.POSTV1BmcUpgradeDellInstallfromrepo(command.Context(), &req, params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}

@@ -5,7 +5,6 @@
 package auth
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"slices"
@@ -29,16 +28,11 @@ var (
 		Short: "List roles",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			var params client.GETV1RolesParams
 			if args[0] != "all" {
 				params.Name.SetTo(args[0])
 			}
-			res, err := gc.GETV1Roles(context.Background(), params)
+			res, err := cmd.API.GETV1Roles(command.Context(), params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
@@ -62,11 +56,6 @@ var (
 	[inherit] is the optional name of an existing role, it will set the permissions of the new role equal to the existing role`,
 		Args: cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			req := client.PostRolesRequest{
 				Role: client.NewOptString(args[0]),
 			}
@@ -74,7 +63,7 @@ var (
 				req.InheritedRole = client.NewOptString(args[1])
 			}
 			params := client.POSTV1RolesParams{}
-			res, err := gc.POSTV1Roles(context.Background(), &req, params)
+			res, err := cmd.API.POSTV1Roles(command.Context(), &req, params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
@@ -87,17 +76,12 @@ var (
 		Short: "Delete a new role",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			names := strings.Join(args, ",")
 
 			params := client.DELETEV1RolesNamesParams{
 				Names: names,
 			}
-			res, err := gc.DELETEV1RolesNames(context.Background(), params)
+			res, err := cmd.API.DELETEV1RolesNames(command.Context(), params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
@@ -114,15 +98,10 @@ var (
 		RunE: func(command *cobra.Command, args []string) error {
 			m := InitialModel(args[0])
 
-			gc, err := cmd.NewOgenClient()
-			if err != nil {
-				return err
-			}
-
 			params := client.GETV1RolesParams{
 				Name: client.NewOptString(args[0]),
 			}
-			res, err := gc.GETV1Roles(context.Background(), params)
+			res, err := cmd.API.GETV1Roles(command.Context(), params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
@@ -165,7 +144,7 @@ var (
 					PermissionList: permissions,
 				}
 				params := client.PATCHV1RolesParams{}
-				patchRes, err := gc.PATCHV1Roles(context.Background(), &req, params)
+				patchRes, err := cmd.API.PATCHV1Roles(command.Context(), &req, params)
 				if err != nil {
 					return cmd.NewApiError(err)
 				}
@@ -209,7 +188,7 @@ var (
 					PermissionList: permissions,
 				}
 				params := client.PATCHV1RolesParams{}
-				res, err := gc.PATCHV1Roles(context.Background(), &req, params)
+				res, err := cmd.API.PATCHV1Roles(command.Context(), &req, params)
 				if err != nil {
 					return cmd.NewApiError(err)
 				}
