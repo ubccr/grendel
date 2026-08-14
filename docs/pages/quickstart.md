@@ -13,7 +13,7 @@ Grendel server.
 ## Configuration
 
 Grendel can be configured using a `TOML` file. See
-[here](https://github.com/ubccr/grendel/blob/master/grendel.toml.sample) for a
+[here](https://github.com/ubccr/grendel/blob/main/configs/grendel.toml.sample) for a
 sample.
 
 ## Assemble the Boot Image
