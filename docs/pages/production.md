@@ -2,10 +2,19 @@
 
 The following are tips for deploying Grendel in a production environment.
 
+## CLI
+
+Grendel installs two binaries. `grendel` is the server: it runs the
+services and the node discovery commands. `grendelctl` is the command
+line client for everything else — nodes, images, users, roles, BMCs — and reaches
+a running server over the API, either the unix socket or a TCP endpoint.
+
+Only `grendel` has to live on the provisioning host. `grendelctl` needs nothing
+but a path to the API, so it can be installed anywhere administrators work.
+
 ## Running a subset of services
 
-`grendel serve` runs every service: `api`, `dhcp`, `dns`, `provision`, `pxe` and
-`tftp`. Name the ones you want to run only those:
+`grendel serve` by default runs every service: `api`, `dhcp`, `dns`, `provision`, `pxe` and `tftp`. If you only want to run a subset, you may pass them as args or through the `--services` flag:
 
 ```
 grendel serve dhcp dns tftp

@@ -75,7 +75,7 @@ $ make clean
 $ make build-with-ca
 $ make bindata
 $ cd ..
-$ go build .
+$ go build ./cmd/grendel
 ```
 
 !!! note

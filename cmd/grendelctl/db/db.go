@@ -1,0 +1,24 @@
+// SPDX-FileCopyrightText: (C) 2019 Grendel Authors
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+package db
+
+import (
+	"github.com/spf13/cobra"
+	"github.com/ubccr/grendel/cmd/shared"
+	"github.com/ubccr/grendel/internal/logger"
+)
+
+var (
+	tags  []string
+	log   = logger.GetLogger("DB")
+	dbCmd = &cobra.Command{
+		Use:   "db",
+		Short: "Database commands",
+	}
+)
+
+func init() {
+	shared.Root.AddCommand(dbCmd)
+}

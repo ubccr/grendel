@@ -24,14 +24,14 @@ We need to extract a few things from the ISO:
  CLI example:
 
  ```bash
- grendel image add ubuntu \
+ grendelctl image add ubuntu \
  --cmdline "console=ttyS0 console=tty0,115200n8 root=/dev/ram0 ramdisk_size=1500000 ip=dhcp url={{ $.endpoints.RepoURL }}/ubuntu/ubuntu-24.04.1-live-server-amd64.iso autoinstall cloud-config-url=/dev/null ds=nocloud-net;s={{ $.endpoints.CloudInitURL }}" \
  --initrd /var/lib/grendel/images/ubuntu/initrd \
  --kernel /var/lib/grendel/images/ubuntu/vmlinuz
 
  # Provision templates can be added with
  # --provision-template kickstart=/var/lib/grendel/templates/ubuntu-autoinstall.tmpl
- # Or added after the fact with 'grendel image edit <name>'
+ # Or added after the fact with 'grendelctl image edit <name>'
  ```
 
  #### Cmdline:
@@ -64,7 +64,7 @@ You can use the Web UI or CLI to add a new image.
 CLI example:
 
 ```bash
-grendel image add rocky10 \
+grendelctl image add rocky10 \
 --cmdline "console=ttyS0 console=tty0,115200n8 ip=dhcp inst.stage2={{ $.endpoints.RepoURL }}/rocky/10 inst.ks={{ $.endpoints.KickstartURL }}" \
 --initrd /var/lib/grendel/images/rocky10/initrd.img \
 --kernel /var/lib/grendel/images/rocky10/vmlinuz \
