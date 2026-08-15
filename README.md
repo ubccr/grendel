@@ -113,6 +113,9 @@ Create the following JSON file `host.json`:
 $ sudo ./grendel --verbose serve --hosts host.json --images image.json --listen 192.168.10.254
 ```
 
+This runs every service. Name the ones you want to run a subset, for example
+`grendel serve dhcp dns tftp`.
+
 Note: The serve command requires root privileges to bind to lower level ports.
 If you don't want to run as root you can allow Grendel to bind to privileged
 with the following command:

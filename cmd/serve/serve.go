@@ -5,13 +5,11 @@
 package serve
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
-	"os/signal"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -19,7 +17,6 @@ import (
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/store/sqlstore"
 	"github.com/ubccr/grendel/pkg/model"
-	"gopkg.in/tomb.v2"
 )
 
 var (
@@ -28,10 +25,31 @@ var (
 	imagesFile    string
 	listenAddress string
 	serveCmd      = &cobra.Command{
-		Use:   "serve",
-		Short: "Run services",
-		Long:  `Run grendel services`,
+		Use:   "serve [service]...",
+		Short: "Run grendel services",
+		Args:  cobra.ArbitraryArgs,
+		ValidArgsFunction: func(_ *cobra.Command, args []string, _ string) ([]string, cobra.ShellCompDirective) {
+			names := make([]string, 0, len(registry))
+			for _, s := range services() {
+				names = append(names, s.Name)
+			}
+
+			return names, cobra.ShellCompDirectiveNoFileComp
+		},
 		RunE: func(command *cobra.Command, args []string) error {
+			// cobra skips PersistentPostRunE when RunE returns an error, so the close belongs here where a failed start still reaches it
+			defer closeDB()
+
+			names := args
+			if len(names) == 0 {
+				names = viper.GetStringSlice("services")
+			}
+
+			svcs, err := selectServices(names)
+			if err != nil {
+				return err
+			}
+
 			if imagesFile != "" {
 				err := loadImageJSON()
 				if err != nil {
@@ -45,7 +63,7 @@ var (
 				}
 			}
 
-			return runServices()
+			return run(command.Context(), svcs)
 		},
 	}
 )
@@ -57,9 +75,11 @@ func init() {
 	viper.BindPFlag("dbpath", serveCmd.PersistentFlags().Lookup("dbpath"))
 	serveCmd.PersistentFlags().StringVar(&hostsFile, "hosts", "", "path to hosts file")
 	serveCmd.PersistentFlags().StringVar(&imagesFile, "images", "", "path to boot images file")
-	serveCmd.PersistentFlags().StringSlice("services", []string{}, "enabled services")
+	serveCmd.PersistentFlags().StringSlice("services", []string{}, "enabled services, ignored when services are named on the command line")
 	serveCmd.PersistentFlags().StringVar(&listenAddress, "listen", "", "listen address")
 	viper.BindPFlag("services", serveCmd.PersistentFlags().Lookup("services"))
+	serveCmd.PersistentFlags().Duration("shutdown-timeout", defaultShutdownTimeout, "how long to wait for a service to stop")
+	viper.BindPFlag("shutdown_timeout", serveCmd.PersistentFlags().Lookup("shutdown-timeout"))
 
 	serveCmd.PersistentPreRunE = func(command *cobra.Command, args []string) error {
 		err := cmd.SetupLogging()
@@ -83,29 +103,24 @@ func init() {
 		return nil
 	}
 
-	serveCmd.PersistentPostRunE = func(command *cobra.Command, args []string) error {
-		if DB != nil {
-			cmd.Log.Info("Closing Database")
-			err := DB.Close()
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
-	}
-
 	cmd.Root.AddCommand(serveCmd)
 }
 
-func loadHostJSON() error {
-	file, err := os.Open(hostsFile)
-	if err != nil {
-		return err
+// closeDB is deferred by RunE rather than run from a post run hook, so that a service that fails to start still checkpoints and releases the database
+func closeDB() {
+	if DB == nil {
+		return
 	}
-	defer file.Close()
 
-	jsonBlob, err := ioutil.ReadAll(file)
+	cmd.Log.Info("Closing Database")
+
+	if err := DB.Close(); err != nil {
+		cmd.Log.Errorf("Failed closing database: %s", err)
+	}
+}
+
+func loadHostJSON() error {
+	jsonBlob, err := os.ReadFile(hostsFile)
 	if err != nil {
 		return err
 	}
@@ -126,13 +141,7 @@ func loadHostJSON() error {
 }
 
 func loadImageJSON() error {
-	file, err := os.Open(imagesFile)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	jsonBlob, err := ioutil.ReadAll(file)
+	jsonBlob, err := os.ReadFile(imagesFile)
 	if err != nil {
 		return err
 	}
@@ -159,60 +168,23 @@ func loadImageJSON() error {
 	return nil
 }
 
-func runServices() error {
-	t := NewInterruptTomb()
-	t.Go(func() error {
-		t.Go(func() error { return serveTFTP(t) })
-		t.Go(func() error { return serveDNS(t) })
-		t.Go(func() error { return serveDHCP(t) })
-		t.Go(func() error { return servePXE(t) })
-		t.Go(func() error { return serveAPI(t) })
-		t.Go(func() error { return serveProvision(t) })
-		return nil
-	})
-	return t.Wait()
-}
-
-func NewInterruptTomb() *tomb.Tomb {
-	t := &tomb.Tomb{}
-	go func() {
-		sigint := make(chan os.Signal, 1)
-		signal.Notify(sigint, os.Interrupt)
-		select {
-		case <-t.Dying():
-		case <-sigint:
-			cmd.Log.Debug("Caught interrupt signal")
-			t.Kill(nil)
-		}
-	}()
-
-	return t
-}
-
-func GetListenAddress(address string) (string, error) {
+// GetListenAddress takes a viper key and returns a listen address
+//
+// Local `--tftp-listen` flags override the global `--listen` flag
+func getListenAddress(key string) string {
+	address := viper.GetString(key)
 	if listenAddress == "" {
-		return address, nil
+		return address
+	}
+
+	if serveCmd.Flags().Changed(strings.Replace(key, ".", "-", 1)) {
+		return address
 	}
 
 	_, port, err := net.SplitHostPort(address)
 	if err != nil {
-		return "", err
+		return address
 	}
 
-	return fmt.Sprintf("%s:%s", listenAddress, port), nil
-}
-
-func NewInterruptContext() (context.Context, context.CancelFunc) {
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt)
-
-	ctx, cancel := context.WithCancel(context.Background())
-
-	go func() {
-		oscall := <-c
-		cmd.Log.Debugf("Signal interrupt system call: %+v", oscall)
-		cancel()
-	}()
-
-	return ctx, cancel
+	return fmt.Sprintf("%s:%s", listenAddress, port)
 }

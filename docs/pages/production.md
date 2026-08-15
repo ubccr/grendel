@@ -2,6 +2,25 @@
 
 The following are tips for deploying Grendel in a production environment.
 
+## Running a subset of services
+
+`grendel serve` runs every service: `api`, `dhcp`, `dns`, `provision`, `pxe` and
+`tftp`. Name the ones you want to run only those:
+
+```
+grendel serve dhcp dns tftp
+```
+
+The same set can be pinned in the config file, and any service named on the
+command line overrides it:
+
+```toml
+services = ["dhcp", "dns", "tftp"]
+```
+
+Per-service flags such as `--dhcp-listen` work whether you run one service or all
+of them.
+
 ## Database settings
 
 Unless you installed an rpm or deb package, Grendel's database is stored

@@ -5,55 +5,46 @@
 package serve
 
 import (
-	"context"
-	"time"
-
-	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/internal/provision"
-	"gopkg.in/tomb.v2"
 )
 
 func init() {
-	provisionCmd.Flags().String("provision-listen", "0.0.0.0:80", "address to listen on")
-	viper.BindPFlag("provision.listen", provisionCmd.Flags().Lookup("provision-listen"))
-	provisionCmd.Flags().String("provision-cert", "", "path to ssl cert")
-	viper.BindPFlag("provision.cert", provisionCmd.Flags().Lookup("provision-cert"))
-	provisionCmd.Flags().String("provision-key", "", "path to ssl key")
-	viper.BindPFlag("provision.key", provisionCmd.Flags().Lookup("provision-key"))
-	provisionCmd.Flags().String("default-image", "", "default image name")
-	viper.BindPFlag("provision.default_image", provisionCmd.Flags().Lookup("default-image"))
-	provisionCmd.Flags().String("repo-dir", "", "path to repo dir")
-	viper.BindPFlag("provision.repo_dir", provisionCmd.Flags().Lookup("repo-dir"))
-	provisionCmd.Flags().String("templates-dir", "", "path to templates dir")
-	viper.BindPFlag("provision.templates_dir", provisionCmd.Flags().Lookup("templates-dir"))
+	serveCmd.PersistentFlags().String("provision-listen", "0.0.0.0:80", "address to listen on")
+	viper.BindPFlag("provision.listen", serveCmd.PersistentFlags().Lookup("provision-listen"))
+	serveCmd.PersistentFlags().String("provision-cert", "", "path to ssl cert")
+	viper.BindPFlag("provision.cert", serveCmd.PersistentFlags().Lookup("provision-cert"))
+	serveCmd.PersistentFlags().String("provision-key", "", "path to ssl key")
+	viper.BindPFlag("provision.key", serveCmd.PersistentFlags().Lookup("provision-key"))
+	serveCmd.PersistentFlags().String("default-image", "", "default image name")
+	viper.BindPFlag("provision.default_image", serveCmd.PersistentFlags().Lookup("default-image"))
+	serveCmd.PersistentFlags().String("repo-dir", "", "path to repo dir")
+	viper.BindPFlag("provision.repo_dir", serveCmd.PersistentFlags().Lookup("repo-dir"))
+	serveCmd.PersistentFlags().String("templates-dir", "", "path to templates dir")
+	viper.BindPFlag("provision.templates_dir", serveCmd.PersistentFlags().Lookup("templates-dir"))
 
-	serveCmd.AddCommand(provisionCmd)
+	register(&Service{
+		Name: "provision",
+		New:  newProvision,
+	})
 }
 
-var (
-	provisionCmd = &cobra.Command{
-		Use:   "provision",
-		Short: "Run Provision server",
-		Long:  `Run Provision server`,
-		RunE: func(command *cobra.Command, args []string) error {
-			t := NewInterruptTomb()
-			t.Go(func() error { return serveProvision(t) })
-			return t.Wait()
-		},
-	}
-)
+// provisionRunner adapts the provision server, whose Serve takes the default image name, to the Runner interface
+type provisionRunner struct {
+	*provision.Server
+	defaultImage string
+}
 
-func serveProvision(t *tomb.Tomb) error {
-	pListen, err := GetListenAddress(viper.GetString("provision.listen"))
-	if err != nil {
-		return err
-	}
+func (p *provisionRunner) Serve() error {
+	return p.Server.Serve(p.defaultImage)
+}
+
+func newProvision() (Runner, error) {
+	pListen := getListenAddress("provision.listen")
 
 	srv, err := provision.NewServer(DB, pListen)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	srv.KeyFile = viper.GetString("provision.key")
@@ -61,20 +52,5 @@ func serveProvision(t *tomb.Tomb) error {
 	srv.RepoDir = viper.GetString("provision.repo_dir")
 	srv.TemplatesDir = viper.GetString("provision.templates_dir")
 
-	t.Go(func() error {
-		time.Sleep(1 * time.Second)
-		<-t.Dying()
-		cmd.Log.Info("Shutting down Provision server...")
-		ctxShutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-
-		if err := srv.Shutdown(ctxShutdown); err != nil {
-			cmd.Log.Errorf("Failed shutting down Provision server: %s", err)
-			return err
-		}
-
-		return nil
-	})
-
-	return srv.Serve(viper.GetString("provision.default_image"))
+	return &provisionRunner{Server: srv, defaultImage: viper.GetString("provision.default_image")}, nil
 }

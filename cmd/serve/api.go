@@ -5,72 +5,45 @@
 package serve
 
 import (
-	"context"
-	"time"
+	"errors"
 
-	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/internal/api"
-	"gopkg.in/tomb.v2"
 )
 
 func init() {
-	apiCmd.PersistentFlags().String("api-listen", "", "address to listen on")
-	viper.BindPFlag("api.listen", apiCmd.PersistentFlags().Lookup("api-listen"))
-	apiCmd.PersistentFlags().String("api-socket", "", "path to unix socket")
-	viper.BindPFlag("api.socket_path", apiCmd.PersistentFlags().Lookup("api-socket"))
-	apiCmd.PersistentFlags().String("api-cert", "", "path to ssl cert")
-	viper.BindPFlag("api.cert", apiCmd.PersistentFlags().Lookup("api-cert"))
-	apiCmd.PersistentFlags().String("api-key", "", "path to ssl key")
-	viper.BindPFlag("api.key", apiCmd.PersistentFlags().Lookup("api-key"))
+	serveCmd.PersistentFlags().String("api-listen", "", "address to listen on")
+	viper.BindPFlag("api.listen", serveCmd.PersistentFlags().Lookup("api-listen"))
+	serveCmd.PersistentFlags().String("api-socket", "", "path to unix socket")
+	viper.BindPFlag("api.socket_path", serveCmd.PersistentFlags().Lookup("api-socket"))
+	serveCmd.PersistentFlags().String("api-cert", "", "path to ssl cert")
+	viper.BindPFlag("api.cert", serveCmd.PersistentFlags().Lookup("api-cert"))
+	serveCmd.PersistentFlags().String("api-key", "", "path to ssl key")
+	viper.BindPFlag("api.key", serveCmd.PersistentFlags().Lookup("api-key"))
 
-	serveCmd.AddCommand(apiCmd)
+	register(&Service{
+		Name: "api",
+		New:  newAPI,
+	})
 }
 
-var (
-	apiCmd = &cobra.Command{
-		Use:   "api",
-		Short: "Run API server",
-		Long:  `Run API server`,
-		RunE: func(command *cobra.Command, args []string) error {
-			t := NewInterruptTomb()
-			t.Go(func() error { return serveAPI(t) })
-			return t.Wait()
-		},
-	}
-)
+func newAPI() (Runner, error) {
+	socket := viper.GetString("api.socket_path")
+	tcpListen := getListenAddress("api.listen")
 
-func serveAPI(t *tomb.Tomb) error {
-	apiListen, err := GetListenAddress(viper.GetString("api.listen"))
+	if socket == "" && tcpListen == "" {
+		return nil, errors.New("set api.socket_path or api.listen")
+	}
+
+	srv, err := api.NewServer(DB, socket, tcpListen)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	apiServer, err := api.NewServer(DB, viper.GetString("api.socket_path"), apiListen)
-	if err != nil {
-		return err
-	}
+	srv.KeyFile = viper.GetString("api.key")
+	srv.CertFile = viper.GetString("api.cert")
+	srv.CORS = viper.GetBool("api.cors")
+	srv.SwaggerUI = viper.GetBool("api.swagger_ui")
 
-	apiServer.KeyFile = viper.GetString("api.key")
-	apiServer.CertFile = viper.GetString("api.cert")
-	apiServer.CORS = viper.GetBool("api.cors")
-	apiServer.SwaggerUI = viper.GetBool("api.swagger_ui")
-
-	t.Go(func() error {
-		time.Sleep(1 * time.Second)
-		<-t.Dying()
-		cmd.Log.Info("Shutting down API server...")
-		ctxShutdown, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-
-		if err := apiServer.Shutdown(ctxShutdown); err != nil {
-			cmd.Log.Errorf("Failed shutting down API server: %s", err)
-			return err
-		}
-
-		return nil
-	})
-
-	return apiServer.Serve()
+	return srv, nil
 }
