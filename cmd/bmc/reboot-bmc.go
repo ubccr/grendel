@@ -5,7 +5,6 @@
 package bmc
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -14,8 +13,15 @@ import (
 )
 
 var (
+	powerBmcFilter  []string
+	powerBmcOptions *cmd.TableOptions
+	powerBmcColumns = []cmd.Column{
+		{Name: "Node"},
+		{Name: "Status"},
+		{Name: "Message"},
+	}
 	powerBmcCmd = &cobra.Command{
-		Use:   "reboot-bmc {nodeset | all}",
+		Use:   "reboot-bmc <nodeset | all>",
 		Short: "Reboot the BMC",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
@@ -27,19 +33,31 @@ var (
 				Nodeset: client.NewOptString(nodeset),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			res, err := cmd.API.POSTV1BmcPowerBmc(command.Context(), params)
+			jobs, err := cmd.API.POSTV1BmcPowerBmc(command.Context(), params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
 
-			for _, jobMessage := range res {
-				fmt.Printf("%s\t %s\t %s\n", jobMessage.Host.Value, jobMessage.Status.Value, jobMessage.Msg.Value)
+			t := cmd.NewTable(powerBmcColumns, powerBmcFilter).Options(*powerBmcOptions).Empty("-")
+
+			for _, job := range jobs {
+				t.AppendRow(
+					job.Host.Value,
+					job.Status.Value,
+					job.Msg.Value,
+				)
 			}
+
+			t.Print()
 			return nil
 		},
 	}
 )
 
 func init() {
+	powerBmcOptions = cmd.RegisterTableFlags(powerBmcCmd)
+	powerBmcCmd.Flags().StringSliceVar(&powerBmcFilter, "filter", nil, "filter table columns by name")
+	powerBmcCmd.RegisterFlagCompletionFunc("filter", cmd.ColumnCompletion(powerBmcColumns))
+
 	bmcCmd.AddCommand(powerBmcCmd)
 }

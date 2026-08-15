@@ -7,7 +7,6 @@ package bmc
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -16,12 +15,27 @@ import (
 )
 
 var (
-	statusLong bool
-	statusOEM  bool
-	statusCmd  = &cobra.Command{
-		Use:   "status {nodeset | all}",
+	statusFilter  []string
+	statusOptions *cmd.TableOptions
+	statusColumns = []cmd.Column{
+		{Name: "Node"},
+		{Name: "Host Name"},
+		{Name: "Power Status"},
+		{Name: "Serial"},
+		{Name: "BIOS Version"},
+		{Name: "Manufacturer"},
+		{Name: "Model"},
+		{Name: "Health"},
+		{Name: "CPU"},
+		{Name: "Memory"},
+		{Name: "Boot Order"},
+		{Name: "Boot Next"},
+		{Name: "OEM"},
+	}
+
+	statusCmd = &cobra.Command{
+		Use:   "status <nodeset | all>",
 		Short: "Check BMC status",
-		Long:  `Check BMC status`,
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
 			nodeset := args[0]
@@ -37,40 +51,46 @@ var (
 				return cmd.NewApiError(err)
 			}
 
-			output := make([]client.RedfishSystem, len(res))
-			for i, v := range res {
-				if !statusOEM {
-					v.OemDell.Reset()
+			t := cmd.NewTable(statusColumns, statusFilter).Options(*statusOptions).Empty("-")
+			for _, o := range res {
+				bootOrder := make([]string, 0, len(o.BootOrder.Value))
+				for _, s := range o.BootOrder.Value {
+					bootOrder = append(bootOrder, s.Value)
 				}
-				output[i] = v
-			}
 
-			if statusLong {
-				enc := json.NewEncoder(os.Stdout)
-				enc.SetIndent("", "    ")
-
-				err := enc.Encode(output)
+				oem, err := json.MarshalIndent(o.OemDell, "", "  ")
 				if err != nil {
-					return err
-				}
-			} else {
-				for _, o := range output {
-
-					if !statusLong {
-						fmt.Printf("%s\t %s\t %s\t %s\n", o.Name.Value, o.PowerStatus.Value, o.SerialNumber.Value, o.BiosVersion.Value)
-						continue
-					}
+					log.WithField("node", o.Name.Value).Error(fmt.Errorf("failed to marshal OEM json: %w", err))
 				}
 
+				t.AppendRow(
+					o.Name.Value,
+					o.HostName.Value,
+					o.PowerStatus.Value,
+					o.SerialNumber.Value,
+					o.BiosVersion.Value,
+					o.Manufacturer.Value,
+					o.Model.Value,
+					o.Health.Value,
+					fmt.Sprintf("%d", o.ProcessorCount.Value),
+					fmt.Sprintf("%.2f", o.TotalMemory.Value),
+					strings.Join(bootOrder, ","),
+					o.BootNext.Value,
+					string(oem),
+				)
 			}
 
+			t.Print()
 			return nil
 		},
 	}
 )
 
 func init() {
-	statusCmd.Flags().BoolVar(&statusLong, "long", false, "Display long format")
-	statusCmd.Flags().BoolVar(&statusOEM, "oem", false, "Display oem info")
+	statusOptions = cmd.RegisterTableFlags(statusCmd)
+	statusCmd.Flags().StringSliceVar(&statusFilter, "filter", []string{"Host Name", "Manufacturer", "CPU", "Memory", "Boot Order", "Boot Next", "OEM"}, "filter table columns by name")
+
+	statusCmd.RegisterFlagCompletionFunc("filter", cmd.ColumnCompletion(statusColumns))
+
 	bmcCmd.AddCommand(statusCmd)
 }

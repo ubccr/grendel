@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package image
+package auth
 
 import (
 	"strings"
@@ -13,24 +13,26 @@ import (
 )
 
 var (
-	showCmd = &cobra.Command{
-		Use:   "show [name]...",
-		Short: "Show images",
-		Args:  cobra.ArbitraryArgs,
+	roleDeleteCmd = &cobra.Command{
+		Use:   "delete <name>...",
+		Short: "Delete a role",
+		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			params := client.GETV1ImagesFindParams{
-				Names: client.NewOptString(strings.Join(args, ",")),
+			names := strings.Join(args, ",")
+
+			params := client.DELETEV1RolesNamesParams{
+				Names: names,
 			}
-			res, err := cmd.API.GETV1ImagesFind(command.Context(), params)
+			res, err := cmd.API.DELETEV1RolesNames(command.Context(), params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
 
-			return cmd.OutputJSON(res)
+			return cmd.NewApiResponse(res)
 		},
 	}
 )
 
 func init() {
-	imageCmd.AddCommand(showCmd)
+	roleCmd.AddCommand(roleDeleteCmd)
 }

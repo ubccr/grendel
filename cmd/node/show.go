@@ -5,8 +5,6 @@
 package node
 
 import (
-	"encoding/json"
-	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -16,36 +14,25 @@ import (
 
 var (
 	showCmd = &cobra.Command{
-		Use:               "show {nodeset | all]",
+		Use:               "show [nodeset]...",
 		Short:             "Show nodes",
-		Args:              cobra.ExactArgs(1),
+		Args:              cobra.ArbitraryArgs,
 		ValidArgsFunction: nodesetCompletion,
 		RunE: func(command *cobra.Command, args []string) error {
-			nodeset := args[0]
-			if args[0] == "all" {
-				nodeset = ""
-			}
-			req := client.GETV1NodesFindParams{
-				Nodeset: client.NewOptString(nodeset),
+			params := client.GETV1NodesFindParams{
+				Nodeset: client.NewOptString(strings.Join(args, ",")),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			res, err := cmd.API.GETV1NodesFind(command.Context(), req)
+			res, err := cmd.API.GETV1NodesFind(command.Context(), params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
 
-			return output(res)
+			return cmd.OutputJSON(res)
 		},
 	}
 )
 
 func init() {
 	nodeCmd.AddCommand(showCmd)
-}
-
-func output(data any) error {
-	enc := json.NewEncoder(os.Stdout)
-	enc.SetIndent("", "    ")
-
-	return enc.Encode(data)
 }

@@ -5,81 +5,21 @@
 package bmc
 
 import (
-	"fmt"
-	"os"
 	"strings"
 
-	"github.com/jedib0t/go-pretty/v6/table"
-	"github.com/jedib0t/go-pretty/v6/text"
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/pkg/client"
 )
 
 var (
-	firmwareCmd = &cobra.Command{
-		Use:   "firmware",
-		Short: "BMC Firmware commands",
-		Long:  `BMC Firmware commands`,
+	firmwareUpgradeFilter  []string
+	firmwareUpgradeOptions *cmd.TableOptions
+	firmwareUpgradeColumns = []cmd.Column{
+		{Name: "Node"},
+		{Name: "Status"},
+		{Name: "Message"},
 	}
-
-	firmwareCheckCmd = &cobra.Command{
-		Use:   "check <nodeset>",
-		Short: "Check for updates on Dell servers",
-		Long: `Check for updates on Dell servers
-Must run bmc upgrade <nodeset> to populate firmware data`,
-		Args: cobra.ExactArgs(1),
-		RunE: func(command *cobra.Command, args []string) error {
-			nodeset := args[0]
-
-			if nodeset == "all" {
-				nodeset = ""
-			}
-
-			params := client.GETV1BmcUpgradeDellRepoParams{
-				Nodeset: client.NewOptString(nodeset),
-				Tags:    client.NewOptString(strings.Join(tags, ",")),
-			}
-			res, err := cmd.API.GETV1BmcUpgradeDellRepo(command.Context(), params)
-			if err != nil {
-				return cmd.NewApiError(err)
-			}
-
-			t := table.NewWriter()
-			t.SetOutputMirror(os.Stdout)
-			t.AppendHeader(table.Row{"Host", "Component", "Current Version", "Latest Version", "Reboot Required"})
-			t.SetColumnConfigs([]table.ColumnConfig{
-				{
-					Name:      "Host",
-					AutoMerge: true,
-				},
-			})
-
-			for _, host := range res {
-				if host.Status.Value != "success" {
-					fmt.Printf("%s\t%s\n", host.Name.Value, host.Message.Value)
-				}
-				for _, fw := range host.UpdateList {
-					t.AppendRow(table.Row{
-						host.Name.Value,
-						fw.DisplayName.Value,
-						fw.InstalledVersion.Value,
-						colorVersion(fw.InstalledVersion.Value, fw.PackageVersion.Value),
-						fw.RebootType.Value,
-					}, table.RowConfig{AutoMerge: true})
-				}
-				t.AppendSeparator()
-			}
-
-			t.AppendSeparator()
-
-			t.SetStyle(table.StyleLight)
-			t.Render()
-
-			return nil
-		},
-	}
-
 	firmwareUpgradeApplyUpdate       bool
 	firmwareUpgradeCatalogFile       string
 	firmwareUpgradeIpAddress         string
@@ -103,36 +43,37 @@ Must run bmc upgrade <nodeset> to populate firmware data`,
 				RebootNeeded:      client.NewOptBool(firmwareUpgradeRebootNeeded),
 				ShareName:         client.NewOptString(firmwareUpgradeShareName),
 				ShareType:         client.NewOptString(firmwareUpgradeShareType),
+				ClearJobQueue:     client.NewOptBool(firmwareUpgradeClearJobs),
 			}
 			params := client.POSTV1BmcUpgradeDellInstallfromrepoParams{
 				Nodeset: client.NewOptString(nodeset),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			res, err := cmd.API.POSTV1BmcUpgradeDellInstallfromrepo(command.Context(), &req, params)
+			jobs, err := cmd.API.POSTV1BmcUpgradeDellInstallfromrepo(command.Context(), &req, params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
 
-			for _, jobMessage := range res {
-				fmt.Printf("%s\t %s\t %s\n", jobMessage.Host.Value, jobMessage.Status.Value, jobMessage.Msg.Value)
+			t := cmd.NewTable(firmwareUpgradeColumns, firmwareUpgradeFilter).Options(*firmwareUpgradeOptions).Empty("-")
+
+			for _, job := range jobs {
+				t.AppendRow(
+					job.Host.Value,
+					job.Status.Value,
+					job.Msg.Value,
+				)
 			}
 
+			t.Print()
 			return nil
 		},
 	}
 )
 
-func colorVersion(v1, v2 string) string {
-	if v1 != v2 {
-		return text.FgHiRed.Sprint(v2)
-	}
-	return text.FgHiGreen.Sprint(v1)
-}
-
 func init() {
-	bmcCmd.AddCommand(firmwareCmd)
-	firmwareCmd.AddCommand(firmwareCheckCmd)
-	firmwareCmd.AddCommand(firmwareUpgradeCmd)
+	firmwareUpgradeOptions = cmd.RegisterTableFlags(firmwareUpgradeCmd)
+	firmwareUpgradeCmd.Flags().StringSliceVar(&firmwareUpgradeFilter, "filter", nil, "filter table columns by name")
+	firmwareUpgradeCmd.RegisterFlagCompletionFunc("filter", cmd.ColumnCompletion(firmwareUpgradeColumns))
 
 	firmwareUpgradeCmd.Flags().BoolVarP(&firmwareUpgradeApplyUpdate, "apply-update", "a", false, "By default only check for updates, do not queue them. Pass this flag to apply available updates.")
 	firmwareUpgradeCmd.Flags().StringVar(&firmwareUpgradeCatalogFile, "catalog-file", "", "Update catalog name. Defaults to Catalog.xml")
@@ -142,4 +83,6 @@ func init() {
 	firmwareUpgradeCmd.Flags().BoolVar(&firmwareUpgradeClearJobs, "clear-jobs", false, "Clear all jobs in the job queue before upgrading. apply-update must be true")
 	firmwareUpgradeCmd.Flags().StringVar(&firmwareUpgradeShareName, "share-name", "", "")
 	firmwareUpgradeCmd.Flags().StringVar(&firmwareUpgradeShareType, "share-type", "HTTPS", "Valid options: HTTPS, HTTP, NFS, or CIFS")
+
+	firmwareCmd.AddCommand(firmwareUpgradeCmd)
 }

@@ -1,12 +1,17 @@
+// SPDX-FileCopyrightText: (C) 2019 Grendel Authors
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 package auth
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
+	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/bubbles/paginator"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 type model struct {
@@ -25,8 +30,10 @@ func InitialModel(role string) model {
 	p := paginator.New()
 	p.Type = paginator.Dots
 	p.PerPage = 10
-	p.ActiveDot = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "235", Dark: "252"}).Render("•")
-	p.InactiveDot = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "250", Dark: "238"}).Render("•")
+	// lipgloss v2 dropped AdaptiveColor, background detection is now explicit
+	lightDark := lipgloss.LightDark(lipgloss.HasDarkBackground(os.Stdin, os.Stdout))
+	p.ActiveDot = lipgloss.NewStyle().Foreground(lightDark(lipgloss.Color("235"), lipgloss.Color("252"))).Render("•")
+	p.InactiveDot = lipgloss.NewStyle().Foreground(lightDark(lipgloss.Color("250"), lipgloss.Color("238"))).Render("•")
 
 	return model{
 		role:      role,
@@ -63,20 +70,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.cursor++
 			}
 
-		case "left", "h":
-			if !m.paginator.OnFirstPage() {
-				m.cursor -= m.paginator.PerPage
-			}
-
-		case "right", "l":
-			if !m.paginator.OnLastPage() {
-				m.cursor += m.paginator.PerPage
-			}
-			if m.cursor > len(m.choices) {
-				m.cursor = len(m.choices) - 1
-			}
-
 		case "enter", " ":
+			if m.cursor < 0 || m.cursor >= len(m.choices) {
+				break
+			}
 			_, ok := m.selected[m.cursor]
 			if ok {
 				delete(m.selected, m.cursor)
@@ -91,7 +88,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	}
 
+	// the paginator turns the page on its own keys, left/h/pgup and right/l/pgdown, so the cursor is held on the same row of whichever page it lands on rather than being left behind on the old one
+	start, _ := m.paginator.GetSliceBounds(len(m.choices))
+	offset := m.cursor - start
+
 	m.paginator, c = m.paginator.Update(msg)
+
+	start, end := m.paginator.GetSliceBounds(len(m.choices))
+	m.cursor = min(max(start+offset, start), end-1)
 
 	return m, c
 }
@@ -112,9 +116,9 @@ func (m model) View() string {
 			checked = "x"
 		}
 
-		b.WriteString(fmt.Sprintf("%s [%s] %s\n", cursor, checked, choice))
+		fmt.Fprintf(&b, "%s [%s] %s\n", cursor, checked, choice)
 	}
-	b.WriteString("\n" + m.paginator.View() + "\n")
+	fmt.Fprintf(&b, "\n%s\n", m.paginator.View())
 	b.WriteString("k/j: up/down  h/l: left/right \n")
 	b.WriteString("q: quit s: save \n")
 

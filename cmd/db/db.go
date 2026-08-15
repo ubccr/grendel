@@ -16,7 +16,6 @@ var (
 	dbCmd = &cobra.Command{
 		Use:   "db",
 		Short: "Database commands",
-		Long:  `Database commands`,
 	}
 )
 

@@ -5,7 +5,6 @@
 package bmc
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -14,6 +13,13 @@ import (
 )
 
 var (
+	powerFilter  []string
+	powerOptions *cmd.TableOptions
+	powerColumns = []cmd.Column{
+		{Name: "Node"},
+		{Name: "Status"},
+		{Name: "Message"},
+	}
 	override string
 	powerCmd = &cobra.Command{
 		Use:   "power {cycle | off | on | redfish.ResetType} {nodeset | all}",
@@ -52,15 +58,27 @@ var (
 				return cmd.NewApiError(err)
 			}
 
+			t := cmd.NewTable(powerColumns, powerFilter).Options(*powerOptions).Empty("-")
+
 			for _, jobMessage := range res {
-				fmt.Printf("%s\t %s\t %s\n", jobMessage.Host.Value, jobMessage.Status.Value, jobMessage.Msg.Value)
+				t.AppendRow(
+					jobMessage.Host.Value,
+					jobMessage.Status.Value,
+					jobMessage.Msg.Value,
+				)
 			}
+
+			t.Print()
 			return nil
 		},
 	}
 )
 
 func init() {
-	powerCmd.PersistentFlags().StringVarP(&override, "override", "o", "None", "Set redfish boot override. Valid options: None, Pxe, BiosSetup, Utilities, Diags")
+	powerOptions = cmd.RegisterTableFlags(powerCmd)
+	powerCmd.Flags().StringSliceVar(&powerFilter, "filter", nil, "filter table columns by name")
+	powerCmd.RegisterFlagCompletionFunc("filter", cmd.ColumnCompletion(powerColumns))
+
+	powerCmd.Flags().StringVarP(&override, "override", "o", "None", "Set redfish boot override. Valid options: None, Pxe, BiosSetup, Utilities, Diags")
 	bmcCmd.AddCommand(powerCmd)
 }

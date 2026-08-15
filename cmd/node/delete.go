@@ -15,14 +15,13 @@ import (
 
 var (
 	deleteCmd = &cobra.Command{
-		Use:               "delete <nodeset>",
+		Use:               "delete <nodeset>...",
 		Short:             "Delete nodes",
-		Long:              `Delete nodes`,
-		Args:              cobra.ExactArgs(1),
+		Args:              cobra.MinimumNArgs(1),
 		ValidArgsFunction: nodesetCompletion,
 		RunE: func(command *cobra.Command, args []string) error {
 			params := client.DELETEV1NodesParams{
-				Nodeset: client.NewOptString(args[0]),
+				Nodeset: client.NewOptString(strings.Join(args, ",")),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
 			res, err := cmd.API.DELETEV1Nodes(command.Context(), params)

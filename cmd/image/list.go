@@ -6,9 +6,8 @@ package image
 
 import (
 	"fmt"
-	"os"
+	"strconv"
 	"strings"
-	"text/tabwriter"
 
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd"
@@ -16,48 +15,58 @@ import (
 )
 
 var (
+	listFilter  []string
+	listOptions *cmd.TableOptions
+	listColumns = []cmd.Column{
+		{Name: "Name"},
+		{Name: "Kernel"},
+		{Name: "Command Line", MinWidth: 10},
+		{Name: "Initrd"},
+		{Name: "Provision Templates"},
+		{Name: "Verify"},
+	}
+
 	listCmd = &cobra.Command{
-		Use:   "list {names... | all}",
-		Short: "List images",
-		Long:  `List images`,
-		Args:  cobra.MinimumNArgs(1),
+		Use:     "list [names]...",
+		Short:   "List images",
+		Aliases: []string{"ls"},
+		Args:    cobra.ArbitraryArgs,
 		RunE: func(command *cobra.Command, args []string) error {
-			var res []client.BootImage
-			var err error
-
-			if strings.ToLower(args[0]) == "all" {
-				params := client.GETV1ImagesParams{}
-				res, err = cmd.API.GETV1Images(command.Context(), params)
-				if err != nil {
-					return cmd.NewApiError(err)
-				}
-			} else {
-				params := client.GETV1ImagesFindParams{
-					Names: client.NewOptString(strings.Join(args, ",")),
-				}
-				res, err = cmd.API.GETV1ImagesFind(command.Context(), params)
-				if err != nil {
-					return cmd.NewApiError(err)
-				}
-
+			params := client.GETV1ImagesFindParams{
+				Names: client.NewOptString(strings.Join(args, ",")),
+			}
+			images, err := cmd.API.GETV1ImagesFind(command.Context(), params)
+			if err != nil {
+				return cmd.NewApiError(err)
 			}
 
-			w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', 0)
+			t := cmd.NewTable(listColumns, listFilter).Options(*listOptions).Empty("-")
 
-			fmt.Fprintln(w, "Name\tKernel\tInitrd\tLive Image\tProvision Templates")
-			for _, image := range res {
-				provisionTemplates := make([]string, 0)
+			for _, image := range images {
+				var sb strings.Builder
 				for k, v := range image.ProvisionTemplates.Value {
-					provisionTemplates = append(provisionTemplates, fmt.Sprintf("\"%s\": \"%s\"", k, v.Value))
+					if sb.Len() > 0 {
+						sb.WriteString(",")
+					}
+
+					fmt.Fprintf(&sb, "%s=%s", k, v.Value)
 				}
-				fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", image.Name, image.Kernel, strings.Join(image.Initrd, ","), strings.Join(provisionTemplates, ","))
+
+				t.AppendRow(image.Name, image.Kernel, image.Cmdline.Value, strings.Join(image.Initrd, ","), sb.String(), strconv.FormatBool(image.Verify.Value))
 			}
 
-			return w.Flush()
+			t.Print()
+
+			return nil
 		},
 	}
 )
 
 func init() {
+	listOptions = cmd.RegisterTableFlags(listCmd)
+	listCmd.Flags().StringSliceVar(&listFilter, "filter", []string{"Command Line"}, "filter table columns by name")
+
+	listCmd.RegisterFlagCompletionFunc("filter", cmd.ColumnCompletion(listColumns))
+
 	imageCmd.AddCommand(listCmd)
 }

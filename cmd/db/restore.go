@@ -20,7 +20,6 @@ var (
 	restoreCmd = &cobra.Command{
 		Use:   "restore <filename>...",
 		Short: "Restore database",
-		Long:  `Restore database`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
 			for _, name := range args {

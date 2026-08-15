@@ -5,9 +5,6 @@
 package db
 
 import (
-	"encoding/json"
-	"os"
-
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/pkg/client"
@@ -17,7 +14,6 @@ var (
 	dumpCmd = &cobra.Command{
 		Use:   "dump",
 		Short: "Dump database",
-		Long:  `Dump database`,
 		Args:  cobra.ExactArgs(0),
 		RunE: func(command *cobra.Command, args []string) error {
 			params := client.GETV1DbDumpParams{}
@@ -26,14 +22,7 @@ var (
 				return cmd.NewApiError(err)
 			}
 
-			enc := json.NewEncoder(os.Stdout)
-			enc.SetIndent("", "    ")
-			if err := enc.Encode(res); err != nil {
-				return err
-			}
-
-			return nil
-
+			return cmd.OutputJSON(res)
 		},
 	}
 )

@@ -17,9 +17,9 @@ var (
 	tags    []string
 	log     = logger.GetLogger("NODE")
 	nodeCmd = &cobra.Command{
-		Use:   "node",
-		Short: "Node commands",
-		Long:  `Node commands`,
+		Use:     "node",
+		Short:   "Node commands",
+		Aliases: []string{"nodes"},
 	}
 )
 

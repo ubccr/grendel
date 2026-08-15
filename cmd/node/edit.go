@@ -17,18 +17,13 @@ import (
 
 var (
 	editCmd = &cobra.Command{
-		Use:               "edit {nodeset | all}",
+		Use:               "edit [nodeset]...",
 		Short:             "edit nodes",
-		Args:              cobra.ExactArgs(1),
+		Args:              cobra.ArbitraryArgs,
 		ValidArgsFunction: nodesetCompletion,
 		RunE: func(command *cobra.Command, args []string) error {
-			nodeset := args[0]
-			if args[0] == "all" {
-				nodeset = ""
-			}
-
 			p := client.GETV1NodesFindParams{
-				Nodeset: client.NewOptString(nodeset),
+				Nodeset: client.NewOptString(strings.Join(args, ",")),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
 			originalNodes, err := cmd.API.GETV1NodesFind(command.Context(), p)

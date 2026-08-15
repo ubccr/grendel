@@ -5,10 +5,8 @@
 package node
 
 import (
-	"fmt"
-	"os"
+	"strconv"
 	"strings"
-	"text/tabwriter"
 
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd"
@@ -16,37 +14,71 @@ import (
 )
 
 var (
+	listFilter  []string
+	listOptions *cmd.TableOptions
+	listColumns = []cmd.Column{
+		{Name: "Name"},
+		{Name: "Provision"},
+		{Name: "Firmware"},
+		{Name: "Boot Image"},
+		{Name: "IP"},
+		{Name: "FQDN"},
+		{Name: "MAC"},
+		{Name: "Tags", MinWidth: 10},
+	}
+
 	listCmd = &cobra.Command{
-		Use:               "list {nodeset | all]",
+		Use:               "list [nodeset]...",
 		Short:             "list nodes",
-		Args:              cobra.ExactArgs(1),
+		Aliases:           []string{"ls"},
+		Args:              cobra.ArbitraryArgs,
 		ValidArgsFunction: nodesetCompletion,
 		RunE: func(command *cobra.Command, args []string) error {
-			nodeset := args[0]
-			if args[0] == "all" {
-				nodeset = ""
-			}
-			req := client.GETV1NodesFindParams{
-				Nodeset: client.NewOptString(nodeset),
+			params := client.GETV1NodesFindParams{
+				Nodeset: client.NewOptString(strings.Join(args, ",")),
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			res, err := cmd.API.GETV1NodesFind(command.Context(), req)
+			res, err := cmd.API.GETV1NodesFind(command.Context(), params)
 			if err != nil {
 				return cmd.NewApiError(err)
 			}
 
-			w := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', 0)
+			t := cmd.NewTable(listColumns, listFilter).Options(*listOptions).Empty("-")
 
-			fmt.Fprintln(w, "Name\tProvision\tFirmware\tBoot Image\tTags")
 			for _, node := range res {
-				fmt.Fprintf(w, "%s\t%t\t%s\t%s\t%s\n", node.Name.Value, node.Provision.Value, node.Firmware.Value, node.BootImage.Value, strings.Join(node.Tags.Value, ","))
+				ips := make([]string, 0, len(node.Interfaces))
+				fqdns := make([]string, 0, len(node.Interfaces))
+				macs := make([]string, 0, len(node.Interfaces))
+				for _, iface := range node.Interfaces {
+					ips = append(ips, iface.Value.IP.Value)
+					fqdns = append(fqdns, iface.Value.Fqdn.Value)
+					macs = append(macs, iface.Value.MAC.Value)
+				}
+
+				t.AppendRow(
+					node.Name.Value,
+					strconv.FormatBool(node.Provision.Value),
+					node.Firmware.Value,
+					node.BootImage.Value,
+					strings.Join(ips, ","),
+					strings.Join(fqdns, ","),
+					strings.Join(macs, ","),
+					strings.Join(node.Tags.Value, ","),
+				)
 			}
 
-			return w.Flush()
+			t.Print()
+
+			return nil
 		},
 	}
 )
 
 func init() {
+	listOptions = cmd.RegisterTableFlags(listCmd)
+	listCmd.Flags().StringSliceVar(&listFilter, "filter", []string{"IP", "FQDN", "MAC"}, "filter table columns by name")
+
+	listCmd.RegisterFlagCompletionFunc("filter", cmd.ColumnCompletion(listColumns))
+
 	nodeCmd.AddCommand(listCmd)
 }

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: (C) 2019 Grendel Authors
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 package auth
 
 import (
@@ -49,9 +53,9 @@ func (m userAddModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c", "q":
+		case "ctrl+c":
 			return m, tea.Quit
-		case "tab", "up", "down", "enter":
+		case "up", "down", "enter":
 			s := msg.String()
 
 			if s == "up" {
@@ -70,7 +74,7 @@ func (m userAddModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.focusIndex > len(m.inputs)-1 {
 				m.focusIndex = 0
 			} else if m.focusIndex < 0 {
-				m.focusIndex = len(m.inputs)
+				m.focusIndex = len(m.inputs) - 1
 			}
 
 			cmds := make([]tea.Cmd, len(m.inputs))
@@ -103,7 +107,7 @@ func (m userAddModel) View() string {
 			b.WriteRune('\n')
 		}
 	}
-	b.WriteString("\n\nq/ctrl+c: quit  enter: submit\n")
+	b.WriteString("\n\nctrl+c: quit  enter: submit\n")
 
 	return b.String()
 }

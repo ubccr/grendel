@@ -11,9 +11,9 @@ import (
 
 var (
 	imageCmd = &cobra.Command{
-		Use:   "image",
-		Short: "Boot Image commands",
-		Long:  `Boot Image commands`,
+		Use:     "image",
+		Short:   "Boot Image commands",
+		Aliases: []string{"images"},
 	}
 )
 

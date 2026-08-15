@@ -5,9 +5,6 @@
 package image
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd"
 	"github.com/ubccr/grendel/pkg/client"
@@ -17,7 +14,7 @@ var (
 	cmdline            string
 	initrd             []string
 	kernel             string
-	provisionTemplates []string
+	provisionTemplates map[string]string
 	verify             bool
 	newCmd             = &cobra.Command{
 		Use:   "add <name>",
@@ -25,13 +22,8 @@ var (
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
 			provisionTemplatesMap := make(client.BootImageAddRequestBootImagesItemProvisionTemplates, 0)
-			for _, str := range provisionTemplates {
-				kv := strings.Split(str, "=")
-				if len(kv) != 2 {
-					return fmt.Errorf("failed to parse provision template key value pair %s", str)
-				}
-
-				provisionTemplatesMap[kv[0]] = client.NewNilString(kv[1])
+			for k, v := range provisionTemplates {
+				provisionTemplatesMap[k] = client.NewNilString(v)
 			}
 
 			newImage := []client.NilBootImageAddRequestBootImagesItem{
@@ -61,11 +53,11 @@ var (
 )
 
 func init() {
-	newCmd.PersistentFlags().StringVar(&cmdline, "cmdline", "", "Kernel Command Line")
-	newCmd.PersistentFlags().StringArrayVar(&initrd, "initrd", []string{}, "Path to Initrd images. Can be passed multiple times")
-	newCmd.PersistentFlags().StringVar(&kernel, "kernel", "", "Path to Kernel")
-	newCmd.PersistentFlags().StringArrayVar(&provisionTemplates, "provision-template", []string{}, "Provision template map. Example: kickstart=/var/lib/grendel/templates/ubuntu-kickstart.tmpl  Can be passed multiple times")
-	newCmd.PersistentFlags().BoolVar(&verify, "verify", false, "Verify the image through iPXE on boot. Requires a .sig file for the kernel & initrd in the same directory")
+	newCmd.Flags().StringVar(&cmdline, "cmdline", "", "Kernel Command Line")
+	newCmd.Flags().StringSliceVar(&initrd, "initrd", nil, "Path to Initrd image")
+	newCmd.Flags().StringVar(&kernel, "kernel", "", "Path to Kernel")
+	newCmd.Flags().StringToStringVar(&provisionTemplates, "provision-template", nil, "Provision template map. Example: `kickstart=/path.tmpl`")
+	newCmd.Flags().BoolVar(&verify, "verify", false, "Verify the image through iPXE on boot. Requires a .sig file for the kernel & initrd in the same directory")
 
 	imageCmd.AddCommand(newCmd)
 }

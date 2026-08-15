@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	tokemCmd = &cobra.Command{
+	tokenCmd = &cobra.Command{
 		Use:   "token <username> <role> <expire>",
 		Short: "Create an auth token",
 		Long: `Args:
@@ -42,5 +42,5 @@ var (
 )
 
 func init() {
-	authCmd.AddCommand(tokemCmd)
+	authCmd.AddCommand(tokenCmd)
 }
