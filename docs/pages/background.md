@@ -118,7 +118,7 @@ number, and VLANID. We can then provide Grendel a simple text file of hostname
 to port mapping to automatically load hosts into Grendel.
 
 ```
-$ grendel discover switch --endpoint swe-d13-25 --mapping hosts.txt --subnet 10.64.0.0
+$ grendeld discover switch --endpoint swe-d13-25 --mapping hosts.txt --subnet 10.64.0.0
 ```
 
 ### Discover hosts using DHCP
@@ -132,7 +132,7 @@ manner. We can run Grendel with the following command providing a subnet and a
 nodeset for assigning host names:
 
 ```
-$ grendel discover dhcp --subnet 10.64.0.0 --nodeset tux-[01-100]
+$ grendeld discover dhcp --subnet 10.64.0.0 --nodeset tux-[01-100]
 ```
 
 ### Discover hosts using a file
@@ -144,7 +144,7 @@ names, IP, and MAC addresses via other means and simply want to load these into
 Grendel.
 
 ```
-$ grendel discover file --input hosts.txt
+$ grendeld discover file --input hosts.txt
 ```
 
 ## Boot process overview

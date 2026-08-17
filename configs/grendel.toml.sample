@@ -26,7 +26,7 @@ loggers = {cli="on", tftp="off", dhcp="on", dns="off", provision="on", api="on",
 #
 # Services to run. Valid entries are api, dhcp, dns, provision, pxe and tftp.
 # Leave this empty or unset to run all of them. Naming services on the command
-# line, as in `grendel serve dhcp dns`, overrides this.
+# line, as in `grendeld serve dhcp dns`, overrides this.
 #
 services = []
 

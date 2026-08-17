@@ -17,8 +17,8 @@ ARG TARGETOS
 ARG TARGETARCH
 
 COPY --from=build /out/ /
+COPY ${TARGETOS}/${TARGETARCH}/grendeld /usr/bin/grendeld
 COPY ${TARGETOS}/${TARGETARCH}/grendel /usr/bin/grendel
-COPY ${TARGETOS}/${TARGETARCH}/grendelctl /usr/bin/grendelctl
 
 ENV HOME=/root
 
@@ -26,6 +26,6 @@ WORKDIR /var/lib/grendel
 
 EXPOSE 80/tcp 8080/tcp 53/tcp 53/udp 67/udp 69/udp 4011/udp
 
-ENTRYPOINT ["/usr/bin/grendel"]
+ENTRYPOINT ["/usr/bin/grendeld"]
 
 CMD ["serve", "--verbose"]

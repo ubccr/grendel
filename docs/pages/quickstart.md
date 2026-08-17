@@ -111,7 +111,7 @@ We can convert this into Grendel's host JSON format using the following
 command:
 
 ```
-./grendel discover file --input hosts.tsv > hosts.json
+./grendeld discover file --input hosts.tsv > hosts.json
 ```
 
 ## Start services
@@ -124,5 +124,5 @@ necessary to netboot the nodes by running Grendel:
     be booted into Ubuntu
 
 ```
-sudo ./grendel --verbose serve --hosts hosts.json --images boot-image.json
+sudo ./grendeld --verbose serve --hosts hosts.json --images boot-image.json
 ```

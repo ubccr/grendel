@@ -3,7 +3,7 @@
 ## [0.2.9] - 2026-08-17
 
 > [!WARNING]
-> **Grendel now ships two binaries.** `grendel` runs the server and the privileged discovery commands, `grendelctl` is the API client for everything else. Client commands move: `grendel node list` -> `grendelctl node list`. Both binaries are installed by the rpm/deb packages and shipped in the release tarball.
+> **Grendel now ships two binaries.** `grendeld` runs the server and the privileged discovery commands, `grendel` is the API client for everything else. Server commands move: `grendel serve` -> `grendeld serve`, `grendel discover` -> `grendeld discover`. Both binaries are installed by the rpm/deb packages and shipped in the release tarball.
 >
 > **NICs now hold a single FQDN.** Comma separated names are no longer supported. The migration keeps the first name on each interface and logs every name it drops, run `grendel db dump` prior to upgrade
 >
@@ -30,10 +30,10 @@ provision:
 - fixed an empty `provision.templates_dir` killing the provision server
 
 cli:
-- split the CLI into the `grendel` server and the `grendelctl` client, `grendelctl`
-- added `grendelctl version`, which prints the client and server version over the API
-- added service selection to `grendel serve`, either as args or through `--services`, with a matching `services` config option
-- moved `discover lldp` to `grendelctl lldp`, which no longer demands `--subnet`
+- split the CLI into the `grendeld` server and the `grendel` client, which builds without cgo
+- added `grendel version`, which prints the client and server version over the API
+- added service selection to `grendeld serve`, either as args or through `--services`, with a matching `services` config option
+- moved `discover lldp` to `grendel lldp`, which no longer demands `--subnet`
 - reworked various `list` command outputs with a custom table formatter
 - renamed the `show` subcommands of `auth user`, `auth role` and `bmc job` to `list`
 - non disruptive command like `grendel node list` imply `all` by default

@@ -4,18 +4,18 @@ The following are tips for deploying Grendel in a production environment.
 
 ## CLI
 
-Grendel installs two binaries. `grendel` is the server: it runs the
-services and the node discovery commands. `grendelctl` is the command
+Grendel installs two binaries. `grendeld` is the server: it runs the
+services and the node discovery commands. `grendel` is the command
 line client for everything else — nodes, images, users, roles, BMCs — and reaches
 a running server over the API, either the unix socket or a TCP endpoint.
 
-Only `grendel` has to live on the provisioning host. `grendelctl` needs nothing
+Only `grendeld` has to live on the provisioning host. `grendel` needs nothing
 but a path to the API, so it can be installed anywhere administrators work.
 
 ## Container image
 
 Releases publish an image to `ubccr/grendel` containing both binaries.
-The default command is `grendel serve --verbose`, and the sample config is
+The default command is `grendeld serve --verbose`, and the sample config is
 installed at `/etc/grendel/grendel.toml`, which is one of the default search
 paths, so the server comes up without any arguments:
 
@@ -40,15 +40,15 @@ docker run -d -p 8080:8080 ubccr/grendel serve api --verbose
 All state lives under `/var/lib/grendel`, so mount a volume there to keep the
 database, boot images and templates across restarts.
 
-`grendelctl` ships in the same image and the API socket is created in the
-server's working directory, so it works over `docker exec` with no extra
-configuration:
+The `grendel` client ships in the same image and the API socket is created in
+the server's working directory, so it works over `docker exec` with no extra
+configuration (the container below is also named `grendel`):
 
 ```
-docker exec grendel grendelctl node list
+docker exec grendel grendel node list
 ```
 
-`grendelctl version` prints the client and server versions, reading the latter
+`grendel version` prints the client and server versions, reading the latter
 over the API. It reads nothing out of the database and fails only when the
 server cannot be reached, which makes it the health check the compose file uses.
 
@@ -66,10 +66,10 @@ goreleaser release --clean --snapshot
 
 ## Running a subset of services
 
-`grendel serve` by default runs every service: `api`, `dhcp`, `dns`, `provision`, `pxe` and `tftp`. If you only want to run a subset, you may pass them as args or through the `--services` flag:
+`grendeld serve` by default runs every service: `api`, `dhcp`, `dns`, `provision`, `pxe` and `tftp`. If you only want to run a subset, you may pass them as args or through the `--services` flag:
 
 ```
-grendel serve dhcp dns tftp
+grendeld serve dhcp dns tftp
 ```
 
 The same set can be pinned in the config file, and any service named on the
@@ -91,7 +91,7 @@ you manage all your boot images and compute nodes via JSON files, simply make
 sure Grendel is started with the following options:
 
 ```
-grendel serve --hosts /path/to/hosts.json --images /path/to/images.json
+grendeld serve --hosts /path/to/hosts.json --images /path/to/images.json
 ```
 
 This will ensure the hosts and boot images are loaded each time Grendel is
@@ -176,7 +176,7 @@ Type=simple
 User=grendel
 Group=grendel
 WorkingDirectory=/var/lib/grendel
-ExecStart=/usr/bin/grendel serve --verbose -c /etc/grendel/grendel.toml
+ExecStart=/usr/bin/grendeld serve --verbose -c /etc/grendel/grendel.toml
 Restart=on-failure
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE CAP_NET_RAW
 AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_NET_RAW

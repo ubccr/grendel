@@ -34,7 +34,7 @@ var (
 	}
 )
 
-// Execute names the binary and runs it. The name is not fixed at init because grendel and grendelctl share this root
+// Execute names the binary and runs it. The name is not fixed at init because grendeld and grendel share this root
 func Execute(use, short string) {
 	Root.Use = use
 	Root.Short = short
