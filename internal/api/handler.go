@@ -69,6 +69,7 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 
 	// Routes
 	fuego.Get(grendel, "/events", h.GetEvents)
+	fuego.Get(grendel, "/version", h.GetVersion, option.Description("Get the server version"))
 
 	fuego.Post(nodes, "", h.NodeAdd, option.Description("Add nodes"))
 	fuego.Get(nodes, "", h.NodeList, option.Description("List all nodes"))

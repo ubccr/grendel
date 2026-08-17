@@ -3741,3 +3741,12 @@ func (s *UserStoreResponse) SetFake() {
 		}
 	}
 }
+
+// SetFake set fake values.
+func (s *Version) SetFake() {
+	{
+		{
+			s.Version.SetFake()
+		}
+	}
+}

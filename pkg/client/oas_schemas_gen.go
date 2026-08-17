@@ -8561,3 +8561,19 @@ func (s *UserStoreResponse) SetRole(val OptString) {
 func (s *UserStoreResponse) SetUsername(val OptString) {
 	s.Username = val
 }
+
+// Version schema.
+// Ref: #/components/schemas/Version
+type Version struct {
+	Version OptString `json:"Version"`
+}
+
+// GetVersion returns the value of Version.
+func (s *Version) GetVersion() OptString {
+	return s.Version
+}
+
+// SetVersion sets the value of Version.
+func (s *Version) SetVersion(val OptString) {
+	s.Version = val
+}

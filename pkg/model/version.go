@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package migrations
+package model
 
-const SchemaVersion = 20260817204744
+type Version struct {
+	Version string
+}

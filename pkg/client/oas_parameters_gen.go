@@ -112,6 +112,11 @@ type GETV1GrendelEventsParams struct {
 	Accept OptString
 }
 
+// GETV1GrendelVersionParams is parameters of GET_/v1/grendel/version operation.
+type GETV1GrendelVersionParams struct {
+	Accept OptString
+}
+
 // GETV1ImagesParams is parameters of GET_/v1/images operation.
 type GETV1ImagesParams struct {
 	Accept OptString

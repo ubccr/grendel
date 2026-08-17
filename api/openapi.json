@@ -2317,6 +2317,15 @@
 				},
 				"type": "object"
 			},
+			"Version": {
+				"description": "Version schema",
+				"properties": {
+					"Version": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
 			"unknown-interface": {
 				"description": "unknown-interface schema"
 			}
@@ -3943,6 +3952,61 @@
 					}
 				],
 				"summary": "get events",
+				"tags": [
+					"v1",
+					"grendel"
+				]
+			}
+		},
+		"/v1/grendel/version": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).GetVersion`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the server version",
+				"operationId": "GET_/v1/grendel/version",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Version"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/Version"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "get version",
 				"tags": [
 					"v1",
 					"grendel"

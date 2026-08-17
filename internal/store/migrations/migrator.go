@@ -55,11 +55,16 @@ func (m *Migrator) Version() (uint, bool, error) {
 }
 
 func (m *Migrator) Migrate() error {
+	return m.migrateTo(SchemaVersion)
+}
+
+// migrateTo runs the pre-checks and then migrates to a specific version. Migrate is the only caller outside of tests, which pin the version they stage a schema for so that adding a migration does not change what they exercise
+func (m *Migrator) migrateTo(version uint) error {
 	if cur, _, err := m.Version(); err == nil || err == ErrNilVersion {
 		runPreChecks(m.db, cur)
 	}
 
-	err := m.mg.Migrate(SchemaVersion)
+	err := m.mg.Migrate(version)
 	if err != nil && err == migrate.ErrNoChange {
 		return ErrNoChange
 	}

@@ -14,6 +14,7 @@ import (
 	_ "github.com/ubccr/grendel/cmd/grendelctl/lldp"
 	_ "github.com/ubccr/grendel/cmd/grendelctl/node"
 	_ "github.com/ubccr/grendel/cmd/grendelctl/status"
+	_ "github.com/ubccr/grendel/cmd/grendelctl/version"
 	"github.com/ubccr/grendel/cmd/shared"
 )
 

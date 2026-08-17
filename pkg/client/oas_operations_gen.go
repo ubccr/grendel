@@ -20,6 +20,7 @@ const (
 	GETV1BmcUpgradeDellRepoOperation             OperationName = "GETV1BmcUpgradeDellRepo"
 	GETV1DbDumpOperation                         OperationName = "GETV1DbDump"
 	GETV1GrendelEventsOperation                  OperationName = "GETV1GrendelEvents"
+	GETV1GrendelVersionOperation                 OperationName = "GETV1GrendelVersion"
 	GETV1ImagesOperation                         OperationName = "GETV1Images"
 	GETV1ImagesFindOperation                     OperationName = "GETV1ImagesFind"
 	GETV1NodesOperation                          OperationName = "GETV1Nodes"
