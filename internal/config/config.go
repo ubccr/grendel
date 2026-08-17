@@ -13,8 +13,14 @@ import (
 	"github.com/spf13/viper"
 )
 
+const defaultProvisionListen = "0.0.0.0:80"
+
+func init() {
+	viper.SetDefault("provision.listen", defaultProvisionListen)
+}
+
 var (
-	ProvisionAddr       netip.AddrPort = netip.MustParseAddrPort("0.0.0.0:80")
+	ProvisionAddr       netip.AddrPort = netip.MustParseAddrPort(defaultProvisionListen)
 	ProvisionScheme     string         = "http"
 	ProvisionHostname   string         = ""
 	Subnets             []Subnet       = []Subnet{}
