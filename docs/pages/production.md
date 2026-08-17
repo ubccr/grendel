@@ -12,6 +12,58 @@ a running server over the API, either the unix socket or a TCP endpoint.
 Only `grendel` has to live on the provisioning host. `grendelctl` needs nothing
 but a path to the API, so it can be installed anywhere administrators work.
 
+## Container image
+
+Releases publish an image to `ubccr/grendel` containing both binaries.
+The default command is `grendel serve --verbose`, and the sample config is
+installed at `/etc/grendel/grendel.toml`, which is one of the default search
+paths, so the server comes up without any arguments:
+
+```
+docker run -d --name grendel \
+    --network host \
+    -v grendel-data:/var/lib/grendel \
+    -v /etc/grendel/grendel.toml:/etc/grendel/grendel.toml \
+    ubccr/grendel:latest
+```
+
+There is an equivalent compose file at `configs/docker-compose.yml`.
+
+`--network host` is what makes DHCP and PXE work. Both answer broadcast traffic
+that a bridge network never delivers to the container. If you only run the
+services that listen on ordinary sockets you can publish ports instead:
+
+```
+docker run -d -p 8080:8080 ubccr/grendel serve api --verbose
+```
+
+All state lives under `/var/lib/grendel`, so mount a volume there to keep the
+database, boot images and templates across restarts.
+
+`grendelctl` ships in the same image and the API socket is created in the
+server's working directory, so it works over `docker exec` with no extra
+configuration:
+
+```
+docker exec grendel grendelctl node list
+```
+
+`grendelctl version` prints the client and server versions, reading the latter
+over the API. It reads nothing out of the database and fails only when the
+server cannot be reached, which makes it the health check the compose file uses.
+
+The image is built `FROM scratch` and holds the two binaries, a CA bundle and
+the sample config, nothing else. There is no shell in it, so `docker exec
+grendel sh` will not work. Run the binaries directly as above.
+
+The `Dockerfile` at the top of the repository is not a from-source build. It
+assembles the image from binaries GoReleaser has already compiled, so build it
+with GoReleaser rather than `docker build`:
+
+```
+goreleaser release --clean --snapshot
+```
+
 ## Running a subset of services
 
 `grendel serve` by default runs every service: `api`, `dhcp`, `dns`, `provision`, `pxe` and `tftp`. If you only want to run a subset, you may pass them as args or through the `--services` flag:

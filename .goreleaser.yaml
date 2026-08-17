@@ -66,6 +66,31 @@ archives:
       - CHANGELOG.md
       - configs/grendel.toml.sample
       - completions/*
+dockers_v2:
+  - id: grendel
+    ids:
+      - grendel
+      - grendelctl
+    images:
+      - ubccr/grendel
+    tags:
+      - "{{ .Version }}"
+      - latest
+    dockerfile: Dockerfile
+    platforms:
+      - linux/amd64
+    extra_files:
+      - configs/grendel.toml.sample
+    labels:
+      org.opencontainers.image.title: "{{ .ProjectName }}"
+      org.opencontainers.image.description: Bare Metal Provisioning for HPC
+      org.opencontainers.image.url: https://github.com/ubccr/grendel
+      org.opencontainers.image.source: https://github.com/ubccr/grendel
+      org.opencontainers.image.documentation: https://grendel.readthedocs.io
+      org.opencontainers.image.version: "{{ .Version }}"
+      org.opencontainers.image.revision: "{{ .FullCommit }}"
+      org.opencontainers.image.created: "{{ .Date }}"
+      org.opencontainers.image.licenses: GPL-3.0-or-later
 nfpms:
   - ids:
       - grendel

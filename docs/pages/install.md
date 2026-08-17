@@ -22,6 +22,16 @@ $ sudo dpkg -i grendel_VERSION_amd64.deb
 $ sudo rpm -ivh grendel-VERSION-amd64.rpm
 ```
 
+### Container image
+
+Both binaries also ship in a container image:
+
+```
+$ docker pull ubccr/grendel:latest
+```
+
+See [Production Deployments](production.md#container-image) for how to run it.
+
 !!! tip
     Stock ubuntu runs a local stub dns resolver bound to port 53 that can
     conflict with Grendel. If you want to run Grendel's built in dns server you

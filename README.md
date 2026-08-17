@@ -170,6 +170,25 @@ none of that and builds without cgo:
 CGO_ENABLED=0 go build ./cmd/grendelctl
 ```
 
+### Container image
+
+The `Dockerfile` is not a from-source build. GoReleaser compiles the binaries
+and assembles the build context around them, so `docker build .` on a checkout
+fails: the binaries it copies do not exist yet. Build the image with GoReleaser
+instead, after building the iPXE submodule above:
+
+```
+goreleaser release --clean --snapshot --skip=archive,nfpm
+```
+
+That leaves `ubccr/grendel:latest-amd64` in your local docker daemon and
+pushes nothing. Drop the `--skip` to also produce the tarball and the deb and
+rpm in `dist/`, or add `docker` to it to skip the image.
+
+```
+docker run --rm ubccr/grendel:latest-amd64 --version
+```
+
 ## Publications
 
 - Andrew E. Bruno, Salvatore J. Guercio, Doris Sajdak, Tony Kew, and Matthew D.
