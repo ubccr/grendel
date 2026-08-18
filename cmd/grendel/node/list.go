@@ -61,9 +61,9 @@ var (
 					strconv.FormatBool(node.Provision.Value),
 					node.Firmware.Value,
 					node.BootImage.Value,
-					strings.Join(ips, ","),
-					strings.Join(fqdns, ","),
-					strings.Join(macs, ","),
+					strings.Join(ips, "\n"),
+					strings.Join(fqdns, "\n"),
+					strings.Join(macs, "\n"),
 					strings.Join(node.Tags.Value, ","),
 				)
 			}

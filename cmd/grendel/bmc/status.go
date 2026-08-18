@@ -75,7 +75,7 @@ var (
 					o.Health.Value,
 					fmt.Sprintf("%d", o.ProcessorCount.Value),
 					fmt.Sprintf("%.2f", o.TotalMemory.Value),
-					strings.Join(bootOrder, ","),
+					strings.Join(bootOrder, "\n"),
 					o.BootNext.Value,
 					string(oem),
 				)

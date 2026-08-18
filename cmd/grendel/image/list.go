@@ -53,7 +53,7 @@ var (
 					fmt.Fprintf(&sb, "%s=%s", k, v.Value)
 				}
 
-				t.AppendRow(image.Name, image.Kernel, image.Cmdline.Value, strings.Join(image.Initrd, ","), sb.String(), strconv.FormatBool(image.Verify.Value))
+				t.AppendRow(image.Name, image.Kernel, image.Cmdline.Value, strings.Join(image.Initrd, "\n"), sb.String(), strconv.FormatBool(image.Verify.Value))
 			}
 
 			t.Print()

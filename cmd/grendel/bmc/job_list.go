@@ -58,15 +58,15 @@ var (
 
 				for _, job := range node.Jobs.Value {
 					messages := []string{}
-					for _, msg := range job.Value.Messages {
-						messages = append(messages, msg.Message.Value)
+					for _, msg := range job.Value.Messages.Value {
+						messages = append(messages, msg.Value.Message.Value)
 					}
 					t.AppendRow(
 						node.Name.Value,
 						job.Value.Name.Value,
 						job.Value.JobState.Value,
 						fmt.Sprintf("%d%%", job.Value.PercentComplete.Value),
-						strings.Join(messages, ", "),
+						strings.Join(messages, "\n"),
 					)
 				}
 			}
