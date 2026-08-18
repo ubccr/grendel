@@ -3553,13 +3553,9 @@ func (s *EventJobMessagesItemRedfishErrorError) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *EventJobMessagesItemRedfishErrorError) encodeFields(e *jx.Encoder) {
 	{
-		if s.MessageDotExtendedInfo != nil {
+		if s.MessageDotExtendedInfo.Set {
 			e.FieldStart("@Message.ExtendedInfo")
-			e.ArrStart()
-			for _, elem := range s.MessageDotExtendedInfo {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+			s.MessageDotExtendedInfo.Encode(e)
 		}
 	}
 	{
@@ -3592,15 +3588,8 @@ func (s *EventJobMessagesItemRedfishErrorError) Decode(d *jx.Decoder) error {
 		switch string(k) {
 		case "@Message.ExtendedInfo":
 			if err := func() error {
-				s.MessageDotExtendedInfo = make([]EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.MessageDotExtendedInfo = append(s.MessageDotExtendedInfo, elem)
-					return nil
-				}); err != nil {
+				s.MessageDotExtendedInfo.Reset()
+				if err := s.MessageDotExtendedInfo.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -6042,6 +6031,50 @@ func (s *NilDataDumpImagesItem) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem as json.
+func (o NilEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem from json.
+func (o *NilEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes HostBondsItem as json.
 func (o NilHostBondsItem) Encode(e *jx.Encoder) {
 	if o.Null {
@@ -6172,6 +6205,50 @@ func (s NilInt) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *NilInt) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes JobMessageRedfishErrorErrorMessageDotExtendedInfoItem as json.
+func (o NilJobMessageRedfishErrorErrorMessageDotExtendedInfoItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes JobMessageRedfishErrorErrorMessageDotExtendedInfoItem from json.
+func (o *NilJobMessageRedfishErrorErrorMessageDotExtendedInfoItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilJobMessageRedfishErrorErrorMessageDotExtendedInfoItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v JobMessageRedfishErrorErrorMessageDotExtendedInfoItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilJobMessageRedfishErrorErrorMessageDotExtendedInfoItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilJobMessageRedfishErrorErrorMessageDotExtendedInfoItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -6308,6 +6385,50 @@ func (s *NilNodeAddRequestNodeListItemInterfacesItem) UnmarshalJSON(data []byte)
 	return s.Decode(d)
 }
 
+// Encode encodes RedfishDellUpgradeFirmwareUpdateListItem as json.
+func (o NilRedfishDellUpgradeFirmwareUpdateListItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes RedfishDellUpgradeFirmwareUpdateListItem from json.
+func (o *NilRedfishDellUpgradeFirmwareUpdateListItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilRedfishDellUpgradeFirmwareUpdateListItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v RedfishDellUpgradeFirmwareUpdateListItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilRedfishDellUpgradeFirmwareUpdateListItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilRedfishDellUpgradeFirmwareUpdateListItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes RedfishJobJobsItem as json.
 func (o NilRedfishJobJobsItem) Encode(e *jx.Encoder) {
 	if o.Null {
@@ -6352,6 +6473,270 @@ func (s *NilRedfishJobJobsItem) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes RedfishJobJobsItemMessageDotExtendedInfoItem as json.
+func (o NilRedfishJobJobsItemMessageDotExtendedInfoItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes RedfishJobJobsItemMessageDotExtendedInfoItem from json.
+func (o *NilRedfishJobJobsItemMessageDotExtendedInfoItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilRedfishJobJobsItemMessageDotExtendedInfoItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v RedfishJobJobsItemMessageDotExtendedInfoItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilRedfishJobJobsItemMessageDotExtendedInfoItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilRedfishJobJobsItemMessageDotExtendedInfoItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem as json.
+func (o NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem from json.
+func (o *NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem as json.
+func (o NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
+func (o *NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes RedfishJobJobsItemMessagesItem as json.
+func (o NilRedfishJobJobsItemMessagesItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes RedfishJobJobsItemMessagesItem from json.
+func (o *NilRedfishJobJobsItemMessagesItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilRedfishJobJobsItemMessagesItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v RedfishJobJobsItemMessagesItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilRedfishJobJobsItemMessagesItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilRedfishJobJobsItemMessagesItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes RedfishJobJobsItemMessagesItemResolutionStepsItem as json.
+func (o NilRedfishJobJobsItemMessagesItemResolutionStepsItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes RedfishJobJobsItemMessagesItemResolutionStepsItem from json.
+func (o *NilRedfishJobJobsItemMessagesItemResolutionStepsItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilRedfishJobJobsItemMessagesItemResolutionStepsItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v RedfishJobJobsItemMessagesItemResolutionStepsItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilRedfishJobJobsItemMessagesItemResolutionStepsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilRedfishJobJobsItemMessagesItemResolutionStepsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem as json.
+func (o NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem from json.
+func (o *NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes RedfishMetricReportReportsItem as json.
 func (o NilRedfishMetricReportReportsItem) Encode(e *jx.Encoder) {
 	if o.Null {
@@ -6392,6 +6777,314 @@ func (s NilRedfishMetricReportReportsItem) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *NilRedfishMetricReportReportsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes RedfishMetricReportReportsItemMessageDotExtendedInfoItem as json.
+func (o NilRedfishMetricReportReportsItemMessageDotExtendedInfoItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes RedfishMetricReportReportsItemMessageDotExtendedInfoItem from json.
+func (o *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilRedfishMetricReportReportsItemMessageDotExtendedInfoItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v RedfishMetricReportReportsItemMessageDotExtendedInfoItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilRedfishMetricReportReportsItemMessageDotExtendedInfoItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem as json.
+func (o NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem from json.
+func (o *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem as json.
+func (o NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
+func (o *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes RedfishMetricReportReportsItemMetricValuesItem as json.
+func (o NilRedfishMetricReportReportsItemMetricValuesItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes RedfishMetricReportReportsItemMetricValuesItem from json.
+func (o *NilRedfishMetricReportReportsItemMetricValuesItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilRedfishMetricReportReportsItemMetricValuesItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v RedfishMetricReportReportsItemMetricValuesItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilRedfishMetricReportReportsItemMetricValuesItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilRedfishMetricReportReportsItemMetricValuesItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes RedfishSystemOemDellMessageDotExtendedInfoItem as json.
+func (o NilRedfishSystemOemDellMessageDotExtendedInfoItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes RedfishSystemOemDellMessageDotExtendedInfoItem from json.
+func (o *NilRedfishSystemOemDellMessageDotExtendedInfoItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilRedfishSystemOemDellMessageDotExtendedInfoItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v RedfishSystemOemDellMessageDotExtendedInfoItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilRedfishSystemOemDellMessageDotExtendedInfoItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilRedfishSystemOemDellMessageDotExtendedInfoItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem as json.
+func (o NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem from json.
+func (o *NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem as json.
+func (o NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
+func (o *NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -8213,8 +8906,8 @@ func (s *OptNilInt64) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes []JobMessageRedfishErrorErrorMessageDotExtendedInfoItem as json.
-func (o OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) Encode(e *jx.Encoder) {
+// Encode encodes []NilEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem as json.
+func (o OptNilNilEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItemArray) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
@@ -8229,17 +8922,17 @@ func (o OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) Encode
 	e.ArrEnd()
 }
 
-// Decode decodes []JobMessageRedfishErrorErrorMessageDotExtendedInfoItem from json.
-func (o *OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) Decode(d *jx.Decoder) error {
+// Decode decodes []NilEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem from json.
+func (o *OptNilNilEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItemArray) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray to nil")
+		return errors.New("invalid: unable to decode OptNilNilEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItemArray to nil")
 	}
 	if d.Next() == jx.Null {
 		if err := d.Null(); err != nil {
 			return err
 		}
 
-		var v []JobMessageRedfishErrorErrorMessageDotExtendedInfoItem
+		var v []NilEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem
 		o.Value = v
 		o.Set = true
 		o.Null = true
@@ -8247,9 +8940,9 @@ func (o *OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) Decod
 	}
 	o.Set = true
 	o.Null = false
-	o.Value = make([]JobMessageRedfishErrorErrorMessageDotExtendedInfoItem, 0)
+	o.Value = make([]NilEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem, 0)
 	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem JobMessageRedfishErrorErrorMessageDotExtendedInfoItem
+		var elem NilEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem
 		if err := elem.Decode(d); err != nil {
 			return err
 		}
@@ -8262,14 +8955,14 @@ func (o *OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) Decod
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) MarshalJSON() ([]byte, error) {
+func (s OptNilNilEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItemArray) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) UnmarshalJSON(data []byte) error {
+func (s *OptNilNilEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItemArray) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -8335,6 +9028,128 @@ func (s *OptNilNilIntArray) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes []NilJobMessageRedfishErrorErrorMessageDotExtendedInfoItem as json.
+func (o OptNilNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilJobMessageRedfishErrorErrorMessageDotExtendedInfoItem from json.
+func (o *OptNilNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilJobMessageRedfishErrorErrorMessageDotExtendedInfoItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilJobMessageRedfishErrorErrorMessageDotExtendedInfoItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilJobMessageRedfishErrorErrorMessageDotExtendedInfoItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilRedfishDellUpgradeFirmwareUpdateListItem as json.
+func (o OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilRedfishDellUpgradeFirmwareUpdateListItem from json.
+func (o *OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilRedfishDellUpgradeFirmwareUpdateListItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilRedfishDellUpgradeFirmwareUpdateListItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilRedfishDellUpgradeFirmwareUpdateListItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes []NilRedfishJobJobsItem as json.
 func (o OptNilNilRedfishJobJobsItemArray) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -8392,6 +9207,860 @@ func (s OptNilNilRedfishJobJobsItemArray) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptNilNilRedfishJobJobsItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilRedfishJobJobsItemMessageDotExtendedInfoItem as json.
+func (o OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilRedfishJobJobsItemMessageDotExtendedInfoItem from json.
+func (o *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilRedfishJobJobsItemMessageDotExtendedInfoItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilRedfishJobJobsItemMessageDotExtendedInfoItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilRedfishJobJobsItemMessageDotExtendedInfoItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem as json.
+func (o OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
+func (o *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem as json.
+func (o OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem from json.
+func (o *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilRedfishJobJobsItemMessagesItem as json.
+func (o OptNilNilRedfishJobJobsItemMessagesItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilRedfishJobJobsItemMessagesItem from json.
+func (o *OptNilNilRedfishJobJobsItemMessagesItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilRedfishJobJobsItemMessagesItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilRedfishJobJobsItemMessagesItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilRedfishJobJobsItemMessagesItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilRedfishJobJobsItemMessagesItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilRedfishJobJobsItemMessagesItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilRedfishJobJobsItemMessagesItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem as json.
+func (o OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem from json.
+func (o *OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilRedfishJobJobsItemMessagesItemResolutionStepsItem as json.
+func (o OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilRedfishJobJobsItemMessagesItemResolutionStepsItem from json.
+func (o *OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilRedfishJobJobsItemMessagesItemResolutionStepsItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilRedfishJobJobsItemMessagesItemResolutionStepsItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilRedfishJobJobsItemMessagesItemResolutionStepsItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilRedfishMetricReportReportsItem as json.
+func (o OptNilNilRedfishMetricReportReportsItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilRedfishMetricReportReportsItem from json.
+func (o *OptNilNilRedfishMetricReportReportsItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilRedfishMetricReportReportsItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilRedfishMetricReportReportsItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilRedfishMetricReportReportsItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilRedfishMetricReportReportsItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilRedfishMetricReportReportsItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilRedfishMetricReportReportsItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItem as json.
+func (o OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItem from json.
+func (o *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilRedfishMetricReportReportsItemMessageDotExtendedInfoItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilRedfishMetricReportReportsItemMessageDotExtendedInfoItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem as json.
+func (o OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
+func (o *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem as json.
+func (o OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem from json.
+func (o *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilRedfishMetricReportReportsItemMetricValuesItem as json.
+func (o OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilRedfishMetricReportReportsItemMetricValuesItem from json.
+func (o *OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilRedfishMetricReportReportsItemMetricValuesItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilRedfishMetricReportReportsItemMetricValuesItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilRedfishMetricReportReportsItemMetricValuesItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilRedfishSystemOemDellMessageDotExtendedInfoItem as json.
+func (o OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilRedfishSystemOemDellMessageDotExtendedInfoItem from json.
+func (o *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilRedfishSystemOemDellMessageDotExtendedInfoItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilRedfishSystemOemDellMessageDotExtendedInfoItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilRedfishSystemOemDellMessageDotExtendedInfoItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem as json.
+func (o OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
+func (o *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem as json.
+func (o OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem from json.
+func (o *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -8502,67 +10171,6 @@ func (s OptNilRedfishSystemOemDell) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptNilRedfishSystemOemDell) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []RedfishSystemOemDellMessageDotExtendedInfoItem as json.
-func (o OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []RedfishSystemOemDellMessageDotExtendedInfoItem from json.
-func (o *OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []RedfishSystemOemDellMessageDotExtendedInfoItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]RedfishSystemOemDellMessageDotExtendedInfoItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem RedfishSystemOemDellMessageDotExtendedInfoItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -9101,13 +10709,9 @@ func (s *RedfishDellUpgradeFirmware) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.UpdateList != nil {
+		if s.UpdateList.Set {
 			e.FieldStart("UpdateList")
-			e.ArrStart()
-			for _, elem := range s.UpdateList {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+			s.UpdateList.Encode(e)
 		}
 	}
 	{
@@ -9177,15 +10781,8 @@ func (s *RedfishDellUpgradeFirmware) Decode(d *jx.Decoder) error {
 			}
 		case "UpdateList":
 			if err := func() error {
-				s.UpdateList = make([]RedfishDellUpgradeFirmwareUpdateListItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishDellUpgradeFirmwareUpdateListItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.UpdateList = append(s.UpdateList, elem)
-					return nil
-				}); err != nil {
+				s.UpdateList.Reset()
+				if err := s.UpdateList.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -9617,13 +11214,9 @@ func (s *RedfishJobJobsItem) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *RedfishJobJobsItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.MessageDotExtendedInfo != nil {
+		if s.MessageDotExtendedInfo.Set {
 			e.FieldStart("@Message.ExtendedInfo")
-			e.ArrStart()
-			for _, elem := range s.MessageDotExtendedInfo {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+			s.MessageDotExtendedInfo.Encode(e)
 		}
 	}
 	{
@@ -9729,13 +11322,9 @@ func (s *RedfishJobJobsItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Messages != nil {
+		if s.Messages.Set {
 			e.FieldStart("Messages")
-			e.ArrStart()
-			for _, elem := range s.Messages {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+			s.Messages.Encode(e)
 		}
 	}
 	{
@@ -9833,15 +11422,8 @@ func (s *RedfishJobJobsItem) Decode(d *jx.Decoder) error {
 		switch string(k) {
 		case "@Message.ExtendedInfo":
 			if err := func() error {
-				s.MessageDotExtendedInfo = make([]RedfishJobJobsItemMessageDotExtendedInfoItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishJobJobsItemMessageDotExtendedInfoItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.MessageDotExtendedInfo = append(s.MessageDotExtendedInfo, elem)
-					return nil
-				}); err != nil {
+				s.MessageDotExtendedInfo.Reset()
+				if err := s.MessageDotExtendedInfo.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -10020,15 +11602,8 @@ func (s *RedfishJobJobsItem) Decode(d *jx.Decoder) error {
 			}
 		case "Messages":
 			if err := func() error {
-				s.Messages = make([]RedfishJobJobsItemMessagesItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishJobJobsItemMessagesItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.Messages = append(s.Messages, elem)
-					return nil
-				}); err != nil {
+				s.Messages.Reset()
+				if err := s.Messages.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -10167,13 +11742,9 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) encodeFields(e *jx.Encode
 		}
 	}
 	{
-		if s.MessageArgs != nil {
+		if s.MessageArgs.Set {
 			e.FieldStart("MessageArgs")
-			e.ArrStart()
-			for _, elem := range s.MessageArgs {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.MessageArgs.Encode(e)
 		}
 	}
 	{
@@ -10207,13 +11778,9 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) encodeFields(e *jx.Encode
 		}
 	}
 	{
-		if s.ResolutionSteps != nil {
+		if s.ResolutionSteps.Set {
 			e.FieldStart("ResolutionSteps")
-			e.ArrStart()
-			for _, elem := range s.ResolutionSteps {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+			s.ResolutionSteps.Encode(e)
 		}
 	}
 	{
@@ -10270,17 +11837,8 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) Decode(d *jx.Decoder) err
 			}
 		case "MessageArgs":
 			if err := func() error {
-				s.MessageArgs = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.MessageArgs = append(s.MessageArgs, elem)
-					return nil
-				}); err != nil {
+				s.MessageArgs.Reset()
+				if err := s.MessageArgs.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -10340,15 +11898,8 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) Decode(d *jx.Decoder) err
 			}
 		case "ResolutionSteps":
 			if err := func() error {
-				s.ResolutionSteps = make([]RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.ResolutionSteps = append(s.ResolutionSteps, elem)
-					return nil
-				}); err != nil {
+				s.ResolutionSteps.Reset()
+				if err := s.ResolutionSteps.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -10419,13 +11970,9 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) Encode
 // encodeFields encodes fields.
 func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.ActionParameters != nil {
+		if s.ActionParameters.Set {
 			e.FieldStart("ActionParameters")
-			e.ArrStart()
-			for _, elem := range s.ActionParameters {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+			s.ActionParameters.Encode(e)
 		}
 	}
 	{
@@ -10493,15 +12040,8 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) Decode
 		switch string(k) {
 		case "ActionParameters":
 			if err := func() error {
-				s.ActionParameters = make([]RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.ActionParameters = append(s.ActionParameters, elem)
-					return nil
-				}); err != nil {
+				s.ActionParameters.Reset()
+				if err := s.ActionParameters.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -10613,13 +12153,9 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionPa
 // encodeFields encodes fields.
 func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.AllowableNumbers != nil {
+		if s.AllowableNumbers.Set {
 			e.FieldStart("AllowableNumbers")
-			e.ArrStart()
-			for _, elem := range s.AllowableNumbers {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.AllowableNumbers.Encode(e)
 		}
 	}
 	{
@@ -10629,23 +12165,15 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionPa
 		}
 	}
 	{
-		if s.AllowableValueDescriptions != nil {
+		if s.AllowableValueDescriptions.Set {
 			e.FieldStart("AllowableValueDescriptions")
-			e.ArrStart()
-			for _, elem := range s.AllowableValueDescriptions {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.AllowableValueDescriptions.Encode(e)
 		}
 	}
 	{
-		if s.AllowableValues != nil {
+		if s.AllowableValues.Set {
 			e.FieldStart("AllowableValues")
-			e.ArrStart()
-			for _, elem := range s.AllowableValues {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.AllowableValues.Encode(e)
 		}
 	}
 	{
@@ -10737,17 +12265,8 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionPa
 		switch string(k) {
 		case "AllowableNumbers":
 			if err := func() error {
-				s.AllowableNumbers = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.AllowableNumbers = append(s.AllowableNumbers, elem)
-					return nil
-				}); err != nil {
+				s.AllowableNumbers.Reset()
+				if err := s.AllowableNumbers.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -10766,17 +12285,8 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionPa
 			}
 		case "AllowableValueDescriptions":
 			if err := func() error {
-				s.AllowableValueDescriptions = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.AllowableValueDescriptions = append(s.AllowableValueDescriptions, elem)
-					return nil
-				}); err != nil {
+				s.AllowableValueDescriptions.Reset()
+				if err := s.AllowableValueDescriptions.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -10785,17 +12295,8 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionPa
 			}
 		case "AllowableValues":
 			if err := func() error {
-				s.AllowableValues = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.AllowableValues = append(s.AllowableValues, elem)
-					return nil
-				}); err != nil {
+				s.AllowableValues.Reset()
+				if err := s.AllowableValues.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -10942,13 +12443,9 @@ func (s *RedfishJobJobsItemMessagesItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.MessageArgs != nil {
+		if s.MessageArgs.Set {
 			e.FieldStart("MessageArgs")
-			e.ArrStart()
-			for _, elem := range s.MessageArgs {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.MessageArgs.Encode(e)
 		}
 	}
 	{
@@ -10982,13 +12479,9 @@ func (s *RedfishJobJobsItemMessagesItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.ResolutionSteps != nil {
+		if s.ResolutionSteps.Set {
 			e.FieldStart("ResolutionSteps")
-			e.ArrStart()
-			for _, elem := range s.ResolutionSteps {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+			s.ResolutionSteps.Encode(e)
 		}
 	}
 	{
@@ -11045,17 +12538,8 @@ func (s *RedfishJobJobsItemMessagesItem) Decode(d *jx.Decoder) error {
 			}
 		case "MessageArgs":
 			if err := func() error {
-				s.MessageArgs = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.MessageArgs = append(s.MessageArgs, elem)
-					return nil
-				}); err != nil {
+				s.MessageArgs.Reset()
+				if err := s.MessageArgs.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -11115,15 +12599,8 @@ func (s *RedfishJobJobsItemMessagesItem) Decode(d *jx.Decoder) error {
 			}
 		case "ResolutionSteps":
 			if err := func() error {
-				s.ResolutionSteps = make([]RedfishJobJobsItemMessagesItemResolutionStepsItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishJobJobsItemMessagesItemResolutionStepsItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.ResolutionSteps = append(s.ResolutionSteps, elem)
-					return nil
-				}); err != nil {
+				s.ResolutionSteps.Reset()
+				if err := s.ResolutionSteps.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -11194,13 +12671,9 @@ func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) Encode(e *jx.Encoder
 // encodeFields encodes fields.
 func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.ActionParameters != nil {
+		if s.ActionParameters.Set {
 			e.FieldStart("ActionParameters")
-			e.ArrStart()
-			for _, elem := range s.ActionParameters {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+			s.ActionParameters.Encode(e)
 		}
 	}
 	{
@@ -11268,15 +12741,8 @@ func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) Decode(d *jx.Decoder
 		switch string(k) {
 		case "ActionParameters":
 			if err := func() error {
-				s.ActionParameters = make([]RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.ActionParameters = append(s.ActionParameters, elem)
-					return nil
-				}); err != nil {
+				s.ActionParameters.Reset()
+				if err := s.ActionParameters.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -11388,13 +12854,9 @@ func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) 
 // encodeFields encodes fields.
 func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.AllowableNumbers != nil {
+		if s.AllowableNumbers.Set {
 			e.FieldStart("AllowableNumbers")
-			e.ArrStart()
-			for _, elem := range s.AllowableNumbers {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.AllowableNumbers.Encode(e)
 		}
 	}
 	{
@@ -11404,23 +12866,15 @@ func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) 
 		}
 	}
 	{
-		if s.AllowableValueDescriptions != nil {
+		if s.AllowableValueDescriptions.Set {
 			e.FieldStart("AllowableValueDescriptions")
-			e.ArrStart()
-			for _, elem := range s.AllowableValueDescriptions {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.AllowableValueDescriptions.Encode(e)
 		}
 	}
 	{
-		if s.AllowableValues != nil {
+		if s.AllowableValues.Set {
 			e.FieldStart("AllowableValues")
-			e.ArrStart()
-			for _, elem := range s.AllowableValues {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.AllowableValues.Encode(e)
 		}
 	}
 	{
@@ -11512,17 +12966,8 @@ func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) 
 		switch string(k) {
 		case "AllowableNumbers":
 			if err := func() error {
-				s.AllowableNumbers = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.AllowableNumbers = append(s.AllowableNumbers, elem)
-					return nil
-				}); err != nil {
+				s.AllowableNumbers.Reset()
+				if err := s.AllowableNumbers.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -11541,17 +12986,8 @@ func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) 
 			}
 		case "AllowableValueDescriptions":
 			if err := func() error {
-				s.AllowableValueDescriptions = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.AllowableValueDescriptions = append(s.AllowableValueDescriptions, elem)
-					return nil
-				}); err != nil {
+				s.AllowableValueDescriptions.Reset()
+				if err := s.AllowableValueDescriptions.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -11560,17 +12996,8 @@ func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) 
 			}
 		case "AllowableValues":
 			if err := func() error {
-				s.AllowableValues = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.AllowableValues = append(s.AllowableValues, elem)
-					return nil
-				}); err != nil {
+				s.AllowableValues.Reset()
+				if err := s.AllowableValues.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -12088,13 +13515,9 @@ func (s *RedfishMetricReport) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Reports != nil {
+		if s.Reports.Set {
 			e.FieldStart("reports")
-			e.ArrStart()
-			for _, elem := range s.Reports {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+			s.Reports.Encode(e)
 		}
 	}
 }
@@ -12124,15 +13547,8 @@ func (s *RedfishMetricReport) Decode(d *jx.Decoder) error {
 			}
 		case "reports":
 			if err := func() error {
-				s.Reports = make([]NilRedfishMetricReportReportsItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem NilRedfishMetricReportReportsItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.Reports = append(s.Reports, elem)
-					return nil
-				}); err != nil {
+				s.Reports.Reset()
+				if err := s.Reports.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -12173,13 +13589,9 @@ func (s *RedfishMetricReportReportsItem) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *RedfishMetricReportReportsItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.MessageDotExtendedInfo != nil {
+		if s.MessageDotExtendedInfo.Set {
 			e.FieldStart("@Message.ExtendedInfo")
-			e.ArrStart()
-			for _, elem := range s.MessageDotExtendedInfo {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+			s.MessageDotExtendedInfo.Encode(e)
 		}
 	}
 	{
@@ -12225,13 +13637,9 @@ func (s *RedfishMetricReportReportsItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.MetricValues != nil {
+		if s.MetricValues.Set {
 			e.FieldStart("MetricValues")
-			e.ArrStart()
-			for _, elem := range s.MetricValues {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+			s.MetricValues.Encode(e)
 		}
 	}
 	{
@@ -12286,15 +13694,8 @@ func (s *RedfishMetricReportReportsItem) Decode(d *jx.Decoder) error {
 		switch string(k) {
 		case "@Message.ExtendedInfo":
 			if err := func() error {
-				s.MessageDotExtendedInfo = make([]RedfishMetricReportReportsItemMessageDotExtendedInfoItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishMetricReportReportsItemMessageDotExtendedInfoItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.MessageDotExtendedInfo = append(s.MessageDotExtendedInfo, elem)
-					return nil
-				}); err != nil {
+				s.MessageDotExtendedInfo.Reset()
+				if err := s.MessageDotExtendedInfo.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -12373,15 +13774,8 @@ func (s *RedfishMetricReportReportsItem) Decode(d *jx.Decoder) error {
 			}
 		case "MetricValues":
 			if err := func() error {
-				s.MetricValues = make([]RedfishMetricReportReportsItemMetricValuesItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishMetricReportReportsItemMetricValuesItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.MetricValues = append(s.MetricValues, elem)
-					return nil
-				}); err != nil {
+				s.MetricValues.Reset()
+				if err := s.MetricValues.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -12469,13 +13863,9 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) encodeFields(
 		}
 	}
 	{
-		if s.MessageArgs != nil {
+		if s.MessageArgs.Set {
 			e.FieldStart("MessageArgs")
-			e.ArrStart()
-			for _, elem := range s.MessageArgs {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.MessageArgs.Encode(e)
 		}
 	}
 	{
@@ -12509,13 +13899,9 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) encodeFields(
 		}
 	}
 	{
-		if s.ResolutionSteps != nil {
+		if s.ResolutionSteps.Set {
 			e.FieldStart("ResolutionSteps")
-			e.ArrStart()
-			for _, elem := range s.ResolutionSteps {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+			s.ResolutionSteps.Encode(e)
 		}
 	}
 	{
@@ -12572,17 +13958,8 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) Decode(d *jx.
 			}
 		case "MessageArgs":
 			if err := func() error {
-				s.MessageArgs = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.MessageArgs = append(s.MessageArgs, elem)
-					return nil
-				}); err != nil {
+				s.MessageArgs.Reset()
+				if err := s.MessageArgs.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -12642,15 +14019,8 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) Decode(d *jx.
 			}
 		case "ResolutionSteps":
 			if err := func() error {
-				s.ResolutionSteps = make([]RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.ResolutionSteps = append(s.ResolutionSteps, elem)
-					return nil
-				}); err != nil {
+				s.ResolutionSteps.Reset()
+				if err := s.ResolutionSteps.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -12721,13 +14091,9 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionSteps
 // encodeFields encodes fields.
 func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.ActionParameters != nil {
+		if s.ActionParameters.Set {
 			e.FieldStart("ActionParameters")
-			e.ArrStart()
-			for _, elem := range s.ActionParameters {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+			s.ActionParameters.Encode(e)
 		}
 	}
 	{
@@ -12795,15 +14161,8 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionSteps
 		switch string(k) {
 		case "ActionParameters":
 			if err := func() error {
-				s.ActionParameters = make([]RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.ActionParameters = append(s.ActionParameters, elem)
-					return nil
-				}); err != nil {
+				s.ActionParameters.Reset()
+				if err := s.ActionParameters.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -12915,13 +14274,9 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionSteps
 // encodeFields encodes fields.
 func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.AllowableNumbers != nil {
+		if s.AllowableNumbers.Set {
 			e.FieldStart("AllowableNumbers")
-			e.ArrStart()
-			for _, elem := range s.AllowableNumbers {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.AllowableNumbers.Encode(e)
 		}
 	}
 	{
@@ -12931,23 +14286,15 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionSteps
 		}
 	}
 	{
-		if s.AllowableValueDescriptions != nil {
+		if s.AllowableValueDescriptions.Set {
 			e.FieldStart("AllowableValueDescriptions")
-			e.ArrStart()
-			for _, elem := range s.AllowableValueDescriptions {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.AllowableValueDescriptions.Encode(e)
 		}
 	}
 	{
-		if s.AllowableValues != nil {
+		if s.AllowableValues.Set {
 			e.FieldStart("AllowableValues")
-			e.ArrStart()
-			for _, elem := range s.AllowableValues {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.AllowableValues.Encode(e)
 		}
 	}
 	{
@@ -13039,17 +14386,8 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionSteps
 		switch string(k) {
 		case "AllowableNumbers":
 			if err := func() error {
-				s.AllowableNumbers = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.AllowableNumbers = append(s.AllowableNumbers, elem)
-					return nil
-				}); err != nil {
+				s.AllowableNumbers.Reset()
+				if err := s.AllowableNumbers.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -13068,17 +14406,8 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionSteps
 			}
 		case "AllowableValueDescriptions":
 			if err := func() error {
-				s.AllowableValueDescriptions = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.AllowableValueDescriptions = append(s.AllowableValueDescriptions, elem)
-					return nil
-				}); err != nil {
+				s.AllowableValueDescriptions.Reset()
+				if err := s.AllowableValueDescriptions.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -13087,17 +14416,8 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionSteps
 			}
 		case "AllowableValues":
 			if err := func() error {
-				s.AllowableValues = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.AllowableValues = append(s.AllowableValues, elem)
-					return nil
-				}); err != nil {
+				s.AllowableValues.Reset()
+				if err := s.AllowableValues.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -14659,13 +15979,9 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) encodeFields(e *jx.Enco
 		}
 	}
 	{
-		if s.MessageArgs != nil {
+		if s.MessageArgs.Set {
 			e.FieldStart("MessageArgs")
-			e.ArrStart()
-			for _, elem := range s.MessageArgs {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.MessageArgs.Encode(e)
 		}
 	}
 	{
@@ -14699,13 +16015,9 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) encodeFields(e *jx.Enco
 		}
 	}
 	{
-		if s.ResolutionSteps != nil {
+		if s.ResolutionSteps.Set {
 			e.FieldStart("ResolutionSteps")
-			e.ArrStart()
-			for _, elem := range s.ResolutionSteps {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+			s.ResolutionSteps.Encode(e)
 		}
 	}
 	{
@@ -14762,17 +16074,8 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) Decode(d *jx.Decoder) e
 			}
 		case "MessageArgs":
 			if err := func() error {
-				s.MessageArgs = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.MessageArgs = append(s.MessageArgs, elem)
-					return nil
-				}); err != nil {
+				s.MessageArgs.Reset()
+				if err := s.MessageArgs.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -14832,15 +16135,8 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) Decode(d *jx.Decoder) e
 			}
 		case "ResolutionSteps":
 			if err := func() error {
-				s.ResolutionSteps = make([]RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.ResolutionSteps = append(s.ResolutionSteps, elem)
-					return nil
-				}); err != nil {
+				s.ResolutionSteps.Reset()
+				if err := s.ResolutionSteps.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -14911,13 +16207,9 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) Enco
 // encodeFields encodes fields.
 func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.ActionParameters != nil {
+		if s.ActionParameters.Set {
 			e.FieldStart("ActionParameters")
-			e.ArrStart()
-			for _, elem := range s.ActionParameters {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+			s.ActionParameters.Encode(e)
 		}
 	}
 	{
@@ -14985,15 +16277,8 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) Deco
 		switch string(k) {
 		case "ActionParameters":
 			if err := func() error {
-				s.ActionParameters = make([]RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.ActionParameters = append(s.ActionParameters, elem)
-					return nil
-				}); err != nil {
+				s.ActionParameters.Reset()
+				if err := s.ActionParameters.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -15105,13 +16390,9 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemAction
 // encodeFields encodes fields.
 func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.AllowableNumbers != nil {
+		if s.AllowableNumbers.Set {
 			e.FieldStart("AllowableNumbers")
-			e.ArrStart()
-			for _, elem := range s.AllowableNumbers {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.AllowableNumbers.Encode(e)
 		}
 	}
 	{
@@ -15121,23 +16402,15 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemAction
 		}
 	}
 	{
-		if s.AllowableValueDescriptions != nil {
+		if s.AllowableValueDescriptions.Set {
 			e.FieldStart("AllowableValueDescriptions")
-			e.ArrStart()
-			for _, elem := range s.AllowableValueDescriptions {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.AllowableValueDescriptions.Encode(e)
 		}
 	}
 	{
-		if s.AllowableValues != nil {
+		if s.AllowableValues.Set {
 			e.FieldStart("AllowableValues")
-			e.ArrStart()
-			for _, elem := range s.AllowableValues {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+			s.AllowableValues.Encode(e)
 		}
 	}
 	{
@@ -15229,17 +16502,8 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemAction
 		switch string(k) {
 		case "AllowableNumbers":
 			if err := func() error {
-				s.AllowableNumbers = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.AllowableNumbers = append(s.AllowableNumbers, elem)
-					return nil
-				}); err != nil {
+				s.AllowableNumbers.Reset()
+				if err := s.AllowableNumbers.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -15258,17 +16522,8 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemAction
 			}
 		case "AllowableValueDescriptions":
 			if err := func() error {
-				s.AllowableValueDescriptions = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.AllowableValueDescriptions = append(s.AllowableValueDescriptions, elem)
-					return nil
-				}); err != nil {
+				s.AllowableValueDescriptions.Reset()
+				if err := s.AllowableValueDescriptions.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -15277,17 +16532,8 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemAction
 			}
 		case "AllowableValues":
 			if err := func() error {
-				s.AllowableValues = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.AllowableValues = append(s.AllowableValues, elem)
-					return nil
-				}); err != nil {
+				s.AllowableValues.Reset()
+				if err := s.AllowableValues.Decode(d); err != nil {
 					return err
 				}
 				return nil

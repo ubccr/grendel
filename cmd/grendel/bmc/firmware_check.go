@@ -48,7 +48,7 @@ var (
 			t := shared.NewTable(firmwareCheckColumns, firmwareCheckFilter).Options(*firmwareCheckOptions).Empty("-")
 
 			for _, job := range jobs {
-				if len(job.UpdateList) < 1 {
+				if len(job.UpdateList.Value) < 1 {
 					t.AppendRow(
 						job.Name.Value,
 						job.Status.Value,
@@ -61,15 +61,15 @@ var (
 					continue
 				}
 
-				for _, update := range job.UpdateList {
+				for _, update := range job.UpdateList.Value {
 					t.AppendRow(
 						job.Name.Value,
 						job.Status.Value,
 						job.Message.Value,
-						update.DisplayName.Value,
-						update.InstalledVersion.Value,
-						colorVersion(update.InstalledVersion.Value, update.PackageVersion.Value),
-						update.RebootType.Value,
+						update.Value.DisplayName.Value,
+						update.Value.InstalledVersion.Value,
+						colorVersion(update.Value.InstalledVersion.Value, update.Value.PackageVersion.Value),
+						update.Value.RebootType.Value,
 					)
 				}
 			}

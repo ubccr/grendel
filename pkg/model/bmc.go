@@ -34,7 +34,7 @@ type RedfishJob struct {
 type RedfishMetricReportList []RedfishMetricReport
 type RedfishMetricReport struct {
 	Name    string                  `json:"name"`
-	Reports []*schemas.MetricReport `json:"reports"`
+	Reports []*schemas.MetricReport `json:"reports" oai3:"nullable"`
 }
 
 type RedfishSystemList []RedfishSystem
@@ -61,7 +61,7 @@ type RedfishDellUpgradeFirmware struct {
 	Message          string
 	UpdateCount      int
 	UpdateRebootType string
-	UpdateList       dell.UpdateList //`oai3:"nullable"`
+	UpdateList       dell.UpdateList `oai3:"nullable"`
 }
 
 // TODO: verify correct json parsing

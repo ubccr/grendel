@@ -546,6 +546,7 @@
 											"properties": {
 												"@Message.ExtendedInfo": {
 													"items": {
+														"nullable": true,
 														"properties": {
 															"Message": {
 																"type": "string"
@@ -568,6 +569,7 @@
 														},
 														"type": "object"
 													},
+													"nullable": true,
 													"type": "array"
 												},
 												"code": {
@@ -851,6 +853,7 @@
 								"properties": {
 									"@Message.ExtendedInfo": {
 										"items": {
+											"nullable": true,
 											"properties": {
 												"Message": {
 													"type": "string"
@@ -1151,6 +1154,7 @@
 					},
 					"UpdateList": {
 						"items": {
+							"nullable": true,
 							"properties": {
 								"BaseLocation": {
 									"type": "string"
@@ -1200,6 +1204,7 @@
 							},
 							"type": "object"
 						},
+						"nullable": true,
 						"type": "array"
 					},
 					"UpdateRebootType": {
@@ -1217,14 +1222,17 @@
 							"properties": {
 								"@Message.ExtendedInfo": {
 									"items": {
+										"nullable": true,
 										"properties": {
 											"Message": {
 												"type": "string"
 											},
 											"MessageArgs": {
 												"items": {
+													"nullable": true,
 													"type": "string"
 												},
+												"nullable": true,
 												"type": "array"
 											},
 											"MessageId": {
@@ -1247,14 +1255,18 @@
 											},
 											"ResolutionSteps": {
 												"items": {
+													"nullable": true,
 													"properties": {
 														"ActionParameters": {
 															"items": {
+																"nullable": true,
 																"properties": {
 																	"AllowableNumbers": {
 																		"items": {
+																			"nullable": true,
 																			"type": "string"
 																		},
+																		"nullable": true,
 																		"type": "array"
 																	},
 																	"AllowablePattern": {
@@ -1262,14 +1274,18 @@
 																	},
 																	"AllowableValueDescriptions": {
 																		"items": {
+																			"nullable": true,
 																			"type": "string"
 																		},
+																		"nullable": true,
 																		"type": "array"
 																	},
 																	"AllowableValues": {
 																		"items": {
+																			"nullable": true,
 																			"type": "string"
 																		},
+																		"nullable": true,
 																		"type": "array"
 																	},
 																	"ArraySizeMaximum": {
@@ -1311,6 +1327,7 @@
 																},
 																"type": "object"
 															},
+															"nullable": true,
 															"type": "array"
 														},
 														"ActionURI": {
@@ -1341,6 +1358,7 @@
 													},
 													"type": "object"
 												},
+												"nullable": true,
 												"type": "array"
 											},
 											"Severity": {
@@ -1355,6 +1373,7 @@
 										},
 										"type": "object"
 									},
+									"nullable": true,
 									"type": "array"
 								},
 								"@odata.context": {
@@ -1412,14 +1431,17 @@
 								},
 								"Messages": {
 									"items": {
+										"nullable": true,
 										"properties": {
 											"Message": {
 												"type": "string"
 											},
 											"MessageArgs": {
 												"items": {
+													"nullable": true,
 													"type": "string"
 												},
+												"nullable": true,
 												"type": "array"
 											},
 											"MessageId": {
@@ -1442,14 +1464,18 @@
 											},
 											"ResolutionSteps": {
 												"items": {
+													"nullable": true,
 													"properties": {
 														"ActionParameters": {
 															"items": {
+																"nullable": true,
 																"properties": {
 																	"AllowableNumbers": {
 																		"items": {
+																			"nullable": true,
 																			"type": "string"
 																		},
+																		"nullable": true,
 																		"type": "array"
 																	},
 																	"AllowablePattern": {
@@ -1457,14 +1483,18 @@
 																	},
 																	"AllowableValueDescriptions": {
 																		"items": {
+																			"nullable": true,
 																			"type": "string"
 																		},
+																		"nullable": true,
 																		"type": "array"
 																	},
 																	"AllowableValues": {
 																		"items": {
+																			"nullable": true,
 																			"type": "string"
 																		},
+																		"nullable": true,
 																		"type": "array"
 																	},
 																	"ArraySizeMaximum": {
@@ -1506,6 +1536,7 @@
 																},
 																"type": "object"
 															},
+															"nullable": true,
 															"type": "array"
 														},
 														"ActionURI": {
@@ -1536,6 +1567,7 @@
 													},
 													"type": "object"
 												},
+												"nullable": true,
 												"type": "array"
 											},
 											"Severity": {
@@ -1550,6 +1582,7 @@
 										},
 										"type": "object"
 									},
+									"nullable": true,
 									"type": "array"
 								},
 								"Name": {
@@ -1679,14 +1712,17 @@
 							"properties": {
 								"@Message.ExtendedInfo": {
 									"items": {
+										"nullable": true,
 										"properties": {
 											"Message": {
 												"type": "string"
 											},
 											"MessageArgs": {
 												"items": {
+													"nullable": true,
 													"type": "string"
 												},
+												"nullable": true,
 												"type": "array"
 											},
 											"MessageId": {
@@ -1709,14 +1745,18 @@
 											},
 											"ResolutionSteps": {
 												"items": {
+													"nullable": true,
 													"properties": {
 														"ActionParameters": {
 															"items": {
+																"nullable": true,
 																"properties": {
 																	"AllowableNumbers": {
 																		"items": {
+																			"nullable": true,
 																			"type": "string"
 																		},
+																		"nullable": true,
 																		"type": "array"
 																	},
 																	"AllowablePattern": {
@@ -1724,14 +1764,18 @@
 																	},
 																	"AllowableValueDescriptions": {
 																		"items": {
+																			"nullable": true,
 																			"type": "string"
 																		},
+																		"nullable": true,
 																		"type": "array"
 																	},
 																	"AllowableValues": {
 																		"items": {
+																			"nullable": true,
 																			"type": "string"
 																		},
+																		"nullable": true,
 																		"type": "array"
 																	},
 																	"ArraySizeMaximum": {
@@ -1773,6 +1817,7 @@
 																},
 																"type": "object"
 															},
+															"nullable": true,
 															"type": "array"
 														},
 														"ActionURI": {
@@ -1803,6 +1848,7 @@
 													},
 													"type": "object"
 												},
+												"nullable": true,
 												"type": "array"
 											},
 											"Severity": {
@@ -1817,6 +1863,7 @@
 										},
 										"type": "object"
 									},
+									"nullable": true,
 									"type": "array"
 								},
 								"@odata.context": {
@@ -1842,6 +1889,7 @@
 								},
 								"MetricValues": {
 									"items": {
+										"nullable": true,
 										"properties": {
 											"MetricId": {
 												"type": "string"
@@ -1859,6 +1907,7 @@
 										},
 										"type": "object"
 									},
+									"nullable": true,
 									"type": "array"
 								},
 								"Name": {
@@ -1874,6 +1923,7 @@
 							},
 							"type": "object"
 						},
+						"nullable": true,
 						"type": "array"
 					}
 				},
@@ -1916,14 +1966,17 @@
 						"properties": {
 							"@Message.ExtendedInfo": {
 								"items": {
+									"nullable": true,
 									"properties": {
 										"Message": {
 											"type": "string"
 										},
 										"MessageArgs": {
 											"items": {
+												"nullable": true,
 												"type": "string"
 											},
+											"nullable": true,
 											"type": "array"
 										},
 										"MessageId": {
@@ -1946,14 +1999,18 @@
 										},
 										"ResolutionSteps": {
 											"items": {
+												"nullable": true,
 												"properties": {
 													"ActionParameters": {
 														"items": {
+															"nullable": true,
 															"properties": {
 																"AllowableNumbers": {
 																	"items": {
+																		"nullable": true,
 																		"type": "string"
 																	},
+																	"nullable": true,
 																	"type": "array"
 																},
 																"AllowablePattern": {
@@ -1961,14 +2018,18 @@
 																},
 																"AllowableValueDescriptions": {
 																	"items": {
+																		"nullable": true,
 																		"type": "string"
 																	},
+																	"nullable": true,
 																	"type": "array"
 																},
 																"AllowableValues": {
 																	"items": {
+																		"nullable": true,
 																		"type": "string"
 																	},
+																	"nullable": true,
 																	"type": "array"
 																},
 																"ArraySizeMaximum": {
@@ -2010,6 +2071,7 @@
 															},
 															"type": "object"
 														},
+														"nullable": true,
 														"type": "array"
 													},
 													"ActionURI": {
@@ -2040,6 +2102,7 @@
 												},
 												"type": "object"
 											},
+											"nullable": true,
 											"type": "array"
 										},
 										"Severity": {

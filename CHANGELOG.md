@@ -14,6 +14,7 @@
 api:
 - added `GET /v1/grendel/version`
 - fixed API server shutdown handling
+- marked the Redfish arrays nullable in the OpenAPI spec
 
 store:
 - capped the read only connection pool to stop large reads from exhausting CPU, tunable with `database.max_read_conns`

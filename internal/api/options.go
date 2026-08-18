@@ -45,7 +45,8 @@ func setupSecurity() openapi3.SecuritySchemes {
 
 func schemaCustomizer() openapi3gen.SchemaCustomizerFn {
 	return func(name string, t reflect.Type, tag reflect.StructTag, schema *openapi3.Schema) error {
-		redfishNulls := []string{"RelatedProperties", "HttpHeaders", "EnabledDaysOfMonth", "EnabledDaysOfWeek", "EnabledIntervals", "EnabledMonthsOfYear", "StepOrder"}
+		// gofish never tags these with omitempty:
+		redfishNulls := []string{"RelatedProperties", "HttpHeaders", "EnabledDaysOfMonth", "EnabledDaysOfWeek", "EnabledIntervals", "EnabledMonthsOfYear", "StepOrder", "@Message.ExtendedInfo", "Messages", "MessageArgs", "ResolutionSteps", "ActionParameters", "AllowableValues", "AllowableNumbers", "AllowableValueDescriptions", "MetricValues"}
 		if slices.Contains(redfishNulls, name) {
 			schema.Nullable = true
 		}
