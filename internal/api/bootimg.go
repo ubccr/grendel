@@ -65,8 +65,6 @@ func (h *Handler) BootImageList(c fuego.ContextNoBody) (model.BootImageList, err
 
 func (h *Handler) BootImageFind(c fuego.ContextNoBody) (model.BootImageList, error) {
 	// TODO: this should be handled in the DB
-	names := strings.Split(c.QueryParam("names"), ",")
-
 	images, err := h.DB.BootImages()
 	if err != nil {
 		return nil, fuego.HTTPError{
@@ -75,6 +73,13 @@ func (h *Handler) BootImageFind(c fuego.ContextNoBody) (model.BootImageList, err
 			Detail: "failed to find images",
 		}
 	}
+
+	namesParam := c.QueryParam("names")
+	if namesParam == "" {
+		return images, nil
+	}
+
+	names := strings.Split(namesParam, ",")
 
 	imageList := make(model.BootImageList, 0)
 	for _, image := range images {

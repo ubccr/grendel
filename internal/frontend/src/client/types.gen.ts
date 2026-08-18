@@ -868,6 +868,13 @@ export type UserStoreResponse = {
 };
 
 /**
+ * Version schema
+ */
+export type Version = {
+    Version?: string;
+};
+
+/**
  * unknown-interface schema
  */
 export type UnknownInterface = unknown;
@@ -1571,6 +1578,34 @@ export type GetV1GrendelEventsResponses = {
 };
 
 export type GetV1GrendelEventsResponse = GetV1GrendelEventsResponses[keyof GetV1GrendelEventsResponses];
+
+export type GetV1GrendelVersionData = {
+    body?: never;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/grendel/version';
+};
+
+export type GetV1GrendelVersionErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type GetV1GrendelVersionError = GetV1GrendelVersionErrors[keyof GetV1GrendelVersionErrors];
+
+export type GetV1GrendelVersionResponses = {
+    /**
+     * OK
+     */
+    200: Version;
+};
+
+export type GetV1GrendelVersionResponse = GetV1GrendelVersionResponses[keyof GetV1GrendelVersionResponses];
 
 export type DeleteV1ImagesData = {
     body?: never;

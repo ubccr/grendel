@@ -111,8 +111,15 @@ func EditLoop(data []byte, validate func(stripped []byte) error) error {
 			return err
 		}
 
+		// exit if no changes including validation message
+		if bytes.Equal(bytes.TrimSpace(edited), bytes.TrimSpace(data)) {
+			fmt.Fprintln(os.Stderr, "Edit cancelled, no changes made.")
+			return nil
+		}
+
 		// exit if no changes
 		if bytes.Equal(bytes.TrimSpace(editedStripped), bytes.TrimSpace(original)) {
+			fmt.Fprintln(os.Stderr, "Edit cancelled, no changes made.")
 			return nil
 		}
 

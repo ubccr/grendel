@@ -1,0 +1,28 @@
+name: grendel
+
+services:
+  grendel:
+    image: ubccr/grendel:latest
+    container_name: grendel
+    restart: unless-stopped
+
+    # dhcp and pxe answer broadcast traffic needs host mode
+    network_mode: host
+
+    volumes:
+      # the database, boot images, provision templates and the api socket all live under here
+      - grendel-data:/var/lib/grendel
+      - ./grendel.toml:/etc/grendel/grendel.toml:ro
+
+    # the image runs `serve --verbose` by default. Uncomment to run a subset of the services instead
+    # command: ["serve", "dhcp", "dns", "tftp", "--verbose"]
+
+    healthcheck:
+      test: ["CMD", "/usr/bin/grendel", "version"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  grendel-data:

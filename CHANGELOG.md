@@ -1,5 +1,62 @@
 # Grendel Changelog
 
+## [0.2.9] - 2026-08-17
+
+> [!WARNING]
+> **Grendel now ships two binaries.** `grendeld` runs the server and the privileged discovery commands, `grendel` is the API client for everything else. Server commands move: `grendel serve` -> `grendeld serve`, `grendel discover` -> `grendeld discover`. Both binaries are installed by the rpm/deb packages and shipped in the release tarball.
+>
+> **NICs now hold a single FQDN.** Comma separated names are no longer supported. The migration keeps the first name on each interface and logs every name it drops, run `grendel db dump` prior to upgrade
+>
+> **The `$.nic.HostNameIndex` template function was removed.** Provision templates using it will need to be updated.
+>
+> Some commands were renamed: `auth user show` -> `auth user list`, `auth role show` -> `auth role list`, `bmc job show` -> `bmc job list`.
+
+api:
+- added `GET /v1/grendel/version`
+- fixed API server shutdown handling
+- marked the Redfish arrays nullable in the OpenAPI spec
+
+store:
+- capped the read only connection pool to stop large reads from exhausting CPU, tunable with `database.max_read_conns`
+- fixed the read only connection not actually being read only
+- split NIC CIDRs into separate address and prefix columns
+- improved and indexed MAC address query
+- dropped comma separated FQDNs from NICs
+
+dns:
+- added a query timeout, `dns.query_timeout`, defaulting to 2s so abandoned queries stop holding database connections
+- answer SERVFAIL on a timeout query rather than dropping the response and forcing the client to retransmit
+
+provision:
+- fixed an empty `provision.templates_dir` killing the provision server
+
+cli:
+- split the CLI into the `grendeld` server and the `grendel` client, which builds without cgo
+- added `grendel version`, which prints the client and server version over the API
+- added service selection to `grendeld serve`, either as args or through `--services`, with a matching `services` config option
+- moved `discover lldp` to `grendel lldp`, which no longer demands `--subnet`
+- reworked various `list` command outputs with a custom table formatter
+- renamed the `show` subcommands of `auth user`, `auth role` and `bmc job` to `list`
+- non disruptive command like `grendel node list` imply `all` by default
+- made usage strings consistent
+- allowed force quitting an edit command after a failed save
+- fixed API requests not being cancelled with the CLI context
+- fixed sub service flags such as `--dhcp-listen` not working from `serve`
+- fixed `--listen` overriding per service listen flags that were set explicitly
+- fixed `bmc configure import` argument handling
+- fixed `bmc job clear` appending the nodeset to the job list
+- fixed `--tag` filtering in `status` and `status nodes`
+- fixed `bmc firmware upgrade --clear-jobs`
+- fixed API error messages in `node edit` and `image edit`
+- fixed `auth user add` quitting on the `q` keystroke and its TUI focus running out of range
+- fixed the off by one cursor in the `auth role edit` TUI
+
+misc:
+- added a Dockerfile and a GoReleaser container build
+- added an example `configs/docker-compose.yml`
+- fixed SIGTERM shutdown handling
+- fixed the database directory permissions set by the package postinstall script
+
 ## [0.2.8] - 2026-07-01
 > [!WARNING]
 > Provision templates using these variables will need to be updated: `provision.root_password` & `admin_ssh_pubkeys` -> `provision.extra_vars.`
@@ -372,4 +429,5 @@ misc:
 [0.2.6]: https://github.com/ubccr/grendel/releases/tag/v0.2.6
 [0.2.7]: https://github.com/ubccr/grendel/releases/tag/v0.2.7
 [0.2.8]: https://github.com/ubccr/grendel/releases/tag/v0.2.8
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.8...HEAD
+[0.2.9]: https://github.com/ubccr/grendel/releases/tag/v0.2.9
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.9...HEAD

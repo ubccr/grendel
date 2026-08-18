@@ -44,7 +44,7 @@ To install Grendel download a copy of the binary [here](https://github.com/ubccr
 ```
 $ tar xvzf grendel-0.x.x-linux-amd64.tar.gz
 $ cd grendel-0.x.x-linux-amd64/
-$ ./grendel --help
+$ ./grendeld --help
 ```
 
 ### Create a TAP device
@@ -109,16 +109,24 @@ Create the following JSON file `host.json`:
 
 ### Start Grendel services
 
+Grendel ships as two binaries. `grendeld` is the server: it runs the services
+and the node discovery commands, and is the only one that needs to run
+privileged. `grendel` is the command line client, and talks to a running server
+over the API.
+
 ```
-$ sudo ./grendel --verbose serve --hosts host.json --images image.json --listen 192.168.10.254
+$ sudo ./grendeld --verbose serve --hosts host.json --images image.json --listen 192.168.10.254
 ```
+
+This runs every service. Name the ones you want to run a subset, for example
+`grendeld serve dhcp dns tftp`.
 
 Note: The serve command requires root privileges to bind to lower level ports.
 If you don't want to run as root you can allow Grendel to bind to privileged
 with the following command:
 
 ```
-$ sudo setcap CAP_NET_BIND_SERVICE,CAP_NET_RAW=+eip /path/to/grendel
+$ sudo setcap CAP_NET_BIND_SERVICE,CAP_NET_RAW=+eip /path/to/grendeld
 ```
 
 ### PXE Boot the linux virtual machine
@@ -136,7 +144,9 @@ Building Grendel requires Go v1.26 or greater:
 ```
 git clone https://github.com/ubccr/grendel
 cd grendel
-go build .
+go build ./cmd/grendeld
+go build ./cmd/grendel
+./grendeld --help
 ./grendel --help
 ```
 
@@ -150,7 +160,33 @@ cd internal/firmware
 make build
 make bindata
 cd -
-go build -tags pxe .
+go build -tags pxe ./cmd/grendeld
+```
+
+Only the server needs the `pxe` tag and the iPXE submodule. `grendel` links
+none of that and builds without cgo:
+
+```
+CGO_ENABLED=0 go build ./cmd/grendel
+```
+
+### Container image
+
+The `Dockerfile` is not a from-source build. GoReleaser compiles the binaries
+and assembles the build context around them, so `docker build .` on a checkout
+fails: the binaries it copies do not exist yet. Build the image with GoReleaser
+instead, after building the iPXE submodule above:
+
+```
+goreleaser release --clean --snapshot --skip=archive,nfpm
+```
+
+That leaves `ubccr/grendel:latest-amd64` in your local docker daemon and
+pushes nothing. Drop the `--skip` to also produce the tarball and the deb and
+rpm in `dist/`, or add `docker` to it to skip the image.
+
+```
+docker run --rm ubccr/grendel:latest-amd64 --version
 ```
 
 ## Publications

@@ -4,23 +4,51 @@ version: 2
 before:
   hooks:
     - go mod tidy
+    - rm -rf completions
+    - mkdir completions
+    - sh -c 'go run ./cmd/grendeld completion bash > completions/grendeld.bash'
+    - sh -c 'go run ./cmd/grendeld completion zsh > completions/grendeld.zsh'
+    - sh -c 'go run ./cmd/grendeld completion fish > completions/grendeld.fish'
+    - sh -c 'go run ./cmd/grendel completion bash > completions/grendel.bash'
+    - sh -c 'go run ./cmd/grendel completion zsh > completions/grendel.zsh'
+    - sh -c 'go run ./cmd/grendel completion fish > completions/grendel.fish'
 builds:
-  - env:
+  - id: grendeld
+    main: ./cmd/grendeld
+    binary: grendeld
+    env:
       - CGO_ENABLED=1
     goarch:
       - amd64
     goos:
       - linux
     ldflags:
-      - -s -w -X github.com/ubccr/grendel/internal/api.Version={{.Version}}
+      - -s -w -X github.com/ubccr/grendel/internal/version.Version={{.Version}}
       - -extldflags=-static
     tags:
       - sqlite_omit_load_extension
       - osusergo
       - netgo
       - pxe
+  - id: grendel
+    main: ./cmd/grendel
+    binary: grendel
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - amd64
+    goos:
+      - linux
+    ldflags:
+      - -s -w -X github.com/ubccr/grendel/internal/version.Version={{.Version}}
+    tags:
+      - osusergo
+      - netgo
 archives:
-  - formats:
+  - ids:
+      - grendeld
+      - grendel
+    formats:
       - tar.gz
     wrap_in_directory: true
     name_template: >-
@@ -37,8 +65,37 @@ archives:
       - README.md
       - CHANGELOG.md
       - configs/grendel.toml.sample
+      - completions/*
+dockers_v2:
+  - id: grendel
+    ids:
+      - grendeld
+      - grendel
+    images:
+      - ubccr/grendel
+    tags:
+      - "{{ .Version }}"
+      - latest
+    dockerfile: Dockerfile
+    platforms:
+      - linux/amd64
+    extra_files:
+      - configs/grendel.toml.sample
+    labels:
+      org.opencontainers.image.title: "{{ .ProjectName }}"
+      org.opencontainers.image.description: Bare Metal Provisioning for HPC
+      org.opencontainers.image.url: https://github.com/ubccr/grendel
+      org.opencontainers.image.source: https://github.com/ubccr/grendel
+      org.opencontainers.image.documentation: https://grendel.readthedocs.io
+      org.opencontainers.image.version: "{{ .Version }}"
+      org.opencontainers.image.revision: "{{ .FullCommit }}"
+      org.opencontainers.image.created: "{{ .Date }}"
+      org.opencontainers.image.licenses: GPL-3.0-or-later
 nfpms:
-  - vendor: University at Buffalo
+  - ids:
+      - grendeld
+      - grendel
+    vendor: University at Buffalo
     homepage: https://github.com/ubccr/grendel
     maintainer: Andrew E. Bruno <aebruno2@buffalo.edu>
     license: GPLv3
@@ -56,6 +113,30 @@ nfpms:
         type: "config|noreplace"
       - src: ./scripts/nfpm/grendel.service
         dst: /usr/lib/systemd/system/grendel.service
+      - src: ./completions/grendeld.bash
+        dst: /usr/share/bash-completion/completions/grendeld
+        file_info:
+          mode: 0644
+      - src: ./completions/grendeld.zsh
+        dst: /usr/share/zsh/site-functions/_grendeld
+        file_info:
+          mode: 0644
+      - src: ./completions/grendeld.fish
+        dst: /usr/share/fish/vendor_completions.d/grendeld.fish
+        file_info:
+          mode: 0644
+      - src: ./completions/grendel.bash
+        dst: /usr/share/bash-completion/completions/grendel
+        file_info:
+          mode: 0644
+      - src: ./completions/grendel.zsh
+        dst: /usr/share/zsh/site-functions/_grendel
+        file_info:
+          mode: 0644
+      - src: ./completions/grendel.fish
+        dst: /usr/share/fish/vendor_completions.d/grendel.fish
+        file_info:
+          mode: 0644
 checksum:
   name_template: "checksums.txt"
 snapshot:

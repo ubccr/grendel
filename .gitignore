@@ -1,18 +1,14 @@
-grendel
-grendel.yaml
-grendel.yml
+/grendel
+/grendeld
+/completions
 grendel.toml
 grendel.db*
 out/
 internal/firmware/bin
-*.swp
-grendel-*.tar.gz
-scripts/*.jar
 key.gpg
-venv/
+/docs/.venv/
 
-dist/
-grendel-*-SNAPSHOT*/
+/dist/
 tmp
 .secrets
 .artifacts

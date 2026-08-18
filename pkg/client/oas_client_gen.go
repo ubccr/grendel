@@ -188,6 +188,18 @@ type Invoker interface {
 	//
 	// GET /v1/grendel/events
 	GETV1GrendelEvents(ctx context.Context, params GETV1GrendelEventsParams) ([]Event, error)
+	// GETV1GrendelVersion invokes GET_/v1/grendel/version operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).GetVersion`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Get the server version.
+	//
+	// GET /v1/grendel/version
+	GETV1GrendelVersion(ctx context.Context, params GETV1GrendelVersionParams) (*Version, error)
 	// GETV1Images invokes GET_/v1/images operation.
 	//
 	// #### Controller:
@@ -2381,6 +2393,109 @@ func (c *Client) sendGETV1GrendelEvents(ctx context.Context, params GETV1Grendel
 	defer resp.Body.Close()
 
 	result, err := decodeGETV1GrendelEventsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GETV1GrendelVersion invokes GET_/v1/grendel/version operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).GetVersion`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Get the server version.
+//
+// GET /v1/grendel/version
+func (c *Client) GETV1GrendelVersion(ctx context.Context, params GETV1GrendelVersionParams) (*Version, error) {
+	res, err := c.sendGETV1GrendelVersion(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGETV1GrendelVersion(ctx context.Context, params GETV1GrendelVersionParams) (res *Version, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/grendel/version"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, GETV1GrendelVersionOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, GETV1GrendelVersionOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGETV1GrendelVersionResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

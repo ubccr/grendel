@@ -12,6 +12,7 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/getkin/kin-openapi/openapi3gen"
 	"github.com/go-fuego/fuego"
+	"github.com/ubccr/grendel/pkg/model"
 )
 
 func setupOpenapiConfig(swaggerUI bool) fuego.OpenAPIConfig {
@@ -43,9 +44,67 @@ func setupSecurity() openapi3.SecuritySchemes {
 	}
 }
 
+// redfishNulls holds the json name of every field in the redfish payloads whose zero value marshals as null
+var redfishNulls = nilableFields(
+	reflect.TypeOf(model.RedfishJob{}),
+	reflect.TypeOf(model.RedfishSystem{}),
+	reflect.TypeOf(model.RedfishMetricReport{}),
+	reflect.TypeOf(model.RedfishDellUpgradeFirmware{}),
+	reflect.TypeOf(model.Event{}),
+)
+
+// nilableFields walks the given types and returns the json names of the fields that can marshal as null and not tagged omitempty.
+func nilableFields(types ...reflect.Type) []string {
+	var (
+		names []string
+		seen  = map[reflect.Type]bool{}
+		walk  func(t reflect.Type)
+	)
+
+	walk = func(t reflect.Type) {
+		for t.Kind() == reflect.Pointer || t.Kind() == reflect.Slice || t.Kind() == reflect.Array {
+			t = t.Elem()
+		}
+		if t.Kind() != reflect.Struct || seen[t] {
+			return
+		}
+		seen[t] = true
+
+		for i := range t.NumField() {
+			field := t.Field(i)
+			if !field.IsExported() {
+				continue
+			}
+
+			name, opts, _ := strings.Cut(field.Tag.Get("json"), ",")
+			if name == "-" {
+				continue
+			}
+			if name == "" {
+				name = field.Name
+			}
+
+			switch field.Type.Kind() {
+			case reflect.Slice, reflect.Map, reflect.Pointer, reflect.Interface:
+				if !slices.Contains(strings.Split(opts, ","), "omitempty") {
+					names = append(names, name)
+				}
+			}
+
+			walk(field.Type)
+		}
+	}
+
+	for _, t := range types {
+		walk(t)
+	}
+
+	slices.Sort(names)
+	return slices.Compact(names)
+}
+
 func schemaCustomizer() openapi3gen.SchemaCustomizerFn {
 	return func(name string, t reflect.Type, tag reflect.StructTag, schema *openapi3.Schema) error {
-		redfishNulls := []string{"RelatedProperties", "HttpHeaders", "EnabledDaysOfMonth", "EnabledDaysOfWeek", "EnabledIntervals", "EnabledMonthsOfYear", "StepOrder"}
 		if slices.Contains(redfishNulls, name) {
 			schema.Nullable = true
 		}

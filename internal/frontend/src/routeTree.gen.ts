@@ -9,38 +9,38 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as EventsRouteImport } from './routes/events'
-import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TemplatesIndexRouteImport } from './routes/templates/index'
-import { Route as RacksIndexRouteImport } from './routes/racks/index'
-import { Route as NodesIndexRouteImport } from './routes/nodes/index'
-import { Route as ImagesIndexRouteImport } from './routes/images/index'
-import { Route as TemplatesTemplateRouteImport } from './routes/templates/$template'
-import { Route as SearchInventoryRouteImport } from './routes/search/inventory'
-import { Route as RacksRackRouteImport } from './routes/racks/$rack'
-import { Route as ImagesImageRouteImport } from './routes/images/$image'
-import { Route as AddTemplateRouteImport } from './routes/add/template'
-import { Route as AddRoleRouteImport } from './routes/add/role'
-import { Route as AddNodeRouteImport } from './routes/add/node'
-import { Route as AddImageRouteImport } from './routes/add/image'
-import { Route as AccountTokenRouteImport } from './routes/account/token'
-import { Route as AccountSignupRouteImport } from './routes/account/signup'
-import { Route as AccountSigninRouteImport } from './routes/account/signin'
+import { Route as SplatRouteImport } from './routes/$'
+import { Route as EventsRouteImport } from './routes/events'
 import { Route as AccountResetRouteImport } from './routes/account/reset'
+import { Route as AccountSigninRouteImport } from './routes/account/signin'
+import { Route as AccountSignupRouteImport } from './routes/account/signup'
+import { Route as AccountTokenRouteImport } from './routes/account/token'
+import { Route as AddImageRouteImport } from './routes/add/image'
+import { Route as AddNodeRouteImport } from './routes/add/node'
+import { Route as AddRoleRouteImport } from './routes/add/role'
+import { Route as AddTemplateRouteImport } from './routes/add/template'
+import { Route as ImagesIndexRouteImport } from './routes/images/index'
+import { Route as ImagesImageRouteImport } from './routes/images/$image'
+import { Route as NodesIndexRouteImport } from './routes/nodes/index'
 import { Route as NodesNodeRouteRouteImport } from './routes/nodes/$node/route'
-import { Route as AccountUsersIndexRouteImport } from './routes/account/users/index'
+import { Route as RacksIndexRouteImport } from './routes/racks/index'
+import { Route as RacksRackRouteImport } from './routes/racks/$rack'
+import { Route as SearchInventoryRouteImport } from './routes/search/inventory'
+import { Route as TemplatesIndexRouteImport } from './routes/templates/index'
+import { Route as TemplatesTemplateRouteImport } from './routes/templates/$template'
 import { Route as AccountRolesIndexRouteImport } from './routes/account/roles/index'
-import { Route as NodesJobsNodesRouteImport } from './routes/nodes/jobs/$nodes'
-import { Route as NodesDellFirmwareNodesRouteImport } from './routes/nodes/dell-firmware/$nodes'
-import { Route as NodesNodeRedfishRouteImport } from './routes/nodes/$node/redfish'
-import { Route as NodesNodeNodeRouteImport } from './routes/nodes/$node/node'
-import { Route as NodesNodeLldpRouteImport } from './routes/nodes/$node/lldp'
 import { Route as AccountRolesRoleRouteImport } from './routes/account/roles/$role'
+import { Route as AccountUsersIndexRouteImport } from './routes/account/users/index'
+import { Route as NodesNodeLldpRouteImport } from './routes/nodes/$node/lldp'
+import { Route as NodesNodeNodeRouteImport } from './routes/nodes/$node/node'
+import { Route as NodesNodeRedfishRouteImport } from './routes/nodes/$node/redfish'
+import { Route as NodesDellFirmwareNodesRouteImport } from './routes/nodes/dell-firmware/$nodes'
+import { Route as NodesJobsNodesRouteImport } from './routes/nodes/jobs/$nodes'
 
-const EventsRoute = EventsRouteImport.update({
-  id: '/events',
-  path: '/events',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SplatRoute = SplatRouteImport.update({
@@ -48,84 +48,9 @@ const SplatRoute = SplatRouteImport.update({
   path: '/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
-  id: '/templates/',
-  path: '/templates/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RacksIndexRoute = RacksIndexRouteImport.update({
-  id: '/racks/',
-  path: '/racks/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NodesIndexRoute = NodesIndexRouteImport.update({
-  id: '/nodes/',
-  path: '/nodes/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ImagesIndexRoute = ImagesIndexRouteImport.update({
-  id: '/images/',
-  path: '/images/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TemplatesTemplateRoute = TemplatesTemplateRouteImport.update({
-  id: '/templates/$template',
-  path: '/templates/$template',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SearchInventoryRoute = SearchInventoryRouteImport.update({
-  id: '/search/inventory',
-  path: '/search/inventory',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RacksRackRoute = RacksRackRouteImport.update({
-  id: '/racks/$rack',
-  path: '/racks/$rack',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ImagesImageRoute = ImagesImageRouteImport.update({
-  id: '/images/$image',
-  path: '/images/$image',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AddTemplateRoute = AddTemplateRouteImport.update({
-  id: '/add/template',
-  path: '/add/template',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AddRoleRoute = AddRoleRouteImport.update({
-  id: '/add/role',
-  path: '/add/role',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AddNodeRoute = AddNodeRouteImport.update({
-  id: '/add/node',
-  path: '/add/node',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AddImageRoute = AddImageRouteImport.update({
-  id: '/add/image',
-  path: '/add/image',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AccountTokenRoute = AccountTokenRouteImport.update({
-  id: '/account/token',
-  path: '/account/token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AccountSignupRoute = AccountSignupRouteImport.update({
-  id: '/account/signup',
-  path: '/account/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AccountSigninRoute = AccountSigninRouteImport.update({
-  id: '/account/signin',
-  path: '/account/signin',
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountResetRoute = AccountResetRouteImport.update({
@@ -133,14 +58,84 @@ const AccountResetRoute = AccountResetRouteImport.update({
   path: '/account/reset',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountSigninRoute = AccountSigninRouteImport.update({
+  id: '/account/signin',
+  path: '/account/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountSignupRoute = AccountSignupRouteImport.update({
+  id: '/account/signup',
+  path: '/account/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountTokenRoute = AccountTokenRouteImport.update({
+  id: '/account/token',
+  path: '/account/token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AddImageRoute = AddImageRouteImport.update({
+  id: '/add/image',
+  path: '/add/image',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AddNodeRoute = AddNodeRouteImport.update({
+  id: '/add/node',
+  path: '/add/node',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AddRoleRoute = AddRoleRouteImport.update({
+  id: '/add/role',
+  path: '/add/role',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AddTemplateRoute = AddTemplateRouteImport.update({
+  id: '/add/template',
+  path: '/add/template',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImagesIndexRoute = ImagesIndexRouteImport.update({
+  id: '/images/',
+  path: '/images/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImagesImageRoute = ImagesImageRouteImport.update({
+  id: '/images/$image',
+  path: '/images/$image',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NodesIndexRoute = NodesIndexRouteImport.update({
+  id: '/nodes/',
+  path: '/nodes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NodesNodeRouteRoute = NodesNodeRouteRouteImport.update({
   id: '/nodes/$node',
   path: '/nodes/$node',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AccountUsersIndexRoute = AccountUsersIndexRouteImport.update({
-  id: '/account/users/',
-  path: '/account/users/',
+const RacksIndexRoute = RacksIndexRouteImport.update({
+  id: '/racks/',
+  path: '/racks/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RacksRackRoute = RacksRackRouteImport.update({
+  id: '/racks/$rack',
+  path: '/racks/$rack',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchInventoryRoute = SearchInventoryRouteImport.update({
+  id: '/search/inventory',
+  path: '/search/inventory',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
+  id: '/templates/',
+  path: '/templates/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplatesTemplateRoute = TemplatesTemplateRouteImport.update({
+  id: '/templates/$template',
+  path: '/templates/$template',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountRolesIndexRoute = AccountRolesIndexRouteImport.update({
@@ -148,19 +143,19 @@ const AccountRolesIndexRoute = AccountRolesIndexRouteImport.update({
   path: '/account/roles/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NodesJobsNodesRoute = NodesJobsNodesRouteImport.update({
-  id: '/nodes/jobs/$nodes',
-  path: '/nodes/jobs/$nodes',
+const AccountRolesRoleRoute = AccountRolesRoleRouteImport.update({
+  id: '/account/roles/$role',
+  path: '/account/roles/$role',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NodesDellFirmwareNodesRoute = NodesDellFirmwareNodesRouteImport.update({
-  id: '/nodes/dell-firmware/$nodes',
-  path: '/nodes/dell-firmware/$nodes',
+const AccountUsersIndexRoute = AccountUsersIndexRouteImport.update({
+  id: '/account/users/',
+  path: '/account/users/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NodesNodeRedfishRoute = NodesNodeRedfishRouteImport.update({
-  id: '/redfish',
-  path: '/redfish',
+const NodesNodeLldpRoute = NodesNodeLldpRouteImport.update({
+  id: '/lldp',
+  path: '/lldp',
   getParentRoute: () => NodesNodeRouteRoute,
 } as any)
 const NodesNodeNodeRoute = NodesNodeNodeRouteImport.update({
@@ -168,14 +163,19 @@ const NodesNodeNodeRoute = NodesNodeNodeRouteImport.update({
   path: '/node',
   getParentRoute: () => NodesNodeRouteRoute,
 } as any)
-const NodesNodeLldpRoute = NodesNodeLldpRouteImport.update({
-  id: '/lldp',
-  path: '/lldp',
+const NodesNodeRedfishRoute = NodesNodeRedfishRouteImport.update({
+  id: '/redfish',
+  path: '/redfish',
   getParentRoute: () => NodesNodeRouteRoute,
 } as any)
-const AccountRolesRoleRoute = AccountRolesRoleRouteImport.update({
-  id: '/account/roles/$role',
-  path: '/account/roles/$role',
+const NodesDellFirmwareNodesRoute = NodesDellFirmwareNodesRouteImport.update({
+  id: '/nodes/dell-firmware/$nodes',
+  path: '/nodes/dell-firmware/$nodes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NodesJobsNodesRoute = NodesJobsNodesRouteImport.update({
+  id: '/nodes/jobs/$nodes',
+  path: '/nodes/jobs/$nodes',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -393,11 +393,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/events': {
-      id: '/events'
-      path: '/events'
-      fullPath: '/events'
-      preLoaderRoute: typeof EventsRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$': {
@@ -407,116 +407,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/templates/': {
-      id: '/templates/'
-      path: '/templates'
-      fullPath: '/templates/'
-      preLoaderRoute: typeof TemplatesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/racks/': {
-      id: '/racks/'
-      path: '/racks'
-      fullPath: '/racks/'
-      preLoaderRoute: typeof RacksIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/nodes/': {
-      id: '/nodes/'
-      path: '/nodes'
-      fullPath: '/nodes/'
-      preLoaderRoute: typeof NodesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/images/': {
-      id: '/images/'
-      path: '/images'
-      fullPath: '/images/'
-      preLoaderRoute: typeof ImagesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/templates/$template': {
-      id: '/templates/$template'
-      path: '/templates/$template'
-      fullPath: '/templates/$template'
-      preLoaderRoute: typeof TemplatesTemplateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/search/inventory': {
-      id: '/search/inventory'
-      path: '/search/inventory'
-      fullPath: '/search/inventory'
-      preLoaderRoute: typeof SearchInventoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/racks/$rack': {
-      id: '/racks/$rack'
-      path: '/racks/$rack'
-      fullPath: '/racks/$rack'
-      preLoaderRoute: typeof RacksRackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/images/$image': {
-      id: '/images/$image'
-      path: '/images/$image'
-      fullPath: '/images/$image'
-      preLoaderRoute: typeof ImagesImageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/add/template': {
-      id: '/add/template'
-      path: '/add/template'
-      fullPath: '/add/template'
-      preLoaderRoute: typeof AddTemplateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/add/role': {
-      id: '/add/role'
-      path: '/add/role'
-      fullPath: '/add/role'
-      preLoaderRoute: typeof AddRoleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/add/node': {
-      id: '/add/node'
-      path: '/add/node'
-      fullPath: '/add/node'
-      preLoaderRoute: typeof AddNodeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/add/image': {
-      id: '/add/image'
-      path: '/add/image'
-      fullPath: '/add/image'
-      preLoaderRoute: typeof AddImageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/account/token': {
-      id: '/account/token'
-      path: '/account/token'
-      fullPath: '/account/token'
-      preLoaderRoute: typeof AccountTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/account/signup': {
-      id: '/account/signup'
-      path: '/account/signup'
-      fullPath: '/account/signup'
-      preLoaderRoute: typeof AccountSignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/account/signin': {
-      id: '/account/signin'
-      path: '/account/signin'
-      fullPath: '/account/signin'
-      preLoaderRoute: typeof AccountSigninRouteImport
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account/reset': {
@@ -526,6 +421,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountResetRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/account/signin': {
+      id: '/account/signin'
+      path: '/account/signin'
+      fullPath: '/account/signin'
+      preLoaderRoute: typeof AccountSigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/signup': {
+      id: '/account/signup'
+      path: '/account/signup'
+      fullPath: '/account/signup'
+      preLoaderRoute: typeof AccountSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/token': {
+      id: '/account/token'
+      path: '/account/token'
+      fullPath: '/account/token'
+      preLoaderRoute: typeof AccountTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/add/image': {
+      id: '/add/image'
+      path: '/add/image'
+      fullPath: '/add/image'
+      preLoaderRoute: typeof AddImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/add/node': {
+      id: '/add/node'
+      path: '/add/node'
+      fullPath: '/add/node'
+      preLoaderRoute: typeof AddNodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/add/role': {
+      id: '/add/role'
+      path: '/add/role'
+      fullPath: '/add/role'
+      preLoaderRoute: typeof AddRoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/add/template': {
+      id: '/add/template'
+      path: '/add/template'
+      fullPath: '/add/template'
+      preLoaderRoute: typeof AddTemplateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/images/': {
+      id: '/images/'
+      path: '/images'
+      fullPath: '/images/'
+      preLoaderRoute: typeof ImagesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/images/$image': {
+      id: '/images/$image'
+      path: '/images/$image'
+      fullPath: '/images/$image'
+      preLoaderRoute: typeof ImagesImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nodes/': {
+      id: '/nodes/'
+      path: '/nodes'
+      fullPath: '/nodes/'
+      preLoaderRoute: typeof NodesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/nodes/$node': {
       id: '/nodes/$node'
       path: '/nodes/$node'
@@ -533,11 +498,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NodesNodeRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/account/users/': {
-      id: '/account/users/'
-      path: '/account/users'
-      fullPath: '/account/users/'
-      preLoaderRoute: typeof AccountUsersIndexRouteImport
+    '/racks/': {
+      id: '/racks/'
+      path: '/racks'
+      fullPath: '/racks/'
+      preLoaderRoute: typeof RacksIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/racks/$rack': {
+      id: '/racks/$rack'
+      path: '/racks/$rack'
+      fullPath: '/racks/$rack'
+      preLoaderRoute: typeof RacksRackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search/inventory': {
+      id: '/search/inventory'
+      path: '/search/inventory'
+      fullPath: '/search/inventory'
+      preLoaderRoute: typeof SearchInventoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates/': {
+      id: '/templates/'
+      path: '/templates'
+      fullPath: '/templates/'
+      preLoaderRoute: typeof TemplatesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates/$template': {
+      id: '/templates/$template'
+      path: '/templates/$template'
+      fullPath: '/templates/$template'
+      preLoaderRoute: typeof TemplatesTemplateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account/roles/': {
@@ -547,25 +540,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountRolesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/nodes/jobs/$nodes': {
-      id: '/nodes/jobs/$nodes'
-      path: '/nodes/jobs/$nodes'
-      fullPath: '/nodes/jobs/$nodes'
-      preLoaderRoute: typeof NodesJobsNodesRouteImport
+    '/account/roles/$role': {
+      id: '/account/roles/$role'
+      path: '/account/roles/$role'
+      fullPath: '/account/roles/$role'
+      preLoaderRoute: typeof AccountRolesRoleRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/nodes/dell-firmware/$nodes': {
-      id: '/nodes/dell-firmware/$nodes'
-      path: '/nodes/dell-firmware/$nodes'
-      fullPath: '/nodes/dell-firmware/$nodes'
-      preLoaderRoute: typeof NodesDellFirmwareNodesRouteImport
+    '/account/users/': {
+      id: '/account/users/'
+      path: '/account/users'
+      fullPath: '/account/users/'
+      preLoaderRoute: typeof AccountUsersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/nodes/$node/redfish': {
-      id: '/nodes/$node/redfish'
-      path: '/redfish'
-      fullPath: '/nodes/$node/redfish'
-      preLoaderRoute: typeof NodesNodeRedfishRouteImport
+    '/nodes/$node/lldp': {
+      id: '/nodes/$node/lldp'
+      path: '/lldp'
+      fullPath: '/nodes/$node/lldp'
+      preLoaderRoute: typeof NodesNodeLldpRouteImport
       parentRoute: typeof NodesNodeRouteRoute
     }
     '/nodes/$node/node': {
@@ -575,18 +568,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NodesNodeNodeRouteImport
       parentRoute: typeof NodesNodeRouteRoute
     }
-    '/nodes/$node/lldp': {
-      id: '/nodes/$node/lldp'
-      path: '/lldp'
-      fullPath: '/nodes/$node/lldp'
-      preLoaderRoute: typeof NodesNodeLldpRouteImport
+    '/nodes/$node/redfish': {
+      id: '/nodes/$node/redfish'
+      path: '/redfish'
+      fullPath: '/nodes/$node/redfish'
+      preLoaderRoute: typeof NodesNodeRedfishRouteImport
       parentRoute: typeof NodesNodeRouteRoute
     }
-    '/account/roles/$role': {
-      id: '/account/roles/$role'
-      path: '/account/roles/$role'
-      fullPath: '/account/roles/$role'
-      preLoaderRoute: typeof AccountRolesRoleRouteImport
+    '/nodes/dell-firmware/$nodes': {
+      id: '/nodes/dell-firmware/$nodes'
+      path: '/nodes/dell-firmware/$nodes'
+      fullPath: '/nodes/dell-firmware/$nodes'
+      preLoaderRoute: typeof NodesDellFirmwareNodesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nodes/jobs/$nodes': {
+      id: '/nodes/jobs/$nodes'
+      path: '/nodes/jobs/$nodes'
+      fullPath: '/nodes/jobs/$nodes'
+      preLoaderRoute: typeof NodesJobsNodesRouteImport
       parentRoute: typeof rootRouteImport
     }
   }

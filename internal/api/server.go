@@ -124,6 +124,7 @@ func (s *Server) Serve() error {
 	s.server.Server.WriteTimeout = time.Minute * 5
 
 	// UNIX listener
+	socketErr := make(chan error, 1)
 	if s.SocketPath != "" {
 		os.Remove(s.SocketPath)
 		unixListener, err := net.Listen("unix", s.SocketPath)
@@ -141,9 +142,13 @@ func (s *Server) Serve() error {
 		}
 		go func() {
 			err := s.socketServer.Serve(unixListener)
+			if errors.Is(err, http.ErrServerClosed) {
+				err = nil
+			}
 			if err != nil {
 				log.Errorf("failed to start unix listener: %s", err)
 			}
+			socketErr <- err
 		}()
 	}
 
@@ -161,15 +166,39 @@ func (s *Server) Serve() error {
 
 	}
 
+	// block on socket listener if TCP listener is not configured
+	if s.SocketPath != "" {
+		return <-socketErr
+	}
+
 	return nil
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {
-	if s.server != nil {
-		return s.server.Shutdown(context.TODO())
-
+	// Serve assigns the server, so a nil one means a shutdown landed before it got that far and there is nothing to stop
+	if s.server == nil {
+		return nil
 	}
-	return errors.New("failed to create api server")
+
+	var errs []error
+
+	if s.socketServer != nil {
+		if err := s.socketServer.Shutdown(ctx); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	if s.SocketPath != "" {
+		if err := os.Remove(s.SocketPath); err != nil && !errors.Is(err, os.ErrNotExist) {
+			errs = append(errs, err)
+		}
+	}
+
+	if err := s.server.Shutdown(ctx); err != nil {
+		errs = append(errs, err)
+	}
+
+	return errors.Join(errs...)
 }
 
 func blockWebUI(next http.Handler) http.Handler {

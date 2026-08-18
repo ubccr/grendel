@@ -18,8 +18,8 @@ import (
 
 // TestMigratePreCheckFiresBeforeTruncation stages a database at the version
 // immediately before the single-FQDN migration, with a multi-name interface in
-// it, and runs the real Migrate(). It proves the two halves work together: the
-// Go side reports the names, the .sql file discards them.
+// it, and migrates to exactly that version. It proves the two halves work
+// together: the Go side reports the names, the .sql file discards them.
 func TestMigratePreCheckFiresBeforeTruncation(t *testing.T) {
 	file := filepath.Join(t.TempDir(), "grendel.db")
 	db, err := sql.Open("sqlite3", file)
@@ -65,7 +65,8 @@ func TestMigratePreCheckFiresBeforeTruncation(t *testing.T) {
 	}
 	defer m.Close()
 
-	if err := m.Migrate(); err != nil && err != ErrNoChange {
+	// the staged schema above only carries what 20260811120000 touches, so this stops there rather than following SchemaVersion into migrations that need tables this test never creates
+	if err := m.migrateTo(20260811120000); err != nil && err != ErrNoChange {
 		t.Fatal(err)
 	}
 

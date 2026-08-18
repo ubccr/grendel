@@ -1274,15 +1274,15 @@ func (s *DataDumpUsersItem) SetUsername(val OptString) {
 // Event schema.
 // Ref: #/components/schemas/Event
 type Event struct {
-	JobMessages []EventJobMessagesItem `json:"JobMessages"`
-	Message     OptString              `json:"Message"`
-	Severity    OptString              `json:"Severity"`
-	Time        OptDateTime            `json:"Time"`
-	User        OptString              `json:"User"`
+	JobMessages OptNilNilEventJobMessagesItemArray `json:"JobMessages"`
+	Message     OptString                          `json:"Message"`
+	Severity    OptString                          `json:"Severity"`
+	Time        OptDateTime                        `json:"Time"`
+	User        OptString                          `json:"User"`
 }
 
 // GetJobMessages returns the value of JobMessages.
-func (s *Event) GetJobMessages() []EventJobMessagesItem {
+func (s *Event) GetJobMessages() OptNilNilEventJobMessagesItemArray {
 	return s.JobMessages
 }
 
@@ -1307,7 +1307,7 @@ func (s *Event) GetUser() OptString {
 }
 
 // SetJobMessages sets the value of JobMessages.
-func (s *Event) SetJobMessages(val []EventJobMessagesItem) {
+func (s *Event) SetJobMessages(val OptNilNilEventJobMessagesItemArray) {
 	s.JobMessages = val
 }
 
@@ -2637,6 +2637,51 @@ func (o NilDataDumpImagesItem) Or(d DataDumpImagesItem) DataDumpImagesItem {
 	return d
 }
 
+// NewNilEventJobMessagesItem returns new NilEventJobMessagesItem with value set to v.
+func NewNilEventJobMessagesItem(v EventJobMessagesItem) NilEventJobMessagesItem {
+	return NilEventJobMessagesItem{
+		Value: v,
+	}
+}
+
+// NilEventJobMessagesItem is nullable EventJobMessagesItem.
+type NilEventJobMessagesItem struct {
+	Value EventJobMessagesItem
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilEventJobMessagesItem) SetTo(v EventJobMessagesItem) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilEventJobMessagesItem) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *NilEventJobMessagesItem) SetToNull() {
+	o.Null = true
+	var v EventJobMessagesItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilEventJobMessagesItem) Get() (v EventJobMessagesItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilEventJobMessagesItem) Or(d EventJobMessagesItem) EventJobMessagesItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewNilHostBondsItem returns new NilHostBondsItem with value set to v.
 func NewNilHostBondsItem(v HostBondsItem) NilHostBondsItem {
 	return NilHostBondsItem{
@@ -2907,6 +2952,51 @@ func (o NilNodeAddRequestNodeListItemInterfacesItem) Or(d NodeAddRequestNodeList
 	return d
 }
 
+// NewNilRedfishDellUpgradeFirmwareUpdateListItem returns new NilRedfishDellUpgradeFirmwareUpdateListItem with value set to v.
+func NewNilRedfishDellUpgradeFirmwareUpdateListItem(v RedfishDellUpgradeFirmwareUpdateListItem) NilRedfishDellUpgradeFirmwareUpdateListItem {
+	return NilRedfishDellUpgradeFirmwareUpdateListItem{
+		Value: v,
+	}
+}
+
+// NilRedfishDellUpgradeFirmwareUpdateListItem is nullable RedfishDellUpgradeFirmwareUpdateListItem.
+type NilRedfishDellUpgradeFirmwareUpdateListItem struct {
+	Value RedfishDellUpgradeFirmwareUpdateListItem
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilRedfishDellUpgradeFirmwareUpdateListItem) SetTo(v RedfishDellUpgradeFirmwareUpdateListItem) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilRedfishDellUpgradeFirmwareUpdateListItem) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *NilRedfishDellUpgradeFirmwareUpdateListItem) SetToNull() {
+	o.Null = true
+	var v RedfishDellUpgradeFirmwareUpdateListItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilRedfishDellUpgradeFirmwareUpdateListItem) Get() (v RedfishDellUpgradeFirmwareUpdateListItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilRedfishDellUpgradeFirmwareUpdateListItem) Or(d RedfishDellUpgradeFirmwareUpdateListItem) RedfishDellUpgradeFirmwareUpdateListItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewNilRedfishJobJobsItem returns new NilRedfishJobJobsItem with value set to v.
 func NewNilRedfishJobJobsItem(v RedfishJobJobsItem) NilRedfishJobJobsItem {
 	return NilRedfishJobJobsItem{
@@ -2952,6 +3042,237 @@ func (o NilRedfishJobJobsItem) Or(d RedfishJobJobsItem) RedfishJobJobsItem {
 	return d
 }
 
+// NewNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem returns new NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem with value set to v.
+func NewNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem(v RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem {
+	return NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem{
+		Value: v,
+	}
+}
+
+// NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem is nullable RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem.
+type NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem struct {
+	Value RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) SetTo(v RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) IsNull() bool {
+	return o.Null
+}
+
+// SetNull sets value to null.
+func (o *NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) SetToNull() {
+	o.Null = true
+	var v RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) Get() (v RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) Or(d RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem returns new NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem with value set to v.
+func NewNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem(v RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
+	return NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem{
+		Value: v,
+	}
+}
+
+// NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem is nullable RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem.
+type NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem struct {
+	Value RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetTo(v RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) IsNull() bool {
+	return o.Null
+}
+
+// SetNull sets value to null.
+func (o *NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetToNull() {
+	o.Null = true
+	var v RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Get() (v RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Or(d RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilRedfishJobJobsItemMessagesItem returns new NilRedfishJobJobsItemMessagesItem with value set to v.
+func NewNilRedfishJobJobsItemMessagesItem(v RedfishJobJobsItemMessagesItem) NilRedfishJobJobsItemMessagesItem {
+	return NilRedfishJobJobsItemMessagesItem{
+		Value: v,
+	}
+}
+
+// NilRedfishJobJobsItemMessagesItem is nullable RedfishJobJobsItemMessagesItem.
+type NilRedfishJobJobsItemMessagesItem struct {
+	Value RedfishJobJobsItemMessagesItem
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilRedfishJobJobsItemMessagesItem) SetTo(v RedfishJobJobsItemMessagesItem) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilRedfishJobJobsItemMessagesItem) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *NilRedfishJobJobsItemMessagesItem) SetToNull() {
+	o.Null = true
+	var v RedfishJobJobsItemMessagesItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilRedfishJobJobsItemMessagesItem) Get() (v RedfishJobJobsItemMessagesItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilRedfishJobJobsItemMessagesItem) Or(d RedfishJobJobsItemMessagesItem) RedfishJobJobsItemMessagesItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilRedfishJobJobsItemMessagesItemResolutionStepsItem returns new NilRedfishJobJobsItemMessagesItemResolutionStepsItem with value set to v.
+func NewNilRedfishJobJobsItemMessagesItemResolutionStepsItem(v RedfishJobJobsItemMessagesItemResolutionStepsItem) NilRedfishJobJobsItemMessagesItemResolutionStepsItem {
+	return NilRedfishJobJobsItemMessagesItemResolutionStepsItem{
+		Value: v,
+	}
+}
+
+// NilRedfishJobJobsItemMessagesItemResolutionStepsItem is nullable RedfishJobJobsItemMessagesItemResolutionStepsItem.
+type NilRedfishJobJobsItemMessagesItemResolutionStepsItem struct {
+	Value RedfishJobJobsItemMessagesItemResolutionStepsItem
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilRedfishJobJobsItemMessagesItemResolutionStepsItem) SetTo(v RedfishJobJobsItemMessagesItemResolutionStepsItem) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilRedfishJobJobsItemMessagesItemResolutionStepsItem) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *NilRedfishJobJobsItemMessagesItemResolutionStepsItem) SetToNull() {
+	o.Null = true
+	var v RedfishJobJobsItemMessagesItemResolutionStepsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilRedfishJobJobsItemMessagesItemResolutionStepsItem) Get() (v RedfishJobJobsItemMessagesItemResolutionStepsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilRedfishJobJobsItemMessagesItemResolutionStepsItem) Or(d RedfishJobJobsItemMessagesItemResolutionStepsItem) RedfishJobJobsItemMessagesItemResolutionStepsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem returns new NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem with value set to v.
+func NewNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem(v RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem {
+	return NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem{
+		Value: v,
+	}
+}
+
+// NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem is nullable RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem.
+type NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem struct {
+	Value RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetTo(v RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) IsNull() bool {
+	return o.Null
+}
+
+// SetNull sets value to null.
+func (o *NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetToNull() {
+	o.Null = true
+	var v RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) Get() (v RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) Or(d RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewNilRedfishMetricReportReportsItem returns new NilRedfishMetricReportReportsItem with value set to v.
 func NewNilRedfishMetricReportReportsItem(v RedfishMetricReportReportsItem) NilRedfishMetricReportReportsItem {
 	return NilRedfishMetricReportReportsItem{
@@ -2991,6 +3312,239 @@ func (o NilRedfishMetricReportReportsItem) Get() (v RedfishMetricReportReportsIt
 
 // Or returns value if set, or given parameter if does not.
 func (o NilRedfishMetricReportReportsItem) Or(d RedfishMetricReportReportsItem) RedfishMetricReportReportsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem returns new NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem with value set to v.
+func NewNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem(v RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem {
+	return NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem{
+		Value: v,
+	}
+}
+
+// NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem is nullable RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem.
+type NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem struct {
+	Value RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) SetTo(v RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) IsNull() bool {
+	return o.Null
+}
+
+// SetNull sets value to null.
+func (o *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) SetToNull() {
+	o.Null = true
+	var v RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) Get() (v RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) Or(d RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem returns new NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem with value set to v.
+func NewNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem(v RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
+	return NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem{
+		Value: v,
+	}
+}
+
+// NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem is nullable RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem.
+type NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem struct {
+	Value RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetTo(v RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) IsNull() bool {
+	return o.Null
+}
+
+// SetNull sets value to null.
+func (o *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetToNull() {
+	o.Null = true
+	var v RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Get() (v RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Or(d RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilRedfishMetricReportReportsItemMetricValuesItem returns new NilRedfishMetricReportReportsItemMetricValuesItem with value set to v.
+func NewNilRedfishMetricReportReportsItemMetricValuesItem(v RedfishMetricReportReportsItemMetricValuesItem) NilRedfishMetricReportReportsItemMetricValuesItem {
+	return NilRedfishMetricReportReportsItemMetricValuesItem{
+		Value: v,
+	}
+}
+
+// NilRedfishMetricReportReportsItemMetricValuesItem is nullable RedfishMetricReportReportsItemMetricValuesItem.
+type NilRedfishMetricReportReportsItemMetricValuesItem struct {
+	Value RedfishMetricReportReportsItemMetricValuesItem
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilRedfishMetricReportReportsItemMetricValuesItem) SetTo(v RedfishMetricReportReportsItemMetricValuesItem) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilRedfishMetricReportReportsItemMetricValuesItem) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *NilRedfishMetricReportReportsItemMetricValuesItem) SetToNull() {
+	o.Null = true
+	var v RedfishMetricReportReportsItemMetricValuesItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilRedfishMetricReportReportsItemMetricValuesItem) Get() (v RedfishMetricReportReportsItemMetricValuesItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilRedfishMetricReportReportsItemMetricValuesItem) Or(d RedfishMetricReportReportsItemMetricValuesItem) RedfishMetricReportReportsItemMetricValuesItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem returns new NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem with value set to v.
+func NewNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem(v RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem {
+	return NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem{
+		Value: v,
+	}
+}
+
+// NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem is nullable RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem.
+type NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem struct {
+	Value RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetTo(v RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) IsNull() bool {
+	return o.Null
+}
+
+// SetNull sets value to null.
+func (o *NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetToNull() {
+	o.Null = true
+	var v RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) Get() (v RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) Or(d RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem returns new NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem with value set to v.
+func NewNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem(v RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
+	return NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem{
+		Value: v,
+	}
+}
+
+// NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem is nullable RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem.
+type NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem struct {
+	Value RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetTo(v RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) IsNull() bool {
+	return o.Null
+}
+
+// SetNull sets value to null.
+func (o *NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetToNull() {
+	o.Null = true
+	var v RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Get() (v RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Or(d RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4075,6 +4629,69 @@ func (o OptNilBootImageProvisionTemplates) Or(d BootImageProvisionTemplates) Boo
 	return d
 }
 
+// NewOptNilByte returns new OptNilByte with value set to v.
+func NewOptNilByte(v []byte) OptNilByte {
+	return OptNilByte{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilByte is optional nullable []byte.
+type OptNilByte struct {
+	Value []byte
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilByte was set.
+func (o OptNilByte) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilByte) Reset() {
+	var v []byte
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilByte) SetTo(v []byte) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilByte) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilByte) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []byte
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilByte) Get() (v []byte, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilByte) Or(d []byte) []byte {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilDataDumpImagesItemProvisionTemplates returns new OptNilDataDumpImagesItemProvisionTemplates with value set to v.
 func NewOptNilDataDumpImagesItemProvisionTemplates(v DataDumpImagesItemProvisionTemplates) OptNilDataDumpImagesItemProvisionTemplates {
 	return OptNilDataDumpImagesItemProvisionTemplates{
@@ -4455,6 +5072,69 @@ func (o OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) Or(d [
 	return d
 }
 
+// NewOptNilNilEventJobMessagesItemArray returns new OptNilNilEventJobMessagesItemArray with value set to v.
+func NewOptNilNilEventJobMessagesItemArray(v []NilEventJobMessagesItem) OptNilNilEventJobMessagesItemArray {
+	return OptNilNilEventJobMessagesItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilNilEventJobMessagesItemArray is optional nullable []NilEventJobMessagesItem.
+type OptNilNilEventJobMessagesItemArray struct {
+	Value []NilEventJobMessagesItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilNilEventJobMessagesItemArray was set.
+func (o OptNilNilEventJobMessagesItemArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilNilEventJobMessagesItemArray) Reset() {
+	var v []NilEventJobMessagesItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilNilEventJobMessagesItemArray) SetTo(v []NilEventJobMessagesItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilNilEventJobMessagesItemArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilNilEventJobMessagesItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []NilEventJobMessagesItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilNilEventJobMessagesItemArray) Get() (v []NilEventJobMessagesItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilNilEventJobMessagesItemArray) Or(d []NilEventJobMessagesItem) []NilEventJobMessagesItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilNilIntArray returns new OptNilNilIntArray with value set to v.
 func NewOptNilNilIntArray(v []NilInt) OptNilNilIntArray {
 	return OptNilNilIntArray{
@@ -4512,6 +5192,69 @@ func (o OptNilNilIntArray) Get() (v []NilInt, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilNilIntArray) Or(d []NilInt) []NilInt {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray returns new OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray with value set to v.
+func NewOptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray(v []NilRedfishDellUpgradeFirmwareUpdateListItem) OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray {
+	return OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray is optional nullable []NilRedfishDellUpgradeFirmwareUpdateListItem.
+type OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray struct {
+	Value []NilRedfishDellUpgradeFirmwareUpdateListItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray was set.
+func (o OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) Reset() {
+	var v []NilRedfishDellUpgradeFirmwareUpdateListItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) SetTo(v []NilRedfishDellUpgradeFirmwareUpdateListItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []NilRedfishDellUpgradeFirmwareUpdateListItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) Get() (v []NilRedfishDellUpgradeFirmwareUpdateListItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) Or(d []NilRedfishDellUpgradeFirmwareUpdateListItem) []NilRedfishDellUpgradeFirmwareUpdateListItem {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4581,6 +5324,727 @@ func (o OptNilNilRedfishJobJobsItemArray) Or(d []NilRedfishJobJobsItem) []NilRed
 	return d
 }
 
+// NewOptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray returns new OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray with value set to v.
+func NewOptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray(v []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray {
+	return OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray is optional nullable []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem.
+type OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray struct {
+	Value []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray was set.
+func (o OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) IsSet() bool {
+	return o.Set
+}
+
+// Reset unsets value.
+func (o *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Reset() {
+	var v []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetTo(v []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) IsNull() bool {
+	return o.Null
+}
+
+// SetNull sets value to null.
+func (o *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Get() (v []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Or(d []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray returns new OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray with value set to v.
+func NewOptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray(v []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray {
+	return OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray is optional nullable []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem.
+type OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray struct {
+	Value []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray was set.
+func (o OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray) IsSet() bool {
+	return o.Set
+}
+
+// Reset unsets value.
+func (o *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray) Reset() {
+	var v []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray) SetTo(v []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray) IsNull() bool {
+	return o.Null
+}
+
+// SetNull sets value to null.
+func (o *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray) Get() (v []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray) Or(d []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilNilRedfishJobJobsItemMessagesItemArray returns new OptNilNilRedfishJobJobsItemMessagesItemArray with value set to v.
+func NewOptNilNilRedfishJobJobsItemMessagesItemArray(v []NilRedfishJobJobsItemMessagesItem) OptNilNilRedfishJobJobsItemMessagesItemArray {
+	return OptNilNilRedfishJobJobsItemMessagesItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilNilRedfishJobJobsItemMessagesItemArray is optional nullable []NilRedfishJobJobsItemMessagesItem.
+type OptNilNilRedfishJobJobsItemMessagesItemArray struct {
+	Value []NilRedfishJobJobsItemMessagesItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilNilRedfishJobJobsItemMessagesItemArray was set.
+func (o OptNilNilRedfishJobJobsItemMessagesItemArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilNilRedfishJobJobsItemMessagesItemArray) Reset() {
+	var v []NilRedfishJobJobsItemMessagesItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilNilRedfishJobJobsItemMessagesItemArray) SetTo(v []NilRedfishJobJobsItemMessagesItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilNilRedfishJobJobsItemMessagesItemArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilNilRedfishJobJobsItemMessagesItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []NilRedfishJobJobsItemMessagesItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilNilRedfishJobJobsItemMessagesItemArray) Get() (v []NilRedfishJobJobsItemMessagesItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilNilRedfishJobJobsItemMessagesItemArray) Or(d []NilRedfishJobJobsItemMessagesItem) []NilRedfishJobJobsItemMessagesItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray returns new OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray with value set to v.
+func NewOptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray(v []NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray {
+	return OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray is optional nullable []NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem.
+type OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray struct {
+	Value []NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray was set.
+func (o OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray) IsSet() bool {
+	return o.Set
+}
+
+// Reset unsets value.
+func (o *OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray) Reset() {
+	var v []NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray) SetTo(v []NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray) IsNull() bool {
+	return o.Null
+}
+
+// SetNull sets value to null.
+func (o *OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray) Get() (v []NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray) Or(d []NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) []NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray returns new OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray with value set to v.
+func NewOptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray(v []NilRedfishJobJobsItemMessagesItemResolutionStepsItem) OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray {
+	return OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray is optional nullable []NilRedfishJobJobsItemMessagesItemResolutionStepsItem.
+type OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray struct {
+	Value []NilRedfishJobJobsItemMessagesItemResolutionStepsItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray was set.
+func (o OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray) Reset() {
+	var v []NilRedfishJobJobsItemMessagesItemResolutionStepsItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray) SetTo(v []NilRedfishJobJobsItemMessagesItemResolutionStepsItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []NilRedfishJobJobsItemMessagesItemResolutionStepsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray) Get() (v []NilRedfishJobJobsItemMessagesItemResolutionStepsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray) Or(d []NilRedfishJobJobsItemMessagesItemResolutionStepsItem) []NilRedfishJobJobsItemMessagesItemResolutionStepsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilNilRedfishMetricReportReportsItemArray returns new OptNilNilRedfishMetricReportReportsItemArray with value set to v.
+func NewOptNilNilRedfishMetricReportReportsItemArray(v []NilRedfishMetricReportReportsItem) OptNilNilRedfishMetricReportReportsItemArray {
+	return OptNilNilRedfishMetricReportReportsItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilNilRedfishMetricReportReportsItemArray is optional nullable []NilRedfishMetricReportReportsItem.
+type OptNilNilRedfishMetricReportReportsItemArray struct {
+	Value []NilRedfishMetricReportReportsItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilNilRedfishMetricReportReportsItemArray was set.
+func (o OptNilNilRedfishMetricReportReportsItemArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilNilRedfishMetricReportReportsItemArray) Reset() {
+	var v []NilRedfishMetricReportReportsItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilNilRedfishMetricReportReportsItemArray) SetTo(v []NilRedfishMetricReportReportsItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilNilRedfishMetricReportReportsItemArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilNilRedfishMetricReportReportsItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []NilRedfishMetricReportReportsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilNilRedfishMetricReportReportsItemArray) Get() (v []NilRedfishMetricReportReportsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilNilRedfishMetricReportReportsItemArray) Or(d []NilRedfishMetricReportReportsItem) []NilRedfishMetricReportReportsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray returns new OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray with value set to v.
+func NewOptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray(v []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray {
+	return OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray is optional nullable []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem.
+type OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray struct {
+	Value []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray was set.
+func (o OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) IsSet() bool {
+	return o.Set
+}
+
+// Reset unsets value.
+func (o *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Reset() {
+	var v []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetTo(v []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) IsNull() bool {
+	return o.Null
+}
+
+// SetNull sets value to null.
+func (o *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Get() (v []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Or(d []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray returns new OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray with value set to v.
+func NewOptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray(v []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray {
+	return OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray is optional nullable []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem.
+type OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray struct {
+	Value []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray was set.
+func (o OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray) IsSet() bool {
+	return o.Set
+}
+
+// Reset unsets value.
+func (o *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray) Reset() {
+	var v []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray) SetTo(v []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray) IsNull() bool {
+	return o.Null
+}
+
+// SetNull sets value to null.
+func (o *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray) Get() (v []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray) Or(d []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilNilRedfishMetricReportReportsItemMetricValuesItemArray returns new OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray with value set to v.
+func NewOptNilNilRedfishMetricReportReportsItemMetricValuesItemArray(v []NilRedfishMetricReportReportsItemMetricValuesItem) OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray {
+	return OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray is optional nullable []NilRedfishMetricReportReportsItemMetricValuesItem.
+type OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray struct {
+	Value []NilRedfishMetricReportReportsItemMetricValuesItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray was set.
+func (o OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) Reset() {
+	var v []NilRedfishMetricReportReportsItemMetricValuesItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) SetTo(v []NilRedfishMetricReportReportsItemMetricValuesItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []NilRedfishMetricReportReportsItemMetricValuesItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) Get() (v []NilRedfishMetricReportReportsItemMetricValuesItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) Or(d []NilRedfishMetricReportReportsItemMetricValuesItem) []NilRedfishMetricReportReportsItemMetricValuesItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray returns new OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray with value set to v.
+func NewOptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray(v []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray {
+	return OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray is optional nullable []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem.
+type OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray struct {
+	Value []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray was set.
+func (o OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) IsSet() bool {
+	return o.Set
+}
+
+// Reset unsets value.
+func (o *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Reset() {
+	var v []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetTo(v []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) IsNull() bool {
+	return o.Null
+}
+
+// SetNull sets value to null.
+func (o *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Get() (v []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Or(d []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray returns new OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray with value set to v.
+func NewOptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray(v []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray {
+	return OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray is optional nullable []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem.
+type OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray struct {
+	Value []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray was set.
+func (o OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) IsSet() bool {
+	return o.Set
+}
+
+// Reset unsets value.
+func (o *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Reset() {
+	var v []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) SetTo(v []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) IsNull() bool {
+	return o.Null
+}
+
+// SetNull sets value to null.
+func (o *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Get() (v []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Or(d []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilNilStringArray returns new OptNilNilStringArray with value set to v.
 func NewOptNilNilStringArray(v []NilString) OptNilNilStringArray {
 	return OptNilNilStringArray{
@@ -4638,6 +6102,69 @@ func (o OptNilNilStringArray) Get() (v []NilString, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilNilStringArray) Or(d []NilString) []NilString {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilRedfishJobJobsItemParameters returns new OptNilRedfishJobJobsItemParameters with value set to v.
+func NewOptNilRedfishJobJobsItemParameters(v RedfishJobJobsItemParameters) OptNilRedfishJobJobsItemParameters {
+	return OptNilRedfishJobJobsItemParameters{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilRedfishJobJobsItemParameters is optional nullable RedfishJobJobsItemParameters.
+type OptNilRedfishJobJobsItemParameters struct {
+	Value RedfishJobJobsItemParameters
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilRedfishJobJobsItemParameters was set.
+func (o OptNilRedfishJobJobsItemParameters) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilRedfishJobJobsItemParameters) Reset() {
+	var v RedfishJobJobsItemParameters
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilRedfishJobJobsItemParameters) SetTo(v RedfishJobJobsItemParameters) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilRedfishJobJobsItemParameters) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilRedfishJobJobsItemParameters) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v RedfishJobJobsItemParameters
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilRedfishJobJobsItemParameters) Get() (v RedfishJobJobsItemParameters, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilRedfishJobJobsItemParameters) Or(d RedfishJobJobsItemParameters) RedfishJobJobsItemParameters {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -4896,52 +6423,6 @@ func (o OptNilStringArray) Or(d []string) []string {
 	return d
 }
 
-// NewOptRedfishJobJobsItemParameters returns new OptRedfishJobJobsItemParameters with value set to v.
-func NewOptRedfishJobJobsItemParameters(v RedfishJobJobsItemParameters) OptRedfishJobJobsItemParameters {
-	return OptRedfishJobJobsItemParameters{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptRedfishJobJobsItemParameters is optional RedfishJobJobsItemParameters.
-type OptRedfishJobJobsItemParameters struct {
-	Value RedfishJobJobsItemParameters
-	Set   bool
-}
-
-// IsSet returns true if OptRedfishJobJobsItemParameters was set.
-func (o OptRedfishJobJobsItemParameters) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptRedfishJobJobsItemParameters) Reset() {
-	var v RedfishJobJobsItemParameters
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptRedfishJobJobsItemParameters) SetTo(v RedfishJobJobsItemParameters) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptRedfishJobJobsItemParameters) Get() (v RedfishJobJobsItemParameters, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptRedfishJobJobsItemParameters) Or(d RedfishJobJobsItemParameters) RedfishJobJobsItemParameters {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptRedfishJobJobsItemPayload returns new OptRedfishJobJobsItemPayload with value set to v.
 func NewOptRedfishJobJobsItemPayload(v RedfishJobJobsItemPayload) OptRedfishJobJobsItemPayload {
 	return OptRedfishJobJobsItemPayload{
@@ -5162,12 +6643,12 @@ func (s *PostRolesRequest) SetRole(val OptString) {
 // RedfishDellUpgradeFirmware schema.
 // Ref: #/components/schemas/RedfishDellUpgradeFirmware
 type RedfishDellUpgradeFirmware struct {
-	Message          OptString                                  `json:"Message"`
-	Name             OptString                                  `json:"Name"`
-	Status           OptString                                  `json:"Status"`
-	UpdateCount      OptInt                                     `json:"UpdateCount"`
-	UpdateList       []RedfishDellUpgradeFirmwareUpdateListItem `json:"UpdateList"`
-	UpdateRebootType OptString                                  `json:"UpdateRebootType"`
+	Message          OptString                                              `json:"Message"`
+	Name             OptString                                              `json:"Name"`
+	Status           OptString                                              `json:"Status"`
+	UpdateCount      OptInt                                                 `json:"UpdateCount"`
+	UpdateList       OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray `json:"UpdateList"`
+	UpdateRebootType OptString                                              `json:"UpdateRebootType"`
 }
 
 // GetMessage returns the value of Message.
@@ -5191,7 +6672,7 @@ func (s *RedfishDellUpgradeFirmware) GetUpdateCount() OptInt {
 }
 
 // GetUpdateList returns the value of UpdateList.
-func (s *RedfishDellUpgradeFirmware) GetUpdateList() []RedfishDellUpgradeFirmwareUpdateListItem {
+func (s *RedfishDellUpgradeFirmware) GetUpdateList() OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray {
 	return s.UpdateList
 }
 
@@ -5221,7 +6702,7 @@ func (s *RedfishDellUpgradeFirmware) SetUpdateCount(val OptInt) {
 }
 
 // SetUpdateList sets the value of UpdateList.
-func (s *RedfishDellUpgradeFirmware) SetUpdateList(val []RedfishDellUpgradeFirmwareUpdateListItem) {
+func (s *RedfishDellUpgradeFirmware) SetUpdateList(val OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) {
 	s.UpdateList = val
 }
 
@@ -5444,13 +6925,13 @@ type RedfishJobJobsItem struct {
 	JobStatus               OptString                                      `json:"JobStatus"`
 	JobType                 OptString                                      `json:"JobType"`
 	MaxExecutionTime        OptString                                      `json:"MaxExecutionTime"`
-	Messages                []RedfishJobJobsItemMessagesItem               `json:"Messages"`
+	Messages                OptNilNilRedfishJobJobsItemMessagesItemArray   `json:"Messages"`
 	Name                    OptString                                      `json:"Name"`
 	Oem                     jx.Raw                                         `json:"Oem"`
-	Parameters              OptRedfishJobJobsItemParameters                `json:"Parameters"`
+	Parameters              OptNilRedfishJobJobsItemParameters             `json:"Parameters"`
 	Payload                 OptRedfishJobJobsItemPayload                   `json:"Payload"`
 	PercentComplete         OptNilInt                                      `json:"PercentComplete"`
-	RawData                 []byte                                         `json:"RawData"`
+	RawData                 OptNilByte                                     `json:"RawData"`
 	Schedule                OptRedfishJobJobsItemSchedule                  `json:"Schedule"`
 	StartTime               OptString                                      `json:"StartTime"`
 	StepOrder               OptNilNilStringArray                           `json:"StepOrder"`
@@ -5547,7 +7028,7 @@ func (s *RedfishJobJobsItem) GetMaxExecutionTime() OptString {
 }
 
 // GetMessages returns the value of Messages.
-func (s *RedfishJobJobsItem) GetMessages() []RedfishJobJobsItemMessagesItem {
+func (s *RedfishJobJobsItem) GetMessages() OptNilNilRedfishJobJobsItemMessagesItemArray {
 	return s.Messages
 }
 
@@ -5562,7 +7043,7 @@ func (s *RedfishJobJobsItem) GetOem() jx.Raw {
 }
 
 // GetParameters returns the value of Parameters.
-func (s *RedfishJobJobsItem) GetParameters() OptRedfishJobJobsItemParameters {
+func (s *RedfishJobJobsItem) GetParameters() OptNilRedfishJobJobsItemParameters {
 	return s.Parameters
 }
 
@@ -5577,7 +7058,7 @@ func (s *RedfishJobJobsItem) GetPercentComplete() OptNilInt {
 }
 
 // GetRawData returns the value of RawData.
-func (s *RedfishJobJobsItem) GetRawData() []byte {
+func (s *RedfishJobJobsItem) GetRawData() OptNilByte {
 	return s.RawData
 }
 
@@ -5687,7 +7168,7 @@ func (s *RedfishJobJobsItem) SetMaxExecutionTime(val OptString) {
 }
 
 // SetMessages sets the value of Messages.
-func (s *RedfishJobJobsItem) SetMessages(val []RedfishJobJobsItemMessagesItem) {
+func (s *RedfishJobJobsItem) SetMessages(val OptNilNilRedfishJobJobsItemMessagesItemArray) {
 	s.Messages = val
 }
 
@@ -5702,7 +7183,7 @@ func (s *RedfishJobJobsItem) SetOem(val jx.Raw) {
 }
 
 // SetParameters sets the value of Parameters.
-func (s *RedfishJobJobsItem) SetParameters(val OptRedfishJobJobsItemParameters) {
+func (s *RedfishJobJobsItem) SetParameters(val OptNilRedfishJobJobsItemParameters) {
 	s.Parameters = val
 }
 
@@ -5717,7 +7198,7 @@ func (s *RedfishJobJobsItem) SetPercentComplete(val OptNilInt) {
 }
 
 // SetRawData sets the value of RawData.
-func (s *RedfishJobJobsItem) SetRawData(val []byte) {
+func (s *RedfishJobJobsItem) SetRawData(val OptNilByte) {
 	s.RawData = val
 }
 
@@ -5737,17 +7218,17 @@ func (s *RedfishJobJobsItem) SetStepOrder(val OptNilNilStringArray) {
 }
 
 type RedfishJobJobsItemMessageDotExtendedInfoItem struct {
-	Message                  OptString                                                         `json:"Message"`
-	MessageArgs              []string                                                          `json:"MessageArgs"`
-	MessageId                OptString                                                         `json:"MessageId"`
-	MessageSeverity          OptString                                                         `json:"MessageSeverity"`
-	Oem                      jx.Raw                                                            `json:"Oem"`
-	RelatedProperties        OptNilNilStringArray                                              `json:"RelatedProperties"`
-	Resolution               OptString                                                         `json:"Resolution"`
-	ResolutionSteps          []RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem `json:"ResolutionSteps"`
-	Severity                 OptString                                                         `json:"Severity"`
-	UserAuthenticationSource OptString                                                         `json:"UserAuthenticationSource"`
-	Username                 OptString                                                         `json:"Username"`
+	Message                  OptString                                                                     `json:"Message"`
+	MessageArgs              OptNilNilStringArray                                                          `json:"MessageArgs"`
+	MessageId                OptString                                                                     `json:"MessageId"`
+	MessageSeverity          OptString                                                                     `json:"MessageSeverity"`
+	Oem                      jx.Raw                                                                        `json:"Oem"`
+	RelatedProperties        OptNilNilStringArray                                                          `json:"RelatedProperties"`
+	Resolution               OptString                                                                     `json:"Resolution"`
+	ResolutionSteps          OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray `json:"ResolutionSteps"`
+	Severity                 OptString                                                                     `json:"Severity"`
+	UserAuthenticationSource OptString                                                                     `json:"UserAuthenticationSource"`
+	Username                 OptString                                                                     `json:"Username"`
 }
 
 // GetMessage returns the value of Message.
@@ -5756,7 +7237,7 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) GetMessage() OptString {
 }
 
 // GetMessageArgs returns the value of MessageArgs.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) GetMessageArgs() []string {
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) GetMessageArgs() OptNilNilStringArray {
 	return s.MessageArgs
 }
 
@@ -5786,7 +7267,7 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) GetResolution() OptString
 }
 
 // GetResolutionSteps returns the value of ResolutionSteps.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) GetResolutionSteps() []RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem {
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) GetResolutionSteps() OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray {
 	return s.ResolutionSteps
 }
 
@@ -5811,7 +7292,7 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetMessage(val OptString)
 }
 
 // SetMessageArgs sets the value of MessageArgs.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetMessageArgs(val []string) {
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetMessageArgs(val OptNilNilStringArray) {
 	s.MessageArgs = val
 }
 
@@ -5841,7 +7322,7 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetResolution(val OptStri
 }
 
 // SetResolutionSteps sets the value of ResolutionSteps.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetResolutionSteps(val []RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) {
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetResolutionSteps(val OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray) {
 	s.ResolutionSteps = val
 }
 
@@ -5861,18 +7342,18 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetUsername(val OptString
 }
 
 type RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem struct {
-	ActionParameters     []RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem `json:"ActionParameters"`
-	ActionURI            OptString                                                                             `json:"ActionURI"`
-	Oem                  jx.Raw                                                                                `json:"Oem"`
-	Priority             OptNilInt                                                                             `json:"Priority"`
-	ResolutionType       OptString                                                                             `json:"ResolutionType"`
-	RetryCount           OptNilInt                                                                             `json:"RetryCount"`
-	RetryIntervalSeconds OptNilInt                                                                             `json:"RetryIntervalSeconds"`
-	TargetComponentURI   OptString                                                                             `json:"TargetComponentURI"`
+	ActionParameters     OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray `json:"ActionParameters"`
+	ActionURI            OptString                                                                                         `json:"ActionURI"`
+	Oem                  jx.Raw                                                                                            `json:"Oem"`
+	Priority             OptNilInt                                                                                         `json:"Priority"`
+	ResolutionType       OptString                                                                                         `json:"ResolutionType"`
+	RetryCount           OptNilInt                                                                                         `json:"RetryCount"`
+	RetryIntervalSeconds OptNilInt                                                                                         `json:"RetryIntervalSeconds"`
+	TargetComponentURI   OptString                                                                                         `json:"TargetComponentURI"`
 }
 
 // GetActionParameters returns the value of ActionParameters.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) GetActionParameters() []RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) GetActionParameters() OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray {
 	return s.ActionParameters
 }
 
@@ -5912,7 +7393,7 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) GetTar
 }
 
 // SetActionParameters sets the value of ActionParameters.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) SetActionParameters(val []RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) {
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) SetActionParameters(val OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) {
 	s.ActionParameters = val
 }
 
@@ -5952,24 +7433,24 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) SetTar
 }
 
 type RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem struct {
-	AllowableNumbers           []string      `json:"AllowableNumbers"`
-	AllowablePattern           OptString     `json:"AllowablePattern"`
-	AllowableValueDescriptions []string      `json:"AllowableValueDescriptions"`
-	AllowableValues            []string      `json:"AllowableValues"`
-	ArraySizeMaximum           OptNilInt     `json:"ArraySizeMaximum"`
-	ArraySizeMinimum           OptNilInt     `json:"ArraySizeMinimum"`
-	DataType                   OptString     `json:"DataType"`
-	DefaultValue               OptString     `json:"DefaultValue"`
-	MaximumValue               OptNilFloat64 `json:"MaximumValue"`
-	MinimumValue               OptNilFloat64 `json:"MinimumValue"`
-	Name                       OptString     `json:"Name"`
-	NoDefaultValue             OptBool       `json:"NoDefaultValue"`
-	ObjectDataType             OptString     `json:"ObjectDataType"`
-	Required                   OptBool       `json:"Required"`
+	AllowableNumbers           OptNilNilStringArray `json:"AllowableNumbers"`
+	AllowablePattern           OptString            `json:"AllowablePattern"`
+	AllowableValueDescriptions OptNilNilStringArray `json:"AllowableValueDescriptions"`
+	AllowableValues            OptNilNilStringArray `json:"AllowableValues"`
+	ArraySizeMaximum           OptNilInt            `json:"ArraySizeMaximum"`
+	ArraySizeMinimum           OptNilInt            `json:"ArraySizeMinimum"`
+	DataType                   OptString            `json:"DataType"`
+	DefaultValue               OptString            `json:"DefaultValue"`
+	MaximumValue               OptNilFloat64        `json:"MaximumValue"`
+	MinimumValue               OptNilFloat64        `json:"MinimumValue"`
+	Name                       OptString            `json:"Name"`
+	NoDefaultValue             OptBool              `json:"NoDefaultValue"`
+	ObjectDataType             OptString            `json:"ObjectDataType"`
+	Required                   OptBool              `json:"Required"`
 }
 
 // GetAllowableNumbers returns the value of AllowableNumbers.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableNumbers() []string {
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableNumbers() OptNilNilStringArray {
 	return s.AllowableNumbers
 }
 
@@ -5979,12 +7460,12 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionPa
 }
 
 // GetAllowableValueDescriptions returns the value of AllowableValueDescriptions.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValueDescriptions() []string {
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValueDescriptions() OptNilNilStringArray {
 	return s.AllowableValueDescriptions
 }
 
 // GetAllowableValues returns the value of AllowableValues.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValues() []string {
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValues() OptNilNilStringArray {
 	return s.AllowableValues
 }
 
@@ -6039,7 +7520,7 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionPa
 }
 
 // SetAllowableNumbers sets the value of AllowableNumbers.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableNumbers(val []string) {
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableNumbers(val OptNilNilStringArray) {
 	s.AllowableNumbers = val
 }
 
@@ -6049,12 +7530,12 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionPa
 }
 
 // SetAllowableValueDescriptions sets the value of AllowableValueDescriptions.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValueDescriptions(val []string) {
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValueDescriptions(val OptNilNilStringArray) {
 	s.AllowableValueDescriptions = val
 }
 
 // SetAllowableValues sets the value of AllowableValues.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValues(val []string) {
+func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValues(val OptNilNilStringArray) {
 	s.AllowableValues = val
 }
 
@@ -6109,17 +7590,17 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionPa
 }
 
 type RedfishJobJobsItemMessagesItem struct {
-	Message                  OptString                                           `json:"Message"`
-	MessageArgs              []string                                            `json:"MessageArgs"`
-	MessageId                OptString                                           `json:"MessageId"`
-	MessageSeverity          OptString                                           `json:"MessageSeverity"`
-	Oem                      jx.Raw                                              `json:"Oem"`
-	RelatedProperties        OptNilNilStringArray                                `json:"RelatedProperties"`
-	Resolution               OptString                                           `json:"Resolution"`
-	ResolutionSteps          []RedfishJobJobsItemMessagesItemResolutionStepsItem `json:"ResolutionSteps"`
-	Severity                 OptString                                           `json:"Severity"`
-	UserAuthenticationSource OptString                                           `json:"UserAuthenticationSource"`
-	Username                 OptString                                           `json:"Username"`
+	Message                  OptString                                                       `json:"Message"`
+	MessageArgs              OptNilNilStringArray                                            `json:"MessageArgs"`
+	MessageId                OptString                                                       `json:"MessageId"`
+	MessageSeverity          OptString                                                       `json:"MessageSeverity"`
+	Oem                      jx.Raw                                                          `json:"Oem"`
+	RelatedProperties        OptNilNilStringArray                                            `json:"RelatedProperties"`
+	Resolution               OptString                                                       `json:"Resolution"`
+	ResolutionSteps          OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray `json:"ResolutionSteps"`
+	Severity                 OptString                                                       `json:"Severity"`
+	UserAuthenticationSource OptString                                                       `json:"UserAuthenticationSource"`
+	Username                 OptString                                                       `json:"Username"`
 }
 
 // GetMessage returns the value of Message.
@@ -6128,7 +7609,7 @@ func (s *RedfishJobJobsItemMessagesItem) GetMessage() OptString {
 }
 
 // GetMessageArgs returns the value of MessageArgs.
-func (s *RedfishJobJobsItemMessagesItem) GetMessageArgs() []string {
+func (s *RedfishJobJobsItemMessagesItem) GetMessageArgs() OptNilNilStringArray {
 	return s.MessageArgs
 }
 
@@ -6158,7 +7639,7 @@ func (s *RedfishJobJobsItemMessagesItem) GetResolution() OptString {
 }
 
 // GetResolutionSteps returns the value of ResolutionSteps.
-func (s *RedfishJobJobsItemMessagesItem) GetResolutionSteps() []RedfishJobJobsItemMessagesItemResolutionStepsItem {
+func (s *RedfishJobJobsItemMessagesItem) GetResolutionSteps() OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray {
 	return s.ResolutionSteps
 }
 
@@ -6183,7 +7664,7 @@ func (s *RedfishJobJobsItemMessagesItem) SetMessage(val OptString) {
 }
 
 // SetMessageArgs sets the value of MessageArgs.
-func (s *RedfishJobJobsItemMessagesItem) SetMessageArgs(val []string) {
+func (s *RedfishJobJobsItemMessagesItem) SetMessageArgs(val OptNilNilStringArray) {
 	s.MessageArgs = val
 }
 
@@ -6213,7 +7694,7 @@ func (s *RedfishJobJobsItemMessagesItem) SetResolution(val OptString) {
 }
 
 // SetResolutionSteps sets the value of ResolutionSteps.
-func (s *RedfishJobJobsItemMessagesItem) SetResolutionSteps(val []RedfishJobJobsItemMessagesItemResolutionStepsItem) {
+func (s *RedfishJobJobsItemMessagesItem) SetResolutionSteps(val OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray) {
 	s.ResolutionSteps = val
 }
 
@@ -6233,18 +7714,18 @@ func (s *RedfishJobJobsItemMessagesItem) SetUsername(val OptString) {
 }
 
 type RedfishJobJobsItemMessagesItemResolutionStepsItem struct {
-	ActionParameters     []RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem `json:"ActionParameters"`
-	ActionURI            OptString                                                               `json:"ActionURI"`
-	Oem                  jx.Raw                                                                  `json:"Oem"`
-	Priority             OptNilInt                                                               `json:"Priority"`
-	ResolutionType       OptString                                                               `json:"ResolutionType"`
-	RetryCount           OptNilInt                                                               `json:"RetryCount"`
-	RetryIntervalSeconds OptNilInt                                                               `json:"RetryIntervalSeconds"`
-	TargetComponentURI   OptString                                                               `json:"TargetComponentURI"`
+	ActionParameters     OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray `json:"ActionParameters"`
+	ActionURI            OptString                                                                           `json:"ActionURI"`
+	Oem                  jx.Raw                                                                              `json:"Oem"`
+	Priority             OptNilInt                                                                           `json:"Priority"`
+	ResolutionType       OptString                                                                           `json:"ResolutionType"`
+	RetryCount           OptNilInt                                                                           `json:"RetryCount"`
+	RetryIntervalSeconds OptNilInt                                                                           `json:"RetryIntervalSeconds"`
+	TargetComponentURI   OptString                                                                           `json:"TargetComponentURI"`
 }
 
 // GetActionParameters returns the value of ActionParameters.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) GetActionParameters() []RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem {
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) GetActionParameters() OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray {
 	return s.ActionParameters
 }
 
@@ -6284,7 +7765,7 @@ func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) GetTargetComponentUR
 }
 
 // SetActionParameters sets the value of ActionParameters.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) SetActionParameters(val []RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) {
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) SetActionParameters(val OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray) {
 	s.ActionParameters = val
 }
 
@@ -6324,24 +7805,24 @@ func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) SetTargetComponentUR
 }
 
 type RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem struct {
-	AllowableNumbers           []string      `json:"AllowableNumbers"`
-	AllowablePattern           OptString     `json:"AllowablePattern"`
-	AllowableValueDescriptions []string      `json:"AllowableValueDescriptions"`
-	AllowableValues            []string      `json:"AllowableValues"`
-	ArraySizeMaximum           OptNilInt     `json:"ArraySizeMaximum"`
-	ArraySizeMinimum           OptNilInt     `json:"ArraySizeMinimum"`
-	DataType                   OptString     `json:"DataType"`
-	DefaultValue               OptString     `json:"DefaultValue"`
-	MaximumValue               OptNilFloat64 `json:"MaximumValue"`
-	MinimumValue               OptNilFloat64 `json:"MinimumValue"`
-	Name                       OptString     `json:"Name"`
-	NoDefaultValue             OptBool       `json:"NoDefaultValue"`
-	ObjectDataType             OptString     `json:"ObjectDataType"`
-	Required                   OptBool       `json:"Required"`
+	AllowableNumbers           OptNilNilStringArray `json:"AllowableNumbers"`
+	AllowablePattern           OptString            `json:"AllowablePattern"`
+	AllowableValueDescriptions OptNilNilStringArray `json:"AllowableValueDescriptions"`
+	AllowableValues            OptNilNilStringArray `json:"AllowableValues"`
+	ArraySizeMaximum           OptNilInt            `json:"ArraySizeMaximum"`
+	ArraySizeMinimum           OptNilInt            `json:"ArraySizeMinimum"`
+	DataType                   OptString            `json:"DataType"`
+	DefaultValue               OptString            `json:"DefaultValue"`
+	MaximumValue               OptNilFloat64        `json:"MaximumValue"`
+	MinimumValue               OptNilFloat64        `json:"MinimumValue"`
+	Name                       OptString            `json:"Name"`
+	NoDefaultValue             OptBool              `json:"NoDefaultValue"`
+	ObjectDataType             OptString            `json:"ObjectDataType"`
+	Required                   OptBool              `json:"Required"`
 }
 
 // GetAllowableNumbers returns the value of AllowableNumbers.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetAllowableNumbers() []string {
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetAllowableNumbers() OptNilNilStringArray {
 	return s.AllowableNumbers
 }
 
@@ -6351,12 +7832,12 @@ func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) 
 }
 
 // GetAllowableValueDescriptions returns the value of AllowableValueDescriptions.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetAllowableValueDescriptions() []string {
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetAllowableValueDescriptions() OptNilNilStringArray {
 	return s.AllowableValueDescriptions
 }
 
 // GetAllowableValues returns the value of AllowableValues.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetAllowableValues() []string {
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) GetAllowableValues() OptNilNilStringArray {
 	return s.AllowableValues
 }
 
@@ -6411,7 +7892,7 @@ func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) 
 }
 
 // SetAllowableNumbers sets the value of AllowableNumbers.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetAllowableNumbers(val []string) {
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetAllowableNumbers(val OptNilNilStringArray) {
 	s.AllowableNumbers = val
 }
 
@@ -6421,12 +7902,12 @@ func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) 
 }
 
 // SetAllowableValueDescriptions sets the value of AllowableValueDescriptions.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetAllowableValueDescriptions(val []string) {
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetAllowableValueDescriptions(val OptNilNilStringArray) {
 	s.AllowableValueDescriptions = val
 }
 
 // SetAllowableValues sets the value of AllowableValues.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetAllowableValues(val []string) {
+func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetAllowableValues(val OptNilNilStringArray) {
 	s.AllowableValues = val
 }
 
@@ -6643,8 +8124,8 @@ func (s *RedfishJobJobsItemSchedule) SetRecurrenceInterval(val OptString) {
 // RedfishMetricReport schema.
 // Ref: #/components/schemas/RedfishMetricReport
 type RedfishMetricReport struct {
-	Name    OptString                           `json:"name"`
-	Reports []NilRedfishMetricReportReportsItem `json:"reports"`
+	Name    OptString                                    `json:"name"`
+	Reports OptNilNilRedfishMetricReportReportsItemArray `json:"reports"`
 }
 
 // GetName returns the value of Name.
@@ -6653,7 +8134,7 @@ func (s *RedfishMetricReport) GetName() OptString {
 }
 
 // GetReports returns the value of Reports.
-func (s *RedfishMetricReport) GetReports() []NilRedfishMetricReportReportsItem {
+func (s *RedfishMetricReport) GetReports() OptNilNilRedfishMetricReportReportsItemArray {
 	return s.Reports
 }
 
@@ -6663,24 +8144,24 @@ func (s *RedfishMetricReport) SetName(val OptString) {
 }
 
 // SetReports sets the value of Reports.
-func (s *RedfishMetricReport) SetReports(val []NilRedfishMetricReportReportsItem) {
+func (s *RedfishMetricReport) SetReports(val OptNilNilRedfishMetricReportReportsItemArray) {
 	s.Reports = val
 }
 
 type RedfishMetricReportReportsItem struct {
-	MessageDotExtendedInfo []RedfishMetricReportReportsItemMessageDotExtendedInfoItem `json:"@Message.ExtendedInfo"`
-	OdataDotContext        OptString                                                  `json:"@odata.context"`
-	OdataDotEtag           OptString                                                  `json:"@odata.etag"`
-	OdataDotID             OptString                                                  `json:"@odata.id"`
-	OdataDotType           OptString                                                  `json:"@odata.type"`
-	Context                OptString                                                  `json:"Context"`
-	Description            OptString                                                  `json:"Description"`
-	ID                     OptString                                                  `json:"Id"`
-	MetricValues           []RedfishMetricReportReportsItemMetricValuesItem           `json:"MetricValues"`
-	Name                   OptString                                                  `json:"Name"`
-	Oem                    jx.Raw                                                     `json:"Oem"`
-	ReportSequence         OptString                                                  `json:"ReportSequence"`
-	Timestamp              OptString                                                  `json:"Timestamp"`
+	MessageDotExtendedInfo []RedfishMetricReportReportsItemMessageDotExtendedInfoItem   `json:"@Message.ExtendedInfo"`
+	OdataDotContext        OptString                                                    `json:"@odata.context"`
+	OdataDotEtag           OptString                                                    `json:"@odata.etag"`
+	OdataDotID             OptString                                                    `json:"@odata.id"`
+	OdataDotType           OptString                                                    `json:"@odata.type"`
+	Context                OptString                                                    `json:"Context"`
+	Description            OptString                                                    `json:"Description"`
+	ID                     OptString                                                    `json:"Id"`
+	MetricValues           OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray `json:"MetricValues"`
+	Name                   OptString                                                    `json:"Name"`
+	Oem                    jx.Raw                                                       `json:"Oem"`
+	ReportSequence         OptString                                                    `json:"ReportSequence"`
+	Timestamp              OptString                                                    `json:"Timestamp"`
 }
 
 // GetMessageDotExtendedInfo returns the value of MessageDotExtendedInfo.
@@ -6724,7 +8205,7 @@ func (s *RedfishMetricReportReportsItem) GetID() OptString {
 }
 
 // GetMetricValues returns the value of MetricValues.
-func (s *RedfishMetricReportReportsItem) GetMetricValues() []RedfishMetricReportReportsItemMetricValuesItem {
+func (s *RedfishMetricReportReportsItem) GetMetricValues() OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray {
 	return s.MetricValues
 }
 
@@ -6789,7 +8270,7 @@ func (s *RedfishMetricReportReportsItem) SetID(val OptString) {
 }
 
 // SetMetricValues sets the value of MetricValues.
-func (s *RedfishMetricReportReportsItem) SetMetricValues(val []RedfishMetricReportReportsItemMetricValuesItem) {
+func (s *RedfishMetricReportReportsItem) SetMetricValues(val OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) {
 	s.MetricValues = val
 }
 
@@ -6814,17 +8295,17 @@ func (s *RedfishMetricReportReportsItem) SetTimestamp(val OptString) {
 }
 
 type RedfishMetricReportReportsItemMessageDotExtendedInfoItem struct {
-	Message                  OptString                                                                     `json:"Message"`
-	MessageArgs              []string                                                                      `json:"MessageArgs"`
-	MessageId                OptString                                                                     `json:"MessageId"`
-	MessageSeverity          OptString                                                                     `json:"MessageSeverity"`
-	Oem                      jx.Raw                                                                        `json:"Oem"`
-	RelatedProperties        OptNilNilStringArray                                                          `json:"RelatedProperties"`
-	Resolution               OptString                                                                     `json:"Resolution"`
-	ResolutionSteps          []RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem `json:"ResolutionSteps"`
-	Severity                 OptString                                                                     `json:"Severity"`
-	UserAuthenticationSource OptString                                                                     `json:"UserAuthenticationSource"`
-	Username                 OptString                                                                     `json:"Username"`
+	Message                  OptString                                                                                 `json:"Message"`
+	MessageArgs              OptNilNilStringArray                                                                      `json:"MessageArgs"`
+	MessageId                OptString                                                                                 `json:"MessageId"`
+	MessageSeverity          OptString                                                                                 `json:"MessageSeverity"`
+	Oem                      jx.Raw                                                                                    `json:"Oem"`
+	RelatedProperties        OptNilNilStringArray                                                                      `json:"RelatedProperties"`
+	Resolution               OptString                                                                                 `json:"Resolution"`
+	ResolutionSteps          OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray `json:"ResolutionSteps"`
+	Severity                 OptString                                                                                 `json:"Severity"`
+	UserAuthenticationSource OptString                                                                                 `json:"UserAuthenticationSource"`
+	Username                 OptString                                                                                 `json:"Username"`
 }
 
 // GetMessage returns the value of Message.
@@ -6833,7 +8314,7 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) GetMessage() 
 }
 
 // GetMessageArgs returns the value of MessageArgs.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) GetMessageArgs() []string {
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) GetMessageArgs() OptNilNilStringArray {
 	return s.MessageArgs
 }
 
@@ -6863,7 +8344,7 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) GetResolution
 }
 
 // GetResolutionSteps returns the value of ResolutionSteps.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) GetResolutionSteps() []RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem {
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) GetResolutionSteps() OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray {
 	return s.ResolutionSteps
 }
 
@@ -6888,7 +8369,7 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetMessage(va
 }
 
 // SetMessageArgs sets the value of MessageArgs.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetMessageArgs(val []string) {
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetMessageArgs(val OptNilNilStringArray) {
 	s.MessageArgs = val
 }
 
@@ -6918,7 +8399,7 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetResolution
 }
 
 // SetResolutionSteps sets the value of ResolutionSteps.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetResolutionSteps(val []RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) {
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetResolutionSteps(val OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray) {
 	s.ResolutionSteps = val
 }
 
@@ -6938,18 +8419,18 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetUsername(v
 }
 
 type RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem struct {
-	ActionParameters     []RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem `json:"ActionParameters"`
-	ActionURI            OptString                                                                                         `json:"ActionURI"`
-	Oem                  jx.Raw                                                                                            `json:"Oem"`
-	Priority             OptNilInt                                                                                         `json:"Priority"`
-	ResolutionType       OptString                                                                                         `json:"ResolutionType"`
-	RetryCount           OptNilInt                                                                                         `json:"RetryCount"`
-	RetryIntervalSeconds OptNilInt                                                                                         `json:"RetryIntervalSeconds"`
-	TargetComponentURI   OptString                                                                                         `json:"TargetComponentURI"`
+	ActionParameters     OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray `json:"ActionParameters"`
+	ActionURI            OptString                                                                                                     `json:"ActionURI"`
+	Oem                  jx.Raw                                                                                                        `json:"Oem"`
+	Priority             OptNilInt                                                                                                     `json:"Priority"`
+	ResolutionType       OptString                                                                                                     `json:"ResolutionType"`
+	RetryCount           OptNilInt                                                                                                     `json:"RetryCount"`
+	RetryIntervalSeconds OptNilInt                                                                                                     `json:"RetryIntervalSeconds"`
+	TargetComponentURI   OptString                                                                                                     `json:"TargetComponentURI"`
 }
 
 // GetActionParameters returns the value of ActionParameters.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) GetActionParameters() []RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) GetActionParameters() OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray {
 	return s.ActionParameters
 }
 
@@ -6989,7 +8470,7 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionSteps
 }
 
 // SetActionParameters sets the value of ActionParameters.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) SetActionParameters(val []RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) {
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) SetActionParameters(val OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) {
 	s.ActionParameters = val
 }
 
@@ -7029,24 +8510,24 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionSteps
 }
 
 type RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem struct {
-	AllowableNumbers           []string      `json:"AllowableNumbers"`
-	AllowablePattern           OptString     `json:"AllowablePattern"`
-	AllowableValueDescriptions []string      `json:"AllowableValueDescriptions"`
-	AllowableValues            []string      `json:"AllowableValues"`
-	ArraySizeMaximum           OptNilInt     `json:"ArraySizeMaximum"`
-	ArraySizeMinimum           OptNilInt     `json:"ArraySizeMinimum"`
-	DataType                   OptString     `json:"DataType"`
-	DefaultValue               OptString     `json:"DefaultValue"`
-	MaximumValue               OptNilFloat64 `json:"MaximumValue"`
-	MinimumValue               OptNilFloat64 `json:"MinimumValue"`
-	Name                       OptString     `json:"Name"`
-	NoDefaultValue             OptBool       `json:"NoDefaultValue"`
-	ObjectDataType             OptString     `json:"ObjectDataType"`
-	Required                   OptBool       `json:"Required"`
+	AllowableNumbers           OptNilNilStringArray `json:"AllowableNumbers"`
+	AllowablePattern           OptString            `json:"AllowablePattern"`
+	AllowableValueDescriptions OptNilNilStringArray `json:"AllowableValueDescriptions"`
+	AllowableValues            OptNilNilStringArray `json:"AllowableValues"`
+	ArraySizeMaximum           OptNilInt            `json:"ArraySizeMaximum"`
+	ArraySizeMinimum           OptNilInt            `json:"ArraySizeMinimum"`
+	DataType                   OptString            `json:"DataType"`
+	DefaultValue               OptString            `json:"DefaultValue"`
+	MaximumValue               OptNilFloat64        `json:"MaximumValue"`
+	MinimumValue               OptNilFloat64        `json:"MinimumValue"`
+	Name                       OptString            `json:"Name"`
+	NoDefaultValue             OptBool              `json:"NoDefaultValue"`
+	ObjectDataType             OptString            `json:"ObjectDataType"`
+	Required                   OptBool              `json:"Required"`
 }
 
 // GetAllowableNumbers returns the value of AllowableNumbers.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableNumbers() []string {
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableNumbers() OptNilNilStringArray {
 	return s.AllowableNumbers
 }
 
@@ -7056,12 +8537,12 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionSteps
 }
 
 // GetAllowableValueDescriptions returns the value of AllowableValueDescriptions.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValueDescriptions() []string {
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValueDescriptions() OptNilNilStringArray {
 	return s.AllowableValueDescriptions
 }
 
 // GetAllowableValues returns the value of AllowableValues.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValues() []string {
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValues() OptNilNilStringArray {
 	return s.AllowableValues
 }
 
@@ -7116,7 +8597,7 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionSteps
 }
 
 // SetAllowableNumbers sets the value of AllowableNumbers.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableNumbers(val []string) {
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableNumbers(val OptNilNilStringArray) {
 	s.AllowableNumbers = val
 }
 
@@ -7126,12 +8607,12 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionSteps
 }
 
 // SetAllowableValueDescriptions sets the value of AllowableValueDescriptions.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValueDescriptions(val []string) {
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValueDescriptions(val OptNilNilStringArray) {
 	s.AllowableValueDescriptions = val
 }
 
 // SetAllowableValues sets the value of AllowableValues.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValues(val []string) {
+func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValues(val OptNilNilStringArray) {
 	s.AllowableValues = val
 }
 
@@ -8022,17 +9503,17 @@ func (s *RedfishSystemOemDell) SetSmbiosGUID(val OptString) {
 }
 
 type RedfishSystemOemDellMessageDotExtendedInfoItem struct {
-	Message                  OptString                                                           `json:"Message"`
-	MessageArgs              []string                                                            `json:"MessageArgs"`
-	MessageId                OptString                                                           `json:"MessageId"`
-	MessageSeverity          OptString                                                           `json:"MessageSeverity"`
-	Oem                      jx.Raw                                                              `json:"Oem"`
-	RelatedProperties        OptNilNilStringArray                                                `json:"RelatedProperties"`
-	Resolution               OptString                                                           `json:"Resolution"`
-	ResolutionSteps          []RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem `json:"ResolutionSteps"`
-	Severity                 OptString                                                           `json:"Severity"`
-	UserAuthenticationSource OptString                                                           `json:"UserAuthenticationSource"`
-	Username                 OptString                                                           `json:"Username"`
+	Message                  OptString                                                                       `json:"Message"`
+	MessageArgs              OptNilNilStringArray                                                            `json:"MessageArgs"`
+	MessageId                OptString                                                                       `json:"MessageId"`
+	MessageSeverity          OptString                                                                       `json:"MessageSeverity"`
+	Oem                      jx.Raw                                                                          `json:"Oem"`
+	RelatedProperties        OptNilNilStringArray                                                            `json:"RelatedProperties"`
+	Resolution               OptString                                                                       `json:"Resolution"`
+	ResolutionSteps          OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray `json:"ResolutionSteps"`
+	Severity                 OptString                                                                       `json:"Severity"`
+	UserAuthenticationSource OptString                                                                       `json:"UserAuthenticationSource"`
+	Username                 OptString                                                                       `json:"Username"`
 }
 
 // GetMessage returns the value of Message.
@@ -8041,7 +9522,7 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) GetMessage() OptString 
 }
 
 // GetMessageArgs returns the value of MessageArgs.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) GetMessageArgs() []string {
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) GetMessageArgs() OptNilNilStringArray {
 	return s.MessageArgs
 }
 
@@ -8071,7 +9552,7 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) GetResolution() OptStri
 }
 
 // GetResolutionSteps returns the value of ResolutionSteps.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) GetResolutionSteps() []RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem {
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) GetResolutionSteps() OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray {
 	return s.ResolutionSteps
 }
 
@@ -8096,7 +9577,7 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetMessage(val OptStrin
 }
 
 // SetMessageArgs sets the value of MessageArgs.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetMessageArgs(val []string) {
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetMessageArgs(val OptNilNilStringArray) {
 	s.MessageArgs = val
 }
 
@@ -8126,7 +9607,7 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetResolution(val OptSt
 }
 
 // SetResolutionSteps sets the value of ResolutionSteps.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetResolutionSteps(val []RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) {
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetResolutionSteps(val OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) {
 	s.ResolutionSteps = val
 }
 
@@ -8146,18 +9627,18 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetUsername(val OptStri
 }
 
 type RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem struct {
-	ActionParameters     []RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem `json:"ActionParameters"`
-	ActionURI            OptString                                                                               `json:"ActionURI"`
-	Oem                  jx.Raw                                                                                  `json:"Oem"`
-	Priority             OptNilInt                                                                               `json:"Priority"`
-	ResolutionType       OptString                                                                               `json:"ResolutionType"`
-	RetryCount           OptNilInt                                                                               `json:"RetryCount"`
-	RetryIntervalSeconds OptNilInt                                                                               `json:"RetryIntervalSeconds"`
-	TargetComponentURI   OptString                                                                               `json:"TargetComponentURI"`
+	ActionParameters     OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray `json:"ActionParameters"`
+	ActionURI            OptString                                                                                           `json:"ActionURI"`
+	Oem                  jx.Raw                                                                                              `json:"Oem"`
+	Priority             OptNilInt                                                                                           `json:"Priority"`
+	ResolutionType       OptString                                                                                           `json:"ResolutionType"`
+	RetryCount           OptNilInt                                                                                           `json:"RetryCount"`
+	RetryIntervalSeconds OptNilInt                                                                                           `json:"RetryIntervalSeconds"`
+	TargetComponentURI   OptString                                                                                           `json:"TargetComponentURI"`
 }
 
 // GetActionParameters returns the value of ActionParameters.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) GetActionParameters() []RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) GetActionParameters() OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray {
 	return s.ActionParameters
 }
 
@@ -8197,7 +9678,7 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) GetT
 }
 
 // SetActionParameters sets the value of ActionParameters.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetActionParameters(val []RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) {
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetActionParameters(val OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) {
 	s.ActionParameters = val
 }
 
@@ -8237,24 +9718,24 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetT
 }
 
 type RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem struct {
-	AllowableNumbers           []string      `json:"AllowableNumbers"`
-	AllowablePattern           OptString     `json:"AllowablePattern"`
-	AllowableValueDescriptions []string      `json:"AllowableValueDescriptions"`
-	AllowableValues            []string      `json:"AllowableValues"`
-	ArraySizeMaximum           OptNilInt     `json:"ArraySizeMaximum"`
-	ArraySizeMinimum           OptNilInt     `json:"ArraySizeMinimum"`
-	DataType                   OptString     `json:"DataType"`
-	DefaultValue               OptString     `json:"DefaultValue"`
-	MaximumValue               OptNilFloat64 `json:"MaximumValue"`
-	MinimumValue               OptNilFloat64 `json:"MinimumValue"`
-	Name                       OptString     `json:"Name"`
-	NoDefaultValue             OptBool       `json:"NoDefaultValue"`
-	ObjectDataType             OptString     `json:"ObjectDataType"`
-	Required                   OptBool       `json:"Required"`
+	AllowableNumbers           OptNilNilStringArray `json:"AllowableNumbers"`
+	AllowablePattern           OptString            `json:"AllowablePattern"`
+	AllowableValueDescriptions OptNilNilStringArray `json:"AllowableValueDescriptions"`
+	AllowableValues            OptNilNilStringArray `json:"AllowableValues"`
+	ArraySizeMaximum           OptNilInt            `json:"ArraySizeMaximum"`
+	ArraySizeMinimum           OptNilInt            `json:"ArraySizeMinimum"`
+	DataType                   OptString            `json:"DataType"`
+	DefaultValue               OptString            `json:"DefaultValue"`
+	MaximumValue               OptNilFloat64        `json:"MaximumValue"`
+	MinimumValue               OptNilFloat64        `json:"MinimumValue"`
+	Name                       OptString            `json:"Name"`
+	NoDefaultValue             OptBool              `json:"NoDefaultValue"`
+	ObjectDataType             OptString            `json:"ObjectDataType"`
+	Required                   OptBool              `json:"Required"`
 }
 
 // GetAllowableNumbers returns the value of AllowableNumbers.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableNumbers() []string {
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableNumbers() OptNilNilStringArray {
 	return s.AllowableNumbers
 }
 
@@ -8264,12 +9745,12 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemAction
 }
 
 // GetAllowableValueDescriptions returns the value of AllowableValueDescriptions.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValueDescriptions() []string {
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValueDescriptions() OptNilNilStringArray {
 	return s.AllowableValueDescriptions
 }
 
 // GetAllowableValues returns the value of AllowableValues.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValues() []string {
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValues() OptNilNilStringArray {
 	return s.AllowableValues
 }
 
@@ -8324,7 +9805,7 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemAction
 }
 
 // SetAllowableNumbers sets the value of AllowableNumbers.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableNumbers(val []string) {
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableNumbers(val OptNilNilStringArray) {
 	s.AllowableNumbers = val
 }
 
@@ -8334,12 +9815,12 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemAction
 }
 
 // SetAllowableValueDescriptions sets the value of AllowableValueDescriptions.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValueDescriptions(val []string) {
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValueDescriptions(val OptNilNilStringArray) {
 	s.AllowableValueDescriptions = val
 }
 
 // SetAllowableValues sets the value of AllowableValues.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValues(val []string) {
+func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValues(val OptNilNilStringArray) {
 	s.AllowableValues = val
 }
 
@@ -8560,4 +10041,20 @@ func (s *UserStoreResponse) SetRole(val OptString) {
 // SetUsername sets the value of Username.
 func (s *UserStoreResponse) SetUsername(val OptString) {
 	s.Username = val
+}
+
+// Version schema.
+// Ref: #/components/schemas/Version
+type Version struct {
+	Version OptString `json:"Version"`
+}
+
+// GetVersion returns the value of Version.
+func (s *Version) GetVersion() OptString {
+	return s.Version
+}
+
+// SetVersion sets the value of Version.
+func (s *Version) SetVersion(val OptString) {
+	s.Version = val
 }

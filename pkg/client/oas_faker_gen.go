@@ -731,14 +731,7 @@ func (s *DataDumpUsersItem) SetFake() {
 func (s *Event) SetFake() {
 	{
 		{
-			s.JobMessages = nil
-			for i := 0; i < 0; i++ {
-				var elem EventJobMessagesItem
-				{
-					elem.SetFake()
-				}
-				s.JobMessages = append(s.JobMessages, elem)
-			}
+			s.JobMessages.SetFake()
 		}
 	}
 	{
@@ -1360,6 +1353,11 @@ func (s *NilDataDumpImagesItem) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *NilEventJobMessagesItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
 func (s *NilHostBondsItem) SetFake() {
 	s.Null = true
 }
@@ -1390,12 +1388,67 @@ func (s *NilNodeAddRequestNodeListItemInterfacesItem) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *NilRedfishDellUpgradeFirmwareUpdateListItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
 func (s *NilRedfishJobJobsItem) SetFake() {
 	s.Null = true
 }
 
 // SetFake set fake values.
+func (s *NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilRedfishJobJobsItemMessagesItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilRedfishJobJobsItemMessagesItemResolutionStepsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
 func (s *NilRedfishMetricReportReportsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilRedfishMetricReportReportsItemMetricValuesItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetFake() {
 	s.Null = true
 }
 
@@ -1752,6 +1805,12 @@ func (s *OptNilBootImageProvisionTemplates) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptNilByte) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
 func (s *OptNilDataDumpImagesItemProvisionTemplates) SetFake() {
 	s.Null = true
 	s.Set = true
@@ -1788,7 +1847,19 @@ func (s *OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) SetFa
 }
 
 // SetFake set fake values.
+func (s *OptNilNilEventJobMessagesItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
 func (s *OptNilNilIntArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) SetFake() {
 	s.Null = true
 	s.Set = true
 }
@@ -1800,7 +1871,79 @@ func (s *OptNilNilRedfishJobJobsItemArray) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilRedfishJobJobsItemMessagesItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilRedfishMetricReportReportsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
 func (s *OptNilNilStringArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilRedfishJobJobsItemParameters) SetFake() {
 	s.Null = true
 	s.Set = true
 }
@@ -1827,15 +1970,6 @@ func (s *OptNilString) SetFake() {
 func (s *OptNilStringArray) SetFake() {
 	s.Null = true
 	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptRedfishJobJobsItemParameters) SetFake() {
-	var elem RedfishJobJobsItemParameters
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
 }
 
 // SetFake set fake values.
@@ -1938,14 +2072,7 @@ func (s *RedfishDellUpgradeFirmware) SetFake() {
 	}
 	{
 		{
-			s.UpdateList = nil
-			for i := 0; i < 0; i++ {
-				var elem RedfishDellUpgradeFirmwareUpdateListItem
-				{
-					elem.SetFake()
-				}
-				s.UpdateList = append(s.UpdateList, elem)
-			}
+			s.UpdateList.SetFake()
 		}
 	}
 	{
@@ -2149,14 +2276,7 @@ func (s *RedfishJobJobsItem) SetFake() {
 	}
 	{
 		{
-			s.Messages = nil
-			for i := 0; i < 0; i++ {
-				var elem RedfishJobJobsItemMessagesItem
-				{
-					elem.SetFake()
-				}
-				s.Messages = append(s.Messages, elem)
-			}
+			s.Messages.SetFake()
 		}
 	}
 	{
@@ -2186,7 +2306,7 @@ func (s *RedfishJobJobsItem) SetFake() {
 	}
 	{
 		{
-			s.RawData = []byte("[]byte")
+			s.RawData.SetFake()
 		}
 	}
 	{
@@ -2215,14 +2335,7 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetFake() {
 	}
 	{
 		{
-			s.MessageArgs = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.MessageArgs = append(s.MessageArgs, elem)
-			}
+			s.MessageArgs.SetFake()
 		}
 	}
 	{
@@ -2252,14 +2365,7 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetFake() {
 	}
 	{
 		{
-			s.ResolutionSteps = nil
-			for i := 0; i < 0; i++ {
-				var elem RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem
-				{
-					elem.SetFake()
-				}
-				s.ResolutionSteps = append(s.ResolutionSteps, elem)
-			}
+			s.ResolutionSteps.SetFake()
 		}
 	}
 	{
@@ -2283,14 +2389,7 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetFake() {
 func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) SetFake() {
 	{
 		{
-			s.ActionParameters = nil
-			for i := 0; i < 0; i++ {
-				var elem RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-				{
-					elem.SetFake()
-				}
-				s.ActionParameters = append(s.ActionParameters, elem)
-			}
+			s.ActionParameters.SetFake()
 		}
 	}
 	{
@@ -2334,14 +2433,7 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) SetFak
 func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetFake() {
 	{
 		{
-			s.AllowableNumbers = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.AllowableNumbers = append(s.AllowableNumbers, elem)
-			}
+			s.AllowableNumbers.SetFake()
 		}
 	}
 	{
@@ -2351,26 +2443,12 @@ func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionPa
 	}
 	{
 		{
-			s.AllowableValueDescriptions = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.AllowableValueDescriptions = append(s.AllowableValueDescriptions, elem)
-			}
+			s.AllowableValueDescriptions.SetFake()
 		}
 	}
 	{
 		{
-			s.AllowableValues = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.AllowableValues = append(s.AllowableValues, elem)
-			}
+			s.AllowableValues.SetFake()
 		}
 	}
 	{
@@ -2434,14 +2512,7 @@ func (s *RedfishJobJobsItemMessagesItem) SetFake() {
 	}
 	{
 		{
-			s.MessageArgs = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.MessageArgs = append(s.MessageArgs, elem)
-			}
+			s.MessageArgs.SetFake()
 		}
 	}
 	{
@@ -2471,14 +2542,7 @@ func (s *RedfishJobJobsItemMessagesItem) SetFake() {
 	}
 	{
 		{
-			s.ResolutionSteps = nil
-			for i := 0; i < 0; i++ {
-				var elem RedfishJobJobsItemMessagesItemResolutionStepsItem
-				{
-					elem.SetFake()
-				}
-				s.ResolutionSteps = append(s.ResolutionSteps, elem)
-			}
+			s.ResolutionSteps.SetFake()
 		}
 	}
 	{
@@ -2502,14 +2566,7 @@ func (s *RedfishJobJobsItemMessagesItem) SetFake() {
 func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) SetFake() {
 	{
 		{
-			s.ActionParameters = nil
-			for i := 0; i < 0; i++ {
-				var elem RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem
-				{
-					elem.SetFake()
-				}
-				s.ActionParameters = append(s.ActionParameters, elem)
-			}
+			s.ActionParameters.SetFake()
 		}
 	}
 	{
@@ -2553,14 +2610,7 @@ func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) SetFake() {
 func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetFake() {
 	{
 		{
-			s.AllowableNumbers = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.AllowableNumbers = append(s.AllowableNumbers, elem)
-			}
+			s.AllowableNumbers.SetFake()
 		}
 	}
 	{
@@ -2570,26 +2620,12 @@ func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) 
 	}
 	{
 		{
-			s.AllowableValueDescriptions = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.AllowableValueDescriptions = append(s.AllowableValueDescriptions, elem)
-			}
+			s.AllowableValueDescriptions.SetFake()
 		}
 	}
 	{
 		{
-			s.AllowableValues = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.AllowableValues = append(s.AllowableValues, elem)
-			}
+			s.AllowableValues.SetFake()
 		}
 	}
 	{
@@ -2737,14 +2773,7 @@ func (s *RedfishMetricReport) SetFake() {
 	}
 	{
 		{
-			s.Reports = nil
-			for i := 0; i < 0; i++ {
-				var elem NilRedfishMetricReportReportsItem
-				{
-					elem.SetFake()
-				}
-				s.Reports = append(s.Reports, elem)
-			}
+			s.Reports.SetFake()
 		}
 	}
 }
@@ -2800,14 +2829,7 @@ func (s *RedfishMetricReportReportsItem) SetFake() {
 	}
 	{
 		{
-			s.MetricValues = nil
-			for i := 0; i < 0; i++ {
-				var elem RedfishMetricReportReportsItemMetricValuesItem
-				{
-					elem.SetFake()
-				}
-				s.MetricValues = append(s.MetricValues, elem)
-			}
+			s.MetricValues.SetFake()
 		}
 	}
 	{
@@ -2841,14 +2863,7 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetFake() {
 	}
 	{
 		{
-			s.MessageArgs = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.MessageArgs = append(s.MessageArgs, elem)
-			}
+			s.MessageArgs.SetFake()
 		}
 	}
 	{
@@ -2878,14 +2893,7 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetFake() {
 	}
 	{
 		{
-			s.ResolutionSteps = nil
-			for i := 0; i < 0; i++ {
-				var elem RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem
-				{
-					elem.SetFake()
-				}
-				s.ResolutionSteps = append(s.ResolutionSteps, elem)
-			}
+			s.ResolutionSteps.SetFake()
 		}
 	}
 	{
@@ -2909,14 +2917,7 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetFake() {
 func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) SetFake() {
 	{
 		{
-			s.ActionParameters = nil
-			for i := 0; i < 0; i++ {
-				var elem RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-				{
-					elem.SetFake()
-				}
-				s.ActionParameters = append(s.ActionParameters, elem)
-			}
+			s.ActionParameters.SetFake()
 		}
 	}
 	{
@@ -2960,14 +2961,7 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionSteps
 func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetFake() {
 	{
 		{
-			s.AllowableNumbers = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.AllowableNumbers = append(s.AllowableNumbers, elem)
-			}
+			s.AllowableNumbers.SetFake()
 		}
 	}
 	{
@@ -2977,26 +2971,12 @@ func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionSteps
 	}
 	{
 		{
-			s.AllowableValueDescriptions = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.AllowableValueDescriptions = append(s.AllowableValueDescriptions, elem)
-			}
+			s.AllowableValueDescriptions.SetFake()
 		}
 	}
 	{
 		{
-			s.AllowableValues = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.AllowableValues = append(s.AllowableValues, elem)
-			}
+			s.AllowableValues.SetFake()
 		}
 	}
 	{
@@ -3447,14 +3427,7 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetFake() {
 	}
 	{
 		{
-			s.MessageArgs = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.MessageArgs = append(s.MessageArgs, elem)
-			}
+			s.MessageArgs.SetFake()
 		}
 	}
 	{
@@ -3484,14 +3457,7 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetFake() {
 	}
 	{
 		{
-			s.ResolutionSteps = nil
-			for i := 0; i < 0; i++ {
-				var elem RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem
-				{
-					elem.SetFake()
-				}
-				s.ResolutionSteps = append(s.ResolutionSteps, elem)
-			}
+			s.ResolutionSteps.SetFake()
 		}
 	}
 	{
@@ -3515,14 +3481,7 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetFake() {
 func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetFake() {
 	{
 		{
-			s.ActionParameters = nil
-			for i := 0; i < 0; i++ {
-				var elem RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-				{
-					elem.SetFake()
-				}
-				s.ActionParameters = append(s.ActionParameters, elem)
-			}
+			s.ActionParameters.SetFake()
 		}
 	}
 	{
@@ -3566,14 +3525,7 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetF
 func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetFake() {
 	{
 		{
-			s.AllowableNumbers = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.AllowableNumbers = append(s.AllowableNumbers, elem)
-			}
+			s.AllowableNumbers.SetFake()
 		}
 	}
 	{
@@ -3583,26 +3535,12 @@ func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemAction
 	}
 	{
 		{
-			s.AllowableValueDescriptions = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.AllowableValueDescriptions = append(s.AllowableValueDescriptions, elem)
-			}
+			s.AllowableValueDescriptions.SetFake()
 		}
 	}
 	{
 		{
-			s.AllowableValues = nil
-			for i := 0; i < 0; i++ {
-				var elem string
-				{
-					elem = "string"
-				}
-				s.AllowableValues = append(s.AllowableValues, elem)
-			}
+			s.AllowableValues.SetFake()
 		}
 	}
 	{
@@ -3738,6 +3676,15 @@ func (s *UserStoreResponse) SetFake() {
 	{
 		{
 			s.Username.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *Version) SetFake() {
+	{
+		{
+			s.Version.SetFake()
 		}
 	}
 }

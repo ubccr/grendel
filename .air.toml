@@ -4,8 +4,8 @@ tmp_dir = ""
 
 [build]
   args_bin = []
-  bin = "./grendel"
-  cmd = "go build -o ./grendel ."
+  bin = "./grendeld"
+  cmd = "go build -o ./grendeld ./cmd/grendeld && go build -o ./grendel ./cmd/grendel"
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata"]
   exclude_file = []
@@ -14,7 +14,7 @@ tmp_dir = ""
   follow_symlink = false
   full_bin = ""
   include_dir = []
-  include_ext = ["go", "toml"]
+  include_ext = ["go", "toml", "sql"]
   include_file = []
   kill_delay = "0s"
   log = "build-errors.log"

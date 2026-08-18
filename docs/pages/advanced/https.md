@@ -75,7 +75,7 @@ $ make clean
 $ make build-with-ca
 $ make bindata
 $ cd ..
-$ go build .
+$ go build ./cmd/grendeld
 ```
 
 !!! note
@@ -143,7 +143,7 @@ file just include a host for Grendel so it will resolve itself like so:
 Now when you run Grendel it should be listening on port 443:
 
 ```
-sudo ./grendel --verbose -c grendel.toml serve  --hosts hosts.json --images images.json --listen 192.168.10.254
+sudo ./grendeld --verbose -c grendel.toml serve  --hosts hosts.json --images images.json --listen 192.168.10.254
 INFO CLI: Using config file: grendel.toml
 INFO CLI: Using database path: :memory:
 INFO CLI: Successfully loaded 2 hosts

@@ -527,6 +527,7 @@
 				"properties": {
 					"JobMessages": {
 						"items": {
+							"nullable": true,
 							"properties": {
 								"data": {
 									"type": "string"
@@ -588,6 +589,7 @@
 							},
 							"type": "object"
 						},
+						"nullable": true,
 						"type": "array"
 					},
 					"Message": {
@@ -1151,6 +1153,7 @@
 					},
 					"UpdateList": {
 						"items": {
+							"nullable": true,
 							"properties": {
 								"BaseLocation": {
 									"type": "string"
@@ -1200,6 +1203,7 @@
 							},
 							"type": "object"
 						},
+						"nullable": true,
 						"type": "array"
 					},
 					"UpdateRebootType": {
@@ -1223,8 +1227,10 @@
 											},
 											"MessageArgs": {
 												"items": {
+													"nullable": true,
 													"type": "string"
 												},
+												"nullable": true,
 												"type": "array"
 											},
 											"MessageId": {
@@ -1233,7 +1239,9 @@
 											"MessageSeverity": {
 												"type": "string"
 											},
-											"Oem": {},
+											"Oem": {
+												"nullable": true
+											},
 											"RelatedProperties": {
 												"items": {
 													"nullable": true,
@@ -1247,14 +1255,18 @@
 											},
 											"ResolutionSteps": {
 												"items": {
+													"nullable": true,
 													"properties": {
 														"ActionParameters": {
 															"items": {
+																"nullable": true,
 																"properties": {
 																	"AllowableNumbers": {
 																		"items": {
+																			"nullable": true,
 																			"type": "string"
 																		},
+																		"nullable": true,
 																		"type": "array"
 																	},
 																	"AllowablePattern": {
@@ -1262,14 +1274,18 @@
 																	},
 																	"AllowableValueDescriptions": {
 																		"items": {
+																			"nullable": true,
 																			"type": "string"
 																		},
+																		"nullable": true,
 																		"type": "array"
 																	},
 																	"AllowableValues": {
 																		"items": {
+																			"nullable": true,
 																			"type": "string"
 																		},
+																		"nullable": true,
 																		"type": "array"
 																	},
 																	"ArraySizeMaximum": {
@@ -1311,12 +1327,15 @@
 																},
 																"type": "object"
 															},
+															"nullable": true,
 															"type": "array"
 														},
 														"ActionURI": {
 															"type": "string"
 														},
-														"Oem": {},
+														"Oem": {
+															"nullable": true
+														},
 														"Priority": {
 															"minimum": 0,
 															"nullable": true,
@@ -1341,6 +1360,7 @@
 													},
 													"type": "object"
 												},
+												"nullable": true,
 												"type": "array"
 											},
 											"Severity": {
@@ -1412,14 +1432,17 @@
 								},
 								"Messages": {
 									"items": {
+										"nullable": true,
 										"properties": {
 											"Message": {
 												"type": "string"
 											},
 											"MessageArgs": {
 												"items": {
+													"nullable": true,
 													"type": "string"
 												},
+												"nullable": true,
 												"type": "array"
 											},
 											"MessageId": {
@@ -1428,7 +1451,9 @@
 											"MessageSeverity": {
 												"type": "string"
 											},
-											"Oem": {},
+											"Oem": {
+												"nullable": true
+											},
 											"RelatedProperties": {
 												"items": {
 													"nullable": true,
@@ -1442,14 +1467,18 @@
 											},
 											"ResolutionSteps": {
 												"items": {
+													"nullable": true,
 													"properties": {
 														"ActionParameters": {
 															"items": {
+																"nullable": true,
 																"properties": {
 																	"AllowableNumbers": {
 																		"items": {
+																			"nullable": true,
 																			"type": "string"
 																		},
+																		"nullable": true,
 																		"type": "array"
 																	},
 																	"AllowablePattern": {
@@ -1457,14 +1486,18 @@
 																	},
 																	"AllowableValueDescriptions": {
 																		"items": {
+																			"nullable": true,
 																			"type": "string"
 																		},
+																		"nullable": true,
 																		"type": "array"
 																	},
 																	"AllowableValues": {
 																		"items": {
+																			"nullable": true,
 																			"type": "string"
 																		},
+																		"nullable": true,
 																		"type": "array"
 																	},
 																	"ArraySizeMaximum": {
@@ -1506,12 +1539,15 @@
 																},
 																"type": "object"
 															},
+															"nullable": true,
 															"type": "array"
 														},
 														"ActionURI": {
 															"type": "string"
 														},
-														"Oem": {},
+														"Oem": {
+															"nullable": true
+														},
 														"Priority": {
 															"minimum": 0,
 															"nullable": true,
@@ -1536,6 +1572,7 @@
 													},
 													"type": "object"
 												},
+												"nullable": true,
 												"type": "array"
 											},
 											"Severity": {
@@ -1550,14 +1587,20 @@
 										},
 										"type": "object"
 									},
+									"nullable": true,
 									"type": "array"
 								},
 								"Name": {
 									"type": "string"
 								},
-								"Oem": {},
+								"Oem": {
+									"nullable": true
+								},
 								"Parameters": {
-									"additionalProperties": {},
+									"additionalProperties": {
+										"nullable": true
+									},
+									"nullable": true,
 									"type": "object"
 								},
 								"Payload": {
@@ -1589,6 +1632,7 @@
 								},
 								"RawData": {
 									"format": "byte",
+									"nullable": true,
 									"type": "string"
 								},
 								"Schedule": {
@@ -1685,8 +1729,10 @@
 											},
 											"MessageArgs": {
 												"items": {
+													"nullable": true,
 													"type": "string"
 												},
+												"nullable": true,
 												"type": "array"
 											},
 											"MessageId": {
@@ -1695,7 +1741,9 @@
 											"MessageSeverity": {
 												"type": "string"
 											},
-											"Oem": {},
+											"Oem": {
+												"nullable": true
+											},
 											"RelatedProperties": {
 												"items": {
 													"nullable": true,
@@ -1709,14 +1757,18 @@
 											},
 											"ResolutionSteps": {
 												"items": {
+													"nullable": true,
 													"properties": {
 														"ActionParameters": {
 															"items": {
+																"nullable": true,
 																"properties": {
 																	"AllowableNumbers": {
 																		"items": {
+																			"nullable": true,
 																			"type": "string"
 																		},
+																		"nullable": true,
 																		"type": "array"
 																	},
 																	"AllowablePattern": {
@@ -1724,14 +1776,18 @@
 																	},
 																	"AllowableValueDescriptions": {
 																		"items": {
+																			"nullable": true,
 																			"type": "string"
 																		},
+																		"nullable": true,
 																		"type": "array"
 																	},
 																	"AllowableValues": {
 																		"items": {
+																			"nullable": true,
 																			"type": "string"
 																		},
+																		"nullable": true,
 																		"type": "array"
 																	},
 																	"ArraySizeMaximum": {
@@ -1773,12 +1829,15 @@
 																},
 																"type": "object"
 															},
+															"nullable": true,
 															"type": "array"
 														},
 														"ActionURI": {
 															"type": "string"
 														},
-														"Oem": {},
+														"Oem": {
+															"nullable": true
+														},
 														"Priority": {
 															"minimum": 0,
 															"nullable": true,
@@ -1803,6 +1862,7 @@
 													},
 													"type": "object"
 												},
+												"nullable": true,
 												"type": "array"
 											},
 											"Severity": {
@@ -1842,6 +1902,7 @@
 								},
 								"MetricValues": {
 									"items": {
+										"nullable": true,
 										"properties": {
 											"MetricId": {
 												"type": "string"
@@ -1852,19 +1913,24 @@
 											"MetricValue": {
 												"type": "string"
 											},
-											"Oem": {},
+											"Oem": {
+												"nullable": true
+											},
 											"Timestamp": {
 												"type": "string"
 											}
 										},
 										"type": "object"
 									},
+									"nullable": true,
 									"type": "array"
 								},
 								"Name": {
 									"type": "string"
 								},
-								"Oem": {},
+								"Oem": {
+									"nullable": true
+								},
 								"ReportSequence": {
 									"type": "string"
 								},
@@ -1874,6 +1940,7 @@
 							},
 							"type": "object"
 						},
+						"nullable": true,
 						"type": "array"
 					}
 				},
@@ -1922,8 +1989,10 @@
 										},
 										"MessageArgs": {
 											"items": {
+												"nullable": true,
 												"type": "string"
 											},
+											"nullable": true,
 											"type": "array"
 										},
 										"MessageId": {
@@ -1932,7 +2001,9 @@
 										"MessageSeverity": {
 											"type": "string"
 										},
-										"Oem": {},
+										"Oem": {
+											"nullable": true
+										},
 										"RelatedProperties": {
 											"items": {
 												"nullable": true,
@@ -1946,14 +2017,18 @@
 										},
 										"ResolutionSteps": {
 											"items": {
+												"nullable": true,
 												"properties": {
 													"ActionParameters": {
 														"items": {
+															"nullable": true,
 															"properties": {
 																"AllowableNumbers": {
 																	"items": {
+																		"nullable": true,
 																		"type": "string"
 																	},
+																	"nullable": true,
 																	"type": "array"
 																},
 																"AllowablePattern": {
@@ -1961,14 +2036,18 @@
 																},
 																"AllowableValueDescriptions": {
 																	"items": {
+																		"nullable": true,
 																		"type": "string"
 																	},
+																	"nullable": true,
 																	"type": "array"
 																},
 																"AllowableValues": {
 																	"items": {
+																		"nullable": true,
 																		"type": "string"
 																	},
+																	"nullable": true,
 																	"type": "array"
 																},
 																"ArraySizeMaximum": {
@@ -2010,12 +2089,15 @@
 															},
 															"type": "object"
 														},
+														"nullable": true,
 														"type": "array"
 													},
 													"ActionURI": {
 														"type": "string"
 													},
-													"Oem": {},
+													"Oem": {
+														"nullable": true
+													},
 													"Priority": {
 														"minimum": 0,
 														"nullable": true,
@@ -2040,6 +2122,7 @@
 												},
 												"type": "object"
 											},
+											"nullable": true,
 											"type": "array"
 										},
 										"Severity": {
@@ -2160,7 +2243,9 @@
 							"NodeID": {
 								"type": "string"
 							},
-							"Oem": {},
+							"Oem": {
+								"nullable": true
+							},
 							"PSRollupStatus": {
 								"type": "string"
 							},
@@ -2312,6 +2397,15 @@
 						"type": "string"
 					},
 					"username": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"Version": {
+				"description": "Version schema",
+				"properties": {
+					"Version": {
 						"type": "string"
 					}
 				},
@@ -3943,6 +4037,61 @@
 					}
 				],
 				"summary": "get events",
+				"tags": [
+					"v1",
+					"grendel"
+				]
+			}
+		},
+		"/v1/grendel/version": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).GetVersion`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the server version",
+				"operationId": "GET_/v1/grendel/version",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Version"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/Version"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "get version",
 				"tags": [
 					"v1",
 					"grendel"

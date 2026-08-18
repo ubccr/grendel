@@ -23,6 +23,18 @@ dbpath = "/var/lib/grendel/db/grendel.sqlite3"
 #
 loggers = {cli="on", tftp="off", dhcp="on", dns="off", provision="on", api="on", pxe="off"}
 
+#
+# Services to run. Valid entries are api, dhcp, dns, provision, pxe and tftp.
+# Leave this empty or unset to run all of them. Naming services on the command
+# line, as in `grendeld serve dhcp dns`, overrides this.
+#
+services = []
+
+#
+# How long to wait for a service to stop before giving up on it during shutdown
+#
+shutdown_timeout = "10s"
+
 #------------------------------------------------------------------------------
 # Database
 #------------------------------------------------------------------------------
