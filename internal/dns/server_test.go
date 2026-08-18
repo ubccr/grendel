@@ -20,6 +20,10 @@ var (
 	serverAddr = "127.0.0.1:8053"
 	clientFQDN = "test-01.example.local"
 	clientIP   = netip.MustParsePrefix("10.1.0.1/24")
+
+	// A name grendel does not know, served by the stub upstream resolver.
+	upstreamFQDN = "forwarded.example.test"
+	upstreamIP   = "192.0.2.53"
 )
 
 func newDNS() (*Server, error) {
@@ -101,9 +105,13 @@ func TestDns(t *testing.T) {
 	assert.True(r3.Response)
 	assert.Len(r3.Answer, 0)
 
-	viper.Set("dns.forward", "1.1.1.1:53")
+	upstream := newStubResolver(t, upstreamFQDN, upstreamIP)
 
-	// Check grendel lookup with forward address set
+	// viper is process global and this key leaks into every later test in the package, so put it back.
+	t.Cleanup(func() { viper.Set("dns.forward", "") })
+	viper.Set("dns.forward", upstream)
+
+	// A name grendel knows is still answered locally, not forwarded.
 	m4 := new(dns.Msg)
 	m4.SetQuestion(clientFQDN+".", dns.TypeA)
 
@@ -118,10 +126,9 @@ func TestDns(t *testing.T) {
 	}
 	assert.Equal(r4.Answer[0].String(), clientFQDN+".\t5\tIN\tA\t10.1.0.1")
 
-	// Check forwarded MX lookup
-	// TODO: This test is giving inconsistent results
+	// A name grendel does not know is forwarded upstream.
 	m5 := new(dns.Msg)
-	m5.SetQuestion("grendel-demo.ccr.buffalo.edu.", dns.TypeA)
+	m5.SetQuestion(upstreamFQDN+".", dns.TypeA)
 
 	r5, err := dns.Exchange(m5, serverAddr)
 	if err != nil {
@@ -137,8 +144,45 @@ func TestDns(t *testing.T) {
 		t.Fatal(errors.New("p5 response length is incorrect"))
 	}
 
-	assert.Equal(p5[0], "grendel-demo.ccr.buffalo.edu.")
+	assert.Equal(p5[0], upstreamFQDN+".")
 	assert.Equal(p5[2], "IN")
 	assert.Equal(p5[3], "A")
-	assert.Equal(p5[4], "128.205.11.109")
+	assert.Equal(p5[4], upstreamIP)
+}
+
+// newStubResolver starts a throwaway DNS server on an ephemeral port that
+// answers exactly one name, and returns its address.
+func newStubResolver(t *testing.T, name, ip string) string {
+	t.Helper()
+
+	pc, err := net.ListenPacket("udp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	srv := &dns.Server{PacketConn: pc}
+	srv.Handler = dns.HandlerFunc(func(w dns.ResponseWriter, r *dns.Msg) {
+		m := new(dns.Msg)
+		m.SetReply(r)
+		if len(r.Question) > 0 && r.Question[0].Name == dns.Fqdn(name) {
+			rr, err := dns.NewRR(dns.Fqdn(name) + "\t5\tIN\tA\t" + ip)
+			if err == nil {
+				m.Answer = append(m.Answer, rr)
+			}
+		}
+		w.WriteMsg(m)
+	})
+
+	started := make(chan struct{})
+	srv.NotifyStartedFunc = func() { close(started) }
+	go srv.ActivateAndServe()
+
+	select {
+	case <-started:
+	case <-time.After(5 * time.Second):
+		t.Fatal("stub resolver did not start")
+	}
+	t.Cleanup(func() { srv.Shutdown() })
+
+	return pc.LocalAddr().String()
 }

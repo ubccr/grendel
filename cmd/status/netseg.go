@@ -138,7 +138,7 @@ var (
 						continue
 					}
 					if ipp.Addr() == k && i.Value.Fqdn.Value != "" {
-						name = strings.Split(i.Value.Fqdn.Value, ",")[0]
+						name = i.Value.Fqdn.Value
 					}
 				}
 

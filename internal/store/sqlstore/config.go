@@ -1,19 +1,16 @@
 package sqlstore
 
-import "net/url"
+import (
+	"fmt"
+	"net/url"
+)
 
 // Config the config for Sqlstore.
 type Config struct {
 	Driver string
-}
 
-// ConfigDefault is the default config
-var ConfigDefault = Config{
-	Driver: "sqlite3",
-}
-
-func configDefault(config ...Config) Config {
-	return ConfigDefault
+	// MaxReadConns caps the read-only connection pool. Zero falls back to database.max_read_conns, then to defaultMaxReadConns.
+	MaxReadConns int
 }
 
 func (c Config) DataSourceName(filename string, rw bool) string {
@@ -23,7 +20,7 @@ func (c Config) DataSourceName(filename string, rw bool) string {
 	} else {
 		p.Set("mode", "ro")
 	}
-	return filename + "?" + p.Encode()
+	return fmt.Sprintf("file:%s?%s", filename, p.Encode())
 }
 
 func (c Config) connectionParams() url.Values {

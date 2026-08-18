@@ -5,11 +5,11 @@
 package storetest
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"math/rand"
 	"net/netip"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -95,28 +95,28 @@ func (s *StoreTestSuite) TestHost() {
 		s.Assert().Equal(host.Interfaces[0].MAC.String(), testHost3.Interfaces[0].MAC.String())
 	}
 
-	testIPs, err := s.db.ResolveIPv4(host.Interfaces[0].FQDN)
+	testIPs, err := s.db.ResolveIPv4(s.T().Context(), host.Interfaces[0].FQDN)
 	if s.Assert().NoError(err) {
 		if s.Assert().Equal(1, len(testIPs)) {
 			s.Assert().Equal(host.Interfaces[0].AddrString(), testIPs[0].String())
 		}
 	}
 
-	testBondIPs, err := s.db.ResolveIPv4(host.Bonds[0].FQDN)
+	testBondIPs, err := s.db.ResolveIPv4(s.T().Context(), host.Bonds[0].FQDN)
 	if s.Assert().NoError(err) {
 		if s.Assert().Equal(1, len(testBondIPs)) {
 			s.Assert().Equal(host.Bonds[0].AddrString(), testBondIPs[0].String())
 		}
 	}
 
-	testNames, err := s.db.ReverseResolve(host.Interfaces[0].AddrString())
+	testNames, err := s.db.ReverseResolve(s.T().Context(), host.Interfaces[0].AddrString())
 	if s.Assert().NoError(err) {
 		if s.Assert().Equal(1, len(testNames)) {
 			s.Assert().Equal(host.Interfaces[0].FQDN, testNames[0])
 		}
 	}
 
-	testBondNames, err := s.db.ReverseResolve(host.Bonds[0].AddrString())
+	testBondNames, err := s.db.ReverseResolve(s.T().Context(), host.Bonds[0].AddrString())
 	if s.Assert().NoError(err) {
 		if s.Assert().Equal(1, len(testBondNames)) {
 			s.Assert().Equal(host.Bonds[0].FQDN, testBondNames[0])
@@ -145,29 +145,134 @@ func (s *StoreTestSuite) TestHost() {
 	}
 }
 
-func (s *StoreTestSuite) TestResolveIPv4() {
-	testNames := []string{"test1.example.com", "cname.example.com"}
-
+// The address and its prefix length are stored in separate columns and
+// recombined on read. Deliberately uses prefixes other than the factory's /24,
+// so a bug that defaulted every mask would fail here rather than pass by
+// coincidence.
+//
+// This matters more than it looks: model.Host.FromJSON parses the recombined
+// value with netip.ParsePrefix and *discards the error*, so a malformed value
+// silently leaves the interface with a zero IP rather than failing loudly.
+func (s *StoreTestSuite) TestHostIPPrefix() {
 	host := tests.HostFactory.MustCreate().(*model.Host)
-	host.Interfaces[0].FQDN = strings.Join(testNames, ",")
+	host.Interfaces[0].IP = netip.MustParsePrefix("10.1.1.17/26")
+	host.Interfaces[1].IP = netip.MustParsePrefix("10.1.2.17/32")
+	host.Bonds[0].IP = netip.MustParsePrefix("10.2.1.17/16")
 
 	err := s.db.StoreHost(host)
 	s.Assert().NoError(err)
 
-	for _, nm := range testNames {
-		testIPs, err := s.db.ResolveIPv4(nm)
-		if s.Assert().NoError(err) {
-			if s.Assert().Equal(1, len(testIPs)) {
+	testHost, err := s.db.LoadHostFromName(host.Name)
+	if s.Assert().NoError(err) {
+		s.Assert().Equal(host.Interfaces[0].IP, testHost.Interfaces[0].IP)
+		s.Assert().Equal(host.Interfaces[1].IP, testHost.Interfaces[1].IP)
+		s.Assert().Equal(host.Bonds[0].IP, testHost.Bonds[0].IP)
+	}
+
+	// The prefix is not part of a DNS answer, only the address.
+	ips, err := s.db.ResolveIPv4(s.T().Context(), host.Interfaces[0].FQDN)
+	if s.Assert().NoError(err) {
+		if s.Assert().Equal(1, len(ips)) {
+			s.Assert().Equal("10.1.1.17", ips[0].String())
+		}
+	}
+
+	names, err := s.db.ReverseResolve(s.T().Context(), "10.1.1.17")
+	if s.Assert().NoError(err) {
+		if s.Assert().Equal(1, len(names)) {
+			s.Assert().Equal(host.Interfaces[0].FQDN, names[0])
+		}
+	}
+}
+
+// An interface with no address round-trips as having no address, rather than
+// as a zero value that looks like one.
+func (s *StoreTestSuite) TestHostNoIP() {
+	host := tests.HostFactory.MustCreate().(*model.Host)
+	host.Interfaces[0].IP = netip.Prefix{}
+
+	err := s.db.StoreHost(host)
+	s.Assert().NoError(err)
+
+	testHost, err := s.db.LoadHostFromName(host.Name)
+	if s.Assert().NoError(err) {
+		s.Assert().False(testHost.Interfaces[0].IP.IsValid())
+		s.Assert().True(testHost.Interfaces[1].IP.IsValid(), "the other nic is unaffected")
+	}
+}
+
+// An interface has exactly one FQDN. The comma separated multi-name form is
+// rejected on write rather than stored and silently left unresolvable.
+func (s *StoreTestSuite) TestFQDNRejectsCommas() {
+	host := tests.HostFactory.MustCreate().(*model.Host)
+	host.Interfaces[0].FQDN = "test1.example.com,cname.example.com"
+
+	err := s.db.StoreHost(host)
+	if s.Assert().Error(err) {
+		s.Assert().Contains(err.Error(), "single FQDN")
+	}
+
+	// The same value on a bond is rejected too.
+	bondHost := tests.HostFactory.MustCreate().(*model.Host)
+	bondHost.Bonds[0].FQDN = "bond0.example.com,alias.example.com"
+
+	err = s.db.StoreHost(bondHost)
+	s.Assert().Error(err)
+}
+
+// Hostnames are case insensitive, but the stored value keeps whatever case the
+// operator entered — only the index is folded.
+func (s *StoreTestSuite) TestResolveIPv4CaseInsensitive() {
+	host := tests.HostFactory.MustCreate().(*model.Host)
+	host.Interfaces[0].FQDN = "Test1.Example.com"
+
+	err := s.db.StoreHost(host)
+	s.Assert().NoError(err)
+
+	for _, query := range []string{"Test1.Example.com", "TEST1.EXAMPLE.COM", "test1.example.com"} {
+		testIPs, err := s.db.ResolveIPv4(s.T().Context(), query)
+		if s.Assert().NoError(err, query) {
+			if s.Assert().Equal(1, len(testIPs), query) {
 				s.Assert().Equal(host.Interfaces[0].AddrString(), testIPs[0].String())
 			}
 		}
 	}
 
-	names, err := s.db.ReverseResolve(host.Interfaces[0].AddrString())
+	names, err := s.db.ReverseResolve(s.T().Context(), host.Interfaces[0].AddrString())
 	if s.Assert().NoError(err) {
 		if s.Assert().Equal(1, len(names)) {
-			s.Assert().Equal(testNames[0], names[0])
+			s.Assert().Equal("Test1.Example.com", names[0], "original case should be preserved")
 		}
+	}
+}
+
+// An interface with no name must never answer a lookup, including the empty
+// name that a query for "." normalizes to.
+func (s *StoreTestSuite) TestResolveIPv4EmptyFQDN() {
+	host := tests.HostFactory.MustCreate().(*model.Host)
+	host.Interfaces[0].FQDN = ""
+
+	err := s.db.StoreHost(host)
+	s.Assert().NoError(err)
+
+	// The root, and anything normalizing to it, is rejected outright. This is
+	// the guard that used to sit before normalization, where "." slipped past
+	// it and matched every row.
+	for _, query := range []string{"", "."} {
+		testIPs, err := s.db.ResolveIPv4(s.T().Context(), query)
+		s.Assert().Error(err, "query %q should be rejected", query)
+		s.Assert().Empty(testIPs)
+	}
+
+	// Any other name is a legitimate query that simply matches nothing.
+	testIPs, err := s.db.ResolveIPv4(s.T().Context(), " ")
+	if s.Assert().NoError(err) {
+		s.Assert().Empty(testIPs)
+	}
+
+	names, err := s.db.ReverseResolve(s.T().Context(), host.Interfaces[0].AddrString())
+	if s.Assert().NoError(err) {
+		s.Assert().Empty(names, "an interface with no name has no PTR record")
 	}
 }
 
@@ -179,14 +284,14 @@ func (s *StoreTestSuite) TestResolveIPv4ExactMatch() {
 	err := s.db.StoreHost(host)
 	s.Assert().NoError(err)
 
-	testIPs, err := s.db.ResolveIPv4("test1.example.com")
+	testIPs, err := s.db.ResolveIPv4(s.T().Context(), "test1.example.com")
 	if s.Assert().NoError(err) {
 		if s.Assert().Equal(1, len(testIPs)) {
 			s.Assert().Equal(host.Interfaces[0].AddrString(), testIPs[0].String())
 		}
 	}
 
-	names, err := s.db.ReverseResolve(host.Interfaces[0].AddrString())
+	names, err := s.db.ReverseResolve(s.T().Context(), host.Interfaces[0].AddrString())
 	if s.Assert().NoError(err) {
 		if s.Assert().Equal(1, len(names)) {
 			s.Assert().Equal("test1.example.com", names[0])
@@ -207,7 +312,7 @@ func (s *StoreTestSuite) TestReverseResolveIPv4() {
 	err = s.db.StoreHost(hostB)
 	s.Assert().NoError(err)
 
-	testNames, err := s.db.ReverseResolve(hostA.Interfaces[0].AddrString())
+	testNames, err := s.db.ReverseResolve(s.T().Context(), hostA.Interfaces[0].AddrString())
 	if s.Assert().NoError(err) {
 		if s.Assert().Equal(1, len(testNames)) {
 			s.Assert().Equal(hostA.Interfaces[0].FQDN, testNames[0])
@@ -934,17 +1039,19 @@ func (s *StoreTestSuite) BenchmarkResolveIP(size int, b *testing.B) {
 	}
 
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			pick := hosts[rand.Intn(size)]
-			ips, err := s.db.ResolveIPv4(pick.Interfaces[0].FQDN)
-			if err != nil {
-				b.Fatal(err)
+	reportCPU(b, func() {
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				pick := hosts[rand.Intn(size)]
+				ips, err := s.db.ResolveIPv4(context.Background(), pick.Interfaces[0].FQDN)
+				if err != nil {
+					b.Fatal(err)
+				}
+				if len(ips) != 1 {
+					b.Fatalf("IPs not found")
+				}
 			}
-			if len(ips) != 1 {
-				b.Fatalf("IPs not found")
-			}
-		}
+		})
 	})
 }
 
@@ -961,16 +1068,19 @@ func (s *StoreTestSuite) BenchmarkReverseResolve(size int, b *testing.B) {
 	}
 
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
-		for pb.Next() {
-			pick := hosts[rand.Intn(size)]
-			names, err := s.db.ReverseResolve(pick.Interfaces[0].AddrString())
-			if err != nil {
-				b.Fatal(err)
+	reportCPU(b, func() {
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				pick := hosts[rand.Intn(size)]
+				names, err := s.db.ReverseResolve(context.Background(), pick.Interfaces[0].AddrString())
+				if err != nil {
+					b.Fatal(err)
+				}
+				// An interface has exactly one FQDN.
+				if len(names) != 1 || names[0] != pick.Interfaces[0].FQDN {
+					b.Fatalf("wrong fqdn expected %s got %#v", pick.Interfaces[0].FQDN, names)
+				}
 			}
-			if len(names) != len(strings.Split(pick.Interfaces[0].FQDN, ",")) {
-				b.Fatalf("wrong fqdn expected %s got %#v", pick.Interfaces[0].FQDN, names)
-			}
-		}
+		})
 	})
 }

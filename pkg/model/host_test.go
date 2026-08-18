@@ -25,8 +25,7 @@ func TestHostTags(t *testing.T) {
 	assert.False(host.HasAnyTags("p22", "m12"))
 	assert.False(host.HasAnyTags())
 	assert.False(host.HasTags())
-	assert.Equal("", host.Interfaces[0].HostNameIndex(100))
-	assert.Equal(host.Interfaces[0].FQDN, host.Interfaces[0].HostNameIndex(0))
+	assert.Equal(host.Interfaces[0].FQDN, host.Interfaces[0].HostName())
 }
 
 func TestHostBonds(t *testing.T) {

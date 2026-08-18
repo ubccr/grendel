@@ -24,6 +24,18 @@ dbpath = "/var/lib/grendel/db/grendel.sqlite3"
 loggers = {cli="on", tftp="off", dhcp="on", dns="off", provision="on", api="on", pxe="off"}
 
 #------------------------------------------------------------------------------
+# Database
+#------------------------------------------------------------------------------
+[database]
+
+#
+# Maximum number of concurrent read connections. Reads do not block each other,
+# so there is little to gain above the core count, and an unbounded pool lets a
+# burst of slow queries exhaust file descriptors and OS threads.
+#
+max_read_conns = 8
+
+#------------------------------------------------------------------------------
 # HTTP Provision Server
 #------------------------------------------------------------------------------
 [provision]
@@ -129,6 +141,10 @@ ttl = 86400
 # Address that Grendel should forward unknown DNS queries to
 # By default Grendel is only a recursive resolver
 #forward = "1.1.1.1:53"
+
+# DNS context timeout for requests. Defaults to 2s to reduce active DB read
+# connections. Cannot be 0.
+#query_timeout = "2s"
 
 #------------------------------------------------------------------------------
 # TFTP Server

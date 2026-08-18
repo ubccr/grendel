@@ -5,11 +5,11 @@
  */
 
 -- name: NicUpsert :one
-insert into nic (id, node_id, nic_type, name, vlan, fqdn, mac, ip, peers, mtu)
-values (sqlc.narg(id), @node_id, @nic_type, @name, @vlan, @fqdn, @mac, @ip, @peers, @mtu)
+insert into nic (id, node_id, nic_type, name, vlan, fqdn, mac, ip, prefix_len, peers, mtu)
+values (sqlc.narg(id), @node_id, @nic_type, @name, @vlan, @fqdn, @mac, @ip, @prefix_len, @peers, @mtu)
 on conflict (id)
 do update set nic_type = ?3, name = ?4, vlan = ?5, fqdn = ?6, mac = ?7, ip = ?8,
-              peers = ?9, mtu = ?10
+              prefix_len = ?9, peers = ?10, mtu = ?11
 returning *;
 
 -- name: NicUpsertDelete :exec
