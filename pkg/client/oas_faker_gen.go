@@ -731,14 +731,7 @@ func (s *DataDumpUsersItem) SetFake() {
 func (s *Event) SetFake() {
 	{
 		{
-			s.JobMessages = nil
-			for i := 0; i < 0; i++ {
-				var elem EventJobMessagesItem
-				{
-					elem.SetFake()
-				}
-				s.JobMessages = append(s.JobMessages, elem)
-			}
+			s.JobMessages.SetFake()
 		}
 	}
 	{
@@ -810,7 +803,14 @@ func (s *EventJobMessagesItemRedfishError) SetFake() {
 func (s *EventJobMessagesItemRedfishErrorError) SetFake() {
 	{
 		{
-			s.MessageDotExtendedInfo.SetFake()
+			s.MessageDotExtendedInfo = nil
+			for i := 0; i < 0; i++ {
+				var elem EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem
+				{
+					elem.SetFake()
+				}
+				s.MessageDotExtendedInfo = append(s.MessageDotExtendedInfo, elem)
+			}
 		}
 	}
 	{
@@ -1353,7 +1353,7 @@ func (s *NilDataDumpImagesItem) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *NilEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem) SetFake() {
+func (s *NilEventJobMessagesItem) SetFake() {
 	s.Null = true
 }
 
@@ -1369,11 +1369,6 @@ func (s *NilHostInterfacesItem) SetFake() {
 
 // SetFake set fake values.
 func (s *NilInt) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilJobMessageRedfishErrorErrorMessageDotExtendedInfoItem) SetFake() {
 	s.Null = true
 }
 
@@ -1399,11 +1394,6 @@ func (s *NilRedfishDellUpgradeFirmwareUpdateListItem) SetFake() {
 
 // SetFake set fake values.
 func (s *NilRedfishJobJobsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilRedfishJobJobsItemMessageDotExtendedInfoItem) SetFake() {
 	s.Null = true
 }
 
@@ -1438,11 +1428,6 @@ func (s *NilRedfishMetricReportReportsItem) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
 func (s *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) SetFake() {
 	s.Null = true
 }
@@ -1454,11 +1439,6 @@ func (s *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionSt
 
 // SetFake set fake values.
 func (s *NilRedfishMetricReportReportsItemMetricValuesItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilRedfishSystemOemDellMessageDotExtendedInfoItem) SetFake() {
 	s.Null = true
 }
 
@@ -1825,6 +1805,12 @@ func (s *OptNilBootImageProvisionTemplates) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptNilByte) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
 func (s *OptNilDataDumpImagesItemProvisionTemplates) SetFake() {
 	s.Null = true
 	s.Set = true
@@ -1855,19 +1841,19 @@ func (s *OptNilInt64) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *OptNilNilEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItemArray) SetFake() {
+func (s *OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilEventJobMessagesItemArray) SetFake() {
 	s.Null = true
 	s.Set = true
 }
 
 // SetFake set fake values.
 func (s *OptNilNilIntArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) SetFake() {
 	s.Null = true
 	s.Set = true
 }
@@ -1880,12 +1866,6 @@ func (s *OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) SetFake() {
 
 // SetFake set fake values.
 func (s *OptNilNilRedfishJobJobsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemArray) SetFake() {
 	s.Null = true
 	s.Set = true
 }
@@ -1927,12 +1907,6 @@ func (s *OptNilNilRedfishMetricReportReportsItemArray) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
 func (s *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetFake() {
 	s.Null = true
 	s.Set = true
@@ -1946,12 +1920,6 @@ func (s *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolu
 
 // SetFake set fake values.
 func (s *OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) SetFake() {
 	s.Null = true
 	s.Set = true
 }
@@ -1975,7 +1943,19 @@ func (s *OptNilNilStringArray) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptNilRedfishJobJobsItemParameters) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
 func (s *OptNilRedfishSystemOemDell) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) SetFake() {
 	s.Null = true
 	s.Set = true
 }
@@ -1990,15 +1970,6 @@ func (s *OptNilString) SetFake() {
 func (s *OptNilStringArray) SetFake() {
 	s.Null = true
 	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptRedfishJobJobsItemParameters) SetFake() {
-	var elem RedfishJobJobsItemParameters
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
 }
 
 // SetFake set fake values.
@@ -2208,7 +2179,14 @@ func (s *RedfishJob) SetFake() {
 func (s *RedfishJobJobsItem) SetFake() {
 	{
 		{
-			s.MessageDotExtendedInfo.SetFake()
+			s.MessageDotExtendedInfo = nil
+			for i := 0; i < 0; i++ {
+				var elem RedfishJobJobsItemMessageDotExtendedInfoItem
+				{
+					elem.SetFake()
+				}
+				s.MessageDotExtendedInfo = append(s.MessageDotExtendedInfo, elem)
+			}
 		}
 	}
 	{
@@ -2328,7 +2306,7 @@ func (s *RedfishJobJobsItem) SetFake() {
 	}
 	{
 		{
-			s.RawData = []byte("[]byte")
+			s.RawData.SetFake()
 		}
 	}
 	{
@@ -2804,7 +2782,14 @@ func (s *RedfishMetricReport) SetFake() {
 func (s *RedfishMetricReportReportsItem) SetFake() {
 	{
 		{
-			s.MessageDotExtendedInfo.SetFake()
+			s.MessageDotExtendedInfo = nil
+			for i := 0; i < 0; i++ {
+				var elem RedfishMetricReportReportsItemMessageDotExtendedInfoItem
+				{
+					elem.SetFake()
+				}
+				s.MessageDotExtendedInfo = append(s.MessageDotExtendedInfo, elem)
+			}
 		}
 	}
 	{

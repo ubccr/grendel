@@ -527,6 +527,7 @@
 				"properties": {
 					"JobMessages": {
 						"items": {
+							"nullable": true,
 							"properties": {
 								"data": {
 									"type": "string"
@@ -546,7 +547,6 @@
 											"properties": {
 												"@Message.ExtendedInfo": {
 													"items": {
-														"nullable": true,
 														"properties": {
 															"Message": {
 																"type": "string"
@@ -569,7 +569,6 @@
 														},
 														"type": "object"
 													},
-													"nullable": true,
 													"type": "array"
 												},
 												"code": {
@@ -590,6 +589,7 @@
 							},
 							"type": "object"
 						},
+						"nullable": true,
 						"type": "array"
 					},
 					"Message": {
@@ -853,7 +853,6 @@
 								"properties": {
 									"@Message.ExtendedInfo": {
 										"items": {
-											"nullable": true,
 											"properties": {
 												"Message": {
 													"type": "string"
@@ -1222,7 +1221,6 @@
 							"properties": {
 								"@Message.ExtendedInfo": {
 									"items": {
-										"nullable": true,
 										"properties": {
 											"Message": {
 												"type": "string"
@@ -1241,7 +1239,9 @@
 											"MessageSeverity": {
 												"type": "string"
 											},
-											"Oem": {},
+											"Oem": {
+												"nullable": true
+											},
 											"RelatedProperties": {
 												"items": {
 													"nullable": true,
@@ -1333,7 +1333,9 @@
 														"ActionURI": {
 															"type": "string"
 														},
-														"Oem": {},
+														"Oem": {
+															"nullable": true
+														},
 														"Priority": {
 															"minimum": 0,
 															"nullable": true,
@@ -1373,7 +1375,6 @@
 										},
 										"type": "object"
 									},
-									"nullable": true,
 									"type": "array"
 								},
 								"@odata.context": {
@@ -1450,7 +1451,9 @@
 											"MessageSeverity": {
 												"type": "string"
 											},
-											"Oem": {},
+											"Oem": {
+												"nullable": true
+											},
 											"RelatedProperties": {
 												"items": {
 													"nullable": true,
@@ -1542,7 +1545,9 @@
 														"ActionURI": {
 															"type": "string"
 														},
-														"Oem": {},
+														"Oem": {
+															"nullable": true
+														},
 														"Priority": {
 															"minimum": 0,
 															"nullable": true,
@@ -1588,9 +1593,14 @@
 								"Name": {
 									"type": "string"
 								},
-								"Oem": {},
+								"Oem": {
+									"nullable": true
+								},
 								"Parameters": {
-									"additionalProperties": {},
+									"additionalProperties": {
+										"nullable": true
+									},
+									"nullable": true,
 									"type": "object"
 								},
 								"Payload": {
@@ -1622,6 +1632,7 @@
 								},
 								"RawData": {
 									"format": "byte",
+									"nullable": true,
 									"type": "string"
 								},
 								"Schedule": {
@@ -1712,7 +1723,6 @@
 							"properties": {
 								"@Message.ExtendedInfo": {
 									"items": {
-										"nullable": true,
 										"properties": {
 											"Message": {
 												"type": "string"
@@ -1731,7 +1741,9 @@
 											"MessageSeverity": {
 												"type": "string"
 											},
-											"Oem": {},
+											"Oem": {
+												"nullable": true
+											},
 											"RelatedProperties": {
 												"items": {
 													"nullable": true,
@@ -1823,7 +1835,9 @@
 														"ActionURI": {
 															"type": "string"
 														},
-														"Oem": {},
+														"Oem": {
+															"nullable": true
+														},
 														"Priority": {
 															"minimum": 0,
 															"nullable": true,
@@ -1863,7 +1877,6 @@
 										},
 										"type": "object"
 									},
-									"nullable": true,
 									"type": "array"
 								},
 								"@odata.context": {
@@ -1900,7 +1913,9 @@
 											"MetricValue": {
 												"type": "string"
 											},
-											"Oem": {},
+											"Oem": {
+												"nullable": true
+											},
 											"Timestamp": {
 												"type": "string"
 											}
@@ -1913,7 +1928,9 @@
 								"Name": {
 									"type": "string"
 								},
-								"Oem": {},
+								"Oem": {
+									"nullable": true
+								},
 								"ReportSequence": {
 									"type": "string"
 								},
@@ -1966,7 +1983,6 @@
 						"properties": {
 							"@Message.ExtendedInfo": {
 								"items": {
-									"nullable": true,
 									"properties": {
 										"Message": {
 											"type": "string"
@@ -1985,7 +2001,9 @@
 										"MessageSeverity": {
 											"type": "string"
 										},
-										"Oem": {},
+										"Oem": {
+											"nullable": true
+										},
 										"RelatedProperties": {
 											"items": {
 												"nullable": true,
@@ -2077,7 +2095,9 @@
 													"ActionURI": {
 														"type": "string"
 													},
-													"Oem": {},
+													"Oem": {
+														"nullable": true
+													},
 													"Priority": {
 														"minimum": 0,
 														"nullable": true,
@@ -2223,7 +2243,9 @@
 							"NodeID": {
 								"type": "string"
 							},
-							"Oem": {},
+							"Oem": {
+								"nullable": true
+							},
 							"PSRollupStatus": {
 								"type": "string"
 							},

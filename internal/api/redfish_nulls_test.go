@@ -6,41 +6,59 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
-	"strings"
+	"slices"
 	"testing"
 
 	"github.com/go-faster/jx"
 	"github.com/ubccr/grendel/pkg/client"
 )
 
-// TestRedfishArraysAreNullable walks the committed spec for arrays the schema customizer has not marked nullable. gofish tags none of its slices omitempty, so an empty one marshals as null and the generated client refuses to decode it. The browser client does not validate, so a miss here breaks only the CLI
-func TestRedfishArraysAreNullable(t *testing.T) {
+// TestRedfishNullsAreNullable checks the committed spec against the fields reflection says can arrive as null. A field missing its nullable flag makes the generated client reject the response, so this fails either when a gofish upgrade adds a field or when someone edits the types without regenerating the spec.
+func TestRedfishNullsAreNullable(t *testing.T) {
 	doc := loadSpec(t)
 
-	schemas, ok := doc["components"].(map[string]any)["schemas"].(map[string]any)
-	if !ok {
-		t.Fatal("spec has no component schemas")
-	}
-
-	for name, schema := range schemas {
-		if !strings.HasPrefix(name, "Redfish") {
-			continue
-		}
-		for _, path := range nonNullableArrays(schema, name) {
-			t.Errorf("%s is an array that is not nullable, add its field name to redfishNulls in options.go and regenerate", path)
-		}
+	missing := notNullable(doc, "")
+	for _, path := range missing {
+		t.Errorf("%s can be null but the spec does not say so, regenerate api/openapi.json", path)
 	}
 }
 
-// TestDecodeJobWithNullArrays is the payload an iDRAC returns for a job whose messages carry no arguments or resolution steps.
-func TestDecodeJobWithNullArrays(t *testing.T) {
+// notNullable returns the path of every property named in redfishNulls that the spec does not mark nullable.
+func notNullable(node any, path string) []string {
+	var found []string
+
+	switch n := node.(type) {
+	case map[string]any:
+		for key, sub := range n {
+			schema, ok := sub.(map[string]any)
+			if ok && slices.Contains(redfishNulls, key) && schema["nullable"] != true {
+				found = append(found, path+"."+key)
+			}
+			found = append(found, notNullable(sub, path+"."+key)...)
+		}
+	case []any:
+		for i, sub := range n {
+			found = append(found, notNullable(sub, fmt.Sprintf("%s[%d]", path, i))...)
+		}
+	}
+
+	return found
+}
+
+// TestDecodeJobWithNulls is the payload an iDRAC returns for a job that carries no parameters and whose message has no arguments or resolution steps.
+func TestDecodeJobWithNulls(t *testing.T) {
 	const payload = `{
 		"name": "cpn-42-bmc",
 		"jobs": [{
 			"Id": "JID_123456789",
 			"JobState": "Completed",
+			"Oem": null,
+			"Parameters": null,
 			"PercentComplete": 100,
+			"RawData": null,
+			"StepOrder": null,
 			"Messages": [{
 				"Message": "The command was successful",
 				"MessageArgs": null,
@@ -82,26 +100,4 @@ func loadSpec(t *testing.T) map[string]any {
 		t.Fatal(err)
 	}
 	return doc
-}
-
-// nonNullableArrays returns the path of every array in the schema that may still be handed a null.
-func nonNullableArrays(node any, path string) []string {
-	schema, ok := node.(map[string]any)
-	if !ok {
-		return nil
-	}
-
-	var found []string
-	if schema["type"] == "array" && schema["nullable"] != true {
-		found = append(found, path)
-	}
-
-	if props, ok := schema["properties"].(map[string]any); ok {
-		for name, sub := range props {
-			found = append(found, nonNullableArrays(sub, path+"."+name)...)
-		}
-	}
-	found = append(found, nonNullableArrays(schema["items"], path+"[]")...)
-
-	return found
 }
