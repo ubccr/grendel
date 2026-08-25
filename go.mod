@@ -29,7 +29,7 @@ require (
 	github.com/insomniacslk/dhcp v0.0.0-20260407060928-11b94ed970f2
 	github.com/jedib0t/go-pretty/v6 v6.7.10
 	github.com/korovkin/limiter v0.0.0-20260306054425-004398ae7895
-	github.com/labstack/echo/v4 v4.15.2
+	github.com/labstack/echo/v4 v4.15.3
 	github.com/labstack/gommon v0.5.0
 	github.com/manifoldco/promptui v0.9.0
 	github.com/mattn/go-sqlite3 v1.14.44
