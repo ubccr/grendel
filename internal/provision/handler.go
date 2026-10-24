@@ -13,7 +13,6 @@ import (
 	"path"
 	"strconv"
 	"strings"
-	"text/template"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -184,20 +183,9 @@ func (h *Handler) Ipxe(c echo.Context) error {
 		tmplName = "ipxe.tmpl"
 	}
 
-	commandLine := bootImage.CommandLine
-
-	if commandLine != "" {
-		cmdTmpl, err := template.New("cmd").Parse(commandLine)
-		if err != nil {
-			return err
-		}
-
-		var buf bytes.Buffer
-		err = cmdTmpl.Execute(&buf, data)
-		if err != nil {
-			return err
-		}
-		commandLine = buf.String()
+	commandLine, err := RenderString("cmdline", bootImage.CommandLine, data)
+	if err != nil {
+		return err
 	}
 
 	data["commandLine"] = commandLine
@@ -207,7 +195,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 }
 
 func (h *Handler) File(c echo.Context) error {
-	bootImage, host, _, _, err := h.verifyClaims(c)
+	bootImage, host, _, data, err := h.verifyClaims(c)
 	if err != nil {
 		return err
 	}
@@ -217,10 +205,15 @@ func (h *Handler) File(c echo.Context) error {
 	log.Infof("Got request for file %q from host %s %s", fileType, host.Name, c.RealIP())
 
 	switch {
-	case fileType == "kernel":
-		return c.File(bootImage.KernelPath)
-	case fileType == "kernel.sig":
-		return c.File(bootImage.KernelPath + ".sig")
+	case fileType == "kernel" || fileType == "kernel.sig":
+		kernel, err := h.renderImagePath("kernel", bootImage.KernelPath, host, bootImage, data)
+		if err != nil {
+			return err
+		}
+		if fileType == "kernel.sig" {
+			kernel += ".sig"
+		}
+		return c.File(kernel)
 
 	case fileType == "liveimg":
 		return c.File(bootImage.LiveImage)
@@ -231,7 +224,10 @@ func (h *Handler) File(c echo.Context) error {
 		if err != nil || i < 0 || i >= len(bootImage.InitrdPaths) {
 			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("no initrd with ID %d", i))
 		}
-		initrd := bootImage.InitrdPaths[i]
+		initrd, err := h.renderImagePath(initrdBaseName, bootImage.InitrdPaths[i], host, bootImage, data)
+		if err != nil {
+			return err
+		}
 		if strings.HasSuffix(fileType, ".sig") {
 			initrd += ".sig"
 		}
@@ -239,6 +235,21 @@ func (h *Handler) File(c echo.Context) error {
 	}
 
 	return echo.NewHTTPError(http.StatusNotFound, "")
+}
+
+func (h *Handler) renderImagePath(name, filePath string, host *model.Host, bootImage *model.BootImage, data map[string]any) (string, error) {
+	rendered, err := RenderString(name, filePath, data)
+	if err != nil {
+		log.WithFields(logrus.Fields{
+			"host":      host.Name,
+			"bootimage": bootImage.Name,
+			"path":      filePath,
+			"err":       err,
+		}).Error("failed to render boot image path template")
+		return "", echo.NewHTTPError(http.StatusInternalServerError, "failed to render boot image path").SetInternal(err)
+	}
+
+	return rendered, nil
 }
 
 func (h *Handler) serveBlob(c echo.Context, name string, data []byte) error {
@@ -434,7 +445,17 @@ func (h *Handler) Onie(c echo.Context) error {
 	case OnieUpdate:
 		return c.File(onie.UpdaterFilePath())
 	case OnieInstall:
-		return c.File(bootImage.KernelPath)
+		data := map[string]any{
+			"bootimage":  bootImage,
+			"host":       host,
+			"headers":    c.Request().Header,
+			"extra_vars": viper.GetStringMap("provision.extra_vars"),
+		}
+		kernel, err := h.renderImagePath("kernel", bootImage.KernelPath, host, bootImage, data)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusNotFound, "")
+		}
+		return c.File(kernel)
 	}
 
 	return echo.NewHTTPError(http.StatusBadRequest, "Invalid ONIE operation")

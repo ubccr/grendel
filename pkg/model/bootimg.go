@@ -8,8 +8,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/segmentio/ksuid"
 )
@@ -44,33 +42,5 @@ func (b *BootImage) Scan(value interface{}) error {
 	}
 
 	*b = image
-	return nil
-}
-
-func (b *BootImage) CheckPathsExist() error {
-	if _, err := os.Stat(b.KernelPath); err != nil {
-		return err
-	}
-
-	for _, i := range b.InitrdPaths {
-		if _, err := os.Stat(i); err != nil {
-			return err
-		}
-	}
-
-	if b.LiveImage != "" {
-		if _, err := os.Stat(b.LiveImage); err != nil {
-			return err
-		}
-	}
-
-	if b.ProvisionTemplates != nil {
-		for _, tmpl := range b.ProvisionTemplates {
-			if _, err := os.Stat(filepath.Join("/var/lib/grendel/templates", tmpl)); err != nil {
-				return err
-			}
-		}
-	}
-
 	return nil
 }

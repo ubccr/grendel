@@ -63,6 +63,26 @@ var funcMap = template.FuncMap{
 	"NetBoxRenderConfig":     NetBoxRenderConfig,
 }
 
+// RenderString executes text as a template with the provision template functions, returning text unchanged if it contains no actions
+func RenderString(name, text string, data map[string]any) (string, error) {
+	if !strings.Contains(text, "{{") {
+		return text, nil
+	}
+
+	tmpl, err := template.New(name).Funcs(funcMap).Option("missingkey=error").Parse(text)
+	if err != nil {
+		return "", err
+	}
+
+	var buf bytes.Buffer
+	err = tmpl.Execute(&buf, data)
+	if err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
+}
+
 type TemplateRenderer struct {
 	templates atomic.Pointer[template.Template]
 }

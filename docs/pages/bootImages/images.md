@@ -76,3 +76,33 @@ grendel image add rocky10 \
 - `inst.stage2` points to the directory containing `.treeinfo` / `images/install.img` (the root of the synced ISO). Adjust the path to match your `repo_dir` layout.
 - `inst.ks` is rendered to the URL of the kickstart Grendel serves from the `kickstart` provision template (see [Auto Provisioning](templates.md#rocky)).
 - `{{ $.endpoints.RepoURL }}` and `{{ $.endpoints.KickstartURL }}` are rendered by Grendel. As with the Ubuntu example, the `cmdline` field is parsed with the same text/template functions and data used in the provision templates.
+
+## Templated Fields
+
+The `cmdline`, `kernel` and `initrd` fields are parsed with the same [text/template](https://pkg.go.dev/text/template) functions and data used in the provision templates. This lets a single image serve different files depending on the host being provisioned:
+
+```bash
+grendel image add per-host \
+--kernel '/var/lib/grendel/images/{{ $.host.Name }}/vmlinuz' \
+--initrd '/var/lib/grendel/images/{{ $.extra_vars.distro }}/initrd.img' \
+--cmdline 'console=ttyS0 ip=dhcp inst.ks={{ $.endpoints.KickstartURL }}'
+```
+
+Paths without `{{` are used as is. Referencing a value that doesn't exist is an error, and the request fails rather than serving a partially rendered path.
+
+The following data is available:
+
+| Key | Description |
+|---|---|
+| `$.host` | The host being provisioned: `.Name`, `.UID`, `.Tags`, `.BootImage`, `.Interfaces`, `.Bonds` |
+| `$.nic` | The interface the host is booting from: `.MAC`, `.Name`, `.IP`, `.FQDN`, `.VLAN`, `.MTU` |
+| `$.bootimage` | The boot image: `.Name`, `.KernelPath`, `.InitrdPaths`, `.CommandLine`, `.Verify` (raw, unrendered values) |
+| `$.endpoints` | Provision URLs, e.g. `.RepoURL`, `.KickstartURL`, `.CloudInitURL`, `.KernelURL` |
+| `$.headers` | HTTP request headers |
+| `$.extra_vars` | Values set under `provision.extra_vars` in the Grendel config |
+| `$.token` | The boot token |
+
+Not all data is available for every request:
+
+- ONIE installs only provide `host`, `bootimage`, `headers` and `extra_vars`.
+- Kernel and initrd files fetched over TFTP only provide `bootimage` and `extra_vars`, since a TFTP request doesn't identify the host.
