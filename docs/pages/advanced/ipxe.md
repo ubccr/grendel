@@ -2,12 +2,14 @@
 
 Grendel ships several embedded iPXE binaries for various architectures. Grendel will attempt to autoselect the correct binary depending on the DHCP Client System Architecture Type (option 93)
 
-| Boot Mode | Architecture | Client Request | Grendel iPXE Binary |
-| --------- | ------------ | -------------- | ------------------- |
-| BIOS      | amd64        | Intel x86PC    | undionly.kpxe       |
-| UEFI      | amd64        | EFI x86-64     | snponly-x86_64.efi  |
-| UEFI      | arm64        | EFI arm64      | snponly-arm64.efi   |
-| UEFI      | i386         | EFI i386       | ipxe-i386.efi       |
+| Boot Mode | Client Request | Grendel iPXE Binary | `{{ $.host.Arch }}` | `{{ $.host.ArchAlias }}` |
+| --------- | -------------- | ------------------- | ------------------- | ------------------------ |
+| BIOS      | Intel x86PC    | undionly.kpxe       | x86_64              | amd64                    |
+| UEFI      | EFI x86-64     | snponly-x86_64.efi  | x86_64              | amd64                    |
+| UEFI      | EFI arm64      | snponly-arm64.efi   | aarch64             | arm64                    |
+| UEFI      | EFI i386       | ipxe-i386.efi       | i386                | i386                     |
+
+The arch columns show the values detected for each client request, see [Host architecture](#host-architecture) below.
 
 ## Host architecture
 
