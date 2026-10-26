@@ -28,7 +28,7 @@ func TestHostTags(t *testing.T) {
 	assert.Equal(host.Interfaces[0].FQDN, host.Interfaces[0].HostName())
 }
 
-func TestHostArchAlias(t *testing.T) {
+func TestHostArchDebian(t *testing.T) {
 	assert := assert.New(t)
 
 	tests := map[string]string{
@@ -41,7 +41,28 @@ func TestHostArchAlias(t *testing.T) {
 
 	for arch, want := range tests {
 		host := &model.Host{Arch: arch}
-		assert.Equalf(want, host.ArchAlias(), "alias for %q", arch)
+		assert.Equalf(want, host.ArchDebian(), "debian arch for %q", arch)
+	}
+}
+
+func TestHostArchMkosi(t *testing.T) {
+	assert := assert.New(t)
+
+	tests := map[string]string{
+		"x86_64":  "x86-64",
+		"aarch64": "arm64",
+		"i386":    "x86",
+		"i686":    "x86",
+		"ppc64le": "ppc64-le",
+		"armv7l":  "arm",
+		"riscv64": "riscv64",
+		"s390x":   "s390x",
+		"":        "",
+	}
+
+	for arch, want := range tests {
+		host := &model.Host{Arch: arch}
+		assert.Equalf(want, host.ArchMkosi(), "mkosi arch for %q", arch)
 	}
 }
 

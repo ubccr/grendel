@@ -54,13 +54,39 @@ func (h *Host) HostType() string {
 	return t
 }
 
-// ArchAlias returns the Debian/Go style name for the host arch (x86_64 -> amd64, aarch64 -> arm64), or the arch unchanged if it has no alias
-func (h *Host) ArchAlias() string {
+// ArchDebian returns the Debian/Go style name for the host arch (x86_64 -> amd64, aarch64 -> arm64), or the arch unchanged if it has no alias
+func (h *Host) ArchDebian() string {
 	switch h.Arch {
 	case "x86_64":
 		return "amd64"
 	case "aarch64":
 		return "arm64"
+	}
+
+	return h.Arch
+}
+
+// ArchMkosi returns the host arch as mkosi names it in Architecture= and the %a specifier (x86_64 -> x86-64, aarch64 -> arm64), following mkosi's uname mapping, or the arch unchanged if it has no alias
+func (h *Host) ArchMkosi() string {
+	switch h.Arch {
+	case "x86_64":
+		return "x86-64"
+	case "aarch64", "aarch64_be":
+		return "arm64"
+	case "i386", "i486", "i586", "i686":
+		return "x86"
+	case "ppc64le":
+		return "ppc64-le"
+	case "mips":
+		return "mips-le"
+	case "mips64":
+		return "mips64-le"
+	case "riscv":
+		return "riscv64"
+	}
+
+	if strings.HasPrefix(h.Arch, "armv") {
+		return "arm"
 	}
 
 	return h.Arch
