@@ -73,6 +73,24 @@ func (b Build) ToBytes() []byte {
 	return nil
 }
 
+// DetectArch returns the CPU architecture name for the client system architecture type a PXE client sends in DHCP option 93
+func DetectArch(archs iana.Archs) (string, error) {
+	if len(archs) == 0 {
+		return "", fmt.Errorf("no client system architecture types provided")
+	}
+
+	switch archs[0] {
+	case iana.INTEL_X86PC, iana.EFI_BC, iana.EFI_X86_64:
+		return "x86_64", nil
+	case iana.EFI_IA32:
+		return "i386", nil
+	case iana.EFI_ARM64:
+		return "aarch64", nil
+	}
+
+	return "", fmt.Errorf("unsupported client system architecture type: %d", archs[0])
+}
+
 func DetectBuild(archs iana.Archs, userClass string) (Build, error) {
 	var build Build
 

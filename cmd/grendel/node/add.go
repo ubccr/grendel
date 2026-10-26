@@ -13,6 +13,7 @@ import (
 
 var (
 	newFirmware  string
+	newArch      string
 	newProvision bool
 	newBootImage string
 	newTags      []string
@@ -25,6 +26,7 @@ var (
 				client.NewNilNodeAddRequestNodeListItem(client.NodeAddRequestNodeListItem{
 					Name:      client.NewOptString(args[0]),
 					Firmware:  client.NewOptString(newFirmware),
+					Arch:      client.NewOptString(newArch),
 					Provision: client.NewOptBool(newProvision),
 					Tags:      client.NewOptNilStringArray(newTags),
 					BootImage: client.NewOptString(newBootImage),
@@ -47,6 +49,7 @@ var (
 
 func init() {
 	newCmd.PersistentFlags().StringVar(&newFirmware, "firmware", "", "iPXE firmware override")
+	newCmd.PersistentFlags().StringVar(&newArch, "arch", "", "Node CPU architecture override. If not set, the arch is detected from the PXE request during each boot. Example: x86_64, aarch64")
 	newCmd.PersistentFlags().BoolVar(&newProvision, "provision", false, "Set the node to provision")
 	newCmd.PersistentFlags().StringArrayVar(&newTags, "tags", []string{}, "Tags to add to the node. Can be passed multiple times")
 	newCmd.PersistentFlags().StringVar(&newBootImage, "image", "", "Node boot image")

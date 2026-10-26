@@ -98,12 +98,27 @@ export default function NodeForm({ data, reset }: { data?: Host; reset?: boolean
           )}
         />
         <form.Field
+          name="arch"
+          children={(field) => (
+            <div>
+              <Label>Arch:</Label>
+              <Input
+                value={field.state.value ?? ""}
+                placeholder="detected during boot"
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+              />
+            </div>
+          )}
+        />
+        <form.Field
           name="boot_image"
           children={(field) => (
             <div>
               <Label>Image:</Label>
               <Input
                 value={field.state.value ?? ""}
+                placeholder="default"
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
               />

@@ -13,6 +13,21 @@ import (
 	"github.com/segmentio/ksuid"
 )
 
+const archUpsert = `-- name: ArchUpsert :one
+insert into arch (name)
+values (?1)
+on conflict (name)
+do update set name = excluded.name
+returning id
+`
+
+func (q *Queries) ArchUpsert(ctx context.Context, db DBTX, name string) (int64, error) {
+	row := db.QueryRowContext(ctx, archUpsert, name)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
 const nodeAll = `-- name: NodeAll :many
 select id, name, uid, host_json from node_view
 `

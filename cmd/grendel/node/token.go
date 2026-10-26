@@ -14,8 +14,9 @@ import (
 )
 
 var (
-	bmc      bool
-	tokenCmd = &cobra.Command{
+	bmc       bool
+	tokenArch string
+	tokenCmd  = &cobra.Command{
 		Use:   "token {nodeset | all} {boot | bmc}",
 		Short: "Generate boot token for nodes",
 		Args:  cobra.ExactArgs(2),
@@ -35,9 +36,10 @@ var (
 				nodeset = ""
 			}
 			params := client.GETV1NodesTokenInterfaceParams{
-				Interface: args[0],
+				Interface: args[1],
 				Nodeset:   client.NewOptString(nodeset),
 				Tags:      client.NewOptString(strings.Join(tags, ",")),
+				Arch:      client.NewOptString(tokenArch),
 			}
 			res, err := apiclient.API.GETV1NodesTokenInterface(command.Context(), params)
 			if err != nil {
@@ -54,5 +56,7 @@ var (
 )
 
 func init() {
+	tokenCmd.Flags().StringVar(&tokenArch, "arch", "", "Arch to embed in the token, simulating the arch detected during a PXE boot. Nodes with an arch set manually ignore it. Example: x86_64, aarch64")
+
 	nodeCmd.AddCommand(tokenCmd)
 }

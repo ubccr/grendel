@@ -1909,6 +1909,12 @@ func (s *DataDumpHostsItem) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *DataDumpHostsItem) encodeFields(e *jx.Encoder) {
 	{
+		if s.Arch.Set {
+			e.FieldStart("arch")
+			s.Arch.Encode(e)
+		}
+	}
+	{
 		if s.Bonds != nil {
 			e.FieldStart("bonds")
 			e.ArrStart()
@@ -1972,16 +1978,17 @@ func (s *DataDumpHostsItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfDataDumpHostsItem = [9]string{
-	0: "bonds",
-	1: "boot_image",
-	2: "firmware",
-	3: "id",
-	4: "interfaces",
-	5: "name",
-	6: "provision",
-	7: "tags",
-	8: "uid",
+var jsonFieldsNameOfDataDumpHostsItem = [10]string{
+	0: "arch",
+	1: "bonds",
+	2: "boot_image",
+	3: "firmware",
+	4: "id",
+	5: "interfaces",
+	6: "name",
+	7: "provision",
+	8: "tags",
+	9: "uid",
 }
 
 // Decode decodes DataDumpHostsItem from json.
@@ -1992,6 +1999,16 @@ func (s *DataDumpHostsItem) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
+		case "arch":
+			if err := func() error {
+				s.Arch.Reset()
+				if err := s.Arch.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"arch\"")
+			}
 		case "bonds":
 			if err := func() error {
 				s.Bonds = make([]NilDataDumpHostsItemBondsItem, 0)
@@ -4602,6 +4619,12 @@ func (s *Host) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *Host) encodeFields(e *jx.Encoder) {
 	{
+		if s.Arch.Set {
+			e.FieldStart("arch")
+			s.Arch.Encode(e)
+		}
+	}
+	{
 		if s.Bonds != nil {
 			e.FieldStart("bonds")
 			e.ArrStart()
@@ -4665,16 +4688,17 @@ func (s *Host) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfHost = [9]string{
-	0: "bonds",
-	1: "boot_image",
-	2: "firmware",
-	3: "id",
-	4: "interfaces",
-	5: "name",
-	6: "provision",
-	7: "tags",
-	8: "uid",
+var jsonFieldsNameOfHost = [10]string{
+	0: "arch",
+	1: "bonds",
+	2: "boot_image",
+	3: "firmware",
+	4: "id",
+	5: "interfaces",
+	6: "name",
+	7: "provision",
+	8: "tags",
+	9: "uid",
 }
 
 // Decode decodes Host from json.
@@ -4685,6 +4709,16 @@ func (s *Host) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
+		case "arch":
+			if err := func() error {
+				s.Arch.Reset()
+				if err := s.Arch.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"arch\"")
+			}
 		case "bonds":
 			if err := func() error {
 				s.Bonds = make([]NilHostBondsItem, 0)
@@ -7094,6 +7128,12 @@ func (s *NodeAddRequestNodeListItem) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *NodeAddRequestNodeListItem) encodeFields(e *jx.Encoder) {
 	{
+		if s.Arch.Set {
+			e.FieldStart("arch")
+			s.Arch.Encode(e)
+		}
+	}
+	{
 		if s.Bonds != nil {
 			e.FieldStart("bonds")
 			e.ArrStart()
@@ -7157,16 +7197,17 @@ func (s *NodeAddRequestNodeListItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfNodeAddRequestNodeListItem = [9]string{
-	0: "bonds",
-	1: "boot_image",
-	2: "firmware",
-	3: "id",
-	4: "interfaces",
-	5: "name",
-	6: "provision",
-	7: "tags",
-	8: "uid",
+var jsonFieldsNameOfNodeAddRequestNodeListItem = [10]string{
+	0: "arch",
+	1: "bonds",
+	2: "boot_image",
+	3: "firmware",
+	4: "id",
+	5: "interfaces",
+	6: "name",
+	7: "provision",
+	8: "tags",
+	9: "uid",
 }
 
 // Decode decodes NodeAddRequestNodeListItem from json.
@@ -7177,6 +7218,16 @@ func (s *NodeAddRequestNodeListItem) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
+		case "arch":
+			if err := func() error {
+				s.Arch.Reset()
+				if err := s.Arch.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"arch\"")
+			}
 		case "bonds":
 			if err := func() error {
 				s.Bonds = make([]NilNodeAddRequestNodeListItemBondsItem, 0)

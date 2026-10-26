@@ -97,7 +97,7 @@ The following data is available:
 
 | Key | Description |
 |---|---|
-| `$.host` | The host being provisioned: `.Name`, `.UID`, `.Tags`, `.BootImage`, `.Interfaces`, `.Bonds` |
+| `$.host` | The host being provisioned: `.Name`, `.UID`, `.Arch` (see [host architecture](../advanced/ipxe.md#host-architecture)), `.Tags`, `.BootImage`, `.Interfaces`, `.Bonds` |
 | `$.nic` | The interface the host is booting from: `.MAC`, `.Name`, `.IP`, `.FQDN`, `.VLAN`, `.MTU` |
 | `$.bootimage` | The boot image: `.Name`, `.Version`, `.KernelPath`, `.InitrdPaths`, `.CommandLine`, `.Verify` (raw, unrendered values) |
 | `$.endpoints` | Provision URLs, e.g. `.RepoURL`, `.KickstartURL`, `.CloudInitURL`, `.KernelURL` |

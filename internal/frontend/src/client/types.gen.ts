@@ -178,6 +178,7 @@ export type BootImageAddRequest = {
  */
 export type DataDump = {
     Hosts?: Array<{
+        arch?: string;
         bonds?: Array<{
             bmc?: boolean;
             fqdn?: string;
@@ -334,6 +335,7 @@ export type HttpError = {
  * Host schema
  */
 export type Host = {
+    arch?: string;
     bonds?: Array<{
         bmc?: boolean;
         fqdn?: string;
@@ -409,6 +411,7 @@ export type Lldp = {
  */
 export type NodeAddRequest = {
     node_list?: Array<{
+        arch?: string;
         bonds?: Array<{
             bmc?: boolean;
             fqdn?: string;
@@ -2013,6 +2016,10 @@ export type GetV1NodesTokenInterfaceData = {
          * Filter by tags. Minimum of one query parameter is required
          */
         tags?: string;
+        /**
+         * Arch to embed in the token, used in templates when the node has no arch set. Simulates the arch detected during a PXE boot
+         */
+        arch?: string;
     };
     url: '/v1/nodes/token/{interface}';
 };

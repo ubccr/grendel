@@ -411,6 +411,11 @@ func (s *DataDump) SetFake() {
 func (s *DataDumpHostsItem) SetFake() {
 	{
 		{
+			s.Arch.SetFake()
+		}
+	}
+	{
+		{
 			s.Bonds = nil
 			for i := 0; i < 0; i++ {
 				var elem NilDataDumpHostsItemBondsItem
@@ -1038,6 +1043,11 @@ func (s *HTTPErrorErrorsItemMore) SetFake() {
 func (s *Host) SetFake() {
 	{
 		{
+			s.Arch.SetFake()
+		}
+	}
+	{
+		{
 			s.Bonds = nil
 			for i := 0; i < 0; i++ {
 				var elem NilHostBondsItem
@@ -1490,6 +1500,11 @@ func (s *NodeAddRequest) SetFake() {
 
 // SetFake set fake values.
 func (s *NodeAddRequestNodeListItem) SetFake() {
+	{
+		{
+			s.Arch.SetFake()
+		}
+	}
 	{
 		{
 			s.Bonds = nil

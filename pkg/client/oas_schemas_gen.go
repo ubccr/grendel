@@ -720,6 +720,7 @@ func (s *DataDump) SetUsers(val []DataDumpUsersItem) {
 }
 
 type DataDumpHostsItem struct {
+	Arch       OptString                            `json:"arch"`
 	Bonds      []NilDataDumpHostsItemBondsItem      `json:"bonds"`
 	BootImage  OptString                            `json:"boot_image"`
 	Firmware   OptString                            `json:"firmware"`
@@ -729,6 +730,11 @@ type DataDumpHostsItem struct {
 	Provision  OptBool                              `json:"provision"`
 	Tags       OptNilStringArray                    `json:"tags"`
 	UID        OptNilString                         `json:"uid"`
+}
+
+// GetArch returns the value of Arch.
+func (s *DataDumpHostsItem) GetArch() OptString {
+	return s.Arch
 }
 
 // GetBonds returns the value of Bonds.
@@ -774,6 +780,11 @@ func (s *DataDumpHostsItem) GetTags() OptNilStringArray {
 // GetUID returns the value of UID.
 func (s *DataDumpHostsItem) GetUID() OptNilString {
 	return s.UID
+}
+
+// SetArch sets the value of Arch.
+func (s *DataDumpHostsItem) SetArch(val OptString) {
+	s.Arch = val
 }
 
 // SetBonds sets the value of Bonds.
@@ -1857,6 +1868,7 @@ func (s *HeaderAuth) SetToken(val string) {
 // Host schema.
 // Ref: #/components/schemas/Host
 type Host struct {
+	Arch       OptString               `json:"arch"`
 	Bonds      []NilHostBondsItem      `json:"bonds"`
 	BootImage  OptString               `json:"boot_image"`
 	Firmware   OptString               `json:"firmware"`
@@ -1866,6 +1878,11 @@ type Host struct {
 	Provision  OptBool                 `json:"provision"`
 	Tags       OptNilStringArray       `json:"tags"`
 	UID        OptNilString            `json:"uid"`
+}
+
+// GetArch returns the value of Arch.
+func (s *Host) GetArch() OptString {
+	return s.Arch
 }
 
 // GetBonds returns the value of Bonds.
@@ -1911,6 +1928,11 @@ func (s *Host) GetTags() OptNilStringArray {
 // GetUID returns the value of UID.
 func (s *Host) GetUID() OptNilString {
 	return s.UID
+}
+
+// SetArch sets the value of Arch.
+func (s *Host) SetArch(val OptString) {
+	s.Arch = val
 }
 
 // SetBonds sets the value of Bonds.
@@ -3646,6 +3668,7 @@ func (s *NodeAddRequest) SetNodeList(val []NilNodeAddRequestNodeListItem) {
 }
 
 type NodeAddRequestNodeListItem struct {
+	Arch       OptString                                     `json:"arch"`
 	Bonds      []NilNodeAddRequestNodeListItemBondsItem      `json:"bonds"`
 	BootImage  OptString                                     `json:"boot_image"`
 	Firmware   OptString                                     `json:"firmware"`
@@ -3655,6 +3678,11 @@ type NodeAddRequestNodeListItem struct {
 	Provision  OptBool                                       `json:"provision"`
 	Tags       OptNilStringArray                             `json:"tags"`
 	UID        OptNilString                                  `json:"uid"`
+}
+
+// GetArch returns the value of Arch.
+func (s *NodeAddRequestNodeListItem) GetArch() OptString {
+	return s.Arch
 }
 
 // GetBonds returns the value of Bonds.
@@ -3700,6 +3728,11 @@ func (s *NodeAddRequestNodeListItem) GetTags() OptNilStringArray {
 // GetUID returns the value of UID.
 func (s *NodeAddRequestNodeListItem) GetUID() OptNilString {
 	return s.UID
+}
+
+// SetArch sets the value of Arch.
+func (s *NodeAddRequestNodeListItem) SetArch(val OptString) {
+	s.Arch = val
 }
 
 // SetBonds sets the value of Bonds.

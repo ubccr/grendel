@@ -223,6 +223,7 @@ func (h *Handler) NodeTags(c fuego.ContextWithBody[NodeTagsRequest]) (*GenericRe
 
 func (h *Handler) NodeBootToken(c fuego.ContextNoBody) (*NodeBootTokenResponse, error) {
 	iface := c.PathParam("interface")
+	arch := c.QueryParam("arch")
 
 	ns, err := h.filterByNodesetAndTags(c.QueryParam("nodeset"), c.QueryParam("tags"))
 	if err != nil {
@@ -266,6 +267,11 @@ func (h *Handler) NodeBootToken(c fuego.ContextNoBody) (*NodeBootTokenResponse, 
 			nic = node.BootInterface()
 		}
 
+		// Skip nodes without the requested interface, like nodes without interfaces above
+		if nic == nil {
+			continue
+		}
+
 		if node.UID.String() == "" || nic.MAC.String() == "" {
 			return nil, fuego.HTTPError{
 				Status: http.StatusBadRequest,
@@ -275,7 +281,7 @@ func (h *Handler) NodeBootToken(c fuego.ContextNoBody) (*NodeBootTokenResponse, 
 			}
 		}
 
-		token, err := model.NewBootToken(node.UID.String(), nic.MAC.String())
+		token, err := model.NewBootTokenWithArch(node.UID.String(), nic.MAC.String(), arch)
 		if err != nil {
 			return nil, fuego.HTTPError{
 				Err:    err,

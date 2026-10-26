@@ -21,6 +21,7 @@ import (
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
 	"github.com/ubccr/grendel/pkg/netbox"
+	"github.com/ubccr/grendel/pkg/nodeset"
 )
 
 var netBoxClient *netbox.Client
@@ -148,6 +149,11 @@ func (h *Handler) verifyClaims(c echo.Context) (*model.BootImage, *model.Host, *
 			"mac":     claims.MAC,
 		}).Error("failed to find boot image for host")
 		return nil, nil, nil, nil, echo.NewHTTPError(http.StatusBadRequest, "invalid boot image").SetInternal(err)
+	}
+
+	// A manually set arch takes precedence over the one detected during the PXE boot
+	if host.Arch == "" {
+		host.Arch = claims.Arch
 	}
 
 	token := c.Param("token")
@@ -279,9 +285,11 @@ func (h *Handler) Complete(c echo.Context) error {
 
 	log.Infof("Unprovisioning host %s", host.Name)
 
-	host.Provision = false
-
-	err = h.DB.StoreHost(host)
+	// Only flip the provision flag, saving the whole host would persist the arch detected for this boot
+	ns, err := nodeset.NewNodeSet(host.Name)
+	if err == nil {
+		err = h.DB.ProvisionHosts(ns, false)
+	}
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"uid":  host.UID,

@@ -15,6 +15,21 @@ import (
 	"github.com/ubccr/grendel/pkg/model"
 )
 
+// detectArch returns the CPU architecture a PXE client reports in DHCP option 93, or an empty string if it can't be determined
+func detectArch(host *model.Host, req *dhcpv4.DHCPv4) string {
+	if !req.Options.Has(dhcpv4.OptionClientSystemArchitectureType) {
+		return ""
+	}
+
+	arch, err := firmware.DetectArch(req.ClientArch())
+	if err != nil {
+		log.Debugf("Unable to detect arch for host %s: %s", host.Name, err)
+		return ""
+	}
+
+	return arch
+}
+
 func (s *Server) bootingHandler4(host *model.Host, serverIP net.IP, req, resp *dhcpv4.DHCPv4) error {
 	if !host.Provision {
 		log.Infof("Host not set to provision: %s", req.ClientHWAddr.String())
@@ -99,7 +114,7 @@ func (s *Server) bootingHandler4(host *model.Host, serverIP net.IP, req, resp *d
 
 	case firmware.GRENDEL:
 		// Chainload to HTTP
-		token, err := model.NewBootToken(host.UID.String(), req.ClientHWAddr.String())
+		token, err := model.NewBootTokenWithArch(host.UID.String(), req.ClientHWAddr.String(), detectArch(host, req))
 		if err != nil {
 			return fmt.Errorf("Failed to generate signed boot token: %s", err)
 		}

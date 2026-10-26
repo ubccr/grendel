@@ -261,6 +261,15 @@ func (s *SqlStore) StoreHosts(hosts model.HostList) error {
 			kernelID.SetValid(kernel.ID)
 		}
 
+		archID := null.NewInt(0, false)
+		if h.Arch != "" {
+			id, err := s.q.ArchUpsert(ctx, tx, h.Arch)
+			if err != nil {
+				return err
+			}
+			archID.SetValid(id)
+		}
+
 		if h.UID.IsNil() {
 			h.UID, err = ksuid.NewRandom()
 			if err != nil {
@@ -273,6 +282,7 @@ func (s *SqlStore) StoreHosts(hosts model.HostList) error {
 			ID:        null.NewInt(h.ID, h.ID != 0),
 			UID:       h.UID,
 			KernelID:  kernelID,
+			ArchID:    archID,
 			Name:      h.Name,
 			Provision: h.Provision,
 			Firmware:  null.NewString(h.Firmware.String(), !h.Firmware.IsNil()),

@@ -426,3 +426,75 @@ func TestFileTemplatedPaths(t *testing.T) {
 		}
 	}
 }
+
+func TestTokenArch(t *testing.T) {
+	assert := assert.New(t)
+
+	h := &Handler{DB: newTestDB(t)}
+
+	dir := t.TempDir()
+	for _, arch := range []string{"aarch64", "x86_64"} {
+		assert.NoError(os.MkdirAll(filepath.Join(dir, arch), 0755))
+		assert.NoError(os.WriteFile(filepath.Join(dir, arch, "vmlinuz"), []byte("kernel-"+arch), 0644))
+	}
+
+	image := tests.BootImageFactory.MustCreate().(*model.BootImage)
+	image.KernelPath = dir + "/{{ .host.Arch }}/vmlinuz"
+	err := h.DB.StoreBootImage(image)
+	assert.NoError(err)
+
+	detected := tests.HostFactory.MustCreate().(*model.Host)
+	detected.BootImage = image.Name
+	detected.Provision = true
+
+	manual := tests.HostFactory.MustCreate().(*model.Host)
+	manual.BootImage = image.Name
+	manual.Provision = true
+	manual.Arch = "x86_64"
+
+	err = h.DB.StoreHosts(model.HostList{detected, manual})
+	assert.NoError(err)
+
+	// the detected arch in the token is used when the host has none, a manual arch always wins
+	hosts := map[*model.Host]string{
+		detected: "kernel-aarch64",
+		manual:   "kernel-x86_64",
+	}
+
+	for host, want := range hosts {
+		token, err := model.NewBootTokenWithArch(host.UID.String(), host.Interfaces[0].MAC.String(), "aarch64")
+		assert.NoError(err)
+
+		e := newTestEcho(t)
+		req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/boot/%s/file/kernel", token), nil)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		c.SetPath("/boot/:token/file/*")
+		c.SetParamNames("token")
+		c.SetParamValues(token)
+
+		if assert.NoErrorf(TokenRequired(h.File)(c), "error fetching kernel for %s", host.Name) {
+			assert.Equal(want, rec.Body.String())
+		}
+	}
+
+	// completing the provision doesn't persist the detected arch
+	token, err := model.NewBootTokenWithArch(detected.UID.String(), detected.Interfaces[0].MAC.String(), "aarch64")
+	assert.NoError(err)
+
+	e := newTestEcho(t)
+	req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/boot/%s/complete", token), nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/boot/:token/complete")
+	c.SetParamNames("token")
+	c.SetParamValues(token)
+
+	if assert.NoError(TokenRequired(h.Complete)(c)) {
+		host, err := h.DB.LoadHostFromName(detected.Name)
+		if assert.NoError(err) {
+			assert.False(host.Provision)
+			assert.Equal("", host.Arch)
+		}
+	}
+}

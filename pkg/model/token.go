@@ -14,8 +14,9 @@ import (
 )
 
 type BootClaims struct {
-	ID  string `json:"id"`
-	MAC string `json:"mac"`
+	ID   string `json:"id"`
+	MAC  string `json:"mac"`
+	Arch string `json:"arch,omitempty"`
 }
 
 func init() {
@@ -31,9 +32,15 @@ func init() {
 }
 
 func NewBootToken(id, mac string) (string, error) {
+	return NewBootTokenWithArch(id, mac, "")
+}
+
+// NewBootTokenWithArch creates a boot token that also carries the CPU architecture detected during the PXE boot, so provisioning requests made with it can use the arch without it being stored on the host
+func NewBootTokenWithArch(id, mac, arch string) (string, error) {
 	claims := &BootClaims{
-		ID:  id,
-		MAC: mac,
+		ID:   id,
+		MAC:  mac,
+		Arch: arch,
 	}
 
 	jsonBytes, err := json.Marshal(claims)

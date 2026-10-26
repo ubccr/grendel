@@ -71,6 +71,13 @@ where id in (sqlc.slice(nodes));
 update node set kernel_id = @kernel_id
 where id in (sqlc.slice(nodes));
 
+-- name: ArchUpsert :one
+insert into arch (name)
+values (@name)
+on conflict (name)
+do update set name = excluded.name
+returning id;
+
 -- name: NodeUpsert :one
 insert into node (id, uid, name, provision, arch_id, kernel_id, node_type_id, firmware)
 values (sqlc.narg('id'), @uid, @name, @provision, @arch_id, @kernel_id, @node_type_id, @firmware)

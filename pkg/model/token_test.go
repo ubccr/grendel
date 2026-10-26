@@ -37,5 +37,17 @@ func TestToken(t *testing.T) {
 	if assert.NoError(err) {
 		assert.Equal(claims.ID, host.UID.String())
 		assert.Equal(claims.MAC, host.Interfaces[0].MAC.String())
+		assert.Equal("", claims.Arch)
+	}
+
+	token, err = model.NewBootTokenWithArch(host.UID.String(), host.Interfaces[0].MAC.String(), "aarch64")
+	if assert.NoError(err) {
+		assert.Greater(len(token), 0)
+	}
+
+	claims, err = model.ParseBootToken(token)
+	if assert.NoError(err) {
+		assert.Equal(claims.ID, host.UID.String())
+		assert.Equal("aarch64", claims.Arch)
 	}
 }

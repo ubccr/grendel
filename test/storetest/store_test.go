@@ -746,6 +746,48 @@ func (s *StoreTestSuite) TestHostUpdate() {
 	}
 }
 
+func (s *StoreTestSuite) TestHostArch() {
+	host := tests.HostFactory.MustCreate().(*model.Host)
+
+	err := s.db.StoreHost(host)
+	s.Assert().NoError(err)
+
+	testHost, err := s.db.LoadHostFromName(host.Name)
+	if s.Assert().NoError(err) {
+		s.Assert().Equal("", testHost.Arch)
+	}
+
+	// arch survives a round trip through StoreHost, and new names are added to the arch table
+	testHost.Arch = "riscv64"
+	err = s.db.StoreHost(testHost)
+	s.Assert().NoError(err)
+
+	testHost, err = s.db.LoadHostFromName(host.Name)
+	if s.Assert().NoError(err) {
+		s.Assert().Equal("riscv64", testHost.Arch)
+	}
+
+	// an existing arch name is reused
+	other := tests.HostFactory.MustCreate().(*model.Host)
+	other.Arch = "riscv64"
+	err = s.db.StoreHost(other)
+	s.Assert().NoError(err)
+
+	other, err = s.db.LoadHostFromName(other.Name)
+	if s.Assert().NoError(err) {
+		s.Assert().Equal("riscv64", other.Arch)
+	}
+
+	testHost.Arch = ""
+	err = s.db.StoreHost(testHost)
+	s.Assert().NoError(err)
+
+	testHost, err = s.db.LoadHostFromName(host.Name)
+	if s.Assert().NoError(err) {
+		s.Assert().Equal("", testHost.Arch)
+	}
+}
+
 func (s *StoreTestSuite) TestHostNics() {
 	host := tests.HostFactory.MustCreate().(*model.Host)
 

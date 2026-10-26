@@ -28,6 +28,23 @@ func TestHostTags(t *testing.T) {
 	assert.Equal(host.Interfaces[0].FQDN, host.Interfaces[0].HostName())
 }
 
+func TestHostArchAlias(t *testing.T) {
+	assert := assert.New(t)
+
+	tests := map[string]string{
+		"x86_64":  "amd64",
+		"aarch64": "arm64",
+		"i386":    "i386",
+		"ppc64le": "ppc64le",
+		"":        "",
+	}
+
+	for arch, want := range tests {
+		host := &model.Host{Arch: arch}
+		assert.Equalf(want, host.ArchAlias(), "alias for %q", arch)
+	}
+}
+
 func TestHostBonds(t *testing.T) {
 	assert := assert.New(t)
 
