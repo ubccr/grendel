@@ -150,6 +150,7 @@ export type BootImage = {
     };
     uid?: string;
     verify?: boolean;
+    version?: string;
 };
 
 /**
@@ -168,6 +169,7 @@ export type BootImageAddRequest = {
         };
         uid?: string;
         verify?: boolean;
+        version?: string;
     }>;
 };
 
@@ -217,6 +219,7 @@ export type DataDump = {
         };
         uid?: string;
         verify?: boolean;
+        version?: string;
     }>;
     Roles?: Array<{
         name?: string;

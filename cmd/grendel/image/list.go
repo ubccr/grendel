@@ -20,6 +20,7 @@ var (
 	listOptions *shared.TableOptions
 	listColumns = []shared.Column{
 		{Name: "Name"},
+		{Name: "Version"},
 		{Name: "Kernel"},
 		{Name: "Command Line", MinWidth: 10},
 		{Name: "Initrd"},
@@ -53,7 +54,7 @@ var (
 					fmt.Fprintf(&sb, "%s=%s", k, v.Value)
 				}
 
-				t.AppendRow(image.Name, image.Kernel, image.Cmdline.Value, strings.Join(image.Initrd, "\n"), sb.String(), strconv.FormatBool(image.Verify.Value))
+				t.AppendRow(image.Name, image.Version.Value, image.Kernel, image.Cmdline.Value, strings.Join(image.Initrd, "\n"), sb.String(), strconv.FormatBool(image.Verify.Value))
 			}
 
 			t.Print()

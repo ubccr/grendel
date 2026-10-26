@@ -351,7 +351,8 @@ func TestRenderString(t *testing.T) {
 	assert := assert.New(t)
 
 	host := &model.Host{Name: "cpn-01", Tags: []string{"gpu"}}
-	data := map[string]any{"host": host}
+	image := &model.BootImage{Name: "ubuntu", Version: "24.04.1"}
+	data := map[string]any{"host": host, "bootimage": image}
 
 	tests := []struct {
 		text    string
@@ -361,6 +362,7 @@ func TestRenderString(t *testing.T) {
 		{text: "/var/lib/grendel/images/vmlinuz", want: "/var/lib/grendel/images/vmlinuz"},
 		{text: "/images/{{ .host.Name }}/vmlinuz", want: "/images/cpn-01/vmlinuz"},
 		{text: `/images/{{ if hasTag .host "gpu" }}gpu{{ else }}cpu{{ end }}/vmlinuz`, want: "/images/gpu/vmlinuz"},
+		{text: "/images/{{ .bootimage.Name }}-{{ .bootimage.Version }}/vmlinuz", want: "/images/ubuntu-24.04.1/vmlinuz"},
 		{text: "/images/{{ .nic.Name }}/vmlinuz", wantErr: true},
 		{text: "/images/{{ .host.Name /vmlinuz", wantErr: true},
 	}

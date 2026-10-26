@@ -249,6 +249,11 @@ func (s *BootImage) SetFake() {
 			s.Verify.SetFake()
 		}
 	}
+	{
+		{
+			s.Version.SetFake()
+		}
+	}
 }
 
 // SetFake set fake values.
@@ -319,6 +324,11 @@ func (s *BootImageAddRequestBootImagesItem) SetFake() {
 	{
 		{
 			s.Verify.SetFake()
+		}
+	}
+	{
+		{
+			s.Version.SetFake()
 		}
 	}
 }
@@ -612,6 +622,11 @@ func (s *DataDumpImagesItem) SetFake() {
 	{
 		{
 			s.Verify.SetFake()
+		}
+	}
+	{
+		{
+			s.Version.SetFake()
 		}
 	}
 }

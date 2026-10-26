@@ -84,9 +84,12 @@ The `cmdline`, `kernel` and `initrd` fields are parsed with the same [text/templ
 ```bash
 grendel image add per-host \
 --kernel '/var/lib/grendel/images/{{ $.host.Name }}/vmlinuz' \
---initrd '/var/lib/grendel/images/{{ $.extra_vars.distro }}/initrd.img' \
+--version 24.04.1 \
+--initrd '/var/lib/grendel/images/ubuntu-{{ $.bootimage.Version }}/initrd.img' \
 --cmdline 'console=ttyS0 ip=dhcp inst.ks={{ $.endpoints.KickstartURL }}'
 ```
+
+The optional `version` field isn't used by Grendel itself, it exists so templates can reference it as `{{ $.bootimage.Version }}`, letting you move an image to a new release by changing one field.
 
 Paths without `{{` are used as is. Referencing a value that doesn't exist is an error, and the request fails rather than serving a partially rendered path.
 
@@ -96,7 +99,7 @@ The following data is available:
 |---|---|
 | `$.host` | The host being provisioned: `.Name`, `.UID`, `.Tags`, `.BootImage`, `.Interfaces`, `.Bonds` |
 | `$.nic` | The interface the host is booting from: `.MAC`, `.Name`, `.IP`, `.FQDN`, `.VLAN`, `.MTU` |
-| `$.bootimage` | The boot image: `.Name`, `.KernelPath`, `.InitrdPaths`, `.CommandLine`, `.Verify` (raw, unrendered values) |
+| `$.bootimage` | The boot image: `.Name`, `.Version`, `.KernelPath`, `.InitrdPaths`, `.CommandLine`, `.Verify` (raw, unrendered values) |
 | `$.endpoints` | Provision URLs, e.g. `.RepoURL`, `.KickstartURL`, `.CloudInitURL`, `.KernelURL` |
 | `$.headers` | HTTP request headers |
 | `$.extra_vars` | Values set under `provision.extra_vars` in the Grendel config |

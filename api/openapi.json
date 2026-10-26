@@ -220,6 +220,9 @@
 					},
 					"verify": {
 						"type": "boolean"
+					},
+					"version": {
+						"type": "string"
 					}
 				},
 				"required": [
@@ -272,6 +275,9 @@
 								},
 								"verify": {
 									"type": "boolean"
+								},
+								"version": {
+									"type": "string"
 								}
 							},
 							"type": "object"
@@ -442,6 +448,9 @@
 								},
 								"verify": {
 									"type": "boolean"
+								},
+								"version": {
+									"type": "string"
 								}
 							},
 							"type": "object"

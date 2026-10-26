@@ -703,6 +703,7 @@ func (s *SqlStore) StoreBootImages(images model.BootImageList) error {
 			ID:          null.NewInt(image.ID, image.ID != 0),
 			UID:         image.UID,
 			Name:        image.Name,
+			Version:     image.Version,
 			Path:        image.KernelPath,
 			CommandLine: null.NewString(image.CommandLine, len(image.CommandLine) != 0),
 			Verify:      image.Verify,

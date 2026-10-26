@@ -18,6 +18,7 @@ type BootImage struct {
 	ID                 int64             `json:"id" oai3:"nullable"`
 	UID                ksuid.KSUID       `json:"uid" oai3:"typeStr,nullable"`
 	Name               string            `json:"name" validate:"required"`
+	Version            string            `json:"version"`
 	KernelPath         string            `json:"kernel" validate:"required"`
 	InitrdPaths        []string          `json:"initrd"`
 	LiveImage          string            `json:"liveimg"` // Deprecated: not stored since sql migration

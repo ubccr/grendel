@@ -666,6 +666,7 @@ func (s *StoreTestSuite) TestBootImageUpdate() {
 	if s.Assert().NoError(err) {
 		s.Assert().Equal(image.Name, testImage.Name)
 		s.Assert().Equal(1, len(testImage.InitrdPaths))
+		s.Assert().Equal("", testImage.Version)
 		s.Assert().Contains(testImage.ProvisionTemplates, "post-install")
 		s.Assert().Contains(testImage.ProvisionTemplates, "kickstart")
 	}
@@ -679,6 +680,7 @@ func (s *StoreTestSuite) TestBootImageUpdate() {
 		"/path/2",
 	}
 	testImage.Verify = true
+	testImage.Version = "24.04.1"
 
 	err = s.db.StoreBootImage(testImage)
 	s.Assert().NoError(err)
@@ -690,6 +692,7 @@ func (s *StoreTestSuite) TestBootImageUpdate() {
 		s.Assert().NotContains(testImage.ProvisionTemplates, "post-install")
 		s.Assert().Contains(testImage.ProvisionTemplates, "kickstart")
 		s.Assert().Equal(true, testImage.Verify)
+		s.Assert().Equal("24.04.1", testImage.Version)
 	}
 }
 

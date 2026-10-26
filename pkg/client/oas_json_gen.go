@@ -1130,9 +1130,15 @@ func (s *BootImage) encodeFields(e *jx.Encoder) {
 			s.Verify.Encode(e)
 		}
 	}
+	{
+		if s.Version.Set {
+			e.FieldStart("version")
+			s.Version.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfBootImage = [9]string{
+var jsonFieldsNameOfBootImage = [10]string{
 	0: "cmdline",
 	1: "id",
 	2: "initrd",
@@ -1142,6 +1148,7 @@ var jsonFieldsNameOfBootImage = [9]string{
 	6: "provision_templates",
 	7: "uid",
 	8: "verify",
+	9: "version",
 }
 
 // Decode decodes BootImage from json.
@@ -1255,6 +1262,16 @@ func (s *BootImage) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"verify\"")
+			}
+		case "version":
+			if err := func() error {
+				s.Version.Reset()
+				if err := s.Version.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"version\"")
 			}
 		default:
 			return d.Skip()
@@ -1454,9 +1471,15 @@ func (s *BootImageAddRequestBootImagesItem) encodeFields(e *jx.Encoder) {
 			s.Verify.Encode(e)
 		}
 	}
+	{
+		if s.Version.Set {
+			e.FieldStart("version")
+			s.Version.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfBootImageAddRequestBootImagesItem = [9]string{
+var jsonFieldsNameOfBootImageAddRequestBootImagesItem = [10]string{
 	0: "cmdline",
 	1: "id",
 	2: "initrd",
@@ -1466,6 +1489,7 @@ var jsonFieldsNameOfBootImageAddRequestBootImagesItem = [9]string{
 	6: "provision_templates",
 	7: "uid",
 	8: "verify",
+	9: "version",
 }
 
 // Decode decodes BootImageAddRequestBootImagesItem from json.
@@ -1574,6 +1598,16 @@ func (s *BootImageAddRequestBootImagesItem) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"verify\"")
+			}
+		case "version":
+			if err := func() error {
+				s.Version.Reset()
+				if err := s.Version.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"version\"")
 			}
 		default:
 			return d.Skip()
@@ -2547,9 +2581,15 @@ func (s *DataDumpImagesItem) encodeFields(e *jx.Encoder) {
 			s.Verify.Encode(e)
 		}
 	}
+	{
+		if s.Version.Set {
+			e.FieldStart("version")
+			s.Version.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfDataDumpImagesItem = [9]string{
+var jsonFieldsNameOfDataDumpImagesItem = [10]string{
 	0: "cmdline",
 	1: "id",
 	2: "initrd",
@@ -2559,6 +2599,7 @@ var jsonFieldsNameOfDataDumpImagesItem = [9]string{
 	6: "provision_templates",
 	7: "uid",
 	8: "verify",
+	9: "version",
 }
 
 // Decode decodes DataDumpImagesItem from json.
@@ -2667,6 +2708,16 @@ func (s *DataDumpImagesItem) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"verify\"")
+			}
+		case "version":
+			if err := func() error {
+				s.Version.Reset()
+				if err := s.Version.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"version\"")
 			}
 		default:
 			return d.Skip()
