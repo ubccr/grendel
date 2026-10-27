@@ -1,5 +1,23 @@
 # Grendel Changelog
 
+## [0.2.10] - 2026-10-27
+
+Improves provisioning workflow by allowing Grendel to respond with different files depending on node architecture without creating separate boot images. Boot image versions can now be set to make booting different image versions easier.
+
+misc:
+- added boot image `Version` field
+- added node `Arch` field
+- added Arch alias helper functions for Debian and Mkosi syntax
+- bumped package versions
+
+provision:
+ - added go template support for kernel and initrd boot image fields
+ - fixed completed endpoint overwriting node changes made during provision process
+
+cli:
+ - fixed node token bmc requesting a boot interface
+ - added version and arch flags
+
 ## [0.2.9] - 2026-08-17
 
 > [!WARNING]
@@ -430,4 +448,5 @@ misc:
 [0.2.7]: https://github.com/ubccr/grendel/releases/tag/v0.2.7
 [0.2.8]: https://github.com/ubccr/grendel/releases/tag/v0.2.8
 [0.2.9]: https://github.com/ubccr/grendel/releases/tag/v0.2.9
-[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.9...HEAD
+[0.2.10]: https://github.com/ubccr/grendel/releases/tag/v0.2.10
+[Unreleased]: https://github.com/ubccr/grendel/compare/v0.2.10...HEAD
