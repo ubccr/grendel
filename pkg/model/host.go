@@ -54,7 +54,7 @@ func (h *Host) HostType() string {
 	return t
 }
 
-// ArchDebian returns the Debian/Go style name for the host arch (x86_64 -> amd64, aarch64 -> arm64), or the arch unchanged if it has no alias
+// ArchDebian returns the Debian style name for the host arch or the arch unchanged if it has no alias
 func (h *Host) ArchDebian() string {
 	switch h.Arch {
 	case "x86_64":
@@ -66,7 +66,7 @@ func (h *Host) ArchDebian() string {
 	return h.Arch
 }
 
-// ArchMkosi returns the host arch as mkosi names it in Architecture= and the %a specifier (x86_64 -> x86-64, aarch64 -> arm64), following mkosi's uname mapping, or the arch unchanged if it has no alias
+// ArchMkosi returns the host arch as mkosi names it in Architecture= and the %a specifier or the arch unchanged if it has no alias
 func (h *Host) ArchMkosi() string {
 	switch h.Arch {
 	case "x86_64":
