@@ -57,6 +57,10 @@ function TableComponent() {
       },
     },
     {
+      accessorKey: "version",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="version" />,
+    },
+    {
       accessorKey: "kernel",
       header: ({ column }) => <DataTableColumnHeader column={column} title="kernel" />,
     },

@@ -150,7 +150,10 @@ type GETV1NodesTokenInterfaceParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
 	Nodeset OptString
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
+	Tags OptString
+	// Arch to embed in the token, used in templates when the node has no arch set. Simulates the arch
+	// detected during a PXE boot.
+	Arch   OptString
 	Accept OptString
 }
 

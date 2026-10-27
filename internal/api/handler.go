@@ -94,6 +94,7 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 		option.Description("Create a boot token for the provision server. Used for debugging requests made by images"),
 		option.Path("interface", "interface token will be created for", param.Example("interface", "boot | bmc")),
 		filterNodes,
+		option.Query("arch", "Arch to embed in the token, used in templates when the node has no arch set. Simulates the arch detected during a PXE boot", param.Example("arch", "x86_64")),
 	)
 	fuego.Patch(nodes, "/image", h.NodeBootImage,
 		option.Description("Update nodes boot image by nodeset and/or tags"),

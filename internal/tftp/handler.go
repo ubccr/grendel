@@ -14,6 +14,8 @@ import (
 	"strings"
 
 	"github.com/pin/tftp/v3"
+	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/provision"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -41,15 +43,30 @@ func (s *Server) imageFileHandler(filePath string, rf io.ReaderFrom) error {
 		return err
 	}
 
+	// TFTP requests carry no host context so only image level data is available to path templates
+	data := map[string]any{
+		"bootimage":  bootImage,
+		"extra_vars": viper.GetStringMap("provision.extra_vars"),
+	}
+
 	switch {
 	case fileType == "kernel":
-		return s.sendFile(bootImage.KernelPath, rf)
+		kernel, err := provision.RenderString("kernel", bootImage.KernelPath, data)
+		if err != nil {
+			log.Errorf("Failed to render kernel path for image %s: %s", bootImage.Name, err)
+			return err
+		}
+		return s.sendFile(kernel, rf)
 	case strings.HasPrefix(fileType, "initrd-"):
 		i, err := strconv.Atoi(fileType[7:])
 		if err != nil || i < 0 || i >= len(bootImage.InitrdPaths) {
 			return fmt.Errorf("no initrd with ID %d", i)
 		}
-		initrd := bootImage.InitrdPaths[i]
+		initrd, err := provision.RenderString(fileType, bootImage.InitrdPaths[i], data)
+		if err != nil {
+			log.Errorf("Failed to render initrd path for image %s: %s", bootImage.Name, err)
+			return err
+		}
 		return s.sendFile(initrd, rf)
 	}
 

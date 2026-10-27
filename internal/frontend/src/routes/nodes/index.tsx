@@ -76,6 +76,10 @@ function TableComponent() {
       header: ({ column }) => <DataTableColumnHeader column={column} title="Boot Image" />,
     },
     {
+      accessorKey: "arch",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Arch" />,
+    },
+    {
       accessorKey: "tags",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Tags" />,
       cell: ({ row }) => {

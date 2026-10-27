@@ -8,8 +8,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
-	"path/filepath"
 
 	"github.com/segmentio/ksuid"
 )
@@ -20,6 +18,7 @@ type BootImage struct {
 	ID                 int64             `json:"id" oai3:"nullable"`
 	UID                ksuid.KSUID       `json:"uid" oai3:"typeStr,nullable"`
 	Name               string            `json:"name" validate:"required"`
+	Version            string            `json:"version"`
 	KernelPath         string            `json:"kernel" validate:"required"`
 	InitrdPaths        []string          `json:"initrd"`
 	LiveImage          string            `json:"liveimg"` // Deprecated: not stored since sql migration
@@ -44,33 +43,5 @@ func (b *BootImage) Scan(value interface{}) error {
 	}
 
 	*b = image
-	return nil
-}
-
-func (b *BootImage) CheckPathsExist() error {
-	if _, err := os.Stat(b.KernelPath); err != nil {
-		return err
-	}
-
-	for _, i := range b.InitrdPaths {
-		if _, err := os.Stat(i); err != nil {
-			return err
-		}
-	}
-
-	if b.LiveImage != "" {
-		if _, err := os.Stat(b.LiveImage); err != nil {
-			return err
-		}
-	}
-
-	if b.ProvisionTemplates != nil {
-		for _, tmpl := range b.ProvisionTemplates {
-			if _, err := os.Stat(filepath.Join("/var/lib/grendel/templates", tmpl)); err != nil {
-				return err
-			}
-		}
-	}
-
 	return nil
 }

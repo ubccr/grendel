@@ -27,6 +27,7 @@ type Host struct {
 	Bonds      []*Bond         `json:"bonds"`
 	Provision  bool            `json:"provision"`
 	Firmware   firmware.Build  `json:"firmware" oai3:"typeStr"`
+	Arch       string          `json:"arch"`
 	BootImage  string          `json:"boot_image"`
 	Tags       []string        `json:"tags" oai3:"nullable,typeStrArr"`
 }
@@ -52,6 +53,45 @@ func (h *Host) HostType() string {
 	}
 	return t
 }
+
+// ArchDebian returns the Debian style name for the host arch or the arch unchanged if it has no alias
+func (h *Host) ArchDebian() string {
+	switch h.Arch {
+	case "x86_64":
+		return "amd64"
+	case "aarch64":
+		return "arm64"
+	}
+
+	return h.Arch
+}
+
+// ArchMkosi returns the host arch as mkosi names it in Architecture= and the %a specifier or the arch unchanged if it has no alias
+func (h *Host) ArchMkosi() string {
+	switch h.Arch {
+	case "x86_64":
+		return "x86-64"
+	case "aarch64", "aarch64_be":
+		return "arm64"
+	case "i386", "i486", "i586", "i686":
+		return "x86"
+	case "ppc64le":
+		return "ppc64-le"
+	case "mips":
+		return "mips-le"
+	case "mips64":
+		return "mips64-le"
+	case "riscv":
+		return "riscv64"
+	}
+
+	if strings.HasPrefix(h.Arch, "armv") {
+		return "arm"
+	}
+
+	return h.Arch
+}
+
 func (h *Host) HasTags(tags ...string) bool {
 	for _, a := range tags {
 		found := false
@@ -131,6 +171,7 @@ func (h *Host) FromJSON(hostJSON string) {
 	h.ID = int64(gjson.Get(hostJSON, "id").Int())
 	h.UID, _ = ksuid.Parse(gjson.Get(hostJSON, "uid").String())
 	h.Firmware = firmware.NewFromString(gjson.Get(hostJSON, "firmware").String())
+	h.Arch = gjson.Get(hostJSON, "arch").String()
 
 	h.Interfaces = make([]*NetInterface, 0)
 	res := gjson.Get(hostJSON, "interfaces")
@@ -173,7 +214,7 @@ func (h *Host) FromJSON(hostJSON string) {
 }
 
 func (h *Host) ToJSON() string {
-	hostJSON := `{"firmware": "", "interfaces": [], "bonds": [], "name": "", "provision": false, "kickstart": false, "boot_image": "", "tags": []}`
+	hostJSON := `{"firmware": "", "arch": "", "interfaces": [], "bonds": [], "name": "", "provision": false, "kickstart": false, "boot_image": "", "tags": []}`
 
 	if !h.UID.IsNil() {
 		hostJSON, _ = sjson.Set(hostJSON, "uid", h.UID.String())
@@ -184,6 +225,7 @@ func (h *Host) ToJSON() string {
 	hostJSON, _ = sjson.Set(hostJSON, "name", h.Name)
 	hostJSON, _ = sjson.Set(hostJSON, "boot_image", h.BootImage)
 	hostJSON, _ = sjson.Set(hostJSON, "firmware", h.Firmware.String())
+	hostJSON, _ = sjson.Set(hostJSON, "arch", h.Arch)
 	hostJSON, _ = sjson.Set(hostJSON, "provision", h.Provision)
 
 	for _, nic := range h.Interfaces {

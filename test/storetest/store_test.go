@@ -666,6 +666,7 @@ func (s *StoreTestSuite) TestBootImageUpdate() {
 	if s.Assert().NoError(err) {
 		s.Assert().Equal(image.Name, testImage.Name)
 		s.Assert().Equal(1, len(testImage.InitrdPaths))
+		s.Assert().Equal("", testImage.Version)
 		s.Assert().Contains(testImage.ProvisionTemplates, "post-install")
 		s.Assert().Contains(testImage.ProvisionTemplates, "kickstart")
 	}
@@ -679,6 +680,7 @@ func (s *StoreTestSuite) TestBootImageUpdate() {
 		"/path/2",
 	}
 	testImage.Verify = true
+	testImage.Version = "24.04.1"
 
 	err = s.db.StoreBootImage(testImage)
 	s.Assert().NoError(err)
@@ -690,6 +692,7 @@ func (s *StoreTestSuite) TestBootImageUpdate() {
 		s.Assert().NotContains(testImage.ProvisionTemplates, "post-install")
 		s.Assert().Contains(testImage.ProvisionTemplates, "kickstart")
 		s.Assert().Equal(true, testImage.Verify)
+		s.Assert().Equal("24.04.1", testImage.Version)
 	}
 }
 
@@ -740,6 +743,48 @@ func (s *StoreTestSuite) TestHostUpdate() {
 			s.Assert().NotEqual(idCheck, h.UID.String())
 			idCheck = h.UID.String()
 		}
+	}
+}
+
+func (s *StoreTestSuite) TestHostArch() {
+	host := tests.HostFactory.MustCreate().(*model.Host)
+
+	err := s.db.StoreHost(host)
+	s.Assert().NoError(err)
+
+	testHost, err := s.db.LoadHostFromName(host.Name)
+	if s.Assert().NoError(err) {
+		s.Assert().Equal("", testHost.Arch)
+	}
+
+	// arch survives a round trip through StoreHost, and new names are added to the arch table
+	testHost.Arch = "riscv64"
+	err = s.db.StoreHost(testHost)
+	s.Assert().NoError(err)
+
+	testHost, err = s.db.LoadHostFromName(host.Name)
+	if s.Assert().NoError(err) {
+		s.Assert().Equal("riscv64", testHost.Arch)
+	}
+
+	// an existing arch name is reused
+	other := tests.HostFactory.MustCreate().(*model.Host)
+	other.Arch = "riscv64"
+	err = s.db.StoreHost(other)
+	s.Assert().NoError(err)
+
+	other, err = s.db.LoadHostFromName(other.Name)
+	if s.Assert().NoError(err) {
+		s.Assert().Equal("riscv64", other.Arch)
+	}
+
+	testHost.Arch = ""
+	err = s.db.StoreHost(testHost)
+	s.Assert().NoError(err)
+
+	testHost, err = s.db.LoadHostFromName(host.Name)
+	if s.Assert().NoError(err) {
+		s.Assert().Equal("", testHost.Arch)
 	}
 }
 

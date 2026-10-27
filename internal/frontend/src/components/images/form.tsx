@@ -78,6 +78,19 @@ export default function ImageForm({ data, reset }: { data?: BootImage; reset?: b
           )}
         />
         <form.Field
+          name="version"
+          children={(field) => (
+            <div>
+              <Label>Version:</Label>
+              <Input
+                value={field.state.value ?? ""}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+              />
+            </div>
+          )}
+        />
+        <form.Field
           name="kernel"
           children={(field) => (
             <div>

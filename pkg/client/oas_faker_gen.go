@@ -249,6 +249,11 @@ func (s *BootImage) SetFake() {
 			s.Verify.SetFake()
 		}
 	}
+	{
+		{
+			s.Version.SetFake()
+		}
+	}
 }
 
 // SetFake set fake values.
@@ -319,6 +324,11 @@ func (s *BootImageAddRequestBootImagesItem) SetFake() {
 	{
 		{
 			s.Verify.SetFake()
+		}
+	}
+	{
+		{
+			s.Version.SetFake()
 		}
 	}
 }
@@ -399,6 +409,11 @@ func (s *DataDump) SetFake() {
 
 // SetFake set fake values.
 func (s *DataDumpHostsItem) SetFake() {
+	{
+		{
+			s.Arch.SetFake()
+		}
+	}
 	{
 		{
 			s.Bonds = nil
@@ -612,6 +627,11 @@ func (s *DataDumpImagesItem) SetFake() {
 	{
 		{
 			s.Verify.SetFake()
+		}
+	}
+	{
+		{
+			s.Version.SetFake()
 		}
 	}
 }
@@ -1021,6 +1041,11 @@ func (s *HTTPErrorErrorsItemMore) SetFake() {
 
 // SetFake set fake values.
 func (s *Host) SetFake() {
+	{
+		{
+			s.Arch.SetFake()
+		}
+	}
 	{
 		{
 			s.Bonds = nil
@@ -1475,6 +1500,11 @@ func (s *NodeAddRequest) SetFake() {
 
 // SetFake set fake values.
 func (s *NodeAddRequestNodeListItem) SetFake() {
+	{
+		{
+			s.Arch.SetFake()
+		}
+	}
 	{
 		{
 			s.Bonds = nil

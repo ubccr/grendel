@@ -220,6 +220,9 @@
 					},
 					"verify": {
 						"type": "boolean"
+					},
+					"version": {
+						"type": "string"
 					}
 				},
 				"required": [
@@ -272,6 +275,9 @@
 								},
 								"verify": {
 									"type": "boolean"
+								},
+								"version": {
+									"type": "string"
 								}
 							},
 							"type": "object"
@@ -288,6 +294,9 @@
 						"items": {
 							"nullable": true,
 							"properties": {
+								"arch": {
+									"type": "string"
+								},
 								"bonds": {
 									"items": {
 										"nullable": true,
@@ -442,6 +451,9 @@
 								},
 								"verify": {
 									"type": "boolean"
+								},
+								"version": {
+									"type": "string"
 								}
 							},
 							"type": "object"
@@ -721,6 +733,9 @@
 			"Host": {
 				"description": "Host schema",
 				"properties": {
+					"arch": {
+						"type": "string"
+					},
 					"bonds": {
 						"items": {
 							"nullable": true,
@@ -936,6 +951,9 @@
 						"items": {
 							"nullable": true,
 							"properties": {
+								"arch": {
+									"type": "string"
+								},
 								"bonds": {
 									"items": {
 										"nullable": true,
@@ -4985,6 +5003,19 @@
 						},
 						"in": "query",
 						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Arch to embed in the token, used in templates when the node has no arch set. Simulates the arch detected during a PXE boot",
+						"examples": {
+							"arch": {
+								"value": "x86_64"
+							}
+						},
+						"in": "query",
+						"name": "arch",
 						"schema": {
 							"type": "string"
 						}

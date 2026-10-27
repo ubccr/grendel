@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/labstack/echo/v4"
@@ -342,5 +344,157 @@ func TestMetaData(t *testing.T) {
 		assert.Equal(http.StatusOK, rec.Code)
 		assert.Contains(rec.Body.String(), "instance-id")
 		assert.Contains(rec.Body.String(), host.UID.String())
+	}
+}
+
+func TestRenderString(t *testing.T) {
+	assert := assert.New(t)
+
+	host := &model.Host{Name: "cpn-01", Tags: []string{"gpu"}}
+	image := &model.BootImage{Name: "ubuntu", Version: "24.04.1"}
+	data := map[string]any{"host": host, "bootimage": image}
+
+	tests := []struct {
+		text    string
+		want    string
+		wantErr bool
+	}{
+		{text: "/var/lib/grendel/images/vmlinuz", want: "/var/lib/grendel/images/vmlinuz"},
+		{text: "/images/{{ .host.Name }}/vmlinuz", want: "/images/cpn-01/vmlinuz"},
+		{text: `/images/{{ if hasTag .host "gpu" }}gpu{{ else }}cpu{{ end }}/vmlinuz`, want: "/images/gpu/vmlinuz"},
+		{text: "/images/{{ .bootimage.Name }}-{{ .bootimage.Version }}/vmlinuz", want: "/images/ubuntu-24.04.1/vmlinuz"},
+		{text: "/images/{{ .nic.Name }}/vmlinuz", wantErr: true},
+		{text: "/images/{{ .host.Name /vmlinuz", wantErr: true},
+	}
+
+	for _, test := range tests {
+		got, err := RenderString("test", test.text, data)
+		if test.wantErr {
+			assert.Errorf(err, "expected error for %q", test.text)
+			continue
+		}
+		if assert.NoErrorf(err, "unexpected error for %q", test.text) {
+			assert.Equal(test.want, got)
+		}
+	}
+}
+
+func TestFileTemplatedPaths(t *testing.T) {
+	assert := assert.New(t)
+
+	h := &Handler{DB: newTestDB(t)}
+
+	host := tests.HostFactory.MustCreate().(*model.Host)
+	host.Provision = true
+
+	dir := t.TempDir()
+	hostDir := filepath.Join(dir, host.Name)
+	assert.NoError(os.MkdirAll(hostDir, 0755))
+	assert.NoError(os.WriteFile(filepath.Join(hostDir, "vmlinuz"), []byte("kernel-"+host.Name), 0644))
+	assert.NoError(os.WriteFile(filepath.Join(hostDir, "initrd.img"), []byte("initrd-"+host.Name), 0644))
+
+	image := tests.BootImageFactory.MustCreate().(*model.BootImage)
+	image.KernelPath = dir + "/{{ .host.Name }}/vmlinuz"
+	image.InitrdPaths = []string{dir + "/{{ .host.Name }}/initrd.img"}
+	err := h.DB.StoreBootImage(image)
+	assert.NoError(err)
+
+	host.BootImage = image.Name
+	err = h.DB.StoreHost(host)
+	assert.NoError(err)
+
+	token, err := model.NewBootToken(host.UID.String(), host.Interfaces[0].MAC.String())
+	assert.NoError(err)
+
+	files := map[string]string{
+		"kernel":   "kernel-" + host.Name,
+		"initrd-0": "initrd-" + host.Name,
+	}
+
+	for file, want := range files {
+		e := newTestEcho(t)
+		req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/boot/%s/file/%s", token, file), nil)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		c.SetPath("/boot/:token/file/*")
+		c.SetParamNames("token")
+		c.SetParamValues(token)
+
+		if assert.NoErrorf(TokenRequired(h.File)(c), "error fetching %s", file) {
+			assert.Equal(http.StatusOK, rec.Code)
+			assert.Equal(want, rec.Body.String())
+		}
+	}
+}
+
+func TestTokenArch(t *testing.T) {
+	assert := assert.New(t)
+
+	h := &Handler{DB: newTestDB(t)}
+
+	dir := t.TempDir()
+	for _, arch := range []string{"aarch64", "x86_64"} {
+		assert.NoError(os.MkdirAll(filepath.Join(dir, arch), 0755))
+		assert.NoError(os.WriteFile(filepath.Join(dir, arch, "vmlinuz"), []byte("kernel-"+arch), 0644))
+	}
+
+	image := tests.BootImageFactory.MustCreate().(*model.BootImage)
+	image.KernelPath = dir + "/{{ .host.Arch }}/vmlinuz"
+	err := h.DB.StoreBootImage(image)
+	assert.NoError(err)
+
+	detected := tests.HostFactory.MustCreate().(*model.Host)
+	detected.BootImage = image.Name
+	detected.Provision = true
+
+	manual := tests.HostFactory.MustCreate().(*model.Host)
+	manual.BootImage = image.Name
+	manual.Provision = true
+	manual.Arch = "x86_64"
+
+	err = h.DB.StoreHosts(model.HostList{detected, manual})
+	assert.NoError(err)
+
+	// the detected arch in the token is used when the host has none, a manual arch always wins
+	hosts := map[*model.Host]string{
+		detected: "kernel-aarch64",
+		manual:   "kernel-x86_64",
+	}
+
+	for host, want := range hosts {
+		token, err := model.NewBootTokenWithArch(host.UID.String(), host.Interfaces[0].MAC.String(), "aarch64")
+		assert.NoError(err)
+
+		e := newTestEcho(t)
+		req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/boot/%s/file/kernel", token), nil)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		c.SetPath("/boot/:token/file/*")
+		c.SetParamNames("token")
+		c.SetParamValues(token)
+
+		if assert.NoErrorf(TokenRequired(h.File)(c), "error fetching kernel for %s", host.Name) {
+			assert.Equal(want, rec.Body.String())
+		}
+	}
+
+	// completing the provision doesn't persist the detected arch
+	token, err := model.NewBootTokenWithArch(detected.UID.String(), detected.Interfaces[0].MAC.String(), "aarch64")
+	assert.NoError(err)
+
+	e := newTestEcho(t)
+	req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/boot/%s/complete", token), nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/boot/:token/complete")
+	c.SetParamNames("token")
+	c.SetParamValues(token)
+
+	if assert.NoError(TokenRequired(h.Complete)(c)) {
+		host, err := h.DB.LoadHostFromName(detected.Name)
+		if assert.NoError(err) {
+			assert.False(host.Provision)
+			assert.Equal("", host.Arch)
+		}
 	}
 }

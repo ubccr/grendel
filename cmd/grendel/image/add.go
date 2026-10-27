@@ -16,6 +16,7 @@ var (
 	kernel             string
 	provisionTemplates map[string]string
 	verify             bool
+	version            string
 	newCmd             = &cobra.Command{
 		Use:   "add <name>",
 		Short: "add image",
@@ -34,6 +35,7 @@ var (
 					Kernel:             client.NewOptString(kernel),
 					ProvisionTemplates: client.NewOptNilBootImageAddRequestBootImagesItemProvisionTemplates(provisionTemplatesMap),
 					Verify:             client.NewOptBool(verify),
+					Version:            client.NewOptString(version),
 				}),
 			}
 
@@ -57,6 +59,7 @@ func init() {
 	newCmd.Flags().StringSliceVar(&initrd, "initrd", nil, "Path to Initrd image")
 	newCmd.Flags().StringVar(&kernel, "kernel", "", "Path to Kernel")
 	newCmd.Flags().StringToStringVar(&provisionTemplates, "provision-template", nil, "Provision template map. Example: `kickstart=/path.tmpl`")
+	newCmd.Flags().StringVar(&version, "version", "", "Image version, available to templates as {{ $.bootimage.Version }}")
 	newCmd.Flags().BoolVar(&verify, "verify", false, "Verify the image through iPXE on boot. Requires a .sig file for the kernel & initrd in the same directory")
 
 	imageCmd.AddCommand(newCmd)

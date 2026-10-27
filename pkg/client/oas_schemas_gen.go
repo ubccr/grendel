@@ -402,6 +402,7 @@ type BootImage struct {
 	ProvisionTemplates OptNilBootImageProvisionTemplates `json:"provision_templates"`
 	UID                OptNilString                      `json:"uid"`
 	Verify             OptBool                           `json:"verify"`
+	Version            OptString                         `json:"version"`
 }
 
 // GetCmdline returns the value of Cmdline.
@@ -449,6 +450,11 @@ func (s *BootImage) GetVerify() OptBool {
 	return s.Verify
 }
 
+// GetVersion returns the value of Version.
+func (s *BootImage) GetVersion() OptString {
+	return s.Version
+}
+
 // SetCmdline sets the value of Cmdline.
 func (s *BootImage) SetCmdline(val OptString) {
 	s.Cmdline = val
@@ -494,6 +500,11 @@ func (s *BootImage) SetVerify(val OptBool) {
 	s.Verify = val
 }
 
+// SetVersion sets the value of Version.
+func (s *BootImage) SetVersion(val OptString) {
+	s.Version = val
+}
+
 // BootImageAddRequest schema.
 // Ref: #/components/schemas/BootImageAddRequest
 type BootImageAddRequest struct {
@@ -520,6 +531,7 @@ type BootImageAddRequestBootImagesItem struct {
 	ProvisionTemplates OptNilBootImageAddRequestBootImagesItemProvisionTemplates `json:"provision_templates"`
 	UID                OptNilString                                              `json:"uid"`
 	Verify             OptBool                                                   `json:"verify"`
+	Version            OptString                                                 `json:"version"`
 }
 
 // GetCmdline returns the value of Cmdline.
@@ -567,6 +579,11 @@ func (s *BootImageAddRequestBootImagesItem) GetVerify() OptBool {
 	return s.Verify
 }
 
+// GetVersion returns the value of Version.
+func (s *BootImageAddRequestBootImagesItem) GetVersion() OptString {
+	return s.Version
+}
+
 // SetCmdline sets the value of Cmdline.
 func (s *BootImageAddRequestBootImagesItem) SetCmdline(val OptString) {
 	s.Cmdline = val
@@ -610,6 +627,11 @@ func (s *BootImageAddRequestBootImagesItem) SetUID(val OptNilString) {
 // SetVerify sets the value of Verify.
 func (s *BootImageAddRequestBootImagesItem) SetVerify(val OptBool) {
 	s.Verify = val
+}
+
+// SetVersion sets the value of Version.
+func (s *BootImageAddRequestBootImagesItem) SetVersion(val OptString) {
+	s.Version = val
 }
 
 type BootImageAddRequestBootImagesItemProvisionTemplates map[string]NilString
@@ -698,6 +720,7 @@ func (s *DataDump) SetUsers(val []DataDumpUsersItem) {
 }
 
 type DataDumpHostsItem struct {
+	Arch       OptString                            `json:"arch"`
 	Bonds      []NilDataDumpHostsItemBondsItem      `json:"bonds"`
 	BootImage  OptString                            `json:"boot_image"`
 	Firmware   OptString                            `json:"firmware"`
@@ -707,6 +730,11 @@ type DataDumpHostsItem struct {
 	Provision  OptBool                              `json:"provision"`
 	Tags       OptNilStringArray                    `json:"tags"`
 	UID        OptNilString                         `json:"uid"`
+}
+
+// GetArch returns the value of Arch.
+func (s *DataDumpHostsItem) GetArch() OptString {
+	return s.Arch
 }
 
 // GetBonds returns the value of Bonds.
@@ -752,6 +780,11 @@ func (s *DataDumpHostsItem) GetTags() OptNilStringArray {
 // GetUID returns the value of UID.
 func (s *DataDumpHostsItem) GetUID() OptNilString {
 	return s.UID
+}
+
+// SetArch sets the value of Arch.
+func (s *DataDumpHostsItem) SetArch(val OptString) {
+	s.Arch = val
 }
 
 // SetBonds sets the value of Bonds.
@@ -1002,6 +1035,7 @@ type DataDumpImagesItem struct {
 	ProvisionTemplates OptNilDataDumpImagesItemProvisionTemplates `json:"provision_templates"`
 	UID                OptNilString                               `json:"uid"`
 	Verify             OptBool                                    `json:"verify"`
+	Version            OptString                                  `json:"version"`
 }
 
 // GetCmdline returns the value of Cmdline.
@@ -1049,6 +1083,11 @@ func (s *DataDumpImagesItem) GetVerify() OptBool {
 	return s.Verify
 }
 
+// GetVersion returns the value of Version.
+func (s *DataDumpImagesItem) GetVersion() OptString {
+	return s.Version
+}
+
 // SetCmdline sets the value of Cmdline.
 func (s *DataDumpImagesItem) SetCmdline(val OptString) {
 	s.Cmdline = val
@@ -1092,6 +1131,11 @@ func (s *DataDumpImagesItem) SetUID(val OptNilString) {
 // SetVerify sets the value of Verify.
 func (s *DataDumpImagesItem) SetVerify(val OptBool) {
 	s.Verify = val
+}
+
+// SetVersion sets the value of Version.
+func (s *DataDumpImagesItem) SetVersion(val OptString) {
+	s.Version = val
 }
 
 type DataDumpImagesItemProvisionTemplates map[string]NilString
@@ -1824,6 +1868,7 @@ func (s *HeaderAuth) SetToken(val string) {
 // Host schema.
 // Ref: #/components/schemas/Host
 type Host struct {
+	Arch       OptString               `json:"arch"`
 	Bonds      []NilHostBondsItem      `json:"bonds"`
 	BootImage  OptString               `json:"boot_image"`
 	Firmware   OptString               `json:"firmware"`
@@ -1833,6 +1878,11 @@ type Host struct {
 	Provision  OptBool                 `json:"provision"`
 	Tags       OptNilStringArray       `json:"tags"`
 	UID        OptNilString            `json:"uid"`
+}
+
+// GetArch returns the value of Arch.
+func (s *Host) GetArch() OptString {
+	return s.Arch
 }
 
 // GetBonds returns the value of Bonds.
@@ -1878,6 +1928,11 @@ func (s *Host) GetTags() OptNilStringArray {
 // GetUID returns the value of UID.
 func (s *Host) GetUID() OptNilString {
 	return s.UID
+}
+
+// SetArch sets the value of Arch.
+func (s *Host) SetArch(val OptString) {
+	s.Arch = val
 }
 
 // SetBonds sets the value of Bonds.
@@ -3613,6 +3668,7 @@ func (s *NodeAddRequest) SetNodeList(val []NilNodeAddRequestNodeListItem) {
 }
 
 type NodeAddRequestNodeListItem struct {
+	Arch       OptString                                     `json:"arch"`
 	Bonds      []NilNodeAddRequestNodeListItemBondsItem      `json:"bonds"`
 	BootImage  OptString                                     `json:"boot_image"`
 	Firmware   OptString                                     `json:"firmware"`
@@ -3622,6 +3678,11 @@ type NodeAddRequestNodeListItem struct {
 	Provision  OptBool                                       `json:"provision"`
 	Tags       OptNilStringArray                             `json:"tags"`
 	UID        OptNilString                                  `json:"uid"`
+}
+
+// GetArch returns the value of Arch.
+func (s *NodeAddRequestNodeListItem) GetArch() OptString {
+	return s.Arch
 }
 
 // GetBonds returns the value of Bonds.
@@ -3667,6 +3728,11 @@ func (s *NodeAddRequestNodeListItem) GetTags() OptNilStringArray {
 // GetUID returns the value of UID.
 func (s *NodeAddRequestNodeListItem) GetUID() OptNilString {
 	return s.UID
+}
+
+// SetArch sets the value of Arch.
+func (s *NodeAddRequestNodeListItem) SetArch(val OptString) {
+	s.Arch = val
 }
 
 // SetBonds sets the value of Bonds.
