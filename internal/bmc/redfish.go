@@ -18,6 +18,8 @@ import (
 	"github.com/ubccr/grendel/pkg/model"
 )
 
+var errNoJobService = errors.New("bmc does not have a job service")
+
 // Power will change the hosts power state
 func (r *Redfish) PowerControl(resetType schemas.ResetType, bootOverride schemas.BootSource) error {
 	ss, err := r.service.Systems()
@@ -103,8 +105,21 @@ func (r *Redfish) GetSystem() (*model.RedfishSystem, error) {
 	return system, nil
 }
 
-func (r *Redfish) GetJobInfo(jid string) (*schemas.Job, error) {
+// jobService returns the BMC's JobService or errNoJobService if it doesn't have one, as gofish returns a nil service and nil error in that case
+func (r *Redfish) jobService() (*schemas.JobService, error) {
 	js, err := r.service.JobService()
+	if err != nil {
+		return nil, err
+	}
+	if js == nil {
+		return nil, errNoJobService
+	}
+
+	return js, nil
+}
+
+func (r *Redfish) GetJobInfo(jid string) (*schemas.Job, error) {
+	js, err := r.jobService()
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +139,7 @@ func (r *Redfish) GetJobInfo(jid string) (*schemas.Job, error) {
 }
 
 func (r *Redfish) GetJobs() ([]*schemas.Job, error) {
-	js, err := r.service.JobService()
+	js, err := r.jobService()
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +147,7 @@ func (r *Redfish) GetJobs() ([]*schemas.Job, error) {
 	return js.Jobs()
 }
 func (r *Redfish) ClearJobs(ids []string) error {
-	js, err := r.service.JobService()
+	js, err := r.jobService()
 	if err != nil {
 		return err
 	}
@@ -323,7 +338,7 @@ func (r *Redfish) BmcImportConfiguration(st, path, file string) (string, error) 
 }
 
 func (r *Redfish) BmcGetJob(id string) (*schemas.Job, error) {
-	j, err := r.service.JobService()
+	j, err := r.jobService()
 	if err != nil {
 		return nil, err
 	}
@@ -357,7 +372,7 @@ func (r *Redfish) DellInstallFromRepo(body dell.InstallFromRepoBody) (*schemas.J
 	if err != nil {
 		return nil, err
 	}
-	js, err := r.service.JobService()
+	js, err := r.jobService()
 	if err != nil {
 		return nil, err
 	}
