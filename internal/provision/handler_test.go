@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/netip"
 	"os"
 	"path/filepath"
 	"testing"
@@ -15,6 +16,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
+	"github.com/ubccr/grendel/internal/config"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/store/sqlstore"
 	"github.com/ubccr/grendel/internal/tests"
@@ -124,6 +126,42 @@ func TestIpxe(t *testing.T) {
 	if assert.NoError(TokenRequired(h.Ipxe)(c)) {
 		assert.Equal(http.StatusOK, rec.Code)
 		assert.Contains(rec.Body.String(), "#!ipxe")
+	}
+}
+
+func TestIpxeURLsNonDefaultPort(t *testing.T) {
+	assert := assert.New(t)
+
+	origAddr := config.ProvisionAddr
+	t.Cleanup(func() { config.ProvisionAddr = origAddr })
+	config.ProvisionAddr = netip.MustParseAddrPort("0.0.0.0:8081")
+
+	h := &Handler{DB: newTestDB(t)}
+
+	image := tests.BootImageFactory.MustCreate().(*model.BootImage)
+	assert.NoError(h.DB.StoreBootImage(image))
+
+	host := tests.HostFactory.MustCreate().(*model.Host)
+	host.BootImage = image.Name
+	host.Provision = true
+	assert.NoError(h.DB.StoreHost(host))
+
+	token, err := model.NewBootToken(host.UID.String(), host.Interfaces[0].MAC.String())
+	assert.NoError(err)
+
+	e := newTestEcho(t)
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.Host = "127.0.0.1:8081"
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+	c.SetPath("/boot/:token/ipxe")
+	c.SetParamNames("token")
+	c.SetParamValues(token)
+
+	if assert.NoError(TokenRequired(h.Ipxe)(c)) {
+		assert.Equal(http.StatusOK, rec.Code)
+		assert.Contains(rec.Body.String(), "http://127.0.0.1:8081/boot/"+token+"/file/kernel")
+		assert.NotContains(rec.Body.String(), ":8081:8081")
 	}
 }
 

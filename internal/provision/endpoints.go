@@ -6,6 +6,7 @@ package provision
 
 import (
 	"fmt"
+	"net"
 
 	"github.com/ubccr/grendel/internal/config"
 )
@@ -54,6 +55,12 @@ func (e *Endpoints) BaseURL() string {
 	}
 
 	baseURL := fmt.Sprintf("%s://%s", config.ProvisionScheme, host)
+
+	// DHCP passes a bare IP while HTTP requests pass the Host header, which already includes any non default port
+	if _, _, err := net.SplitHostPort(host); err == nil {
+		return baseURL
+	}
+
 	if config.ProvisionAddr.Port() != 80 && config.ProvisionAddr.Port() != 443 {
 		baseURL += fmt.Sprintf(":%d", config.ProvisionAddr.Port())
 	}
