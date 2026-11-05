@@ -201,8 +201,8 @@ func (t *TemplateRenderer) Watch(ctx context.Context) error {
 			case <-debounceChan:
 				err := t.reload()
 				if err != nil {
-					log.WithError(err).Error("template hot reload failed")
-					return
+					log.WithError(err).Error("template hot reload failed, serving previous templates")
+					continue
 				}
 
 				log.Info("Successfully hot reloaded templates")
