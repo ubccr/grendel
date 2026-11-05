@@ -12,6 +12,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
 	"path/filepath"
 	"strings"
 	"sync/atomic"
@@ -246,10 +247,18 @@ func (t *TemplateRenderer) RenderIgnition(code int, name string, data any, c ech
 		Pretty: false,
 	}
 
-	// TODO: how should we handle warnings in the translation?
-	dataOut, _, err := config.TranslateBytes(buf.Bytes(), options)
+	dataOut, report, err := config.TranslateBytes(buf.Bytes(), options)
+	details := strings.TrimSpace(report.String())
 	if err != nil {
-		return err
+		if details != "" {
+			err = fmt.Errorf("%w: %s", err, details)
+		}
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to translate butane config").SetInternal(fmt.Errorf("template %s: %w", name, err))
+	}
+
+	// Strict like butane --strict, as Butane only warns about unknown keys and the node would boot without that config
+	if len(report.Entries) > 0 {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to translate butane config").SetInternal(fmt.Errorf("template %s: butane warnings: %s", name, details))
 	}
 
 	return c.HTMLBlob(code, dataOut)

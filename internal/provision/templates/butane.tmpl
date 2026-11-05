@@ -1,18 +1,21 @@
 variant: flatcar
 version: 1.0.0
+{{- if or $.extra_vars.root_password $.extra_vars.ssh_keys }}
 passwd:
+  users:
 {{- with $.extra_vars.root_password }}
     - name: root
       password_hash: {{ . }}
-{{ end }}
+{{- end }}
 {{- with $.extra_vars.ssh_keys }}
     - name: core
       ssh_authorized_keys:
       {{- range $i, $key := . }}
         - "{{ $key }}"
       {{- end }}
-{{ end }}
-
+{{- end }}
+{{- end }}
+storage:
   files:
     - path: /etc/systemd/network/10-static.network
       mode: 0644
