@@ -175,6 +175,8 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 	fuego.Get(bmc, "/identity/defaults", h.BmcIdentityDefaults,
 		option.Description("Get the location and asset tag templates configured as defaults"),
 	)
+	// a websocket, so it stays out of the OpenAPI spec, see BmcConsole for why it goes on the mux directly
+	s.Mux.Handle("GET /v1/bmc/console", h.authMiddleware(http.HandlerFunc(h.BmcConsole)))
 	fuego.Get(bmc, "/bios", h.BmcBios,
 		option.Description("Get the BIOS attributes of node(s), with any staged changes"),
 		option.Query("names", "Keep only these attributes", param.Example("names", "SriovGlobalEnable,ProcCStates")),

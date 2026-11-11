@@ -2,6 +2,7 @@ import { ActionSection } from "./action-card";
 import NodesAutoConfigAction from "./nodes/auto-config";
 import NodesBiosAction from "./nodes/bios";
 import NodesIdentityAction from "./nodes/identity";
+import NodesConsoleAction from "./nodes/console";
 import NodesBmcPowerAction from "./nodes/bmc-power";
 import NodesDeleteAction from "./nodes/delete";
 import NodesExportAction from "./nodes/export";
@@ -33,6 +34,7 @@ export default function NodesAction({ nodes }: { nodes: string }) {
       <NodesJobsAction nodes={nodes} />
       <NodesBiosAction nodes={nodes} />
       <NodesIdentityAction nodes={nodes} />
+      <NodesConsoleAction nodes={nodes} />
 
       <ActionSection title="Dell" />
       <NodesImportConfigAction nodes={nodes} />

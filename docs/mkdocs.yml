@@ -54,5 +54,6 @@ nav:
       - Kickstarting Live Images: advanced/kslive.md
       - iPXE: advanced/ipxe.md
       - BMC Compatibility Testing: advanced/bmc-compatibility.md
+      - Serial Console: advanced/serial-console.md
   - Integrations:
       - ClusterShell: integrations/clush.md

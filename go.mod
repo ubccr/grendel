@@ -12,8 +12,10 @@ require (
 	github.com/aristanetworks/goeapi v1.0.0
 	github.com/bits-and-blooms/bitset v1.24.6
 	github.com/bluele/factory-go v0.0.0-20181130035244-e6e8633dd3fe
+	github.com/bougou/go-ipmi v0.9.2-0.20261110105325-d4fb9c6923cb
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
+	github.com/coder/websocket v1.8.15
 	github.com/coreos/butane v0.27.0
 	github.com/dustin/go-humanize v1.0.1
 	github.com/fatih/color v1.19.0
@@ -135,9 +137,12 @@ require (
 	github.com/coreos/vcontext v0.0.0-20230201181013-d72178a18687 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/eknkc/basex v1.0.0 // indirect
+	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/kr/pretty v0.3.1 // indirect
+	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.16 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect
 	github.com/mattn/go-runewidth v0.0.24 // indirect

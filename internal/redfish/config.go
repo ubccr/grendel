@@ -34,6 +34,9 @@ func init() {
 	viper.SetDefault("bmc.gofish.dial_keep_alive_timeout", time.Second*30)
 	viper.SetDefault("bmc.gofish.tls_handshake_timeout", time.Second*10)
 	viper.SetDefault("bmc.gofish.idle_conn_timeout", time.Second*90)
+
+	viper.SetDefault("bmc.ipmi.port", 623)
+	viper.SetDefault("bmc.ipmi.cipher_suites", []int{17, 3})
 }
 
 // BMC username and password
@@ -60,6 +63,9 @@ type Config struct {
 	IdleConnTimeout       time.Duration
 	MaxConcurrentRequests int64
 	ReuseConnections      bool
+
+	IPMIPort         int
+	IPMICipherSuites []int
 }
 
 func ConfigFromViper() Config {
@@ -81,6 +87,9 @@ func ConfigFromViper() Config {
 
 		MaxConcurrentRequests: viper.GetInt64("bmc.gofish.max_concurrent_requests"),
 		ReuseConnections:      viper.GetBool("bmc.gofish.reuse_connections"),
+
+		IPMIPort:         viper.GetInt("bmc.ipmi.port"),
+		IPMICipherSuites: viper.GetIntSlice("bmc.ipmi.cipher_suites"),
 	}
 
 	if user := viper.GetString("bmc.user"); user != "" {

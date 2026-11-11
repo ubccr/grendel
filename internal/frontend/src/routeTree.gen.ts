@@ -33,6 +33,7 @@ import { Route as AccountRolesIndexRouteImport } from './routes/account/roles/in
 import { Route as AccountRolesRoleRouteImport } from './routes/account/roles/$role'
 import { Route as AccountUsersIndexRouteImport } from './routes/account/users/index'
 import { Route as NodesNodeBiosRouteImport } from './routes/nodes/$node/bios'
+import { Route as NodesNodeConsoleRouteImport } from './routes/nodes/$node/console'
 import { Route as NodesNodeLldpRouteImport } from './routes/nodes/$node/lldp'
 import { Route as NodesNodeNodeRouteImport } from './routes/nodes/$node/node'
 import { Route as NodesNodeRedfishRouteImport } from './routes/nodes/$node/redfish'
@@ -162,6 +163,11 @@ const NodesNodeBiosRoute = NodesNodeBiosRouteImport.update({
   path: '/bios',
   getParentRoute: () => NodesNodeRouteRoute,
 } as any)
+const NodesNodeConsoleRoute = NodesNodeConsoleRouteImport.update({
+  id: '/console',
+  path: '/console',
+  getParentRoute: () => NodesNodeRouteRoute,
+} as any)
 const NodesNodeLldpRoute = NodesNodeLldpRouteImport.update({
   id: '/lldp',
   path: '/lldp',
@@ -226,6 +232,7 @@ export interface FileRoutesByFullPath {
   '/templates/': typeof TemplatesIndexRoute
   '/account/roles/$role': typeof AccountRolesRoleRoute
   '/nodes/$node/bios': typeof NodesNodeBiosRoute
+  '/nodes/$node/console': typeof NodesNodeConsoleRoute
   '/nodes/$node/lldp': typeof NodesNodeLldpRoute
   '/nodes/$node/node': typeof NodesNodeNodeRoute
   '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
@@ -260,6 +267,7 @@ export interface FileRoutesByTo {
   '/templates': typeof TemplatesIndexRoute
   '/account/roles/$role': typeof AccountRolesRoleRoute
   '/nodes/$node/bios': typeof NodesNodeBiosRoute
+  '/nodes/$node/console': typeof NodesNodeConsoleRoute
   '/nodes/$node/lldp': typeof NodesNodeLldpRoute
   '/nodes/$node/node': typeof NodesNodeNodeRoute
   '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
@@ -295,6 +303,7 @@ export interface FileRoutesById {
   '/templates/': typeof TemplatesIndexRoute
   '/account/roles/$role': typeof AccountRolesRoleRoute
   '/nodes/$node/bios': typeof NodesNodeBiosRoute
+  '/nodes/$node/console': typeof NodesNodeConsoleRoute
   '/nodes/$node/lldp': typeof NodesNodeLldpRoute
   '/nodes/$node/node': typeof NodesNodeNodeRoute
   '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
@@ -331,6 +340,7 @@ export interface FileRouteTypes {
     | '/templates/'
     | '/account/roles/$role'
     | '/nodes/$node/bios'
+    | '/nodes/$node/console'
     | '/nodes/$node/lldp'
     | '/nodes/$node/node'
     | '/nodes/$node/redfish'
@@ -365,6 +375,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/account/roles/$role'
     | '/nodes/$node/bios'
+    | '/nodes/$node/console'
     | '/nodes/$node/lldp'
     | '/nodes/$node/node'
     | '/nodes/$node/redfish'
@@ -399,6 +410,7 @@ export interface FileRouteTypes {
     | '/templates/'
     | '/account/roles/$role'
     | '/nodes/$node/bios'
+    | '/nodes/$node/console'
     | '/nodes/$node/lldp'
     | '/nodes/$node/node'
     | '/nodes/$node/redfish'
@@ -612,6 +624,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NodesNodeBiosRouteImport
       parentRoute: typeof NodesNodeRouteRoute
     }
+    '/nodes/$node/console': {
+      id: '/nodes/$node/console'
+      path: '/console'
+      fullPath: '/nodes/$node/console'
+      preLoaderRoute: typeof NodesNodeConsoleRouteImport
+      parentRoute: typeof NodesNodeRouteRoute
+    }
     '/nodes/$node/lldp': {
       id: '/nodes/$node/lldp'
       path: '/lldp'
@@ -673,6 +692,7 @@ declare module '@tanstack/react-router' {
 
 interface NodesNodeRouteRouteChildren {
   NodesNodeBiosRoute: typeof NodesNodeBiosRoute
+  NodesNodeConsoleRoute: typeof NodesNodeConsoleRoute
   NodesNodeLldpRoute: typeof NodesNodeLldpRoute
   NodesNodeNodeRoute: typeof NodesNodeNodeRoute
   NodesNodeRedfishRoute: typeof NodesNodeRedfishRoute
@@ -680,6 +700,7 @@ interface NodesNodeRouteRouteChildren {
 
 const NodesNodeRouteRouteChildren: NodesNodeRouteRouteChildren = {
   NodesNodeBiosRoute: NodesNodeBiosRoute,
+  NodesNodeConsoleRoute: NodesNodeConsoleRoute,
   NodesNodeLldpRoute: NodesNodeLldpRoute,
   NodesNodeNodeRoute: NodesNodeNodeRoute,
   NodesNodeRedfishRoute: NodesNodeRedfishRoute,

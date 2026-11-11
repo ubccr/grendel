@@ -18,6 +18,7 @@ export default defineConfig(() => {
         "/v1": {
           target: "https://127.0.0.1:8080",
           secure: false,
+          ws: true,
         },
       },
     },

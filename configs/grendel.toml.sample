@@ -270,6 +270,14 @@ rate_limit_per_second = 30
 #room = ""
 #datacenter = ""
 
+[bmc.ipmi]
+# IPMI settings for the serial console, "grendel bmc console". The BMCs need
+# IPMI over LAN and SOL enabled, and UDP 623 reachable from this server
+port = 623
+# RMCP+ cipher suites to try, in order. 17 is the iDRAC9 default, 3 covers
+# older BMCs
+cipher_suites = [17, 3]
+
 [bmc.gofish]
 # Advanced gofish connection options. See https://github.com/ubccr/grendel/blob/main/internal/redfish/client.go for implementation details
 max_concurrent_requests = 1
