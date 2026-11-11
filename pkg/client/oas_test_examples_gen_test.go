@@ -107,6 +107,18 @@ func TestBmcImportConfigBody_EncodeDecode(t *testing.T) {
 	var typ2 BmcImportConfigBody
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestBmcIndicatorBody_EncodeDecode(t *testing.T) {
+	var typ BmcIndicatorBody
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcIndicatorBody
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestBmcInstallFirmwareBody_EncodeDecode(t *testing.T) {
 	var typ BmcInstallFirmwareBody
 	typ.SetFake()

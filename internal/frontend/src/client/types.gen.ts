@@ -92,6 +92,16 @@ export type BmcImportConfigBody = {
 };
 
 /**
+ * BmcIndicatorBody schema
+ */
+export type BmcIndicatorBody = {
+    /**
+     * on or off
+     */
+    state?: string;
+};
+
+/**
  * BmcInstallFirmwareBody schema
  */
 export type BmcInstallFirmwareBody = {
@@ -282,6 +292,7 @@ export type BmcResponseModelRedfishSystem = {
             boot_progress_time?: string;
             health?: string;
             host_name?: string;
+            location_indicator?: string;
             manufacturer?: string;
             model?: string;
             name?: string;
@@ -1102,6 +1113,50 @@ export type GetV1BmcFirmwareUpdatesResponses = {
 };
 
 export type GetV1BmcFirmwareUpdatesResponse = GetV1BmcFirmwareUpdatesResponses[keyof GetV1BmcFirmwareUpdatesResponses];
+
+export type PostV1BmcIndicatorData = {
+    /**
+     * Request body for api.BmcIndicatorBody
+     */
+    body: BmcIndicatorBody;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
+    };
+    url: '/v1/bmc/indicator';
+};
+
+export type PostV1BmcIndicatorErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type PostV1BmcIndicatorError = PostV1BmcIndicatorErrors[keyof PostV1BmcIndicatorErrors];
+
+export type PostV1BmcIndicatorResponses = {
+    /**
+     * OK
+     */
+    200: BmcResponseModelBmcAck;
+};
+
+export type PostV1BmcIndicatorResponse = PostV1BmcIndicatorResponses[keyof PostV1BmcIndicatorResponses];
 
 export type GetV1BmcJobsData = {
     body?: never;

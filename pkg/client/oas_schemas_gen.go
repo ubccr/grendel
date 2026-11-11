@@ -260,6 +260,23 @@ func (s *BmcImportConfigBody) SetShutdownType(val OptString) {
 	s.ShutdownType = val
 }
 
+// BmcIndicatorBody schema.
+// Ref: #/components/schemas/BmcIndicatorBody
+type BmcIndicatorBody struct {
+	// On or off.
+	State OptString `json:"state"`
+}
+
+// GetState returns the value of State.
+func (s *BmcIndicatorBody) GetState() OptString {
+	return s.State
+}
+
+// SetState sets the value of State.
+func (s *BmcIndicatorBody) SetState(val OptString) {
+	s.State = val
+}
+
 // BmcInstallFirmwareBody schema.
 // Ref: #/components/schemas/BmcInstallFirmwareBody
 type BmcInstallFirmwareBody struct {
@@ -1467,6 +1484,7 @@ type BmcResponseModelRedfishSystemResultsItemData struct {
 	BootProgressTime    OptString                                                 `json:"boot_progress_time"`
 	Health              OptString                                                 `json:"health"`
 	HostName            OptString                                                 `json:"host_name"`
+	LocationIndicator   OptString                                                 `json:"location_indicator"`
 	Manufacturer        OptString                                                 `json:"manufacturer"`
 	Model               OptString                                                 `json:"model"`
 	Name                OptString                                                 `json:"name"`
@@ -1528,6 +1546,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) GetHealth() OptString {
 // GetHostName returns the value of HostName.
 func (s *BmcResponseModelRedfishSystemResultsItemData) GetHostName() OptString {
 	return s.HostName
+}
+
+// GetLocationIndicator returns the value of LocationIndicator.
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetLocationIndicator() OptString {
+	return s.LocationIndicator
 }
 
 // GetManufacturer returns the value of Manufacturer.
@@ -1633,6 +1656,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) SetHealth(val OptString) 
 // SetHostName sets the value of HostName.
 func (s *BmcResponseModelRedfishSystemResultsItemData) SetHostName(val OptString) {
 	s.HostName = val
+}
+
+// SetLocationIndicator sets the value of LocationIndicator.
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetLocationIndicator(val OptString) {
+	s.LocationIndicator = val
 }
 
 // SetManufacturer sets the value of Manufacturer.

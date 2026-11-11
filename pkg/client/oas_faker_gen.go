@@ -132,6 +132,15 @@ func (s *BmcImportConfigBody) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *BmcIndicatorBody) SetFake() {
+	{
+		{
+			s.State.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
 func (s *BmcInstallFirmwareBody) SetFake() {
 	{
 		{
@@ -769,6 +778,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) SetFake() {
 	{
 		{
 			s.HostName.SetFake()
+		}
+	}
+	{
+		{
+			s.LocationIndicator.SetFake()
 		}
 	}
 	{

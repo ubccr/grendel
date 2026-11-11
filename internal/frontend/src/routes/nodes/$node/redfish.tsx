@@ -8,6 +8,7 @@ import { logSeverityColor } from "@/lib/bmc";
 import { cn, relativeTime } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 import {
   Activity,
   ArrowRight,
@@ -142,7 +143,8 @@ function Overview({ system, dell }: { system?: System; dell?: Dell }) {
   const inventoried = dell?.LastSystemInventoryTime
     ? relativeTime(dell.LastSystemInventoryTime)
     : undefined;
-  const facts: Array<[string, string | undefined, string?]> = [
+  // a fact is label, value, hover title, and what to show when it is more than the value
+  const facts: Array<[string, string | undefined, string?, ReactNode?]> = [
     ["Serial", system?.serial_number],
     ["Hostname", system?.host_name],
     ["Express service code", dell?.ExpressServiceCode],
@@ -152,6 +154,12 @@ function Overview({ system, dell }: { system?: System; dell?: Dell }) {
     ],
     ["Height", dell?.ChassisSystemHeightUnit ? `${dell.ChassisSystemHeightUnit}U` : undefined],
     ["Inventoried", inventoried?.text, inventoried?.title],
+    [
+      "Locate LED",
+      system?.location_indicator,
+      undefined,
+      <LedState key="led" state={system?.location_indicator} />,
+    ],
   ];
 
   return (
@@ -174,17 +182,38 @@ function Overview({ system, dell }: { system?: System; dell?: Dell }) {
         <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
           {facts
             .filter(([, value]) => value)
-            .map(([label, value, title]) => (
+            .map(([label, value, title, display]) => (
               <div key={label} className="min-w-0">
                 <dt className="text-xs text-muted-foreground">{label}</dt>
                 <dd className="truncate font-mono" title={title ?? value}>
-                  {value}
+                  {display ?? value}
                 </dd>
               </div>
             ))}
         </dl>
       </CardContent>
     </Card>
+  );
+}
+
+// LedState blinks a dot while the locate light is on, the way the light itself does in the rack
+function LedState({ state }: { state?: string }) {
+  const on = state === "On";
+  return (
+    <span className="inline-flex items-center gap-2">
+      <span className="relative ml-1 inline-flex size-2">
+        {on && (
+          <span className="absolute inline-flex size-full rounded-full bg-sky-400 opacity-75 motion-safe:animate-ping" />
+        )}
+        <span
+          className={cn(
+            "relative inline-flex size-2 rounded-full",
+            on ? "bg-sky-500" : "bg-muted-foreground/40",
+          )}
+        />
+      </span>
+      {state}
+    </span>
   );
 }
 

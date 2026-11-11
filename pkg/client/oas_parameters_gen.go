@@ -261,6 +261,17 @@ type POSTV1BmcFirmwareInstallParams struct {
 	Accept OptString
 }
 
+// POSTV1BmcIndicatorParams is parameters of POST_/v1/bmc/indicator operation.
+type POSTV1BmcIndicatorParams struct {
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
+	Accept OptString
+}
+
 // POSTV1BmcJobsClearParams is parameters of POST_/v1/bmc/jobs/clear operation.
 type POSTV1BmcJobsClearParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.

@@ -37,6 +37,10 @@ const (
 	TargetBMC  PowerTarget = "bmc"
 )
 
+type IndicatorRequest struct {
+	On bool
+}
+
 type ClearJobsRequest struct {
 	All bool
 	IDs []string
@@ -80,6 +84,11 @@ func (s *Service) Status(ctx context.Context, targets []Target) []NodeResult[mod
 // Power changes the power state of every target, or of their BMCs
 func (s *Service) Power(ctx context.Context, targets []Target, req PowerRequest) []NodeResult[Ack] {
 	return run(ctx, s, targets, func(ctx context.Context, t Target) (*Ack, error) { return s.powerOne(ctx, t, req) })
+}
+
+// Indicator turns the location indicator of every target on or off
+func (s *Service) Indicator(ctx context.Context, targets []Target, req IndicatorRequest) []NodeResult[Ack] {
+	return run(ctx, s, targets, func(ctx context.Context, t Target) (*Ack, error) { return s.indicatorOne(ctx, t, req) })
 }
 
 // Jobs lists the Redfish jobs queued on every target

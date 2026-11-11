@@ -46,6 +46,7 @@ delete from role_permission where permission_id in
     ('GET', '/v1/bmc/sel'),
     ('GET', '/v1/bmc/firmware/updates'),
     ('POST', '/v1/bmc/power'),
+    ('POST', '/v1/bmc/indicator'),
     ('POST', '/v1/bmc/jobs/clear'),
     ('POST', '/v1/bmc/sel/clear'),
     ('POST', '/v1/bmc/firmware/install')
@@ -59,6 +60,7 @@ delete from permission where (method, path) in
   ('GET', '/v1/bmc/sel'),
   ('GET', '/v1/bmc/firmware/updates'),
   ('POST', '/v1/bmc/power'),
+  ('POST', '/v1/bmc/indicator'),
   ('POST', '/v1/bmc/jobs/clear'),
   ('POST', '/v1/bmc/sel/clear'),
   ('POST', '/v1/bmc/firmware/install')

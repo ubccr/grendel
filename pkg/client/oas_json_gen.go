@@ -755,6 +755,69 @@ func (s *BmcImportConfigBody) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *BmcIndicatorBody) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcIndicatorBody) encodeFields(e *jx.Encoder) {
+	{
+		if s.State.Set {
+			e.FieldStart("state")
+			s.State.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcIndicatorBody = [1]string{
+	0: "state",
+}
+
+// Decode decodes BmcIndicatorBody from json.
+func (s *BmcIndicatorBody) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcIndicatorBody to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "state":
+			if err := func() error {
+				s.State.Reset()
+				if err := s.State.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"state\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcIndicatorBody")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcIndicatorBody) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcIndicatorBody) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *BmcInstallFirmwareBody) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -3537,6 +3600,12 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) encodeFields(e *jx.Encode
 		}
 	}
 	{
+		if s.LocationIndicator.Set {
+			e.FieldStart("location_indicator")
+			s.LocationIndicator.Encode(e)
+		}
+	}
+	{
 		if s.Manufacturer.Set {
 			e.FieldStart("manufacturer")
 			s.Manufacturer.Encode(e)
@@ -3604,7 +3673,7 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) encodeFields(e *jx.Encode
 	}
 }
 
-var jsonFieldsNameOfBmcResponseModelRedfishSystemResultsItemData = [21]string{
+var jsonFieldsNameOfBmcResponseModelRedfishSystemResultsItemData = [22]string{
 	0:  "bios_version",
 	1:  "boot_mode",
 	2:  "boot_next",
@@ -3615,17 +3684,18 @@ var jsonFieldsNameOfBmcResponseModelRedfishSystemResultsItemData = [21]string{
 	7:  "boot_progress_time",
 	8:  "health",
 	9:  "host_name",
-	10: "manufacturer",
-	11: "model",
-	12: "name",
-	13: "oem_dell",
-	14: "power_status",
-	15: "processor_cores",
-	16: "processor_count",
-	17: "processor_model",
-	18: "processor_sockets",
-	19: "serial_number",
-	20: "total_memory",
+	10: "location_indicator",
+	11: "manufacturer",
+	12: "model",
+	13: "name",
+	14: "oem_dell",
+	15: "power_status",
+	16: "processor_cores",
+	17: "processor_count",
+	18: "processor_model",
+	19: "processor_sockets",
+	20: "serial_number",
+	21: "total_memory",
 }
 
 // Decode decodes BmcResponseModelRedfishSystemResultsItemData from json.
@@ -3735,6 +3805,16 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"host_name\"")
+			}
+		case "location_indicator":
+			if err := func() error {
+				s.LocationIndicator.Reset()
+				if err := s.LocationIndicator.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"location_indicator\"")
 			}
 		case "manufacturer":
 			if err := func() error {

@@ -8,6 +8,7 @@ insert into permission(method, path) values
   ('GET', '/v1/bmc/sel'),
   ('GET', '/v1/bmc/firmware/updates'),
   ('POST', '/v1/bmc/power'),
+  ('POST', '/v1/bmc/indicator'),
   ('POST', '/v1/bmc/jobs/clear'),
   ('POST', '/v1/bmc/sel/clear'),
   ('POST', '/v1/bmc/firmware/install')
@@ -20,6 +21,7 @@ with replaced(old_method, old_path, new_method, new_path) as
     ('GET', '/v1/bmc', 'GET', '/v1/bmc/status'),
     ('GET', '/v1/bmc', 'GET', '/v1/bmc/sel'),
     ('POST', '/v1/bmc/power/os', 'POST', '/v1/bmc/power'),
+    ('POST', '/v1/bmc/power/os', 'POST', '/v1/bmc/indicator'),
     ('POST', '/v1/bmc/power/bmc', 'POST', '/v1/bmc/power'),
     ('DELETE', '/v1/bmc/sel', 'POST', '/v1/bmc/sel/clear'),
     ('DELETE', '/v1/bmc/jobs', 'POST', '/v1/bmc/jobs/clear'),
@@ -56,6 +58,7 @@ where role.name in ('admin', 'user')
   and (permission.method, permission.path) in
   (
     ('POST', '/v1/bmc/power'),
+    ('POST', '/v1/bmc/indicator'),
     ('POST', '/v1/bmc/jobs/clear'),
     ('POST', '/v1/bmc/sel/clear')
   )

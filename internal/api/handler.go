@@ -157,6 +157,11 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 		filterNodes,
 		selectAll,
 	)
+	fuego.Post(bmc, "/indicator", h.BmcIndicator,
+		option.Description("Turn the location indicator of node(s) on or off"),
+		filterNodes,
+		selectAll,
+	)
 	fuego.Get(bmc, "/jobs", h.BmcJobs,
 		option.Description("Get the redfish job queue of node(s)"),
 		filterNodes,

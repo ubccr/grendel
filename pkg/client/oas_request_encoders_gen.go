@@ -179,6 +179,20 @@ func encodePOSTV1BmcFirmwareInstallRequest(
 	return nil
 }
 
+func encodePOSTV1BmcIndicatorRequest(
+	req *BmcIndicatorBody,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
 func encodePOSTV1BmcJobsClearRequest(
 	req *BmcClearJobsBody,
 	r *http.Request,

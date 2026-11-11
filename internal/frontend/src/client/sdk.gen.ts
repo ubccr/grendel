@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteV1AuthSignoutData, DeleteV1AuthSignoutErrors, DeleteV1AuthSignoutResponses, DeleteV1ImagesData, DeleteV1ImagesErrors, DeleteV1ImagesResponses, DeleteV1NodesData, DeleteV1NodesErrors, DeleteV1NodesResponses, DeleteV1RolesNamesData, DeleteV1RolesNamesErrors, DeleteV1RolesNamesResponses, DeleteV1UsersUsernamesData, DeleteV1UsersUsernamesErrors, DeleteV1UsersUsernamesResponses, GetV1BmcFirmwareUpdatesData, GetV1BmcFirmwareUpdatesErrors, GetV1BmcFirmwareUpdatesResponses, GetV1BmcJobsData, GetV1BmcJobsErrors, GetV1BmcJobsResponses, GetV1BmcSelData, GetV1BmcSelErrors, GetV1BmcSelResponses, GetV1BmcStatusData, GetV1BmcStatusErrors, GetV1BmcStatusResponses, GetV1DbDumpData, GetV1DbDumpErrors, GetV1DbDumpResponses, GetV1GrendelEventsData, GetV1GrendelEventsErrors, GetV1GrendelEventsResponses, GetV1GrendelVersionData, GetV1GrendelVersionErrors, GetV1GrendelVersionResponses, GetV1ImagesData, GetV1ImagesErrors, GetV1ImagesFindData, GetV1ImagesFindErrors, GetV1ImagesFindResponses, GetV1ImagesResponses, GetV1NodesData, GetV1NodesErrors, GetV1NodesFindData, GetV1NodesFindErrors, GetV1NodesFindResponses, GetV1NodesResponses, GetV1NodesTokenInterfaceData, GetV1NodesTokenInterfaceErrors, GetV1NodesTokenInterfaceResponses, GetV1RolesData, GetV1RolesErrors, GetV1RolesResponses, GetV1SwitchNodesetLldpData, GetV1SwitchNodesetLldpErrors, GetV1SwitchNodesetLldpResponses, GetV1UsersData, GetV1UsersErrors, GetV1UsersResponses, PatchV1AuthResetData, PatchV1AuthResetErrors, PatchV1AuthResetResponses, PatchV1NodesImageData, PatchV1NodesImageErrors, PatchV1NodesImageResponses, PatchV1NodesProvisionData, PatchV1NodesProvisionErrors, PatchV1NodesProvisionResponses, PatchV1NodesTagsActionData, PatchV1NodesTagsActionErrors, PatchV1NodesTagsActionResponses, PatchV1RolesData, PatchV1RolesErrors, PatchV1RolesResponses, PatchV1UsersUsernamesEnableData, PatchV1UsersUsernamesEnableErrors, PatchV1UsersUsernamesEnableResponses, PatchV1UsersUsernamesRoleData, PatchV1UsersUsernamesRoleErrors, PatchV1UsersUsernamesRoleResponses, PostV1AuthSigninData, PostV1AuthSigninErrors, PostV1AuthSigninResponses, PostV1AuthSignupData, PostV1AuthSignupErrors, PostV1AuthSignupResponses, PostV1AuthTokenData, PostV1AuthTokenErrors, PostV1AuthTokenResponses, PostV1BmcConfigureAutoData, PostV1BmcConfigureAutoErrors, PostV1BmcConfigureAutoResponses, PostV1BmcConfigureImportData, PostV1BmcConfigureImportErrors, PostV1BmcConfigureImportResponses, PostV1BmcFirmwareInstallData, PostV1BmcFirmwareInstallErrors, PostV1BmcFirmwareInstallResponses, PostV1BmcJobsClearData, PostV1BmcJobsClearErrors, PostV1BmcJobsClearResponses, PostV1BmcPowerData, PostV1BmcPowerErrors, PostV1BmcPowerResponses, PostV1BmcSelClearData, PostV1BmcSelClearErrors, PostV1BmcSelClearResponses, PostV1DbRestoreData, PostV1DbRestoreErrors, PostV1DbRestoreResponses, PostV1ImagesData, PostV1ImagesErrors, PostV1ImagesResponses, PostV1NodesData, PostV1NodesErrors, PostV1NodesResponses, PostV1RolesData, PostV1RolesErrors, PostV1RolesResponses, PostV1UsersData, PostV1UsersErrors, PostV1UsersResponses } from './types.gen';
+import type { DeleteV1AuthSignoutData, DeleteV1AuthSignoutErrors, DeleteV1AuthSignoutResponses, DeleteV1ImagesData, DeleteV1ImagesErrors, DeleteV1ImagesResponses, DeleteV1NodesData, DeleteV1NodesErrors, DeleteV1NodesResponses, DeleteV1RolesNamesData, DeleteV1RolesNamesErrors, DeleteV1RolesNamesResponses, DeleteV1UsersUsernamesData, DeleteV1UsersUsernamesErrors, DeleteV1UsersUsernamesResponses, GetV1BmcFirmwareUpdatesData, GetV1BmcFirmwareUpdatesErrors, GetV1BmcFirmwareUpdatesResponses, GetV1BmcJobsData, GetV1BmcJobsErrors, GetV1BmcJobsResponses, GetV1BmcSelData, GetV1BmcSelErrors, GetV1BmcSelResponses, GetV1BmcStatusData, GetV1BmcStatusErrors, GetV1BmcStatusResponses, GetV1DbDumpData, GetV1DbDumpErrors, GetV1DbDumpResponses, GetV1GrendelEventsData, GetV1GrendelEventsErrors, GetV1GrendelEventsResponses, GetV1GrendelVersionData, GetV1GrendelVersionErrors, GetV1GrendelVersionResponses, GetV1ImagesData, GetV1ImagesErrors, GetV1ImagesFindData, GetV1ImagesFindErrors, GetV1ImagesFindResponses, GetV1ImagesResponses, GetV1NodesData, GetV1NodesErrors, GetV1NodesFindData, GetV1NodesFindErrors, GetV1NodesFindResponses, GetV1NodesResponses, GetV1NodesTokenInterfaceData, GetV1NodesTokenInterfaceErrors, GetV1NodesTokenInterfaceResponses, GetV1RolesData, GetV1RolesErrors, GetV1RolesResponses, GetV1SwitchNodesetLldpData, GetV1SwitchNodesetLldpErrors, GetV1SwitchNodesetLldpResponses, GetV1UsersData, GetV1UsersErrors, GetV1UsersResponses, PatchV1AuthResetData, PatchV1AuthResetErrors, PatchV1AuthResetResponses, PatchV1NodesImageData, PatchV1NodesImageErrors, PatchV1NodesImageResponses, PatchV1NodesProvisionData, PatchV1NodesProvisionErrors, PatchV1NodesProvisionResponses, PatchV1NodesTagsActionData, PatchV1NodesTagsActionErrors, PatchV1NodesTagsActionResponses, PatchV1RolesData, PatchV1RolesErrors, PatchV1RolesResponses, PatchV1UsersUsernamesEnableData, PatchV1UsersUsernamesEnableErrors, PatchV1UsersUsernamesEnableResponses, PatchV1UsersUsernamesRoleData, PatchV1UsersUsernamesRoleErrors, PatchV1UsersUsernamesRoleResponses, PostV1AuthSigninData, PostV1AuthSigninErrors, PostV1AuthSigninResponses, PostV1AuthSignupData, PostV1AuthSignupErrors, PostV1AuthSignupResponses, PostV1AuthTokenData, PostV1AuthTokenErrors, PostV1AuthTokenResponses, PostV1BmcConfigureAutoData, PostV1BmcConfigureAutoErrors, PostV1BmcConfigureAutoResponses, PostV1BmcConfigureImportData, PostV1BmcConfigureImportErrors, PostV1BmcConfigureImportResponses, PostV1BmcFirmwareInstallData, PostV1BmcFirmwareInstallErrors, PostV1BmcFirmwareInstallResponses, PostV1BmcIndicatorData, PostV1BmcIndicatorErrors, PostV1BmcIndicatorResponses, PostV1BmcJobsClearData, PostV1BmcJobsClearErrors, PostV1BmcJobsClearResponses, PostV1BmcPowerData, PostV1BmcPowerErrors, PostV1BmcPowerResponses, PostV1BmcSelClearData, PostV1BmcSelClearErrors, PostV1BmcSelClearResponses, PostV1DbRestoreData, PostV1DbRestoreErrors, PostV1DbRestoreResponses, PostV1ImagesData, PostV1ImagesErrors, PostV1ImagesResponses, PostV1NodesData, PostV1NodesErrors, PostV1NodesResponses, PostV1RolesData, PostV1RolesErrors, PostV1RolesResponses, PostV1UsersData, PostV1UsersErrors, PostV1UsersResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -307,6 +307,40 @@ export const getV1BmcFirmwareUpdates = <ThrowOnError extends boolean = false>(op
         }],
     url: '/v1/bmc/firmware/updates',
     ...options
+});
+
+/**
+ * bmc indicator
+ *
+ * #### Controller:
+ *
+ * `github.com/ubccr/grendel/internal/api.(*Handler).BmcIndicator`
+ *
+ * #### Middlewares:
+ *
+ * - `github.com/go-fuego/fuego.defaultLogger.middleware`
+ * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+ *
+ * ---
+ *
+ * Turn the location indicator of node(s) on or off
+ */
+export const postV1BmcIndicator = <ThrowOnError extends boolean = false>(options: Options<PostV1BmcIndicatorData, ThrowOnError>): RequestResult<PostV1BmcIndicatorResponses, PostV1BmcIndicatorErrors, ThrowOnError> => (options.client ?? client).post<PostV1BmcIndicatorResponses, PostV1BmcIndicatorErrors, ThrowOnError>({
+    security: [{
+            key: 'headerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'cookieAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/v1/bmc/indicator',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**

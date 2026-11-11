@@ -132,6 +132,17 @@
 				},
 				"type": "object"
 			},
+			"BmcIndicatorBody": {
+				"description": "BmcIndicatorBody schema",
+				"properties": {
+					"state": {
+						"description": "on or off",
+						"example": "on",
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
 			"BmcInstallFirmwareBody": {
 				"description": "BmcInstallFirmwareBody schema",
 				"properties": {
@@ -579,6 +590,9 @@
 											"type": "string"
 										},
 										"host_name": {
+											"type": "string"
+										},
+										"location_indicator": {
 											"type": "string"
 										},
 										"manufacturer": {
@@ -2680,6 +2694,111 @@
 					}
 				],
 				"summary": "bmc firmware updates",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/indicator": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcIndicator`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nTurn the location indicator of node(s) on or off",
+				"operationId": "POST_/v1/bmc/indicator",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BmcIndicatorBody"
+							}
+						}
+					},
+					"description": "Request body for api.BmcIndicatorBody",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc indicator",
 				"tags": [
 					"v1",
 					"bmc"

@@ -39,6 +39,7 @@ const (
 	POSTV1BmcConfigureAutoOperation      OperationName = "POSTV1BmcConfigureAuto"
 	POSTV1BmcConfigureImportOperation    OperationName = "POSTV1BmcConfigureImport"
 	POSTV1BmcFirmwareInstallOperation    OperationName = "POSTV1BmcFirmwareInstall"
+	POSTV1BmcIndicatorOperation          OperationName = "POSTV1BmcIndicator"
 	POSTV1BmcJobsClearOperation          OperationName = "POSTV1BmcJobsClear"
 	POSTV1BmcPowerOperation              OperationName = "POSTV1BmcPower"
 	POSTV1BmcSelClearOperation           OperationName = "POSTV1BmcSelClear"

@@ -41,6 +41,7 @@ type RedfishSystem struct {
 	BootMode            string          `json:"boot_mode" description:"UEFI or Legacy"`
 	BootNext            string          `json:"boot_next"`
 	BootOrder           []string        `json:"boot_order" oai3:"nullable"`
+	LocationIndicator   string          `json:"location_indicator" description:"On, Off, or empty when the bmc does not report one"`
 	OEMDell             *dell.OEMSystem `json:"oem_dell" oai3:"nullable"`
 }
 

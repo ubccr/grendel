@@ -55,6 +55,8 @@ func (s *Service) statusOne(ctx context.Context, t Target) (*model.RedfishSystem
 		BootMode:            string(sys.Boot.BootSourceOverrideMode),
 		BootNext:            sys.Boot.BootNext,
 		BootOrder:           sys.Boot.BootOrder,
+
+		LocationIndicator: indicatorState(sys),
 	}
 
 	// a failure parsing Dell's extra block should not cost the operator the standard fields above

@@ -32,6 +32,11 @@ type BmcPowerBody struct {
 	BootOverride string `json:"boot_override" description:"schemas.BootSource to boot from once. None, Pxe, Floppy, Cd, Usb, Hdd, BiosSetup, Utilities, Diags, UefiShell, UefiTarget, SDCard, UefiHttp, RemoteDrive, UefiBootNext, Recovery" example:"Pxe"`
 }
 
+// BmcIndicatorBody turns the location indicator on or off
+type BmcIndicatorBody struct {
+	State string `json:"state" description:"on or off" example:"on"`
+}
+
 // BmcClearJobsBody names what to clear. Clearing everything is its own field, so no job id is reserved to mean it
 type BmcClearJobsBody struct {
 	All bool     `json:"all" description:"Clear every job in the queue. Mutually exclusive with ids"`
@@ -63,6 +68,27 @@ func (h *Handler) BmcPower(c fuego.ContextWithBody[BmcPowerBody]) (model.BmcResp
 
 	return runAck(h, c, powerOperation(req), func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
 		return h.Redfish.Power(ctx, t, req)
+	})
+}
+
+// BmcIndicator turns the location indicator of node(s) on or off, so they can be found in the rack
+func (h *Handler) BmcIndicator(c fuego.ContextWithBody[BmcIndicatorBody]) (model.BmcResponse[model.BmcAck], error) {
+	body, err := c.Body()
+	if err != nil {
+		return model.BmcResponse[model.BmcAck]{}, badRequest(err, "failed to parse the indicator request")
+	}
+
+	var req redfish.IndicatorRequest
+	switch strings.ToLower(body.State) {
+	case "on":
+		req.On = true
+	case "off":
+	default:
+		return model.BmcResponse[model.BmcAck]{}, badRequest(fmt.Errorf("unknown indicator state %q", body.State), "state must be on or off")
+	}
+
+	return runAck(h, c, "bmc indicator "+strings.ToLower(body.State), func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
+		return h.Redfish.Indicator(ctx, t, req)
 	})
 }
 
