@@ -32,9 +32,11 @@ import { Route as TemplatesTemplateRouteImport } from './routes/templates/$templ
 import { Route as AccountRolesIndexRouteImport } from './routes/account/roles/index'
 import { Route as AccountRolesRoleRouteImport } from './routes/account/roles/$role'
 import { Route as AccountUsersIndexRouteImport } from './routes/account/users/index'
+import { Route as NodesNodeBiosRouteImport } from './routes/nodes/$node/bios'
 import { Route as NodesNodeLldpRouteImport } from './routes/nodes/$node/lldp'
 import { Route as NodesNodeNodeRouteImport } from './routes/nodes/$node/node'
 import { Route as NodesNodeRedfishRouteImport } from './routes/nodes/$node/redfish'
+import { Route as NodesBiosNodesRouteImport } from './routes/nodes/bios/$nodes'
 import { Route as NodesDellFirmwareNodesRouteImport } from './routes/nodes/dell-firmware/$nodes'
 import { Route as NodesJobsNodesRouteImport } from './routes/nodes/jobs/$nodes'
 import { Route as NodesSelNodesRouteImport } from './routes/nodes/sel/$nodes'
@@ -154,6 +156,11 @@ const AccountUsersIndexRoute = AccountUsersIndexRouteImport.update({
   path: '/account/users/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NodesNodeBiosRoute = NodesNodeBiosRouteImport.update({
+  id: '/bios',
+  path: '/bios',
+  getParentRoute: () => NodesNodeRouteRoute,
+} as any)
 const NodesNodeLldpRoute = NodesNodeLldpRouteImport.update({
   id: '/lldp',
   path: '/lldp',
@@ -168,6 +175,11 @@ const NodesNodeRedfishRoute = NodesNodeRedfishRouteImport.update({
   id: '/redfish',
   path: '/redfish',
   getParentRoute: () => NodesNodeRouteRoute,
+} as any)
+const NodesBiosNodesRoute = NodesBiosNodesRouteImport.update({
+  id: '/nodes/bios/$nodes',
+  path: '/nodes/bios/$nodes',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const NodesDellFirmwareNodesRoute = NodesDellFirmwareNodesRouteImport.update({
   id: '/nodes/dell-firmware/$nodes',
@@ -207,9 +219,11 @@ export interface FileRoutesByFullPath {
   '/racks/': typeof RacksIndexRoute
   '/templates/': typeof TemplatesIndexRoute
   '/account/roles/$role': typeof AccountRolesRoleRoute
+  '/nodes/$node/bios': typeof NodesNodeBiosRoute
   '/nodes/$node/lldp': typeof NodesNodeLldpRoute
   '/nodes/$node/node': typeof NodesNodeNodeRoute
   '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
+  '/nodes/bios/$nodes': typeof NodesBiosNodesRoute
   '/nodes/dell-firmware/$nodes': typeof NodesDellFirmwareNodesRoute
   '/nodes/jobs/$nodes': typeof NodesJobsNodesRoute
   '/nodes/sel/$nodes': typeof NodesSelNodesRoute
@@ -238,9 +252,11 @@ export interface FileRoutesByTo {
   '/racks': typeof RacksIndexRoute
   '/templates': typeof TemplatesIndexRoute
   '/account/roles/$role': typeof AccountRolesRoleRoute
+  '/nodes/$node/bios': typeof NodesNodeBiosRoute
   '/nodes/$node/lldp': typeof NodesNodeLldpRoute
   '/nodes/$node/node': typeof NodesNodeNodeRoute
   '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
+  '/nodes/bios/$nodes': typeof NodesBiosNodesRoute
   '/nodes/dell-firmware/$nodes': typeof NodesDellFirmwareNodesRoute
   '/nodes/jobs/$nodes': typeof NodesJobsNodesRoute
   '/nodes/sel/$nodes': typeof NodesSelNodesRoute
@@ -270,9 +286,11 @@ export interface FileRoutesById {
   '/racks/': typeof RacksIndexRoute
   '/templates/': typeof TemplatesIndexRoute
   '/account/roles/$role': typeof AccountRolesRoleRoute
+  '/nodes/$node/bios': typeof NodesNodeBiosRoute
   '/nodes/$node/lldp': typeof NodesNodeLldpRoute
   '/nodes/$node/node': typeof NodesNodeNodeRoute
   '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
+  '/nodes/bios/$nodes': typeof NodesBiosNodesRoute
   '/nodes/dell-firmware/$nodes': typeof NodesDellFirmwareNodesRoute
   '/nodes/jobs/$nodes': typeof NodesJobsNodesRoute
   '/nodes/sel/$nodes': typeof NodesSelNodesRoute
@@ -303,9 +321,11 @@ export interface FileRouteTypes {
     | '/racks/'
     | '/templates/'
     | '/account/roles/$role'
+    | '/nodes/$node/bios'
     | '/nodes/$node/lldp'
     | '/nodes/$node/node'
     | '/nodes/$node/redfish'
+    | '/nodes/bios/$nodes'
     | '/nodes/dell-firmware/$nodes'
     | '/nodes/jobs/$nodes'
     | '/nodes/sel/$nodes'
@@ -334,9 +354,11 @@ export interface FileRouteTypes {
     | '/racks'
     | '/templates'
     | '/account/roles/$role'
+    | '/nodes/$node/bios'
     | '/nodes/$node/lldp'
     | '/nodes/$node/node'
     | '/nodes/$node/redfish'
+    | '/nodes/bios/$nodes'
     | '/nodes/dell-firmware/$nodes'
     | '/nodes/jobs/$nodes'
     | '/nodes/sel/$nodes'
@@ -365,9 +387,11 @@ export interface FileRouteTypes {
     | '/racks/'
     | '/templates/'
     | '/account/roles/$role'
+    | '/nodes/$node/bios'
     | '/nodes/$node/lldp'
     | '/nodes/$node/node'
     | '/nodes/$node/redfish'
+    | '/nodes/bios/$nodes'
     | '/nodes/dell-firmware/$nodes'
     | '/nodes/jobs/$nodes'
     | '/nodes/sel/$nodes'
@@ -397,6 +421,7 @@ export interface RootRouteChildren {
   RacksIndexRoute: typeof RacksIndexRoute
   TemplatesIndexRoute: typeof TemplatesIndexRoute
   AccountRolesRoleRoute: typeof AccountRolesRoleRoute
+  NodesBiosNodesRoute: typeof NodesBiosNodesRoute
   NodesDellFirmwareNodesRoute: typeof NodesDellFirmwareNodesRoute
   NodesJobsNodesRoute: typeof NodesJobsNodesRoute
   NodesSelNodesRoute: typeof NodesSelNodesRoute
@@ -567,6 +592,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountUsersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/nodes/$node/bios': {
+      id: '/nodes/$node/bios'
+      path: '/bios'
+      fullPath: '/nodes/$node/bios'
+      preLoaderRoute: typeof NodesNodeBiosRouteImport
+      parentRoute: typeof NodesNodeRouteRoute
+    }
     '/nodes/$node/lldp': {
       id: '/nodes/$node/lldp'
       path: '/lldp'
@@ -587,6 +619,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/nodes/$node/redfish'
       preLoaderRoute: typeof NodesNodeRedfishRouteImport
       parentRoute: typeof NodesNodeRouteRoute
+    }
+    '/nodes/bios/$nodes': {
+      id: '/nodes/bios/$nodes'
+      path: '/nodes/bios/$nodes'
+      fullPath: '/nodes/bios/$nodes'
+      preLoaderRoute: typeof NodesBiosNodesRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/nodes/dell-firmware/$nodes': {
       id: '/nodes/dell-firmware/$nodes'
@@ -613,12 +652,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface NodesNodeRouteRouteChildren {
+  NodesNodeBiosRoute: typeof NodesNodeBiosRoute
   NodesNodeLldpRoute: typeof NodesNodeLldpRoute
   NodesNodeNodeRoute: typeof NodesNodeNodeRoute
   NodesNodeRedfishRoute: typeof NodesNodeRedfishRoute
 }
 
 const NodesNodeRouteRouteChildren: NodesNodeRouteRouteChildren = {
+  NodesNodeBiosRoute: NodesNodeBiosRoute,
   NodesNodeLldpRoute: NodesNodeLldpRoute,
   NodesNodeNodeRoute: NodesNodeNodeRoute,
   NodesNodeRedfishRoute: NodesNodeRedfishRoute,
@@ -650,6 +691,7 @@ const rootRouteChildren: RootRouteChildren = {
   RacksIndexRoute: RacksIndexRoute,
   TemplatesIndexRoute: TemplatesIndexRoute,
   AccountRolesRoleRoute: AccountRolesRoleRoute,
+  NodesBiosNodesRoute: NodesBiosNodesRoute,
   NodesDellFirmwareNodesRoute: NodesDellFirmwareNodesRoute,
   NodesJobsNodesRoute: NodesJobsNodesRoute,
   NodesSelNodesRoute: NodesSelNodesRoute,

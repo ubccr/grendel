@@ -578,6 +578,722 @@ func (s *BmcResponseModelBmcAckSummary) SetTotal(val OptInt) {
 	s.Total = val
 }
 
+// BmcResponse_model.BmcBios schema.
+// Ref: #/components/schemas/BmcResponse_model.BmcBios
+type BmcResponseModelBmcBios struct {
+	Results OptNilNilBmcResponseModelBmcBiosResultsItemArray `json:"results"`
+	RunID   OptString                                        `json:"run_id"`
+	Summary OptBmcResponseModelBmcBiosSummary                `json:"summary"`
+}
+
+// GetResults returns the value of Results.
+func (s *BmcResponseModelBmcBios) GetResults() OptNilNilBmcResponseModelBmcBiosResultsItemArray {
+	return s.Results
+}
+
+// GetRunID returns the value of RunID.
+func (s *BmcResponseModelBmcBios) GetRunID() OptString {
+	return s.RunID
+}
+
+// GetSummary returns the value of Summary.
+func (s *BmcResponseModelBmcBios) GetSummary() OptBmcResponseModelBmcBiosSummary {
+	return s.Summary
+}
+
+// SetResults sets the value of Results.
+func (s *BmcResponseModelBmcBios) SetResults(val OptNilNilBmcResponseModelBmcBiosResultsItemArray) {
+	s.Results = val
+}
+
+// SetRunID sets the value of RunID.
+func (s *BmcResponseModelBmcBios) SetRunID(val OptString) {
+	s.RunID = val
+}
+
+// SetSummary sets the value of Summary.
+func (s *BmcResponseModelBmcBios) SetSummary(val OptBmcResponseModelBmcBiosSummary) {
+	s.Summary = val
+}
+
+// BmcResponse_model.BmcBiosRegistry schema.
+// Ref: #/components/schemas/BmcResponse_model.BmcBiosRegistry
+type BmcResponseModelBmcBiosRegistry struct {
+	Results OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray `json:"results"`
+	RunID   OptString                                                `json:"run_id"`
+	Summary OptBmcResponseModelBmcBiosRegistrySummary                `json:"summary"`
+}
+
+// GetResults returns the value of Results.
+func (s *BmcResponseModelBmcBiosRegistry) GetResults() OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray {
+	return s.Results
+}
+
+// GetRunID returns the value of RunID.
+func (s *BmcResponseModelBmcBiosRegistry) GetRunID() OptString {
+	return s.RunID
+}
+
+// GetSummary returns the value of Summary.
+func (s *BmcResponseModelBmcBiosRegistry) GetSummary() OptBmcResponseModelBmcBiosRegistrySummary {
+	return s.Summary
+}
+
+// SetResults sets the value of Results.
+func (s *BmcResponseModelBmcBiosRegistry) SetResults(val OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) {
+	s.Results = val
+}
+
+// SetRunID sets the value of RunID.
+func (s *BmcResponseModelBmcBiosRegistry) SetRunID(val OptString) {
+	s.RunID = val
+}
+
+// SetSummary sets the value of Summary.
+func (s *BmcResponseModelBmcBiosRegistry) SetSummary(val OptBmcResponseModelBmcBiosRegistrySummary) {
+	s.Summary = val
+}
+
+type BmcResponseModelBmcBiosRegistryResultsItem struct {
+	Data       OptNilBmcResponseModelBmcBiosRegistryResultsItemData `json:"data"`
+	DurationMs OptInt64                                             `json:"duration_ms"`
+	Message    OptString                                            `json:"message"`
+	Node       OptString                                            `json:"node"`
+	Success    OptBool                                              `json:"success"`
+}
+
+// GetData returns the value of Data.
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) GetData() OptNilBmcResponseModelBmcBiosRegistryResultsItemData {
+	return s.Data
+}
+
+// GetDurationMs returns the value of DurationMs.
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) GetDurationMs() OptInt64 {
+	return s.DurationMs
+}
+
+// GetMessage returns the value of Message.
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) GetMessage() OptString {
+	return s.Message
+}
+
+// GetNode returns the value of Node.
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) GetNode() OptString {
+	return s.Node
+}
+
+// GetSuccess returns the value of Success.
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) GetSuccess() OptBool {
+	return s.Success
+}
+
+// SetData sets the value of Data.
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) SetData(val OptNilBmcResponseModelBmcBiosRegistryResultsItemData) {
+	s.Data = val
+}
+
+// SetDurationMs sets the value of DurationMs.
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) SetDurationMs(val OptInt64) {
+	s.DurationMs = val
+}
+
+// SetMessage sets the value of Message.
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) SetMessage(val OptString) {
+	s.Message = val
+}
+
+// SetNode sets the value of Node.
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) SetNode(val OptString) {
+	s.Node = val
+}
+
+// SetSuccess sets the value of Success.
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) SetSuccess(val OptBool) {
+	s.Success = val
+}
+
+type BmcResponseModelBmcBiosRegistryResultsItemData struct {
+	Attributes []BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem `json:"attributes"`
+	Available  OptBool                                                        `json:"available"`
+	Language   OptString                                                      `json:"language"`
+	Registry   OptString                                                      `json:"registry"`
+	Version    OptString                                                      `json:"version"`
+}
+
+// GetAttributes returns the value of Attributes.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) GetAttributes() []BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem {
+	return s.Attributes
+}
+
+// GetAvailable returns the value of Available.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) GetAvailable() OptBool {
+	return s.Available
+}
+
+// GetLanguage returns the value of Language.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) GetLanguage() OptString {
+	return s.Language
+}
+
+// GetRegistry returns the value of Registry.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) GetRegistry() OptString {
+	return s.Registry
+}
+
+// GetVersion returns the value of Version.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) GetVersion() OptString {
+	return s.Version
+}
+
+// SetAttributes sets the value of Attributes.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) SetAttributes(val []BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) {
+	s.Attributes = val
+}
+
+// SetAvailable sets the value of Available.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) SetAvailable(val OptBool) {
+	s.Available = val
+}
+
+// SetLanguage sets the value of Language.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) SetLanguage(val OptString) {
+	s.Language = val
+}
+
+// SetRegistry sets the value of Registry.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) SetRegistry(val OptString) {
+	s.Registry = val
+}
+
+// SetVersion sets the value of Version.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) SetVersion(val OptString) {
+	s.Version = val
+}
+
+type BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem struct {
+	DefaultValue  jx.Raw                                                                   `json:"default_value"`
+	DisplayName   OptString                                                                `json:"display_name"`
+	DisplayOrder  OptInt                                                                   `json:"display_order"`
+	GrayOut       OptBool                                                                  `json:"gray_out"`
+	HelpText      OptString                                                                `json:"help_text"`
+	Hidden        OptBool                                                                  `json:"hidden"`
+	Immutable     OptBool                                                                  `json:"immutable"`
+	LowerBound    OptNilInt64                                                              `json:"lower_bound"`
+	MaxLength     OptNilInt                                                                `json:"max_length"`
+	MenuPath      OptString                                                                `json:"menu_path"`
+	MinLength     OptNilInt                                                                `json:"min_length"`
+	Name          OptString                                                                `json:"name"`
+	ReadOnly      OptBool                                                                  `json:"read_only"`
+	ResetRequired OptBool                                                                  `json:"reset_required"`
+	SystemUnique  OptBool                                                                  `json:"system_unique"`
+	Type          OptString                                                                `json:"type"`
+	UpperBound    OptNilInt64                                                              `json:"upper_bound"`
+	Values        []BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem `json:"values"`
+	WarningText   OptString                                                                `json:"warning_text"`
+	WriteOnly     OptBool                                                                  `json:"write_only"`
+}
+
+// GetDefaultValue returns the value of DefaultValue.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetDefaultValue() jx.Raw {
+	return s.DefaultValue
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetDisplayName() OptString {
+	return s.DisplayName
+}
+
+// GetDisplayOrder returns the value of DisplayOrder.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetDisplayOrder() OptInt {
+	return s.DisplayOrder
+}
+
+// GetGrayOut returns the value of GrayOut.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetGrayOut() OptBool {
+	return s.GrayOut
+}
+
+// GetHelpText returns the value of HelpText.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetHelpText() OptString {
+	return s.HelpText
+}
+
+// GetHidden returns the value of Hidden.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetHidden() OptBool {
+	return s.Hidden
+}
+
+// GetImmutable returns the value of Immutable.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetImmutable() OptBool {
+	return s.Immutable
+}
+
+// GetLowerBound returns the value of LowerBound.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetLowerBound() OptNilInt64 {
+	return s.LowerBound
+}
+
+// GetMaxLength returns the value of MaxLength.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetMaxLength() OptNilInt {
+	return s.MaxLength
+}
+
+// GetMenuPath returns the value of MenuPath.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetMenuPath() OptString {
+	return s.MenuPath
+}
+
+// GetMinLength returns the value of MinLength.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetMinLength() OptNilInt {
+	return s.MinLength
+}
+
+// GetName returns the value of Name.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetName() OptString {
+	return s.Name
+}
+
+// GetReadOnly returns the value of ReadOnly.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetReadOnly() OptBool {
+	return s.ReadOnly
+}
+
+// GetResetRequired returns the value of ResetRequired.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetResetRequired() OptBool {
+	return s.ResetRequired
+}
+
+// GetSystemUnique returns the value of SystemUnique.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetSystemUnique() OptBool {
+	return s.SystemUnique
+}
+
+// GetType returns the value of Type.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetType() OptString {
+	return s.Type
+}
+
+// GetUpperBound returns the value of UpperBound.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetUpperBound() OptNilInt64 {
+	return s.UpperBound
+}
+
+// GetValues returns the value of Values.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetValues() []BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem {
+	return s.Values
+}
+
+// GetWarningText returns the value of WarningText.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetWarningText() OptString {
+	return s.WarningText
+}
+
+// GetWriteOnly returns the value of WriteOnly.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetWriteOnly() OptBool {
+	return s.WriteOnly
+}
+
+// SetDefaultValue sets the value of DefaultValue.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetDefaultValue(val jx.Raw) {
+	s.DefaultValue = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetDisplayName(val OptString) {
+	s.DisplayName = val
+}
+
+// SetDisplayOrder sets the value of DisplayOrder.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetDisplayOrder(val OptInt) {
+	s.DisplayOrder = val
+}
+
+// SetGrayOut sets the value of GrayOut.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetGrayOut(val OptBool) {
+	s.GrayOut = val
+}
+
+// SetHelpText sets the value of HelpText.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetHelpText(val OptString) {
+	s.HelpText = val
+}
+
+// SetHidden sets the value of Hidden.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetHidden(val OptBool) {
+	s.Hidden = val
+}
+
+// SetImmutable sets the value of Immutable.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetImmutable(val OptBool) {
+	s.Immutable = val
+}
+
+// SetLowerBound sets the value of LowerBound.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetLowerBound(val OptNilInt64) {
+	s.LowerBound = val
+}
+
+// SetMaxLength sets the value of MaxLength.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetMaxLength(val OptNilInt) {
+	s.MaxLength = val
+}
+
+// SetMenuPath sets the value of MenuPath.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetMenuPath(val OptString) {
+	s.MenuPath = val
+}
+
+// SetMinLength sets the value of MinLength.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetMinLength(val OptNilInt) {
+	s.MinLength = val
+}
+
+// SetName sets the value of Name.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetReadOnly sets the value of ReadOnly.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetReadOnly(val OptBool) {
+	s.ReadOnly = val
+}
+
+// SetResetRequired sets the value of ResetRequired.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetResetRequired(val OptBool) {
+	s.ResetRequired = val
+}
+
+// SetSystemUnique sets the value of SystemUnique.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetSystemUnique(val OptBool) {
+	s.SystemUnique = val
+}
+
+// SetType sets the value of Type.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetType(val OptString) {
+	s.Type = val
+}
+
+// SetUpperBound sets the value of UpperBound.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetUpperBound(val OptNilInt64) {
+	s.UpperBound = val
+}
+
+// SetValues sets the value of Values.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetValues(val []BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem) {
+	s.Values = val
+}
+
+// SetWarningText sets the value of WarningText.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetWarningText(val OptString) {
+	s.WarningText = val
+}
+
+// SetWriteOnly sets the value of WriteOnly.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetWriteOnly(val OptBool) {
+	s.WriteOnly = val
+}
+
+type BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem struct {
+	DisplayName OptString `json:"display_name"`
+	Name        OptString `json:"name"`
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem) GetDisplayName() OptString {
+	return s.DisplayName
+}
+
+// GetName returns the value of Name.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem) GetName() OptString {
+	return s.Name
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem) SetDisplayName(val OptString) {
+	s.DisplayName = val
+}
+
+// SetName sets the value of Name.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem) SetName(val OptString) {
+	s.Name = val
+}
+
+type BmcResponseModelBmcBiosRegistrySummary struct {
+	DurationMs  OptInt64  `json:"duration_ms"`
+	Failed      OptInt    `json:"failed"`
+	FailedNodes OptString `json:"failed_nodes"`
+	Succeeded   OptInt    `json:"succeeded"`
+	Total       OptInt    `json:"total"`
+}
+
+// GetDurationMs returns the value of DurationMs.
+func (s *BmcResponseModelBmcBiosRegistrySummary) GetDurationMs() OptInt64 {
+	return s.DurationMs
+}
+
+// GetFailed returns the value of Failed.
+func (s *BmcResponseModelBmcBiosRegistrySummary) GetFailed() OptInt {
+	return s.Failed
+}
+
+// GetFailedNodes returns the value of FailedNodes.
+func (s *BmcResponseModelBmcBiosRegistrySummary) GetFailedNodes() OptString {
+	return s.FailedNodes
+}
+
+// GetSucceeded returns the value of Succeeded.
+func (s *BmcResponseModelBmcBiosRegistrySummary) GetSucceeded() OptInt {
+	return s.Succeeded
+}
+
+// GetTotal returns the value of Total.
+func (s *BmcResponseModelBmcBiosRegistrySummary) GetTotal() OptInt {
+	return s.Total
+}
+
+// SetDurationMs sets the value of DurationMs.
+func (s *BmcResponseModelBmcBiosRegistrySummary) SetDurationMs(val OptInt64) {
+	s.DurationMs = val
+}
+
+// SetFailed sets the value of Failed.
+func (s *BmcResponseModelBmcBiosRegistrySummary) SetFailed(val OptInt) {
+	s.Failed = val
+}
+
+// SetFailedNodes sets the value of FailedNodes.
+func (s *BmcResponseModelBmcBiosRegistrySummary) SetFailedNodes(val OptString) {
+	s.FailedNodes = val
+}
+
+// SetSucceeded sets the value of Succeeded.
+func (s *BmcResponseModelBmcBiosRegistrySummary) SetSucceeded(val OptInt) {
+	s.Succeeded = val
+}
+
+// SetTotal sets the value of Total.
+func (s *BmcResponseModelBmcBiosRegistrySummary) SetTotal(val OptInt) {
+	s.Total = val
+}
+
+type BmcResponseModelBmcBiosResultsItem struct {
+	Data       OptNilBmcResponseModelBmcBiosResultsItemData `json:"data"`
+	DurationMs OptInt64                                     `json:"duration_ms"`
+	Message    OptString                                    `json:"message"`
+	Node       OptString                                    `json:"node"`
+	Success    OptBool                                      `json:"success"`
+}
+
+// GetData returns the value of Data.
+func (s *BmcResponseModelBmcBiosResultsItem) GetData() OptNilBmcResponseModelBmcBiosResultsItemData {
+	return s.Data
+}
+
+// GetDurationMs returns the value of DurationMs.
+func (s *BmcResponseModelBmcBiosResultsItem) GetDurationMs() OptInt64 {
+	return s.DurationMs
+}
+
+// GetMessage returns the value of Message.
+func (s *BmcResponseModelBmcBiosResultsItem) GetMessage() OptString {
+	return s.Message
+}
+
+// GetNode returns the value of Node.
+func (s *BmcResponseModelBmcBiosResultsItem) GetNode() OptString {
+	return s.Node
+}
+
+// GetSuccess returns the value of Success.
+func (s *BmcResponseModelBmcBiosResultsItem) GetSuccess() OptBool {
+	return s.Success
+}
+
+// SetData sets the value of Data.
+func (s *BmcResponseModelBmcBiosResultsItem) SetData(val OptNilBmcResponseModelBmcBiosResultsItemData) {
+	s.Data = val
+}
+
+// SetDurationMs sets the value of DurationMs.
+func (s *BmcResponseModelBmcBiosResultsItem) SetDurationMs(val OptInt64) {
+	s.DurationMs = val
+}
+
+// SetMessage sets the value of Message.
+func (s *BmcResponseModelBmcBiosResultsItem) SetMessage(val OptString) {
+	s.Message = val
+}
+
+// SetNode sets the value of Node.
+func (s *BmcResponseModelBmcBiosResultsItem) SetNode(val OptString) {
+	s.Node = val
+}
+
+// SetSuccess sets the value of Success.
+func (s *BmcResponseModelBmcBiosResultsItem) SetSuccess(val OptBool) {
+	s.Success = val
+}
+
+type BmcResponseModelBmcBiosResultsItemData struct {
+	ApplyTimes        []string                                            `json:"apply_times"`
+	AttributeRegistry OptString                                           `json:"attribute_registry"`
+	Attributes        OptBmcResponseModelBmcBiosResultsItemDataAttributes `json:"attributes"`
+	BiosVersion       OptString                                           `json:"bios_version"`
+	Model             OptString                                           `json:"model"`
+	Pending           OptBmcResponseModelBmcBiosResultsItemDataPending    `json:"pending"`
+	ResetPending      OptBool                                             `json:"reset_pending"`
+}
+
+// GetApplyTimes returns the value of ApplyTimes.
+func (s *BmcResponseModelBmcBiosResultsItemData) GetApplyTimes() []string {
+	return s.ApplyTimes
+}
+
+// GetAttributeRegistry returns the value of AttributeRegistry.
+func (s *BmcResponseModelBmcBiosResultsItemData) GetAttributeRegistry() OptString {
+	return s.AttributeRegistry
+}
+
+// GetAttributes returns the value of Attributes.
+func (s *BmcResponseModelBmcBiosResultsItemData) GetAttributes() OptBmcResponseModelBmcBiosResultsItemDataAttributes {
+	return s.Attributes
+}
+
+// GetBiosVersion returns the value of BiosVersion.
+func (s *BmcResponseModelBmcBiosResultsItemData) GetBiosVersion() OptString {
+	return s.BiosVersion
+}
+
+// GetModel returns the value of Model.
+func (s *BmcResponseModelBmcBiosResultsItemData) GetModel() OptString {
+	return s.Model
+}
+
+// GetPending returns the value of Pending.
+func (s *BmcResponseModelBmcBiosResultsItemData) GetPending() OptBmcResponseModelBmcBiosResultsItemDataPending {
+	return s.Pending
+}
+
+// GetResetPending returns the value of ResetPending.
+func (s *BmcResponseModelBmcBiosResultsItemData) GetResetPending() OptBool {
+	return s.ResetPending
+}
+
+// SetApplyTimes sets the value of ApplyTimes.
+func (s *BmcResponseModelBmcBiosResultsItemData) SetApplyTimes(val []string) {
+	s.ApplyTimes = val
+}
+
+// SetAttributeRegistry sets the value of AttributeRegistry.
+func (s *BmcResponseModelBmcBiosResultsItemData) SetAttributeRegistry(val OptString) {
+	s.AttributeRegistry = val
+}
+
+// SetAttributes sets the value of Attributes.
+func (s *BmcResponseModelBmcBiosResultsItemData) SetAttributes(val OptBmcResponseModelBmcBiosResultsItemDataAttributes) {
+	s.Attributes = val
+}
+
+// SetBiosVersion sets the value of BiosVersion.
+func (s *BmcResponseModelBmcBiosResultsItemData) SetBiosVersion(val OptString) {
+	s.BiosVersion = val
+}
+
+// SetModel sets the value of Model.
+func (s *BmcResponseModelBmcBiosResultsItemData) SetModel(val OptString) {
+	s.Model = val
+}
+
+// SetPending sets the value of Pending.
+func (s *BmcResponseModelBmcBiosResultsItemData) SetPending(val OptBmcResponseModelBmcBiosResultsItemDataPending) {
+	s.Pending = val
+}
+
+// SetResetPending sets the value of ResetPending.
+func (s *BmcResponseModelBmcBiosResultsItemData) SetResetPending(val OptBool) {
+	s.ResetPending = val
+}
+
+type BmcResponseModelBmcBiosResultsItemDataAttributes map[string]jx.Raw
+
+func (s *BmcResponseModelBmcBiosResultsItemDataAttributes) init() BmcResponseModelBmcBiosResultsItemDataAttributes {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
+}
+
+type BmcResponseModelBmcBiosResultsItemDataPending map[string]jx.Raw
+
+func (s *BmcResponseModelBmcBiosResultsItemDataPending) init() BmcResponseModelBmcBiosResultsItemDataPending {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
+}
+
+type BmcResponseModelBmcBiosSummary struct {
+	DurationMs  OptInt64  `json:"duration_ms"`
+	Failed      OptInt    `json:"failed"`
+	FailedNodes OptString `json:"failed_nodes"`
+	Succeeded   OptInt    `json:"succeeded"`
+	Total       OptInt    `json:"total"`
+}
+
+// GetDurationMs returns the value of DurationMs.
+func (s *BmcResponseModelBmcBiosSummary) GetDurationMs() OptInt64 {
+	return s.DurationMs
+}
+
+// GetFailed returns the value of Failed.
+func (s *BmcResponseModelBmcBiosSummary) GetFailed() OptInt {
+	return s.Failed
+}
+
+// GetFailedNodes returns the value of FailedNodes.
+func (s *BmcResponseModelBmcBiosSummary) GetFailedNodes() OptString {
+	return s.FailedNodes
+}
+
+// GetSucceeded returns the value of Succeeded.
+func (s *BmcResponseModelBmcBiosSummary) GetSucceeded() OptInt {
+	return s.Succeeded
+}
+
+// GetTotal returns the value of Total.
+func (s *BmcResponseModelBmcBiosSummary) GetTotal() OptInt {
+	return s.Total
+}
+
+// SetDurationMs sets the value of DurationMs.
+func (s *BmcResponseModelBmcBiosSummary) SetDurationMs(val OptInt64) {
+	s.DurationMs = val
+}
+
+// SetFailed sets the value of Failed.
+func (s *BmcResponseModelBmcBiosSummary) SetFailed(val OptInt) {
+	s.Failed = val
+}
+
+// SetFailedNodes sets the value of FailedNodes.
+func (s *BmcResponseModelBmcBiosSummary) SetFailedNodes(val OptString) {
+	s.FailedNodes = val
+}
+
+// SetSucceeded sets the value of Succeeded.
+func (s *BmcResponseModelBmcBiosSummary) SetSucceeded(val OptInt) {
+	s.Succeeded = val
+}
+
+// SetTotal sets the value of Total.
+func (s *BmcResponseModelBmcBiosSummary) SetTotal(val OptInt) {
+	s.Total = val
+}
+
 // BmcResponse_model.BmcFirmwareUpdates schema.
 // Ref: #/components/schemas/BmcResponse_model.BmcFirmwareUpdates
 type BmcResponseModelBmcFirmwareUpdates struct {
@@ -2778,6 +3494,50 @@ func (s *BmcResponseModelRedfishSystemSummary) SetTotal(val OptInt) {
 	s.Total = val
 }
 
+// BmcSetBiosBody schema.
+// Ref: #/components/schemas/BmcSetBiosBody
+type BmcSetBiosBody struct {
+	// When the bmc applies the change. Immediate, OnReset, AtMaintenanceWindowStart or
+	// InMaintenanceWindowOnReset, limited to what each bmc accepts. Empty for the bmc's default.
+	ApplyTime OptString `json:"apply_time"`
+	// Attribute names and their new values. A string value is converted to the number or boolean the
+	// attribute holds.
+	Attributes OptBmcSetBiosBodyAttributes `json:"attributes"`
+}
+
+// GetApplyTime returns the value of ApplyTime.
+func (s *BmcSetBiosBody) GetApplyTime() OptString {
+	return s.ApplyTime
+}
+
+// GetAttributes returns the value of Attributes.
+func (s *BmcSetBiosBody) GetAttributes() OptBmcSetBiosBodyAttributes {
+	return s.Attributes
+}
+
+// SetApplyTime sets the value of ApplyTime.
+func (s *BmcSetBiosBody) SetApplyTime(val OptString) {
+	s.ApplyTime = val
+}
+
+// SetAttributes sets the value of Attributes.
+func (s *BmcSetBiosBody) SetAttributes(val OptBmcSetBiosBodyAttributes) {
+	s.Attributes = val
+}
+
+// Attribute names and their new values. A string value is converted to the number or boolean the
+// attribute holds.
+type BmcSetBiosBodyAttributes map[string]jx.Raw
+
+func (s *BmcSetBiosBodyAttributes) init() BmcSetBiosBodyAttributes {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
+}
+
 // BootImage schema.
 // Ref: #/components/schemas/BootImage
 type BootImage struct {
@@ -4558,6 +5318,96 @@ func (o NilBmcResponseModelBmcAckResultsItem) Or(d BmcResponseModelBmcAckResults
 	return d
 }
 
+// NewNilBmcResponseModelBmcBiosRegistryResultsItem returns new NilBmcResponseModelBmcBiosRegistryResultsItem with value set to v.
+func NewNilBmcResponseModelBmcBiosRegistryResultsItem(v BmcResponseModelBmcBiosRegistryResultsItem) NilBmcResponseModelBmcBiosRegistryResultsItem {
+	return NilBmcResponseModelBmcBiosRegistryResultsItem{
+		Value: v,
+	}
+}
+
+// NilBmcResponseModelBmcBiosRegistryResultsItem is nullable BmcResponseModelBmcBiosRegistryResultsItem.
+type NilBmcResponseModelBmcBiosRegistryResultsItem struct {
+	Value BmcResponseModelBmcBiosRegistryResultsItem
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilBmcResponseModelBmcBiosRegistryResultsItem) SetTo(v BmcResponseModelBmcBiosRegistryResultsItem) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilBmcResponseModelBmcBiosRegistryResultsItem) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *NilBmcResponseModelBmcBiosRegistryResultsItem) SetToNull() {
+	o.Null = true
+	var v BmcResponseModelBmcBiosRegistryResultsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilBmcResponseModelBmcBiosRegistryResultsItem) Get() (v BmcResponseModelBmcBiosRegistryResultsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilBmcResponseModelBmcBiosRegistryResultsItem) Or(d BmcResponseModelBmcBiosRegistryResultsItem) BmcResponseModelBmcBiosRegistryResultsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilBmcResponseModelBmcBiosResultsItem returns new NilBmcResponseModelBmcBiosResultsItem with value set to v.
+func NewNilBmcResponseModelBmcBiosResultsItem(v BmcResponseModelBmcBiosResultsItem) NilBmcResponseModelBmcBiosResultsItem {
+	return NilBmcResponseModelBmcBiosResultsItem{
+		Value: v,
+	}
+}
+
+// NilBmcResponseModelBmcBiosResultsItem is nullable BmcResponseModelBmcBiosResultsItem.
+type NilBmcResponseModelBmcBiosResultsItem struct {
+	Value BmcResponseModelBmcBiosResultsItem
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilBmcResponseModelBmcBiosResultsItem) SetTo(v BmcResponseModelBmcBiosResultsItem) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilBmcResponseModelBmcBiosResultsItem) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *NilBmcResponseModelBmcBiosResultsItem) SetToNull() {
+	o.Null = true
+	var v BmcResponseModelBmcBiosResultsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilBmcResponseModelBmcBiosResultsItem) Get() (v BmcResponseModelBmcBiosResultsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilBmcResponseModelBmcBiosResultsItem) Or(d BmcResponseModelBmcBiosResultsItem) BmcResponseModelBmcBiosResultsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewNilBmcResponseModelBmcFirmwareUpdatesResultsItem returns new NilBmcResponseModelBmcFirmwareUpdatesResultsItem with value set to v.
 func NewNilBmcResponseModelBmcFirmwareUpdatesResultsItem(v BmcResponseModelBmcFirmwareUpdatesResultsItem) NilBmcResponseModelBmcFirmwareUpdatesResultsItem {
 	return NilBmcResponseModelBmcFirmwareUpdatesResultsItem{
@@ -5965,6 +6815,190 @@ func (o OptBmcResponseModelBmcAckSummary) Or(d BmcResponseModelBmcAckSummary) Bm
 	return d
 }
 
+// NewOptBmcResponseModelBmcBiosRegistrySummary returns new OptBmcResponseModelBmcBiosRegistrySummary with value set to v.
+func NewOptBmcResponseModelBmcBiosRegistrySummary(v BmcResponseModelBmcBiosRegistrySummary) OptBmcResponseModelBmcBiosRegistrySummary {
+	return OptBmcResponseModelBmcBiosRegistrySummary{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptBmcResponseModelBmcBiosRegistrySummary is optional BmcResponseModelBmcBiosRegistrySummary.
+type OptBmcResponseModelBmcBiosRegistrySummary struct {
+	Value BmcResponseModelBmcBiosRegistrySummary
+	Set   bool
+}
+
+// IsSet returns true if OptBmcResponseModelBmcBiosRegistrySummary was set.
+func (o OptBmcResponseModelBmcBiosRegistrySummary) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptBmcResponseModelBmcBiosRegistrySummary) Reset() {
+	var v BmcResponseModelBmcBiosRegistrySummary
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptBmcResponseModelBmcBiosRegistrySummary) SetTo(v BmcResponseModelBmcBiosRegistrySummary) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptBmcResponseModelBmcBiosRegistrySummary) Get() (v BmcResponseModelBmcBiosRegistrySummary, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptBmcResponseModelBmcBiosRegistrySummary) Or(d BmcResponseModelBmcBiosRegistrySummary) BmcResponseModelBmcBiosRegistrySummary {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptBmcResponseModelBmcBiosResultsItemDataAttributes returns new OptBmcResponseModelBmcBiosResultsItemDataAttributes with value set to v.
+func NewOptBmcResponseModelBmcBiosResultsItemDataAttributes(v BmcResponseModelBmcBiosResultsItemDataAttributes) OptBmcResponseModelBmcBiosResultsItemDataAttributes {
+	return OptBmcResponseModelBmcBiosResultsItemDataAttributes{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptBmcResponseModelBmcBiosResultsItemDataAttributes is optional BmcResponseModelBmcBiosResultsItemDataAttributes.
+type OptBmcResponseModelBmcBiosResultsItemDataAttributes struct {
+	Value BmcResponseModelBmcBiosResultsItemDataAttributes
+	Set   bool
+}
+
+// IsSet returns true if OptBmcResponseModelBmcBiosResultsItemDataAttributes was set.
+func (o OptBmcResponseModelBmcBiosResultsItemDataAttributes) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptBmcResponseModelBmcBiosResultsItemDataAttributes) Reset() {
+	var v BmcResponseModelBmcBiosResultsItemDataAttributes
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptBmcResponseModelBmcBiosResultsItemDataAttributes) SetTo(v BmcResponseModelBmcBiosResultsItemDataAttributes) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptBmcResponseModelBmcBiosResultsItemDataAttributes) Get() (v BmcResponseModelBmcBiosResultsItemDataAttributes, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptBmcResponseModelBmcBiosResultsItemDataAttributes) Or(d BmcResponseModelBmcBiosResultsItemDataAttributes) BmcResponseModelBmcBiosResultsItemDataAttributes {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptBmcResponseModelBmcBiosResultsItemDataPending returns new OptBmcResponseModelBmcBiosResultsItemDataPending with value set to v.
+func NewOptBmcResponseModelBmcBiosResultsItemDataPending(v BmcResponseModelBmcBiosResultsItemDataPending) OptBmcResponseModelBmcBiosResultsItemDataPending {
+	return OptBmcResponseModelBmcBiosResultsItemDataPending{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptBmcResponseModelBmcBiosResultsItemDataPending is optional BmcResponseModelBmcBiosResultsItemDataPending.
+type OptBmcResponseModelBmcBiosResultsItemDataPending struct {
+	Value BmcResponseModelBmcBiosResultsItemDataPending
+	Set   bool
+}
+
+// IsSet returns true if OptBmcResponseModelBmcBiosResultsItemDataPending was set.
+func (o OptBmcResponseModelBmcBiosResultsItemDataPending) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptBmcResponseModelBmcBiosResultsItemDataPending) Reset() {
+	var v BmcResponseModelBmcBiosResultsItemDataPending
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptBmcResponseModelBmcBiosResultsItemDataPending) SetTo(v BmcResponseModelBmcBiosResultsItemDataPending) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptBmcResponseModelBmcBiosResultsItemDataPending) Get() (v BmcResponseModelBmcBiosResultsItemDataPending, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptBmcResponseModelBmcBiosResultsItemDataPending) Or(d BmcResponseModelBmcBiosResultsItemDataPending) BmcResponseModelBmcBiosResultsItemDataPending {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptBmcResponseModelBmcBiosSummary returns new OptBmcResponseModelBmcBiosSummary with value set to v.
+func NewOptBmcResponseModelBmcBiosSummary(v BmcResponseModelBmcBiosSummary) OptBmcResponseModelBmcBiosSummary {
+	return OptBmcResponseModelBmcBiosSummary{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptBmcResponseModelBmcBiosSummary is optional BmcResponseModelBmcBiosSummary.
+type OptBmcResponseModelBmcBiosSummary struct {
+	Value BmcResponseModelBmcBiosSummary
+	Set   bool
+}
+
+// IsSet returns true if OptBmcResponseModelBmcBiosSummary was set.
+func (o OptBmcResponseModelBmcBiosSummary) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptBmcResponseModelBmcBiosSummary) Reset() {
+	var v BmcResponseModelBmcBiosSummary
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptBmcResponseModelBmcBiosSummary) SetTo(v BmcResponseModelBmcBiosSummary) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptBmcResponseModelBmcBiosSummary) Get() (v BmcResponseModelBmcBiosSummary, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptBmcResponseModelBmcBiosSummary) Or(d BmcResponseModelBmcBiosSummary) BmcResponseModelBmcBiosSummary {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptBmcResponseModelBmcFirmwareUpdatesSummary returns new OptBmcResponseModelBmcFirmwareUpdatesSummary with value set to v.
 func NewOptBmcResponseModelBmcFirmwareUpdatesSummary(v BmcResponseModelBmcFirmwareUpdatesSummary) OptBmcResponseModelBmcFirmwareUpdatesSummary {
 	return OptBmcResponseModelBmcFirmwareUpdatesSummary{
@@ -6143,6 +7177,52 @@ func (o OptBmcResponseModelRedfishSystemSummary) Get() (v BmcResponseModelRedfis
 
 // Or returns value if set, or given parameter if does not.
 func (o OptBmcResponseModelRedfishSystemSummary) Or(d BmcResponseModelRedfishSystemSummary) BmcResponseModelRedfishSystemSummary {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptBmcSetBiosBodyAttributes returns new OptBmcSetBiosBodyAttributes with value set to v.
+func NewOptBmcSetBiosBodyAttributes(v BmcSetBiosBodyAttributes) OptBmcSetBiosBodyAttributes {
+	return OptBmcSetBiosBodyAttributes{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptBmcSetBiosBodyAttributes is optional BmcSetBiosBodyAttributes.
+type OptBmcSetBiosBodyAttributes struct {
+	Value BmcSetBiosBodyAttributes
+	Set   bool
+}
+
+// IsSet returns true if OptBmcSetBiosBodyAttributes was set.
+func (o OptBmcSetBiosBodyAttributes) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptBmcSetBiosBodyAttributes) Reset() {
+	var v BmcSetBiosBodyAttributes
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptBmcSetBiosBodyAttributes) SetTo(v BmcSetBiosBodyAttributes) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptBmcSetBiosBodyAttributes) Get() (v BmcSetBiosBodyAttributes, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptBmcSetBiosBodyAttributes) Or(d BmcSetBiosBodyAttributes) BmcSetBiosBodyAttributes {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -6419,6 +7499,132 @@ func (o OptInt64) Get() (v int64, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptInt64) Or(d int64) int64 {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilBmcResponseModelBmcBiosRegistryResultsItemData returns new OptNilBmcResponseModelBmcBiosRegistryResultsItemData with value set to v.
+func NewOptNilBmcResponseModelBmcBiosRegistryResultsItemData(v BmcResponseModelBmcBiosRegistryResultsItemData) OptNilBmcResponseModelBmcBiosRegistryResultsItemData {
+	return OptNilBmcResponseModelBmcBiosRegistryResultsItemData{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilBmcResponseModelBmcBiosRegistryResultsItemData is optional nullable BmcResponseModelBmcBiosRegistryResultsItemData.
+type OptNilBmcResponseModelBmcBiosRegistryResultsItemData struct {
+	Value BmcResponseModelBmcBiosRegistryResultsItemData
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilBmcResponseModelBmcBiosRegistryResultsItemData was set.
+func (o OptNilBmcResponseModelBmcBiosRegistryResultsItemData) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilBmcResponseModelBmcBiosRegistryResultsItemData) Reset() {
+	var v BmcResponseModelBmcBiosRegistryResultsItemData
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilBmcResponseModelBmcBiosRegistryResultsItemData) SetTo(v BmcResponseModelBmcBiosRegistryResultsItemData) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilBmcResponseModelBmcBiosRegistryResultsItemData) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilBmcResponseModelBmcBiosRegistryResultsItemData) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v BmcResponseModelBmcBiosRegistryResultsItemData
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilBmcResponseModelBmcBiosRegistryResultsItemData) Get() (v BmcResponseModelBmcBiosRegistryResultsItemData, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilBmcResponseModelBmcBiosRegistryResultsItemData) Or(d BmcResponseModelBmcBiosRegistryResultsItemData) BmcResponseModelBmcBiosRegistryResultsItemData {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilBmcResponseModelBmcBiosResultsItemData returns new OptNilBmcResponseModelBmcBiosResultsItemData with value set to v.
+func NewOptNilBmcResponseModelBmcBiosResultsItemData(v BmcResponseModelBmcBiosResultsItemData) OptNilBmcResponseModelBmcBiosResultsItemData {
+	return OptNilBmcResponseModelBmcBiosResultsItemData{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilBmcResponseModelBmcBiosResultsItemData is optional nullable BmcResponseModelBmcBiosResultsItemData.
+type OptNilBmcResponseModelBmcBiosResultsItemData struct {
+	Value BmcResponseModelBmcBiosResultsItemData
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilBmcResponseModelBmcBiosResultsItemData was set.
+func (o OptNilBmcResponseModelBmcBiosResultsItemData) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilBmcResponseModelBmcBiosResultsItemData) Reset() {
+	var v BmcResponseModelBmcBiosResultsItemData
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilBmcResponseModelBmcBiosResultsItemData) SetTo(v BmcResponseModelBmcBiosResultsItemData) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilBmcResponseModelBmcBiosResultsItemData) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilBmcResponseModelBmcBiosResultsItemData) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v BmcResponseModelBmcBiosResultsItemData
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilBmcResponseModelBmcBiosResultsItemData) Get() (v BmcResponseModelBmcBiosResultsItemData, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilBmcResponseModelBmcBiosResultsItemData) Or(d BmcResponseModelBmcBiosResultsItemData) BmcResponseModelBmcBiosResultsItemData {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -7238,6 +8444,132 @@ func (o OptNilNilBmcResponseModelBmcAckResultsItemArray) Get() (v []NilBmcRespon
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilNilBmcResponseModelBmcAckResultsItemArray) Or(d []NilBmcResponseModelBmcAckResultsItem) []NilBmcResponseModelBmcAckResultsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray returns new OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray with value set to v.
+func NewOptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray(v []NilBmcResponseModelBmcBiosRegistryResultsItem) OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray {
+	return OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray is optional nullable []NilBmcResponseModelBmcBiosRegistryResultsItem.
+type OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray struct {
+	Value []NilBmcResponseModelBmcBiosRegistryResultsItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray was set.
+func (o OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) Reset() {
+	var v []NilBmcResponseModelBmcBiosRegistryResultsItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) SetTo(v []NilBmcResponseModelBmcBiosRegistryResultsItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []NilBmcResponseModelBmcBiosRegistryResultsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) Get() (v []NilBmcResponseModelBmcBiosRegistryResultsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) Or(d []NilBmcResponseModelBmcBiosRegistryResultsItem) []NilBmcResponseModelBmcBiosRegistryResultsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilNilBmcResponseModelBmcBiosResultsItemArray returns new OptNilNilBmcResponseModelBmcBiosResultsItemArray with value set to v.
+func NewOptNilNilBmcResponseModelBmcBiosResultsItemArray(v []NilBmcResponseModelBmcBiosResultsItem) OptNilNilBmcResponseModelBmcBiosResultsItemArray {
+	return OptNilNilBmcResponseModelBmcBiosResultsItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilNilBmcResponseModelBmcBiosResultsItemArray is optional nullable []NilBmcResponseModelBmcBiosResultsItem.
+type OptNilNilBmcResponseModelBmcBiosResultsItemArray struct {
+	Value []NilBmcResponseModelBmcBiosResultsItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilNilBmcResponseModelBmcBiosResultsItemArray was set.
+func (o OptNilNilBmcResponseModelBmcBiosResultsItemArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilNilBmcResponseModelBmcBiosResultsItemArray) Reset() {
+	var v []NilBmcResponseModelBmcBiosResultsItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilNilBmcResponseModelBmcBiosResultsItemArray) SetTo(v []NilBmcResponseModelBmcBiosResultsItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilNilBmcResponseModelBmcBiosResultsItemArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilNilBmcResponseModelBmcBiosResultsItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []NilBmcResponseModelBmcBiosResultsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilNilBmcResponseModelBmcBiosResultsItemArray) Get() (v []NilBmcResponseModelBmcBiosResultsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilNilBmcResponseModelBmcBiosResultsItemArray) Or(d []NilBmcResponseModelBmcBiosResultsItem) []NilBmcResponseModelBmcBiosResultsItem {
 	if v, ok := o.Get(); ok {
 		return v
 	}

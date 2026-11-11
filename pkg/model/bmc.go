@@ -125,3 +125,53 @@ type BmcFirmwareUpdates struct {
 	Updates    []BmcFirmwareUpdate `json:"updates" oai3:"nullable"`
 	RebootType string              `json:"reboot_type" description:"NONE, IDRAC or HOST"`
 }
+
+// BmcBios is one node's BIOS attributes. Values keep the JSON type the BMC reports, a string, number or boolean. Pending holds the staged values that differ from the applied ones, which take effect at the apply time they were staged with
+type BmcBios struct {
+	Attributes        map[string]any `json:"attributes"`
+	Pending           map[string]any `json:"pending"`
+	AttributeRegistry string         `json:"attribute_registry" description:"Name of the attribute registry describing these attributes, empty when the bmc names none"`
+	ApplyTimes        []string       `json:"apply_times" description:"Apply times the bmc accepts for a change"`
+	ResetPending      bool           `json:"reset_pending" description:"A reset to defaults is staged"`
+	Model             string         `json:"model"`
+	BIOSVersion       string         `json:"bios_version"`
+}
+
+// BmcBiosValue is one allowed value of an enumeration attribute
+type BmcBiosValue struct {
+	Name        string `json:"name"`
+	DisplayName string `json:"display_name"`
+}
+
+// BmcBiosAttribute is one attribute registry entry, narrowed to what an editor needs. Bounds and lengths are null when the registry sets none
+type BmcBiosAttribute struct {
+	Name          string         `json:"name"`
+	DisplayName   string         `json:"display_name"`
+	HelpText      string         `json:"help_text"`
+	WarningText   string         `json:"warning_text"`
+	MenuPath      string         `json:"menu_path"`
+	DisplayOrder  int            `json:"display_order"`
+	Type          string         `json:"type" description:"Enumeration, String, Integer, Boolean or Password"`
+	Values        []BmcBiosValue `json:"values"`
+	DefaultValue  any            `json:"default_value" oai3:"nullable"`
+	ReadOnly      bool           `json:"read_only"`
+	WriteOnly     bool           `json:"write_only"`
+	Hidden        bool           `json:"hidden"`
+	Immutable     bool           `json:"immutable"`
+	GrayOut       bool           `json:"gray_out"`
+	ResetRequired bool           `json:"reset_required"`
+	SystemUnique  bool           `json:"system_unique" description:"The value is meant to differ per system, such as an asset tag"`
+	LowerBound    *int64         `json:"lower_bound" oai3:"nullable"`
+	UpperBound    *int64         `json:"upper_bound" oai3:"nullable"`
+	MinLength     *int           `json:"min_length" oai3:"nullable"`
+	MaxLength     *int           `json:"max_length" oai3:"nullable"`
+}
+
+// BmcBiosRegistry describes a node's BIOS attributes. Available is false when the bmc publishes no registry it serves itself, and Attributes is then empty
+type BmcBiosRegistry struct {
+	Available  bool               `json:"available"`
+	Registry   string             `json:"registry"`
+	Version    string             `json:"version"`
+	Language   string             `json:"language"`
+	Attributes []BmcBiosAttribute `json:"attributes"`
+}

@@ -262,6 +262,247 @@
 				},
 				"type": "object"
 			},
+			"BmcResponse_model.BmcBios": {
+				"description": "BmcResponse_model.BmcBios schema",
+				"properties": {
+					"results": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"data": {
+									"nullable": true,
+									"properties": {
+										"apply_times": {
+											"items": {
+												"type": "string"
+											},
+											"type": "array"
+										},
+										"attribute_registry": {
+											"type": "string"
+										},
+										"attributes": {
+											"additionalProperties": {},
+											"type": "object"
+										},
+										"bios_version": {
+											"type": "string"
+										},
+										"model": {
+											"type": "string"
+										},
+										"pending": {
+											"additionalProperties": {},
+											"type": "object"
+										},
+										"reset_pending": {
+											"type": "boolean"
+										}
+									},
+									"type": "object"
+								},
+								"duration_ms": {
+									"format": "int64",
+									"type": "integer"
+								},
+								"message": {
+									"type": "string"
+								},
+								"node": {
+									"type": "string"
+								},
+								"success": {
+									"type": "boolean"
+								}
+							},
+							"type": "object"
+						},
+						"nullable": true,
+						"type": "array"
+					},
+					"run_id": {
+						"type": "string"
+					},
+					"summary": {
+						"properties": {
+							"duration_ms": {
+								"format": "int64",
+								"type": "integer"
+							},
+							"failed": {
+								"type": "integer"
+							},
+							"failed_nodes": {
+								"type": "string"
+							},
+							"succeeded": {
+								"type": "integer"
+							},
+							"total": {
+								"type": "integer"
+							}
+						},
+						"type": "object"
+					}
+				},
+				"type": "object"
+			},
+			"BmcResponse_model.BmcBiosRegistry": {
+				"description": "BmcResponse_model.BmcBiosRegistry schema",
+				"properties": {
+					"results": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"data": {
+									"nullable": true,
+									"properties": {
+										"attributes": {
+											"items": {
+												"properties": {
+													"default_value": {
+														"nullable": true
+													},
+													"display_name": {
+														"type": "string"
+													},
+													"display_order": {
+														"type": "integer"
+													},
+													"gray_out": {
+														"type": "boolean"
+													},
+													"help_text": {
+														"type": "string"
+													},
+													"hidden": {
+														"type": "boolean"
+													},
+													"immutable": {
+														"type": "boolean"
+													},
+													"lower_bound": {
+														"format": "int64",
+														"nullable": true,
+														"type": "integer"
+													},
+													"max_length": {
+														"nullable": true,
+														"type": "integer"
+													},
+													"menu_path": {
+														"type": "string"
+													},
+													"min_length": {
+														"nullable": true,
+														"type": "integer"
+													},
+													"name": {
+														"type": "string"
+													},
+													"read_only": {
+														"type": "boolean"
+													},
+													"reset_required": {
+														"type": "boolean"
+													},
+													"system_unique": {
+														"type": "boolean"
+													},
+													"type": {
+														"type": "string"
+													},
+													"upper_bound": {
+														"format": "int64",
+														"nullable": true,
+														"type": "integer"
+													},
+													"values": {
+														"items": {
+															"properties": {
+																"display_name": {
+																	"type": "string"
+																},
+																"name": {
+																	"type": "string"
+																}
+															},
+															"type": "object"
+														},
+														"type": "array"
+													},
+													"warning_text": {
+														"type": "string"
+													},
+													"write_only": {
+														"type": "boolean"
+													}
+												},
+												"type": "object"
+											},
+											"type": "array"
+										},
+										"available": {
+											"type": "boolean"
+										},
+										"language": {
+											"type": "string"
+										},
+										"registry": {
+											"type": "string"
+										},
+										"version": {
+											"type": "string"
+										}
+									},
+									"type": "object"
+								},
+								"duration_ms": {
+									"format": "int64",
+									"type": "integer"
+								},
+								"message": {
+									"type": "string"
+								},
+								"node": {
+									"type": "string"
+								},
+								"success": {
+									"type": "boolean"
+								}
+							},
+							"type": "object"
+						},
+						"nullable": true,
+						"type": "array"
+					},
+					"run_id": {
+						"type": "string"
+					},
+					"summary": {
+						"properties": {
+							"duration_ms": {
+								"format": "int64",
+								"type": "integer"
+							},
+							"failed": {
+								"type": "integer"
+							},
+							"failed_nodes": {
+								"type": "string"
+							},
+							"succeeded": {
+								"type": "integer"
+							},
+							"total": {
+								"type": "integer"
+							}
+						},
+						"type": "object"
+					}
+				},
+				"type": "object"
+			},
 			"BmcResponse_model.BmcFirmwareUpdates": {
 				"description": "BmcResponse_model.BmcFirmwareUpdates schema",
 				"properties": {
@@ -1002,6 +1243,22 @@
 								"type": "integer"
 							}
 						},
+						"type": "object"
+					}
+				},
+				"type": "object"
+			},
+			"BmcSetBiosBody": {
+				"description": "BmcSetBiosBody schema",
+				"properties": {
+					"apply_time": {
+						"description": "When the bmc applies the change. Immediate, OnReset, AtMaintenanceWindowStart or InMaintenanceWindowOnReset, limited to what each bmc accepts. Empty for the bmc's default",
+						"example": "OnReset",
+						"type": "string"
+					},
+					"attributes": {
+						"additionalProperties": {},
+						"description": "Attribute names and their new values. A string value is converted to the number or boolean the attribute holds",
 						"type": "object"
 					}
 				},
@@ -2299,6 +2556,404 @@
 				"tags": [
 					"v1",
 					"auth"
+				]
+			}
+		},
+		"/v1/bmc/bios": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcBios`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the BIOS attributes of node(s), with any staged changes",
+				"operationId": "GET_/v1/bmc/bios",
+				"parameters": [
+					{
+						"description": "Keep only these attributes",
+						"examples": {
+							"names": {
+								"value": "SriovGlobalEnable,ProcCStates"
+							}
+						},
+						"in": "query",
+						"name": "names",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcBios"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcBios"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc bios",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			},
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcSetBios`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nStage BIOS attribute changes on node(s), applied at the given apply time",
+				"operationId": "POST_/v1/bmc/bios",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BmcSetBiosBody"
+							}
+						}
+					},
+					"description": "Request body for api.BmcSetBiosBody",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc set bios",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/bios/discard": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcDiscardBios`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nDiscard the BIOS changes staged on node(s)",
+				"operationId": "POST_/v1/bmc/bios/discard",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc discard bios",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/bios/registry": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcBiosRegistry`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the attribute registry describing one node's BIOS attributes",
+				"operationId": "GET_/v1/bmc/bios/registry",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcBiosRegistry"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcBiosRegistry"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc bios registry",
+				"tags": [
+					"v1",
+					"bmc"
 				]
 			}
 		},

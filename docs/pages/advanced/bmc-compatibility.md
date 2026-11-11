@@ -91,6 +91,7 @@ advertises no usable session service.
 | `-redfish.basic-auth` | `false` | Log in with basic auth instead of a Redfish session |
 | `-redfish.insecure` | `true` | Skip TLS verification, which every BMC needs |
 | `-redfish.destructive` | `false` | Also run the checks that write: power reset, job clear, SEL clear |
+| `-redfish.bios-change` | *(empty)* | `Name=Value` of a harmless BIOS attribute, such as `NumLock=Off`, to stage and then discard. Needs `-redfish.destructive`. Pick one that would do no harm if the discard failed and the next reboot applied it |
 
 ## 4. Read the report
 
@@ -129,6 +130,7 @@ actually declares, so a healthy R760 still reports that `ForceOn`, `Suspend`, `P
 | `power` | Reset types and boot override targets the system declares, against what the CLI offers; that the manager supports the `GracefulRestart` that `bmc reboot-bmc` sends |
 | `jobs` | That the job service exists, that jobs parse, and that the URL Grendel builds to delete a job is where the service actually keeps it |
 | `sel` | Which log services are identified as the system event log, on the managers and then the systems; that entry timestamps are in a format Grendel can sort on; that `$top` returns the newest entries; that each one declares a `ClearLog` action |
+| `bios` | That the BIOS attributes can be read; whether changes are staged in a separate settings object, which pending values and discard need; whether the BMC serves its attribute registry, and which attributes it leaves undescribed; with `-redfish.bios-change`, that a staged change shows as pending and can be discarded |
 | `fanout` | That the concurrent runner and error classifier agree with the per-node results above |
 
 !!! note "`bmc sel list --limit` may not show the newest entries"

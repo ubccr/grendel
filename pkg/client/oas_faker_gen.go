@@ -281,6 +281,389 @@ func (s *BmcResponseModelBmcAckSummary) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *BmcResponseModelBmcBios) SetFake() {
+	{
+		{
+			s.Results.SetFake()
+		}
+	}
+	{
+		{
+			s.RunID.SetFake()
+		}
+	}
+	{
+		{
+			s.Summary.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcBiosRegistry) SetFake() {
+	{
+		{
+			s.Results.SetFake()
+		}
+	}
+	{
+		{
+			s.RunID.SetFake()
+		}
+	}
+	{
+		{
+			s.Summary.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) SetFake() {
+	{
+		{
+			s.Data.SetFake()
+		}
+	}
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Message.SetFake()
+		}
+	}
+	{
+		{
+			s.Node.SetFake()
+		}
+	}
+	{
+		{
+			s.Success.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) SetFake() {
+	{
+		{
+			s.Attributes = nil
+			for i := 0; i < 0; i++ {
+				var elem BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem
+				{
+					elem.SetFake()
+				}
+				s.Attributes = append(s.Attributes, elem)
+			}
+		}
+	}
+	{
+		{
+			s.Available.SetFake()
+		}
+	}
+	{
+		{
+			s.Language.SetFake()
+		}
+	}
+	{
+		{
+			s.Registry.SetFake()
+		}
+	}
+	{
+		{
+			s.Version.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetFake() {
+	{
+		{
+			s.DefaultValue = []byte("null")
+		}
+	}
+	{
+		{
+			s.DisplayName.SetFake()
+		}
+	}
+	{
+		{
+			s.DisplayOrder.SetFake()
+		}
+	}
+	{
+		{
+			s.GrayOut.SetFake()
+		}
+	}
+	{
+		{
+			s.HelpText.SetFake()
+		}
+	}
+	{
+		{
+			s.Hidden.SetFake()
+		}
+	}
+	{
+		{
+			s.Immutable.SetFake()
+		}
+	}
+	{
+		{
+			s.LowerBound.SetFake()
+		}
+	}
+	{
+		{
+			s.MaxLength.SetFake()
+		}
+	}
+	{
+		{
+			s.MenuPath.SetFake()
+		}
+	}
+	{
+		{
+			s.MinLength.SetFake()
+		}
+	}
+	{
+		{
+			s.Name.SetFake()
+		}
+	}
+	{
+		{
+			s.ReadOnly.SetFake()
+		}
+	}
+	{
+		{
+			s.ResetRequired.SetFake()
+		}
+	}
+	{
+		{
+			s.SystemUnique.SetFake()
+		}
+	}
+	{
+		{
+			s.Type.SetFake()
+		}
+	}
+	{
+		{
+			s.UpperBound.SetFake()
+		}
+	}
+	{
+		{
+			s.Values = nil
+			for i := 0; i < 0; i++ {
+				var elem BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem
+				{
+					elem.SetFake()
+				}
+				s.Values = append(s.Values, elem)
+			}
+		}
+	}
+	{
+		{
+			s.WarningText.SetFake()
+		}
+	}
+	{
+		{
+			s.WriteOnly.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem) SetFake() {
+	{
+		{
+			s.DisplayName.SetFake()
+		}
+	}
+	{
+		{
+			s.Name.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcBiosRegistrySummary) SetFake() {
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Failed.SetFake()
+		}
+	}
+	{
+		{
+			s.FailedNodes.SetFake()
+		}
+	}
+	{
+		{
+			s.Succeeded.SetFake()
+		}
+	}
+	{
+		{
+			s.Total.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcBiosResultsItem) SetFake() {
+	{
+		{
+			s.Data.SetFake()
+		}
+	}
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Message.SetFake()
+		}
+	}
+	{
+		{
+			s.Node.SetFake()
+		}
+	}
+	{
+		{
+			s.Success.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcBiosResultsItemData) SetFake() {
+	{
+		{
+			s.ApplyTimes = nil
+			for i := 0; i < 0; i++ {
+				var elem string
+				{
+					elem = "string"
+				}
+				s.ApplyTimes = append(s.ApplyTimes, elem)
+			}
+		}
+	}
+	{
+		{
+			s.AttributeRegistry.SetFake()
+		}
+	}
+	{
+		{
+			s.Attributes.SetFake()
+		}
+	}
+	{
+		{
+			s.BiosVersion.SetFake()
+		}
+	}
+	{
+		{
+			s.Model.SetFake()
+		}
+	}
+	{
+		{
+			s.Pending.SetFake()
+		}
+	}
+	{
+		{
+			s.ResetPending.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcBiosResultsItemDataAttributes) SetFake() {
+	var (
+		elem jx.Raw
+		m    map[string]jx.Raw = s.init()
+	)
+	for i := 0; i < 0; i++ {
+		m[fmt.Sprintf("fake%d", i)] = elem
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcBiosResultsItemDataPending) SetFake() {
+	var (
+		elem jx.Raw
+		m    map[string]jx.Raw = s.init()
+	)
+	for i := 0; i < 0; i++ {
+		m[fmt.Sprintf("fake%d", i)] = elem
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcBiosSummary) SetFake() {
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Failed.SetFake()
+		}
+	}
+	{
+		{
+			s.FailedNodes.SetFake()
+		}
+	}
+	{
+		{
+			s.Succeeded.SetFake()
+		}
+	}
+	{
+		{
+			s.Total.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
 func (s *BmcResponseModelBmcFirmwareUpdates) SetFake() {
 	{
 		{
@@ -1345,6 +1728,31 @@ func (s *BmcResponseModelRedfishSystemSummary) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *BmcSetBiosBody) SetFake() {
+	{
+		{
+			s.ApplyTime.SetFake()
+		}
+	}
+	{
+		{
+			s.Attributes.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcSetBiosBodyAttributes) SetFake() {
+	var (
+		elem jx.Raw
+		m    map[string]jx.Raw = s.init()
+	)
+	for i := 0; i < 0; i++ {
+		m[fmt.Sprintf("fake%d", i)] = elem
+	}
+}
+
+// SetFake set fake values.
 func (s *BootImage) SetFake() {
 	{
 		{
@@ -2327,6 +2735,16 @@ func (s *NilBmcResponseModelBmcAckResultsItem) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *NilBmcResponseModelBmcBiosRegistryResultsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilBmcResponseModelBmcBiosResultsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
 func (s *NilBmcResponseModelBmcFirmwareUpdatesResultsItem) SetFake() {
 	s.Null = true
 }
@@ -2682,6 +3100,42 @@ func (s *OptBmcResponseModelBmcAckSummary) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptBmcResponseModelBmcBiosRegistrySummary) SetFake() {
+	var elem BmcResponseModelBmcBiosRegistrySummary
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptBmcResponseModelBmcBiosResultsItemDataAttributes) SetFake() {
+	var elem BmcResponseModelBmcBiosResultsItemDataAttributes
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptBmcResponseModelBmcBiosResultsItemDataPending) SetFake() {
+	var elem BmcResponseModelBmcBiosResultsItemDataPending
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptBmcResponseModelBmcBiosSummary) SetFake() {
+	var elem BmcResponseModelBmcBiosSummary
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
 func (s *OptBmcResponseModelBmcFirmwareUpdatesSummary) SetFake() {
 	var elem BmcResponseModelBmcFirmwareUpdatesSummary
 	{
@@ -2711,6 +3165,15 @@ func (s *OptBmcResponseModelBmcSELLogSummary) SetFake() {
 // SetFake set fake values.
 func (s *OptBmcResponseModelRedfishSystemSummary) SetFake() {
 	var elem BmcResponseModelRedfishSystemSummary
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptBmcSetBiosBodyAttributes) SetFake() {
+	var elem BmcSetBiosBodyAttributes
 	{
 		elem.SetFake()
 	}
@@ -2769,6 +3232,18 @@ func (s *OptInt64) SetFake() {
 		elem = int64(0)
 	}
 	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptNilBmcResponseModelBmcBiosRegistryResultsItemData) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilBmcResponseModelBmcBiosResultsItemData) SetFake() {
+	s.Null = true
+	s.Set = true
 }
 
 // SetFake set fake values.
@@ -2845,6 +3320,18 @@ func (s *OptNilInt64) SetFake() {
 
 // SetFake set fake values.
 func (s *OptNilNilBmcResponseModelBmcAckResultsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilBmcResponseModelBmcBiosResultsItemArray) SetFake() {
 	s.Null = true
 	s.Set = true
 }

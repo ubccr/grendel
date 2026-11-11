@@ -162,6 +162,27 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 		filterNodes,
 		selectAll,
 	)
+	fuego.Get(bmc, "/bios", h.BmcBios,
+		option.Description("Get the BIOS attributes of node(s), with any staged changes"),
+		option.Query("names", "Keep only these attributes", param.Example("names", "SriovGlobalEnable,ProcCStates")),
+		filterNodes,
+		selectAll,
+	)
+	fuego.Post(bmc, "/bios", h.BmcSetBios,
+		option.Description("Stage BIOS attribute changes on node(s), applied at the given apply time"),
+		filterNodes,
+		selectAll,
+	)
+	fuego.Post(bmc, "/bios/discard", h.BmcDiscardBios,
+		option.Description("Discard the BIOS changes staged on node(s)"),
+		filterNodes,
+		selectAll,
+	)
+	fuego.Get(bmc, "/bios/registry", h.BmcBiosRegistry,
+		option.Description("Get the attribute registry describing one node's BIOS attributes"),
+		filterNodes,
+		selectAll,
+	)
 	fuego.Get(bmc, "/jobs", h.BmcJobs,
 		option.Description("Get the redfish job queue of node(s)"),
 		filterNodes,

@@ -15,11 +15,14 @@ import (
 )
 
 type Service struct {
-	cfg  Config
-	opts Options
+	cfg        Config
+	opts       Options
+	registries *registryCache
 }
 
-func New(cfg Config) *Service { return &Service{cfg: cfg, opts: cfg.options()} }
+func New(cfg Config) *Service {
+	return &Service{cfg: cfg, opts: cfg.options(), registries: newRegistryCache(32)}
+}
 
 func NewFromViper() *Service { return New(ConfigFromViper()) }
 

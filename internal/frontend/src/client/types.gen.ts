@@ -179,6 +179,90 @@ export type BmcResponseModelBmcAck = {
 };
 
 /**
+ * BmcResponse_model.BmcBios schema
+ */
+export type BmcResponseModelBmcBios = {
+    results?: Array<{
+        data?: {
+            apply_times?: Array<string>;
+            attribute_registry?: string;
+            attributes?: {
+                [key: string]: unknown;
+            };
+            bios_version?: string;
+            model?: string;
+            pending?: {
+                [key: string]: unknown;
+            };
+            reset_pending?: boolean;
+        };
+        duration_ms?: number;
+        message?: string;
+        node?: string;
+        success?: boolean;
+    }>;
+    run_id?: string;
+    summary?: {
+        duration_ms?: number;
+        failed?: number;
+        failed_nodes?: string;
+        succeeded?: number;
+        total?: number;
+    };
+};
+
+/**
+ * BmcResponse_model.BmcBiosRegistry schema
+ */
+export type BmcResponseModelBmcBiosRegistry = {
+    results?: Array<{
+        data?: {
+            attributes?: Array<{
+                default_value?: unknown;
+                display_name?: string;
+                display_order?: number;
+                gray_out?: boolean;
+                help_text?: string;
+                hidden?: boolean;
+                immutable?: boolean;
+                lower_bound?: number;
+                max_length?: number;
+                menu_path?: string;
+                min_length?: number;
+                name?: string;
+                read_only?: boolean;
+                reset_required?: boolean;
+                system_unique?: boolean;
+                type?: string;
+                upper_bound?: number;
+                values?: Array<{
+                    display_name?: string;
+                    name?: string;
+                }>;
+                warning_text?: string;
+                write_only?: boolean;
+            }>;
+            available?: boolean;
+            language?: string;
+            registry?: string;
+            version?: string;
+        };
+        duration_ms?: number;
+        message?: string;
+        node?: string;
+        success?: boolean;
+    }>;
+    run_id?: string;
+    summary?: {
+        duration_ms?: number;
+        failed?: number;
+        failed_nodes?: string;
+        succeeded?: number;
+        total?: number;
+    };
+};
+
+/**
  * BmcResponse_model.BmcFirmwareUpdates schema
  */
 export type BmcResponseModelBmcFirmwareUpdates = {
@@ -411,6 +495,22 @@ export type BmcResponseModelRedfishSystem = {
         failed_nodes?: string;
         succeeded?: number;
         total?: number;
+    };
+};
+
+/**
+ * BmcSetBiosBody schema
+ */
+export type BmcSetBiosBody = {
+    /**
+     * When the bmc applies the change. Immediate, OnReset, AtMaintenanceWindowStart or InMaintenanceWindowOnReset, limited to what each bmc accepts. Empty for the bmc's default
+     */
+    apply_time?: string;
+    /**
+     * Attribute names and their new values. A string value is converted to the number or boolean the attribute holds
+     */
+    attributes?: {
+        [key: string]: unknown;
     };
 };
 
@@ -943,6 +1043,177 @@ export type PostV1AuthTokenResponses = {
 };
 
 export type PostV1AuthTokenResponse = PostV1AuthTokenResponses[keyof PostV1AuthTokenResponses];
+
+export type GetV1BmcBiosData = {
+    body?: never;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Keep only these attributes
+         */
+        names?: string;
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
+    };
+    url: '/v1/bmc/bios';
+};
+
+export type GetV1BmcBiosErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type GetV1BmcBiosError = GetV1BmcBiosErrors[keyof GetV1BmcBiosErrors];
+
+export type GetV1BmcBiosResponses = {
+    /**
+     * OK
+     */
+    200: BmcResponseModelBmcBios;
+};
+
+export type GetV1BmcBiosResponse = GetV1BmcBiosResponses[keyof GetV1BmcBiosResponses];
+
+export type PostV1BmcBiosData = {
+    /**
+     * Request body for api.BmcSetBiosBody
+     */
+    body: BmcSetBiosBody;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
+    };
+    url: '/v1/bmc/bios';
+};
+
+export type PostV1BmcBiosErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type PostV1BmcBiosError = PostV1BmcBiosErrors[keyof PostV1BmcBiosErrors];
+
+export type PostV1BmcBiosResponses = {
+    /**
+     * OK
+     */
+    200: BmcResponseModelBmcAck;
+};
+
+export type PostV1BmcBiosResponse = PostV1BmcBiosResponses[keyof PostV1BmcBiosResponses];
+
+export type PostV1BmcBiosDiscardData = {
+    body?: never;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
+    };
+    url: '/v1/bmc/bios/discard';
+};
+
+export type PostV1BmcBiosDiscardErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type PostV1BmcBiosDiscardError = PostV1BmcBiosDiscardErrors[keyof PostV1BmcBiosDiscardErrors];
+
+export type PostV1BmcBiosDiscardResponses = {
+    /**
+     * OK
+     */
+    200: BmcResponseModelBmcAck;
+};
+
+export type PostV1BmcBiosDiscardResponse = PostV1BmcBiosDiscardResponses[keyof PostV1BmcBiosDiscardResponses];
+
+export type GetV1BmcBiosRegistryData = {
+    body?: never;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
+    };
+    url: '/v1/bmc/bios/registry';
+};
+
+export type GetV1BmcBiosRegistryErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type GetV1BmcBiosRegistryError = GetV1BmcBiosRegistryErrors[keyof GetV1BmcBiosRegistryErrors];
+
+export type GetV1BmcBiosRegistryResponses = {
+    /**
+     * OK
+     */
+    200: BmcResponseModelBmcBiosRegistry;
+};
+
+export type GetV1BmcBiosRegistryResponse = GetV1BmcBiosRegistryResponses[keyof GetV1BmcBiosRegistryResponses];
 
 export type PostV1BmcConfigureAutoData = {
     body?: never;

@@ -30,6 +30,7 @@ var (
 	compatBasicAuth   = flag.Bool("redfish.basic-auth", false, "log in with basic auth instead of a redfish session. Required against a mockup server, which advertises no session service")
 	compatInsecure    = flag.Bool("redfish.insecure", true, "skip tls verification, which every bmc needs since they all ship a self signed cert")
 	compatDestructive = flag.Bool("redfish.destructive", false, "run the checks that actually write: power, job clear and sel clear. Off by default because this suite cannot tell a mockup server from a live bmc")
+	compatBiosChange  = flag.String("redfish.bios-change", "", "Name=Value of a harmless bios attribute to stage and then discard, such as NumLock=Off. Needs -redfish.destructive. The suite picks none itself, since no attribute is harmless on every machine")
 )
 
 // resetTypes the power command tells the operator it accepts, from cmd/grendel/bmc/power.go
@@ -66,6 +67,7 @@ func TestCompat(t *testing.T) {
 	t.Run("power", func(t *testing.T) { compatPower(t, ctx) })
 	t.Run("jobs", func(t *testing.T) { compatJobs(t, ctx) })
 	t.Run("sel", func(t *testing.T) { compatSEL(t, ctx) })
+	t.Run("bios", func(t *testing.T) { compatBios(t, ctx) })
 	t.Run("fanout", func(t *testing.T) { compatFanout(t, ctx) })
 }
 
@@ -436,6 +438,99 @@ func compatSEL(t *testing.T, ctx context.Context) {
 
 		results := compatService(*compatBasicAuth).ClearSEL(ctx, []Target{compatTarget()})
 		compatAssertSuccess(t, results[0].Success, results[0].Message)
+	})
+}
+
+func compatBios(t *testing.T, ctx context.Context) {
+	svc := compatService(*compatBasicAuth)
+
+	bios, err := svc.biosOne(ctx, compatTarget(), BiosRequest{})
+	if compatAbsent(err) {
+		t.Skipf("bmc has no bios resource: %s", err)
+	}
+	if err != nil {
+		t.Fatalf("cannot read the bios: %s", err)
+	}
+	t.Logf("%d attributes, %d pending, registry %q, apply times %v", len(bios.Attributes), len(bios.Pending), bios.AttributeRegistry, bios.ApplyTimes)
+
+	t.Run("readable", func(t *testing.T) {
+		if len(bios.Attributes) == 0 {
+			t.Error("the bios resource lists no attributes, so bmc bios get shows nothing")
+		}
+	})
+
+	t.Run("settings_object", func(t *testing.T) {
+		b, err := svc.connectBios(ctx, compatTarget())
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer b.Close()
+
+		if b.settings.SettingsObject == "" || b.settings.SettingsObject == b.bios.ODataID {
+			t.Skip("no separate settings object, this bmc applies bios changes directly and has nothing to show as pending or discard")
+		}
+		t.Logf("changes are staged at %s", b.settings.SettingsObject)
+		if len(b.settings.SupportedApplyTimes) == 0 {
+			t.Log("the bmc declares no apply times, so the editor offers all four and the bmc may refuse some")
+		}
+	})
+
+	t.Run("registry_reachable", func(t *testing.T) {
+		reg, err := svc.biosRegistryOne(ctx, compatTarget())
+		if err != nil {
+			t.Fatalf("cannot read the attribute registry: %s", err)
+		}
+		if !reg.Available {
+			t.Skipf("the bmc serves no copy of registry %q itself, so the editor falls back to raw names", bios.AttributeRegistry)
+		}
+
+		described := map[string]bool{}
+		for _, a := range reg.Attributes {
+			described[a.Name] = true
+		}
+		var missing []string
+		for name := range bios.Attributes {
+			if !described[name] {
+				missing = append(missing, name)
+			}
+		}
+		t.Logf("registry %s %s (%s) describes %d attributes", reg.Registry, reg.Version, reg.Language, len(reg.Attributes))
+		if len(missing) > 0 {
+			slices.Sort(missing)
+			t.Logf("%d attributes are not in the registry and show under Other: %v", len(missing), missing)
+		}
+	})
+
+	t.Run("stage_and_discard", func(t *testing.T) {
+		compatRequireDestructive(t)
+		if *compatBiosChange == "" {
+			t.Skip("pass -redfish.bios-change Name=Value to stage a change and discard it")
+		}
+		name, value, ok := strings.Cut(*compatBiosChange, "=")
+		if !ok {
+			t.Fatalf("-redfish.bios-change %q is not Name=Value", *compatBiosChange)
+		}
+
+		// no apply time, so the change stays staged rather than becoming a job that a reboot would apply if the discard fails
+		staged, err := svc.setBiosOne(ctx, compatTarget(), SetBiosRequest{Attributes: map[string]any{name: value}})
+		if err != nil {
+			t.Fatalf("cannot stage %s: %s", *compatBiosChange, err)
+		}
+		t.Log(staged.Note)
+
+		after, err := svc.biosOne(ctx, compatTarget(), BiosRequest{Names: []string{name}})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, ok := after.Pending[name]; !ok {
+			t.Errorf("%s was staged but does not show as pending, so the editor would not show it", name)
+		}
+
+		discarded, err := svc.discardBiosOne(ctx, compatTarget())
+		if err != nil {
+			t.Fatalf("staged %s but could not discard it, clear it on the bmc before its next reboot: %s", name, err)
+		}
+		t.Log(discarded.Note)
 	})
 }
 

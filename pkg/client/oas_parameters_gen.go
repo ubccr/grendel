@@ -37,6 +37,30 @@ type DELETEV1UsersUsernamesParams struct {
 	Accept    OptString
 }
 
+// GETV1BmcBiosParams is parameters of GET_/v1/bmc/bios operation.
+type GETV1BmcBiosParams struct {
+	// Keep only these attributes.
+	Names OptString
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
+	Accept OptString
+}
+
+// GETV1BmcBiosRegistryParams is parameters of GET_/v1/bmc/bios/registry operation.
+type GETV1BmcBiosRegistryParams struct {
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
+	Accept OptString
+}
+
 // GETV1BmcFirmwareUpdatesParams is parameters of GET_/v1/bmc/firmware/updates operation.
 type GETV1BmcFirmwareUpdatesParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
@@ -225,6 +249,28 @@ type POSTV1AuthSignupParams struct {
 
 // POSTV1AuthTokenParams is parameters of POST_/v1/auth/token operation.
 type POSTV1AuthTokenParams struct {
+	Accept OptString
+}
+
+// POSTV1BmcBiosParams is parameters of POST_/v1/bmc/bios operation.
+type POSTV1BmcBiosParams struct {
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
+	Accept OptString
+}
+
+// POSTV1BmcBiosDiscardParams is parameters of POST_/v1/bmc/bios/discard operation.
+type POSTV1BmcBiosDiscardParams struct {
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
 	Accept OptString
 }
 

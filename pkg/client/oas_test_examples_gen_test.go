@@ -179,6 +179,154 @@ func TestBmcResponseModelBmcAckSummary_EncodeDecode(t *testing.T) {
 	var typ2 BmcResponseModelBmcAckSummary
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestBmcResponseModelBmcBios_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcBios
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcBios
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcBiosRegistry_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcBiosRegistry
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcBiosRegistry
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcBiosRegistryResultsItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcBiosRegistryResultsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcBiosRegistryResultsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcBiosRegistryResultsItemData_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcBiosRegistryResultsItemData
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcBiosRegistryResultsItemData
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcBiosRegistrySummary_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcBiosRegistrySummary
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcBiosRegistrySummary
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcBiosResultsItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcBiosResultsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcBiosResultsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcBiosResultsItemData_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcBiosResultsItemData
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcBiosResultsItemData
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcBiosResultsItemDataAttributes_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcBiosResultsItemDataAttributes
+	typ = make(BmcResponseModelBmcBiosResultsItemDataAttributes)
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcBiosResultsItemDataAttributes
+	typ2 = make(BmcResponseModelBmcBiosResultsItemDataAttributes)
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcBiosResultsItemDataPending_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcBiosResultsItemDataPending
+	typ = make(BmcResponseModelBmcBiosResultsItemDataPending)
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcBiosResultsItemDataPending
+	typ2 = make(BmcResponseModelBmcBiosResultsItemDataPending)
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcBiosSummary_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcBiosSummary
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcBiosSummary
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestBmcResponseModelBmcFirmwareUpdates_EncodeDecode(t *testing.T) {
 	var typ BmcResponseModelBmcFirmwareUpdates
 	typ.SetFake()
@@ -453,6 +601,32 @@ func TestBmcResponseModelRedfishSystemSummary_EncodeDecode(t *testing.T) {
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
 	var typ2 BmcResponseModelRedfishSystemSummary
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcSetBiosBody_EncodeDecode(t *testing.T) {
+	var typ BmcSetBiosBody
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcSetBiosBody
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcSetBiosBodyAttributes_EncodeDecode(t *testing.T) {
+	var typ BmcSetBiosBodyAttributes
+	typ = make(BmcSetBiosBodyAttributes)
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcSetBiosBodyAttributes
+	typ2 = make(BmcSetBiosBodyAttributes)
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestBootImage_EncodeDecode(t *testing.T) {
