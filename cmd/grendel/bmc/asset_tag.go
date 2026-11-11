@@ -48,8 +48,9 @@ var (
 	}
 
 	assetTagListCmd = &cobra.Command{
-		Use:   "list <nodeset | all>",
-		Short: "List the asset tag and serial each BMC reports",
+		Use:     "list <nodeset | all>",
+		Aliases: []string{"ls"},
+		Short:   "List the asset tag and serial each BMC reports",
 		Example: `  grendel bmc asset-tag list cpn-f01-[01-40]
   grendel bmc asset-tag list all --tags gpu`,
 		Args: cobra.ExactArgs(1),

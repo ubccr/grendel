@@ -47,8 +47,9 @@ var (
 	}
 
 	locationListCmd = &cobra.Command{
-		Use:   "list <nodeset | all>",
-		Short: "List the rack location each BMC reports",
+		Use:     "list <nodeset | all>",
+		Aliases: []string{"ls"},
+		Short:   "List the rack location each BMC reports",
 		Example: `  grendel bmc location list cpn-f01-[01-40]
   grendel bmc location list all --filter Datacenter,Room,Message`,
 		Args: cobra.ExactArgs(1),
