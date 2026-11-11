@@ -33,7 +33,15 @@ import {
 import { toastBmcResponse } from "@/lib/bmc";
 import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
-import { CircleHelp, LoaderCircle, RotateCw, Search, TriangleAlert, Undo2 } from "lucide-react";
+import {
+  CircleHelp,
+  LoaderCircle,
+  Lock,
+  RotateCw,
+  Search,
+  TriangleAlert,
+  Undo2,
+} from "lucide-react";
 import { ReactNode, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -382,7 +390,6 @@ function AttributeRow({
             </Badge>
           )}
           {attr?.system_unique && <Badge variant="secondary">per system</Badge>}
-          {!canEdit && kind !== "password" && <Badge variant="secondary">read only</Badge>}
         </div>
         {attr?.display_name && (
           <div className="truncate font-mono text-xs text-muted-foreground">{name}</div>
@@ -404,15 +411,26 @@ function AttributeRow({
         </div>
         {/* the slot is kept when empty, so every input in the list lines up */}
         <span className="ml-2 flex w-5 shrink-0 justify-center">
-          {attr?.reset_required && (
+          {!canEdit && kind !== "password" ? (
             <Tooltip>
               <TooltipTrigger asChild>
-                <RotateCw className="size-4 text-muted-foreground" aria-label="Reboot required" />
+                <Lock className="size-4 text-muted-foreground" aria-label="Read only" />
               </TooltipTrigger>
               <TooltipContent className="border bg-popover text-sm text-popover-foreground shadow-md">
-                Reboot required
+                Read only
               </TooltipContent>
             </Tooltip>
+          ) : (
+            attr?.reset_required && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <RotateCw className="size-4 text-muted-foreground" aria-label="Reboot required" />
+                </TooltipTrigger>
+                <TooltipContent className="border bg-popover text-sm text-popover-foreground shadow-md">
+                  Reboot required
+                </TooltipContent>
+              </Tooltip>
+            )
           )}
         </span>
         <Button
