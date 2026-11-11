@@ -64,6 +64,26 @@ export type AuthTokenRequest = {
 };
 
 /**
+ * BmcAssetTagBody schema
+ */
+export type BmcAssetTagBody = {
+    /**
+     * Asset tag for each serial number. A selected node whose serial is not listed fails
+     */
+    by_serial?: {
+        [key: string]: string;
+    };
+    /**
+     * Read the bmcs and report what would change, without writing
+     */
+    dry_run?: boolean;
+    /**
+     * Go template rendered per node, such as UB-{{.Name}}. A plain string is a valid template
+     */
+    template?: string;
+};
+
+/**
  * BmcClearJobsBody schema
  */
 export type BmcClearJobsBody = {
@@ -75,6 +95,18 @@ export type BmcClearJobsBody = {
      * Clear only these job ids
      */
     ids?: Array<string>;
+};
+
+/**
+ * BmcIdentityDefaults schema
+ */
+export type BmcIdentityDefaults = {
+    asset_tag?: string;
+    datacenter?: string;
+    rack?: string;
+    rack_unit?: string;
+    room?: string;
+    row?: string;
 };
 
 /**
@@ -140,6 +172,24 @@ export type BmcInstallFirmwareBody = {
 };
 
 /**
+ * BmcLocationBody schema
+ */
+export type BmcLocationBody = {
+    datacenter?: string;
+    /**
+     * Read the bmcs and report what would change, without writing
+     */
+    dry_run?: boolean;
+    rack?: string;
+    /**
+     * Must render to a whole number
+     */
+    rack_unit?: string;
+    room?: string;
+    row?: string;
+};
+
+/**
  * BmcPowerBody schema
  */
 export type BmcPowerBody = {
@@ -163,6 +213,32 @@ export type BmcPowerBody = {
 export type BmcResponseModelBmcAck = {
     results?: Array<{
         data?: unknown;
+        duration_ms?: number;
+        message?: string;
+        node?: string;
+        success?: boolean;
+    }>;
+    run_id?: string;
+    summary?: {
+        duration_ms?: number;
+        failed?: number;
+        failed_nodes?: string;
+        succeeded?: number;
+        total?: number;
+    };
+};
+
+/**
+ * BmcResponse_model.BmcAssetTagResult schema
+ */
+export type BmcResponseModelBmcAssetTagResult = {
+    results?: Array<{
+        data?: {
+            changed?: boolean;
+            current?: string;
+            desired?: string;
+            serial?: string;
+        };
         duration_ms?: number;
         message?: string;
         node?: string;
@@ -329,6 +405,43 @@ export type BmcResponseModelBmcJobList = {
 };
 
 /**
+ * BmcResponse_model.BmcLocationResult schema
+ */
+export type BmcResponseModelBmcLocationResult = {
+    results?: Array<{
+        data?: {
+            changed?: boolean;
+            current?: {
+                datacenter?: string;
+                rack?: string;
+                rack_unit?: number;
+                room?: string;
+                row?: string;
+            };
+            desired?: {
+                datacenter?: string;
+                rack?: string;
+                rack_unit?: number;
+                room?: string;
+                row?: string;
+            };
+        };
+        duration_ms?: number;
+        message?: string;
+        node?: string;
+        success?: boolean;
+    }>;
+    run_id?: string;
+    summary?: {
+        duration_ms?: number;
+        failed?: number;
+        failed_nodes?: string;
+        succeeded?: number;
+        total?: number;
+    };
+};
+
+/**
  * BmcResponse_model.BmcSELLog schema
  */
 export type BmcResponseModelBmcSelLog = {
@@ -366,6 +479,7 @@ export type BmcResponseModelBmcSelLog = {
 export type BmcResponseModelRedfishSystem = {
     results?: Array<{
         data?: {
+            asset_tag?: string;
             bios_version?: string;
             boot_mode?: string;
             boot_next?: string;
@@ -376,6 +490,13 @@ export type BmcResponseModelRedfishSystem = {
             boot_progress_time?: string;
             health?: string;
             host_name?: string;
+            location?: {
+                datacenter?: string;
+                rack?: string;
+                rack_unit?: number;
+                room?: string;
+                row?: string;
+            };
             location_indicator?: string;
             manufacturer?: string;
             model?: string;
@@ -1044,6 +1165,50 @@ export type PostV1AuthTokenResponses = {
 
 export type PostV1AuthTokenResponse = PostV1AuthTokenResponses[keyof PostV1AuthTokenResponses];
 
+export type PostV1BmcAssetTagData = {
+    /**
+     * Request body for api.BmcAssetTagBody
+     */
+    body: BmcAssetTagBody;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
+    };
+    url: '/v1/bmc/asset-tag';
+};
+
+export type PostV1BmcAssetTagErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type PostV1BmcAssetTagError = PostV1BmcAssetTagErrors[keyof PostV1BmcAssetTagErrors];
+
+export type PostV1BmcAssetTagResponses = {
+    /**
+     * OK
+     */
+    200: BmcResponseModelBmcAssetTagResult;
+};
+
+export type PostV1BmcAssetTagResponse = PostV1BmcAssetTagResponses[keyof PostV1BmcAssetTagResponses];
+
 export type GetV1BmcBiosData = {
     body?: never;
     headers?: {
@@ -1385,6 +1550,34 @@ export type GetV1BmcFirmwareUpdatesResponses = {
 
 export type GetV1BmcFirmwareUpdatesResponse = GetV1BmcFirmwareUpdatesResponses[keyof GetV1BmcFirmwareUpdatesResponses];
 
+export type GetV1BmcIdentityDefaultsData = {
+    body?: never;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/bmc/identity/defaults';
+};
+
+export type GetV1BmcIdentityDefaultsErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type GetV1BmcIdentityDefaultsError = GetV1BmcIdentityDefaultsErrors[keyof GetV1BmcIdentityDefaultsErrors];
+
+export type GetV1BmcIdentityDefaultsResponses = {
+    /**
+     * OK
+     */
+    200: BmcIdentityDefaults;
+};
+
+export type GetV1BmcIdentityDefaultsResponse = GetV1BmcIdentityDefaultsResponses[keyof GetV1BmcIdentityDefaultsResponses];
+
 export type PostV1BmcIndicatorData = {
     /**
      * Request body for api.BmcIndicatorBody
@@ -1513,6 +1706,50 @@ export type PostV1BmcJobsClearResponses = {
 };
 
 export type PostV1BmcJobsClearResponse = PostV1BmcJobsClearResponses[keyof PostV1BmcJobsClearResponses];
+
+export type PostV1BmcLocationData = {
+    /**
+     * Request body for api.BmcLocationBody
+     */
+    body: BmcLocationBody;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
+    };
+    url: '/v1/bmc/location';
+};
+
+export type PostV1BmcLocationErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type PostV1BmcLocationError = PostV1BmcLocationErrors[keyof PostV1BmcLocationErrors];
+
+export type PostV1BmcLocationResponses = {
+    /**
+     * OK
+     */
+    200: BmcResponseModelBmcLocationResult;
+};
+
+export type PostV1BmcLocationResponse = PostV1BmcLocationResponses[keyof PostV1BmcLocationResponses];
 
 export type PostV1BmcPowerData = {
     /**

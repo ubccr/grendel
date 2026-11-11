@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { logSeverityColor } from "@/lib/bmc";
+import { formatLocation } from "@/lib/identity";
 import { cn, relativeTime } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -147,6 +148,8 @@ function Overview({ system, dell }: { system?: System; dell?: Dell }) {
   const facts: Array<[string, string | undefined, string?, ReactNode?]> = [
     ["Serial", system?.serial_number],
     ["Hostname", system?.host_name],
+    ["Asset tag", system?.asset_tag],
+    ["Location", formatLocation(system?.location) || undefined],
     ["Express service code", dell?.ExpressServiceCode],
     [
       "PCIe slots",

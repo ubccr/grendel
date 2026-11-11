@@ -104,6 +104,36 @@ func (s *AuthTokenRequest) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *BmcAssetTagBody) SetFake() {
+	{
+		{
+			s.BySerial.SetFake()
+		}
+	}
+	{
+		{
+			s.DryRun.SetFake()
+		}
+	}
+	{
+		{
+			s.Template.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcAssetTagBodyBySerial) SetFake() {
+	var (
+		elem NilString
+		m    map[string]NilString = s.init()
+	)
+	for i := 0; i < 0; i++ {
+		m[fmt.Sprintf("fake%d", i)] = elem
+	}
+}
+
+// SetFake set fake values.
 func (s *BmcClearJobsBody) SetFake() {
 	{
 		{
@@ -113,6 +143,40 @@ func (s *BmcClearJobsBody) SetFake() {
 	{
 		{
 			s.Ids.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcIdentityDefaults) SetFake() {
+	{
+		{
+			s.AssetTag.SetFake()
+		}
+	}
+	{
+		{
+			s.Datacenter.SetFake()
+		}
+	}
+	{
+		{
+			s.Rack.SetFake()
+		}
+	}
+	{
+		{
+			s.RackUnit.SetFake()
+		}
+	}
+	{
+		{
+			s.Room.SetFake()
+		}
+	}
+	{
+		{
+			s.Row.SetFake()
 		}
 	}
 }
@@ -180,6 +244,40 @@ func (s *BmcInstallFirmwareBody) SetFake() {
 	{
 		{
 			s.ShareType.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcLocationBody) SetFake() {
+	{
+		{
+			s.Datacenter.SetFake()
+		}
+	}
+	{
+		{
+			s.DryRun.SetFake()
+		}
+	}
+	{
+		{
+			s.Rack.SetFake()
+		}
+	}
+	{
+		{
+			s.RackUnit.SetFake()
+		}
+	}
+	{
+		{
+			s.Room.SetFake()
+		}
+	}
+	{
+		{
+			s.Row.SetFake()
 		}
 	}
 }
@@ -253,6 +351,107 @@ func (s *BmcResponseModelBmcAckResultsItem) SetFake() {
 
 // SetFake set fake values.
 func (s *BmcResponseModelBmcAckSummary) SetFake() {
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Failed.SetFake()
+		}
+	}
+	{
+		{
+			s.FailedNodes.SetFake()
+		}
+	}
+	{
+		{
+			s.Succeeded.SetFake()
+		}
+	}
+	{
+		{
+			s.Total.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcAssetTagResult) SetFake() {
+	{
+		{
+			s.Results.SetFake()
+		}
+	}
+	{
+		{
+			s.RunID.SetFake()
+		}
+	}
+	{
+		{
+			s.Summary.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcAssetTagResultResultsItem) SetFake() {
+	{
+		{
+			s.Data.SetFake()
+		}
+	}
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Message.SetFake()
+		}
+	}
+	{
+		{
+			s.Node.SetFake()
+		}
+	}
+	{
+		{
+			s.Success.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcAssetTagResultResultsItemData) SetFake() {
+	{
+		{
+			s.Changed.SetFake()
+		}
+	}
+	{
+		{
+			s.Current.SetFake()
+		}
+	}
+	{
+		{
+			s.Desired.SetFake()
+		}
+	}
+	{
+		{
+			s.Serial.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcAssetTagResultSummary) SetFake() {
 	{
 		{
 			s.DurationMs.SetFake()
@@ -934,6 +1133,160 @@ func (s *BmcResponseModelBmcJobListSummary) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *BmcResponseModelBmcLocationResult) SetFake() {
+	{
+		{
+			s.Results.SetFake()
+		}
+	}
+	{
+		{
+			s.RunID.SetFake()
+		}
+	}
+	{
+		{
+			s.Summary.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcLocationResultResultsItem) SetFake() {
+	{
+		{
+			s.Data.SetFake()
+		}
+	}
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Message.SetFake()
+		}
+	}
+	{
+		{
+			s.Node.SetFake()
+		}
+	}
+	{
+		{
+			s.Success.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcLocationResultResultsItemData) SetFake() {
+	{
+		{
+			s.Changed.SetFake()
+		}
+	}
+	{
+		{
+			s.Current.SetFake()
+		}
+	}
+	{
+		{
+			s.Desired.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) SetFake() {
+	{
+		{
+			s.Datacenter.SetFake()
+		}
+	}
+	{
+		{
+			s.Rack.SetFake()
+		}
+	}
+	{
+		{
+			s.RackUnit.SetFake()
+		}
+	}
+	{
+		{
+			s.Room.SetFake()
+		}
+	}
+	{
+		{
+			s.Row.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) SetFake() {
+	{
+		{
+			s.Datacenter.SetFake()
+		}
+	}
+	{
+		{
+			s.Rack.SetFake()
+		}
+	}
+	{
+		{
+			s.RackUnit.SetFake()
+		}
+	}
+	{
+		{
+			s.Room.SetFake()
+		}
+	}
+	{
+		{
+			s.Row.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcLocationResultSummary) SetFake() {
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Failed.SetFake()
+		}
+	}
+	{
+		{
+			s.FailedNodes.SetFake()
+		}
+	}
+	{
+		{
+			s.Succeeded.SetFake()
+		}
+	}
+	{
+		{
+			s.Total.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
 func (s *BmcResponseModelBmcSELLog) SetFake() {
 	{
 		{
@@ -1115,6 +1468,11 @@ func (s *BmcResponseModelRedfishSystemResultsItem) SetFake() {
 func (s *BmcResponseModelRedfishSystemResultsItemData) SetFake() {
 	{
 		{
+			s.AssetTag.SetFake()
+		}
+	}
+	{
+		{
 			s.BiosVersion.SetFake()
 		}
 	}
@@ -1161,6 +1519,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) SetFake() {
 	{
 		{
 			s.HostName.SetFake()
+		}
+	}
+	{
+		{
+			s.Location.SetFake()
 		}
 	}
 	{
@@ -1221,6 +1584,35 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) SetFake() {
 	{
 		{
 			s.TotalMemory.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) SetFake() {
+	{
+		{
+			s.Datacenter.SetFake()
+		}
+	}
+	{
+		{
+			s.Rack.SetFake()
+		}
+	}
+	{
+		{
+			s.RackUnit.SetFake()
+		}
+	}
+	{
+		{
+			s.Room.SetFake()
+		}
+	}
+	{
+		{
+			s.Row.SetFake()
 		}
 	}
 }
@@ -2735,6 +3127,11 @@ func (s *NilBmcResponseModelBmcAckResultsItem) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *NilBmcResponseModelBmcAssetTagResultResultsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
 func (s *NilBmcResponseModelBmcBiosRegistryResultsItem) SetFake() {
 	s.Null = true
 }
@@ -2761,6 +3158,11 @@ func (s *NilBmcResponseModelBmcJobListResultsItem) SetFake() {
 
 // SetFake set fake values.
 func (s *NilBmcResponseModelBmcJobListResultsItemDataJobsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilBmcResponseModelBmcLocationResultResultsItem) SetFake() {
 	s.Null = true
 }
 
@@ -3100,6 +3502,15 @@ func (s *OptBmcResponseModelBmcAckSummary) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptBmcResponseModelBmcAssetTagResultSummary) SetFake() {
+	var elem BmcResponseModelBmcAssetTagResultSummary
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
 func (s *OptBmcResponseModelBmcBiosRegistrySummary) SetFake() {
 	var elem BmcResponseModelBmcBiosRegistrySummary
 	{
@@ -3147,6 +3558,33 @@ func (s *OptBmcResponseModelBmcFirmwareUpdatesSummary) SetFake() {
 // SetFake set fake values.
 func (s *OptBmcResponseModelBmcJobListSummary) SetFake() {
 	var elem BmcResponseModelBmcJobListSummary
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptBmcResponseModelBmcLocationResultResultsItemDataCurrent) SetFake() {
+	var elem BmcResponseModelBmcLocationResultResultsItemDataCurrent
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptBmcResponseModelBmcLocationResultResultsItemDataDesired) SetFake() {
+	var elem BmcResponseModelBmcLocationResultResultsItemDataDesired
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptBmcResponseModelBmcLocationResultSummary) SetFake() {
+	var elem BmcResponseModelBmcLocationResultSummary
 	{
 		elem.SetFake()
 	}
@@ -3235,6 +3673,18 @@ func (s *OptInt64) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptNilBmcAssetTagBodyBySerial) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilBmcResponseModelBmcAssetTagResultResultsItemData) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
 func (s *OptNilBmcResponseModelBmcBiosRegistryResultsItemData) SetFake() {
 	s.Null = true
 	s.Set = true
@@ -3259,6 +3709,12 @@ func (s *OptNilBmcResponseModelBmcJobListResultsItemData) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptNilBmcResponseModelBmcLocationResultResultsItemData) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
 func (s *OptNilBmcResponseModelBmcSELLogResultsItemData) SetFake() {
 	s.Null = true
 	s.Set = true
@@ -3266,6 +3722,12 @@ func (s *OptNilBmcResponseModelBmcSELLogResultsItemData) SetFake() {
 
 // SetFake set fake values.
 func (s *OptNilBmcResponseModelRedfishSystemResultsItemData) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilBmcResponseModelRedfishSystemResultsItemDataLocation) SetFake() {
 	s.Null = true
 	s.Set = true
 }
@@ -3325,6 +3787,12 @@ func (s *OptNilNilBmcResponseModelBmcAckResultsItemArray) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
 func (s *OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) SetFake() {
 	s.Null = true
 	s.Set = true
@@ -3356,6 +3824,12 @@ func (s *OptNilNilBmcResponseModelBmcJobListResultsItemArray) SetFake() {
 
 // SetFake set fake values.
 func (s *OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) SetFake() {
 	s.Null = true
 	s.Set = true
 }

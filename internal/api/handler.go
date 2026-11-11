@@ -162,6 +162,19 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 		filterNodes,
 		selectAll,
 	)
+	fuego.Post(bmc, "/asset-tag", h.BmcAssetTag,
+		option.Description("Set the asset tag of node(s), from a template or a table of serial numbers"),
+		filterNodes,
+		selectAll,
+	)
+	fuego.Post(bmc, "/location", h.BmcLocation,
+		option.Description("Set the rack location of node(s), rendered per node from templates"),
+		filterNodes,
+		selectAll,
+	)
+	fuego.Get(bmc, "/identity/defaults", h.BmcIdentityDefaults,
+		option.Description("Get the location and asset tag templates configured as defaults"),
+	)
 	fuego.Get(bmc, "/bios", h.BmcBios,
 		option.Description("Get the BIOS attributes of node(s), with any staged changes"),
 		option.Query("names", "Keep only these attributes", param.Example("names", "SriovGlobalEnable,ProcCStates")),

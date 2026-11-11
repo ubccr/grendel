@@ -131,6 +131,7 @@ actually declares, so a healthy R760 still reports that `ForceOn`, `Suspend`, `P
 | `jobs` | That the job service exists, that jobs parse, and that the URL Grendel builds to delete a job is where the service actually keeps it |
 | `sel` | Which log services are identified as the system event log, on the managers and then the systems; that entry timestamps are in a format Grendel can sort on; that `$top` returns the newest entries; that each one declares a `ClearLog` action |
 | `bios` | That the BIOS attributes can be read; whether changes are staged in a separate settings object, which pending values and discard need; whether the BMC serves its attribute registry, and which attributes it leaves undescribed; with `-redfish.bios-change`, that a staged change shows as pending and can be discarded |
+| `identity` | That the asset tag and chassis location can be read, and where the location is kept (the iDRAC's ServerTopology attributes, or the chassis `Location`); with `-redfish.destructive`, that a rack written there reads back and is restored |
 | `fanout` | That the concurrent runner and error classifier agree with the per-node results above |
 
 !!! note "`bmc sel list --limit` may not show the newest entries"

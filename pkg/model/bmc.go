@@ -42,6 +42,8 @@ type RedfishSystem struct {
 	BootNext            string          `json:"boot_next"`
 	BootOrder           []string        `json:"boot_order" oai3:"nullable"`
 	LocationIndicator   string          `json:"location_indicator" description:"On, Off, or empty when the bmc does not report one"`
+	AssetTag            string          `json:"asset_tag"`
+	Location            *BmcLocation    `json:"location" oai3:"nullable"`
 	OEMDell             *dell.OEMSystem `json:"oem_dell" oai3:"nullable"`
 }
 
@@ -174,4 +176,28 @@ type BmcBiosRegistry struct {
 	Version    string             `json:"version"`
 	Language   string             `json:"language"`
 	Attributes []BmcBiosAttribute `json:"attributes"`
+}
+
+// BmcLocation is where a node sits, as its bmc records it. RackUnit is nil when unset
+type BmcLocation struct {
+	Datacenter string `json:"datacenter"`
+	Room       string `json:"room"`
+	Row        string `json:"row"`
+	Rack       string `json:"rack"`
+	RackUnit   *int   `json:"rack_unit" oai3:"nullable"`
+}
+
+// BmcAssetTagResult is one node's asset tag before and after a change. Changed is false when the bmc already had it, and on a dry run nothing was written either way
+type BmcAssetTagResult struct {
+	Serial  string `json:"serial"`
+	Current string `json:"current"`
+	Desired string `json:"desired"`
+	Changed bool   `json:"changed"`
+}
+
+// BmcLocationResult is one node's location before and after a change
+type BmcLocationResult struct {
+	Current BmcLocation `json:"current"`
+	Desired BmcLocation `json:"desired"`
+	Changed bool        `json:"changed"`
 }

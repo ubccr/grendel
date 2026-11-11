@@ -151,6 +151,20 @@ func encodePOSTV1AuthTokenRequest(
 	return nil
 }
 
+func encodePOSTV1BmcAssetTagRequest(
+	req *BmcAssetTagBody,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
 func encodePOSTV1BmcBiosRequest(
 	req *BmcSetBiosBody,
 	r *http.Request,
@@ -209,6 +223,20 @@ func encodePOSTV1BmcIndicatorRequest(
 
 func encodePOSTV1BmcJobsClearRequest(
 	req *BmcClearJobsBody,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodePOSTV1BmcLocationRequest(
+	req *BmcLocationBody,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"

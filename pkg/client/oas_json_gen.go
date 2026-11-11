@@ -595,6 +595,157 @@ func (s *AuthTokenRequest) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *BmcAssetTagBody) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcAssetTagBody) encodeFields(e *jx.Encoder) {
+	{
+		if s.BySerial.Set {
+			e.FieldStart("by_serial")
+			s.BySerial.Encode(e)
+		}
+	}
+	{
+		if s.DryRun.Set {
+			e.FieldStart("dry_run")
+			s.DryRun.Encode(e)
+		}
+	}
+	{
+		if s.Template.Set {
+			e.FieldStart("template")
+			s.Template.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcAssetTagBody = [3]string{
+	0: "by_serial",
+	1: "dry_run",
+	2: "template",
+}
+
+// Decode decodes BmcAssetTagBody from json.
+func (s *BmcAssetTagBody) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcAssetTagBody to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "by_serial":
+			if err := func() error {
+				s.BySerial.Reset()
+				if err := s.BySerial.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"by_serial\"")
+			}
+		case "dry_run":
+			if err := func() error {
+				s.DryRun.Reset()
+				if err := s.DryRun.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"dry_run\"")
+			}
+		case "template":
+			if err := func() error {
+				s.Template.Reset()
+				if err := s.Template.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"template\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcAssetTagBody")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcAssetTagBody) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcAssetTagBody) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s BmcAssetTagBodyBySerial) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields implements json.Marshaler.
+func (s BmcAssetTagBodyBySerial) encodeFields(e *jx.Encoder) {
+	for k, elem := range s {
+		e.FieldStart(k)
+
+		elem.Encode(e)
+	}
+}
+
+// Decode decodes BmcAssetTagBodyBySerial from json.
+func (s *BmcAssetTagBodyBySerial) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcAssetTagBodyBySerial to nil")
+	}
+	m := s.init()
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		var elem NilString
+		if err := func() error {
+			if err := elem.Decode(d); err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return errors.Wrapf(err, "decode field %q", k)
+		}
+		m[string(k)] = elem
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcAssetTagBodyBySerial")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s BmcAssetTagBodyBySerial) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcAssetTagBodyBySerial) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *BmcClearJobsBody) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -670,6 +821,154 @@ func (s *BmcClearJobsBody) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *BmcClearJobsBody) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcIdentityDefaults) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcIdentityDefaults) encodeFields(e *jx.Encoder) {
+	{
+		if s.AssetTag.Set {
+			e.FieldStart("asset_tag")
+			s.AssetTag.Encode(e)
+		}
+	}
+	{
+		if s.Datacenter.Set {
+			e.FieldStart("datacenter")
+			s.Datacenter.Encode(e)
+		}
+	}
+	{
+		if s.Rack.Set {
+			e.FieldStart("rack")
+			s.Rack.Encode(e)
+		}
+	}
+	{
+		if s.RackUnit.Set {
+			e.FieldStart("rack_unit")
+			s.RackUnit.Encode(e)
+		}
+	}
+	{
+		if s.Room.Set {
+			e.FieldStart("room")
+			s.Room.Encode(e)
+		}
+	}
+	{
+		if s.Row.Set {
+			e.FieldStart("row")
+			s.Row.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcIdentityDefaults = [6]string{
+	0: "asset_tag",
+	1: "datacenter",
+	2: "rack",
+	3: "rack_unit",
+	4: "room",
+	5: "row",
+}
+
+// Decode decodes BmcIdentityDefaults from json.
+func (s *BmcIdentityDefaults) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcIdentityDefaults to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "asset_tag":
+			if err := func() error {
+				s.AssetTag.Reset()
+				if err := s.AssetTag.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"asset_tag\"")
+			}
+		case "datacenter":
+			if err := func() error {
+				s.Datacenter.Reset()
+				if err := s.Datacenter.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"datacenter\"")
+			}
+		case "rack":
+			if err := func() error {
+				s.Rack.Reset()
+				if err := s.Rack.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"rack\"")
+			}
+		case "rack_unit":
+			if err := func() error {
+				s.RackUnit.Reset()
+				if err := s.RackUnit.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"rack_unit\"")
+			}
+		case "room":
+			if err := func() error {
+				s.Room.Reset()
+				if err := s.Room.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"room\"")
+			}
+		case "row":
+			if err := func() error {
+				s.Row.Reset()
+				if err := s.Row.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"row\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcIdentityDefaults")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcIdentityDefaults) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcIdentityDefaults) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -995,6 +1294,154 @@ func (s *BmcInstallFirmwareBody) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *BmcInstallFirmwareBody) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcLocationBody) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcLocationBody) encodeFields(e *jx.Encoder) {
+	{
+		if s.Datacenter.Set {
+			e.FieldStart("datacenter")
+			s.Datacenter.Encode(e)
+		}
+	}
+	{
+		if s.DryRun.Set {
+			e.FieldStart("dry_run")
+			s.DryRun.Encode(e)
+		}
+	}
+	{
+		if s.Rack.Set {
+			e.FieldStart("rack")
+			s.Rack.Encode(e)
+		}
+	}
+	{
+		if s.RackUnit.Set {
+			e.FieldStart("rack_unit")
+			s.RackUnit.Encode(e)
+		}
+	}
+	{
+		if s.Room.Set {
+			e.FieldStart("room")
+			s.Room.Encode(e)
+		}
+	}
+	{
+		if s.Row.Set {
+			e.FieldStart("row")
+			s.Row.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcLocationBody = [6]string{
+	0: "datacenter",
+	1: "dry_run",
+	2: "rack",
+	3: "rack_unit",
+	4: "room",
+	5: "row",
+}
+
+// Decode decodes BmcLocationBody from json.
+func (s *BmcLocationBody) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcLocationBody to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "datacenter":
+			if err := func() error {
+				s.Datacenter.Reset()
+				if err := s.Datacenter.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"datacenter\"")
+			}
+		case "dry_run":
+			if err := func() error {
+				s.DryRun.Reset()
+				if err := s.DryRun.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"dry_run\"")
+			}
+		case "rack":
+			if err := func() error {
+				s.Rack.Reset()
+				if err := s.Rack.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"rack\"")
+			}
+		case "rack_unit":
+			if err := func() error {
+				s.RackUnit.Reset()
+				if err := s.RackUnit.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"rack_unit\"")
+			}
+		case "room":
+			if err := func() error {
+				s.Room.Reset()
+				if err := s.Room.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"room\"")
+			}
+		case "row":
+			if err := func() error {
+				s.Row.Reset()
+				if err := s.Row.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"row\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcLocationBody")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcLocationBody) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcLocationBody) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -1452,6 +1899,479 @@ func (s *BmcResponseModelBmcAckSummary) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *BmcResponseModelBmcAckSummary) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcAssetTagResult) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcAssetTagResult) encodeFields(e *jx.Encoder) {
+	{
+		if s.Results.Set {
+			e.FieldStart("results")
+			s.Results.Encode(e)
+		}
+	}
+	{
+		if s.RunID.Set {
+			e.FieldStart("run_id")
+			s.RunID.Encode(e)
+		}
+	}
+	{
+		if s.Summary.Set {
+			e.FieldStart("summary")
+			s.Summary.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcAssetTagResult = [3]string{
+	0: "results",
+	1: "run_id",
+	2: "summary",
+}
+
+// Decode decodes BmcResponseModelBmcAssetTagResult from json.
+func (s *BmcResponseModelBmcAssetTagResult) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcAssetTagResult to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "results":
+			if err := func() error {
+				s.Results.Reset()
+				if err := s.Results.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"results\"")
+			}
+		case "run_id":
+			if err := func() error {
+				s.RunID.Reset()
+				if err := s.RunID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"run_id\"")
+			}
+		case "summary":
+			if err := func() error {
+				s.Summary.Reset()
+				if err := s.Summary.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"summary\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcAssetTagResult")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcAssetTagResult) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcAssetTagResult) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcAssetTagResultResultsItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcAssetTagResultResultsItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Data.Set {
+			e.FieldStart("data")
+			s.Data.Encode(e)
+		}
+	}
+	{
+		if s.DurationMs.Set {
+			e.FieldStart("duration_ms")
+			s.DurationMs.Encode(e)
+		}
+	}
+	{
+		if s.Message.Set {
+			e.FieldStart("message")
+			s.Message.Encode(e)
+		}
+	}
+	{
+		if s.Node.Set {
+			e.FieldStart("node")
+			s.Node.Encode(e)
+		}
+	}
+	{
+		if s.Success.Set {
+			e.FieldStart("success")
+			s.Success.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcAssetTagResultResultsItem = [5]string{
+	0: "data",
+	1: "duration_ms",
+	2: "message",
+	3: "node",
+	4: "success",
+}
+
+// Decode decodes BmcResponseModelBmcAssetTagResultResultsItem from json.
+func (s *BmcResponseModelBmcAssetTagResultResultsItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcAssetTagResultResultsItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "data":
+			if err := func() error {
+				s.Data.Reset()
+				if err := s.Data.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"data\"")
+			}
+		case "duration_ms":
+			if err := func() error {
+				s.DurationMs.Reset()
+				if err := s.DurationMs.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"duration_ms\"")
+			}
+		case "message":
+			if err := func() error {
+				s.Message.Reset()
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		case "node":
+			if err := func() error {
+				s.Node.Reset()
+				if err := s.Node.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"node\"")
+			}
+		case "success":
+			if err := func() error {
+				s.Success.Reset()
+				if err := s.Success.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"success\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcAssetTagResultResultsItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcAssetTagResultResultsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcAssetTagResultResultsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcAssetTagResultResultsItemData) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcAssetTagResultResultsItemData) encodeFields(e *jx.Encoder) {
+	{
+		if s.Changed.Set {
+			e.FieldStart("changed")
+			s.Changed.Encode(e)
+		}
+	}
+	{
+		if s.Current.Set {
+			e.FieldStart("current")
+			s.Current.Encode(e)
+		}
+	}
+	{
+		if s.Desired.Set {
+			e.FieldStart("desired")
+			s.Desired.Encode(e)
+		}
+	}
+	{
+		if s.Serial.Set {
+			e.FieldStart("serial")
+			s.Serial.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcAssetTagResultResultsItemData = [4]string{
+	0: "changed",
+	1: "current",
+	2: "desired",
+	3: "serial",
+}
+
+// Decode decodes BmcResponseModelBmcAssetTagResultResultsItemData from json.
+func (s *BmcResponseModelBmcAssetTagResultResultsItemData) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcAssetTagResultResultsItemData to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "changed":
+			if err := func() error {
+				s.Changed.Reset()
+				if err := s.Changed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"changed\"")
+			}
+		case "current":
+			if err := func() error {
+				s.Current.Reset()
+				if err := s.Current.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"current\"")
+			}
+		case "desired":
+			if err := func() error {
+				s.Desired.Reset()
+				if err := s.Desired.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"desired\"")
+			}
+		case "serial":
+			if err := func() error {
+				s.Serial.Reset()
+				if err := s.Serial.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"serial\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcAssetTagResultResultsItemData")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcAssetTagResultResultsItemData) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcAssetTagResultResultsItemData) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcAssetTagResultSummary) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcAssetTagResultSummary) encodeFields(e *jx.Encoder) {
+	{
+		if s.DurationMs.Set {
+			e.FieldStart("duration_ms")
+			s.DurationMs.Encode(e)
+		}
+	}
+	{
+		if s.Failed.Set {
+			e.FieldStart("failed")
+			s.Failed.Encode(e)
+		}
+	}
+	{
+		if s.FailedNodes.Set {
+			e.FieldStart("failed_nodes")
+			s.FailedNodes.Encode(e)
+		}
+	}
+	{
+		if s.Succeeded.Set {
+			e.FieldStart("succeeded")
+			s.Succeeded.Encode(e)
+		}
+	}
+	{
+		if s.Total.Set {
+			e.FieldStart("total")
+			s.Total.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcAssetTagResultSummary = [5]string{
+	0: "duration_ms",
+	1: "failed",
+	2: "failed_nodes",
+	3: "succeeded",
+	4: "total",
+}
+
+// Decode decodes BmcResponseModelBmcAssetTagResultSummary from json.
+func (s *BmcResponseModelBmcAssetTagResultSummary) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcAssetTagResultSummary to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "duration_ms":
+			if err := func() error {
+				s.DurationMs.Reset()
+				if err := s.DurationMs.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"duration_ms\"")
+			}
+		case "failed":
+			if err := func() error {
+				s.Failed.Reset()
+				if err := s.Failed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"failed\"")
+			}
+		case "failed_nodes":
+			if err := func() error {
+				s.FailedNodes.Reset()
+				if err := s.FailedNodes.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"failed_nodes\"")
+			}
+		case "succeeded":
+			if err := func() error {
+				s.Succeeded.Reset()
+				if err := s.Succeeded.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"succeeded\"")
+			}
+		case "total":
+			if err := func() error {
+				s.Total.Reset()
+				if err := s.Total.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"total\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcAssetTagResultSummary")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcAssetTagResultSummary) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcAssetTagResultSummary) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -4331,6 +5251,724 @@ func (s *BmcResponseModelBmcJobListSummary) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcLocationResult) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcLocationResult) encodeFields(e *jx.Encoder) {
+	{
+		if s.Results.Set {
+			e.FieldStart("results")
+			s.Results.Encode(e)
+		}
+	}
+	{
+		if s.RunID.Set {
+			e.FieldStart("run_id")
+			s.RunID.Encode(e)
+		}
+	}
+	{
+		if s.Summary.Set {
+			e.FieldStart("summary")
+			s.Summary.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcLocationResult = [3]string{
+	0: "results",
+	1: "run_id",
+	2: "summary",
+}
+
+// Decode decodes BmcResponseModelBmcLocationResult from json.
+func (s *BmcResponseModelBmcLocationResult) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcLocationResult to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "results":
+			if err := func() error {
+				s.Results.Reset()
+				if err := s.Results.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"results\"")
+			}
+		case "run_id":
+			if err := func() error {
+				s.RunID.Reset()
+				if err := s.RunID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"run_id\"")
+			}
+		case "summary":
+			if err := func() error {
+				s.Summary.Reset()
+				if err := s.Summary.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"summary\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcLocationResult")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcLocationResult) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcLocationResult) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcLocationResultResultsItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcLocationResultResultsItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Data.Set {
+			e.FieldStart("data")
+			s.Data.Encode(e)
+		}
+	}
+	{
+		if s.DurationMs.Set {
+			e.FieldStart("duration_ms")
+			s.DurationMs.Encode(e)
+		}
+	}
+	{
+		if s.Message.Set {
+			e.FieldStart("message")
+			s.Message.Encode(e)
+		}
+	}
+	{
+		if s.Node.Set {
+			e.FieldStart("node")
+			s.Node.Encode(e)
+		}
+	}
+	{
+		if s.Success.Set {
+			e.FieldStart("success")
+			s.Success.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcLocationResultResultsItem = [5]string{
+	0: "data",
+	1: "duration_ms",
+	2: "message",
+	3: "node",
+	4: "success",
+}
+
+// Decode decodes BmcResponseModelBmcLocationResultResultsItem from json.
+func (s *BmcResponseModelBmcLocationResultResultsItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcLocationResultResultsItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "data":
+			if err := func() error {
+				s.Data.Reset()
+				if err := s.Data.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"data\"")
+			}
+		case "duration_ms":
+			if err := func() error {
+				s.DurationMs.Reset()
+				if err := s.DurationMs.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"duration_ms\"")
+			}
+		case "message":
+			if err := func() error {
+				s.Message.Reset()
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		case "node":
+			if err := func() error {
+				s.Node.Reset()
+				if err := s.Node.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"node\"")
+			}
+		case "success":
+			if err := func() error {
+				s.Success.Reset()
+				if err := s.Success.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"success\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcLocationResultResultsItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcLocationResultResultsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcLocationResultResultsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcLocationResultResultsItemData) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcLocationResultResultsItemData) encodeFields(e *jx.Encoder) {
+	{
+		if s.Changed.Set {
+			e.FieldStart("changed")
+			s.Changed.Encode(e)
+		}
+	}
+	{
+		if s.Current.Set {
+			e.FieldStart("current")
+			s.Current.Encode(e)
+		}
+	}
+	{
+		if s.Desired.Set {
+			e.FieldStart("desired")
+			s.Desired.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcLocationResultResultsItemData = [3]string{
+	0: "changed",
+	1: "current",
+	2: "desired",
+}
+
+// Decode decodes BmcResponseModelBmcLocationResultResultsItemData from json.
+func (s *BmcResponseModelBmcLocationResultResultsItemData) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcLocationResultResultsItemData to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "changed":
+			if err := func() error {
+				s.Changed.Reset()
+				if err := s.Changed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"changed\"")
+			}
+		case "current":
+			if err := func() error {
+				s.Current.Reset()
+				if err := s.Current.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"current\"")
+			}
+		case "desired":
+			if err := func() error {
+				s.Desired.Reset()
+				if err := s.Desired.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"desired\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcLocationResultResultsItemData")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcLocationResultResultsItemData) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcLocationResultResultsItemData) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) encodeFields(e *jx.Encoder) {
+	{
+		if s.Datacenter.Set {
+			e.FieldStart("datacenter")
+			s.Datacenter.Encode(e)
+		}
+	}
+	{
+		if s.Rack.Set {
+			e.FieldStart("rack")
+			s.Rack.Encode(e)
+		}
+	}
+	{
+		if s.RackUnit.Set {
+			e.FieldStart("rack_unit")
+			s.RackUnit.Encode(e)
+		}
+	}
+	{
+		if s.Room.Set {
+			e.FieldStart("room")
+			s.Room.Encode(e)
+		}
+	}
+	{
+		if s.Row.Set {
+			e.FieldStart("row")
+			s.Row.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcLocationResultResultsItemDataCurrent = [5]string{
+	0: "datacenter",
+	1: "rack",
+	2: "rack_unit",
+	3: "room",
+	4: "row",
+}
+
+// Decode decodes BmcResponseModelBmcLocationResultResultsItemDataCurrent from json.
+func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcLocationResultResultsItemDataCurrent to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "datacenter":
+			if err := func() error {
+				s.Datacenter.Reset()
+				if err := s.Datacenter.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"datacenter\"")
+			}
+		case "rack":
+			if err := func() error {
+				s.Rack.Reset()
+				if err := s.Rack.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"rack\"")
+			}
+		case "rack_unit":
+			if err := func() error {
+				s.RackUnit.Reset()
+				if err := s.RackUnit.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"rack_unit\"")
+			}
+		case "room":
+			if err := func() error {
+				s.Room.Reset()
+				if err := s.Room.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"room\"")
+			}
+		case "row":
+			if err := func() error {
+				s.Row.Reset()
+				if err := s.Row.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"row\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcLocationResultResultsItemDataCurrent")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) encodeFields(e *jx.Encoder) {
+	{
+		if s.Datacenter.Set {
+			e.FieldStart("datacenter")
+			s.Datacenter.Encode(e)
+		}
+	}
+	{
+		if s.Rack.Set {
+			e.FieldStart("rack")
+			s.Rack.Encode(e)
+		}
+	}
+	{
+		if s.RackUnit.Set {
+			e.FieldStart("rack_unit")
+			s.RackUnit.Encode(e)
+		}
+	}
+	{
+		if s.Room.Set {
+			e.FieldStart("room")
+			s.Room.Encode(e)
+		}
+	}
+	{
+		if s.Row.Set {
+			e.FieldStart("row")
+			s.Row.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcLocationResultResultsItemDataDesired = [5]string{
+	0: "datacenter",
+	1: "rack",
+	2: "rack_unit",
+	3: "room",
+	4: "row",
+}
+
+// Decode decodes BmcResponseModelBmcLocationResultResultsItemDataDesired from json.
+func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcLocationResultResultsItemDataDesired to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "datacenter":
+			if err := func() error {
+				s.Datacenter.Reset()
+				if err := s.Datacenter.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"datacenter\"")
+			}
+		case "rack":
+			if err := func() error {
+				s.Rack.Reset()
+				if err := s.Rack.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"rack\"")
+			}
+		case "rack_unit":
+			if err := func() error {
+				s.RackUnit.Reset()
+				if err := s.RackUnit.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"rack_unit\"")
+			}
+		case "room":
+			if err := func() error {
+				s.Room.Reset()
+				if err := s.Room.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"room\"")
+			}
+		case "row":
+			if err := func() error {
+				s.Row.Reset()
+				if err := s.Row.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"row\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcLocationResultResultsItemDataDesired")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcLocationResultSummary) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcLocationResultSummary) encodeFields(e *jx.Encoder) {
+	{
+		if s.DurationMs.Set {
+			e.FieldStart("duration_ms")
+			s.DurationMs.Encode(e)
+		}
+	}
+	{
+		if s.Failed.Set {
+			e.FieldStart("failed")
+			s.Failed.Encode(e)
+		}
+	}
+	{
+		if s.FailedNodes.Set {
+			e.FieldStart("failed_nodes")
+			s.FailedNodes.Encode(e)
+		}
+	}
+	{
+		if s.Succeeded.Set {
+			e.FieldStart("succeeded")
+			s.Succeeded.Encode(e)
+		}
+	}
+	{
+		if s.Total.Set {
+			e.FieldStart("total")
+			s.Total.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcLocationResultSummary = [5]string{
+	0: "duration_ms",
+	1: "failed",
+	2: "failed_nodes",
+	3: "succeeded",
+	4: "total",
+}
+
+// Decode decodes BmcResponseModelBmcLocationResultSummary from json.
+func (s *BmcResponseModelBmcLocationResultSummary) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcLocationResultSummary to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "duration_ms":
+			if err := func() error {
+				s.DurationMs.Reset()
+				if err := s.DurationMs.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"duration_ms\"")
+			}
+		case "failed":
+			if err := func() error {
+				s.Failed.Reset()
+				if err := s.Failed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"failed\"")
+			}
+		case "failed_nodes":
+			if err := func() error {
+				s.FailedNodes.Reset()
+				if err := s.FailedNodes.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"failed_nodes\"")
+			}
+		case "succeeded":
+			if err := func() error {
+				s.Succeeded.Reset()
+				if err := s.Succeeded.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"succeeded\"")
+			}
+		case "total":
+			if err := func() error {
+				s.Total.Reset()
+				if err := s.Total.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"total\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcLocationResultSummary")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcLocationResultSummary) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcLocationResultSummary) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *BmcResponseModelBmcSELLog) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -5172,6 +6810,12 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelRedfishSystemResultsItemData) encodeFields(e *jx.Encoder) {
 	{
+		if s.AssetTag.Set {
+			e.FieldStart("asset_tag")
+			s.AssetTag.Encode(e)
+		}
+	}
+	{
 		if s.BiosVersion.Set {
 			e.FieldStart("bios_version")
 			s.BiosVersion.Encode(e)
@@ -5229,6 +6873,12 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) encodeFields(e *jx.Encode
 		if s.HostName.Set {
 			e.FieldStart("host_name")
 			s.HostName.Encode(e)
+		}
+	}
+	{
+		if s.Location.Set {
+			e.FieldStart("location")
+			s.Location.Encode(e)
 		}
 	}
 	{
@@ -5305,29 +6955,31 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) encodeFields(e *jx.Encode
 	}
 }
 
-var jsonFieldsNameOfBmcResponseModelRedfishSystemResultsItemData = [22]string{
-	0:  "bios_version",
-	1:  "boot_mode",
-	2:  "boot_next",
-	3:  "boot_order",
-	4:  "boot_override_enabled",
-	5:  "boot_override_target",
-	6:  "boot_progress",
-	7:  "boot_progress_time",
-	8:  "health",
-	9:  "host_name",
-	10: "location_indicator",
-	11: "manufacturer",
-	12: "model",
-	13: "name",
-	14: "oem_dell",
-	15: "power_status",
-	16: "processor_cores",
-	17: "processor_count",
-	18: "processor_model",
-	19: "processor_sockets",
-	20: "serial_number",
-	21: "total_memory",
+var jsonFieldsNameOfBmcResponseModelRedfishSystemResultsItemData = [24]string{
+	0:  "asset_tag",
+	1:  "bios_version",
+	2:  "boot_mode",
+	3:  "boot_next",
+	4:  "boot_order",
+	5:  "boot_override_enabled",
+	6:  "boot_override_target",
+	7:  "boot_progress",
+	8:  "boot_progress_time",
+	9:  "health",
+	10: "host_name",
+	11: "location",
+	12: "location_indicator",
+	13: "manufacturer",
+	14: "model",
+	15: "name",
+	16: "oem_dell",
+	17: "power_status",
+	18: "processor_cores",
+	19: "processor_count",
+	20: "processor_model",
+	21: "processor_sockets",
+	22: "serial_number",
+	23: "total_memory",
 }
 
 // Decode decodes BmcResponseModelRedfishSystemResultsItemData from json.
@@ -5338,6 +6990,16 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
+		case "asset_tag":
+			if err := func() error {
+				s.AssetTag.Reset()
+				if err := s.AssetTag.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"asset_tag\"")
+			}
 		case "bios_version":
 			if err := func() error {
 				s.BiosVersion.Reset()
@@ -5437,6 +7099,16 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"host_name\"")
+			}
+		case "location":
+			if err := func() error {
+				s.Location.Reset()
+				if err := s.Location.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"location\"")
 			}
 		case "location_indicator":
 			if err := func() error {
@@ -5578,6 +7250,137 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) MarshalJSON() ([]byte, er
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *BmcResponseModelRedfishSystemResultsItemData) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) encodeFields(e *jx.Encoder) {
+	{
+		if s.Datacenter.Set {
+			e.FieldStart("datacenter")
+			s.Datacenter.Encode(e)
+		}
+	}
+	{
+		if s.Rack.Set {
+			e.FieldStart("rack")
+			s.Rack.Encode(e)
+		}
+	}
+	{
+		if s.RackUnit.Set {
+			e.FieldStart("rack_unit")
+			s.RackUnit.Encode(e)
+		}
+	}
+	{
+		if s.Room.Set {
+			e.FieldStart("room")
+			s.Room.Encode(e)
+		}
+	}
+	{
+		if s.Row.Set {
+			e.FieldStart("row")
+			s.Row.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelRedfishSystemResultsItemDataLocation = [5]string{
+	0: "datacenter",
+	1: "rack",
+	2: "rack_unit",
+	3: "room",
+	4: "row",
+}
+
+// Decode decodes BmcResponseModelRedfishSystemResultsItemDataLocation from json.
+func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelRedfishSystemResultsItemDataLocation to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "datacenter":
+			if err := func() error {
+				s.Datacenter.Reset()
+				if err := s.Datacenter.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"datacenter\"")
+			}
+		case "rack":
+			if err := func() error {
+				s.Rack.Reset()
+				if err := s.Rack.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"rack\"")
+			}
+		case "rack_unit":
+			if err := func() error {
+				s.RackUnit.Reset()
+				if err := s.RackUnit.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"rack_unit\"")
+			}
+		case "room":
+			if err := func() error {
+				s.Room.Reset()
+				if err := s.Room.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"room\"")
+			}
+		case "row":
+			if err := func() error {
+				s.Row.Reset()
+				if err := s.Row.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"row\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelRedfishSystemResultsItemDataLocation")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -11626,6 +13429,50 @@ func (s *NilBmcResponseModelBmcAckResultsItem) UnmarshalJSON(data []byte) error 
 	return s.Decode(d)
 }
 
+// Encode encodes BmcResponseModelBmcAssetTagResultResultsItem as json.
+func (o NilBmcResponseModelBmcAssetTagResultResultsItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcAssetTagResultResultsItem from json.
+func (o *NilBmcResponseModelBmcAssetTagResultResultsItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilBmcResponseModelBmcAssetTagResultResultsItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelBmcAssetTagResultResultsItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilBmcResponseModelBmcAssetTagResultResultsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilBmcResponseModelBmcAssetTagResultResultsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes BmcResponseModelBmcBiosRegistryResultsItem as json.
 func (o NilBmcResponseModelBmcBiosRegistryResultsItem) Encode(e *jx.Encoder) {
 	if o.Null {
@@ -11886,6 +13733,50 @@ func (s NilBmcResponseModelBmcJobListResultsItemDataJobsItem) MarshalJSON() ([]b
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *NilBmcResponseModelBmcJobListResultsItemDataJobsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelBmcLocationResultResultsItem as json.
+func (o NilBmcResponseModelBmcLocationResultResultsItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcLocationResultResultsItem from json.
+func (o *NilBmcResponseModelBmcLocationResultResultsItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilBmcResponseModelBmcLocationResultResultsItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelBmcLocationResultResultsItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilBmcResponseModelBmcLocationResultResultsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilBmcResponseModelBmcLocationResultResultsItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -13722,6 +15613,39 @@ func (s *OptBmcResponseModelBmcAckSummary) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes BmcResponseModelBmcAssetTagResultSummary as json.
+func (o OptBmcResponseModelBmcAssetTagResultSummary) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcAssetTagResultSummary from json.
+func (o *OptBmcResponseModelBmcAssetTagResultSummary) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptBmcResponseModelBmcAssetTagResultSummary to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptBmcResponseModelBmcAssetTagResultSummary) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptBmcResponseModelBmcAssetTagResultSummary) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes BmcResponseModelBmcBiosRegistrySummary as json.
 func (o OptBmcResponseModelBmcBiosRegistrySummary) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -13918,6 +15842,105 @@ func (s OptBmcResponseModelBmcJobListSummary) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptBmcResponseModelBmcJobListSummary) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelBmcLocationResultResultsItemDataCurrent as json.
+func (o OptBmcResponseModelBmcLocationResultResultsItemDataCurrent) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcLocationResultResultsItemDataCurrent from json.
+func (o *OptBmcResponseModelBmcLocationResultResultsItemDataCurrent) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptBmcResponseModelBmcLocationResultResultsItemDataCurrent to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptBmcResponseModelBmcLocationResultResultsItemDataCurrent) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptBmcResponseModelBmcLocationResultResultsItemDataCurrent) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelBmcLocationResultResultsItemDataDesired as json.
+func (o OptBmcResponseModelBmcLocationResultResultsItemDataDesired) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcLocationResultResultsItemDataDesired from json.
+func (o *OptBmcResponseModelBmcLocationResultResultsItemDataDesired) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptBmcResponseModelBmcLocationResultResultsItemDataDesired to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptBmcResponseModelBmcLocationResultResultsItemDataDesired) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptBmcResponseModelBmcLocationResultResultsItemDataDesired) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelBmcLocationResultSummary as json.
+func (o OptBmcResponseModelBmcLocationResultSummary) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcLocationResultSummary from json.
+func (o *OptBmcResponseModelBmcLocationResultSummary) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptBmcResponseModelBmcLocationResultSummary to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptBmcResponseModelBmcLocationResultSummary) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptBmcResponseModelBmcLocationResultSummary) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -14231,6 +16254,105 @@ func (s *OptInt64) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes BmcAssetTagBodyBySerial as json.
+func (o OptNilBmcAssetTagBodyBySerial) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcAssetTagBodyBySerial from json.
+func (o *OptNilBmcAssetTagBodyBySerial) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilBmcAssetTagBodyBySerial to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcAssetTagBodyBySerial
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make(BmcAssetTagBodyBySerial)
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilBmcAssetTagBodyBySerial) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilBmcAssetTagBodyBySerial) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelBmcAssetTagResultResultsItemData as json.
+func (o OptNilBmcResponseModelBmcAssetTagResultResultsItemData) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcAssetTagResultResultsItemData from json.
+func (o *OptNilBmcResponseModelBmcAssetTagResultResultsItemData) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilBmcResponseModelBmcAssetTagResultResultsItemData to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelBmcAssetTagResultResultsItemData
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilBmcResponseModelBmcAssetTagResultResultsItemData) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilBmcResponseModelBmcAssetTagResultResultsItemData) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes BmcResponseModelBmcBiosRegistryResultsItemData as json.
 func (o OptNilBmcResponseModelBmcBiosRegistryResultsItemData) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -14427,6 +16549,55 @@ func (s *OptNilBmcResponseModelBmcJobListResultsItemData) UnmarshalJSON(data []b
 	return s.Decode(d)
 }
 
+// Encode encodes BmcResponseModelBmcLocationResultResultsItemData as json.
+func (o OptNilBmcResponseModelBmcLocationResultResultsItemData) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcLocationResultResultsItemData from json.
+func (o *OptNilBmcResponseModelBmcLocationResultResultsItemData) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilBmcResponseModelBmcLocationResultResultsItemData to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelBmcLocationResultResultsItemData
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilBmcResponseModelBmcLocationResultResultsItemData) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilBmcResponseModelBmcLocationResultResultsItemData) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes BmcResponseModelBmcSELLogResultsItemData as json.
 func (o OptNilBmcResponseModelBmcSELLogResultsItemData) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -14521,6 +16692,55 @@ func (s OptNilBmcResponseModelRedfishSystemResultsItemData) MarshalJSON() ([]byt
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptNilBmcResponseModelRedfishSystemResultsItemData) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelRedfishSystemResultsItemDataLocation as json.
+func (o OptNilBmcResponseModelRedfishSystemResultsItemDataLocation) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelRedfishSystemResultsItemDataLocation from json.
+func (o *OptNilBmcResponseModelRedfishSystemResultsItemDataLocation) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilBmcResponseModelRedfishSystemResultsItemDataLocation to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelRedfishSystemResultsItemDataLocation
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilBmcResponseModelRedfishSystemResultsItemDataLocation) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilBmcResponseModelRedfishSystemResultsItemDataLocation) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -14999,6 +17219,67 @@ func (s *OptNilNilBmcResponseModelBmcAckResultsItemArray) UnmarshalJSON(data []b
 	return s.Decode(d)
 }
 
+// Encode encodes []NilBmcResponseModelBmcAssetTagResultResultsItem as json.
+func (o OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilBmcResponseModelBmcAssetTagResultResultsItem from json.
+func (o *OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilBmcResponseModelBmcAssetTagResultResultsItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilBmcResponseModelBmcAssetTagResultResultsItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilBmcResponseModelBmcAssetTagResultResultsItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes []NilBmcResponseModelBmcBiosRegistryResultsItem as json.
 func (o OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -15361,6 +17642,67 @@ func (s OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) Marshal
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilBmcResponseModelBmcLocationResultResultsItem as json.
+func (o OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilBmcResponseModelBmcLocationResultResultsItem from json.
+func (o *OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcLocationResultResultsItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilBmcResponseModelBmcLocationResultResultsItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilBmcResponseModelBmcLocationResultResultsItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilBmcResponseModelBmcLocationResultResultsItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

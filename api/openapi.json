@@ -96,6 +96,30 @@
 				},
 				"type": "object"
 			},
+			"BmcAssetTagBody": {
+				"description": "BmcAssetTagBody schema",
+				"properties": {
+					"by_serial": {
+						"additionalProperties": {
+							"nullable": true,
+							"type": "string"
+						},
+						"description": "Asset tag for each serial number. A selected node whose serial is not listed fails",
+						"nullable": true,
+						"type": "object"
+					},
+					"dry_run": {
+						"description": "Read the bmcs and report what would change, without writing",
+						"type": "boolean"
+					},
+					"template": {
+						"description": "Go template rendered per node, such as UB-{{.Name}}. A plain string is a valid template",
+						"nullable": true,
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
 			"BmcClearJobsBody": {
 				"description": "BmcClearJobsBody schema",
 				"properties": {
@@ -112,6 +136,31 @@
 						},
 						"nullable": true,
 						"type": "array"
+					}
+				},
+				"type": "object"
+			},
+			"BmcIdentityDefaults": {
+				"description": "BmcIdentityDefaults schema",
+				"properties": {
+					"asset_tag": {
+						"type": "string"
+					},
+					"datacenter": {
+						"type": "string"
+					},
+					"rack": {
+						"type": "string"
+					},
+					"rack_unit": {
+						"nullable": true,
+						"type": "string"
+					},
+					"room": {
+						"type": "string"
+					},
+					"row": {
+						"type": "string"
 					}
 				},
 				"type": "object"
@@ -185,6 +234,39 @@
 				},
 				"type": "object"
 			},
+			"BmcLocationBody": {
+				"description": "BmcLocationBody schema",
+				"properties": {
+					"datacenter": {
+						"nullable": true,
+						"type": "string"
+					},
+					"dry_run": {
+						"description": "Read the bmcs and report what would change, without writing",
+						"type": "boolean"
+					},
+					"rack": {
+						"example": "{{ index .Parts 1 }}",
+						"nullable": true,
+						"type": "string"
+					},
+					"rack_unit": {
+						"description": "Must render to a whole number",
+						"example": "{{ index .Parts 2 }}",
+						"nullable": true,
+						"type": "string"
+					},
+					"room": {
+						"nullable": true,
+						"type": "string"
+					},
+					"row": {
+						"nullable": true,
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
 			"BmcPowerBody": {
 				"description": "BmcPowerBody schema",
 				"properties": {
@@ -215,6 +297,77 @@
 							"properties": {
 								"data": {
 									"nullable": true
+								},
+								"duration_ms": {
+									"format": "int64",
+									"type": "integer"
+								},
+								"message": {
+									"type": "string"
+								},
+								"node": {
+									"type": "string"
+								},
+								"success": {
+									"type": "boolean"
+								}
+							},
+							"type": "object"
+						},
+						"nullable": true,
+						"type": "array"
+					},
+					"run_id": {
+						"type": "string"
+					},
+					"summary": {
+						"properties": {
+							"duration_ms": {
+								"format": "int64",
+								"type": "integer"
+							},
+							"failed": {
+								"type": "integer"
+							},
+							"failed_nodes": {
+								"type": "string"
+							},
+							"succeeded": {
+								"type": "integer"
+							},
+							"total": {
+								"type": "integer"
+							}
+						},
+						"type": "object"
+					}
+				},
+				"type": "object"
+			},
+			"BmcResponse_model.BmcAssetTagResult": {
+				"description": "BmcResponse_model.BmcAssetTagResult schema",
+				"properties": {
+					"results": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"data": {
+									"nullable": true,
+									"properties": {
+										"changed": {
+											"type": "boolean"
+										},
+										"current": {
+											"type": "string"
+										},
+										"desired": {
+											"type": "string"
+										},
+										"serial": {
+											"type": "string"
+										}
+									},
+									"type": "object"
 								},
 								"duration_ms": {
 									"format": "int64",
@@ -695,6 +848,110 @@
 				},
 				"type": "object"
 			},
+			"BmcResponse_model.BmcLocationResult": {
+				"description": "BmcResponse_model.BmcLocationResult schema",
+				"properties": {
+					"results": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"data": {
+									"nullable": true,
+									"properties": {
+										"changed": {
+											"type": "boolean"
+										},
+										"current": {
+											"properties": {
+												"datacenter": {
+													"type": "string"
+												},
+												"rack": {
+													"type": "string"
+												},
+												"rack_unit": {
+													"nullable": true,
+													"type": "integer"
+												},
+												"room": {
+													"type": "string"
+												},
+												"row": {
+													"type": "string"
+												}
+											},
+											"type": "object"
+										},
+										"desired": {
+											"properties": {
+												"datacenter": {
+													"type": "string"
+												},
+												"rack": {
+													"type": "string"
+												},
+												"rack_unit": {
+													"nullable": true,
+													"type": "integer"
+												},
+												"room": {
+													"type": "string"
+												},
+												"row": {
+													"type": "string"
+												}
+											},
+											"type": "object"
+										}
+									},
+									"type": "object"
+								},
+								"duration_ms": {
+									"format": "int64",
+									"type": "integer"
+								},
+								"message": {
+									"type": "string"
+								},
+								"node": {
+									"type": "string"
+								},
+								"success": {
+									"type": "boolean"
+								}
+							},
+							"type": "object"
+						},
+						"nullable": true,
+						"type": "array"
+					},
+					"run_id": {
+						"type": "string"
+					},
+					"summary": {
+						"properties": {
+							"duration_ms": {
+								"format": "int64",
+								"type": "integer"
+							},
+							"failed": {
+								"type": "integer"
+							},
+							"failed_nodes": {
+								"type": "string"
+							},
+							"succeeded": {
+								"type": "integer"
+							},
+							"total": {
+								"type": "integer"
+							}
+						},
+						"type": "object"
+					}
+				},
+				"type": "object"
+			},
 			"BmcResponse_model.BmcSELLog": {
 				"description": "BmcResponse_model.BmcSELLog schema",
 				"properties": {
@@ -798,6 +1055,9 @@
 								"data": {
 									"nullable": true,
 									"properties": {
+										"asset_tag": {
+											"type": "string"
+										},
 										"bios_version": {
 											"type": "string"
 										},
@@ -832,6 +1092,28 @@
 										},
 										"host_name": {
 											"type": "string"
+										},
+										"location": {
+											"nullable": true,
+											"properties": {
+												"datacenter": {
+													"type": "string"
+												},
+												"rack": {
+													"type": "string"
+												},
+												"rack_unit": {
+													"nullable": true,
+													"type": "integer"
+												},
+												"room": {
+													"type": "string"
+												},
+												"row": {
+													"type": "string"
+												}
+											},
+											"type": "object"
 										},
 										"location_indicator": {
 											"type": "string"
@@ -2559,6 +2841,111 @@
 				]
 			}
 		},
+		"/v1/bmc/asset-tag": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcAssetTag`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nSet the asset tag of node(s), from a template or a table of serial numbers",
+				"operationId": "POST_/v1/bmc/asset-tag",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BmcAssetTagBody"
+							}
+						}
+					},
+					"description": "Request body for api.BmcAssetTagBody",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAssetTagResult"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAssetTagResult"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc asset tag",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
 		"/v1/bmc/bios": {
 			"get": {
 				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcBios`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the BIOS attributes of node(s), with any staged changes",
@@ -3355,6 +3742,61 @@
 				]
 			}
 		},
+		"/v1/bmc/identity/defaults": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcIdentityDefaults`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the location and asset tag templates configured as defaults",
+				"operationId": "GET_/v1/bmc/identity/defaults",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcIdentityDefaults"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcIdentityDefaults"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc identity defaults",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
 		"/v1/bmc/indicator": {
 			"post": {
 				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcIndicator`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nTurn the location indicator of node(s) on or off",
@@ -3653,6 +4095,111 @@
 					}
 				],
 				"summary": "bmc clear jobs",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/location": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcLocation`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nSet the rack location of node(s), rendered per node from templates",
+				"operationId": "POST_/v1/bmc/location",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BmcLocationBody"
+							}
+						}
+					},
+					"description": "Request body for api.BmcLocationBody",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcLocationResult"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcLocationResult"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc location",
 				"tags": [
 					"v1",
 					"bmc"

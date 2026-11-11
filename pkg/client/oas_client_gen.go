@@ -118,6 +118,18 @@ type Invoker interface {
 	//
 	// GET /v1/bmc/firmware/updates
 	GETV1BmcFirmwareUpdates(ctx context.Context, params GETV1BmcFirmwareUpdatesParams) (*BmcResponseModelBmcFirmwareUpdates, error)
+	// GETV1BmcIdentityDefaults invokes GET_/v1/bmc/identity/defaults operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcIdentityDefaults`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Get the location and asset tag templates configured as defaults.
+	//
+	// GET /v1/bmc/identity/defaults
+	GETV1BmcIdentityDefaults(ctx context.Context, params GETV1BmcIdentityDefaultsParams) (*BmcIdentityDefaults, error)
 	// GETV1BmcJobs invokes GET_/v1/bmc/jobs operation.
 	//
 	// #### Controller:
@@ -403,6 +415,18 @@ type Invoker interface {
 	//
 	// POST /v1/auth/token
 	POSTV1AuthToken(ctx context.Context, request *AuthTokenRequest, params POSTV1AuthTokenParams) (*AuthTokenReponse, error)
+	// POSTV1BmcAssetTag invokes POST_/v1/bmc/asset-tag operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcAssetTag`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Set the asset tag of node(s), from a template or a table of serial numbers.
+	//
+	// POST /v1/bmc/asset-tag
+	POSTV1BmcAssetTag(ctx context.Context, request *BmcAssetTagBody, params POSTV1BmcAssetTagParams) (*BmcResponseModelBmcAssetTagResult, error)
 	// POSTV1BmcBios invokes POST_/v1/bmc/bios operation.
 	//
 	// #### Controller:
@@ -488,6 +512,18 @@ type Invoker interface {
 	//
 	// POST /v1/bmc/jobs/clear
 	POSTV1BmcJobsClear(ctx context.Context, request *BmcClearJobsBody, params POSTV1BmcJobsClearParams) (*BmcResponseModelBmcAck, error)
+	// POSTV1BmcLocation invokes POST_/v1/bmc/location operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcLocation`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Set the rack location of node(s), rendered per node from templates.
+	//
+	// POST /v1/bmc/location
+	POSTV1BmcLocation(ctx context.Context, request *BmcLocationBody, params POSTV1BmcLocationParams) (*BmcResponseModelBmcLocationResult, error)
 	// POSTV1BmcPower invokes POST_/v1/bmc/power operation.
 	//
 	// #### Controller:
@@ -1705,6 +1741,109 @@ func (c *Client) sendGETV1BmcFirmwareUpdates(ctx context.Context, params GETV1Bm
 	defer resp.Body.Close()
 
 	result, err := decodeGETV1BmcFirmwareUpdatesResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GETV1BmcIdentityDefaults invokes GET_/v1/bmc/identity/defaults operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).BmcIdentityDefaults`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Get the location and asset tag templates configured as defaults.
+//
+// GET /v1/bmc/identity/defaults
+func (c *Client) GETV1BmcIdentityDefaults(ctx context.Context, params GETV1BmcIdentityDefaultsParams) (*BmcIdentityDefaults, error) {
+	res, err := c.sendGETV1BmcIdentityDefaults(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGETV1BmcIdentityDefaults(ctx context.Context, params GETV1BmcIdentityDefaultsParams) (res *BmcIdentityDefaults, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/bmc/identity/defaults"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, GETV1BmcIdentityDefaultsOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, GETV1BmcIdentityDefaultsOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGETV1BmcIdentityDefaultsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -4785,6 +4924,166 @@ func (c *Client) sendPOSTV1AuthToken(ctx context.Context, request *AuthTokenRequ
 	return result, nil
 }
 
+// POSTV1BmcAssetTag invokes POST_/v1/bmc/asset-tag operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).BmcAssetTag`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Set the asset tag of node(s), from a template or a table of serial numbers.
+//
+// POST /v1/bmc/asset-tag
+func (c *Client) POSTV1BmcAssetTag(ctx context.Context, request *BmcAssetTagBody, params POSTV1BmcAssetTagParams) (*BmcResponseModelBmcAssetTagResult, error) {
+	res, err := c.sendPOSTV1BmcAssetTag(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendPOSTV1BmcAssetTag(ctx context.Context, request *BmcAssetTagBody, params POSTV1BmcAssetTagParams) (res *BmcResponseModelBmcAssetTagResult, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/bmc/asset-tag"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "nodeset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "nodeset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Nodeset.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "tags" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "tags",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Tags.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "all" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "all",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.All.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePOSTV1BmcAssetTagRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, POSTV1BmcAssetTagOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, POSTV1BmcAssetTagOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodePOSTV1BmcAssetTagResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // POSTV1BmcBios invokes POST_/v1/bmc/bios operation.
 //
 // #### Controller:
@@ -5902,6 +6201,166 @@ func (c *Client) sendPOSTV1BmcJobsClear(ctx context.Context, request *BmcClearJo
 	defer resp.Body.Close()
 
 	result, err := decodePOSTV1BmcJobsClearResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// POSTV1BmcLocation invokes POST_/v1/bmc/location operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).BmcLocation`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Set the rack location of node(s), rendered per node from templates.
+//
+// POST /v1/bmc/location
+func (c *Client) POSTV1BmcLocation(ctx context.Context, request *BmcLocationBody, params POSTV1BmcLocationParams) (*BmcResponseModelBmcLocationResult, error) {
+	res, err := c.sendPOSTV1BmcLocation(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendPOSTV1BmcLocation(ctx context.Context, request *BmcLocationBody, params POSTV1BmcLocationParams) (res *BmcResponseModelBmcLocationResult, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/bmc/location"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "nodeset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "nodeset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Nodeset.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "tags" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "tags",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Tags.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "all" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "all",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.All.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePOSTV1BmcLocationRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, POSTV1BmcLocationOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, POSTV1BmcLocationOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodePOSTV1BmcLocationResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

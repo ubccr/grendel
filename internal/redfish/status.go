@@ -57,6 +57,16 @@ func (s *Service) statusOne(ctx context.Context, t Target) (*model.RedfishSystem
 		BootOrder:           sys.Boot.BootOrder,
 
 		LocationIndicator: indicatorState(sys),
+		AssetTag:          sys.AssetTag,
+	}
+
+	// the iDRAC mirrors its ServerTopology attributes here, so the chassis is enough for a read
+	if chassis, err := sys.Chassis(); err != nil {
+		log.Debugf("node %s: could not read its chassis for the location: %s", t.Name, err)
+	} else if len(chassis) > 0 {
+		if loc := chassisLocation(chassis[0].Location); loc != (model.BmcLocation{}) {
+			system.Location = &loc
+		}
 	}
 
 	// a failure parsing Dell's extra block should not cost the operator the standard fields above

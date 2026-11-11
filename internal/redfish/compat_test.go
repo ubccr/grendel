@@ -68,6 +68,7 @@ func TestCompat(t *testing.T) {
 	t.Run("jobs", func(t *testing.T) { compatJobs(t, ctx) })
 	t.Run("sel", func(t *testing.T) { compatSEL(t, ctx) })
 	t.Run("bios", func(t *testing.T) { compatBios(t, ctx) })
+	t.Run("identity", func(t *testing.T) { compatIdentity(t, ctx) })
 	t.Run("fanout", func(t *testing.T) { compatFanout(t, ctx) })
 }
 
@@ -566,6 +567,57 @@ func compatAssertSuccess(t *testing.T, success bool, message string) {
 	if message != "" {
 		t.Log(message)
 	}
+}
+
+func compatIdentity(t *testing.T, ctx context.Context) {
+	svc := compatService(*compatBasicAuth)
+	name := compatTarget().Name
+
+	t.Run("readable", func(t *testing.T) {
+		sys, err := svc.statusOne(ctx, compatTarget())
+		if err != nil {
+			t.Fatalf("cannot read the system: %s", err)
+		}
+		if sys.Location == nil {
+			t.Log("the chassis reports no location, so bmc status shows none until one is set")
+		} else {
+			t.Logf("asset tag %q, location %+v", sys.AssetTag, *sys.Location)
+		}
+	})
+
+	t.Run("location_source", func(t *testing.T) {
+		res := svc.SetLocation(ctx, []Target{compatTarget()}, LocationRequest{ByNode: map[string]LocationUpdate{name: {}}, DryRun: true})[0]
+		if !res.Success {
+			t.Fatalf("cannot read the current location: %s", res.Message)
+		}
+		t.Logf("current location %+v", res.Data.Current)
+	})
+
+	// writes back the values already there, which exercises the PATCH without changing anything
+	t.Run("roundtrip", func(t *testing.T) {
+		compatRequireDestructive(t)
+
+		cur := svc.SetLocation(ctx, []Target{compatTarget()}, LocationRequest{ByNode: map[string]LocationUpdate{name: {}}, DryRun: true})[0]
+		if !cur.Success {
+			t.Fatal(cur.Message)
+		}
+		loc := cur.Data.Current
+		marker := loc.Rack + "-grendel"
+		update := LocationUpdate{Rack: &marker}
+		res := svc.SetLocation(ctx, []Target{compatTarget()}, LocationRequest{ByNode: map[string]LocationUpdate{name: update}})[0]
+		if !res.Success {
+			t.Fatalf("cannot write the rack: %s", res.Message)
+		}
+		after := svc.SetLocation(ctx, []Target{compatTarget()}, LocationRequest{ByNode: map[string]LocationUpdate{name: {}}, DryRun: true})[0]
+		if after.Success && after.Data.Current.Rack != marker {
+			t.Errorf("wrote rack %q but the bmc reads back %q", marker, after.Data.Current.Rack)
+		}
+
+		restore := svc.SetLocation(ctx, []Target{compatTarget()}, LocationRequest{ByNode: map[string]LocationUpdate{name: {Rack: &loc.Rack}}})[0]
+		if !restore.Success {
+			t.Errorf("could not restore rack %q: %s", loc.Rack, restore.Message)
+		}
+	})
 }
 
 // compatRequireDestructive keeps the writing checks off a machine somebody cares about. This suite takes a url and cannot tell a mockup server from a live iDRAC, so the operator has to say

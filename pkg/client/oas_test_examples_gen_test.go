@@ -83,6 +83,32 @@ func TestAuthTokenRequest_EncodeDecode(t *testing.T) {
 	var typ2 AuthTokenRequest
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestBmcAssetTagBody_EncodeDecode(t *testing.T) {
+	var typ BmcAssetTagBody
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcAssetTagBody
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcAssetTagBodyBySerial_EncodeDecode(t *testing.T) {
+	var typ BmcAssetTagBodyBySerial
+	typ = make(BmcAssetTagBodyBySerial)
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcAssetTagBodyBySerial
+	typ2 = make(BmcAssetTagBodyBySerial)
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestBmcClearJobsBody_EncodeDecode(t *testing.T) {
 	var typ BmcClearJobsBody
 	typ.SetFake()
@@ -93,6 +119,18 @@ func TestBmcClearJobsBody_EncodeDecode(t *testing.T) {
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
 	var typ2 BmcClearJobsBody
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcIdentityDefaults_EncodeDecode(t *testing.T) {
+	var typ BmcIdentityDefaults
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcIdentityDefaults
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestBmcImportConfigBody_EncodeDecode(t *testing.T) {
@@ -129,6 +167,18 @@ func TestBmcInstallFirmwareBody_EncodeDecode(t *testing.T) {
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
 	var typ2 BmcInstallFirmwareBody
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcLocationBody_EncodeDecode(t *testing.T) {
+	var typ BmcLocationBody
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcLocationBody
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestBmcPowerBody_EncodeDecode(t *testing.T) {
@@ -177,6 +227,54 @@ func TestBmcResponseModelBmcAckSummary_EncodeDecode(t *testing.T) {
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
 	var typ2 BmcResponseModelBmcAckSummary
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcAssetTagResult_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcAssetTagResult
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcAssetTagResult
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcAssetTagResultResultsItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcAssetTagResultResultsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcAssetTagResultResultsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcAssetTagResultResultsItemData_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcAssetTagResultResultsItemData
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcAssetTagResultResultsItemData
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcAssetTagResultSummary_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcAssetTagResultSummary
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcAssetTagResultSummary
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestBmcResponseModelBmcBios_EncodeDecode(t *testing.T) {
@@ -447,6 +545,78 @@ func TestBmcResponseModelBmcJobListSummary_EncodeDecode(t *testing.T) {
 	var typ2 BmcResponseModelBmcJobListSummary
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestBmcResponseModelBmcLocationResult_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcLocationResult
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcLocationResult
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcLocationResultResultsItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcLocationResultResultsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcLocationResultResultsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcLocationResultResultsItemData_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcLocationResultResultsItemData
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcLocationResultResultsItemData
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcLocationResultResultsItemDataCurrent_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcLocationResultResultsItemDataCurrent
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcLocationResultResultsItemDataCurrent
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcLocationResultResultsItemDataDesired_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcLocationResultResultsItemDataDesired
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcLocationResultResultsItemDataDesired
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcLocationResultSummary_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcLocationResultSummary
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcLocationResultSummary
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestBmcResponseModelBmcSELLog_EncodeDecode(t *testing.T) {
 	var typ BmcResponseModelBmcSELLog
 	typ.SetFake()
@@ -541,6 +711,18 @@ func TestBmcResponseModelRedfishSystemResultsItemData_EncodeDecode(t *testing.T)
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
 	var typ2 BmcResponseModelRedfishSystemResultsItemData
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelRedfishSystemResultsItemDataLocation_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelRedfishSystemResultsItemDataLocation
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelRedfishSystemResultsItemDataLocation
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestBmcResponseModelRedfishSystemResultsItemDataOemDell_EncodeDecode(t *testing.T) {

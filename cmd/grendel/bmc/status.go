@@ -31,6 +31,8 @@ var (
 		{Name: "Model"},
 		{Name: "Health"},
 		{Name: "Locate LED"},
+		{Name: "Asset Tag"},
+		{Name: "Location"},
 		{Name: "CPU"},
 		{Name: "Memory"},
 		{Name: "Boot Order"},
@@ -43,16 +45,9 @@ var (
 		Short: "Check BMC status",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			nodeset, all := selector(args[0])
-			params := client.GETV1BmcStatusParams{
-				Nodeset: nodeset,
-				All:     all,
-				Tags:    client.NewOptString(strings.Join(tags, ",")),
-			}
-
-			res, err := apiclient.API.GETV1BmcStatus(command.Context(), params)
+			res, err := bmcStatus(command, args[0])
 			if err != nil {
-				return apiclient.NewApiError(err)
+				return err
 			}
 
 			t := shared.NewTable(statusColumns, statusFilter).Options(*statusOptions).Empty("-")
@@ -60,6 +55,7 @@ var (
 				result := r.Value
 				// data is null unless the node was reached, so every other column stays empty and the row still names the node and why it failed
 				o := result.Data.Value
+				loc := o.Location.Value
 
 				bootOrder := make([]string, 0, len(o.BootOrder.Value))
 				for _, s := range o.BootOrder.Value {
@@ -86,6 +82,8 @@ var (
 					o.Model.Value,
 					o.Health.Value,
 					o.LocationIndicator.Value,
+					o.AssetTag.Value,
+					formatLocation(loc.Datacenter.Value, loc.Room.Value, loc.Row.Value, loc.Rack.Value, loc.RackUnit),
 					optInt(o.ProcessorCount),
 					optFloat(o.TotalMemory),
 					strings.Join(bootOrder, "\n"),
@@ -101,6 +99,22 @@ var (
 		},
 	}
 )
+
+// bmcStatus fetches the status of the selected nodes, which the asset tag and location list commands read as well
+func bmcStatus(command *cobra.Command, selection string) (*client.BmcResponseModelRedfishSystem, error) {
+	nodeset, all := selector(selection)
+	params := client.GETV1BmcStatusParams{
+		Nodeset: nodeset,
+		All:     all,
+		Tags:    client.NewOptString(strings.Join(tags, ",")),
+	}
+
+	res, err := apiclient.API.GETV1BmcStatus(command.Context(), params)
+	if err != nil {
+		return nil, apiclient.NewApiError(err)
+	}
+	return res, nil
+}
 
 // optInt and optFloat leave the cell empty when the field was absent, so an unreached node shows the table's placeholder rather than a made up zero
 func optInt(v client.OptInt) string {
@@ -119,7 +133,7 @@ func optFloat(v client.OptFloat32) string {
 
 func init() {
 	statusOptions = shared.RegisterTableFlags(statusCmd)
-	statusCmd.Flags().StringSliceVar(&statusFilter, "filter", []string{"Host Name", "Manufacturer", "CPU", "Memory", "Boot Order", "Boot Next", "OEM"}, "filter table columns by name")
+	statusCmd.Flags().StringSliceVar(&statusFilter, "filter", []string{"Host Name", "Manufacturer", "Locate LED", "Asset Tag", "Location", "CPU", "Memory", "Boot Order", "Boot Next", "OEM"}, "filter table columns by name")
 
 	statusCmd.RegisterFlagCompletionFunc("filter", shared.ColumnCompletion(statusColumns))
 

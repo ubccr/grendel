@@ -251,10 +251,24 @@ rate_limit_per_second = 30
 # certificate on the provision server
 #config_ignore_certificate_warning = "Disabled"
 
+# Default asset tag template for "grendel bmc asset-tag set" when none is given.
+# Templates see .Name, .Parts (the name split on -), .Tags (key=value tags by key)
+#asset_tag = "UB-{{ .Name }}"
+
 # Extra logins to try, useful for old bmc credentials or factory defaults
 #[[bmc.defaults.credentials]]
 #user = "root"
 #password = "calvin"
+
+[bmc.location]
+# Default templates for "grendel bmc location set" and the GUI form, rendered
+# per node. A field left unset is not written. With node names like
+# cpn-f01-04 (<prefix>-<rack>-<rack unit>):
+#rack = "{{ index .Parts 1 }}"
+#rack_unit = "{{ index .Parts 2 }}"
+#row = ""
+#room = ""
+#datacenter = ""
 
 [bmc.gofish]
 # Advanced gofish connection options. See https://github.com/ubccr/grendel/blob/main/internal/redfish/client.go for implementation details
