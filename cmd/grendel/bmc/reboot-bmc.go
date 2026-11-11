@@ -18,7 +18,7 @@ var (
 	powerBmcOptions *shared.TableOptions
 	powerBmcColumns = []shared.Column{
 		{Name: "Node"},
-		{Name: "Status"},
+		{Name: "State"},
 		{Name: "Message"},
 	}
 	powerBmcCmd = &cobra.Command{
@@ -26,31 +26,34 @@ var (
 		Short: "Reboot the BMC",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			nodeset := args[0]
-			if args[0] == "all" {
-				nodeset = ""
-			}
-			params := client.POSTV1BmcPowerBmcParams{
-				Nodeset: client.NewOptString(nodeset),
+			// one power route covers both, a bmc target is always a graceful manager restart
+			req := &client.BmcPowerBody{Target: client.NewOptString("bmc")}
+
+			nodeset, all := selector(args[0])
+			params := client.POSTV1BmcPowerParams{
+				Nodeset: nodeset,
+				All:     all,
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			jobs, err := apiclient.API.POSTV1BmcPowerBmc(command.Context(), params)
+
+			res, err := apiclient.API.POSTV1BmcPower(command.Context(), req, params)
 			if err != nil {
 				return apiclient.NewApiError(err)
 			}
 
 			t := shared.NewTable(powerBmcColumns, powerBmcFilter).Options(*powerBmcOptions).Empty("-")
-
-			for _, job := range jobs {
+			for _, r := range res.Results.Value {
+				result := r.Value
 				t.AppendRow(
-					job.Host.Value,
-					job.Status.Value,
-					job.Msg.Value,
+					result.Node.Value,
+					colorState(result.Success.Value),
+					result.Message.Value,
 				)
 			}
-
 			t.Print()
-			return nil
+
+			s := res.Summary.Value
+			return summaryLine(s.Total.Value, s.Succeeded.Value, s.Failed.Value, s.FailedNodes.Value, s.DurationMs.Value)
 		},
 	}
 )

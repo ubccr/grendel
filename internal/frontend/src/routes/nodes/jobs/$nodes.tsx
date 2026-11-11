@@ -1,8 +1,9 @@
-import { getV1BmcJobs, RedfishJob } from "@/client";
+import { BmcResponseModelBmcJobList, getV1BmcJobs } from "@/client";
 import ActionsSheet from "@/components/actions-sheet";
 import JobsDeleteAction from "@/components/actions/jobs/delete";
 import { DataTable, DataTableActions } from "@/components/data-table/data-table";
 import { DataTableColumnHeader } from "@/components/data-table/header";
+import { countWith, nodeColumns, NodeRow, rowsPerNode } from "@/components/nodes/bmc-columns";
 import SelectableCheckbox from "@/components/data-table/selectableCheckbox";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,14 +12,13 @@ import { Switch } from "@/components/ui/switch";
 import AuthRedirect from "@/lib/auth";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ColumnDef } from "@tanstack/react-table";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 type ArrayElement<T> = T extends (infer U)[] ? U : never;
-type Job = ArrayElement<RedfishJob["jobs"]>;
+type Result = ArrayElement<NonNullable<BmcResponseModelBmcJobList["results"]>>;
+type Job = ArrayElement<NonNullable<NonNullable<Result["data"]>["jobs"]>>;
 
-type nodeJob = Job & {
-  Node: string;
-};
+type nodeJob = NodeRow & Partial<Job>;
 
 export const Route = createFileRoute("/nodes/jobs/$nodes")({
   component: RouteComponent,
@@ -31,21 +31,10 @@ function RouteComponent() {
   const { isFetching } = Route.useMatch();
 
   const [lastSelectedID, setLastSelectedID] = useState(0);
-  const [nodeJobList, setNodeJobList] = useState<Array<nodeJob>>([]);
-  useEffect(() => {
-    const list: Array<nodeJob> = [];
-
-    data?.forEach((d) => {
-      d.jobs?.forEach((v) => {
-        list.push({
-          Node: d.name ?? "",
-          ...v,
-        });
-      });
-    });
-
-    setNodeJobList(list);
-  }, [data]);
+  const nodeJobList = useMemo(
+    () => rowsPerNode((data?.results ?? []).map((r) => ({ ...r, items: r.data?.jobs }))),
+    [data],
+  );
 
   const columns: ColumnDef<nodeJob>[] = [
     {
@@ -76,7 +65,7 @@ function RouteComponent() {
       ),
     },
     {
-      accessorKey: "Node",
+      accessorKey: "node",
       header: ({ table }) => (
         <div className="flex justify-between gap-2">
           <span>Node</span>
@@ -90,7 +79,7 @@ function RouteComponent() {
         </div>
       ),
       cell: ({ row }) => {
-        const node = row.original?.Node;
+        const node = row.original?.node;
         return (
           <Link
             to={"/nodes/$node/node"}
@@ -102,50 +91,49 @@ function RouteComponent() {
         );
       },
     },
+    ...nodeColumns<nodeJob>(),
     {
-      accessorKey: "Id",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
-      aggregationFn: "count",
+      accessorKey: "id",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Job ID" />,
+      aggregationFn: countWith<nodeJob>("id"),
       aggregatedCell: ({ getValue }) => <Badge variant="secondary">{getValue<number>()}</Badge>,
     },
     {
-      accessorKey: "JobStatus",
+      accessorKey: "status",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Job Status" />,
       aggregationFn: "unique",
     },
     {
-      accessorKey: "JobState",
+      accessorKey: "state",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Job State" />,
       aggregationFn: "unique",
     },
     {
-      accessorKey: "PercentComplete",
+      accessorKey: "percent_complete",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Percent Complete" />,
       aggregationFn: "min",
       aggregatedCell: ({ getValue }) => <span>Minimum: {getValue<number>()}</span>,
     },
     {
-      accessorKey: "Name",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
+      accessorKey: "name",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Job Name" />,
     },
     {
-      accessorKey: "Messages",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Messages" />,
-      cell: ({ row }) => {
-        return <span>{row.original?.Messages?.map((v) => v.Message).join(",")}</span>;
-      },
+      accessorKey: "message",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Job Message" />,
     },
   ];
 
   const actions: DataTableActions<nodeJob> = ({ table }) => {
     const checked = new Map<string, string[]>();
-    table.getSelectedRowModel().rows.forEach((v) => {
-      const node = v.getAllCells()[0].getValue<string>();
-      const jid = v.getAllCells()[2].getValue<string>();
-      checked.set(node, [jid, ...(checked.get(node) ?? [])]);
+    const selected = table.getSelectedRowModel().rows.filter((v) => !v.getIsGrouped());
+    selected.forEach((v) => {
+      const { node, id } = v.original;
+      if (!id) return;
+      checked.set(node, [id, ...(checked.get(node) ?? [])]);
     });
 
-    const length = table.getSelectedRowModel().rows.length;
+    const length = selected.length;
     return (
       <ActionsSheet checked={""} length={length}>
         <JobsDeleteAction list={Object.fromEntries(checked)} />
@@ -159,7 +147,7 @@ function RouteComponent() {
         <DataTable
           columns={columns}
           Actions={actions}
-          initialGrouping={["Node"]}
+          initialGrouping={["node"]}
           data={nodeJobList}
           progress={isFetching !== false}
         />

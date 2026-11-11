@@ -7,35 +7,6 @@ type DELETEV1AuthSignoutParams struct {
 	Accept OptString
 }
 
-// DELETEV1BmcJobsParams is parameters of DELETE_/v1/bmc/jobs operation.
-type DELETEV1BmcJobsParams struct {
-	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
-	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
-	Accept OptString
-}
-
-// DELETEV1BmcJobsJidsParams is parameters of DELETE_/v1/bmc/jobs/:jids operation.
-type DELETEV1BmcJobsJidsParams struct {
-	// Redfish Job IDs. Use 'JID_CLEARALL' to clear all jobs.
-	Jids string
-	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
-	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
-	Accept OptString
-}
-
-// DELETEV1BmcSelParams is parameters of DELETE_/v1/bmc/sel operation.
-type DELETEV1BmcSelParams struct {
-	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
-	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
-	Accept OptString
-}
-
 // DELETEV1ImagesParams is parameters of DELETE_/v1/images operation.
 type DELETEV1ImagesParams struct {
 	// Filter by name.
@@ -66,12 +37,14 @@ type DELETEV1UsersUsernamesParams struct {
 	Accept    OptString
 }
 
-// GETV1BmcParams is parameters of GET_/v1/bmc operation.
-type GETV1BmcParams struct {
+// GETV1BmcFirmwareUpdatesParams is parameters of GET_/v1/bmc/firmware/updates operation.
+type GETV1BmcFirmwareUpdatesParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
 	Nodeset OptString
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
 	Accept OptString
 }
 
@@ -80,25 +53,33 @@ type GETV1BmcJobsParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
 	Nodeset OptString
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
 	Accept OptString
 }
 
-// GETV1BmcMetricsParams is parameters of GET_/v1/bmc/metrics operation.
-type GETV1BmcMetricsParams struct {
+// GETV1BmcSelParams is parameters of GET_/v1/bmc/sel operation.
+type GETV1BmcSelParams struct {
+	// Keep only this many entries per node.
+	Limit OptString
 	// Filter by nodeset. Minimum of one query parameter is required.
 	Nodeset OptString
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
 	Accept OptString
 }
 
-// GETV1BmcUpgradeDellRepoParams is parameters of GET_/v1/bmc/upgrade/dell/repo operation.
-type GETV1BmcUpgradeDellRepoParams struct {
+// GETV1BmcStatusParams is parameters of GET_/v1/bmc/status operation.
+type GETV1BmcStatusParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
 	Nodeset OptString
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
 	Accept OptString
 }
 
@@ -252,7 +233,9 @@ type POSTV1BmcConfigureAutoParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
 	Nodeset OptString
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
 	Accept OptString
 }
 
@@ -261,34 +244,53 @@ type POSTV1BmcConfigureImportParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
 	Nodeset OptString
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
 	Accept OptString
 }
 
-// POSTV1BmcPowerBmcParams is parameters of POST_/v1/bmc/power/bmc operation.
-type POSTV1BmcPowerBmcParams struct {
+// POSTV1BmcFirmwareInstallParams is parameters of POST_/v1/bmc/firmware/install operation.
+type POSTV1BmcFirmwareInstallParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
 	Nodeset OptString
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
 	Accept OptString
 }
 
-// POSTV1BmcPowerOsParams is parameters of POST_/v1/bmc/power/os operation.
-type POSTV1BmcPowerOsParams struct {
+// POSTV1BmcJobsClearParams is parameters of POST_/v1/bmc/jobs/clear operation.
+type POSTV1BmcJobsClearParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
 	Nodeset OptString
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
 	Accept OptString
 }
 
-// POSTV1BmcUpgradeDellInstallfromrepoParams is parameters of POST_/v1/bmc/upgrade/dell/installfromrepo operation.
-type POSTV1BmcUpgradeDellInstallfromrepoParams struct {
+// POSTV1BmcPowerParams is parameters of POST_/v1/bmc/power operation.
+type POSTV1BmcPowerParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
 	Nodeset OptString
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
+	Accept OptString
+}
+
+// POSTV1BmcSelClearParams is parameters of POST_/v1/bmc/sel/clear operation.
+type POSTV1BmcSelClearParams struct {
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
 	Accept OptString
 }
 

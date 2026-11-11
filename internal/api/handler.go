@@ -12,6 +12,7 @@ import (
 	"github.com/go-fuego/fuego/option"
 	"github.com/go-fuego/fuego/param"
 	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/redfish"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/store/eventstore"
 )
@@ -19,12 +20,12 @@ import (
 type Handler struct {
 	DB     store.Store
 	Events eventstore.Store
+	// Redfish serves the bmc routes
+	Redfish *redfish.Service
 }
 
 func NewHandler(db store.Store) (*Handler, error) {
-	h := &Handler{
-		DB: db,
-	}
+	h := &Handler{DB: db, Redfish: redfish.NewFromViper()}
 
 	return h, nil
 }
@@ -41,6 +42,7 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 
 	// Params
 	filterNodes := fuego.GroupOptions(option.Query("nodeset", "Filter by nodeset. Minimum of one query parameter is required", nsExample), option.Query("tags", "Filter by tags. Minimum of one query parameter is required", param.Example("tags", "a01,ib,test")))
+	selectAll := option.Query("all", "Select every node in the database. Required when no nodeset or tags are given", param.Example("all", "true"))
 	filterNames := fuego.GroupOptions(option.Query("names", "Filter by name", param.Example("names", "image1,image2")))
 
 	globalOptions := fuego.GroupOptions(
@@ -145,58 +147,56 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 	fuego.Post(db, "/restore", h.Restore, option.Description("Restore a backup of the DB"))
 	fuego.Get(db, "/dump", h.Dump, option.Description("Get a backup of the DB"))
 
-	fuego.Get(bmc, "", h.BmcQuery,
-		option.Description("Get redfish info from node(s)"),
+	fuego.Get(bmc, "/status", h.BmcStatus,
+		option.Description("Get redfish system information from node(s)"),
 		filterNodes,
+		selectAll,
 	)
-	fuego.Post(bmc, "/power/os", h.BmcOsPower,
-		option.Description("Change power status of node(s)"),
+	fuego.Post(bmc, "/power", h.BmcPower,
+		option.Description("Change the power state of node(s), or restart their BMCs"),
 		filterNodes,
+		selectAll,
 	)
-	fuego.Post(bmc, "/power/bmc", h.BmcPower,
-		option.Description("Reboot node(s) BMC"),
+	fuego.Get(bmc, "/jobs", h.BmcJobs,
+		option.Description("Get the redfish job queue of node(s)"),
 		filterNodes,
+		selectAll,
 	)
-	fuego.Delete(bmc, "/sel", h.BmcSelClear,
-		option.Description("Clear system event log on node(s)"),
+	fuego.Post(bmc, "/jobs/clear", h.BmcClearJobs,
+		option.Description("Clear redfish jobs from node(s)"),
 		filterNodes,
+		selectAll,
 	)
-	fuego.Get(bmc, "/jobs", h.BmcJobList,
-		option.Description("Get redfish jobs from node(s)"),
+	fuego.Get(bmc, "/sel", h.BmcSEL,
+		option.Description("Get the system event log of node(s)"),
+		option.Query("limit", "Keep only this many entries per node", param.Example("limit", "50")),
 		filterNodes,
+		selectAll,
 	)
-	fuego.Delete(bmc, "/jobs/{jids}", h.BmcJobDelete,
-		option.Description("Delete redfish jobs from node(s) by JID"),
-		option.Path("jids", "Redfish Job IDs. Use 'JID_CLEARALL' to clear all jobs",
-			param.Example("jids", "JID_000000000001,JID_000000000002"),
-		),
+	fuego.Post(bmc, "/sel/clear", h.BmcClearSEL,
+		option.Description("Clear the system event log on node(s)"),
 		filterNodes,
-	)
-	fuego.Delete(bmc, "/jobs", h.BmcJobDeleteMany,
-		option.Description("Delete redfish jobs from many node(s)"),
-		filterNodes,
+		selectAll,
 	)
 	fuego.Post(bmc, "/configure/auto", h.BmcAutoConfigure,
-		option.Description("Set BMC to autoconfigure"),
+		option.Description("Set iDRAC(s) to auto configure once, on the node's next boot. Dell only"),
 		filterNodes,
+		selectAll,
 	)
-	fuego.Post(bmc, "/configure/import", h.BmcImportConfiguration,
-		option.Description("Manually import system configuration to BMC"),
+	fuego.Post(bmc, "/configure/import", h.BmcImportConfig,
+		option.Description("Have iDRAC(s) download a config template from the provision server and import it. Dell only"),
 		filterNodes,
+		selectAll,
 	)
-	fuego.Get(bmc, "/metrics", h.BmcMetricReports,
-		option.Description("Get metric reports by nodeset"),
+	fuego.Get(bmc, "/firmware/updates", h.BmcFirmwareUpdates,
+		option.Description("List the firmware updates iDRAC(s) found in their last catalog comparison, which firmware/install with apply_update false runs. Dell only"),
 		filterNodes,
+		selectAll,
 	)
-
-	fuego.Post(bmc, "/upgrade/dell/installfromrepo", h.BmcDellInstallFromRepo,
-		option.Description("Request iDRAC to download the latest firmware catalog and compare firmware versions."),
+	fuego.Post(bmc, "/firmware/install", h.BmcInstallFirmware,
+		option.Description("Compare the firmware of iDRAC(s) against an update catalog, and with apply_update queue the updates. A comparison waits for its job to finish, up to bmc.node_timeout. Dell only"),
 		filterNodes,
-	)
-
-	fuego.Get(bmc, "/upgrade/dell/repo", h.BmcDellGetRepoUpdateList,
-		option.Description("Fetch which packages can be upgraded"),
-		filterNodes,
+		selectAll,
 	)
 
 	fuego.Get(sw, "/{nodeset}/lldp", h.SwitchGetLLDP,

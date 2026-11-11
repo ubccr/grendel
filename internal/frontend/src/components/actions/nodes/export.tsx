@@ -1,6 +1,6 @@
 import { getV1NodesFindOptions } from "@/client/@tanstack/react-query.gen";
+import ActionCard from "@/components/actions/action-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -15,15 +15,15 @@ import { toast } from "sonner";
 
 export default function NodesExportAction({ nodes }: { nodes: string }) {
   const { data, refetch } = useQuery(getV1NodesFindOptions({ query: { nodeset: nodes } }));
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Export JSON</CardTitle>
-      </CardHeader>
-      <CardFooter>
+    <ActionCard
+      title="Export JSON"
+      description="Show the nodes as JSON, ready to copy or import elsewhere."
+      footer={
         <Dialog>
           <DialogTrigger asChild>
-            <Button onClick={() => refetch()}>Submit</Button>
+            <Button onClick={() => refetch()}>Export</Button>
           </DialogTrigger>
           <DialogContent className="max-w-1/2">
             <DialogHeader>
@@ -47,7 +47,7 @@ export default function NodesExportAction({ nodes }: { nodes: string }) {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </CardFooter>
-    </Card>
+      }
+    />
   );
 }

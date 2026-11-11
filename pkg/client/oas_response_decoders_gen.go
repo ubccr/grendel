@@ -107,384 +107,6 @@ func decodeDELETEV1AuthSignoutResponse(resp *http.Response) (res *GenericRespons
 	return res, errors.Wrap(defRes, "error")
 }
 
-func decodeDELETEV1BmcJobsResponse(resp *http.Response) (res []JobMessage, _ error) {
-	switch resp.StatusCode {
-	case 200:
-		// Code 200.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response []JobMessage
-			if err := func() error {
-				response = make([]JobMessage, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem JobMessage
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					response = append(response, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			// Validate response.
-			if err := func() error {
-				if response == nil {
-					return errors.New("nil is invalid value")
-				}
-				var failures []validate.FieldError
-				for i, elem := range response {
-					if err := func() error {
-						if err := elem.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						failures = append(failures, validate.FieldError{
-							Name:  fmt.Sprintf("[%d]", i),
-							Error: err,
-						})
-					}
-				}
-				if len(failures) > 0 {
-					return &validate.Error{Fields: failures}
-				}
-				return nil
-			}(); err != nil {
-				return res, errors.Wrap(err, "validate")
-			}
-			return response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	}
-	// Convenient error response.
-	defRes, err := func() (res *HTTPErrorStatusCode, err error) {
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response HTTPError
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			// Validate response.
-			if err := func() error {
-				if err := response.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return res, errors.Wrap(err, "validate")
-			}
-			return &HTTPErrorStatusCode{
-				StatusCode: resp.StatusCode,
-				Response:   response,
-			}, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	}()
-	if err != nil {
-		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
-	}
-	return res, errors.Wrap(defRes, "error")
-}
-
-func decodeDELETEV1BmcJobsJidsResponse(resp *http.Response) (res []JobMessage, _ error) {
-	switch resp.StatusCode {
-	case 200:
-		// Code 200.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response []JobMessage
-			if err := func() error {
-				response = make([]JobMessage, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem JobMessage
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					response = append(response, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			// Validate response.
-			if err := func() error {
-				if response == nil {
-					return errors.New("nil is invalid value")
-				}
-				var failures []validate.FieldError
-				for i, elem := range response {
-					if err := func() error {
-						if err := elem.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						failures = append(failures, validate.FieldError{
-							Name:  fmt.Sprintf("[%d]", i),
-							Error: err,
-						})
-					}
-				}
-				if len(failures) > 0 {
-					return &validate.Error{Fields: failures}
-				}
-				return nil
-			}(); err != nil {
-				return res, errors.Wrap(err, "validate")
-			}
-			return response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	}
-	// Convenient error response.
-	defRes, err := func() (res *HTTPErrorStatusCode, err error) {
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response HTTPError
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			// Validate response.
-			if err := func() error {
-				if err := response.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return res, errors.Wrap(err, "validate")
-			}
-			return &HTTPErrorStatusCode{
-				StatusCode: resp.StatusCode,
-				Response:   response,
-			}, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	}()
-	if err != nil {
-		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
-	}
-	return res, errors.Wrap(defRes, "error")
-}
-
-func decodeDELETEV1BmcSelResponse(resp *http.Response) (res []JobMessage, _ error) {
-	switch resp.StatusCode {
-	case 200:
-		// Code 200.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response []JobMessage
-			if err := func() error {
-				response = make([]JobMessage, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem JobMessage
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					response = append(response, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			// Validate response.
-			if err := func() error {
-				if response == nil {
-					return errors.New("nil is invalid value")
-				}
-				var failures []validate.FieldError
-				for i, elem := range response {
-					if err := func() error {
-						if err := elem.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						failures = append(failures, validate.FieldError{
-							Name:  fmt.Sprintf("[%d]", i),
-							Error: err,
-						})
-					}
-				}
-				if len(failures) > 0 {
-					return &validate.Error{Fields: failures}
-				}
-				return nil
-			}(); err != nil {
-				return res, errors.Wrap(err, "validate")
-			}
-			return response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	}
-	// Convenient error response.
-	defRes, err := func() (res *HTTPErrorStatusCode, err error) {
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response HTTPError
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			// Validate response.
-			if err := func() error {
-				if err := response.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return res, errors.Wrap(err, "validate")
-			}
-			return &HTTPErrorStatusCode{
-				StatusCode: resp.StatusCode,
-				Response:   response,
-			}, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	}()
-	if err != nil {
-		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
-	}
-	return res, errors.Wrap(defRes, "error")
-}
-
 func decodeDELETEV1ImagesResponse(resp *http.Response) (res *GenericResponse, _ error) {
 	switch resp.StatusCode {
 	case 200:
@@ -853,7 +475,7 @@ func decodeDELETEV1UsersUsernamesResponse(resp *http.Response) (res *GenericResp
 	return res, errors.Wrap(defRes, "error")
 }
 
-func decodeGETV1BmcResponse(resp *http.Response) (res []RedfishSystem, _ error) {
+func decodeGETV1BmcFirmwareUpdatesResponse(resp *http.Response) (res *BmcResponseModelBmcFirmwareUpdates, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -869,17 +491,9 @@ func decodeGETV1BmcResponse(resp *http.Response) (res []RedfishSystem, _ error) 
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response []RedfishSystem
+			var response BmcResponseModelBmcFirmwareUpdates
 			if err := func() error {
-				response = make([]RedfishSystem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishSystem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					response = append(response, elem)
-					return nil
-				}); err != nil {
+				if err := response.Decode(d); err != nil {
 					return err
 				}
 				if err := d.Skip(); err != io.EOF {
@@ -896,31 +510,14 @@ func decodeGETV1BmcResponse(resp *http.Response) (res []RedfishSystem, _ error) 
 			}
 			// Validate response.
 			if err := func() error {
-				if response == nil {
-					return errors.New("nil is invalid value")
-				}
-				var failures []validate.FieldError
-				for i, elem := range response {
-					if err := func() error {
-						if err := elem.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						failures = append(failures, validate.FieldError{
-							Name:  fmt.Sprintf("[%d]", i),
-							Error: err,
-						})
-					}
-				}
-				if len(failures) > 0 {
-					return &validate.Error{Fields: failures}
+				if err := response.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
 				return res, errors.Wrap(err, "validate")
 			}
-			return response, nil
+			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -979,7 +576,7 @@ func decodeGETV1BmcResponse(resp *http.Response) (res []RedfishSystem, _ error) 
 	return res, errors.Wrap(defRes, "error")
 }
 
-func decodeGETV1BmcJobsResponse(resp *http.Response) (res []RedfishJob, _ error) {
+func decodeGETV1BmcJobsResponse(resp *http.Response) (res *BmcResponseModelBmcJobList, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -995,17 +592,9 @@ func decodeGETV1BmcJobsResponse(resp *http.Response) (res []RedfishJob, _ error)
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response []RedfishJob
+			var response BmcResponseModelBmcJobList
 			if err := func() error {
-				response = make([]RedfishJob, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishJob
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					response = append(response, elem)
-					return nil
-				}); err != nil {
+				if err := response.Decode(d); err != nil {
 					return err
 				}
 				if err := d.Skip(); err != io.EOF {
@@ -1022,31 +611,14 @@ func decodeGETV1BmcJobsResponse(resp *http.Response) (res []RedfishJob, _ error)
 			}
 			// Validate response.
 			if err := func() error {
-				if response == nil {
-					return errors.New("nil is invalid value")
-				}
-				var failures []validate.FieldError
-				for i, elem := range response {
-					if err := func() error {
-						if err := elem.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						failures = append(failures, validate.FieldError{
-							Name:  fmt.Sprintf("[%d]", i),
-							Error: err,
-						})
-					}
-				}
-				if len(failures) > 0 {
-					return &validate.Error{Fields: failures}
+				if err := response.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
 				return res, errors.Wrap(err, "validate")
 			}
-			return response, nil
+			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -1105,7 +677,7 @@ func decodeGETV1BmcJobsResponse(resp *http.Response) (res []RedfishJob, _ error)
 	return res, errors.Wrap(defRes, "error")
 }
 
-func decodeGETV1BmcMetricsResponse(resp *http.Response) (res []RedfishMetricReport, _ error) {
+func decodeGETV1BmcSelResponse(resp *http.Response) (res *BmcResponseModelBmcSELLog, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1121,17 +693,9 @@ func decodeGETV1BmcMetricsResponse(resp *http.Response) (res []RedfishMetricRepo
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response []RedfishMetricReport
+			var response BmcResponseModelBmcSELLog
 			if err := func() error {
-				response = make([]RedfishMetricReport, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishMetricReport
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					response = append(response, elem)
-					return nil
-				}); err != nil {
+				if err := response.Decode(d); err != nil {
 					return err
 				}
 				if err := d.Skip(); err != io.EOF {
@@ -1148,31 +712,14 @@ func decodeGETV1BmcMetricsResponse(resp *http.Response) (res []RedfishMetricRepo
 			}
 			// Validate response.
 			if err := func() error {
-				if response == nil {
-					return errors.New("nil is invalid value")
-				}
-				var failures []validate.FieldError
-				for i, elem := range response {
-					if err := func() error {
-						if err := elem.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						failures = append(failures, validate.FieldError{
-							Name:  fmt.Sprintf("[%d]", i),
-							Error: err,
-						})
-					}
-				}
-				if len(failures) > 0 {
-					return &validate.Error{Fields: failures}
+				if err := response.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
 				return res, errors.Wrap(err, "validate")
 			}
-			return response, nil
+			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -1231,7 +778,7 @@ func decodeGETV1BmcMetricsResponse(resp *http.Response) (res []RedfishMetricRepo
 	return res, errors.Wrap(defRes, "error")
 }
 
-func decodeGETV1BmcUpgradeDellRepoResponse(resp *http.Response) (res []RedfishDellUpgradeFirmware, _ error) {
+func decodeGETV1BmcStatusResponse(resp *http.Response) (res *BmcResponseModelRedfishSystem, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1247,17 +794,9 @@ func decodeGETV1BmcUpgradeDellRepoResponse(resp *http.Response) (res []RedfishDe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response []RedfishDellUpgradeFirmware
+			var response BmcResponseModelRedfishSystem
 			if err := func() error {
-				response = make([]RedfishDellUpgradeFirmware, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishDellUpgradeFirmware
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					response = append(response, elem)
-					return nil
-				}); err != nil {
+				if err := response.Decode(d); err != nil {
 					return err
 				}
 				if err := d.Skip(); err != io.EOF {
@@ -1274,31 +813,14 @@ func decodeGETV1BmcUpgradeDellRepoResponse(resp *http.Response) (res []RedfishDe
 			}
 			// Validate response.
 			if err := func() error {
-				if response == nil {
-					return errors.New("nil is invalid value")
-				}
-				var failures []validate.FieldError
-				for i, elem := range response {
-					if err := func() error {
-						if err := elem.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						failures = append(failures, validate.FieldError{
-							Name:  fmt.Sprintf("[%d]", i),
-							Error: err,
-						})
-					}
-				}
-				if len(failures) > 0 {
-					return &validate.Error{Fields: failures}
+				if err := response.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
 				return res, errors.Wrap(err, "validate")
 			}
-			return response, nil
+			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -3468,7 +2990,7 @@ func decodePOSTV1AuthTokenResponse(resp *http.Response) (res *AuthTokenReponse, 
 	return res, errors.Wrap(defRes, "error")
 }
 
-func decodePOSTV1BmcConfigureAutoResponse(resp *http.Response) (res []JobMessage, _ error) {
+func decodePOSTV1BmcConfigureAutoResponse(resp *http.Response) (res *BmcResponseModelBmcAck, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -3484,17 +3006,9 @@ func decodePOSTV1BmcConfigureAutoResponse(resp *http.Response) (res []JobMessage
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response []JobMessage
+			var response BmcResponseModelBmcAck
 			if err := func() error {
-				response = make([]JobMessage, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem JobMessage
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					response = append(response, elem)
-					return nil
-				}); err != nil {
+				if err := response.Decode(d); err != nil {
 					return err
 				}
 				if err := d.Skip(); err != io.EOF {
@@ -3511,31 +3025,14 @@ func decodePOSTV1BmcConfigureAutoResponse(resp *http.Response) (res []JobMessage
 			}
 			// Validate response.
 			if err := func() error {
-				if response == nil {
-					return errors.New("nil is invalid value")
-				}
-				var failures []validate.FieldError
-				for i, elem := range response {
-					if err := func() error {
-						if err := elem.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						failures = append(failures, validate.FieldError{
-							Name:  fmt.Sprintf("[%d]", i),
-							Error: err,
-						})
-					}
-				}
-				if len(failures) > 0 {
-					return &validate.Error{Fields: failures}
+				if err := response.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
 				return res, errors.Wrap(err, "validate")
 			}
-			return response, nil
+			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -3594,7 +3091,7 @@ func decodePOSTV1BmcConfigureAutoResponse(resp *http.Response) (res []JobMessage
 	return res, errors.Wrap(defRes, "error")
 }
 
-func decodePOSTV1BmcConfigureImportResponse(resp *http.Response) (res []JobMessage, _ error) {
+func decodePOSTV1BmcConfigureImportResponse(resp *http.Response) (res *BmcResponseModelBmcAck, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -3610,17 +3107,9 @@ func decodePOSTV1BmcConfigureImportResponse(resp *http.Response) (res []JobMessa
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response []JobMessage
+			var response BmcResponseModelBmcAck
 			if err := func() error {
-				response = make([]JobMessage, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem JobMessage
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					response = append(response, elem)
-					return nil
-				}); err != nil {
+				if err := response.Decode(d); err != nil {
 					return err
 				}
 				if err := d.Skip(); err != io.EOF {
@@ -3637,31 +3126,14 @@ func decodePOSTV1BmcConfigureImportResponse(resp *http.Response) (res []JobMessa
 			}
 			// Validate response.
 			if err := func() error {
-				if response == nil {
-					return errors.New("nil is invalid value")
-				}
-				var failures []validate.FieldError
-				for i, elem := range response {
-					if err := func() error {
-						if err := elem.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						failures = append(failures, validate.FieldError{
-							Name:  fmt.Sprintf("[%d]", i),
-							Error: err,
-						})
-					}
-				}
-				if len(failures) > 0 {
-					return &validate.Error{Fields: failures}
+				if err := response.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
 				return res, errors.Wrap(err, "validate")
 			}
-			return response, nil
+			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -3720,7 +3192,7 @@ func decodePOSTV1BmcConfigureImportResponse(resp *http.Response) (res []JobMessa
 	return res, errors.Wrap(defRes, "error")
 }
 
-func decodePOSTV1BmcPowerBmcResponse(resp *http.Response) (res []JobMessage, _ error) {
+func decodePOSTV1BmcFirmwareInstallResponse(resp *http.Response) (res *BmcResponseModelBmcAck, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -3736,17 +3208,9 @@ func decodePOSTV1BmcPowerBmcResponse(resp *http.Response) (res []JobMessage, _ e
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response []JobMessage
+			var response BmcResponseModelBmcAck
 			if err := func() error {
-				response = make([]JobMessage, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem JobMessage
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					response = append(response, elem)
-					return nil
-				}); err != nil {
+				if err := response.Decode(d); err != nil {
 					return err
 				}
 				if err := d.Skip(); err != io.EOF {
@@ -3763,31 +3227,14 @@ func decodePOSTV1BmcPowerBmcResponse(resp *http.Response) (res []JobMessage, _ e
 			}
 			// Validate response.
 			if err := func() error {
-				if response == nil {
-					return errors.New("nil is invalid value")
-				}
-				var failures []validate.FieldError
-				for i, elem := range response {
-					if err := func() error {
-						if err := elem.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						failures = append(failures, validate.FieldError{
-							Name:  fmt.Sprintf("[%d]", i),
-							Error: err,
-						})
-					}
-				}
-				if len(failures) > 0 {
-					return &validate.Error{Fields: failures}
+				if err := response.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
 				return res, errors.Wrap(err, "validate")
 			}
-			return response, nil
+			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -3846,7 +3293,7 @@ func decodePOSTV1BmcPowerBmcResponse(resp *http.Response) (res []JobMessage, _ e
 	return res, errors.Wrap(defRes, "error")
 }
 
-func decodePOSTV1BmcPowerOsResponse(resp *http.Response) (res []JobMessage, _ error) {
+func decodePOSTV1BmcJobsClearResponse(resp *http.Response) (res *BmcResponseModelBmcAck, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -3862,17 +3309,9 @@ func decodePOSTV1BmcPowerOsResponse(resp *http.Response) (res []JobMessage, _ er
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response []JobMessage
+			var response BmcResponseModelBmcAck
 			if err := func() error {
-				response = make([]JobMessage, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem JobMessage
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					response = append(response, elem)
-					return nil
-				}); err != nil {
+				if err := response.Decode(d); err != nil {
 					return err
 				}
 				if err := d.Skip(); err != io.EOF {
@@ -3889,31 +3328,14 @@ func decodePOSTV1BmcPowerOsResponse(resp *http.Response) (res []JobMessage, _ er
 			}
 			// Validate response.
 			if err := func() error {
-				if response == nil {
-					return errors.New("nil is invalid value")
-				}
-				var failures []validate.FieldError
-				for i, elem := range response {
-					if err := func() error {
-						if err := elem.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						failures = append(failures, validate.FieldError{
-							Name:  fmt.Sprintf("[%d]", i),
-							Error: err,
-						})
-					}
-				}
-				if len(failures) > 0 {
-					return &validate.Error{Fields: failures}
+				if err := response.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
 				return res, errors.Wrap(err, "validate")
 			}
-			return response, nil
+			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}
@@ -3972,7 +3394,7 @@ func decodePOSTV1BmcPowerOsResponse(resp *http.Response) (res []JobMessage, _ er
 	return res, errors.Wrap(defRes, "error")
 }
 
-func decodePOSTV1BmcUpgradeDellInstallfromrepoResponse(resp *http.Response) (res []JobMessage, _ error) {
+func decodePOSTV1BmcPowerResponse(resp *http.Response) (res *BmcResponseModelBmcAck, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -3988,17 +3410,9 @@ func decodePOSTV1BmcUpgradeDellInstallfromrepoResponse(resp *http.Response) (res
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response []JobMessage
+			var response BmcResponseModelBmcAck
 			if err := func() error {
-				response = make([]JobMessage, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem JobMessage
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					response = append(response, elem)
-					return nil
-				}); err != nil {
+				if err := response.Decode(d); err != nil {
 					return err
 				}
 				if err := d.Skip(); err != io.EOF {
@@ -4015,31 +3429,115 @@ func decodePOSTV1BmcUpgradeDellInstallfromrepoResponse(resp *http.Response) (res
 			}
 			// Validate response.
 			if err := func() error {
-				if response == nil {
-					return errors.New("nil is invalid value")
-				}
-				var failures []validate.FieldError
-				for i, elem := range response {
-					if err := func() error {
-						if err := elem.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						failures = append(failures, validate.FieldError{
-							Name:  fmt.Sprintf("[%d]", i),
-							Error: err,
-						})
-					}
-				}
-				if len(failures) > 0 {
-					return &validate.Error{Fields: failures}
+				if err := response.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
 				return res, errors.Wrap(err, "validate")
 			}
-			return response, nil
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}
+	// Convenient error response.
+	defRes, err := func() (res *HTTPErrorStatusCode, err error) {
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response HTTPError
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &HTTPErrorStatusCode{
+				StatusCode: resp.StatusCode,
+				Response:   response,
+			}, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	}()
+	if err != nil {
+		return res, errors.Wrapf(err, "default (code %d)", resp.StatusCode)
+	}
+	return res, errors.Wrap(defRes, "error")
+}
+
+func decodePOSTV1BmcSelClearResponse(resp *http.Response) (res *BmcResponseModelBmcAck, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response BmcResponseModelBmcAck
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
+			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
 		}

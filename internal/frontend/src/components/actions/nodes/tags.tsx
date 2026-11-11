@@ -1,7 +1,7 @@
 import { patchV1NodesTagsActionMutation } from "@/client/@tanstack/react-query.gen";
+import ActionCard from "@/components/actions/action-card";
 import { TagsInput } from "@/components/tags-input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -17,27 +17,15 @@ import { toast } from "sonner";
 export default function NodesTagsAction({ nodes }: { nodes: string }) {
   const [tags, setTags] = useState<string[]>([]);
   const [action, setAction] = useState("");
-
   const { mutate, isPending } = useMutation(patchV1NodesTagsActionMutation());
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Tags</CardTitle>
-      </CardHeader>
-      <CardContent className="grid grid-cols-1 gap-2">
-        <TagsInput value={tags} onValueChange={setTags} placeholder="Tags" />
-        <Select onValueChange={(e) => setAction(e)}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Action" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="add">Add</SelectItem>
-            <SelectItem value="remove">Remove</SelectItem>
-          </SelectContent>
-        </Select>
-      </CardContent>
-      <CardFooter>
+    <ActionCard
+      title="Tags"
+      description="Add tags to the nodes or remove them."
+      footer={
         <Button
+          disabled={isPending || !action || tags.length === 0}
           onClick={() =>
             mutate(
               {
@@ -46,22 +34,27 @@ export default function NodesTagsAction({ nodes }: { nodes: string }) {
                 body: { tags: tags.join(",") },
               },
               {
-                onSuccess: (data) => {
-                  toast.success(data?.title, {
-                    description: data?.detail,
-                  });
-                },
-                onError: (e) =>
-                  toast.error(e.title, {
-                    description: e.detail,
-                  }),
+                onSuccess: (data) => toast.success(data?.title, { description: data?.detail }),
+                onError: (e) => toast.error(e.title, { description: e.detail }),
               },
             )
           }
         >
-          {isPending ? <LoaderCircle className="animate-spin" /> : <span>Submit</span>}
+          {isPending && <LoaderCircle className="animate-spin" />}
+          Apply
         </Button>
-      </CardFooter>
-    </Card>
+      }
+    >
+      <Select onValueChange={setAction}>
+        <SelectTrigger>
+          <SelectValue placeholder="Add or remove" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="add">Add</SelectItem>
+          <SelectItem value="remove">Remove</SelectItem>
+        </SelectContent>
+      </Select>
+      <TagsInput value={tags} onValueChange={setTags} placeholder="Tags" />
+    </ActionCard>
   );
 }

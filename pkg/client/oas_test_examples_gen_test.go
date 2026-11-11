@@ -83,8 +83,8 @@ func TestAuthTokenRequest_EncodeDecode(t *testing.T) {
 	var typ2 AuthTokenRequest
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
-func TestBmcDellInstallFromRepoRequest_EncodeDecode(t *testing.T) {
-	var typ BmcDellInstallFromRepoRequest
+func TestBmcClearJobsBody_EncodeDecode(t *testing.T) {
+	var typ BmcClearJobsBody
 	typ.SetFake()
 
 	e := jx.Encoder{}
@@ -92,11 +92,11 @@ func TestBmcDellInstallFromRepoRequest_EncodeDecode(t *testing.T) {
 	data := e.Bytes()
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
-	var typ2 BmcDellInstallFromRepoRequest
+	var typ2 BmcClearJobsBody
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
-func TestBmcImportConfigurationRequest_EncodeDecode(t *testing.T) {
-	var typ BmcImportConfigurationRequest
+func TestBmcImportConfigBody_EncodeDecode(t *testing.T) {
+	var typ BmcImportConfigBody
 	typ.SetFake()
 
 	e := jx.Encoder{}
@@ -104,11 +104,11 @@ func TestBmcImportConfigurationRequest_EncodeDecode(t *testing.T) {
 	data := e.Bytes()
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
-	var typ2 BmcImportConfigurationRequest
+	var typ2 BmcImportConfigBody
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
-func TestBmcJobDeleteRequest_EncodeDecode(t *testing.T) {
-	var typ BmcJobDeleteRequest
+func TestBmcInstallFirmwareBody_EncodeDecode(t *testing.T) {
+	var typ BmcInstallFirmwareBody
 	typ.SetFake()
 
 	e := jx.Encoder{}
@@ -116,12 +116,11 @@ func TestBmcJobDeleteRequest_EncodeDecode(t *testing.T) {
 	data := e.Bytes()
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
-	var typ2 BmcJobDeleteRequest
+	var typ2 BmcInstallFirmwareBody
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
-func TestBmcJobDeleteRequestNodeJobList_EncodeDecode(t *testing.T) {
-	var typ BmcJobDeleteRequestNodeJobList
-	typ = make(BmcJobDeleteRequestNodeJobList)
+func TestBmcPowerBody_EncodeDecode(t *testing.T) {
+	var typ BmcPowerBody
 	typ.SetFake()
 
 	e := jx.Encoder{}
@@ -129,12 +128,11 @@ func TestBmcJobDeleteRequestNodeJobList_EncodeDecode(t *testing.T) {
 	data := e.Bytes()
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
-	var typ2 BmcJobDeleteRequestNodeJobList
-	typ2 = make(BmcJobDeleteRequestNodeJobList)
+	var typ2 BmcPowerBody
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
-func TestBmcOsPowerBody_EncodeDecode(t *testing.T) {
-	var typ BmcOsPowerBody
+func TestBmcResponseModelBmcAck_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcAck
 	typ.SetFake()
 
 	e := jx.Encoder{}
@@ -142,7 +140,307 @@ func TestBmcOsPowerBody_EncodeDecode(t *testing.T) {
 	data := e.Bytes()
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
-	var typ2 BmcOsPowerBody
+	var typ2 BmcResponseModelBmcAck
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcAckResultsItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcAckResultsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcAckResultsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcAckSummary_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcAckSummary
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcAckSummary
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcFirmwareUpdates_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcFirmwareUpdates
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcFirmwareUpdates
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcFirmwareUpdatesResultsItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcFirmwareUpdatesResultsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcFirmwareUpdatesResultsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcFirmwareUpdatesResultsItemData_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcFirmwareUpdatesResultsItemData
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcFirmwareUpdatesResultsItemData
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcFirmwareUpdatesSummary_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcFirmwareUpdatesSummary
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcFirmwareUpdatesSummary
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcJobList_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcJobList
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcJobList
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcJobListResultsItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcJobListResultsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcJobListResultsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcJobListResultsItemData_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcJobListResultsItemData
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcJobListResultsItemData
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcJobListResultsItemDataJobsItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcJobListResultsItemDataJobsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcJobListResultsItemDataJobsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcJobListSummary_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcJobListSummary
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcJobListSummary
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcSELLog_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcSELLog
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcSELLog
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcSELLogResultsItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcSELLogResultsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcSELLogResultsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcSELLogResultsItemData_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcSELLogResultsItemData
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcSELLogResultsItemData
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcSELLogResultsItemDataEntriesItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcSELLogResultsItemDataEntriesItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcSELLogResultsItemDataEntriesItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcSELLogSummary_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcSELLogSummary
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcSELLogSummary
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelRedfishSystem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelRedfishSystem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelRedfishSystem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelRedfishSystemResultsItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelRedfishSystemResultsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelRedfishSystemResultsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelRedfishSystemResultsItemData_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelRedfishSystemResultsItemData
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelRedfishSystemResultsItemData
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelRedfishSystemResultsItemDataOemDell_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelRedfishSystemResultsItemDataOemDell
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelRedfishSystemResultsItemDataOemDell
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelRedfishSystemSummary_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelRedfishSystemSummary
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelRedfishSystemSummary
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestBootImage_EncodeDecode(t *testing.T) {
@@ -355,42 +653,6 @@ func TestEventJobMessagesItem_EncodeDecode(t *testing.T) {
 	var typ2 EventJobMessagesItem
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
-func TestEventJobMessagesItemRedfishError_EncodeDecode(t *testing.T) {
-	var typ EventJobMessagesItemRedfishError
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 EventJobMessagesItemRedfishError
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestEventJobMessagesItemRedfishErrorError_EncodeDecode(t *testing.T) {
-	var typ EventJobMessagesItemRedfishErrorError
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 EventJobMessagesItemRedfishErrorError
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem_EncodeDecode(t *testing.T) {
-	var typ EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
 func TestGenericResponse_EncodeDecode(t *testing.T) {
 	var typ GenericResponse
 	typ.SetFake()
@@ -523,54 +785,6 @@ func TestHostInterfacesItem_EncodeDecode(t *testing.T) {
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
 	var typ2 HostInterfacesItem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestJobMessage_EncodeDecode(t *testing.T) {
-	var typ JobMessage
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 JobMessage
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestJobMessageRedfishError_EncodeDecode(t *testing.T) {
-	var typ JobMessageRedfishError
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 JobMessageRedfishError
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestJobMessageRedfishErrorError_EncodeDecode(t *testing.T) {
-	var typ JobMessageRedfishErrorError
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 JobMessageRedfishErrorError
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestJobMessageRedfishErrorErrorMessageDotExtendedInfoItem_EncodeDecode(t *testing.T) {
-	var typ JobMessageRedfishErrorErrorMessageDotExtendedInfoItem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 JobMessageRedfishErrorErrorMessageDotExtendedInfoItem
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestLLDP_EncodeDecode(t *testing.T) {
@@ -727,296 +941,6 @@ func TestPostRolesRequest_EncodeDecode(t *testing.T) {
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
 	var typ2 PostRolesRequest
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishDellUpgradeFirmware_EncodeDecode(t *testing.T) {
-	var typ RedfishDellUpgradeFirmware
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishDellUpgradeFirmware
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishDellUpgradeFirmwareUpdateListItem_EncodeDecode(t *testing.T) {
-	var typ RedfishDellUpgradeFirmwareUpdateListItem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishDellUpgradeFirmwareUpdateListItem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishJob_EncodeDecode(t *testing.T) {
-	var typ RedfishJob
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishJob
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishJobJobsItem_EncodeDecode(t *testing.T) {
-	var typ RedfishJobJobsItem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishJobJobsItem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishJobJobsItemMessageDotExtendedInfoItem_EncodeDecode(t *testing.T) {
-	var typ RedfishJobJobsItemMessageDotExtendedInfoItem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishJobJobsItemMessageDotExtendedInfoItem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem_EncodeDecode(t *testing.T) {
-	var typ RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem_EncodeDecode(t *testing.T) {
-	var typ RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishJobJobsItemMessagesItem_EncodeDecode(t *testing.T) {
-	var typ RedfishJobJobsItemMessagesItem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishJobJobsItemMessagesItem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishJobJobsItemMessagesItemResolutionStepsItem_EncodeDecode(t *testing.T) {
-	var typ RedfishJobJobsItemMessagesItemResolutionStepsItem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishJobJobsItemMessagesItemResolutionStepsItem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem_EncodeDecode(t *testing.T) {
-	var typ RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishJobJobsItemParameters_EncodeDecode(t *testing.T) {
-	var typ RedfishJobJobsItemParameters
-	typ = make(RedfishJobJobsItemParameters)
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishJobJobsItemParameters
-	typ2 = make(RedfishJobJobsItemParameters)
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishJobJobsItemPayload_EncodeDecode(t *testing.T) {
-	var typ RedfishJobJobsItemPayload
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishJobJobsItemPayload
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishJobJobsItemSchedule_EncodeDecode(t *testing.T) {
-	var typ RedfishJobJobsItemSchedule
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishJobJobsItemSchedule
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishMetricReport_EncodeDecode(t *testing.T) {
-	var typ RedfishMetricReport
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishMetricReport
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishMetricReportReportsItem_EncodeDecode(t *testing.T) {
-	var typ RedfishMetricReportReportsItem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishMetricReportReportsItem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishMetricReportReportsItemMessageDotExtendedInfoItem_EncodeDecode(t *testing.T) {
-	var typ RedfishMetricReportReportsItemMessageDotExtendedInfoItem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishMetricReportReportsItemMessageDotExtendedInfoItem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem_EncodeDecode(t *testing.T) {
-	var typ RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem_EncodeDecode(t *testing.T) {
-	var typ RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishMetricReportReportsItemMetricValuesItem_EncodeDecode(t *testing.T) {
-	var typ RedfishMetricReportReportsItemMetricValuesItem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishMetricReportReportsItemMetricValuesItem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishSystem_EncodeDecode(t *testing.T) {
-	var typ RedfishSystem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishSystem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishSystemOemDell_EncodeDecode(t *testing.T) {
-	var typ RedfishSystemOemDell
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishSystemOemDell
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishSystemOemDellMessageDotExtendedInfoItem_EncodeDecode(t *testing.T) {
-	var typ RedfishSystemOemDellMessageDotExtendedInfoItem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishSystemOemDellMessageDotExtendedInfoItem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem_EncodeDecode(t *testing.T) {
-	var typ RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem
-	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
-}
-func TestRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem_EncodeDecode(t *testing.T) {
-	var typ RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-	typ.SetFake()
-
-	e := jx.Encoder{}
-	typ.Encode(&e)
-	data := e.Bytes()
-	require.True(t, std.Valid(data), "Encoded: %s", data)
-
-	var typ2 RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestUser_EncodeDecode(t *testing.T) {

@@ -64,75 +64,343 @@ export type AuthTokenRequest = {
 };
 
 /**
- * BmcDellInstallFromRepoRequest schema
+ * BmcClearJobsBody schema
  */
-export type BmcDellInstallFromRepoRequest = {
+export type BmcClearJobsBody = {
     /**
-     * ApplyUpdate false will only check for firmware upgrades. true will queue the update installs as a job.
+     * Clear every job in the queue. Mutually exclusive with ids
      */
-    ApplyUpdate?: boolean;
-    CatalogFile?: string;
+    all?: boolean;
     /**
-     * clear job queue before submitting request. ApplyUpdate must be true
+     * Clear only these job ids
      */
-    ClearJobQueue?: boolean;
-    /**
-     * domain name or IP address of share
-     */
-    IPAddress?: string;
-    /**
-     * false = share needs valid HTTPS cert, true = allow invalid certs
-     */
-    IgnoreCertWarning?: boolean;
-    /**
-     * false = do not reboot node automatically, jobs will queue as scheduled and wait until next boot. true = reboot when needed
-     */
-    RebootNeeded?: boolean;
-    ShareName?: string;
-    /**
-     * type of share
-     */
-    ShareType?: string;
+    ids?: Array<string>;
 };
 
 /**
- * BmcImportConfigurationRequest schema
+ * BmcImportConfigBody schema
  */
-export type BmcImportConfigurationRequest = {
+export type BmcImportConfigBody = {
     /**
-     * template file relative to templates directory
+     * BMC config template to import, by its name in the provision templates. Each iDRAC downloads it from Grendel's provision server
      */
     file?: string;
     /**
-     * options include: NoReboot, Graceful, Forced
+     * NoReboot queues the import until the node next reboots. Graceful and Forced reboot the node to apply it. Defaults to NoReboot
      */
     shutdown_type?: string;
 };
 
 /**
- * BmcJobDeleteRequest schema
+ * BmcInstallFirmwareBody schema
  */
-export type BmcJobDeleteRequest = {
+export type BmcInstallFirmwareBody = {
     /**
-     * Map with Node and Redfish Job IDs. Use 'JID_CLEARALL' to clear all jobs
+     * false only compares the installed firmware against the catalog, which firmware/updates then lists. true queues every available update as a job
      */
-    node_job_list?: {
-        [key: string]: Array<string>;
+    apply_update?: boolean;
+    /**
+     * Catalog file name on the share. The iDRAC defaults to Catalog.xml
+     */
+    catalog_file?: string;
+    /**
+     * Clear every job in the queue first. Requires apply_update
+     */
+    clear_jobs?: boolean;
+    /**
+     * Accept an HTTPS share whose certificate does not validate
+     */
+    ignore_cert_warning?: boolean;
+    /**
+     * Domain name or IP address of the share holding the catalog
+     */
+    ip_address?: string;
+    /**
+     * Reboot the node when an update needs it. Otherwise the updates wait as scheduled jobs until the node next reboots
+     */
+    reboot?: boolean;
+    /**
+     * Path of the catalog's directory on the share, or the NFS export
+     */
+    share_name?: string;
+    /**
+     * HTTP, HTTPS or NFS
+     */
+    share_type?: string;
+};
+
+/**
+ * BmcPowerBody schema
+ */
+export type BmcPowerBody = {
+    /**
+     * schemas.ResetType. On, ForceOn, ForceOff, ForceRestart, GracefulRestart, GracefulShutdown, PowerCycle, Nmi, PushPowerButton, Suspend, Pause, Resume, FullPowerCycle
+     */
+    action?: string;
+    /**
+     * schemas.BootSource to boot from once. None, Pxe, Floppy, Cd, Usb, Hdd, BiosSetup, Utilities, Diags, UefiShell, UefiTarget, SDCard, UefiHttp, RemoteDrive, UefiBootNext, Recovery
+     */
+    boot_override?: string;
+    /**
+     * What to power, 'host' or 'bmc'. Defaults to host. A bmc target is always a graceful restart and ignores the other fields
+     */
+    target?: string;
+};
+
+/**
+ * BmcResponse_model.BmcAck schema
+ */
+export type BmcResponseModelBmcAck = {
+    results?: Array<{
+        data?: unknown;
+        duration_ms?: number;
+        message?: string;
+        node?: string;
+        success?: boolean;
+    }>;
+    run_id?: string;
+    summary?: {
+        duration_ms?: number;
+        failed?: number;
+        failed_nodes?: string;
+        succeeded?: number;
+        total?: number;
     };
 };
 
 /**
- * BmcOsPowerBody schema
+ * BmcResponse_model.BmcFirmwareUpdates schema
  */
-export type BmcOsPowerBody = {
-    /**
-     * string of type schemas.BootSourceOverrideTarget. Common options include: None, Pxe, BiosSetup, Utilities, Diags
-     */
-    boot_option?: string;
-    /**
-     * string of type schemas.ResetType. Common options include: On, ForceOn, ForceOff, ForceRestart, GracefulRestart, GracefulShutdown, PowerCycle
-     */
-    power_option?: string;
+export type BmcResponseModelBmcFirmwareUpdates = {
+    results?: Array<{
+        data?: {
+            reboot_type?: string;
+            updates?: Array<{
+                component_type?: string;
+                criticality?: string;
+                display_name?: string;
+                installed_version?: string;
+                name?: string;
+                package_path?: string;
+                package_version?: string;
+                reboot_type?: string;
+            }>;
+        };
+        duration_ms?: number;
+        message?: string;
+        node?: string;
+        success?: boolean;
+    }>;
+    run_id?: string;
+    summary?: {
+        duration_ms?: number;
+        failed?: number;
+        failed_nodes?: string;
+        succeeded?: number;
+        total?: number;
+    };
+};
+
+/**
+ * BmcResponse_model.BmcJobList schema
+ */
+export type BmcResponseModelBmcJobList = {
+    results?: Array<{
+        data?: {
+            jobs?: Array<{
+                end_time?: string;
+                id?: string;
+                message?: string;
+                name?: string;
+                percent_complete?: number;
+                start_time?: string;
+                state?: string;
+                status?: string;
+                type?: string;
+            }>;
+        };
+        duration_ms?: number;
+        message?: string;
+        node?: string;
+        success?: boolean;
+    }>;
+    run_id?: string;
+    summary?: {
+        duration_ms?: number;
+        failed?: number;
+        failed_nodes?: string;
+        succeeded?: number;
+        total?: number;
+    };
+};
+
+/**
+ * BmcResponse_model.BmcSELLog schema
+ */
+export type BmcResponseModelBmcSelLog = {
+    results?: Array<{
+        data?: {
+            entries?: Array<{
+                created?: string;
+                entry_type?: string;
+                id?: string;
+                message?: string;
+                message_id?: string;
+                resolution?: string;
+                sensor_type?: string;
+                severity?: string;
+            }>;
+        };
+        duration_ms?: number;
+        message?: string;
+        node?: string;
+        success?: boolean;
+    }>;
+    run_id?: string;
+    summary?: {
+        duration_ms?: number;
+        failed?: number;
+        failed_nodes?: string;
+        succeeded?: number;
+        total?: number;
+    };
+};
+
+/**
+ * BmcResponse_model.RedfishSystem schema
+ */
+export type BmcResponseModelRedfishSystem = {
+    results?: Array<{
+        data?: {
+            bios_version?: string;
+            boot_mode?: string;
+            boot_next?: string;
+            boot_order?: Array<string>;
+            boot_override_enabled?: string;
+            boot_override_target?: string;
+            boot_progress?: string;
+            boot_progress_time?: string;
+            health?: string;
+            host_name?: string;
+            manufacturer?: string;
+            model?: string;
+            name?: string;
+            oem_dell?: {
+                '@Message.ExtendedInfo'?: Array<{
+                    Message?: string;
+                    MessageArgs?: Array<string>;
+                    MessageId?: string;
+                    MessageSeverity?: string;
+                    Oem?: unknown;
+                    RelatedProperties?: Array<string>;
+                    Resolution?: string;
+                    ResolutionSteps?: Array<{
+                        ActionParameters?: Array<{
+                            AllowableNumbers?: Array<string>;
+                            AllowablePattern?: string;
+                            AllowableValueDescriptions?: Array<string>;
+                            AllowableValues?: Array<string>;
+                            ArraySizeMaximum?: number;
+                            ArraySizeMinimum?: number;
+                            DataType?: string;
+                            DefaultValue?: string;
+                            MaximumValue?: number;
+                            MinimumValue?: number;
+                            Name?: string;
+                            NoDefaultValue?: boolean;
+                            ObjectDataType?: string;
+                            Required?: boolean;
+                        }>;
+                        ActionURI?: string;
+                        Oem?: unknown;
+                        Priority?: number;
+                        ResolutionType?: string;
+                        RetryCount?: number;
+                        RetryIntervalSeconds?: number;
+                        TargetComponentURI?: string;
+                    }>;
+                    Severity?: string;
+                    UserAuthenticationSource?: string;
+                    Username?: string;
+                }>;
+                '@odata.context'?: string;
+                '@odata.etag'?: string;
+                '@odata.id'?: string;
+                '@odata.type'?: string;
+                BIOSReleaseDate?: string;
+                BaseBoardChassisSlot?: string;
+                BatteryRollupStatus?: string;
+                BladeGeometry?: string;
+                CMCIP?: string;
+                CPURollupStatus?: string;
+                ChassisModel?: string;
+                ChassisName?: string;
+                ChassisServiceTag?: string;
+                ChassisSystemHeightUnit?: number;
+                CurrentRollupStatus?: string;
+                Description?: string;
+                EstimatedExhaustTemperatureCelsius?: number;
+                EstimatedSystemAirflowCFM?: number;
+                ExpressServiceCode?: string;
+                FanRollupStatus?: string;
+                IDSDMRollupStatus?: string;
+                Id?: string;
+                IntrusionRollupStatus?: string;
+                IsOEMBranded?: string;
+                LastSystemInventoryTime?: string;
+                LastUpdateTime?: string;
+                LicensingRollupStatus?: string;
+                ManagedSystemSize?: string;
+                MaxCPUSockets?: number;
+                MaxDIMMSlots?: number;
+                MaxPCIeSlots?: number;
+                MemoryOperationMode?: string;
+                Name?: string;
+                NodeID?: string;
+                Oem?: unknown;
+                PSRollupStatus?: string;
+                PlatformGUID?: string;
+                PopulatedDIMMSlots?: number;
+                PopulatedPCIeSlots?: number;
+                PowerCapEnabledState?: string;
+                SDCardRollupStatus?: string;
+                SELRollupStatus?: string;
+                ServerAllocationWatts?: number;
+                StorageRollupStatus?: string;
+                SysMemErrorMethodology?: string;
+                SysMemFailOverState?: string;
+                SysMemLocation?: string;
+                SysMemPrimaryStatus?: string;
+                SystemGeneration?: string;
+                SystemID?: number;
+                SystemRevision?: string;
+                TempRollupStatus?: string;
+                TempStatisticsRollupStatus?: string;
+                UUID?: string;
+                VoltRollupStatus?: string;
+                smbiosGUID?: string;
+            };
+            power_status?: string;
+            processor_cores?: number;
+            processor_count?: number;
+            processor_model?: string;
+            processor_sockets?: number;
+            serial_number?: string;
+            total_memory?: number;
+        };
+        duration_ms?: number;
+        message?: string;
+        node?: string;
+        success?: boolean;
+    }>;
+    run_id?: string;
+    summary?: {
+        duration_ms?: number;
+        failed?: number;
+        failed_nodes?: string;
+        succeeded?: number;
+        total?: number;
+    };
 };
 
 /**
@@ -249,24 +517,8 @@ export type DataDump = {
  */
 export type Event = {
     JobMessages?: Array<{
-        data?: string;
         host?: string;
         msg?: string;
-        redfish_error?: {
-            code?: string;
-            error?: {
-                '@Message.ExtendedInfo'?: Array<{
-                    Message?: string;
-                    'MessageArgs.@odata.count'?: number;
-                    MessageId?: string;
-                    'RelatedProperties.@odata.count'?: number;
-                    Resolution?: string;
-                    Severity?: string;
-                }>;
-                code?: string;
-                message?: string;
-            };
-        };
         status?: string;
     }>;
     Message?: string;
@@ -364,31 +616,6 @@ export type Host = {
     provision?: boolean;
     tags?: Array<string>;
     uid?: string;
-};
-
-/**
- * JobMessage schema
- */
-export type JobMessage = {
-    data?: string;
-    host?: string;
-    msg?: string;
-    redfish_error?: {
-        code?: string;
-        error?: {
-            '@Message.ExtendedInfo'?: Array<{
-                Message?: string;
-                'MessageArgs.@odata.count'?: number;
-                MessageId?: string;
-                'RelatedProperties.@odata.count'?: number;
-                Resolution?: string;
-                Severity?: string;
-            }>;
-            code?: string;
-            message?: string;
-        };
-    };
-    status?: string;
 };
 
 /**
@@ -494,337 +721,6 @@ export type PatchRolesRequest = {
 export type PostRolesRequest = {
     inherited_role?: string;
     role?: string;
-};
-
-/**
- * RedfishDellUpgradeFirmware schema
- */
-export type RedfishDellUpgradeFirmware = {
-    Message?: string;
-    Name?: string;
-    Status?: string;
-    UpdateCount?: number;
-    UpdateList?: Array<{
-        BaseLocation?: string;
-        ComponentID?: string;
-        ComponentInfoName?: string;
-        ComponentInfoValue?: string;
-        ComponentType?: string;
-        Criticality?: string;
-        DisplayName?: string;
-        InstalledVersion?: string;
-        JobID?: string;
-        Name?: string;
-        PackageName?: string;
-        PackagePath?: string;
-        PackageVersion?: string;
-        RebootType?: string;
-        Target?: string;
-    }>;
-    UpdateRebootType?: string;
-};
-
-/**
- * RedfishJob schema
- */
-export type RedfishJob = {
-    jobs?: Array<{
-        '@Message.ExtendedInfo'?: Array<{
-            Message?: string;
-            MessageArgs?: Array<string>;
-            MessageId?: string;
-            MessageSeverity?: string;
-            Oem?: unknown;
-            RelatedProperties?: Array<string>;
-            Resolution?: string;
-            ResolutionSteps?: Array<{
-                ActionParameters?: Array<{
-                    AllowableNumbers?: Array<string>;
-                    AllowablePattern?: string;
-                    AllowableValueDescriptions?: Array<string>;
-                    AllowableValues?: Array<string>;
-                    ArraySizeMaximum?: number;
-                    ArraySizeMinimum?: number;
-                    DataType?: string;
-                    DefaultValue?: string;
-                    MaximumValue?: number;
-                    MinimumValue?: number;
-                    Name?: string;
-                    NoDefaultValue?: boolean;
-                    ObjectDataType?: string;
-                    Required?: boolean;
-                }>;
-                ActionURI?: string;
-                Oem?: unknown;
-                Priority?: number;
-                ResolutionType?: string;
-                RetryCount?: number;
-                RetryIntervalSeconds?: number;
-                TargetComponentURI?: string;
-            }>;
-            Severity?: string;
-            UserAuthenticationSource?: string;
-            Username?: string;
-        }>;
-        '@odata.context'?: string;
-        '@odata.etag'?: string;
-        '@odata.id'?: string;
-        '@odata.type'?: string;
-        CreatedBy?: string;
-        CreationTime?: string;
-        Description?: string;
-        EndTime?: string;
-        EstimatedCompletionTime?: string;
-        EstimatedDuration?: string;
-        HidePayload?: boolean;
-        Id?: string;
-        JobPriority?: number;
-        JobState?: string;
-        JobStatus?: string;
-        JobType?: string;
-        MaxExecutionTime?: string;
-        Messages?: Array<{
-            Message?: string;
-            MessageArgs?: Array<string>;
-            MessageId?: string;
-            MessageSeverity?: string;
-            Oem?: unknown;
-            RelatedProperties?: Array<string>;
-            Resolution?: string;
-            ResolutionSteps?: Array<{
-                ActionParameters?: Array<{
-                    AllowableNumbers?: Array<string>;
-                    AllowablePattern?: string;
-                    AllowableValueDescriptions?: Array<string>;
-                    AllowableValues?: Array<string>;
-                    ArraySizeMaximum?: number;
-                    ArraySizeMinimum?: number;
-                    DataType?: string;
-                    DefaultValue?: string;
-                    MaximumValue?: number;
-                    MinimumValue?: number;
-                    Name?: string;
-                    NoDefaultValue?: boolean;
-                    ObjectDataType?: string;
-                    Required?: boolean;
-                }>;
-                ActionURI?: string;
-                Oem?: unknown;
-                Priority?: number;
-                ResolutionType?: string;
-                RetryCount?: number;
-                RetryIntervalSeconds?: number;
-                TargetComponentURI?: string;
-            }>;
-            Severity?: string;
-            UserAuthenticationSource?: string;
-            Username?: string;
-        }>;
-        Name?: string;
-        Oem?: unknown;
-        Parameters?: {
-            [key: string]: unknown;
-        };
-        Payload?: {
-            HttpHeaders?: Array<string>;
-            HttpOperation?: string;
-            JsonBody?: string;
-            TargetUri?: string;
-        };
-        PercentComplete?: number;
-        RawData?: string;
-        Schedule?: {
-            EnabledDaysOfMonth?: Array<number>;
-            EnabledDaysOfWeek?: Array<string>;
-            EnabledIntervals?: Array<string>;
-            EnabledMonthsOfYear?: Array<string>;
-            InitialStartTime?: string;
-            Lifetime?: string;
-            MaxOccurrences?: number;
-            Name?: string;
-            RecurrenceInterval?: string;
-        };
-        StartTime?: string;
-        StepOrder?: Array<string>;
-    }>;
-    name?: string;
-};
-
-/**
- * RedfishMetricReport schema
- */
-export type RedfishMetricReport = {
-    name?: string;
-    reports?: Array<{
-        '@Message.ExtendedInfo'?: Array<{
-            Message?: string;
-            MessageArgs?: Array<string>;
-            MessageId?: string;
-            MessageSeverity?: string;
-            Oem?: unknown;
-            RelatedProperties?: Array<string>;
-            Resolution?: string;
-            ResolutionSteps?: Array<{
-                ActionParameters?: Array<{
-                    AllowableNumbers?: Array<string>;
-                    AllowablePattern?: string;
-                    AllowableValueDescriptions?: Array<string>;
-                    AllowableValues?: Array<string>;
-                    ArraySizeMaximum?: number;
-                    ArraySizeMinimum?: number;
-                    DataType?: string;
-                    DefaultValue?: string;
-                    MaximumValue?: number;
-                    MinimumValue?: number;
-                    Name?: string;
-                    NoDefaultValue?: boolean;
-                    ObjectDataType?: string;
-                    Required?: boolean;
-                }>;
-                ActionURI?: string;
-                Oem?: unknown;
-                Priority?: number;
-                ResolutionType?: string;
-                RetryCount?: number;
-                RetryIntervalSeconds?: number;
-                TargetComponentURI?: string;
-            }>;
-            Severity?: string;
-            UserAuthenticationSource?: string;
-            Username?: string;
-        }>;
-        '@odata.context'?: string;
-        '@odata.etag'?: string;
-        '@odata.id'?: string;
-        '@odata.type'?: string;
-        Context?: string;
-        Description?: string;
-        Id?: string;
-        MetricValues?: Array<{
-            MetricId?: string;
-            MetricProperty?: string;
-            MetricValue?: string;
-            Oem?: unknown;
-            Timestamp?: string;
-        }>;
-        Name?: string;
-        Oem?: unknown;
-        ReportSequence?: string;
-        Timestamp?: string;
-    }>;
-};
-
-/**
- * RedfishSystem schema
- */
-export type RedfishSystem = {
-    bios_version?: string;
-    boot_next?: string;
-    boot_order?: Array<string>;
-    health?: string;
-    host_name?: string;
-    manufacturer?: string;
-    model?: string;
-    name?: string;
-    oem_dell?: {
-        '@Message.ExtendedInfo'?: Array<{
-            Message?: string;
-            MessageArgs?: Array<string>;
-            MessageId?: string;
-            MessageSeverity?: string;
-            Oem?: unknown;
-            RelatedProperties?: Array<string>;
-            Resolution?: string;
-            ResolutionSteps?: Array<{
-                ActionParameters?: Array<{
-                    AllowableNumbers?: Array<string>;
-                    AllowablePattern?: string;
-                    AllowableValueDescriptions?: Array<string>;
-                    AllowableValues?: Array<string>;
-                    ArraySizeMaximum?: number;
-                    ArraySizeMinimum?: number;
-                    DataType?: string;
-                    DefaultValue?: string;
-                    MaximumValue?: number;
-                    MinimumValue?: number;
-                    Name?: string;
-                    NoDefaultValue?: boolean;
-                    ObjectDataType?: string;
-                    Required?: boolean;
-                }>;
-                ActionURI?: string;
-                Oem?: unknown;
-                Priority?: number;
-                ResolutionType?: string;
-                RetryCount?: number;
-                RetryIntervalSeconds?: number;
-                TargetComponentURI?: string;
-            }>;
-            Severity?: string;
-            UserAuthenticationSource?: string;
-            Username?: string;
-        }>;
-        '@odata.context'?: string;
-        '@odata.etag'?: string;
-        '@odata.id'?: string;
-        '@odata.type'?: string;
-        BIOSReleaseDate?: string;
-        BaseBoardChassisSlot?: string;
-        BatteryRollupStatus?: string;
-        BladeGeometry?: string;
-        CMCIP?: string;
-        CPURollupStatus?: string;
-        ChassisModel?: string;
-        ChassisName?: string;
-        ChassisServiceTag?: string;
-        ChassisSystemHeightUnit?: number;
-        CurrentRollupStatus?: string;
-        Description?: string;
-        EstimatedExhaustTemperatureCelsius?: number;
-        EstimatedSystemAirflowCFM?: number;
-        ExpressServiceCode?: string;
-        FanRollupStatus?: string;
-        IDSDMRollupStatus?: string;
-        Id?: string;
-        IntrusionRollupStatus?: string;
-        IsOEMBranded?: string;
-        LastSystemInventoryTime?: string;
-        LastUpdateTime?: string;
-        LicensingRollupStatus?: string;
-        ManagedSystemSize?: string;
-        MaxCPUSockets?: number;
-        MaxDIMMSlots?: number;
-        MaxPCIeSlots?: number;
-        MemoryOperationMode?: string;
-        Name?: string;
-        NodeID?: string;
-        Oem?: unknown;
-        PSRollupStatus?: string;
-        PlatformGUID?: string;
-        PopulatedDIMMSlots?: number;
-        PopulatedPCIeSlots?: number;
-        PowerCapEnabledState?: string;
-        SDCardRollupStatus?: string;
-        SELRollupStatus?: string;
-        ServerAllocationWatts?: number;
-        StorageRollupStatus?: string;
-        SysMemErrorMethodology?: string;
-        SysMemFailOverState?: string;
-        SysMemLocation?: string;
-        SysMemPrimaryStatus?: string;
-        SystemGeneration?: string;
-        SystemID?: number;
-        SystemRevision?: string;
-        TempRollupStatus?: string;
-        TempStatisticsRollupStatus?: string;
-        UUID?: string;
-        VoltRollupStatus?: string;
-        smbiosGUID?: string;
-    };
-    power_status?: string;
-    processor_count?: number;
-    serial_number?: string;
-    total_memory?: number;
 };
 
 /**
@@ -1037,43 +933,6 @@ export type PostV1AuthTokenResponses = {
 
 export type PostV1AuthTokenResponse = PostV1AuthTokenResponses[keyof PostV1AuthTokenResponses];
 
-export type GetV1BmcData = {
-    body?: never;
-    headers?: {
-        Accept?: string;
-    };
-    path?: never;
-    query?: {
-        /**
-         * Filter by nodeset. Minimum of one query parameter is required
-         */
-        nodeset?: string;
-        /**
-         * Filter by tags. Minimum of one query parameter is required
-         */
-        tags?: string;
-    };
-    url: '/v1/bmc';
-};
-
-export type GetV1BmcErrors = {
-    /**
-     * Default Error
-     */
-    default: HttpError;
-};
-
-export type GetV1BmcError = GetV1BmcErrors[keyof GetV1BmcErrors];
-
-export type GetV1BmcResponses = {
-    /**
-     * OK
-     */
-    200: Array<RedfishSystem>;
-};
-
-export type GetV1BmcResponse = GetV1BmcResponses[keyof GetV1BmcResponses];
-
 export type PostV1BmcConfigureAutoData = {
     body?: never;
     headers?: {
@@ -1089,6 +948,10 @@ export type PostV1BmcConfigureAutoData = {
          * Filter by tags. Minimum of one query parameter is required
          */
         tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
     };
     url: '/v1/bmc/configure/auto';
 };
@@ -1106,16 +969,16 @@ export type PostV1BmcConfigureAutoResponses = {
     /**
      * OK
      */
-    200: Array<JobMessage>;
+    200: BmcResponseModelBmcAck;
 };
 
 export type PostV1BmcConfigureAutoResponse = PostV1BmcConfigureAutoResponses[keyof PostV1BmcConfigureAutoResponses];
 
 export type PostV1BmcConfigureImportData = {
     /**
-     * Request body for api.BmcImportConfigurationRequest
+     * Request body for api.BmcImportConfigBody
      */
-    body: BmcImportConfigurationRequest;
+    body: BmcImportConfigBody;
     headers?: {
         Accept?: string;
     };
@@ -1129,6 +992,10 @@ export type PostV1BmcConfigureImportData = {
          * Filter by tags. Minimum of one query parameter is required
          */
         tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
     };
     url: '/v1/bmc/configure/import';
 };
@@ -1146,16 +1013,16 @@ export type PostV1BmcConfigureImportResponses = {
     /**
      * OK
      */
-    200: Array<JobMessage>;
+    200: BmcResponseModelBmcAck;
 };
 
 export type PostV1BmcConfigureImportResponse = PostV1BmcConfigureImportResponses[keyof PostV1BmcConfigureImportResponses];
 
-export type DeleteV1BmcJobsData = {
+export type PostV1BmcFirmwareInstallData = {
     /**
-     * Request body for api.BmcJobDeleteRequest
+     * Request body for api.BmcInstallFirmwareBody
      */
-    body: BmcJobDeleteRequest;
+    body: BmcInstallFirmwareBody;
     headers?: {
         Accept?: string;
     };
@@ -1169,27 +1036,72 @@ export type DeleteV1BmcJobsData = {
          * Filter by tags. Minimum of one query parameter is required
          */
         tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
     };
-    url: '/v1/bmc/jobs';
+    url: '/v1/bmc/firmware/install';
 };
 
-export type DeleteV1BmcJobsErrors = {
+export type PostV1BmcFirmwareInstallErrors = {
     /**
      * Default Error
      */
     default: HttpError;
 };
 
-export type DeleteV1BmcJobsError = DeleteV1BmcJobsErrors[keyof DeleteV1BmcJobsErrors];
+export type PostV1BmcFirmwareInstallError = PostV1BmcFirmwareInstallErrors[keyof PostV1BmcFirmwareInstallErrors];
 
-export type DeleteV1BmcJobsResponses = {
+export type PostV1BmcFirmwareInstallResponses = {
     /**
      * OK
      */
-    200: Array<JobMessage>;
+    200: BmcResponseModelBmcAck;
 };
 
-export type DeleteV1BmcJobsResponse = DeleteV1BmcJobsResponses[keyof DeleteV1BmcJobsResponses];
+export type PostV1BmcFirmwareInstallResponse = PostV1BmcFirmwareInstallResponses[keyof PostV1BmcFirmwareInstallResponses];
+
+export type GetV1BmcFirmwareUpdatesData = {
+    body?: never;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
+    };
+    url: '/v1/bmc/firmware/updates';
+};
+
+export type GetV1BmcFirmwareUpdatesErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type GetV1BmcFirmwareUpdatesError = GetV1BmcFirmwareUpdatesErrors[keyof GetV1BmcFirmwareUpdatesErrors];
+
+export type GetV1BmcFirmwareUpdatesResponses = {
+    /**
+     * OK
+     */
+    200: BmcResponseModelBmcFirmwareUpdates;
+};
+
+export type GetV1BmcFirmwareUpdatesResponse = GetV1BmcFirmwareUpdatesResponses[keyof GetV1BmcFirmwareUpdatesResponses];
 
 export type GetV1BmcJobsData = {
     body?: never;
@@ -1206,6 +1118,10 @@ export type GetV1BmcJobsData = {
          * Filter by tags. Minimum of one query parameter is required
          */
         tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
     };
     url: '/v1/bmc/jobs';
 };
@@ -1223,55 +1139,16 @@ export type GetV1BmcJobsResponses = {
     /**
      * OK
      */
-    200: Array<RedfishJob>;
+    200: BmcResponseModelBmcJobList;
 };
 
 export type GetV1BmcJobsResponse = GetV1BmcJobsResponses[keyof GetV1BmcJobsResponses];
 
-export type DeleteV1BmcJobsJidsData = {
-    body?: never;
-    headers?: {
-        Accept?: string;
-    };
-    path: {
-        /**
-         * Redfish Job IDs. Use 'JID_CLEARALL' to clear all jobs
-         */
-        jids: string;
-    };
-    query?: {
-        /**
-         * Filter by nodeset. Minimum of one query parameter is required
-         */
-        nodeset?: string;
-        /**
-         * Filter by tags. Minimum of one query parameter is required
-         */
-        tags?: string;
-    };
-    url: '/v1/bmc/jobs/{jids}';
-};
-
-export type DeleteV1BmcJobsJidsErrors = {
+export type PostV1BmcJobsClearData = {
     /**
-     * Default Error
+     * Request body for api.BmcClearJobsBody
      */
-    default: HttpError;
-};
-
-export type DeleteV1BmcJobsJidsError = DeleteV1BmcJobsJidsErrors[keyof DeleteV1BmcJobsJidsErrors];
-
-export type DeleteV1BmcJobsJidsResponses = {
-    /**
-     * OK
-     */
-    200: Array<JobMessage>;
-};
-
-export type DeleteV1BmcJobsJidsResponse = DeleteV1BmcJobsJidsResponses[keyof DeleteV1BmcJobsJidsResponses];
-
-export type GetV1BmcMetricsData = {
-    body?: never;
+    body: BmcClearJobsBody;
     headers?: {
         Accept?: string;
     };
@@ -1285,29 +1162,77 @@ export type GetV1BmcMetricsData = {
          * Filter by tags. Minimum of one query parameter is required
          */
         tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
     };
-    url: '/v1/bmc/metrics';
+    url: '/v1/bmc/jobs/clear';
 };
 
-export type GetV1BmcMetricsErrors = {
+export type PostV1BmcJobsClearErrors = {
     /**
      * Default Error
      */
     default: HttpError;
 };
 
-export type GetV1BmcMetricsError = GetV1BmcMetricsErrors[keyof GetV1BmcMetricsErrors];
+export type PostV1BmcJobsClearError = PostV1BmcJobsClearErrors[keyof PostV1BmcJobsClearErrors];
 
-export type GetV1BmcMetricsResponses = {
+export type PostV1BmcJobsClearResponses = {
     /**
      * OK
      */
-    200: Array<RedfishMetricReport>;
+    200: BmcResponseModelBmcAck;
 };
 
-export type GetV1BmcMetricsResponse = GetV1BmcMetricsResponses[keyof GetV1BmcMetricsResponses];
+export type PostV1BmcJobsClearResponse = PostV1BmcJobsClearResponses[keyof PostV1BmcJobsClearResponses];
 
-export type PostV1BmcPowerBmcData = {
+export type PostV1BmcPowerData = {
+    /**
+     * Request body for api.BmcPowerBody
+     */
+    body: BmcPowerBody;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
+    };
+    url: '/v1/bmc/power';
+};
+
+export type PostV1BmcPowerErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type PostV1BmcPowerError = PostV1BmcPowerErrors[keyof PostV1BmcPowerErrors];
+
+export type PostV1BmcPowerResponses = {
+    /**
+     * OK
+     */
+    200: BmcResponseModelBmcAck;
+};
+
+export type PostV1BmcPowerResponse = PostV1BmcPowerResponses[keyof PostV1BmcPowerResponses];
+
+export type GetV1BmcSelData = {
     body?: never;
     headers?: {
         Accept?: string;
@@ -1315,45 +1240,9 @@ export type PostV1BmcPowerBmcData = {
     path?: never;
     query?: {
         /**
-         * Filter by nodeset. Minimum of one query parameter is required
+         * Keep only this many entries per node
          */
-        nodeset?: string;
-        /**
-         * Filter by tags. Minimum of one query parameter is required
-         */
-        tags?: string;
-    };
-    url: '/v1/bmc/power/bmc';
-};
-
-export type PostV1BmcPowerBmcErrors = {
-    /**
-     * Default Error
-     */
-    default: HttpError;
-};
-
-export type PostV1BmcPowerBmcError = PostV1BmcPowerBmcErrors[keyof PostV1BmcPowerBmcErrors];
-
-export type PostV1BmcPowerBmcResponses = {
-    /**
-     * OK
-     */
-    200: Array<JobMessage>;
-};
-
-export type PostV1BmcPowerBmcResponse = PostV1BmcPowerBmcResponses[keyof PostV1BmcPowerBmcResponses];
-
-export type PostV1BmcPowerOsData = {
-    /**
-     * Request body for api.BmcOsPowerBody
-     */
-    body: BmcOsPowerBody;
-    headers?: {
-        Accept?: string;
-    };
-    path?: never;
-    query?: {
+        limit?: string;
         /**
          * Filter by nodeset. Minimum of one query parameter is required
          */
@@ -1362,106 +1251,33 @@ export type PostV1BmcPowerOsData = {
          * Filter by tags. Minimum of one query parameter is required
          */
         tags?: string;
-    };
-    url: '/v1/bmc/power/os';
-};
-
-export type PostV1BmcPowerOsErrors = {
-    /**
-     * Default Error
-     */
-    default: HttpError;
-};
-
-export type PostV1BmcPowerOsError = PostV1BmcPowerOsErrors[keyof PostV1BmcPowerOsErrors];
-
-export type PostV1BmcPowerOsResponses = {
-    /**
-     * OK
-     */
-    200: Array<JobMessage>;
-};
-
-export type PostV1BmcPowerOsResponse = PostV1BmcPowerOsResponses[keyof PostV1BmcPowerOsResponses];
-
-export type DeleteV1BmcSelData = {
-    body?: never;
-    headers?: {
-        Accept?: string;
-    };
-    path?: never;
-    query?: {
         /**
-         * Filter by nodeset. Minimum of one query parameter is required
+         * Select every node in the database. Required when no nodeset or tags are given
          */
-        nodeset?: string;
-        /**
-         * Filter by tags. Minimum of one query parameter is required
-         */
-        tags?: string;
+        all?: string;
     };
     url: '/v1/bmc/sel';
 };
 
-export type DeleteV1BmcSelErrors = {
+export type GetV1BmcSelErrors = {
     /**
      * Default Error
      */
     default: HttpError;
 };
 
-export type DeleteV1BmcSelError = DeleteV1BmcSelErrors[keyof DeleteV1BmcSelErrors];
+export type GetV1BmcSelError = GetV1BmcSelErrors[keyof GetV1BmcSelErrors];
 
-export type DeleteV1BmcSelResponses = {
+export type GetV1BmcSelResponses = {
     /**
      * OK
      */
-    200: Array<JobMessage>;
+    200: BmcResponseModelBmcSelLog;
 };
 
-export type DeleteV1BmcSelResponse = DeleteV1BmcSelResponses[keyof DeleteV1BmcSelResponses];
+export type GetV1BmcSelResponse = GetV1BmcSelResponses[keyof GetV1BmcSelResponses];
 
-export type PostV1BmcUpgradeDellInstallfromrepoData = {
-    /**
-     * Request body for api.BmcDellInstallFromRepoRequest
-     */
-    body: BmcDellInstallFromRepoRequest;
-    headers?: {
-        Accept?: string;
-    };
-    path?: never;
-    query?: {
-        /**
-         * Filter by nodeset. Minimum of one query parameter is required
-         */
-        nodeset?: string;
-        /**
-         * Filter by tags. Minimum of one query parameter is required
-         */
-        tags?: string;
-    };
-    url: '/v1/bmc/upgrade/dell/installfromrepo';
-};
-
-export type PostV1BmcUpgradeDellInstallfromrepoErrors = {
-    /**
-     * Default Error
-     */
-    default: HttpError;
-};
-
-export type PostV1BmcUpgradeDellInstallfromrepoError = PostV1BmcUpgradeDellInstallfromrepoErrors[keyof PostV1BmcUpgradeDellInstallfromrepoErrors];
-
-export type PostV1BmcUpgradeDellInstallfromrepoResponses = {
-    /**
-     * OK
-     */
-    200: Array<JobMessage>;
-};
-
-export type PostV1BmcUpgradeDellInstallfromrepoResponse = PostV1BmcUpgradeDellInstallfromrepoResponses[keyof PostV1BmcUpgradeDellInstallfromrepoResponses];
-
-export type GetV1BmcUpgradeDellRepoData = {
+export type PostV1BmcSelClearData = {
     body?: never;
     headers?: {
         Accept?: string;
@@ -1476,27 +1292,72 @@ export type GetV1BmcUpgradeDellRepoData = {
          * Filter by tags. Minimum of one query parameter is required
          */
         tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
     };
-    url: '/v1/bmc/upgrade/dell/repo';
+    url: '/v1/bmc/sel/clear';
 };
 
-export type GetV1BmcUpgradeDellRepoErrors = {
+export type PostV1BmcSelClearErrors = {
     /**
      * Default Error
      */
     default: HttpError;
 };
 
-export type GetV1BmcUpgradeDellRepoError = GetV1BmcUpgradeDellRepoErrors[keyof GetV1BmcUpgradeDellRepoErrors];
+export type PostV1BmcSelClearError = PostV1BmcSelClearErrors[keyof PostV1BmcSelClearErrors];
 
-export type GetV1BmcUpgradeDellRepoResponses = {
+export type PostV1BmcSelClearResponses = {
     /**
      * OK
      */
-    200: Array<RedfishDellUpgradeFirmware>;
+    200: BmcResponseModelBmcAck;
 };
 
-export type GetV1BmcUpgradeDellRepoResponse = GetV1BmcUpgradeDellRepoResponses[keyof GetV1BmcUpgradeDellRepoResponses];
+export type PostV1BmcSelClearResponse = PostV1BmcSelClearResponses[keyof PostV1BmcSelClearResponses];
+
+export type GetV1BmcStatusData = {
+    body?: never;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
+    };
+    url: '/v1/bmc/status';
+};
+
+export type GetV1BmcStatusErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type GetV1BmcStatusError = GetV1BmcStatusErrors[keyof GetV1BmcStatusErrors];
+
+export type GetV1BmcStatusResponses = {
+    /**
+     * OK
+     */
+    200: BmcResponseModelRedfishSystem;
+};
+
+export type GetV1BmcStatusResponse = GetV1BmcStatusResponses[keyof GetV1BmcStatusResponses];
 
 export type GetV1DbDumpData = {
     body?: never;

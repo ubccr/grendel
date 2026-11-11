@@ -96,86 +96,899 @@
 				},
 				"type": "object"
 			},
-			"BmcDellInstallFromRepoRequest": {
-				"description": "BmcDellInstallFromRepoRequest schema",
+			"BmcClearJobsBody": {
+				"description": "BmcClearJobsBody schema",
 				"properties": {
-					"ApplyUpdate": {
-						"description": "ApplyUpdate false will only check for firmware upgrades. true will queue the update installs as a job.",
+					"all": {
+						"description": "Clear every job in the queue. Mutually exclusive with ids",
 						"type": "boolean"
 					},
-					"CatalogFile": {
-						"type": "string"
-					},
-					"ClearJobQueue": {
-						"description": "clear job queue before submitting request. ApplyUpdate must be true",
-						"type": "boolean"
-					},
-					"IPAddress": {
-						"description": "domain name or IP address of share",
-						"type": "string"
-					},
-					"IgnoreCertWarning": {
-						"description": "false = share needs valid HTTPS cert, true = allow invalid certs",
-						"type": "boolean"
-					},
-					"RebootNeeded": {
-						"description": "false = do not reboot node automatically, jobs will queue as scheduled and wait until next boot. true = reboot when needed",
-						"type": "boolean"
-					},
-					"ShareName": {
-						"type": "string"
-					},
-					"ShareType": {
-						"description": "type of share",
-						"type": "string"
+					"ids": {
+						"description": "Clear only these job ids",
+						"example": "JID_000000000001",
+						"items": {
+							"nullable": true,
+							"type": "string"
+						},
+						"nullable": true,
+						"type": "array"
 					}
 				},
 				"type": "object"
 			},
-			"BmcImportConfigurationRequest": {
-				"description": "BmcImportConfigurationRequest schema",
+			"BmcImportConfigBody": {
+				"description": "BmcImportConfigBody schema",
 				"properties": {
 					"file": {
-						"description": "template file relative to templates directory",
-						"example": "idrac-config.json.tmpl",
+						"description": "BMC config template to import, by its name in the provision templates. Each iDRAC downloads it from Grendel's provision server",
+						"example": "idrac-config.json",
 						"type": "string"
 					},
 					"shutdown_type": {
-						"description": "options include: NoReboot, Graceful, Forced",
-						"example": "Graceful",
+						"description": "NoReboot queues the import until the node next reboots. Graceful and Forced reboot the node to apply it. Defaults to NoReboot",
+						"example": "NoReboot",
 						"type": "string"
 					}
 				},
 				"type": "object"
 			},
-			"BmcJobDeleteRequest": {
-				"description": "BmcJobDeleteRequest schema",
+			"BmcInstallFirmwareBody": {
+				"description": "BmcInstallFirmwareBody schema",
 				"properties": {
-					"node_job_list": {
-						"additionalProperties": {
-							"items": {
+					"apply_update": {
+						"description": "false only compares the installed firmware against the catalog, which firmware/updates then lists. true queues every available update as a job",
+						"type": "boolean"
+					},
+					"catalog_file": {
+						"description": "Catalog file name on the share. The iDRAC defaults to Catalog.xml",
+						"example": "Catalog.xml",
+						"type": "string"
+					},
+					"clear_jobs": {
+						"description": "Clear every job in the queue first. Requires apply_update",
+						"type": "boolean"
+					},
+					"ignore_cert_warning": {
+						"description": "Accept an HTTPS share whose certificate does not validate",
+						"type": "boolean"
+					},
+					"ip_address": {
+						"description": "Domain name or IP address of the share holding the catalog",
+						"example": "downloads.dell.com",
+						"type": "string"
+					},
+					"reboot": {
+						"description": "Reboot the node when an update needs it. Otherwise the updates wait as scheduled jobs until the node next reboots",
+						"type": "boolean"
+					},
+					"share_name": {
+						"description": "Path of the catalog's directory on the share, or the NFS export",
+						"example": "/",
+						"type": "string"
+					},
+					"share_type": {
+						"description": "HTTP, HTTPS or NFS",
+						"example": "HTTPS",
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"BmcPowerBody": {
+				"description": "BmcPowerBody schema",
+				"properties": {
+					"action": {
+						"description": "schemas.ResetType. On, ForceOn, ForceOff, ForceRestart, GracefulRestart, GracefulShutdown, PowerCycle, Nmi, PushPowerButton, Suspend, Pause, Resume, FullPowerCycle",
+						"example": "PowerCycle",
+						"type": "string"
+					},
+					"boot_override": {
+						"description": "schemas.BootSource to boot from once. None, Pxe, Floppy, Cd, Usb, Hdd, BiosSetup, Utilities, Diags, UefiShell, UefiTarget, SDCard, UefiHttp, RemoteDrive, UefiBootNext, Recovery",
+						"example": "Pxe",
+						"type": "string"
+					},
+					"target": {
+						"description": "What to power, 'host' or 'bmc'. Defaults to host. A bmc target is always a graceful restart and ignores the other fields",
+						"example": "host",
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"BmcResponse_model.BmcAck": {
+				"description": "BmcResponse_model.BmcAck schema",
+				"properties": {
+					"results": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"data": {
+									"nullable": true
+								},
+								"duration_ms": {
+									"format": "int64",
+									"type": "integer"
+								},
+								"message": {
+									"type": "string"
+								},
+								"node": {
+									"type": "string"
+								},
+								"success": {
+									"type": "boolean"
+								}
+							},
+							"type": "object"
+						},
+						"nullable": true,
+						"type": "array"
+					},
+					"run_id": {
+						"type": "string"
+					},
+					"summary": {
+						"properties": {
+							"duration_ms": {
+								"format": "int64",
+								"type": "integer"
+							},
+							"failed": {
+								"type": "integer"
+							},
+							"failed_nodes": {
 								"type": "string"
 							},
-							"type": "array"
+							"succeeded": {
+								"type": "integer"
+							},
+							"total": {
+								"type": "integer"
+							}
 						},
-						"description": "Map with Node and Redfish Job IDs. Use 'JID_CLEARALL' to clear all jobs",
 						"type": "object"
 					}
 				},
 				"type": "object"
 			},
-			"BmcOsPowerBody": {
-				"description": "BmcOsPowerBody schema",
+			"BmcResponse_model.BmcFirmwareUpdates": {
+				"description": "BmcResponse_model.BmcFirmwareUpdates schema",
 				"properties": {
-					"boot_option": {
-						"description": "string of type schemas.BootSourceOverrideTarget. Common options include: None, Pxe, BiosSetup, Utilities, Diags",
-						"example": "Pxe",
+					"results": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"data": {
+									"nullable": true,
+									"properties": {
+										"reboot_type": {
+											"type": "string"
+										},
+										"updates": {
+											"items": {
+												"nullable": true,
+												"properties": {
+													"component_type": {
+														"type": "string"
+													},
+													"criticality": {
+														"type": "string"
+													},
+													"display_name": {
+														"type": "string"
+													},
+													"installed_version": {
+														"type": "string"
+													},
+													"name": {
+														"type": "string"
+													},
+													"package_path": {
+														"type": "string"
+													},
+													"package_version": {
+														"type": "string"
+													},
+													"reboot_type": {
+														"type": "string"
+													}
+												},
+												"type": "object"
+											},
+											"nullable": true,
+											"type": "array"
+										}
+									},
+									"type": "object"
+								},
+								"duration_ms": {
+									"format": "int64",
+									"type": "integer"
+								},
+								"message": {
+									"type": "string"
+								},
+								"node": {
+									"type": "string"
+								},
+								"success": {
+									"type": "boolean"
+								}
+							},
+							"type": "object"
+						},
+						"nullable": true,
+						"type": "array"
+					},
+					"run_id": {
 						"type": "string"
 					},
-					"power_option": {
-						"description": "string of type schemas.ResetType. Common options include: On, ForceOn, ForceOff, ForceRestart, GracefulRestart, GracefulShutdown, PowerCycle",
-						"example": "PowerCycle",
+					"summary": {
+						"properties": {
+							"duration_ms": {
+								"format": "int64",
+								"type": "integer"
+							},
+							"failed": {
+								"type": "integer"
+							},
+							"failed_nodes": {
+								"type": "string"
+							},
+							"succeeded": {
+								"type": "integer"
+							},
+							"total": {
+								"type": "integer"
+							}
+						},
+						"type": "object"
+					}
+				},
+				"type": "object"
+			},
+			"BmcResponse_model.BmcJobList": {
+				"description": "BmcResponse_model.BmcJobList schema",
+				"properties": {
+					"results": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"data": {
+									"nullable": true,
+									"properties": {
+										"jobs": {
+											"items": {
+												"nullable": true,
+												"properties": {
+													"end_time": {
+														"type": "string"
+													},
+													"id": {
+														"type": "string"
+													},
+													"message": {
+														"type": "string"
+													},
+													"name": {
+														"type": "string"
+													},
+													"percent_complete": {
+														"type": "integer"
+													},
+													"start_time": {
+														"type": "string"
+													},
+													"state": {
+														"type": "string"
+													},
+													"status": {
+														"type": "string"
+													},
+													"type": {
+														"type": "string"
+													}
+												},
+												"type": "object"
+											},
+											"nullable": true,
+											"type": "array"
+										}
+									},
+									"type": "object"
+								},
+								"duration_ms": {
+									"format": "int64",
+									"type": "integer"
+								},
+								"message": {
+									"type": "string"
+								},
+								"node": {
+									"type": "string"
+								},
+								"success": {
+									"type": "boolean"
+								}
+							},
+							"type": "object"
+						},
+						"nullable": true,
+						"type": "array"
+					},
+					"run_id": {
 						"type": "string"
+					},
+					"summary": {
+						"properties": {
+							"duration_ms": {
+								"format": "int64",
+								"type": "integer"
+							},
+							"failed": {
+								"type": "integer"
+							},
+							"failed_nodes": {
+								"type": "string"
+							},
+							"succeeded": {
+								"type": "integer"
+							},
+							"total": {
+								"type": "integer"
+							}
+						},
+						"type": "object"
+					}
+				},
+				"type": "object"
+			},
+			"BmcResponse_model.BmcSELLog": {
+				"description": "BmcResponse_model.BmcSELLog schema",
+				"properties": {
+					"results": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"data": {
+									"nullable": true,
+									"properties": {
+										"entries": {
+											"items": {
+												"nullable": true,
+												"properties": {
+													"created": {
+														"type": "string"
+													},
+													"entry_type": {
+														"type": "string"
+													},
+													"id": {
+														"type": "string"
+													},
+													"message": {
+														"type": "string"
+													},
+													"message_id": {
+														"type": "string"
+													},
+													"resolution": {
+														"type": "string"
+													},
+													"sensor_type": {
+														"type": "string"
+													},
+													"severity": {
+														"type": "string"
+													}
+												},
+												"type": "object"
+											},
+											"nullable": true,
+											"type": "array"
+										}
+									},
+									"type": "object"
+								},
+								"duration_ms": {
+									"format": "int64",
+									"type": "integer"
+								},
+								"message": {
+									"type": "string"
+								},
+								"node": {
+									"type": "string"
+								},
+								"success": {
+									"type": "boolean"
+								}
+							},
+							"type": "object"
+						},
+						"nullable": true,
+						"type": "array"
+					},
+					"run_id": {
+						"type": "string"
+					},
+					"summary": {
+						"properties": {
+							"duration_ms": {
+								"format": "int64",
+								"type": "integer"
+							},
+							"failed": {
+								"type": "integer"
+							},
+							"failed_nodes": {
+								"type": "string"
+							},
+							"succeeded": {
+								"type": "integer"
+							},
+							"total": {
+								"type": "integer"
+							}
+						},
+						"type": "object"
+					}
+				},
+				"type": "object"
+			},
+			"BmcResponse_model.RedfishSystem": {
+				"description": "BmcResponse_model.RedfishSystem schema",
+				"properties": {
+					"results": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"data": {
+									"nullable": true,
+									"properties": {
+										"bios_version": {
+											"type": "string"
+										},
+										"boot_mode": {
+											"type": "string"
+										},
+										"boot_next": {
+											"type": "string"
+										},
+										"boot_order": {
+											"items": {
+												"nullable": true,
+												"type": "string"
+											},
+											"nullable": true,
+											"type": "array"
+										},
+										"boot_override_enabled": {
+											"type": "string"
+										},
+										"boot_override_target": {
+											"type": "string"
+										},
+										"boot_progress": {
+											"type": "string"
+										},
+										"boot_progress_time": {
+											"type": "string"
+										},
+										"health": {
+											"type": "string"
+										},
+										"host_name": {
+											"type": "string"
+										},
+										"manufacturer": {
+											"type": "string"
+										},
+										"model": {
+											"type": "string"
+										},
+										"name": {
+											"type": "string"
+										},
+										"oem_dell": {
+											"nullable": true,
+											"properties": {
+												"@Message.ExtendedInfo": {
+													"items": {
+														"properties": {
+															"Message": {
+																"type": "string"
+															},
+															"MessageArgs": {
+																"items": {
+																	"nullable": true,
+																	"type": "string"
+																},
+																"nullable": true,
+																"type": "array"
+															},
+															"MessageId": {
+																"type": "string"
+															},
+															"MessageSeverity": {
+																"type": "string"
+															},
+															"Oem": {
+																"nullable": true
+															},
+															"RelatedProperties": {
+																"items": {
+																	"nullable": true,
+																	"type": "string"
+																},
+																"nullable": true,
+																"type": "array"
+															},
+															"Resolution": {
+																"type": "string"
+															},
+															"ResolutionSteps": {
+																"items": {
+																	"nullable": true,
+																	"properties": {
+																		"ActionParameters": {
+																			"items": {
+																				"nullable": true,
+																				"properties": {
+																					"AllowableNumbers": {
+																						"items": {
+																							"nullable": true,
+																							"type": "string"
+																						},
+																						"nullable": true,
+																						"type": "array"
+																					},
+																					"AllowablePattern": {
+																						"type": "string"
+																					},
+																					"AllowableValueDescriptions": {
+																						"items": {
+																							"nullable": true,
+																							"type": "string"
+																						},
+																						"nullable": true,
+																						"type": "array"
+																					},
+																					"AllowableValues": {
+																						"items": {
+																							"nullable": true,
+																							"type": "string"
+																						},
+																						"nullable": true,
+																						"type": "array"
+																					},
+																					"ArraySizeMaximum": {
+																						"nullable": true,
+																						"type": "integer"
+																					},
+																					"ArraySizeMinimum": {
+																						"nullable": true,
+																						"type": "integer"
+																					},
+																					"DataType": {
+																						"type": "string"
+																					},
+																					"DefaultValue": {
+																						"type": "string"
+																					},
+																					"MaximumValue": {
+																						"format": "double",
+																						"nullable": true,
+																						"type": "number"
+																					},
+																					"MinimumValue": {
+																						"format": "double",
+																						"nullable": true,
+																						"type": "number"
+																					},
+																					"Name": {
+																						"type": "string"
+																					},
+																					"NoDefaultValue": {
+																						"type": "boolean"
+																					},
+																					"ObjectDataType": {
+																						"type": "string"
+																					},
+																					"Required": {
+																						"type": "boolean"
+																					}
+																				},
+																				"type": "object"
+																			},
+																			"nullable": true,
+																			"type": "array"
+																		},
+																		"ActionURI": {
+																			"type": "string"
+																		},
+																		"Oem": {
+																			"nullable": true
+																		},
+																		"Priority": {
+																			"minimum": 0,
+																			"nullable": true,
+																			"type": "integer"
+																		},
+																		"ResolutionType": {
+																			"type": "string"
+																		},
+																		"RetryCount": {
+																			"minimum": 0,
+																			"nullable": true,
+																			"type": "integer"
+																		},
+																		"RetryIntervalSeconds": {
+																			"minimum": 0,
+																			"nullable": true,
+																			"type": "integer"
+																		},
+																		"TargetComponentURI": {
+																			"type": "string"
+																		}
+																	},
+																	"type": "object"
+																},
+																"nullable": true,
+																"type": "array"
+															},
+															"Severity": {
+																"type": "string"
+															},
+															"UserAuthenticationSource": {
+																"type": "string"
+															},
+															"Username": {
+																"type": "string"
+															}
+														},
+														"type": "object"
+													},
+													"type": "array"
+												},
+												"@odata.context": {
+													"type": "string"
+												},
+												"@odata.etag": {
+													"type": "string"
+												},
+												"@odata.id": {
+													"type": "string"
+												},
+												"@odata.type": {
+													"type": "string"
+												},
+												"BIOSReleaseDate": {
+													"type": "string"
+												},
+												"BaseBoardChassisSlot": {
+													"type": "string"
+												},
+												"BatteryRollupStatus": {
+													"type": "string"
+												},
+												"BladeGeometry": {
+													"type": "string"
+												},
+												"CMCIP": {
+													"type": "string"
+												},
+												"CPURollupStatus": {
+													"type": "string"
+												},
+												"ChassisModel": {
+													"type": "string"
+												},
+												"ChassisName": {
+													"type": "string"
+												},
+												"ChassisServiceTag": {
+													"type": "string"
+												},
+												"ChassisSystemHeightUnit": {
+													"type": "integer"
+												},
+												"CurrentRollupStatus": {
+													"type": "string"
+												},
+												"Description": {
+													"type": "string"
+												},
+												"EstimatedExhaustTemperatureCelsius": {
+													"type": "integer"
+												},
+												"EstimatedSystemAirflowCFM": {
+													"type": "integer"
+												},
+												"ExpressServiceCode": {
+													"type": "string"
+												},
+												"FanRollupStatus": {
+													"type": "string"
+												},
+												"IDSDMRollupStatus": {
+													"type": "string"
+												},
+												"Id": {
+													"type": "string"
+												},
+												"IntrusionRollupStatus": {
+													"type": "string"
+												},
+												"IsOEMBranded": {
+													"type": "string"
+												},
+												"LastSystemInventoryTime": {
+													"type": "string"
+												},
+												"LastUpdateTime": {
+													"type": "string"
+												},
+												"LicensingRollupStatus": {
+													"type": "string"
+												},
+												"ManagedSystemSize": {
+													"type": "string"
+												},
+												"MaxCPUSockets": {
+													"type": "integer"
+												},
+												"MaxDIMMSlots": {
+													"type": "integer"
+												},
+												"MaxPCIeSlots": {
+													"type": "integer"
+												},
+												"MemoryOperationMode": {
+													"type": "string"
+												},
+												"Name": {
+													"type": "string"
+												},
+												"NodeID": {
+													"type": "string"
+												},
+												"Oem": {
+													"nullable": true
+												},
+												"PSRollupStatus": {
+													"type": "string"
+												},
+												"PlatformGUID": {
+													"type": "string"
+												},
+												"PopulatedDIMMSlots": {
+													"type": "integer"
+												},
+												"PopulatedPCIeSlots": {
+													"type": "integer"
+												},
+												"PowerCapEnabledState": {
+													"type": "string"
+												},
+												"SDCardRollupStatus": {
+													"type": "string"
+												},
+												"SELRollupStatus": {
+													"type": "string"
+												},
+												"ServerAllocationWatts": {
+													"type": "integer"
+												},
+												"StorageRollupStatus": {
+													"type": "string"
+												},
+												"SysMemErrorMethodology": {
+													"type": "string"
+												},
+												"SysMemFailOverState": {
+													"type": "string"
+												},
+												"SysMemLocation": {
+													"type": "string"
+												},
+												"SysMemPrimaryStatus": {
+													"type": "string"
+												},
+												"SystemGeneration": {
+													"type": "string"
+												},
+												"SystemID": {
+													"type": "integer"
+												},
+												"SystemRevision": {
+													"type": "string"
+												},
+												"TempRollupStatus": {
+													"type": "string"
+												},
+												"TempStatisticsRollupStatus": {
+													"type": "string"
+												},
+												"UUID": {
+													"type": "string"
+												},
+												"VoltRollupStatus": {
+													"type": "string"
+												},
+												"smbiosGUID": {
+													"type": "string"
+												}
+											},
+											"type": "object"
+										},
+										"power_status": {
+											"type": "string"
+										},
+										"processor_cores": {
+											"type": "integer"
+										},
+										"processor_count": {
+											"type": "integer"
+										},
+										"processor_model": {
+											"type": "string"
+										},
+										"processor_sockets": {
+											"type": "integer"
+										},
+										"serial_number": {
+											"type": "string"
+										},
+										"total_memory": {
+											"format": "float",
+											"type": "number"
+										}
+									},
+									"type": "object"
+								},
+								"duration_ms": {
+									"format": "int64",
+									"type": "integer"
+								},
+								"message": {
+									"type": "string"
+								},
+								"node": {
+									"type": "string"
+								},
+								"success": {
+									"type": "boolean"
+								}
+							},
+							"type": "object"
+						},
+						"nullable": true,
+						"type": "array"
+					},
+					"run_id": {
+						"type": "string"
+					},
+					"summary": {
+						"properties": {
+							"duration_ms": {
+								"format": "int64",
+								"type": "integer"
+							},
+							"failed": {
+								"type": "integer"
+							},
+							"failed_nodes": {
+								"type": "string"
+							},
+							"succeeded": {
+								"type": "integer"
+							},
+							"total": {
+								"type": "integer"
+							}
+						},
+						"type": "object"
 					}
 				},
 				"type": "object"
@@ -541,59 +1354,11 @@
 						"items": {
 							"nullable": true,
 							"properties": {
-								"data": {
-									"type": "string"
-								},
 								"host": {
 									"type": "string"
 								},
 								"msg": {
 									"type": "string"
-								},
-								"redfish_error": {
-									"properties": {
-										"code": {
-											"type": "string"
-										},
-										"error": {
-											"properties": {
-												"@Message.ExtendedInfo": {
-													"items": {
-														"properties": {
-															"Message": {
-																"type": "string"
-															},
-															"MessageArgs.@odata.count": {
-																"type": "integer"
-															},
-															"MessageId": {
-																"type": "string"
-															},
-															"RelatedProperties.@odata.count": {
-																"type": "integer"
-															},
-															"Resolution": {
-																"type": "string"
-															},
-															"Severity": {
-																"type": "string"
-															}
-														},
-														"type": "object"
-													},
-													"type": "array"
-												},
-												"code": {
-													"type": "string"
-												},
-												"message": {
-													"type": "string"
-												}
-											},
-											"type": "object"
-										}
-									},
-									"type": "object"
 								},
 								"status": {
 									"type": "string"
@@ -847,70 +1612,6 @@
 				},
 				"type": "object"
 			},
-			"JobMessage": {
-				"description": "JobMessage schema",
-				"properties": {
-					"data": {
-						"type": "string"
-					},
-					"host": {
-						"type": "string"
-					},
-					"msg": {
-						"type": "string"
-					},
-					"redfish_error": {
-						"properties": {
-							"code": {
-								"type": "string"
-							},
-							"error": {
-								"properties": {
-									"@Message.ExtendedInfo": {
-										"items": {
-											"properties": {
-												"Message": {
-													"type": "string"
-												},
-												"MessageArgs.@odata.count": {
-													"type": "integer"
-												},
-												"MessageId": {
-													"type": "string"
-												},
-												"RelatedProperties.@odata.count": {
-													"type": "integer"
-												},
-												"Resolution": {
-													"type": "string"
-												},
-												"Severity": {
-													"type": "string"
-												}
-											},
-											"type": "object"
-										},
-										"nullable": true,
-										"type": "array"
-									},
-									"code": {
-										"type": "string"
-									},
-									"message": {
-										"type": "string"
-									}
-								},
-								"type": "object"
-							}
-						},
-						"type": "object"
-					},
-					"status": {
-						"type": "string"
-					}
-				},
-				"type": "object"
-			},
 			"LLDP": {
 				"description": "LLDP schema",
 				"properties": {
@@ -1150,1198 +1851,6 @@
 					},
 					"role": {
 						"type": "string"
-					}
-				},
-				"type": "object"
-			},
-			"RedfishDellUpgradeFirmware": {
-				"description": "RedfishDellUpgradeFirmware schema",
-				"properties": {
-					"Message": {
-						"type": "string"
-					},
-					"Name": {
-						"type": "string"
-					},
-					"Status": {
-						"type": "string"
-					},
-					"UpdateCount": {
-						"type": "integer"
-					},
-					"UpdateList": {
-						"items": {
-							"nullable": true,
-							"properties": {
-								"BaseLocation": {
-									"type": "string"
-								},
-								"ComponentID": {
-									"type": "string"
-								},
-								"ComponentInfoName": {
-									"type": "string"
-								},
-								"ComponentInfoValue": {
-									"type": "string"
-								},
-								"ComponentType": {
-									"type": "string"
-								},
-								"Criticality": {
-									"type": "string"
-								},
-								"DisplayName": {
-									"type": "string"
-								},
-								"InstalledVersion": {
-									"type": "string"
-								},
-								"JobID": {
-									"type": "string"
-								},
-								"Name": {
-									"type": "string"
-								},
-								"PackageName": {
-									"type": "string"
-								},
-								"PackagePath": {
-									"type": "string"
-								},
-								"PackageVersion": {
-									"type": "string"
-								},
-								"RebootType": {
-									"type": "string"
-								},
-								"Target": {
-									"type": "string"
-								}
-							},
-							"type": "object"
-						},
-						"nullable": true,
-						"type": "array"
-					},
-					"UpdateRebootType": {
-						"type": "string"
-					}
-				},
-				"type": "object"
-			},
-			"RedfishJob": {
-				"description": "RedfishJob schema",
-				"properties": {
-					"jobs": {
-						"items": {
-							"nullable": true,
-							"properties": {
-								"@Message.ExtendedInfo": {
-									"items": {
-										"properties": {
-											"Message": {
-												"type": "string"
-											},
-											"MessageArgs": {
-												"items": {
-													"nullable": true,
-													"type": "string"
-												},
-												"nullable": true,
-												"type": "array"
-											},
-											"MessageId": {
-												"type": "string"
-											},
-											"MessageSeverity": {
-												"type": "string"
-											},
-											"Oem": {
-												"nullable": true
-											},
-											"RelatedProperties": {
-												"items": {
-													"nullable": true,
-													"type": "string"
-												},
-												"nullable": true,
-												"type": "array"
-											},
-											"Resolution": {
-												"type": "string"
-											},
-											"ResolutionSteps": {
-												"items": {
-													"nullable": true,
-													"properties": {
-														"ActionParameters": {
-															"items": {
-																"nullable": true,
-																"properties": {
-																	"AllowableNumbers": {
-																		"items": {
-																			"nullable": true,
-																			"type": "string"
-																		},
-																		"nullable": true,
-																		"type": "array"
-																	},
-																	"AllowablePattern": {
-																		"type": "string"
-																	},
-																	"AllowableValueDescriptions": {
-																		"items": {
-																			"nullable": true,
-																			"type": "string"
-																		},
-																		"nullable": true,
-																		"type": "array"
-																	},
-																	"AllowableValues": {
-																		"items": {
-																			"nullable": true,
-																			"type": "string"
-																		},
-																		"nullable": true,
-																		"type": "array"
-																	},
-																	"ArraySizeMaximum": {
-																		"nullable": true,
-																		"type": "integer"
-																	},
-																	"ArraySizeMinimum": {
-																		"nullable": true,
-																		"type": "integer"
-																	},
-																	"DataType": {
-																		"type": "string"
-																	},
-																	"DefaultValue": {
-																		"type": "string"
-																	},
-																	"MaximumValue": {
-																		"format": "double",
-																		"nullable": true,
-																		"type": "number"
-																	},
-																	"MinimumValue": {
-																		"format": "double",
-																		"nullable": true,
-																		"type": "number"
-																	},
-																	"Name": {
-																		"type": "string"
-																	},
-																	"NoDefaultValue": {
-																		"type": "boolean"
-																	},
-																	"ObjectDataType": {
-																		"type": "string"
-																	},
-																	"Required": {
-																		"type": "boolean"
-																	}
-																},
-																"type": "object"
-															},
-															"nullable": true,
-															"type": "array"
-														},
-														"ActionURI": {
-															"type": "string"
-														},
-														"Oem": {
-															"nullable": true
-														},
-														"Priority": {
-															"minimum": 0,
-															"nullable": true,
-															"type": "integer"
-														},
-														"ResolutionType": {
-															"type": "string"
-														},
-														"RetryCount": {
-															"minimum": 0,
-															"nullable": true,
-															"type": "integer"
-														},
-														"RetryIntervalSeconds": {
-															"minimum": 0,
-															"nullable": true,
-															"type": "integer"
-														},
-														"TargetComponentURI": {
-															"type": "string"
-														}
-													},
-													"type": "object"
-												},
-												"nullable": true,
-												"type": "array"
-											},
-											"Severity": {
-												"type": "string"
-											},
-											"UserAuthenticationSource": {
-												"type": "string"
-											},
-											"Username": {
-												"type": "string"
-											}
-										},
-										"type": "object"
-									},
-									"type": "array"
-								},
-								"@odata.context": {
-									"type": "string"
-								},
-								"@odata.etag": {
-									"type": "string"
-								},
-								"@odata.id": {
-									"type": "string"
-								},
-								"@odata.type": {
-									"type": "string"
-								},
-								"CreatedBy": {
-									"type": "string"
-								},
-								"CreationTime": {
-									"type": "string"
-								},
-								"Description": {
-									"type": "string"
-								},
-								"EndTime": {
-									"type": "string"
-								},
-								"EstimatedCompletionTime": {
-									"type": "string"
-								},
-								"EstimatedDuration": {
-									"type": "string"
-								},
-								"HidePayload": {
-									"type": "boolean"
-								},
-								"Id": {
-									"type": "string"
-								},
-								"JobPriority": {
-									"minimum": 0,
-									"nullable": true,
-									"type": "integer"
-								},
-								"JobState": {
-									"type": "string"
-								},
-								"JobStatus": {
-									"type": "string"
-								},
-								"JobType": {
-									"type": "string"
-								},
-								"MaxExecutionTime": {
-									"type": "string"
-								},
-								"Messages": {
-									"items": {
-										"nullable": true,
-										"properties": {
-											"Message": {
-												"type": "string"
-											},
-											"MessageArgs": {
-												"items": {
-													"nullable": true,
-													"type": "string"
-												},
-												"nullable": true,
-												"type": "array"
-											},
-											"MessageId": {
-												"type": "string"
-											},
-											"MessageSeverity": {
-												"type": "string"
-											},
-											"Oem": {
-												"nullable": true
-											},
-											"RelatedProperties": {
-												"items": {
-													"nullable": true,
-													"type": "string"
-												},
-												"nullable": true,
-												"type": "array"
-											},
-											"Resolution": {
-												"type": "string"
-											},
-											"ResolutionSteps": {
-												"items": {
-													"nullable": true,
-													"properties": {
-														"ActionParameters": {
-															"items": {
-																"nullable": true,
-																"properties": {
-																	"AllowableNumbers": {
-																		"items": {
-																			"nullable": true,
-																			"type": "string"
-																		},
-																		"nullable": true,
-																		"type": "array"
-																	},
-																	"AllowablePattern": {
-																		"type": "string"
-																	},
-																	"AllowableValueDescriptions": {
-																		"items": {
-																			"nullable": true,
-																			"type": "string"
-																		},
-																		"nullable": true,
-																		"type": "array"
-																	},
-																	"AllowableValues": {
-																		"items": {
-																			"nullable": true,
-																			"type": "string"
-																		},
-																		"nullable": true,
-																		"type": "array"
-																	},
-																	"ArraySizeMaximum": {
-																		"nullable": true,
-																		"type": "integer"
-																	},
-																	"ArraySizeMinimum": {
-																		"nullable": true,
-																		"type": "integer"
-																	},
-																	"DataType": {
-																		"type": "string"
-																	},
-																	"DefaultValue": {
-																		"type": "string"
-																	},
-																	"MaximumValue": {
-																		"format": "double",
-																		"nullable": true,
-																		"type": "number"
-																	},
-																	"MinimumValue": {
-																		"format": "double",
-																		"nullable": true,
-																		"type": "number"
-																	},
-																	"Name": {
-																		"type": "string"
-																	},
-																	"NoDefaultValue": {
-																		"type": "boolean"
-																	},
-																	"ObjectDataType": {
-																		"type": "string"
-																	},
-																	"Required": {
-																		"type": "boolean"
-																	}
-																},
-																"type": "object"
-															},
-															"nullable": true,
-															"type": "array"
-														},
-														"ActionURI": {
-															"type": "string"
-														},
-														"Oem": {
-															"nullable": true
-														},
-														"Priority": {
-															"minimum": 0,
-															"nullable": true,
-															"type": "integer"
-														},
-														"ResolutionType": {
-															"type": "string"
-														},
-														"RetryCount": {
-															"minimum": 0,
-															"nullable": true,
-															"type": "integer"
-														},
-														"RetryIntervalSeconds": {
-															"minimum": 0,
-															"nullable": true,
-															"type": "integer"
-														},
-														"TargetComponentURI": {
-															"type": "string"
-														}
-													},
-													"type": "object"
-												},
-												"nullable": true,
-												"type": "array"
-											},
-											"Severity": {
-												"type": "string"
-											},
-											"UserAuthenticationSource": {
-												"type": "string"
-											},
-											"Username": {
-												"type": "string"
-											}
-										},
-										"type": "object"
-									},
-									"nullable": true,
-									"type": "array"
-								},
-								"Name": {
-									"type": "string"
-								},
-								"Oem": {
-									"nullable": true
-								},
-								"Parameters": {
-									"additionalProperties": {
-										"nullable": true
-									},
-									"nullable": true,
-									"type": "object"
-								},
-								"Payload": {
-									"properties": {
-										"HttpHeaders": {
-											"items": {
-												"nullable": true,
-												"type": "string"
-											},
-											"nullable": true,
-											"type": "array"
-										},
-										"HttpOperation": {
-											"type": "string"
-										},
-										"JsonBody": {
-											"type": "string"
-										},
-										"TargetUri": {
-											"type": "string"
-										}
-									},
-									"type": "object"
-								},
-								"PercentComplete": {
-									"minimum": 0,
-									"nullable": true,
-									"type": "integer"
-								},
-								"RawData": {
-									"format": "byte",
-									"nullable": true,
-									"type": "string"
-								},
-								"Schedule": {
-									"properties": {
-										"EnabledDaysOfMonth": {
-											"items": {
-												"nullable": true,
-												"type": "integer"
-											},
-											"nullable": true,
-											"type": "array"
-										},
-										"EnabledDaysOfWeek": {
-											"items": {
-												"nullable": true,
-												"type": "string"
-											},
-											"nullable": true,
-											"type": "array"
-										},
-										"EnabledIntervals": {
-											"items": {
-												"nullable": true,
-												"type": "string"
-											},
-											"nullable": true,
-											"type": "array"
-										},
-										"EnabledMonthsOfYear": {
-											"items": {
-												"nullable": true,
-												"type": "string"
-											},
-											"nullable": true,
-											"type": "array"
-										},
-										"InitialStartTime": {
-											"type": "string"
-										},
-										"Lifetime": {
-											"type": "string"
-										},
-										"MaxOccurrences": {
-											"nullable": true,
-											"type": "integer"
-										},
-										"Name": {
-											"type": "string"
-										},
-										"RecurrenceInterval": {
-											"type": "string"
-										}
-									},
-									"type": "object"
-								},
-								"StartTime": {
-									"type": "string"
-								},
-								"StepOrder": {
-									"items": {
-										"nullable": true,
-										"type": "string"
-									},
-									"nullable": true,
-									"type": "array"
-								}
-							},
-							"type": "object"
-						},
-						"nullable": true,
-						"type": "array"
-					},
-					"name": {
-						"type": "string"
-					}
-				},
-				"type": "object"
-			},
-			"RedfishMetricReport": {
-				"description": "RedfishMetricReport schema",
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"reports": {
-						"items": {
-							"nullable": true,
-							"properties": {
-								"@Message.ExtendedInfo": {
-									"items": {
-										"properties": {
-											"Message": {
-												"type": "string"
-											},
-											"MessageArgs": {
-												"items": {
-													"nullable": true,
-													"type": "string"
-												},
-												"nullable": true,
-												"type": "array"
-											},
-											"MessageId": {
-												"type": "string"
-											},
-											"MessageSeverity": {
-												"type": "string"
-											},
-											"Oem": {
-												"nullable": true
-											},
-											"RelatedProperties": {
-												"items": {
-													"nullable": true,
-													"type": "string"
-												},
-												"nullable": true,
-												"type": "array"
-											},
-											"Resolution": {
-												"type": "string"
-											},
-											"ResolutionSteps": {
-												"items": {
-													"nullable": true,
-													"properties": {
-														"ActionParameters": {
-															"items": {
-																"nullable": true,
-																"properties": {
-																	"AllowableNumbers": {
-																		"items": {
-																			"nullable": true,
-																			"type": "string"
-																		},
-																		"nullable": true,
-																		"type": "array"
-																	},
-																	"AllowablePattern": {
-																		"type": "string"
-																	},
-																	"AllowableValueDescriptions": {
-																		"items": {
-																			"nullable": true,
-																			"type": "string"
-																		},
-																		"nullable": true,
-																		"type": "array"
-																	},
-																	"AllowableValues": {
-																		"items": {
-																			"nullable": true,
-																			"type": "string"
-																		},
-																		"nullable": true,
-																		"type": "array"
-																	},
-																	"ArraySizeMaximum": {
-																		"nullable": true,
-																		"type": "integer"
-																	},
-																	"ArraySizeMinimum": {
-																		"nullable": true,
-																		"type": "integer"
-																	},
-																	"DataType": {
-																		"type": "string"
-																	},
-																	"DefaultValue": {
-																		"type": "string"
-																	},
-																	"MaximumValue": {
-																		"format": "double",
-																		"nullable": true,
-																		"type": "number"
-																	},
-																	"MinimumValue": {
-																		"format": "double",
-																		"nullable": true,
-																		"type": "number"
-																	},
-																	"Name": {
-																		"type": "string"
-																	},
-																	"NoDefaultValue": {
-																		"type": "boolean"
-																	},
-																	"ObjectDataType": {
-																		"type": "string"
-																	},
-																	"Required": {
-																		"type": "boolean"
-																	}
-																},
-																"type": "object"
-															},
-															"nullable": true,
-															"type": "array"
-														},
-														"ActionURI": {
-															"type": "string"
-														},
-														"Oem": {
-															"nullable": true
-														},
-														"Priority": {
-															"minimum": 0,
-															"nullable": true,
-															"type": "integer"
-														},
-														"ResolutionType": {
-															"type": "string"
-														},
-														"RetryCount": {
-															"minimum": 0,
-															"nullable": true,
-															"type": "integer"
-														},
-														"RetryIntervalSeconds": {
-															"minimum": 0,
-															"nullable": true,
-															"type": "integer"
-														},
-														"TargetComponentURI": {
-															"type": "string"
-														}
-													},
-													"type": "object"
-												},
-												"nullable": true,
-												"type": "array"
-											},
-											"Severity": {
-												"type": "string"
-											},
-											"UserAuthenticationSource": {
-												"type": "string"
-											},
-											"Username": {
-												"type": "string"
-											}
-										},
-										"type": "object"
-									},
-									"type": "array"
-								},
-								"@odata.context": {
-									"type": "string"
-								},
-								"@odata.etag": {
-									"type": "string"
-								},
-								"@odata.id": {
-									"type": "string"
-								},
-								"@odata.type": {
-									"type": "string"
-								},
-								"Context": {
-									"type": "string"
-								},
-								"Description": {
-									"type": "string"
-								},
-								"Id": {
-									"type": "string"
-								},
-								"MetricValues": {
-									"items": {
-										"nullable": true,
-										"properties": {
-											"MetricId": {
-												"type": "string"
-											},
-											"MetricProperty": {
-												"type": "string"
-											},
-											"MetricValue": {
-												"type": "string"
-											},
-											"Oem": {
-												"nullable": true
-											},
-											"Timestamp": {
-												"type": "string"
-											}
-										},
-										"type": "object"
-									},
-									"nullable": true,
-									"type": "array"
-								},
-								"Name": {
-									"type": "string"
-								},
-								"Oem": {
-									"nullable": true
-								},
-								"ReportSequence": {
-									"type": "string"
-								},
-								"Timestamp": {
-									"type": "string"
-								}
-							},
-							"type": "object"
-						},
-						"nullable": true,
-						"type": "array"
-					}
-				},
-				"type": "object"
-			},
-			"RedfishSystem": {
-				"description": "RedfishSystem schema",
-				"properties": {
-					"bios_version": {
-						"type": "string"
-					},
-					"boot_next": {
-						"type": "string"
-					},
-					"boot_order": {
-						"items": {
-							"nullable": true,
-							"type": "string"
-						},
-						"nullable": true,
-						"type": "array"
-					},
-					"health": {
-						"type": "string"
-					},
-					"host_name": {
-						"type": "string"
-					},
-					"manufacturer": {
-						"type": "string"
-					},
-					"model": {
-						"type": "string"
-					},
-					"name": {
-						"type": "string"
-					},
-					"oem_dell": {
-						"nullable": true,
-						"properties": {
-							"@Message.ExtendedInfo": {
-								"items": {
-									"properties": {
-										"Message": {
-											"type": "string"
-										},
-										"MessageArgs": {
-											"items": {
-												"nullable": true,
-												"type": "string"
-											},
-											"nullable": true,
-											"type": "array"
-										},
-										"MessageId": {
-											"type": "string"
-										},
-										"MessageSeverity": {
-											"type": "string"
-										},
-										"Oem": {
-											"nullable": true
-										},
-										"RelatedProperties": {
-											"items": {
-												"nullable": true,
-												"type": "string"
-											},
-											"nullable": true,
-											"type": "array"
-										},
-										"Resolution": {
-											"type": "string"
-										},
-										"ResolutionSteps": {
-											"items": {
-												"nullable": true,
-												"properties": {
-													"ActionParameters": {
-														"items": {
-															"nullable": true,
-															"properties": {
-																"AllowableNumbers": {
-																	"items": {
-																		"nullable": true,
-																		"type": "string"
-																	},
-																	"nullable": true,
-																	"type": "array"
-																},
-																"AllowablePattern": {
-																	"type": "string"
-																},
-																"AllowableValueDescriptions": {
-																	"items": {
-																		"nullable": true,
-																		"type": "string"
-																	},
-																	"nullable": true,
-																	"type": "array"
-																},
-																"AllowableValues": {
-																	"items": {
-																		"nullable": true,
-																		"type": "string"
-																	},
-																	"nullable": true,
-																	"type": "array"
-																},
-																"ArraySizeMaximum": {
-																	"nullable": true,
-																	"type": "integer"
-																},
-																"ArraySizeMinimum": {
-																	"nullable": true,
-																	"type": "integer"
-																},
-																"DataType": {
-																	"type": "string"
-																},
-																"DefaultValue": {
-																	"type": "string"
-																},
-																"MaximumValue": {
-																	"format": "double",
-																	"nullable": true,
-																	"type": "number"
-																},
-																"MinimumValue": {
-																	"format": "double",
-																	"nullable": true,
-																	"type": "number"
-																},
-																"Name": {
-																	"type": "string"
-																},
-																"NoDefaultValue": {
-																	"type": "boolean"
-																},
-																"ObjectDataType": {
-																	"type": "string"
-																},
-																"Required": {
-																	"type": "boolean"
-																}
-															},
-															"type": "object"
-														},
-														"nullable": true,
-														"type": "array"
-													},
-													"ActionURI": {
-														"type": "string"
-													},
-													"Oem": {
-														"nullable": true
-													},
-													"Priority": {
-														"minimum": 0,
-														"nullable": true,
-														"type": "integer"
-													},
-													"ResolutionType": {
-														"type": "string"
-													},
-													"RetryCount": {
-														"minimum": 0,
-														"nullable": true,
-														"type": "integer"
-													},
-													"RetryIntervalSeconds": {
-														"minimum": 0,
-														"nullable": true,
-														"type": "integer"
-													},
-													"TargetComponentURI": {
-														"type": "string"
-													}
-												},
-												"type": "object"
-											},
-											"nullable": true,
-											"type": "array"
-										},
-										"Severity": {
-											"type": "string"
-										},
-										"UserAuthenticationSource": {
-											"type": "string"
-										},
-										"Username": {
-											"type": "string"
-										}
-									},
-									"type": "object"
-								},
-								"nullable": true,
-								"type": "array"
-							},
-							"@odata.context": {
-								"type": "string"
-							},
-							"@odata.etag": {
-								"nullable": true,
-								"type": "string"
-							},
-							"@odata.id": {
-								"type": "string"
-							},
-							"@odata.type": {
-								"type": "string"
-							},
-							"BIOSReleaseDate": {
-								"type": "string"
-							},
-							"BaseBoardChassisSlot": {
-								"type": "string"
-							},
-							"BatteryRollupStatus": {
-								"type": "string"
-							},
-							"BladeGeometry": {
-								"type": "string"
-							},
-							"CMCIP": {
-								"type": "string"
-							},
-							"CPURollupStatus": {
-								"type": "string"
-							},
-							"ChassisModel": {
-								"type": "string"
-							},
-							"ChassisName": {
-								"type": "string"
-							},
-							"ChassisServiceTag": {
-								"type": "string"
-							},
-							"ChassisSystemHeightUnit": {
-								"type": "integer"
-							},
-							"CurrentRollupStatus": {
-								"type": "string"
-							},
-							"Description": {
-								"type": "string"
-							},
-							"EstimatedExhaustTemperatureCelsius": {
-								"type": "integer"
-							},
-							"EstimatedSystemAirflowCFM": {
-								"type": "integer"
-							},
-							"ExpressServiceCode": {
-								"type": "string"
-							},
-							"FanRollupStatus": {
-								"type": "string"
-							},
-							"IDSDMRollupStatus": {
-								"type": "string"
-							},
-							"Id": {
-								"type": "string"
-							},
-							"IntrusionRollupStatus": {
-								"type": "string"
-							},
-							"IsOEMBranded": {
-								"type": "string"
-							},
-							"LastSystemInventoryTime": {
-								"type": "string"
-							},
-							"LastUpdateTime": {
-								"type": "string"
-							},
-							"LicensingRollupStatus": {
-								"type": "string"
-							},
-							"ManagedSystemSize": {
-								"type": "string"
-							},
-							"MaxCPUSockets": {
-								"type": "integer"
-							},
-							"MaxDIMMSlots": {
-								"type": "integer"
-							},
-							"MaxPCIeSlots": {
-								"type": "integer"
-							},
-							"MemoryOperationMode": {
-								"type": "string"
-							},
-							"Name": {
-								"type": "string"
-							},
-							"NodeID": {
-								"type": "string"
-							},
-							"Oem": {
-								"nullable": true
-							},
-							"PSRollupStatus": {
-								"type": "string"
-							},
-							"PlatformGUID": {
-								"type": "string"
-							},
-							"PopulatedDIMMSlots": {
-								"type": "integer"
-							},
-							"PopulatedPCIeSlots": {
-								"type": "integer"
-							},
-							"PowerCapEnabledState": {
-								"type": "string"
-							},
-							"SDCardRollupStatus": {
-								"type": "string"
-							},
-							"SELRollupStatus": {
-								"type": "string"
-							},
-							"ServerAllocationWatts": {
-								"type": "integer"
-							},
-							"StorageRollupStatus": {
-								"type": "string"
-							},
-							"SysMemErrorMethodology": {
-								"type": "string"
-							},
-							"SysMemFailOverState": {
-								"type": "string"
-							},
-							"SysMemLocation": {
-								"type": "string"
-							},
-							"SysMemPrimaryStatus": {
-								"type": "string"
-							},
-							"SystemGeneration": {
-								"type": "string"
-							},
-							"SystemID": {
-								"type": "integer"
-							},
-							"SystemRevision": {
-								"type": "string"
-							},
-							"TempRollupStatus": {
-								"type": "string"
-							},
-							"TempStatisticsRollupStatus": {
-								"type": "string"
-							},
-							"UUID": {
-								"type": "string"
-							},
-							"VoltRollupStatus": {
-								"type": "string"
-							},
-							"smbiosGUID": {
-								"type": "string"
-							}
-						},
-						"type": "object"
-					},
-					"power_status": {
-						"type": "string"
-					},
-					"processor_count": {
-						"type": "integer"
-					},
-					"serial_number": {
-						"type": "string"
-					},
-					"total_memory": {
-						"format": "float",
-						"type": "number"
 					}
 				},
 				"type": "object"
@@ -2779,96 +2288,9 @@
 				]
 			}
 		},
-		"/v1/bmc": {
-			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcQuery`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet redfish info from node(s)",
-				"operationId": "GET_/v1/bmc",
-				"parameters": [
-					{
-						"description": "Filter by nodeset. Minimum of one query parameter is required",
-						"examples": {
-							"nodeset": {
-								"value": "cpn-i10-[04-05],cpn-h22-33"
-							}
-						},
-						"in": "query",
-						"name": "nodeset",
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"description": "Filter by tags. Minimum of one query parameter is required",
-						"examples": {
-							"tags": {
-								"value": "a01,ib,test"
-							}
-						},
-						"in": "query",
-						"name": "tags",
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "Accept",
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"content": {
-							"application/json": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/RedfishSystem"
-									},
-									"type": "array"
-								}
-							},
-							"application/xml": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/RedfishSystem"
-									},
-									"type": "array"
-								}
-							}
-						},
-						"description": "OK"
-					},
-					"default": {
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/HTTPError"
-								}
-							}
-						},
-						"description": "Default Error"
-					}
-				},
-				"security": [
-					{
-						"headerAuth": []
-					},
-					{
-						"cookieAuth": []
-					}
-				],
-				"summary": "bmc query",
-				"tags": [
-					"v1",
-					"bmc"
-				]
-			}
-		},
 		"/v1/bmc/configure/auto": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcAutoConfigure`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nSet BMC to autoconfigure",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcAutoConfigure`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nSet iDRAC(s) to auto configure once, on the node's next boot. Dell only",
 				"operationId": "POST_/v1/bmc/configure/auto",
 				"parameters": [
 					{
@@ -2898,6 +2320,19 @@
 						}
 					},
 					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"in": "header",
 						"name": "Accept",
 						"schema": {
@@ -2910,18 +2345,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/JobMessage"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
 								}
 							},
 							"application/xml": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/JobMessage"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
 								}
 							}
 						},
@@ -2955,7 +2384,7 @@
 		},
 		"/v1/bmc/configure/import": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfiguration`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nManually import system configuration to BMC",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfig`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nHave iDRAC(s) download a config template from the provision server and import it. Dell only",
 				"operationId": "POST_/v1/bmc/configure/import",
 				"parameters": [
 					{
@@ -2985,6 +2414,19 @@
 						}
 					},
 					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"in": "header",
 						"name": "Accept",
 						"schema": {
@@ -2996,11 +2438,11 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/BmcImportConfigurationRequest"
+								"$ref": "#/components/schemas/BmcImportConfigBody"
 							}
 						}
 					},
-					"description": "Request body for api.BmcImportConfigurationRequest",
+					"description": "Request body for api.BmcImportConfigBody",
 					"required": true
 				},
 				"responses": {
@@ -3008,18 +2450,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/JobMessage"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
 								}
 							},
 							"application/xml": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/JobMessage"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
 								}
 							}
 						},
@@ -3044,17 +2480,17 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc import configuration",
+				"summary": "bmc import config",
 				"tags": [
 					"v1",
 					"bmc"
 				]
 			}
 		},
-		"/v1/bmc/jobs": {
-			"delete": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcJobDeleteMany`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nDelete redfish jobs from many node(s)",
-				"operationId": "DELETE_/v1/bmc/jobs",
+		"/v1/bmc/firmware/install": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcInstallFirmware`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nCompare the firmware of iDRAC(s) against an update catalog, and with apply_update queue the updates. A comparison waits for its job to finish, up to bmc.node_timeout. Dell only",
+				"operationId": "POST_/v1/bmc/firmware/install",
 				"parameters": [
 					{
 						"description": "Filter by nodeset. Minimum of one query parameter is required",
@@ -3083,6 +2519,19 @@
 						}
 					},
 					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"in": "header",
 						"name": "Accept",
 						"schema": {
@@ -3094,11 +2543,11 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/BmcJobDeleteRequest"
+								"$ref": "#/components/schemas/BmcInstallFirmwareBody"
 							}
 						}
 					},
-					"description": "Request body for api.BmcJobDeleteRequest",
+					"description": "Request body for api.BmcInstallFirmwareBody",
 					"required": true
 				},
 				"responses": {
@@ -3106,18 +2555,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/JobMessage"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
 								}
 							},
 							"application/xml": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/JobMessage"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
 								}
 							}
 						},
@@ -3142,14 +2585,110 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc job delete many",
+				"summary": "bmc install firmware",
 				"tags": [
 					"v1",
 					"bmc"
 				]
-			},
+			}
+		},
+		"/v1/bmc/firmware/updates": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcJobList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet redfish jobs from node(s)",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcFirmwareUpdates`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList the firmware updates iDRAC(s) found in their last catalog comparison, which firmware/install with apply_update false runs. Dell only",
+				"operationId": "GET_/v1/bmc/firmware/updates",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcFirmwareUpdates"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcFirmwareUpdates"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc firmware updates",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/jobs": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcJobs`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the redfish job queue of node(s)",
 				"operationId": "GET_/v1/bmc/jobs",
 				"parameters": [
 					{
@@ -3179,6 +2718,19 @@
 						}
 					},
 					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"in": "header",
 						"name": "Accept",
 						"schema": {
@@ -3191,18 +2743,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/RedfishJob"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/BmcResponse_model.BmcJobList"
 								}
 							},
 							"application/xml": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/RedfishJob"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/BmcResponse_model.BmcJobList"
 								}
 							}
 						},
@@ -3227,205 +2773,17 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc job list",
+				"summary": "bmc jobs",
 				"tags": [
 					"v1",
 					"bmc"
 				]
 			}
 		},
-		"/v1/bmc/jobs/{jids}": {
-			"delete": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcJobDelete`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nDelete redfish jobs from node(s) by JID",
-				"operationId": "DELETE_/v1/bmc/jobs/:jids",
-				"parameters": [
-					{
-						"description": "Redfish Job IDs. Use 'JID_CLEARALL' to clear all jobs",
-						"examples": {
-							"jids": {
-								"value": "JID_000000000001,JID_000000000002"
-							}
-						},
-						"in": "path",
-						"name": "jids",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"description": "Filter by nodeset. Minimum of one query parameter is required",
-						"examples": {
-							"nodeset": {
-								"value": "cpn-i10-[04-05],cpn-h22-33"
-							}
-						},
-						"in": "query",
-						"name": "nodeset",
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"description": "Filter by tags. Minimum of one query parameter is required",
-						"examples": {
-							"tags": {
-								"value": "a01,ib,test"
-							}
-						},
-						"in": "query",
-						"name": "tags",
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "Accept",
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"content": {
-							"application/json": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/JobMessage"
-									},
-									"type": "array"
-								}
-							},
-							"application/xml": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/JobMessage"
-									},
-									"type": "array"
-								}
-							}
-						},
-						"description": "OK"
-					},
-					"default": {
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/HTTPError"
-								}
-							}
-						},
-						"description": "Default Error"
-					}
-				},
-				"security": [
-					{
-						"headerAuth": []
-					},
-					{
-						"cookieAuth": []
-					}
-				],
-				"summary": "bmc job delete",
-				"tags": [
-					"v1",
-					"bmc"
-				]
-			}
-		},
-		"/v1/bmc/metrics": {
-			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcMetricReports`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet metric reports by nodeset",
-				"operationId": "GET_/v1/bmc/metrics",
-				"parameters": [
-					{
-						"description": "Filter by nodeset. Minimum of one query parameter is required",
-						"examples": {
-							"nodeset": {
-								"value": "cpn-i10-[04-05],cpn-h22-33"
-							}
-						},
-						"in": "query",
-						"name": "nodeset",
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"description": "Filter by tags. Minimum of one query parameter is required",
-						"examples": {
-							"tags": {
-								"value": "a01,ib,test"
-							}
-						},
-						"in": "query",
-						"name": "tags",
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "Accept",
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"content": {
-							"application/json": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/RedfishMetricReport"
-									},
-									"type": "array"
-								}
-							},
-							"application/xml": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/RedfishMetricReport"
-									},
-									"type": "array"
-								}
-							}
-						},
-						"description": "OK"
-					},
-					"default": {
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/HTTPError"
-								}
-							}
-						},
-						"description": "Default Error"
-					}
-				},
-				"security": [
-					{
-						"headerAuth": []
-					},
-					{
-						"cookieAuth": []
-					}
-				],
-				"summary": "bmc metric reports",
-				"tags": [
-					"v1",
-					"bmc"
-				]
-			}
-		},
-		"/v1/bmc/power/bmc": {
+		"/v1/bmc/jobs/clear": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcPower`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nReboot node(s) BMC",
-				"operationId": "POST_/v1/bmc/power/bmc",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcClearJobs`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nClear redfish jobs from node(s)",
+				"operationId": "POST_/v1/bmc/jobs/clear",
 				"parameters": [
 					{
 						"description": "Filter by nodeset. Minimum of one query parameter is required",
@@ -3454,6 +2812,19 @@
 						}
 					},
 					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"in": "header",
 						"name": "Accept",
 						"schema": {
@@ -3461,23 +2832,133 @@
 						}
 					}
 				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BmcClearJobsBody"
+							}
+						}
+					},
+					"description": "Request body for api.BmcClearJobsBody",
+					"required": true
+				},
 				"responses": {
 					"200": {
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/JobMessage"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
 								}
 							},
 							"application/xml": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/JobMessage"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc clear jobs",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/power": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcPower`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nChange the power state of node(s), or restart their BMCs",
+				"operationId": "POST_/v1/bmc/power",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BmcPowerBody"
+							}
+						}
+					},
+					"description": "Request body for api.BmcPowerBody",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
 								}
 							}
 						},
@@ -3509,293 +2990,117 @@
 				]
 			}
 		},
-		"/v1/bmc/power/os": {
-			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcOsPower`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nChange power status of node(s)",
-				"operationId": "POST_/v1/bmc/power/os",
-				"parameters": [
-					{
-						"description": "Filter by nodeset. Minimum of one query parameter is required",
-						"examples": {
-							"nodeset": {
-								"value": "cpn-i10-[04-05],cpn-h22-33"
-							}
-						},
-						"in": "query",
-						"name": "nodeset",
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"description": "Filter by tags. Minimum of one query parameter is required",
-						"examples": {
-							"tags": {
-								"value": "a01,ib,test"
-							}
-						},
-						"in": "query",
-						"name": "tags",
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "Accept",
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/BmcOsPowerBody"
-							}
-						}
-					},
-					"description": "Request body for api.BmcOsPowerBody",
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"content": {
-							"application/json": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/JobMessage"
-									},
-									"type": "array"
-								}
-							},
-							"application/xml": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/JobMessage"
-									},
-									"type": "array"
-								}
-							}
-						},
-						"description": "OK"
-					},
-					"default": {
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/HTTPError"
-								}
-							}
-						},
-						"description": "Default Error"
-					}
-				},
-				"security": [
-					{
-						"headerAuth": []
-					},
-					{
-						"cookieAuth": []
-					}
-				],
-				"summary": "bmc os power",
-				"tags": [
-					"v1",
-					"bmc"
-				]
-			}
-		},
 		"/v1/bmc/sel": {
-			"delete": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcSelClear`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nClear system event log on node(s)",
-				"operationId": "DELETE_/v1/bmc/sel",
-				"parameters": [
-					{
-						"description": "Filter by nodeset. Minimum of one query parameter is required",
-						"examples": {
-							"nodeset": {
-								"value": "cpn-i10-[04-05],cpn-h22-33"
-							}
-						},
-						"in": "query",
-						"name": "nodeset",
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"description": "Filter by tags. Minimum of one query parameter is required",
-						"examples": {
-							"tags": {
-								"value": "a01,ib,test"
-							}
-						},
-						"in": "query",
-						"name": "tags",
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "Accept",
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"content": {
-							"application/json": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/JobMessage"
-									},
-									"type": "array"
-								}
-							},
-							"application/xml": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/JobMessage"
-									},
-									"type": "array"
-								}
-							}
-						},
-						"description": "OK"
-					},
-					"default": {
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/HTTPError"
-								}
-							}
-						},
-						"description": "Default Error"
-					}
-				},
-				"security": [
-					{
-						"headerAuth": []
-					},
-					{
-						"cookieAuth": []
-					}
-				],
-				"summary": "bmc sel clear",
-				"tags": [
-					"v1",
-					"bmc"
-				]
-			}
-		},
-		"/v1/bmc/upgrade/dell/installfromrepo": {
-			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcDellInstallFromRepo`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nRequest iDRAC to download the latest firmware catalog and compare firmware versions.",
-				"operationId": "POST_/v1/bmc/upgrade/dell/installfromrepo",
-				"parameters": [
-					{
-						"description": "Filter by nodeset. Minimum of one query parameter is required",
-						"examples": {
-							"nodeset": {
-								"value": "cpn-i10-[04-05],cpn-h22-33"
-							}
-						},
-						"in": "query",
-						"name": "nodeset",
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"description": "Filter by tags. Minimum of one query parameter is required",
-						"examples": {
-							"tags": {
-								"value": "a01,ib,test"
-							}
-						},
-						"in": "query",
-						"name": "tags",
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "header",
-						"name": "Accept",
-						"schema": {
-							"type": "string"
-						}
-					}
-				],
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/BmcDellInstallFromRepoRequest"
-							}
-						}
-					},
-					"description": "Request body for api.BmcDellInstallFromRepoRequest",
-					"required": true
-				},
-				"responses": {
-					"200": {
-						"content": {
-							"application/json": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/JobMessage"
-									},
-									"type": "array"
-								}
-							},
-							"application/xml": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/JobMessage"
-									},
-									"type": "array"
-								}
-							}
-						},
-						"description": "OK"
-					},
-					"default": {
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/HTTPError"
-								}
-							}
-						},
-						"description": "Default Error"
-					}
-				},
-				"security": [
-					{
-						"headerAuth": []
-					},
-					{
-						"cookieAuth": []
-					}
-				],
-				"summary": "bmc dell install from repo",
-				"tags": [
-					"v1",
-					"bmc"
-				]
-			}
-		},
-		"/v1/bmc/upgrade/dell/repo": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcDellGetRepoUpdateList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nFetch which packages can be upgraded",
-				"operationId": "GET_/v1/bmc/upgrade/dell/repo",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcSEL`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the system event log of node(s)",
+				"operationId": "GET_/v1/bmc/sel",
+				"parameters": [
+					{
+						"description": "Keep only this many entries per node",
+						"examples": {
+							"limit": {
+								"value": "50"
+							}
+						},
+						"in": "query",
+						"name": "limit",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcSELLog"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcSELLog"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc s e l",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/sel/clear": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcClearSEL`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nClear the system event log on node(s)",
+				"operationId": "POST_/v1/bmc/sel/clear",
 				"parameters": [
 					{
 						"description": "Filter by nodeset. Minimum of one query parameter is required",
@@ -3824,6 +3129,19 @@
 						}
 					},
 					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"in": "header",
 						"name": "Accept",
 						"schema": {
@@ -3836,18 +3154,12 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/RedfishDellUpgradeFirmware"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
 								}
 							},
 							"application/xml": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/RedfishDellUpgradeFirmware"
-									},
-									"type": "array"
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
 								}
 							}
 						},
@@ -3872,7 +3184,101 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc dell get repo update list",
+				"summary": "bmc clear s e l",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/status": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcStatus`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet redfish system information from node(s)",
+				"operationId": "GET_/v1/bmc/status",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.RedfishSystem"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.RedfishSystem"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc status",
 				"tags": [
 					"v1",
 					"bmc"

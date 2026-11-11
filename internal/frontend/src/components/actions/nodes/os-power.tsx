@@ -1,17 +1,7 @@
-import { postV1BmcPowerOsMutation } from "@/client/@tanstack/react-query.gen";
+import { postV1BmcPowerMutation } from "@/client/@tanstack/react-query.gen";
+import ActionCard, { ConfirmDialog } from "@/components/actions/action-card";
 import NodesetView from "@/components/nodeset-view";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -20,105 +10,101 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toastBmcResponse } from "@/lib/bmc";
 import { useMutation } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+const powerOptions = {
+  ForceRestart: "Power Cycle",
+  On: "On",
+  ForceOff: "Off",
+  GracefulRestart: "Graceful Restart",
+};
+
+const bootOptions = {
+  None: "None",
+  Pxe: "PXE",
+  BiosSetup: "BIOS",
+  Utilities: "Utilities",
+  Diags: "Diagnostics",
+  Usb: "USB",
+  Hdd: "HDD",
+};
+
 export default function NodesOsPowerAction({ nodes }: { nodes: string }) {
   const [powerOption, setPowerOption] = useState("");
-  const [bootOption, setBootOption] = useState("");
+  const [bootOption, setBootOption] = useState("None");
+  const { mutate, isPending } = useMutation(postV1BmcPowerMutation());
 
-  const { mutate, isPending } = useMutation(postV1BmcPowerOsMutation());
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>OS Power</CardTitle>
-      </CardHeader>
-      <CardContent className="grid grid-cols-1 gap-2">
-        <div>
-          <Label>Power Option:</Label>
-          <Select defaultValue={powerOption} onValueChange={(e) => setPowerOption(e)}>
-            <SelectTrigger className="w-[180px]">
+    <ActionCard
+      title="Host Power"
+      description="Power the nodes on, off or cycle them, optionally booting a one time target."
+      footer={
+        <ConfirmDialog
+          trigger={
+            <Button disabled={isPending || !powerOption}>
+              {isPending && <LoaderCircle className="animate-spin" />}
+              Run
+            </Button>
+          }
+          onConfirm={() =>
+            mutate(
+              {
+                query: { nodeset: nodes },
+                body: {
+                  target: "host",
+                  action: powerOption,
+                  boot_override: bootOption === "None" ? "" : bootOption,
+                },
+              },
+              {
+                onSuccess: (data) => toastBmcResponse(`Power ${powerOption}`, data),
+                onError: (e) => toast.error(e.title, { description: e.detail }),
+              },
+            )
+          }
+        >
+          Power: {powerOptions[powerOption as keyof typeof powerOptions]}, boot:{" "}
+          {bootOptions[bootOption as keyof typeof bootOptions]}
+          <NodesetView nodes={nodes} />
+        </ConfirmDialog>
+      }
+    >
+      <div className="grid grid-cols-2 gap-2">
+        <div className="grid gap-1.5">
+          <Label htmlFor="power-option">Power</Label>
+          <Select value={powerOption} onValueChange={setPowerOption}>
+            <SelectTrigger id="power-option">
               <SelectValue placeholder="Action" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ForceRestart">Power Cycle</SelectItem>
-              <SelectItem value="On">On</SelectItem>
-              <SelectItem value="ForceOff">Off</SelectItem>
-              <SelectItem value="GracefulRestart">Graceful Restart</SelectItem>
+              {Object.entries(powerOptions).map(([value, label]) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
-        <div>
-          <Label>Boot Option:</Label>
-          <Select defaultValue={bootOption} onValueChange={(e) => setBootOption(e)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Boot Option" />
+        <div className="grid gap-1.5">
+          <Label htmlFor="boot-option">Boot</Label>
+          <Select value={bootOption} onValueChange={setBootOption}>
+            <SelectTrigger id="boot-option">
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="None">None</SelectItem>
-              <SelectItem value="Pxe">PXE</SelectItem>
-              <SelectItem value="BiosSetup">BIOS</SelectItem>
-              <SelectItem value="Utilities">Utilities</SelectItem>
-              <SelectItem value="Diags">Diagnostics</SelectItem>
-              <SelectItem value="Usb">USB</SelectItem>
-              <SelectItem value="Hdd">HDD</SelectItem>
+              {Object.entries(bootOptions).map(([value, label]) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
-      </CardContent>
-      <CardFooter>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>
-              {isPending ? <LoaderCircle className="animate-spin" /> : <span>Submit</span>}
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-h-dvh overflow-scroll">
-            <DialogHeader>
-              <DialogTitle>Are you sure?</DialogTitle>
-              <DialogDescription>
-                Power Option: {powerOption}, Boot Option: {bootOption} <br />
-                <NodesetView nodes={nodes} />
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button
-                  variant="destructive"
-                  onClick={() =>
-                    mutate(
-                      {
-                        query: { nodeset: nodes },
-                        body: {
-                          power_option: powerOption,
-                          boot_option: bootOption,
-                        },
-                      },
-                      {
-                        onSuccess: () => {
-                          toast.success("Successfully sent power command node(s)");
-                        },
-                        onError: () =>
-                          toast.error("Failed to send power command to node(s)", {
-                            // description: e.message,
-                          }),
-                      },
-                    )
-                  }
-                >
-                  Confirm
-                </Button>
-              </DialogClose>
-
-              <DialogClose asChild>
-                <Button>Cancel</Button>
-              </DialogClose>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </CardFooter>
-    </Card>
+      </div>
+    </ActionCard>
   );
 }

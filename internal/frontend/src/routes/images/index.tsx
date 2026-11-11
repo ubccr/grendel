@@ -73,7 +73,7 @@ function TableComponent() {
       .join(",");
     return (
       <ActionsSheet checked={checked} length={table.getSelectedRowModel().rows.length}>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           <ImagesDeleteAction images={checked} />
           <ImagesExportAction images={checked} />
         </div>

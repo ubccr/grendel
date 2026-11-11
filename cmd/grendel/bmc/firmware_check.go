@@ -18,7 +18,7 @@ var (
 	firmwareCheckOptions *shared.TableOptions
 	firmwareCheckColumns = []shared.Column{
 		{Name: "Node"},
-		{Name: "Status"},
+		{Name: "State"},
 		{Name: "Message"},
 		{Name: "Component"},
 		{Name: "Current Version"},
@@ -26,56 +26,51 @@ var (
 		{Name: "Reboot Required"},
 	}
 	firmwareCheckCmd = &cobra.Command{
-		Use:   "check <nodeset>",
+		Use:   "check <nodeset | all>",
 		Short: "Check for updates on Dell servers",
+		Long:  "Check for updates on Dell servers. Lists what the iDRAC found in its last catalog comparison, which bmc firmware upgrade runs without --apply-update",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			nodeset := args[0]
-
-			if nodeset == "all" {
-				nodeset = ""
-			}
-
-			params := client.GETV1BmcUpgradeDellRepoParams{
-				Nodeset: client.NewOptString(nodeset),
+			nodeset, all := selector(args[0])
+			params := client.GETV1BmcFirmwareUpdatesParams{
+				Nodeset: nodeset,
+				All:     all,
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			jobs, err := apiclient.API.GETV1BmcUpgradeDellRepo(command.Context(), params)
+
+			res, err := apiclient.API.GETV1BmcFirmwareUpdates(command.Context(), params)
 			if err != nil {
 				return apiclient.NewApiError(err)
 			}
 
 			t := shared.NewTable(firmwareCheckColumns, firmwareCheckFilter).Options(*firmwareCheckOptions).Empty("-")
+			for _, r := range res.Results.Value {
+				result := r.Value
+				state := colorState(result.Success.Value)
 
-			for _, job := range jobs {
-				if len(job.UpdateList.Value) < 1 {
-					t.AppendRow(
-						job.Name.Value,
-						job.Status.Value,
-						job.Message.Value,
-						"",
-						"",
-						"",
-						"",
-					)
+				updates := result.Data.Value.Updates.Value
+				if len(updates) == 0 {
+					t.AppendRow(result.Node.Value, state, result.Message.Value, "", "", "", "")
 					continue
 				}
 
-				for _, update := range job.UpdateList.Value {
+				for _, u := range updates {
+					update := u.Value
 					t.AppendRow(
-						job.Name.Value,
-						job.Status.Value,
-						job.Message.Value,
-						update.Value.DisplayName.Value,
-						update.Value.InstalledVersion.Value,
-						colorVersion(update.Value.InstalledVersion.Value, update.Value.PackageVersion.Value),
-						update.Value.RebootType.Value,
+						result.Node.Value,
+						state,
+						result.Message.Value,
+						update.DisplayName.Value,
+						update.InstalledVersion.Value,
+						colorVersion(update.InstalledVersion.Value, update.PackageVersion.Value),
+						update.RebootType.Value,
 					)
 				}
 			}
-
 			t.Print()
-			return nil
+
+			s := res.Summary.Value
+			return summaryLine(s.Total.Value, s.Succeeded.Value, s.Failed.Value, s.FailedNodes.Value, s.DurationMs.Value)
 		},
 	}
 )

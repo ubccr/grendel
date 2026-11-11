@@ -104,7 +104,35 @@ func (s *AuthTokenRequest) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *BmcDellInstallFromRepoRequest) SetFake() {
+func (s *BmcClearJobsBody) SetFake() {
+	{
+		{
+			s.All.SetFake()
+		}
+	}
+	{
+		{
+			s.Ids.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcImportConfigBody) SetFake() {
+	{
+		{
+			s.File.SetFake()
+		}
+	}
+	{
+		{
+			s.ShutdownType.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcInstallFirmwareBody) SetFake() {
 	{
 		{
 			s.ApplyUpdate.SetFake()
@@ -117,12 +145,7 @@ func (s *BmcDellInstallFromRepoRequest) SetFake() {
 	}
 	{
 		{
-			s.ClearJobQueue.SetFake()
-		}
-	}
-	{
-		{
-			s.IPAddress.SetFake()
+			s.ClearJobs.SetFake()
 		}
 	}
 	{
@@ -132,7 +155,12 @@ func (s *BmcDellInstallFromRepoRequest) SetFake() {
 	}
 	{
 		{
-			s.RebootNeeded.SetFake()
+			s.IPAddress.SetFake()
+		}
+	}
+	{
+		{
+			s.Reboot.SetFake()
 		}
 	}
 	{
@@ -148,49 +176,1156 @@ func (s *BmcDellInstallFromRepoRequest) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *BmcImportConfigurationRequest) SetFake() {
+func (s *BmcPowerBody) SetFake() {
 	{
 		{
-			s.File.SetFake()
+			s.Action.SetFake()
 		}
 	}
 	{
 		{
-			s.ShutdownType.SetFake()
+			s.BootOverride.SetFake()
 		}
 	}
-}
-
-// SetFake set fake values.
-func (s *BmcJobDeleteRequest) SetFake() {
 	{
 		{
-			s.NodeJobList.SetFake()
+			s.Target.SetFake()
 		}
 	}
 }
 
 // SetFake set fake values.
-func (s *BmcJobDeleteRequestNodeJobList) SetFake() {
-	var (
-		elem []string
-		m    map[string][]string = s.init()
-	)
-	for i := 0; i < 0; i++ {
-		m[fmt.Sprintf("fake%d", i)] = elem
-	}
-}
-
-// SetFake set fake values.
-func (s *BmcOsPowerBody) SetFake() {
+func (s *BmcResponseModelBmcAck) SetFake() {
 	{
 		{
-			s.BootOption.SetFake()
+			s.Results.SetFake()
 		}
 	}
 	{
 		{
-			s.PowerOption.SetFake()
+			s.RunID.SetFake()
+		}
+	}
+	{
+		{
+			s.Summary.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcAckResultsItem) SetFake() {
+	{
+		{
+			s.Data = []byte("null")
+		}
+	}
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Message.SetFake()
+		}
+	}
+	{
+		{
+			s.Node.SetFake()
+		}
+	}
+	{
+		{
+			s.Success.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcAckSummary) SetFake() {
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Failed.SetFake()
+		}
+	}
+	{
+		{
+			s.FailedNodes.SetFake()
+		}
+	}
+	{
+		{
+			s.Succeeded.SetFake()
+		}
+	}
+	{
+		{
+			s.Total.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcFirmwareUpdates) SetFake() {
+	{
+		{
+			s.Results.SetFake()
+		}
+	}
+	{
+		{
+			s.RunID.SetFake()
+		}
+	}
+	{
+		{
+			s.Summary.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) SetFake() {
+	{
+		{
+			s.Data.SetFake()
+		}
+	}
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Message.SetFake()
+		}
+	}
+	{
+		{
+			s.Node.SetFake()
+		}
+	}
+	{
+		{
+			s.Success.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) SetFake() {
+	{
+		{
+			s.RebootType.SetFake()
+		}
+	}
+	{
+		{
+			s.Updates.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetFake() {
+	{
+		{
+			s.ComponentType.SetFake()
+		}
+	}
+	{
+		{
+			s.Criticality.SetFake()
+		}
+	}
+	{
+		{
+			s.DisplayName.SetFake()
+		}
+	}
+	{
+		{
+			s.InstalledVersion.SetFake()
+		}
+	}
+	{
+		{
+			s.Name.SetFake()
+		}
+	}
+	{
+		{
+			s.PackagePath.SetFake()
+		}
+	}
+	{
+		{
+			s.PackageVersion.SetFake()
+		}
+	}
+	{
+		{
+			s.RebootType.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcFirmwareUpdatesSummary) SetFake() {
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Failed.SetFake()
+		}
+	}
+	{
+		{
+			s.FailedNodes.SetFake()
+		}
+	}
+	{
+		{
+			s.Succeeded.SetFake()
+		}
+	}
+	{
+		{
+			s.Total.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcJobList) SetFake() {
+	{
+		{
+			s.Results.SetFake()
+		}
+	}
+	{
+		{
+			s.RunID.SetFake()
+		}
+	}
+	{
+		{
+			s.Summary.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcJobListResultsItem) SetFake() {
+	{
+		{
+			s.Data.SetFake()
+		}
+	}
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Message.SetFake()
+		}
+	}
+	{
+		{
+			s.Node.SetFake()
+		}
+	}
+	{
+		{
+			s.Success.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcJobListResultsItemData) SetFake() {
+	{
+		{
+			s.Jobs.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetFake() {
+	{
+		{
+			s.EndTime.SetFake()
+		}
+	}
+	{
+		{
+			s.ID.SetFake()
+		}
+	}
+	{
+		{
+			s.Message.SetFake()
+		}
+	}
+	{
+		{
+			s.Name.SetFake()
+		}
+	}
+	{
+		{
+			s.PercentComplete.SetFake()
+		}
+	}
+	{
+		{
+			s.StartTime.SetFake()
+		}
+	}
+	{
+		{
+			s.State.SetFake()
+		}
+	}
+	{
+		{
+			s.Status.SetFake()
+		}
+	}
+	{
+		{
+			s.Type.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcJobListSummary) SetFake() {
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Failed.SetFake()
+		}
+	}
+	{
+		{
+			s.FailedNodes.SetFake()
+		}
+	}
+	{
+		{
+			s.Succeeded.SetFake()
+		}
+	}
+	{
+		{
+			s.Total.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcSELLog) SetFake() {
+	{
+		{
+			s.Results.SetFake()
+		}
+	}
+	{
+		{
+			s.RunID.SetFake()
+		}
+	}
+	{
+		{
+			s.Summary.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcSELLogResultsItem) SetFake() {
+	{
+		{
+			s.Data.SetFake()
+		}
+	}
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Message.SetFake()
+		}
+	}
+	{
+		{
+			s.Node.SetFake()
+		}
+	}
+	{
+		{
+			s.Success.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcSELLogResultsItemData) SetFake() {
+	{
+		{
+			s.Entries.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetFake() {
+	{
+		{
+			s.Created.SetFake()
+		}
+	}
+	{
+		{
+			s.EntryType.SetFake()
+		}
+	}
+	{
+		{
+			s.ID.SetFake()
+		}
+	}
+	{
+		{
+			s.Message.SetFake()
+		}
+	}
+	{
+		{
+			s.MessageID.SetFake()
+		}
+	}
+	{
+		{
+			s.Resolution.SetFake()
+		}
+	}
+	{
+		{
+			s.SensorType.SetFake()
+		}
+	}
+	{
+		{
+			s.Severity.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcSELLogSummary) SetFake() {
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Failed.SetFake()
+		}
+	}
+	{
+		{
+			s.FailedNodes.SetFake()
+		}
+	}
+	{
+		{
+			s.Succeeded.SetFake()
+		}
+	}
+	{
+		{
+			s.Total.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelRedfishSystem) SetFake() {
+	{
+		{
+			s.Results.SetFake()
+		}
+	}
+	{
+		{
+			s.RunID.SetFake()
+		}
+	}
+	{
+		{
+			s.Summary.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelRedfishSystemResultsItem) SetFake() {
+	{
+		{
+			s.Data.SetFake()
+		}
+	}
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Message.SetFake()
+		}
+	}
+	{
+		{
+			s.Node.SetFake()
+		}
+	}
+	{
+		{
+			s.Success.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetFake() {
+	{
+		{
+			s.BiosVersion.SetFake()
+		}
+	}
+	{
+		{
+			s.BootMode.SetFake()
+		}
+	}
+	{
+		{
+			s.BootNext.SetFake()
+		}
+	}
+	{
+		{
+			s.BootOrder.SetFake()
+		}
+	}
+	{
+		{
+			s.BootOverrideEnabled.SetFake()
+		}
+	}
+	{
+		{
+			s.BootOverrideTarget.SetFake()
+		}
+	}
+	{
+		{
+			s.BootProgress.SetFake()
+		}
+	}
+	{
+		{
+			s.BootProgressTime.SetFake()
+		}
+	}
+	{
+		{
+			s.Health.SetFake()
+		}
+	}
+	{
+		{
+			s.HostName.SetFake()
+		}
+	}
+	{
+		{
+			s.Manufacturer.SetFake()
+		}
+	}
+	{
+		{
+			s.Model.SetFake()
+		}
+	}
+	{
+		{
+			s.Name.SetFake()
+		}
+	}
+	{
+		{
+			s.OemDell.SetFake()
+		}
+	}
+	{
+		{
+			s.PowerStatus.SetFake()
+		}
+	}
+	{
+		{
+			s.ProcessorCores.SetFake()
+		}
+	}
+	{
+		{
+			s.ProcessorCount.SetFake()
+		}
+	}
+	{
+		{
+			s.ProcessorModel.SetFake()
+		}
+	}
+	{
+		{
+			s.ProcessorSockets.SetFake()
+		}
+	}
+	{
+		{
+			s.SerialNumber.SetFake()
+		}
+	}
+	{
+		{
+			s.TotalMemory.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDell) SetFake() {
+	{
+		{
+			s.MessageDotExtendedInfo = nil
+			for i := 0; i < 0; i++ {
+				var elem BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem
+				{
+					elem.SetFake()
+				}
+				s.MessageDotExtendedInfo = append(s.MessageDotExtendedInfo, elem)
+			}
+		}
+	}
+	{
+		{
+			s.OdataDotContext.SetFake()
+		}
+	}
+	{
+		{
+			s.OdataDotEtag.SetFake()
+		}
+	}
+	{
+		{
+			s.OdataDotID.SetFake()
+		}
+	}
+	{
+		{
+			s.OdataDotType.SetFake()
+		}
+	}
+	{
+		{
+			s.BIOSReleaseDate.SetFake()
+		}
+	}
+	{
+		{
+			s.BaseBoardChassisSlot.SetFake()
+		}
+	}
+	{
+		{
+			s.BatteryRollupStatus.SetFake()
+		}
+	}
+	{
+		{
+			s.BladeGeometry.SetFake()
+		}
+	}
+	{
+		{
+			s.CMCIP.SetFake()
+		}
+	}
+	{
+		{
+			s.CPURollupStatus.SetFake()
+		}
+	}
+	{
+		{
+			s.ChassisModel.SetFake()
+		}
+	}
+	{
+		{
+			s.ChassisName.SetFake()
+		}
+	}
+	{
+		{
+			s.ChassisServiceTag.SetFake()
+		}
+	}
+	{
+		{
+			s.ChassisSystemHeightUnit.SetFake()
+		}
+	}
+	{
+		{
+			s.CurrentRollupStatus.SetFake()
+		}
+	}
+	{
+		{
+			s.Description.SetFake()
+		}
+	}
+	{
+		{
+			s.EstimatedExhaustTemperatureCelsius.SetFake()
+		}
+	}
+	{
+		{
+			s.EstimatedSystemAirflowCFM.SetFake()
+		}
+	}
+	{
+		{
+			s.ExpressServiceCode.SetFake()
+		}
+	}
+	{
+		{
+			s.FanRollupStatus.SetFake()
+		}
+	}
+	{
+		{
+			s.IDSDMRollupStatus.SetFake()
+		}
+	}
+	{
+		{
+			s.ID.SetFake()
+		}
+	}
+	{
+		{
+			s.IntrusionRollupStatus.SetFake()
+		}
+	}
+	{
+		{
+			s.IsOEMBranded.SetFake()
+		}
+	}
+	{
+		{
+			s.LastSystemInventoryTime.SetFake()
+		}
+	}
+	{
+		{
+			s.LastUpdateTime.SetFake()
+		}
+	}
+	{
+		{
+			s.LicensingRollupStatus.SetFake()
+		}
+	}
+	{
+		{
+			s.ManagedSystemSize.SetFake()
+		}
+	}
+	{
+		{
+			s.MaxCPUSockets.SetFake()
+		}
+	}
+	{
+		{
+			s.MaxDIMMSlots.SetFake()
+		}
+	}
+	{
+		{
+			s.MaxPCIeSlots.SetFake()
+		}
+	}
+	{
+		{
+			s.MemoryOperationMode.SetFake()
+		}
+	}
+	{
+		{
+			s.Name.SetFake()
+		}
+	}
+	{
+		{
+			s.NodeID.SetFake()
+		}
+	}
+	{
+		{
+			s.Oem = []byte("null")
+		}
+	}
+	{
+		{
+			s.PSRollupStatus.SetFake()
+		}
+	}
+	{
+		{
+			s.PlatformGUID.SetFake()
+		}
+	}
+	{
+		{
+			s.PopulatedDIMMSlots.SetFake()
+		}
+	}
+	{
+		{
+			s.PopulatedPCIeSlots.SetFake()
+		}
+	}
+	{
+		{
+			s.PowerCapEnabledState.SetFake()
+		}
+	}
+	{
+		{
+			s.SDCardRollupStatus.SetFake()
+		}
+	}
+	{
+		{
+			s.SELRollupStatus.SetFake()
+		}
+	}
+	{
+		{
+			s.ServerAllocationWatts.SetFake()
+		}
+	}
+	{
+		{
+			s.StorageRollupStatus.SetFake()
+		}
+	}
+	{
+		{
+			s.SysMemErrorMethodology.SetFake()
+		}
+	}
+	{
+		{
+			s.SysMemFailOverState.SetFake()
+		}
+	}
+	{
+		{
+			s.SysMemLocation.SetFake()
+		}
+	}
+	{
+		{
+			s.SysMemPrimaryStatus.SetFake()
+		}
+	}
+	{
+		{
+			s.SystemGeneration.SetFake()
+		}
+	}
+	{
+		{
+			s.SystemID.SetFake()
+		}
+	}
+	{
+		{
+			s.SystemRevision.SetFake()
+		}
+	}
+	{
+		{
+			s.TempRollupStatus.SetFake()
+		}
+	}
+	{
+		{
+			s.TempStatisticsRollupStatus.SetFake()
+		}
+	}
+	{
+		{
+			s.UUID.SetFake()
+		}
+	}
+	{
+		{
+			s.VoltRollupStatus.SetFake()
+		}
+	}
+	{
+		{
+			s.SmbiosGUID.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem) SetFake() {
+	{
+		{
+			s.Message.SetFake()
+		}
+	}
+	{
+		{
+			s.MessageArgs.SetFake()
+		}
+	}
+	{
+		{
+			s.MessageId.SetFake()
+		}
+	}
+	{
+		{
+			s.MessageSeverity.SetFake()
+		}
+	}
+	{
+		{
+			s.Oem = []byte("null")
+		}
+	}
+	{
+		{
+			s.RelatedProperties.SetFake()
+		}
+	}
+	{
+		{
+			s.Resolution.SetFake()
+		}
+	}
+	{
+		{
+			s.ResolutionSteps.SetFake()
+		}
+	}
+	{
+		{
+			s.Severity.SetFake()
+		}
+	}
+	{
+		{
+			s.UserAuthenticationSource.SetFake()
+		}
+	}
+	{
+		{
+			s.Username.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetFake() {
+	{
+		{
+			s.ActionParameters.SetFake()
+		}
+	}
+	{
+		{
+			s.ActionURI.SetFake()
+		}
+	}
+	{
+		{
+			s.Oem = []byte("null")
+		}
+	}
+	{
+		{
+			s.Priority.SetFake()
+		}
+	}
+	{
+		{
+			s.ResolutionType.SetFake()
+		}
+	}
+	{
+		{
+			s.RetryCount.SetFake()
+		}
+	}
+	{
+		{
+			s.RetryIntervalSeconds.SetFake()
+		}
+	}
+	{
+		{
+			s.TargetComponentURI.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetFake() {
+	{
+		{
+			s.AllowableNumbers.SetFake()
+		}
+	}
+	{
+		{
+			s.AllowablePattern.SetFake()
+		}
+	}
+	{
+		{
+			s.AllowableValueDescriptions.SetFake()
+		}
+	}
+	{
+		{
+			s.AllowableValues.SetFake()
+		}
+	}
+	{
+		{
+			s.ArraySizeMaximum.SetFake()
+		}
+	}
+	{
+		{
+			s.ArraySizeMinimum.SetFake()
+		}
+	}
+	{
+		{
+			s.DataType.SetFake()
+		}
+	}
+	{
+		{
+			s.DefaultValue.SetFake()
+		}
+	}
+	{
+		{
+			s.MaximumValue.SetFake()
+		}
+	}
+	{
+		{
+			s.MinimumValue.SetFake()
+		}
+	}
+	{
+		{
+			s.Name.SetFake()
+		}
+	}
+	{
+		{
+			s.NoDefaultValue.SetFake()
+		}
+	}
+	{
+		{
+			s.ObjectDataType.SetFake()
+		}
+	}
+	{
+		{
+			s.Required.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelRedfishSystemSummary) SetFake() {
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Failed.SetFake()
+		}
+	}
+	{
+		{
+			s.FailedNodes.SetFake()
+		}
+	}
+	{
+		{
+			s.Succeeded.SetFake()
+		}
+	}
+	{
+		{
+			s.Total.SetFake()
 		}
 	}
 }
@@ -780,11 +1915,6 @@ func (s *Event) SetFake() {
 func (s *EventJobMessagesItem) SetFake() {
 	{
 		{
-			s.Data.SetFake()
-		}
-	}
-	{
-		{
 			s.Host.SetFake()
 		}
 	}
@@ -795,86 +1925,7 @@ func (s *EventJobMessagesItem) SetFake() {
 	}
 	{
 		{
-			s.RedfishError.SetFake()
-		}
-	}
-	{
-		{
 			s.Status.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *EventJobMessagesItemRedfishError) SetFake() {
-	{
-		{
-			s.Code.SetFake()
-		}
-	}
-	{
-		{
-			s.Error.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *EventJobMessagesItemRedfishErrorError) SetFake() {
-	{
-		{
-			s.MessageDotExtendedInfo = nil
-			for i := 0; i < 0; i++ {
-				var elem EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem
-				{
-					elem.SetFake()
-				}
-				s.MessageDotExtendedInfo = append(s.MessageDotExtendedInfo, elem)
-			}
-		}
-	}
-	{
-		{
-			s.Code.SetFake()
-		}
-	}
-	{
-		{
-			s.Message.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem) SetFake() {
-	{
-		{
-			s.Message.SetFake()
-		}
-	}
-	{
-		{
-			s.MessageArgsDotOdataDotCount.SetFake()
-		}
-	}
-	{
-		{
-			s.MessageId.SetFake()
-		}
-	}
-	{
-		{
-			s.RelatedPropertiesDotOdataDotCount.SetFake()
-		}
-	}
-	{
-		{
-			s.Resolution.SetFake()
-		}
-	}
-	{
-		{
-			s.Severity.SetFake()
 		}
 	}
 }
@@ -1208,102 +2259,6 @@ func (s *HostInterfacesItem) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *JobMessage) SetFake() {
-	{
-		{
-			s.Data.SetFake()
-		}
-	}
-	{
-		{
-			s.Host.SetFake()
-		}
-	}
-	{
-		{
-			s.Msg.SetFake()
-		}
-	}
-	{
-		{
-			s.RedfishError.SetFake()
-		}
-	}
-	{
-		{
-			s.Status.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *JobMessageRedfishError) SetFake() {
-	{
-		{
-			s.Code.SetFake()
-		}
-	}
-	{
-		{
-			s.Error.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *JobMessageRedfishErrorError) SetFake() {
-	{
-		{
-			s.MessageDotExtendedInfo.SetFake()
-		}
-	}
-	{
-		{
-			s.Code.SetFake()
-		}
-	}
-	{
-		{
-			s.Message.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *JobMessageRedfishErrorErrorMessageDotExtendedInfoItem) SetFake() {
-	{
-		{
-			s.Message.SetFake()
-		}
-	}
-	{
-		{
-			s.MessageArgsDotOdataDotCount.SetFake()
-		}
-	}
-	{
-		{
-			s.MessageId.SetFake()
-		}
-	}
-	{
-		{
-			s.RelatedPropertiesDotOdataDotCount.SetFake()
-		}
-	}
-	{
-		{
-			s.Resolution.SetFake()
-		}
-	}
-	{
-		{
-			s.Severity.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
 func (s *LLDP) SetFake() {
 	{
 		{
@@ -1353,6 +2308,56 @@ func (s *LLDP) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *NilBmcResponseModelBmcAckResultsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilBmcResponseModelBmcFirmwareUpdatesResultsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilBmcResponseModelBmcJobListResultsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilBmcResponseModelBmcJobListResultsItemDataJobsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilBmcResponseModelBmcSELLogResultsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilBmcResponseModelRedfishSystemResultsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
 func (s *NilBootImageAddRequestBootImagesItem) SetFake() {
 	s.Null = true
 }
@@ -1393,11 +2398,6 @@ func (s *NilHostInterfacesItem) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *NilInt) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
 func (s *NilNodeAddRequestNodeListItem) SetFake() {
 	s.Null = true
 }
@@ -1409,71 +2409,6 @@ func (s *NilNodeAddRequestNodeListItemBondsItem) SetFake() {
 
 // SetFake set fake values.
 func (s *NilNodeAddRequestNodeListItemInterfacesItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilRedfishDellUpgradeFirmwareUpdateListItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilRedfishJobJobsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilRedfishJobJobsItemMessagesItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilRedfishJobJobsItemMessagesItemResolutionStepsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilRedfishMetricReportReportsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilRedfishMetricReportReportsItemMetricValuesItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetFake() {
 	s.Null = true
 }
 
@@ -1724,8 +2659,44 @@ func (s *NodeTagsRequest) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *OptBmcJobDeleteRequestNodeJobList) SetFake() {
-	var elem BmcJobDeleteRequestNodeJobList
+func (s *OptBmcResponseModelBmcAckSummary) SetFake() {
+	var elem BmcResponseModelBmcAckSummary
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptBmcResponseModelBmcFirmwareUpdatesSummary) SetFake() {
+	var elem BmcResponseModelBmcFirmwareUpdatesSummary
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptBmcResponseModelBmcJobListSummary) SetFake() {
+	var elem BmcResponseModelBmcJobListSummary
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptBmcResponseModelBmcSELLogSummary) SetFake() {
+	var elem BmcResponseModelBmcSELLogSummary
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptBmcResponseModelRedfishSystemSummary) SetFake() {
+	var elem BmcResponseModelRedfishSystemSummary
 	{
 		elem.SetFake()
 	}
@@ -1746,24 +2717,6 @@ func (s *OptDateTime) SetFake() {
 	var elem time.Time
 	{
 		elem = time.Now()
-	}
-	s.SetTo(elem)
-}
-
-// SetFake set fake values.
-func (s *OptEventJobMessagesItemRedfishError) SetFake() {
-	var elem EventJobMessagesItemRedfishError
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
-}
-
-// SetFake set fake values.
-func (s *OptEventJobMessagesItemRedfishErrorError) SetFake() {
-	var elem EventJobMessagesItemRedfishErrorError
-	{
-		elem.SetFake()
 	}
 	s.SetTo(elem)
 }
@@ -1805,21 +2758,33 @@ func (s *OptInt64) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *OptJobMessageRedfishError) SetFake() {
-	var elem JobMessageRedfishError
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
+func (s *OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemData) SetFake() {
+	s.Null = true
+	s.Set = true
 }
 
 // SetFake set fake values.
-func (s *OptJobMessageRedfishErrorError) SetFake() {
-	var elem JobMessageRedfishErrorError
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
+func (s *OptNilBmcResponseModelBmcJobListResultsItemData) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilBmcResponseModelBmcSELLogResultsItemData) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilBmcResponseModelRedfishSystemResultsItemData) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDell) SetFake() {
+	s.Null = true
+	s.Set = true
 }
 
 // SetFake set fake values.
@@ -1830,12 +2795,6 @@ func (s *OptNilBootImageAddRequestBootImagesItemProvisionTemplates) SetFake() {
 
 // SetFake set fake values.
 func (s *OptNilBootImageProvisionTemplates) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilByte) SetFake() {
 	s.Null = true
 	s.Set = true
 }
@@ -1871,7 +2830,61 @@ func (s *OptNilInt64) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) SetFake() {
+func (s *OptNilNilBmcResponseModelBmcAckResultsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilBmcResponseModelBmcJobListResultsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilBmcResponseModelBmcSELLogResultsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilBmcResponseModelRedfishSystemResultsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) SetFake() {
 	s.Null = true
 	s.Set = true
 }
@@ -1883,109 +2896,7 @@ func (s *OptNilNilEventJobMessagesItemArray) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *OptNilNilIntArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilRedfishJobJobsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilRedfishJobJobsItemMessagesItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilRedfishMetricReportReportsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
 func (s *OptNilNilStringArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilRedfishJobJobsItemParameters) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilRedfishSystemOemDell) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) SetFake() {
 	s.Null = true
 	s.Set = true
 }
@@ -2000,24 +2911,6 @@ func (s *OptNilString) SetFake() {
 func (s *OptNilStringArray) SetFake() {
 	s.Null = true
 	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptRedfishJobJobsItemPayload) SetFake() {
-	var elem RedfishJobJobsItemPayload
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
-}
-
-// SetFake set fake values.
-func (s *OptRedfishJobJobsItemSchedule) SetFake() {
-	var elem RedfishJobJobsItemSchedule
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
 }
 
 // SetFake set fake values.
@@ -2074,1553 +2967,6 @@ func (s *PostRolesRequest) SetFake() {
 	{
 		{
 			s.Role.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishDellUpgradeFirmware) SetFake() {
-	{
-		{
-			s.Message.SetFake()
-		}
-	}
-	{
-		{
-			s.Name.SetFake()
-		}
-	}
-	{
-		{
-			s.Status.SetFake()
-		}
-	}
-	{
-		{
-			s.UpdateCount.SetFake()
-		}
-	}
-	{
-		{
-			s.UpdateList.SetFake()
-		}
-	}
-	{
-		{
-			s.UpdateRebootType.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishDellUpgradeFirmwareUpdateListItem) SetFake() {
-	{
-		{
-			s.BaseLocation.SetFake()
-		}
-	}
-	{
-		{
-			s.ComponentID.SetFake()
-		}
-	}
-	{
-		{
-			s.ComponentInfoName.SetFake()
-		}
-	}
-	{
-		{
-			s.ComponentInfoValue.SetFake()
-		}
-	}
-	{
-		{
-			s.ComponentType.SetFake()
-		}
-	}
-	{
-		{
-			s.Criticality.SetFake()
-		}
-	}
-	{
-		{
-			s.DisplayName.SetFake()
-		}
-	}
-	{
-		{
-			s.InstalledVersion.SetFake()
-		}
-	}
-	{
-		{
-			s.JobID.SetFake()
-		}
-	}
-	{
-		{
-			s.Name.SetFake()
-		}
-	}
-	{
-		{
-			s.PackageName.SetFake()
-		}
-	}
-	{
-		{
-			s.PackagePath.SetFake()
-		}
-	}
-	{
-		{
-			s.PackageVersion.SetFake()
-		}
-	}
-	{
-		{
-			s.RebootType.SetFake()
-		}
-	}
-	{
-		{
-			s.Target.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishJob) SetFake() {
-	{
-		{
-			s.Jobs.SetFake()
-		}
-	}
-	{
-		{
-			s.Name.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishJobJobsItem) SetFake() {
-	{
-		{
-			s.MessageDotExtendedInfo = nil
-			for i := 0; i < 0; i++ {
-				var elem RedfishJobJobsItemMessageDotExtendedInfoItem
-				{
-					elem.SetFake()
-				}
-				s.MessageDotExtendedInfo = append(s.MessageDotExtendedInfo, elem)
-			}
-		}
-	}
-	{
-		{
-			s.OdataDotContext.SetFake()
-		}
-	}
-	{
-		{
-			s.OdataDotEtag.SetFake()
-		}
-	}
-	{
-		{
-			s.OdataDotID.SetFake()
-		}
-	}
-	{
-		{
-			s.OdataDotType.SetFake()
-		}
-	}
-	{
-		{
-			s.CreatedBy.SetFake()
-		}
-	}
-	{
-		{
-			s.CreationTime.SetFake()
-		}
-	}
-	{
-		{
-			s.Description.SetFake()
-		}
-	}
-	{
-		{
-			s.EndTime.SetFake()
-		}
-	}
-	{
-		{
-			s.EstimatedCompletionTime.SetFake()
-		}
-	}
-	{
-		{
-			s.EstimatedDuration.SetFake()
-		}
-	}
-	{
-		{
-			s.HidePayload.SetFake()
-		}
-	}
-	{
-		{
-			s.ID.SetFake()
-		}
-	}
-	{
-		{
-			s.JobPriority.SetFake()
-		}
-	}
-	{
-		{
-			s.JobState.SetFake()
-		}
-	}
-	{
-		{
-			s.JobStatus.SetFake()
-		}
-	}
-	{
-		{
-			s.JobType.SetFake()
-		}
-	}
-	{
-		{
-			s.MaxExecutionTime.SetFake()
-		}
-	}
-	{
-		{
-			s.Messages.SetFake()
-		}
-	}
-	{
-		{
-			s.Name.SetFake()
-		}
-	}
-	{
-		{
-			s.Oem = []byte("null")
-		}
-	}
-	{
-		{
-			s.Parameters.SetFake()
-		}
-	}
-	{
-		{
-			s.Payload.SetFake()
-		}
-	}
-	{
-		{
-			s.PercentComplete.SetFake()
-		}
-	}
-	{
-		{
-			s.RawData.SetFake()
-		}
-	}
-	{
-		{
-			s.Schedule.SetFake()
-		}
-	}
-	{
-		{
-			s.StartTime.SetFake()
-		}
-	}
-	{
-		{
-			s.StepOrder.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) SetFake() {
-	{
-		{
-			s.Message.SetFake()
-		}
-	}
-	{
-		{
-			s.MessageArgs.SetFake()
-		}
-	}
-	{
-		{
-			s.MessageId.SetFake()
-		}
-	}
-	{
-		{
-			s.MessageSeverity.SetFake()
-		}
-	}
-	{
-		{
-			s.Oem = []byte("null")
-		}
-	}
-	{
-		{
-			s.RelatedProperties.SetFake()
-		}
-	}
-	{
-		{
-			s.Resolution.SetFake()
-		}
-	}
-	{
-		{
-			s.ResolutionSteps.SetFake()
-		}
-	}
-	{
-		{
-			s.Severity.SetFake()
-		}
-	}
-	{
-		{
-			s.UserAuthenticationSource.SetFake()
-		}
-	}
-	{
-		{
-			s.Username.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) SetFake() {
-	{
-		{
-			s.ActionParameters.SetFake()
-		}
-	}
-	{
-		{
-			s.ActionURI.SetFake()
-		}
-	}
-	{
-		{
-			s.Oem = []byte("null")
-		}
-	}
-	{
-		{
-			s.Priority.SetFake()
-		}
-	}
-	{
-		{
-			s.ResolutionType.SetFake()
-		}
-	}
-	{
-		{
-			s.RetryCount.SetFake()
-		}
-	}
-	{
-		{
-			s.RetryIntervalSeconds.SetFake()
-		}
-	}
-	{
-		{
-			s.TargetComponentURI.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetFake() {
-	{
-		{
-			s.AllowableNumbers.SetFake()
-		}
-	}
-	{
-		{
-			s.AllowablePattern.SetFake()
-		}
-	}
-	{
-		{
-			s.AllowableValueDescriptions.SetFake()
-		}
-	}
-	{
-		{
-			s.AllowableValues.SetFake()
-		}
-	}
-	{
-		{
-			s.ArraySizeMaximum.SetFake()
-		}
-	}
-	{
-		{
-			s.ArraySizeMinimum.SetFake()
-		}
-	}
-	{
-		{
-			s.DataType.SetFake()
-		}
-	}
-	{
-		{
-			s.DefaultValue.SetFake()
-		}
-	}
-	{
-		{
-			s.MaximumValue.SetFake()
-		}
-	}
-	{
-		{
-			s.MinimumValue.SetFake()
-		}
-	}
-	{
-		{
-			s.Name.SetFake()
-		}
-	}
-	{
-		{
-			s.NoDefaultValue.SetFake()
-		}
-	}
-	{
-		{
-			s.ObjectDataType.SetFake()
-		}
-	}
-	{
-		{
-			s.Required.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishJobJobsItemMessagesItem) SetFake() {
-	{
-		{
-			s.Message.SetFake()
-		}
-	}
-	{
-		{
-			s.MessageArgs.SetFake()
-		}
-	}
-	{
-		{
-			s.MessageId.SetFake()
-		}
-	}
-	{
-		{
-			s.MessageSeverity.SetFake()
-		}
-	}
-	{
-		{
-			s.Oem = []byte("null")
-		}
-	}
-	{
-		{
-			s.RelatedProperties.SetFake()
-		}
-	}
-	{
-		{
-			s.Resolution.SetFake()
-		}
-	}
-	{
-		{
-			s.ResolutionSteps.SetFake()
-		}
-	}
-	{
-		{
-			s.Severity.SetFake()
-		}
-	}
-	{
-		{
-			s.UserAuthenticationSource.SetFake()
-		}
-	}
-	{
-		{
-			s.Username.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) SetFake() {
-	{
-		{
-			s.ActionParameters.SetFake()
-		}
-	}
-	{
-		{
-			s.ActionURI.SetFake()
-		}
-	}
-	{
-		{
-			s.Oem = []byte("null")
-		}
-	}
-	{
-		{
-			s.Priority.SetFake()
-		}
-	}
-	{
-		{
-			s.ResolutionType.SetFake()
-		}
-	}
-	{
-		{
-			s.RetryCount.SetFake()
-		}
-	}
-	{
-		{
-			s.RetryIntervalSeconds.SetFake()
-		}
-	}
-	{
-		{
-			s.TargetComponentURI.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) SetFake() {
-	{
-		{
-			s.AllowableNumbers.SetFake()
-		}
-	}
-	{
-		{
-			s.AllowablePattern.SetFake()
-		}
-	}
-	{
-		{
-			s.AllowableValueDescriptions.SetFake()
-		}
-	}
-	{
-		{
-			s.AllowableValues.SetFake()
-		}
-	}
-	{
-		{
-			s.ArraySizeMaximum.SetFake()
-		}
-	}
-	{
-		{
-			s.ArraySizeMinimum.SetFake()
-		}
-	}
-	{
-		{
-			s.DataType.SetFake()
-		}
-	}
-	{
-		{
-			s.DefaultValue.SetFake()
-		}
-	}
-	{
-		{
-			s.MaximumValue.SetFake()
-		}
-	}
-	{
-		{
-			s.MinimumValue.SetFake()
-		}
-	}
-	{
-		{
-			s.Name.SetFake()
-		}
-	}
-	{
-		{
-			s.NoDefaultValue.SetFake()
-		}
-	}
-	{
-		{
-			s.ObjectDataType.SetFake()
-		}
-	}
-	{
-		{
-			s.Required.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishJobJobsItemParameters) SetFake() {
-	var (
-		elem jx.Raw
-		m    map[string]jx.Raw = s.init()
-	)
-	for i := 0; i < 0; i++ {
-		m[fmt.Sprintf("fake%d", i)] = elem
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishJobJobsItemPayload) SetFake() {
-	{
-		{
-			s.HttpHeaders.SetFake()
-		}
-	}
-	{
-		{
-			s.HttpOperation.SetFake()
-		}
-	}
-	{
-		{
-			s.JsonBody.SetFake()
-		}
-	}
-	{
-		{
-			s.TargetUri.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishJobJobsItemSchedule) SetFake() {
-	{
-		{
-			s.EnabledDaysOfMonth.SetFake()
-		}
-	}
-	{
-		{
-			s.EnabledDaysOfWeek.SetFake()
-		}
-	}
-	{
-		{
-			s.EnabledIntervals.SetFake()
-		}
-	}
-	{
-		{
-			s.EnabledMonthsOfYear.SetFake()
-		}
-	}
-	{
-		{
-			s.InitialStartTime.SetFake()
-		}
-	}
-	{
-		{
-			s.Lifetime.SetFake()
-		}
-	}
-	{
-		{
-			s.MaxOccurrences.SetFake()
-		}
-	}
-	{
-		{
-			s.Name.SetFake()
-		}
-	}
-	{
-		{
-			s.RecurrenceInterval.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishMetricReport) SetFake() {
-	{
-		{
-			s.Name.SetFake()
-		}
-	}
-	{
-		{
-			s.Reports.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishMetricReportReportsItem) SetFake() {
-	{
-		{
-			s.MessageDotExtendedInfo = nil
-			for i := 0; i < 0; i++ {
-				var elem RedfishMetricReportReportsItemMessageDotExtendedInfoItem
-				{
-					elem.SetFake()
-				}
-				s.MessageDotExtendedInfo = append(s.MessageDotExtendedInfo, elem)
-			}
-		}
-	}
-	{
-		{
-			s.OdataDotContext.SetFake()
-		}
-	}
-	{
-		{
-			s.OdataDotEtag.SetFake()
-		}
-	}
-	{
-		{
-			s.OdataDotID.SetFake()
-		}
-	}
-	{
-		{
-			s.OdataDotType.SetFake()
-		}
-	}
-	{
-		{
-			s.Context.SetFake()
-		}
-	}
-	{
-		{
-			s.Description.SetFake()
-		}
-	}
-	{
-		{
-			s.ID.SetFake()
-		}
-	}
-	{
-		{
-			s.MetricValues.SetFake()
-		}
-	}
-	{
-		{
-			s.Name.SetFake()
-		}
-	}
-	{
-		{
-			s.Oem = []byte("null")
-		}
-	}
-	{
-		{
-			s.ReportSequence.SetFake()
-		}
-	}
-	{
-		{
-			s.Timestamp.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) SetFake() {
-	{
-		{
-			s.Message.SetFake()
-		}
-	}
-	{
-		{
-			s.MessageArgs.SetFake()
-		}
-	}
-	{
-		{
-			s.MessageId.SetFake()
-		}
-	}
-	{
-		{
-			s.MessageSeverity.SetFake()
-		}
-	}
-	{
-		{
-			s.Oem = []byte("null")
-		}
-	}
-	{
-		{
-			s.RelatedProperties.SetFake()
-		}
-	}
-	{
-		{
-			s.Resolution.SetFake()
-		}
-	}
-	{
-		{
-			s.ResolutionSteps.SetFake()
-		}
-	}
-	{
-		{
-			s.Severity.SetFake()
-		}
-	}
-	{
-		{
-			s.UserAuthenticationSource.SetFake()
-		}
-	}
-	{
-		{
-			s.Username.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) SetFake() {
-	{
-		{
-			s.ActionParameters.SetFake()
-		}
-	}
-	{
-		{
-			s.ActionURI.SetFake()
-		}
-	}
-	{
-		{
-			s.Oem = []byte("null")
-		}
-	}
-	{
-		{
-			s.Priority.SetFake()
-		}
-	}
-	{
-		{
-			s.ResolutionType.SetFake()
-		}
-	}
-	{
-		{
-			s.RetryCount.SetFake()
-		}
-	}
-	{
-		{
-			s.RetryIntervalSeconds.SetFake()
-		}
-	}
-	{
-		{
-			s.TargetComponentURI.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetFake() {
-	{
-		{
-			s.AllowableNumbers.SetFake()
-		}
-	}
-	{
-		{
-			s.AllowablePattern.SetFake()
-		}
-	}
-	{
-		{
-			s.AllowableValueDescriptions.SetFake()
-		}
-	}
-	{
-		{
-			s.AllowableValues.SetFake()
-		}
-	}
-	{
-		{
-			s.ArraySizeMaximum.SetFake()
-		}
-	}
-	{
-		{
-			s.ArraySizeMinimum.SetFake()
-		}
-	}
-	{
-		{
-			s.DataType.SetFake()
-		}
-	}
-	{
-		{
-			s.DefaultValue.SetFake()
-		}
-	}
-	{
-		{
-			s.MaximumValue.SetFake()
-		}
-	}
-	{
-		{
-			s.MinimumValue.SetFake()
-		}
-	}
-	{
-		{
-			s.Name.SetFake()
-		}
-	}
-	{
-		{
-			s.NoDefaultValue.SetFake()
-		}
-	}
-	{
-		{
-			s.ObjectDataType.SetFake()
-		}
-	}
-	{
-		{
-			s.Required.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishMetricReportReportsItemMetricValuesItem) SetFake() {
-	{
-		{
-			s.MetricId.SetFake()
-		}
-	}
-	{
-		{
-			s.MetricProperty.SetFake()
-		}
-	}
-	{
-		{
-			s.MetricValue.SetFake()
-		}
-	}
-	{
-		{
-			s.Oem = []byte("null")
-		}
-	}
-	{
-		{
-			s.Timestamp.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishSystem) SetFake() {
-	{
-		{
-			s.BiosVersion.SetFake()
-		}
-	}
-	{
-		{
-			s.BootNext.SetFake()
-		}
-	}
-	{
-		{
-			s.BootOrder.SetFake()
-		}
-	}
-	{
-		{
-			s.Health.SetFake()
-		}
-	}
-	{
-		{
-			s.HostName.SetFake()
-		}
-	}
-	{
-		{
-			s.Manufacturer.SetFake()
-		}
-	}
-	{
-		{
-			s.Model.SetFake()
-		}
-	}
-	{
-		{
-			s.Name.SetFake()
-		}
-	}
-	{
-		{
-			s.OemDell.SetFake()
-		}
-	}
-	{
-		{
-			s.PowerStatus.SetFake()
-		}
-	}
-	{
-		{
-			s.ProcessorCount.SetFake()
-		}
-	}
-	{
-		{
-			s.SerialNumber.SetFake()
-		}
-	}
-	{
-		{
-			s.TotalMemory.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishSystemOemDell) SetFake() {
-	{
-		{
-			s.MessageDotExtendedInfo.SetFake()
-		}
-	}
-	{
-		{
-			s.OdataDotContext.SetFake()
-		}
-	}
-	{
-		{
-			s.OdataDotEtag.SetFake()
-		}
-	}
-	{
-		{
-			s.OdataDotID.SetFake()
-		}
-	}
-	{
-		{
-			s.OdataDotType.SetFake()
-		}
-	}
-	{
-		{
-			s.BIOSReleaseDate.SetFake()
-		}
-	}
-	{
-		{
-			s.BaseBoardChassisSlot.SetFake()
-		}
-	}
-	{
-		{
-			s.BatteryRollupStatus.SetFake()
-		}
-	}
-	{
-		{
-			s.BladeGeometry.SetFake()
-		}
-	}
-	{
-		{
-			s.CMCIP.SetFake()
-		}
-	}
-	{
-		{
-			s.CPURollupStatus.SetFake()
-		}
-	}
-	{
-		{
-			s.ChassisModel.SetFake()
-		}
-	}
-	{
-		{
-			s.ChassisName.SetFake()
-		}
-	}
-	{
-		{
-			s.ChassisServiceTag.SetFake()
-		}
-	}
-	{
-		{
-			s.ChassisSystemHeightUnit.SetFake()
-		}
-	}
-	{
-		{
-			s.CurrentRollupStatus.SetFake()
-		}
-	}
-	{
-		{
-			s.Description.SetFake()
-		}
-	}
-	{
-		{
-			s.EstimatedExhaustTemperatureCelsius.SetFake()
-		}
-	}
-	{
-		{
-			s.EstimatedSystemAirflowCFM.SetFake()
-		}
-	}
-	{
-		{
-			s.ExpressServiceCode.SetFake()
-		}
-	}
-	{
-		{
-			s.FanRollupStatus.SetFake()
-		}
-	}
-	{
-		{
-			s.IDSDMRollupStatus.SetFake()
-		}
-	}
-	{
-		{
-			s.ID.SetFake()
-		}
-	}
-	{
-		{
-			s.IntrusionRollupStatus.SetFake()
-		}
-	}
-	{
-		{
-			s.IsOEMBranded.SetFake()
-		}
-	}
-	{
-		{
-			s.LastSystemInventoryTime.SetFake()
-		}
-	}
-	{
-		{
-			s.LastUpdateTime.SetFake()
-		}
-	}
-	{
-		{
-			s.LicensingRollupStatus.SetFake()
-		}
-	}
-	{
-		{
-			s.ManagedSystemSize.SetFake()
-		}
-	}
-	{
-		{
-			s.MaxCPUSockets.SetFake()
-		}
-	}
-	{
-		{
-			s.MaxDIMMSlots.SetFake()
-		}
-	}
-	{
-		{
-			s.MaxPCIeSlots.SetFake()
-		}
-	}
-	{
-		{
-			s.MemoryOperationMode.SetFake()
-		}
-	}
-	{
-		{
-			s.Name.SetFake()
-		}
-	}
-	{
-		{
-			s.NodeID.SetFake()
-		}
-	}
-	{
-		{
-			s.Oem = []byte("null")
-		}
-	}
-	{
-		{
-			s.PSRollupStatus.SetFake()
-		}
-	}
-	{
-		{
-			s.PlatformGUID.SetFake()
-		}
-	}
-	{
-		{
-			s.PopulatedDIMMSlots.SetFake()
-		}
-	}
-	{
-		{
-			s.PopulatedPCIeSlots.SetFake()
-		}
-	}
-	{
-		{
-			s.PowerCapEnabledState.SetFake()
-		}
-	}
-	{
-		{
-			s.SDCardRollupStatus.SetFake()
-		}
-	}
-	{
-		{
-			s.SELRollupStatus.SetFake()
-		}
-	}
-	{
-		{
-			s.ServerAllocationWatts.SetFake()
-		}
-	}
-	{
-		{
-			s.StorageRollupStatus.SetFake()
-		}
-	}
-	{
-		{
-			s.SysMemErrorMethodology.SetFake()
-		}
-	}
-	{
-		{
-			s.SysMemFailOverState.SetFake()
-		}
-	}
-	{
-		{
-			s.SysMemLocation.SetFake()
-		}
-	}
-	{
-		{
-			s.SysMemPrimaryStatus.SetFake()
-		}
-	}
-	{
-		{
-			s.SystemGeneration.SetFake()
-		}
-	}
-	{
-		{
-			s.SystemID.SetFake()
-		}
-	}
-	{
-		{
-			s.SystemRevision.SetFake()
-		}
-	}
-	{
-		{
-			s.TempRollupStatus.SetFake()
-		}
-	}
-	{
-		{
-			s.TempStatisticsRollupStatus.SetFake()
-		}
-	}
-	{
-		{
-			s.UUID.SetFake()
-		}
-	}
-	{
-		{
-			s.VoltRollupStatus.SetFake()
-		}
-	}
-	{
-		{
-			s.SmbiosGUID.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) SetFake() {
-	{
-		{
-			s.Message.SetFake()
-		}
-	}
-	{
-		{
-			s.MessageArgs.SetFake()
-		}
-	}
-	{
-		{
-			s.MessageId.SetFake()
-		}
-	}
-	{
-		{
-			s.MessageSeverity.SetFake()
-		}
-	}
-	{
-		{
-			s.Oem = []byte("null")
-		}
-	}
-	{
-		{
-			s.RelatedProperties.SetFake()
-		}
-	}
-	{
-		{
-			s.Resolution.SetFake()
-		}
-	}
-	{
-		{
-			s.ResolutionSteps.SetFake()
-		}
-	}
-	{
-		{
-			s.Severity.SetFake()
-		}
-	}
-	{
-		{
-			s.UserAuthenticationSource.SetFake()
-		}
-	}
-	{
-		{
-			s.Username.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetFake() {
-	{
-		{
-			s.ActionParameters.SetFake()
-		}
-	}
-	{
-		{
-			s.ActionURI.SetFake()
-		}
-	}
-	{
-		{
-			s.Oem = []byte("null")
-		}
-	}
-	{
-		{
-			s.Priority.SetFake()
-		}
-	}
-	{
-		{
-			s.ResolutionType.SetFake()
-		}
-	}
-	{
-		{
-			s.RetryCount.SetFake()
-		}
-	}
-	{
-		{
-			s.RetryIntervalSeconds.SetFake()
-		}
-	}
-	{
-		{
-			s.TargetComponentURI.SetFake()
-		}
-	}
-}
-
-// SetFake set fake values.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetFake() {
-	{
-		{
-			s.AllowableNumbers.SetFake()
-		}
-	}
-	{
-		{
-			s.AllowablePattern.SetFake()
-		}
-	}
-	{
-		{
-			s.AllowableValueDescriptions.SetFake()
-		}
-	}
-	{
-		{
-			s.AllowableValues.SetFake()
-		}
-	}
-	{
-		{
-			s.ArraySizeMaximum.SetFake()
-		}
-	}
-	{
-		{
-			s.ArraySizeMinimum.SetFake()
-		}
-	}
-	{
-		{
-			s.DataType.SetFake()
-		}
-	}
-	{
-		{
-			s.DefaultValue.SetFake()
-		}
-	}
-	{
-		{
-			s.MaximumValue.SetFake()
-		}
-	}
-	{
-		{
-			s.MinimumValue.SetFake()
-		}
-	}
-	{
-		{
-			s.Name.SetFake()
-		}
-	}
-	{
-		{
-			s.NoDefaultValue.SetFake()
-		}
-	}
-	{
-		{
-			s.ObjectDataType.SetFake()
-		}
-	}
-	{
-		{
-			s.Required.SetFake()
 		}
 	}
 }

@@ -94,8 +94,9 @@ func (h *Handler) NodeFind(c fuego.ContextNoBody) (model.HostList, error) {
 		}
 	}
 
+	// this has to ask whether a filter was given rather than whether it matched, or a filter matching nothing returns every node
 	var NodeList model.HostList
-	if ns.Len() == 0 {
+	if c.QueryParam("nodeset") == "" && c.QueryParam("tags") == "" {
 		NodeList, err = h.DB.Hosts()
 	} else {
 		NodeList, err = h.DB.FindHosts(ns)

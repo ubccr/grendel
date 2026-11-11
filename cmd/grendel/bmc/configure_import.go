@@ -18,10 +18,9 @@ var (
 	configureImportOptions *shared.TableOptions
 	configureImportColumns = []shared.Column{
 		{Name: "Node"},
-		{Name: "Status"},
+		{Name: "State"},
 		{Name: "Message"},
 	}
-
 	configureImportCmd = &cobra.Command{
 		Use:   "import <nodeset | all> <NoReboot | Graceful | Forced> <filename>",
 		Short: "Import BMC configuration",
@@ -31,36 +30,36 @@ var (
 		`,
 		Args: cobra.ExactArgs(3),
 		RunE: func(command *cobra.Command, args []string) error {
-			nodeset := args[0]
-			if args[0] == "all" {
-				nodeset = ""
-			}
-
-			req := &client.BmcImportConfigurationRequest{
+			req := &client.BmcImportConfigBody{
 				ShutdownType: client.NewOptString(args[1]),
 				File:         client.NewOptString(args[2]),
 			}
+
+			nodeset, all := selector(args[0])
 			params := client.POSTV1BmcConfigureImportParams{
-				Nodeset: client.NewOptString(nodeset),
+				Nodeset: nodeset,
+				All:     all,
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			jobs, err := apiclient.API.POSTV1BmcConfigureImport(command.Context(), req, params)
+
+			res, err := apiclient.API.POSTV1BmcConfigureImport(command.Context(), req, params)
 			if err != nil {
 				return apiclient.NewApiError(err)
 			}
 
 			t := shared.NewTable(configureImportColumns, configureImportFilter).Options(*configureImportOptions).Empty("-")
-
-			for _, job := range jobs {
+			for _, r := range res.Results.Value {
+				result := r.Value
 				t.AppendRow(
-					job.Host.Value,
-					job.Status.Value,
-					job.Msg.Value,
+					result.Node.Value,
+					colorState(result.Success.Value),
+					result.Message.Value,
 				)
 			}
-
 			t.Print()
-			return nil
+
+			s := res.Summary.Value
+			return summaryLine(s.Total.Value, s.Succeeded.Value, s.Failed.Value, s.FailedNodes.Value, s.DurationMs.Value)
 		},
 	}
 )

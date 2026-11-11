@@ -595,196 +595,94 @@ func (s *AuthTokenRequest) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
-func (s *BmcDellInstallFromRepoRequest) Encode(e *jx.Encoder) {
+func (s *BmcClearJobsBody) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *BmcDellInstallFromRepoRequest) encodeFields(e *jx.Encoder) {
+func (s *BmcClearJobsBody) encodeFields(e *jx.Encoder) {
 	{
-		if s.ApplyUpdate.Set {
-			e.FieldStart("ApplyUpdate")
-			s.ApplyUpdate.Encode(e)
+		if s.All.Set {
+			e.FieldStart("all")
+			s.All.Encode(e)
 		}
 	}
 	{
-		if s.CatalogFile.Set {
-			e.FieldStart("CatalogFile")
-			s.CatalogFile.Encode(e)
-		}
-	}
-	{
-		if s.ClearJobQueue.Set {
-			e.FieldStart("ClearJobQueue")
-			s.ClearJobQueue.Encode(e)
-		}
-	}
-	{
-		if s.IPAddress.Set {
-			e.FieldStart("IPAddress")
-			s.IPAddress.Encode(e)
-		}
-	}
-	{
-		if s.IgnoreCertWarning.Set {
-			e.FieldStart("IgnoreCertWarning")
-			s.IgnoreCertWarning.Encode(e)
-		}
-	}
-	{
-		if s.RebootNeeded.Set {
-			e.FieldStart("RebootNeeded")
-			s.RebootNeeded.Encode(e)
-		}
-	}
-	{
-		if s.ShareName.Set {
-			e.FieldStart("ShareName")
-			s.ShareName.Encode(e)
-		}
-	}
-	{
-		if s.ShareType.Set {
-			e.FieldStart("ShareType")
-			s.ShareType.Encode(e)
+		if s.Ids.Set {
+			e.FieldStart("ids")
+			s.Ids.Encode(e)
 		}
 	}
 }
 
-var jsonFieldsNameOfBmcDellInstallFromRepoRequest = [8]string{
-	0: "ApplyUpdate",
-	1: "CatalogFile",
-	2: "ClearJobQueue",
-	3: "IPAddress",
-	4: "IgnoreCertWarning",
-	5: "RebootNeeded",
-	6: "ShareName",
-	7: "ShareType",
+var jsonFieldsNameOfBmcClearJobsBody = [2]string{
+	0: "all",
+	1: "ids",
 }
 
-// Decode decodes BmcDellInstallFromRepoRequest from json.
-func (s *BmcDellInstallFromRepoRequest) Decode(d *jx.Decoder) error {
+// Decode decodes BmcClearJobsBody from json.
+func (s *BmcClearJobsBody) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode BmcDellInstallFromRepoRequest to nil")
+		return errors.New("invalid: unable to decode BmcClearJobsBody to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "ApplyUpdate":
+		case "all":
 			if err := func() error {
-				s.ApplyUpdate.Reset()
-				if err := s.ApplyUpdate.Decode(d); err != nil {
+				s.All.Reset()
+				if err := s.All.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ApplyUpdate\"")
+				return errors.Wrap(err, "decode field \"all\"")
 			}
-		case "CatalogFile":
+		case "ids":
 			if err := func() error {
-				s.CatalogFile.Reset()
-				if err := s.CatalogFile.Decode(d); err != nil {
+				s.Ids.Reset()
+				if err := s.Ids.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"CatalogFile\"")
-			}
-		case "ClearJobQueue":
-			if err := func() error {
-				s.ClearJobQueue.Reset()
-				if err := s.ClearJobQueue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ClearJobQueue\"")
-			}
-		case "IPAddress":
-			if err := func() error {
-				s.IPAddress.Reset()
-				if err := s.IPAddress.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"IPAddress\"")
-			}
-		case "IgnoreCertWarning":
-			if err := func() error {
-				s.IgnoreCertWarning.Reset()
-				if err := s.IgnoreCertWarning.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"IgnoreCertWarning\"")
-			}
-		case "RebootNeeded":
-			if err := func() error {
-				s.RebootNeeded.Reset()
-				if err := s.RebootNeeded.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RebootNeeded\"")
-			}
-		case "ShareName":
-			if err := func() error {
-				s.ShareName.Reset()
-				if err := s.ShareName.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ShareName\"")
-			}
-		case "ShareType":
-			if err := func() error {
-				s.ShareType.Reset()
-				if err := s.ShareType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ShareType\"")
+				return errors.Wrap(err, "decode field \"ids\"")
 			}
 		default:
 			return d.Skip()
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode BmcDellInstallFromRepoRequest")
+		return errors.Wrap(err, "decode BmcClearJobsBody")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *BmcDellInstallFromRepoRequest) MarshalJSON() ([]byte, error) {
+func (s *BmcClearJobsBody) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *BmcDellInstallFromRepoRequest) UnmarshalJSON(data []byte) error {
+func (s *BmcClearJobsBody) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *BmcImportConfigurationRequest) Encode(e *jx.Encoder) {
+func (s *BmcImportConfigBody) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *BmcImportConfigurationRequest) encodeFields(e *jx.Encoder) {
+func (s *BmcImportConfigBody) encodeFields(e *jx.Encoder) {
 	{
 		if s.File.Set {
 			e.FieldStart("file")
@@ -799,15 +697,15 @@ func (s *BmcImportConfigurationRequest) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfBmcImportConfigurationRequest = [2]string{
+var jsonFieldsNameOfBmcImportConfigBody = [2]string{
 	0: "file",
 	1: "shutdown_type",
 }
 
-// Decode decodes BmcImportConfigurationRequest from json.
-func (s *BmcImportConfigurationRequest) Decode(d *jx.Decoder) error {
+// Decode decodes BmcImportConfigBody from json.
+func (s *BmcImportConfigBody) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode BmcImportConfigurationRequest to nil")
+		return errors.New("invalid: unable to decode BmcImportConfigBody to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -837,232 +735,4996 @@ func (s *BmcImportConfigurationRequest) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode BmcImportConfigurationRequest")
+		return errors.Wrap(err, "decode BmcImportConfigBody")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *BmcImportConfigurationRequest) MarshalJSON() ([]byte, error) {
+func (s *BmcImportConfigBody) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *BmcImportConfigurationRequest) UnmarshalJSON(data []byte) error {
+func (s *BmcImportConfigBody) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *BmcJobDeleteRequest) Encode(e *jx.Encoder) {
+func (s *BmcInstallFirmwareBody) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *BmcJobDeleteRequest) encodeFields(e *jx.Encoder) {
+func (s *BmcInstallFirmwareBody) encodeFields(e *jx.Encoder) {
 	{
-		if s.NodeJobList.Set {
-			e.FieldStart("node_job_list")
-			s.NodeJobList.Encode(e)
+		if s.ApplyUpdate.Set {
+			e.FieldStart("apply_update")
+			s.ApplyUpdate.Encode(e)
+		}
+	}
+	{
+		if s.CatalogFile.Set {
+			e.FieldStart("catalog_file")
+			s.CatalogFile.Encode(e)
+		}
+	}
+	{
+		if s.ClearJobs.Set {
+			e.FieldStart("clear_jobs")
+			s.ClearJobs.Encode(e)
+		}
+	}
+	{
+		if s.IgnoreCertWarning.Set {
+			e.FieldStart("ignore_cert_warning")
+			s.IgnoreCertWarning.Encode(e)
+		}
+	}
+	{
+		if s.IPAddress.Set {
+			e.FieldStart("ip_address")
+			s.IPAddress.Encode(e)
+		}
+	}
+	{
+		if s.Reboot.Set {
+			e.FieldStart("reboot")
+			s.Reboot.Encode(e)
+		}
+	}
+	{
+		if s.ShareName.Set {
+			e.FieldStart("share_name")
+			s.ShareName.Encode(e)
+		}
+	}
+	{
+		if s.ShareType.Set {
+			e.FieldStart("share_type")
+			s.ShareType.Encode(e)
 		}
 	}
 }
 
-var jsonFieldsNameOfBmcJobDeleteRequest = [1]string{
-	0: "node_job_list",
+var jsonFieldsNameOfBmcInstallFirmwareBody = [8]string{
+	0: "apply_update",
+	1: "catalog_file",
+	2: "clear_jobs",
+	3: "ignore_cert_warning",
+	4: "ip_address",
+	5: "reboot",
+	6: "share_name",
+	7: "share_type",
 }
 
-// Decode decodes BmcJobDeleteRequest from json.
-func (s *BmcJobDeleteRequest) Decode(d *jx.Decoder) error {
+// Decode decodes BmcInstallFirmwareBody from json.
+func (s *BmcInstallFirmwareBody) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode BmcJobDeleteRequest to nil")
+		return errors.New("invalid: unable to decode BmcInstallFirmwareBody to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "node_job_list":
+		case "apply_update":
 			if err := func() error {
-				s.NodeJobList.Reset()
-				if err := s.NodeJobList.Decode(d); err != nil {
+				s.ApplyUpdate.Reset()
+				if err := s.ApplyUpdate.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"node_job_list\"")
+				return errors.Wrap(err, "decode field \"apply_update\"")
+			}
+		case "catalog_file":
+			if err := func() error {
+				s.CatalogFile.Reset()
+				if err := s.CatalogFile.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"catalog_file\"")
+			}
+		case "clear_jobs":
+			if err := func() error {
+				s.ClearJobs.Reset()
+				if err := s.ClearJobs.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"clear_jobs\"")
+			}
+		case "ignore_cert_warning":
+			if err := func() error {
+				s.IgnoreCertWarning.Reset()
+				if err := s.IgnoreCertWarning.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ignore_cert_warning\"")
+			}
+		case "ip_address":
+			if err := func() error {
+				s.IPAddress.Reset()
+				if err := s.IPAddress.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ip_address\"")
+			}
+		case "reboot":
+			if err := func() error {
+				s.Reboot.Reset()
+				if err := s.Reboot.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"reboot\"")
+			}
+		case "share_name":
+			if err := func() error {
+				s.ShareName.Reset()
+				if err := s.ShareName.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"share_name\"")
+			}
+		case "share_type":
+			if err := func() error {
+				s.ShareType.Reset()
+				if err := s.ShareType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"share_type\"")
 			}
 		default:
 			return d.Skip()
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode BmcJobDeleteRequest")
+		return errors.Wrap(err, "decode BmcInstallFirmwareBody")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *BmcJobDeleteRequest) MarshalJSON() ([]byte, error) {
+func (s *BmcInstallFirmwareBody) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *BmcJobDeleteRequest) UnmarshalJSON(data []byte) error {
+func (s *BmcInstallFirmwareBody) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s BmcJobDeleteRequestNodeJobList) Encode(e *jx.Encoder) {
+func (s *BmcPowerBody) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
-// encodeFields implements json.Marshaler.
-func (s BmcJobDeleteRequestNodeJobList) encodeFields(e *jx.Encoder) {
-	for k, elem := range s {
-		e.FieldStart(k)
-
-		e.ArrStart()
-		for _, elem := range elem {
-			e.Str(elem)
+// encodeFields encodes fields.
+func (s *BmcPowerBody) encodeFields(e *jx.Encoder) {
+	{
+		if s.Action.Set {
+			e.FieldStart("action")
+			s.Action.Encode(e)
 		}
-		e.ArrEnd()
+	}
+	{
+		if s.BootOverride.Set {
+			e.FieldStart("boot_override")
+			s.BootOverride.Encode(e)
+		}
+	}
+	{
+		if s.Target.Set {
+			e.FieldStart("target")
+			s.Target.Encode(e)
+		}
 	}
 }
 
-// Decode decodes BmcJobDeleteRequestNodeJobList from json.
-func (s *BmcJobDeleteRequestNodeJobList) Decode(d *jx.Decoder) error {
+var jsonFieldsNameOfBmcPowerBody = [3]string{
+	0: "action",
+	1: "boot_override",
+	2: "target",
+}
+
+// Decode decodes BmcPowerBody from json.
+func (s *BmcPowerBody) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode BmcJobDeleteRequestNodeJobList to nil")
+		return errors.New("invalid: unable to decode BmcPowerBody to nil")
 	}
-	m := s.init()
+
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		var elem []string
-		if err := func() error {
-			elem = make([]string, 0)
-			if err := d.Arr(func(d *jx.Decoder) error {
-				var elemElem string
-				v, err := d.Str()
-				elemElem = string(v)
+		switch string(k) {
+		case "action":
+			if err := func() error {
+				s.Action.Reset()
+				if err := s.Action.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"action\"")
+			}
+		case "boot_override":
+			if err := func() error {
+				s.BootOverride.Reset()
+				if err := s.BootOverride.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"boot_override\"")
+			}
+		case "target":
+			if err := func() error {
+				s.Target.Reset()
+				if err := s.Target.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"target\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcPowerBody")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcPowerBody) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcPowerBody) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcAck) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcAck) encodeFields(e *jx.Encoder) {
+	{
+		if s.Results.Set {
+			e.FieldStart("results")
+			s.Results.Encode(e)
+		}
+	}
+	{
+		if s.RunID.Set {
+			e.FieldStart("run_id")
+			s.RunID.Encode(e)
+		}
+	}
+	{
+		if s.Summary.Set {
+			e.FieldStart("summary")
+			s.Summary.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcAck = [3]string{
+	0: "results",
+	1: "run_id",
+	2: "summary",
+}
+
+// Decode decodes BmcResponseModelBmcAck from json.
+func (s *BmcResponseModelBmcAck) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcAck to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "results":
+			if err := func() error {
+				s.Results.Reset()
+				if err := s.Results.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"results\"")
+			}
+		case "run_id":
+			if err := func() error {
+				s.RunID.Reset()
+				if err := s.RunID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"run_id\"")
+			}
+		case "summary":
+			if err := func() error {
+				s.Summary.Reset()
+				if err := s.Summary.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"summary\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcAck")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcAck) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcAck) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcAckResultsItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcAckResultsItem) encodeFields(e *jx.Encoder) {
+	{
+		if len(s.Data) != 0 {
+			e.FieldStart("data")
+			e.Raw(s.Data)
+		}
+	}
+	{
+		if s.DurationMs.Set {
+			e.FieldStart("duration_ms")
+			s.DurationMs.Encode(e)
+		}
+	}
+	{
+		if s.Message.Set {
+			e.FieldStart("message")
+			s.Message.Encode(e)
+		}
+	}
+	{
+		if s.Node.Set {
+			e.FieldStart("node")
+			s.Node.Encode(e)
+		}
+	}
+	{
+		if s.Success.Set {
+			e.FieldStart("success")
+			s.Success.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcAckResultsItem = [5]string{
+	0: "data",
+	1: "duration_ms",
+	2: "message",
+	3: "node",
+	4: "success",
+}
+
+// Decode decodes BmcResponseModelBmcAckResultsItem from json.
+func (s *BmcResponseModelBmcAckResultsItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcAckResultsItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "data":
+			if err := func() error {
+				v, err := d.RawAppend(nil)
+				s.Data = jx.Raw(v)
 				if err != nil {
 					return err
 				}
-				elem = append(elem, elemElem)
 				return nil
-			}); err != nil {
-				return err
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"data\"")
 			}
-			return nil
-		}(); err != nil {
-			return errors.Wrapf(err, "decode field %q", k)
-		}
-		m[string(k)] = elem
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode BmcJobDeleteRequestNodeJobList")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s BmcJobDeleteRequestNodeJobList) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *BmcJobDeleteRequestNodeJobList) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *BmcOsPowerBody) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *BmcOsPowerBody) encodeFields(e *jx.Encoder) {
-	{
-		if s.BootOption.Set {
-			e.FieldStart("boot_option")
-			s.BootOption.Encode(e)
-		}
-	}
-	{
-		if s.PowerOption.Set {
-			e.FieldStart("power_option")
-			s.PowerOption.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfBmcOsPowerBody = [2]string{
-	0: "boot_option",
-	1: "power_option",
-}
-
-// Decode decodes BmcOsPowerBody from json.
-func (s *BmcOsPowerBody) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode BmcOsPowerBody to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "boot_option":
+		case "duration_ms":
 			if err := func() error {
-				s.BootOption.Reset()
-				if err := s.BootOption.Decode(d); err != nil {
+				s.DurationMs.Reset()
+				if err := s.DurationMs.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"boot_option\"")
+				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
-		case "power_option":
+		case "message":
 			if err := func() error {
-				s.PowerOption.Reset()
-				if err := s.PowerOption.Decode(d); err != nil {
+				s.Message.Reset()
+				if err := s.Message.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"power_option\"")
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		case "node":
+			if err := func() error {
+				s.Node.Reset()
+				if err := s.Node.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"node\"")
+			}
+		case "success":
+			if err := func() error {
+				s.Success.Reset()
+				if err := s.Success.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"success\"")
 			}
 		default:
 			return d.Skip()
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode BmcOsPowerBody")
+		return errors.Wrap(err, "decode BmcResponseModelBmcAckResultsItem")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *BmcOsPowerBody) MarshalJSON() ([]byte, error) {
+func (s *BmcResponseModelBmcAckResultsItem) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *BmcOsPowerBody) UnmarshalJSON(data []byte) error {
+func (s *BmcResponseModelBmcAckResultsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcAckSummary) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcAckSummary) encodeFields(e *jx.Encoder) {
+	{
+		if s.DurationMs.Set {
+			e.FieldStart("duration_ms")
+			s.DurationMs.Encode(e)
+		}
+	}
+	{
+		if s.Failed.Set {
+			e.FieldStart("failed")
+			s.Failed.Encode(e)
+		}
+	}
+	{
+		if s.FailedNodes.Set {
+			e.FieldStart("failed_nodes")
+			s.FailedNodes.Encode(e)
+		}
+	}
+	{
+		if s.Succeeded.Set {
+			e.FieldStart("succeeded")
+			s.Succeeded.Encode(e)
+		}
+	}
+	{
+		if s.Total.Set {
+			e.FieldStart("total")
+			s.Total.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcAckSummary = [5]string{
+	0: "duration_ms",
+	1: "failed",
+	2: "failed_nodes",
+	3: "succeeded",
+	4: "total",
+}
+
+// Decode decodes BmcResponseModelBmcAckSummary from json.
+func (s *BmcResponseModelBmcAckSummary) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcAckSummary to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "duration_ms":
+			if err := func() error {
+				s.DurationMs.Reset()
+				if err := s.DurationMs.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"duration_ms\"")
+			}
+		case "failed":
+			if err := func() error {
+				s.Failed.Reset()
+				if err := s.Failed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"failed\"")
+			}
+		case "failed_nodes":
+			if err := func() error {
+				s.FailedNodes.Reset()
+				if err := s.FailedNodes.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"failed_nodes\"")
+			}
+		case "succeeded":
+			if err := func() error {
+				s.Succeeded.Reset()
+				if err := s.Succeeded.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"succeeded\"")
+			}
+		case "total":
+			if err := func() error {
+				s.Total.Reset()
+				if err := s.Total.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"total\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcAckSummary")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcAckSummary) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcAckSummary) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcFirmwareUpdates) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcFirmwareUpdates) encodeFields(e *jx.Encoder) {
+	{
+		if s.Results.Set {
+			e.FieldStart("results")
+			s.Results.Encode(e)
+		}
+	}
+	{
+		if s.RunID.Set {
+			e.FieldStart("run_id")
+			s.RunID.Encode(e)
+		}
+	}
+	{
+		if s.Summary.Set {
+			e.FieldStart("summary")
+			s.Summary.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcFirmwareUpdates = [3]string{
+	0: "results",
+	1: "run_id",
+	2: "summary",
+}
+
+// Decode decodes BmcResponseModelBmcFirmwareUpdates from json.
+func (s *BmcResponseModelBmcFirmwareUpdates) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcFirmwareUpdates to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "results":
+			if err := func() error {
+				s.Results.Reset()
+				if err := s.Results.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"results\"")
+			}
+		case "run_id":
+			if err := func() error {
+				s.RunID.Reset()
+				if err := s.RunID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"run_id\"")
+			}
+		case "summary":
+			if err := func() error {
+				s.Summary.Reset()
+				if err := s.Summary.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"summary\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcFirmwareUpdates")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcFirmwareUpdates) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcFirmwareUpdates) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Data.Set {
+			e.FieldStart("data")
+			s.Data.Encode(e)
+		}
+	}
+	{
+		if s.DurationMs.Set {
+			e.FieldStart("duration_ms")
+			s.DurationMs.Encode(e)
+		}
+	}
+	{
+		if s.Message.Set {
+			e.FieldStart("message")
+			s.Message.Encode(e)
+		}
+	}
+	{
+		if s.Node.Set {
+			e.FieldStart("node")
+			s.Node.Encode(e)
+		}
+	}
+	{
+		if s.Success.Set {
+			e.FieldStart("success")
+			s.Success.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcFirmwareUpdatesResultsItem = [5]string{
+	0: "data",
+	1: "duration_ms",
+	2: "message",
+	3: "node",
+	4: "success",
+}
+
+// Decode decodes BmcResponseModelBmcFirmwareUpdatesResultsItem from json.
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcFirmwareUpdatesResultsItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "data":
+			if err := func() error {
+				s.Data.Reset()
+				if err := s.Data.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"data\"")
+			}
+		case "duration_ms":
+			if err := func() error {
+				s.DurationMs.Reset()
+				if err := s.DurationMs.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"duration_ms\"")
+			}
+		case "message":
+			if err := func() error {
+				s.Message.Reset()
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		case "node":
+			if err := func() error {
+				s.Node.Reset()
+				if err := s.Node.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"node\"")
+			}
+		case "success":
+			if err := func() error {
+				s.Success.Reset()
+				if err := s.Success.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"success\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcFirmwareUpdatesResultsItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) encodeFields(e *jx.Encoder) {
+	{
+		if s.RebootType.Set {
+			e.FieldStart("reboot_type")
+			s.RebootType.Encode(e)
+		}
+	}
+	{
+		if s.Updates.Set {
+			e.FieldStart("updates")
+			s.Updates.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcFirmwareUpdatesResultsItemData = [2]string{
+	0: "reboot_type",
+	1: "updates",
+}
+
+// Decode decodes BmcResponseModelBmcFirmwareUpdatesResultsItemData from json.
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcFirmwareUpdatesResultsItemData to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "reboot_type":
+			if err := func() error {
+				s.RebootType.Reset()
+				if err := s.RebootType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"reboot_type\"")
+			}
+		case "updates":
+			if err := func() error {
+				s.Updates.Reset()
+				if err := s.Updates.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"updates\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcFirmwareUpdatesResultsItemData")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.ComponentType.Set {
+			e.FieldStart("component_type")
+			s.ComponentType.Encode(e)
+		}
+	}
+	{
+		if s.Criticality.Set {
+			e.FieldStart("criticality")
+			s.Criticality.Encode(e)
+		}
+	}
+	{
+		if s.DisplayName.Set {
+			e.FieldStart("display_name")
+			s.DisplayName.Encode(e)
+		}
+	}
+	{
+		if s.InstalledVersion.Set {
+			e.FieldStart("installed_version")
+			s.InstalledVersion.Encode(e)
+		}
+	}
+	{
+		if s.Name.Set {
+			e.FieldStart("name")
+			s.Name.Encode(e)
+		}
+	}
+	{
+		if s.PackagePath.Set {
+			e.FieldStart("package_path")
+			s.PackagePath.Encode(e)
+		}
+	}
+	{
+		if s.PackageVersion.Set {
+			e.FieldStart("package_version")
+			s.PackageVersion.Encode(e)
+		}
+	}
+	{
+		if s.RebootType.Set {
+			e.FieldStart("reboot_type")
+			s.RebootType.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem = [8]string{
+	0: "component_type",
+	1: "criticality",
+	2: "display_name",
+	3: "installed_version",
+	4: "name",
+	5: "package_path",
+	6: "package_version",
+	7: "reboot_type",
+}
+
+// Decode decodes BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem from json.
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "component_type":
+			if err := func() error {
+				s.ComponentType.Reset()
+				if err := s.ComponentType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"component_type\"")
+			}
+		case "criticality":
+			if err := func() error {
+				s.Criticality.Reset()
+				if err := s.Criticality.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"criticality\"")
+			}
+		case "display_name":
+			if err := func() error {
+				s.DisplayName.Reset()
+				if err := s.DisplayName.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"display_name\"")
+			}
+		case "installed_version":
+			if err := func() error {
+				s.InstalledVersion.Reset()
+				if err := s.InstalledVersion.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"installed_version\"")
+			}
+		case "name":
+			if err := func() error {
+				s.Name.Reset()
+				if err := s.Name.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"name\"")
+			}
+		case "package_path":
+			if err := func() error {
+				s.PackagePath.Reset()
+				if err := s.PackagePath.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"package_path\"")
+			}
+		case "package_version":
+			if err := func() error {
+				s.PackageVersion.Reset()
+				if err := s.PackageVersion.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"package_version\"")
+			}
+		case "reboot_type":
+			if err := func() error {
+				s.RebootType.Reset()
+				if err := s.RebootType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"reboot_type\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcFirmwareUpdatesSummary) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcFirmwareUpdatesSummary) encodeFields(e *jx.Encoder) {
+	{
+		if s.DurationMs.Set {
+			e.FieldStart("duration_ms")
+			s.DurationMs.Encode(e)
+		}
+	}
+	{
+		if s.Failed.Set {
+			e.FieldStart("failed")
+			s.Failed.Encode(e)
+		}
+	}
+	{
+		if s.FailedNodes.Set {
+			e.FieldStart("failed_nodes")
+			s.FailedNodes.Encode(e)
+		}
+	}
+	{
+		if s.Succeeded.Set {
+			e.FieldStart("succeeded")
+			s.Succeeded.Encode(e)
+		}
+	}
+	{
+		if s.Total.Set {
+			e.FieldStart("total")
+			s.Total.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcFirmwareUpdatesSummary = [5]string{
+	0: "duration_ms",
+	1: "failed",
+	2: "failed_nodes",
+	3: "succeeded",
+	4: "total",
+}
+
+// Decode decodes BmcResponseModelBmcFirmwareUpdatesSummary from json.
+func (s *BmcResponseModelBmcFirmwareUpdatesSummary) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcFirmwareUpdatesSummary to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "duration_ms":
+			if err := func() error {
+				s.DurationMs.Reset()
+				if err := s.DurationMs.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"duration_ms\"")
+			}
+		case "failed":
+			if err := func() error {
+				s.Failed.Reset()
+				if err := s.Failed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"failed\"")
+			}
+		case "failed_nodes":
+			if err := func() error {
+				s.FailedNodes.Reset()
+				if err := s.FailedNodes.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"failed_nodes\"")
+			}
+		case "succeeded":
+			if err := func() error {
+				s.Succeeded.Reset()
+				if err := s.Succeeded.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"succeeded\"")
+			}
+		case "total":
+			if err := func() error {
+				s.Total.Reset()
+				if err := s.Total.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"total\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcFirmwareUpdatesSummary")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcFirmwareUpdatesSummary) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcFirmwareUpdatesSummary) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcJobList) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcJobList) encodeFields(e *jx.Encoder) {
+	{
+		if s.Results.Set {
+			e.FieldStart("results")
+			s.Results.Encode(e)
+		}
+	}
+	{
+		if s.RunID.Set {
+			e.FieldStart("run_id")
+			s.RunID.Encode(e)
+		}
+	}
+	{
+		if s.Summary.Set {
+			e.FieldStart("summary")
+			s.Summary.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcJobList = [3]string{
+	0: "results",
+	1: "run_id",
+	2: "summary",
+}
+
+// Decode decodes BmcResponseModelBmcJobList from json.
+func (s *BmcResponseModelBmcJobList) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcJobList to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "results":
+			if err := func() error {
+				s.Results.Reset()
+				if err := s.Results.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"results\"")
+			}
+		case "run_id":
+			if err := func() error {
+				s.RunID.Reset()
+				if err := s.RunID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"run_id\"")
+			}
+		case "summary":
+			if err := func() error {
+				s.Summary.Reset()
+				if err := s.Summary.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"summary\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcJobList")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcJobList) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcJobList) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcJobListResultsItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcJobListResultsItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Data.Set {
+			e.FieldStart("data")
+			s.Data.Encode(e)
+		}
+	}
+	{
+		if s.DurationMs.Set {
+			e.FieldStart("duration_ms")
+			s.DurationMs.Encode(e)
+		}
+	}
+	{
+		if s.Message.Set {
+			e.FieldStart("message")
+			s.Message.Encode(e)
+		}
+	}
+	{
+		if s.Node.Set {
+			e.FieldStart("node")
+			s.Node.Encode(e)
+		}
+	}
+	{
+		if s.Success.Set {
+			e.FieldStart("success")
+			s.Success.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcJobListResultsItem = [5]string{
+	0: "data",
+	1: "duration_ms",
+	2: "message",
+	3: "node",
+	4: "success",
+}
+
+// Decode decodes BmcResponseModelBmcJobListResultsItem from json.
+func (s *BmcResponseModelBmcJobListResultsItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcJobListResultsItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "data":
+			if err := func() error {
+				s.Data.Reset()
+				if err := s.Data.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"data\"")
+			}
+		case "duration_ms":
+			if err := func() error {
+				s.DurationMs.Reset()
+				if err := s.DurationMs.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"duration_ms\"")
+			}
+		case "message":
+			if err := func() error {
+				s.Message.Reset()
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		case "node":
+			if err := func() error {
+				s.Node.Reset()
+				if err := s.Node.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"node\"")
+			}
+		case "success":
+			if err := func() error {
+				s.Success.Reset()
+				if err := s.Success.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"success\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcJobListResultsItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcJobListResultsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcJobListResultsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcJobListResultsItemData) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcJobListResultsItemData) encodeFields(e *jx.Encoder) {
+	{
+		if s.Jobs.Set {
+			e.FieldStart("jobs")
+			s.Jobs.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcJobListResultsItemData = [1]string{
+	0: "jobs",
+}
+
+// Decode decodes BmcResponseModelBmcJobListResultsItemData from json.
+func (s *BmcResponseModelBmcJobListResultsItemData) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcJobListResultsItemData to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "jobs":
+			if err := func() error {
+				s.Jobs.Reset()
+				if err := s.Jobs.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"jobs\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcJobListResultsItemData")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcJobListResultsItemData) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcJobListResultsItemData) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.EndTime.Set {
+			e.FieldStart("end_time")
+			s.EndTime.Encode(e)
+		}
+	}
+	{
+		if s.ID.Set {
+			e.FieldStart("id")
+			s.ID.Encode(e)
+		}
+	}
+	{
+		if s.Message.Set {
+			e.FieldStart("message")
+			s.Message.Encode(e)
+		}
+	}
+	{
+		if s.Name.Set {
+			e.FieldStart("name")
+			s.Name.Encode(e)
+		}
+	}
+	{
+		if s.PercentComplete.Set {
+			e.FieldStart("percent_complete")
+			s.PercentComplete.Encode(e)
+		}
+	}
+	{
+		if s.StartTime.Set {
+			e.FieldStart("start_time")
+			s.StartTime.Encode(e)
+		}
+	}
+	{
+		if s.State.Set {
+			e.FieldStart("state")
+			s.State.Encode(e)
+		}
+	}
+	{
+		if s.Status.Set {
+			e.FieldStart("status")
+			s.Status.Encode(e)
+		}
+	}
+	{
+		if s.Type.Set {
+			e.FieldStart("type")
+			s.Type.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcJobListResultsItemDataJobsItem = [9]string{
+	0: "end_time",
+	1: "id",
+	2: "message",
+	3: "name",
+	4: "percent_complete",
+	5: "start_time",
+	6: "state",
+	7: "status",
+	8: "type",
+}
+
+// Decode decodes BmcResponseModelBmcJobListResultsItemDataJobsItem from json.
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcJobListResultsItemDataJobsItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "end_time":
+			if err := func() error {
+				s.EndTime.Reset()
+				if err := s.EndTime.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"end_time\"")
+			}
+		case "id":
+			if err := func() error {
+				s.ID.Reset()
+				if err := s.ID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"id\"")
+			}
+		case "message":
+			if err := func() error {
+				s.Message.Reset()
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		case "name":
+			if err := func() error {
+				s.Name.Reset()
+				if err := s.Name.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"name\"")
+			}
+		case "percent_complete":
+			if err := func() error {
+				s.PercentComplete.Reset()
+				if err := s.PercentComplete.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"percent_complete\"")
+			}
+		case "start_time":
+			if err := func() error {
+				s.StartTime.Reset()
+				if err := s.StartTime.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"start_time\"")
+			}
+		case "state":
+			if err := func() error {
+				s.State.Reset()
+				if err := s.State.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"state\"")
+			}
+		case "status":
+			if err := func() error {
+				s.Status.Reset()
+				if err := s.Status.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"status\"")
+			}
+		case "type":
+			if err := func() error {
+				s.Type.Reset()
+				if err := s.Type.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"type\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcJobListResultsItemDataJobsItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcJobListSummary) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcJobListSummary) encodeFields(e *jx.Encoder) {
+	{
+		if s.DurationMs.Set {
+			e.FieldStart("duration_ms")
+			s.DurationMs.Encode(e)
+		}
+	}
+	{
+		if s.Failed.Set {
+			e.FieldStart("failed")
+			s.Failed.Encode(e)
+		}
+	}
+	{
+		if s.FailedNodes.Set {
+			e.FieldStart("failed_nodes")
+			s.FailedNodes.Encode(e)
+		}
+	}
+	{
+		if s.Succeeded.Set {
+			e.FieldStart("succeeded")
+			s.Succeeded.Encode(e)
+		}
+	}
+	{
+		if s.Total.Set {
+			e.FieldStart("total")
+			s.Total.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcJobListSummary = [5]string{
+	0: "duration_ms",
+	1: "failed",
+	2: "failed_nodes",
+	3: "succeeded",
+	4: "total",
+}
+
+// Decode decodes BmcResponseModelBmcJobListSummary from json.
+func (s *BmcResponseModelBmcJobListSummary) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcJobListSummary to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "duration_ms":
+			if err := func() error {
+				s.DurationMs.Reset()
+				if err := s.DurationMs.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"duration_ms\"")
+			}
+		case "failed":
+			if err := func() error {
+				s.Failed.Reset()
+				if err := s.Failed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"failed\"")
+			}
+		case "failed_nodes":
+			if err := func() error {
+				s.FailedNodes.Reset()
+				if err := s.FailedNodes.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"failed_nodes\"")
+			}
+		case "succeeded":
+			if err := func() error {
+				s.Succeeded.Reset()
+				if err := s.Succeeded.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"succeeded\"")
+			}
+		case "total":
+			if err := func() error {
+				s.Total.Reset()
+				if err := s.Total.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"total\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcJobListSummary")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcJobListSummary) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcJobListSummary) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcSELLog) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcSELLog) encodeFields(e *jx.Encoder) {
+	{
+		if s.Results.Set {
+			e.FieldStart("results")
+			s.Results.Encode(e)
+		}
+	}
+	{
+		if s.RunID.Set {
+			e.FieldStart("run_id")
+			s.RunID.Encode(e)
+		}
+	}
+	{
+		if s.Summary.Set {
+			e.FieldStart("summary")
+			s.Summary.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcSELLog = [3]string{
+	0: "results",
+	1: "run_id",
+	2: "summary",
+}
+
+// Decode decodes BmcResponseModelBmcSELLog from json.
+func (s *BmcResponseModelBmcSELLog) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcSELLog to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "results":
+			if err := func() error {
+				s.Results.Reset()
+				if err := s.Results.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"results\"")
+			}
+		case "run_id":
+			if err := func() error {
+				s.RunID.Reset()
+				if err := s.RunID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"run_id\"")
+			}
+		case "summary":
+			if err := func() error {
+				s.Summary.Reset()
+				if err := s.Summary.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"summary\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcSELLog")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcSELLog) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcSELLog) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcSELLogResultsItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcSELLogResultsItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Data.Set {
+			e.FieldStart("data")
+			s.Data.Encode(e)
+		}
+	}
+	{
+		if s.DurationMs.Set {
+			e.FieldStart("duration_ms")
+			s.DurationMs.Encode(e)
+		}
+	}
+	{
+		if s.Message.Set {
+			e.FieldStart("message")
+			s.Message.Encode(e)
+		}
+	}
+	{
+		if s.Node.Set {
+			e.FieldStart("node")
+			s.Node.Encode(e)
+		}
+	}
+	{
+		if s.Success.Set {
+			e.FieldStart("success")
+			s.Success.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcSELLogResultsItem = [5]string{
+	0: "data",
+	1: "duration_ms",
+	2: "message",
+	3: "node",
+	4: "success",
+}
+
+// Decode decodes BmcResponseModelBmcSELLogResultsItem from json.
+func (s *BmcResponseModelBmcSELLogResultsItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcSELLogResultsItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "data":
+			if err := func() error {
+				s.Data.Reset()
+				if err := s.Data.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"data\"")
+			}
+		case "duration_ms":
+			if err := func() error {
+				s.DurationMs.Reset()
+				if err := s.DurationMs.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"duration_ms\"")
+			}
+		case "message":
+			if err := func() error {
+				s.Message.Reset()
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		case "node":
+			if err := func() error {
+				s.Node.Reset()
+				if err := s.Node.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"node\"")
+			}
+		case "success":
+			if err := func() error {
+				s.Success.Reset()
+				if err := s.Success.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"success\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcSELLogResultsItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcSELLogResultsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcSELLogResultsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcSELLogResultsItemData) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcSELLogResultsItemData) encodeFields(e *jx.Encoder) {
+	{
+		if s.Entries.Set {
+			e.FieldStart("entries")
+			s.Entries.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcSELLogResultsItemData = [1]string{
+	0: "entries",
+}
+
+// Decode decodes BmcResponseModelBmcSELLogResultsItemData from json.
+func (s *BmcResponseModelBmcSELLogResultsItemData) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcSELLogResultsItemData to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "entries":
+			if err := func() error {
+				s.Entries.Reset()
+				if err := s.Entries.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"entries\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcSELLogResultsItemData")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcSELLogResultsItemData) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcSELLogResultsItemData) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Created.Set {
+			e.FieldStart("created")
+			s.Created.Encode(e)
+		}
+	}
+	{
+		if s.EntryType.Set {
+			e.FieldStart("entry_type")
+			s.EntryType.Encode(e)
+		}
+	}
+	{
+		if s.ID.Set {
+			e.FieldStart("id")
+			s.ID.Encode(e)
+		}
+	}
+	{
+		if s.Message.Set {
+			e.FieldStart("message")
+			s.Message.Encode(e)
+		}
+	}
+	{
+		if s.MessageID.Set {
+			e.FieldStart("message_id")
+			s.MessageID.Encode(e)
+		}
+	}
+	{
+		if s.Resolution.Set {
+			e.FieldStart("resolution")
+			s.Resolution.Encode(e)
+		}
+	}
+	{
+		if s.SensorType.Set {
+			e.FieldStart("sensor_type")
+			s.SensorType.Encode(e)
+		}
+	}
+	{
+		if s.Severity.Set {
+			e.FieldStart("severity")
+			s.Severity.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcSELLogResultsItemDataEntriesItem = [8]string{
+	0: "created",
+	1: "entry_type",
+	2: "id",
+	3: "message",
+	4: "message_id",
+	5: "resolution",
+	6: "sensor_type",
+	7: "severity",
+}
+
+// Decode decodes BmcResponseModelBmcSELLogResultsItemDataEntriesItem from json.
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcSELLogResultsItemDataEntriesItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "created":
+			if err := func() error {
+				s.Created.Reset()
+				if err := s.Created.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"created\"")
+			}
+		case "entry_type":
+			if err := func() error {
+				s.EntryType.Reset()
+				if err := s.EntryType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"entry_type\"")
+			}
+		case "id":
+			if err := func() error {
+				s.ID.Reset()
+				if err := s.ID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"id\"")
+			}
+		case "message":
+			if err := func() error {
+				s.Message.Reset()
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		case "message_id":
+			if err := func() error {
+				s.MessageID.Reset()
+				if err := s.MessageID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message_id\"")
+			}
+		case "resolution":
+			if err := func() error {
+				s.Resolution.Reset()
+				if err := s.Resolution.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"resolution\"")
+			}
+		case "sensor_type":
+			if err := func() error {
+				s.SensorType.Reset()
+				if err := s.SensorType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"sensor_type\"")
+			}
+		case "severity":
+			if err := func() error {
+				s.Severity.Reset()
+				if err := s.Severity.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"severity\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcSELLogResultsItemDataEntriesItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelBmcSELLogSummary) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelBmcSELLogSummary) encodeFields(e *jx.Encoder) {
+	{
+		if s.DurationMs.Set {
+			e.FieldStart("duration_ms")
+			s.DurationMs.Encode(e)
+		}
+	}
+	{
+		if s.Failed.Set {
+			e.FieldStart("failed")
+			s.Failed.Encode(e)
+		}
+	}
+	{
+		if s.FailedNodes.Set {
+			e.FieldStart("failed_nodes")
+			s.FailedNodes.Encode(e)
+		}
+	}
+	{
+		if s.Succeeded.Set {
+			e.FieldStart("succeeded")
+			s.Succeeded.Encode(e)
+		}
+	}
+	{
+		if s.Total.Set {
+			e.FieldStart("total")
+			s.Total.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelBmcSELLogSummary = [5]string{
+	0: "duration_ms",
+	1: "failed",
+	2: "failed_nodes",
+	3: "succeeded",
+	4: "total",
+}
+
+// Decode decodes BmcResponseModelBmcSELLogSummary from json.
+func (s *BmcResponseModelBmcSELLogSummary) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelBmcSELLogSummary to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "duration_ms":
+			if err := func() error {
+				s.DurationMs.Reset()
+				if err := s.DurationMs.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"duration_ms\"")
+			}
+		case "failed":
+			if err := func() error {
+				s.Failed.Reset()
+				if err := s.Failed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"failed\"")
+			}
+		case "failed_nodes":
+			if err := func() error {
+				s.FailedNodes.Reset()
+				if err := s.FailedNodes.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"failed_nodes\"")
+			}
+		case "succeeded":
+			if err := func() error {
+				s.Succeeded.Reset()
+				if err := s.Succeeded.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"succeeded\"")
+			}
+		case "total":
+			if err := func() error {
+				s.Total.Reset()
+				if err := s.Total.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"total\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelBmcSELLogSummary")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelBmcSELLogSummary) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelBmcSELLogSummary) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelRedfishSystem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelRedfishSystem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Results.Set {
+			e.FieldStart("results")
+			s.Results.Encode(e)
+		}
+	}
+	{
+		if s.RunID.Set {
+			e.FieldStart("run_id")
+			s.RunID.Encode(e)
+		}
+	}
+	{
+		if s.Summary.Set {
+			e.FieldStart("summary")
+			s.Summary.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelRedfishSystem = [3]string{
+	0: "results",
+	1: "run_id",
+	2: "summary",
+}
+
+// Decode decodes BmcResponseModelRedfishSystem from json.
+func (s *BmcResponseModelRedfishSystem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelRedfishSystem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "results":
+			if err := func() error {
+				s.Results.Reset()
+				if err := s.Results.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"results\"")
+			}
+		case "run_id":
+			if err := func() error {
+				s.RunID.Reset()
+				if err := s.RunID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"run_id\"")
+			}
+		case "summary":
+			if err := func() error {
+				s.Summary.Reset()
+				if err := s.Summary.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"summary\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelRedfishSystem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelRedfishSystem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelRedfishSystem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelRedfishSystemResultsItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelRedfishSystemResultsItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Data.Set {
+			e.FieldStart("data")
+			s.Data.Encode(e)
+		}
+	}
+	{
+		if s.DurationMs.Set {
+			e.FieldStart("duration_ms")
+			s.DurationMs.Encode(e)
+		}
+	}
+	{
+		if s.Message.Set {
+			e.FieldStart("message")
+			s.Message.Encode(e)
+		}
+	}
+	{
+		if s.Node.Set {
+			e.FieldStart("node")
+			s.Node.Encode(e)
+		}
+	}
+	{
+		if s.Success.Set {
+			e.FieldStart("success")
+			s.Success.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelRedfishSystemResultsItem = [5]string{
+	0: "data",
+	1: "duration_ms",
+	2: "message",
+	3: "node",
+	4: "success",
+}
+
+// Decode decodes BmcResponseModelRedfishSystemResultsItem from json.
+func (s *BmcResponseModelRedfishSystemResultsItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelRedfishSystemResultsItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "data":
+			if err := func() error {
+				s.Data.Reset()
+				if err := s.Data.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"data\"")
+			}
+		case "duration_ms":
+			if err := func() error {
+				s.DurationMs.Reset()
+				if err := s.DurationMs.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"duration_ms\"")
+			}
+		case "message":
+			if err := func() error {
+				s.Message.Reset()
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"message\"")
+			}
+		case "node":
+			if err := func() error {
+				s.Node.Reset()
+				if err := s.Node.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"node\"")
+			}
+		case "success":
+			if err := func() error {
+				s.Success.Reset()
+				if err := s.Success.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"success\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelRedfishSystemResultsItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelRedfishSystemResultsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelRedfishSystemResultsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelRedfishSystemResultsItemData) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelRedfishSystemResultsItemData) encodeFields(e *jx.Encoder) {
+	{
+		if s.BiosVersion.Set {
+			e.FieldStart("bios_version")
+			s.BiosVersion.Encode(e)
+		}
+	}
+	{
+		if s.BootMode.Set {
+			e.FieldStart("boot_mode")
+			s.BootMode.Encode(e)
+		}
+	}
+	{
+		if s.BootNext.Set {
+			e.FieldStart("boot_next")
+			s.BootNext.Encode(e)
+		}
+	}
+	{
+		if s.BootOrder.Set {
+			e.FieldStart("boot_order")
+			s.BootOrder.Encode(e)
+		}
+	}
+	{
+		if s.BootOverrideEnabled.Set {
+			e.FieldStart("boot_override_enabled")
+			s.BootOverrideEnabled.Encode(e)
+		}
+	}
+	{
+		if s.BootOverrideTarget.Set {
+			e.FieldStart("boot_override_target")
+			s.BootOverrideTarget.Encode(e)
+		}
+	}
+	{
+		if s.BootProgress.Set {
+			e.FieldStart("boot_progress")
+			s.BootProgress.Encode(e)
+		}
+	}
+	{
+		if s.BootProgressTime.Set {
+			e.FieldStart("boot_progress_time")
+			s.BootProgressTime.Encode(e)
+		}
+	}
+	{
+		if s.Health.Set {
+			e.FieldStart("health")
+			s.Health.Encode(e)
+		}
+	}
+	{
+		if s.HostName.Set {
+			e.FieldStart("host_name")
+			s.HostName.Encode(e)
+		}
+	}
+	{
+		if s.Manufacturer.Set {
+			e.FieldStart("manufacturer")
+			s.Manufacturer.Encode(e)
+		}
+	}
+	{
+		if s.Model.Set {
+			e.FieldStart("model")
+			s.Model.Encode(e)
+		}
+	}
+	{
+		if s.Name.Set {
+			e.FieldStart("name")
+			s.Name.Encode(e)
+		}
+	}
+	{
+		if s.OemDell.Set {
+			e.FieldStart("oem_dell")
+			s.OemDell.Encode(e)
+		}
+	}
+	{
+		if s.PowerStatus.Set {
+			e.FieldStart("power_status")
+			s.PowerStatus.Encode(e)
+		}
+	}
+	{
+		if s.ProcessorCores.Set {
+			e.FieldStart("processor_cores")
+			s.ProcessorCores.Encode(e)
+		}
+	}
+	{
+		if s.ProcessorCount.Set {
+			e.FieldStart("processor_count")
+			s.ProcessorCount.Encode(e)
+		}
+	}
+	{
+		if s.ProcessorModel.Set {
+			e.FieldStart("processor_model")
+			s.ProcessorModel.Encode(e)
+		}
+	}
+	{
+		if s.ProcessorSockets.Set {
+			e.FieldStart("processor_sockets")
+			s.ProcessorSockets.Encode(e)
+		}
+	}
+	{
+		if s.SerialNumber.Set {
+			e.FieldStart("serial_number")
+			s.SerialNumber.Encode(e)
+		}
+	}
+	{
+		if s.TotalMemory.Set {
+			e.FieldStart("total_memory")
+			s.TotalMemory.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelRedfishSystemResultsItemData = [21]string{
+	0:  "bios_version",
+	1:  "boot_mode",
+	2:  "boot_next",
+	3:  "boot_order",
+	4:  "boot_override_enabled",
+	5:  "boot_override_target",
+	6:  "boot_progress",
+	7:  "boot_progress_time",
+	8:  "health",
+	9:  "host_name",
+	10: "manufacturer",
+	11: "model",
+	12: "name",
+	13: "oem_dell",
+	14: "power_status",
+	15: "processor_cores",
+	16: "processor_count",
+	17: "processor_model",
+	18: "processor_sockets",
+	19: "serial_number",
+	20: "total_memory",
+}
+
+// Decode decodes BmcResponseModelRedfishSystemResultsItemData from json.
+func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelRedfishSystemResultsItemData to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "bios_version":
+			if err := func() error {
+				s.BiosVersion.Reset()
+				if err := s.BiosVersion.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"bios_version\"")
+			}
+		case "boot_mode":
+			if err := func() error {
+				s.BootMode.Reset()
+				if err := s.BootMode.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"boot_mode\"")
+			}
+		case "boot_next":
+			if err := func() error {
+				s.BootNext.Reset()
+				if err := s.BootNext.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"boot_next\"")
+			}
+		case "boot_order":
+			if err := func() error {
+				s.BootOrder.Reset()
+				if err := s.BootOrder.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"boot_order\"")
+			}
+		case "boot_override_enabled":
+			if err := func() error {
+				s.BootOverrideEnabled.Reset()
+				if err := s.BootOverrideEnabled.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"boot_override_enabled\"")
+			}
+		case "boot_override_target":
+			if err := func() error {
+				s.BootOverrideTarget.Reset()
+				if err := s.BootOverrideTarget.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"boot_override_target\"")
+			}
+		case "boot_progress":
+			if err := func() error {
+				s.BootProgress.Reset()
+				if err := s.BootProgress.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"boot_progress\"")
+			}
+		case "boot_progress_time":
+			if err := func() error {
+				s.BootProgressTime.Reset()
+				if err := s.BootProgressTime.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"boot_progress_time\"")
+			}
+		case "health":
+			if err := func() error {
+				s.Health.Reset()
+				if err := s.Health.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"health\"")
+			}
+		case "host_name":
+			if err := func() error {
+				s.HostName.Reset()
+				if err := s.HostName.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"host_name\"")
+			}
+		case "manufacturer":
+			if err := func() error {
+				s.Manufacturer.Reset()
+				if err := s.Manufacturer.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"manufacturer\"")
+			}
+		case "model":
+			if err := func() error {
+				s.Model.Reset()
+				if err := s.Model.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"model\"")
+			}
+		case "name":
+			if err := func() error {
+				s.Name.Reset()
+				if err := s.Name.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"name\"")
+			}
+		case "oem_dell":
+			if err := func() error {
+				s.OemDell.Reset()
+				if err := s.OemDell.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"oem_dell\"")
+			}
+		case "power_status":
+			if err := func() error {
+				s.PowerStatus.Reset()
+				if err := s.PowerStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"power_status\"")
+			}
+		case "processor_cores":
+			if err := func() error {
+				s.ProcessorCores.Reset()
+				if err := s.ProcessorCores.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"processor_cores\"")
+			}
+		case "processor_count":
+			if err := func() error {
+				s.ProcessorCount.Reset()
+				if err := s.ProcessorCount.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"processor_count\"")
+			}
+		case "processor_model":
+			if err := func() error {
+				s.ProcessorModel.Reset()
+				if err := s.ProcessorModel.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"processor_model\"")
+			}
+		case "processor_sockets":
+			if err := func() error {
+				s.ProcessorSockets.Reset()
+				if err := s.ProcessorSockets.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"processor_sockets\"")
+			}
+		case "serial_number":
+			if err := func() error {
+				s.SerialNumber.Reset()
+				if err := s.SerialNumber.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"serial_number\"")
+			}
+		case "total_memory":
+			if err := func() error {
+				s.TotalMemory.Reset()
+				if err := s.TotalMemory.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"total_memory\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelRedfishSystemResultsItemData")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelRedfishSystemResultsItemData) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelRedfishSystemResultsItemData) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDell) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDell) encodeFields(e *jx.Encoder) {
+	{
+		if s.MessageDotExtendedInfo != nil {
+			e.FieldStart("@Message.ExtendedInfo")
+			e.ArrStart()
+			for _, elem := range s.MessageDotExtendedInfo {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.OdataDotContext.Set {
+			e.FieldStart("@odata.context")
+			s.OdataDotContext.Encode(e)
+		}
+	}
+	{
+		if s.OdataDotEtag.Set {
+			e.FieldStart("@odata.etag")
+			s.OdataDotEtag.Encode(e)
+		}
+	}
+	{
+		if s.OdataDotID.Set {
+			e.FieldStart("@odata.id")
+			s.OdataDotID.Encode(e)
+		}
+	}
+	{
+		if s.OdataDotType.Set {
+			e.FieldStart("@odata.type")
+			s.OdataDotType.Encode(e)
+		}
+	}
+	{
+		if s.BIOSReleaseDate.Set {
+			e.FieldStart("BIOSReleaseDate")
+			s.BIOSReleaseDate.Encode(e)
+		}
+	}
+	{
+		if s.BaseBoardChassisSlot.Set {
+			e.FieldStart("BaseBoardChassisSlot")
+			s.BaseBoardChassisSlot.Encode(e)
+		}
+	}
+	{
+		if s.BatteryRollupStatus.Set {
+			e.FieldStart("BatteryRollupStatus")
+			s.BatteryRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.BladeGeometry.Set {
+			e.FieldStart("BladeGeometry")
+			s.BladeGeometry.Encode(e)
+		}
+	}
+	{
+		if s.CMCIP.Set {
+			e.FieldStart("CMCIP")
+			s.CMCIP.Encode(e)
+		}
+	}
+	{
+		if s.CPURollupStatus.Set {
+			e.FieldStart("CPURollupStatus")
+			s.CPURollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.ChassisModel.Set {
+			e.FieldStart("ChassisModel")
+			s.ChassisModel.Encode(e)
+		}
+	}
+	{
+		if s.ChassisName.Set {
+			e.FieldStart("ChassisName")
+			s.ChassisName.Encode(e)
+		}
+	}
+	{
+		if s.ChassisServiceTag.Set {
+			e.FieldStart("ChassisServiceTag")
+			s.ChassisServiceTag.Encode(e)
+		}
+	}
+	{
+		if s.ChassisSystemHeightUnit.Set {
+			e.FieldStart("ChassisSystemHeightUnit")
+			s.ChassisSystemHeightUnit.Encode(e)
+		}
+	}
+	{
+		if s.CurrentRollupStatus.Set {
+			e.FieldStart("CurrentRollupStatus")
+			s.CurrentRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.Description.Set {
+			e.FieldStart("Description")
+			s.Description.Encode(e)
+		}
+	}
+	{
+		if s.EstimatedExhaustTemperatureCelsius.Set {
+			e.FieldStart("EstimatedExhaustTemperatureCelsius")
+			s.EstimatedExhaustTemperatureCelsius.Encode(e)
+		}
+	}
+	{
+		if s.EstimatedSystemAirflowCFM.Set {
+			e.FieldStart("EstimatedSystemAirflowCFM")
+			s.EstimatedSystemAirflowCFM.Encode(e)
+		}
+	}
+	{
+		if s.ExpressServiceCode.Set {
+			e.FieldStart("ExpressServiceCode")
+			s.ExpressServiceCode.Encode(e)
+		}
+	}
+	{
+		if s.FanRollupStatus.Set {
+			e.FieldStart("FanRollupStatus")
+			s.FanRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.IDSDMRollupStatus.Set {
+			e.FieldStart("IDSDMRollupStatus")
+			s.IDSDMRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.ID.Set {
+			e.FieldStart("Id")
+			s.ID.Encode(e)
+		}
+	}
+	{
+		if s.IntrusionRollupStatus.Set {
+			e.FieldStart("IntrusionRollupStatus")
+			s.IntrusionRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.IsOEMBranded.Set {
+			e.FieldStart("IsOEMBranded")
+			s.IsOEMBranded.Encode(e)
+		}
+	}
+	{
+		if s.LastSystemInventoryTime.Set {
+			e.FieldStart("LastSystemInventoryTime")
+			s.LastSystemInventoryTime.Encode(e)
+		}
+	}
+	{
+		if s.LastUpdateTime.Set {
+			e.FieldStart("LastUpdateTime")
+			s.LastUpdateTime.Encode(e)
+		}
+	}
+	{
+		if s.LicensingRollupStatus.Set {
+			e.FieldStart("LicensingRollupStatus")
+			s.LicensingRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.ManagedSystemSize.Set {
+			e.FieldStart("ManagedSystemSize")
+			s.ManagedSystemSize.Encode(e)
+		}
+	}
+	{
+		if s.MaxCPUSockets.Set {
+			e.FieldStart("MaxCPUSockets")
+			s.MaxCPUSockets.Encode(e)
+		}
+	}
+	{
+		if s.MaxDIMMSlots.Set {
+			e.FieldStart("MaxDIMMSlots")
+			s.MaxDIMMSlots.Encode(e)
+		}
+	}
+	{
+		if s.MaxPCIeSlots.Set {
+			e.FieldStart("MaxPCIeSlots")
+			s.MaxPCIeSlots.Encode(e)
+		}
+	}
+	{
+		if s.MemoryOperationMode.Set {
+			e.FieldStart("MemoryOperationMode")
+			s.MemoryOperationMode.Encode(e)
+		}
+	}
+	{
+		if s.Name.Set {
+			e.FieldStart("Name")
+			s.Name.Encode(e)
+		}
+	}
+	{
+		if s.NodeID.Set {
+			e.FieldStart("NodeID")
+			s.NodeID.Encode(e)
+		}
+	}
+	{
+		if len(s.Oem) != 0 {
+			e.FieldStart("Oem")
+			e.Raw(s.Oem)
+		}
+	}
+	{
+		if s.PSRollupStatus.Set {
+			e.FieldStart("PSRollupStatus")
+			s.PSRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.PlatformGUID.Set {
+			e.FieldStart("PlatformGUID")
+			s.PlatformGUID.Encode(e)
+		}
+	}
+	{
+		if s.PopulatedDIMMSlots.Set {
+			e.FieldStart("PopulatedDIMMSlots")
+			s.PopulatedDIMMSlots.Encode(e)
+		}
+	}
+	{
+		if s.PopulatedPCIeSlots.Set {
+			e.FieldStart("PopulatedPCIeSlots")
+			s.PopulatedPCIeSlots.Encode(e)
+		}
+	}
+	{
+		if s.PowerCapEnabledState.Set {
+			e.FieldStart("PowerCapEnabledState")
+			s.PowerCapEnabledState.Encode(e)
+		}
+	}
+	{
+		if s.SDCardRollupStatus.Set {
+			e.FieldStart("SDCardRollupStatus")
+			s.SDCardRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.SELRollupStatus.Set {
+			e.FieldStart("SELRollupStatus")
+			s.SELRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.ServerAllocationWatts.Set {
+			e.FieldStart("ServerAllocationWatts")
+			s.ServerAllocationWatts.Encode(e)
+		}
+	}
+	{
+		if s.StorageRollupStatus.Set {
+			e.FieldStart("StorageRollupStatus")
+			s.StorageRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.SysMemErrorMethodology.Set {
+			e.FieldStart("SysMemErrorMethodology")
+			s.SysMemErrorMethodology.Encode(e)
+		}
+	}
+	{
+		if s.SysMemFailOverState.Set {
+			e.FieldStart("SysMemFailOverState")
+			s.SysMemFailOverState.Encode(e)
+		}
+	}
+	{
+		if s.SysMemLocation.Set {
+			e.FieldStart("SysMemLocation")
+			s.SysMemLocation.Encode(e)
+		}
+	}
+	{
+		if s.SysMemPrimaryStatus.Set {
+			e.FieldStart("SysMemPrimaryStatus")
+			s.SysMemPrimaryStatus.Encode(e)
+		}
+	}
+	{
+		if s.SystemGeneration.Set {
+			e.FieldStart("SystemGeneration")
+			s.SystemGeneration.Encode(e)
+		}
+	}
+	{
+		if s.SystemID.Set {
+			e.FieldStart("SystemID")
+			s.SystemID.Encode(e)
+		}
+	}
+	{
+		if s.SystemRevision.Set {
+			e.FieldStart("SystemRevision")
+			s.SystemRevision.Encode(e)
+		}
+	}
+	{
+		if s.TempRollupStatus.Set {
+			e.FieldStart("TempRollupStatus")
+			s.TempRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.TempStatisticsRollupStatus.Set {
+			e.FieldStart("TempStatisticsRollupStatus")
+			s.TempStatisticsRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.UUID.Set {
+			e.FieldStart("UUID")
+			s.UUID.Encode(e)
+		}
+	}
+	{
+		if s.VoltRollupStatus.Set {
+			e.FieldStart("VoltRollupStatus")
+			s.VoltRollupStatus.Encode(e)
+		}
+	}
+	{
+		if s.SmbiosGUID.Set {
+			e.FieldStart("smbiosGUID")
+			s.SmbiosGUID.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelRedfishSystemResultsItemDataOemDell = [57]string{
+	0:  "@Message.ExtendedInfo",
+	1:  "@odata.context",
+	2:  "@odata.etag",
+	3:  "@odata.id",
+	4:  "@odata.type",
+	5:  "BIOSReleaseDate",
+	6:  "BaseBoardChassisSlot",
+	7:  "BatteryRollupStatus",
+	8:  "BladeGeometry",
+	9:  "CMCIP",
+	10: "CPURollupStatus",
+	11: "ChassisModel",
+	12: "ChassisName",
+	13: "ChassisServiceTag",
+	14: "ChassisSystemHeightUnit",
+	15: "CurrentRollupStatus",
+	16: "Description",
+	17: "EstimatedExhaustTemperatureCelsius",
+	18: "EstimatedSystemAirflowCFM",
+	19: "ExpressServiceCode",
+	20: "FanRollupStatus",
+	21: "IDSDMRollupStatus",
+	22: "Id",
+	23: "IntrusionRollupStatus",
+	24: "IsOEMBranded",
+	25: "LastSystemInventoryTime",
+	26: "LastUpdateTime",
+	27: "LicensingRollupStatus",
+	28: "ManagedSystemSize",
+	29: "MaxCPUSockets",
+	30: "MaxDIMMSlots",
+	31: "MaxPCIeSlots",
+	32: "MemoryOperationMode",
+	33: "Name",
+	34: "NodeID",
+	35: "Oem",
+	36: "PSRollupStatus",
+	37: "PlatformGUID",
+	38: "PopulatedDIMMSlots",
+	39: "PopulatedPCIeSlots",
+	40: "PowerCapEnabledState",
+	41: "SDCardRollupStatus",
+	42: "SELRollupStatus",
+	43: "ServerAllocationWatts",
+	44: "StorageRollupStatus",
+	45: "SysMemErrorMethodology",
+	46: "SysMemFailOverState",
+	47: "SysMemLocation",
+	48: "SysMemPrimaryStatus",
+	49: "SystemGeneration",
+	50: "SystemID",
+	51: "SystemRevision",
+	52: "TempRollupStatus",
+	53: "TempStatisticsRollupStatus",
+	54: "UUID",
+	55: "VoltRollupStatus",
+	56: "smbiosGUID",
+}
+
+// Decode decodes BmcResponseModelRedfishSystemResultsItemDataOemDell from json.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDell) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelRedfishSystemResultsItemDataOemDell to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "@Message.ExtendedInfo":
+			if err := func() error {
+				s.MessageDotExtendedInfo = make([]BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.MessageDotExtendedInfo = append(s.MessageDotExtendedInfo, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"@Message.ExtendedInfo\"")
+			}
+		case "@odata.context":
+			if err := func() error {
+				s.OdataDotContext.Reset()
+				if err := s.OdataDotContext.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"@odata.context\"")
+			}
+		case "@odata.etag":
+			if err := func() error {
+				s.OdataDotEtag.Reset()
+				if err := s.OdataDotEtag.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"@odata.etag\"")
+			}
+		case "@odata.id":
+			if err := func() error {
+				s.OdataDotID.Reset()
+				if err := s.OdataDotID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"@odata.id\"")
+			}
+		case "@odata.type":
+			if err := func() error {
+				s.OdataDotType.Reset()
+				if err := s.OdataDotType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"@odata.type\"")
+			}
+		case "BIOSReleaseDate":
+			if err := func() error {
+				s.BIOSReleaseDate.Reset()
+				if err := s.BIOSReleaseDate.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"BIOSReleaseDate\"")
+			}
+		case "BaseBoardChassisSlot":
+			if err := func() error {
+				s.BaseBoardChassisSlot.Reset()
+				if err := s.BaseBoardChassisSlot.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"BaseBoardChassisSlot\"")
+			}
+		case "BatteryRollupStatus":
+			if err := func() error {
+				s.BatteryRollupStatus.Reset()
+				if err := s.BatteryRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"BatteryRollupStatus\"")
+			}
+		case "BladeGeometry":
+			if err := func() error {
+				s.BladeGeometry.Reset()
+				if err := s.BladeGeometry.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"BladeGeometry\"")
+			}
+		case "CMCIP":
+			if err := func() error {
+				s.CMCIP.Reset()
+				if err := s.CMCIP.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"CMCIP\"")
+			}
+		case "CPURollupStatus":
+			if err := func() error {
+				s.CPURollupStatus.Reset()
+				if err := s.CPURollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"CPURollupStatus\"")
+			}
+		case "ChassisModel":
+			if err := func() error {
+				s.ChassisModel.Reset()
+				if err := s.ChassisModel.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ChassisModel\"")
+			}
+		case "ChassisName":
+			if err := func() error {
+				s.ChassisName.Reset()
+				if err := s.ChassisName.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ChassisName\"")
+			}
+		case "ChassisServiceTag":
+			if err := func() error {
+				s.ChassisServiceTag.Reset()
+				if err := s.ChassisServiceTag.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ChassisServiceTag\"")
+			}
+		case "ChassisSystemHeightUnit":
+			if err := func() error {
+				s.ChassisSystemHeightUnit.Reset()
+				if err := s.ChassisSystemHeightUnit.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ChassisSystemHeightUnit\"")
+			}
+		case "CurrentRollupStatus":
+			if err := func() error {
+				s.CurrentRollupStatus.Reset()
+				if err := s.CurrentRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"CurrentRollupStatus\"")
+			}
+		case "Description":
+			if err := func() error {
+				s.Description.Reset()
+				if err := s.Description.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Description\"")
+			}
+		case "EstimatedExhaustTemperatureCelsius":
+			if err := func() error {
+				s.EstimatedExhaustTemperatureCelsius.Reset()
+				if err := s.EstimatedExhaustTemperatureCelsius.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"EstimatedExhaustTemperatureCelsius\"")
+			}
+		case "EstimatedSystemAirflowCFM":
+			if err := func() error {
+				s.EstimatedSystemAirflowCFM.Reset()
+				if err := s.EstimatedSystemAirflowCFM.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"EstimatedSystemAirflowCFM\"")
+			}
+		case "ExpressServiceCode":
+			if err := func() error {
+				s.ExpressServiceCode.Reset()
+				if err := s.ExpressServiceCode.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ExpressServiceCode\"")
+			}
+		case "FanRollupStatus":
+			if err := func() error {
+				s.FanRollupStatus.Reset()
+				if err := s.FanRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"FanRollupStatus\"")
+			}
+		case "IDSDMRollupStatus":
+			if err := func() error {
+				s.IDSDMRollupStatus.Reset()
+				if err := s.IDSDMRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"IDSDMRollupStatus\"")
+			}
+		case "Id":
+			if err := func() error {
+				s.ID.Reset()
+				if err := s.ID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Id\"")
+			}
+		case "IntrusionRollupStatus":
+			if err := func() error {
+				s.IntrusionRollupStatus.Reset()
+				if err := s.IntrusionRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"IntrusionRollupStatus\"")
+			}
+		case "IsOEMBranded":
+			if err := func() error {
+				s.IsOEMBranded.Reset()
+				if err := s.IsOEMBranded.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"IsOEMBranded\"")
+			}
+		case "LastSystemInventoryTime":
+			if err := func() error {
+				s.LastSystemInventoryTime.Reset()
+				if err := s.LastSystemInventoryTime.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"LastSystemInventoryTime\"")
+			}
+		case "LastUpdateTime":
+			if err := func() error {
+				s.LastUpdateTime.Reset()
+				if err := s.LastUpdateTime.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"LastUpdateTime\"")
+			}
+		case "LicensingRollupStatus":
+			if err := func() error {
+				s.LicensingRollupStatus.Reset()
+				if err := s.LicensingRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"LicensingRollupStatus\"")
+			}
+		case "ManagedSystemSize":
+			if err := func() error {
+				s.ManagedSystemSize.Reset()
+				if err := s.ManagedSystemSize.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ManagedSystemSize\"")
+			}
+		case "MaxCPUSockets":
+			if err := func() error {
+				s.MaxCPUSockets.Reset()
+				if err := s.MaxCPUSockets.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"MaxCPUSockets\"")
+			}
+		case "MaxDIMMSlots":
+			if err := func() error {
+				s.MaxDIMMSlots.Reset()
+				if err := s.MaxDIMMSlots.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"MaxDIMMSlots\"")
+			}
+		case "MaxPCIeSlots":
+			if err := func() error {
+				s.MaxPCIeSlots.Reset()
+				if err := s.MaxPCIeSlots.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"MaxPCIeSlots\"")
+			}
+		case "MemoryOperationMode":
+			if err := func() error {
+				s.MemoryOperationMode.Reset()
+				if err := s.MemoryOperationMode.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"MemoryOperationMode\"")
+			}
+		case "Name":
+			if err := func() error {
+				s.Name.Reset()
+				if err := s.Name.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Name\"")
+			}
+		case "NodeID":
+			if err := func() error {
+				s.NodeID.Reset()
+				if err := s.NodeID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"NodeID\"")
+			}
+		case "Oem":
+			if err := func() error {
+				v, err := d.RawAppend(nil)
+				s.Oem = jx.Raw(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Oem\"")
+			}
+		case "PSRollupStatus":
+			if err := func() error {
+				s.PSRollupStatus.Reset()
+				if err := s.PSRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"PSRollupStatus\"")
+			}
+		case "PlatformGUID":
+			if err := func() error {
+				s.PlatformGUID.Reset()
+				if err := s.PlatformGUID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"PlatformGUID\"")
+			}
+		case "PopulatedDIMMSlots":
+			if err := func() error {
+				s.PopulatedDIMMSlots.Reset()
+				if err := s.PopulatedDIMMSlots.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"PopulatedDIMMSlots\"")
+			}
+		case "PopulatedPCIeSlots":
+			if err := func() error {
+				s.PopulatedPCIeSlots.Reset()
+				if err := s.PopulatedPCIeSlots.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"PopulatedPCIeSlots\"")
+			}
+		case "PowerCapEnabledState":
+			if err := func() error {
+				s.PowerCapEnabledState.Reset()
+				if err := s.PowerCapEnabledState.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"PowerCapEnabledState\"")
+			}
+		case "SDCardRollupStatus":
+			if err := func() error {
+				s.SDCardRollupStatus.Reset()
+				if err := s.SDCardRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"SDCardRollupStatus\"")
+			}
+		case "SELRollupStatus":
+			if err := func() error {
+				s.SELRollupStatus.Reset()
+				if err := s.SELRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"SELRollupStatus\"")
+			}
+		case "ServerAllocationWatts":
+			if err := func() error {
+				s.ServerAllocationWatts.Reset()
+				if err := s.ServerAllocationWatts.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ServerAllocationWatts\"")
+			}
+		case "StorageRollupStatus":
+			if err := func() error {
+				s.StorageRollupStatus.Reset()
+				if err := s.StorageRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"StorageRollupStatus\"")
+			}
+		case "SysMemErrorMethodology":
+			if err := func() error {
+				s.SysMemErrorMethodology.Reset()
+				if err := s.SysMemErrorMethodology.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"SysMemErrorMethodology\"")
+			}
+		case "SysMemFailOverState":
+			if err := func() error {
+				s.SysMemFailOverState.Reset()
+				if err := s.SysMemFailOverState.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"SysMemFailOverState\"")
+			}
+		case "SysMemLocation":
+			if err := func() error {
+				s.SysMemLocation.Reset()
+				if err := s.SysMemLocation.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"SysMemLocation\"")
+			}
+		case "SysMemPrimaryStatus":
+			if err := func() error {
+				s.SysMemPrimaryStatus.Reset()
+				if err := s.SysMemPrimaryStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"SysMemPrimaryStatus\"")
+			}
+		case "SystemGeneration":
+			if err := func() error {
+				s.SystemGeneration.Reset()
+				if err := s.SystemGeneration.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"SystemGeneration\"")
+			}
+		case "SystemID":
+			if err := func() error {
+				s.SystemID.Reset()
+				if err := s.SystemID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"SystemID\"")
+			}
+		case "SystemRevision":
+			if err := func() error {
+				s.SystemRevision.Reset()
+				if err := s.SystemRevision.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"SystemRevision\"")
+			}
+		case "TempRollupStatus":
+			if err := func() error {
+				s.TempRollupStatus.Reset()
+				if err := s.TempRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"TempRollupStatus\"")
+			}
+		case "TempStatisticsRollupStatus":
+			if err := func() error {
+				s.TempStatisticsRollupStatus.Reset()
+				if err := s.TempStatisticsRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"TempStatisticsRollupStatus\"")
+			}
+		case "UUID":
+			if err := func() error {
+				s.UUID.Reset()
+				if err := s.UUID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"UUID\"")
+			}
+		case "VoltRollupStatus":
+			if err := func() error {
+				s.VoltRollupStatus.Reset()
+				if err := s.VoltRollupStatus.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"VoltRollupStatus\"")
+			}
+		case "smbiosGUID":
+			if err := func() error {
+				s.SmbiosGUID.Reset()
+				if err := s.SmbiosGUID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"smbiosGUID\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelRedfishSystemResultsItemDataOemDell")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDell) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDell) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Message.Set {
+			e.FieldStart("Message")
+			s.Message.Encode(e)
+		}
+	}
+	{
+		if s.MessageArgs.Set {
+			e.FieldStart("MessageArgs")
+			s.MessageArgs.Encode(e)
+		}
+	}
+	{
+		if s.MessageId.Set {
+			e.FieldStart("MessageId")
+			s.MessageId.Encode(e)
+		}
+	}
+	{
+		if s.MessageSeverity.Set {
+			e.FieldStart("MessageSeverity")
+			s.MessageSeverity.Encode(e)
+		}
+	}
+	{
+		if len(s.Oem) != 0 {
+			e.FieldStart("Oem")
+			e.Raw(s.Oem)
+		}
+	}
+	{
+		if s.RelatedProperties.Set {
+			e.FieldStart("RelatedProperties")
+			s.RelatedProperties.Encode(e)
+		}
+	}
+	{
+		if s.Resolution.Set {
+			e.FieldStart("Resolution")
+			s.Resolution.Encode(e)
+		}
+	}
+	{
+		if s.ResolutionSteps.Set {
+			e.FieldStart("ResolutionSteps")
+			s.ResolutionSteps.Encode(e)
+		}
+	}
+	{
+		if s.Severity.Set {
+			e.FieldStart("Severity")
+			s.Severity.Encode(e)
+		}
+	}
+	{
+		if s.UserAuthenticationSource.Set {
+			e.FieldStart("UserAuthenticationSource")
+			s.UserAuthenticationSource.Encode(e)
+		}
+	}
+	{
+		if s.Username.Set {
+			e.FieldStart("Username")
+			s.Username.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem = [11]string{
+	0:  "Message",
+	1:  "MessageArgs",
+	2:  "MessageId",
+	3:  "MessageSeverity",
+	4:  "Oem",
+	5:  "RelatedProperties",
+	6:  "Resolution",
+	7:  "ResolutionSteps",
+	8:  "Severity",
+	9:  "UserAuthenticationSource",
+	10: "Username",
+}
+
+// Decode decodes BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem from json.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "Message":
+			if err := func() error {
+				s.Message.Reset()
+				if err := s.Message.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Message\"")
+			}
+		case "MessageArgs":
+			if err := func() error {
+				s.MessageArgs.Reset()
+				if err := s.MessageArgs.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"MessageArgs\"")
+			}
+		case "MessageId":
+			if err := func() error {
+				s.MessageId.Reset()
+				if err := s.MessageId.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"MessageId\"")
+			}
+		case "MessageSeverity":
+			if err := func() error {
+				s.MessageSeverity.Reset()
+				if err := s.MessageSeverity.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"MessageSeverity\"")
+			}
+		case "Oem":
+			if err := func() error {
+				v, err := d.RawAppend(nil)
+				s.Oem = jx.Raw(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Oem\"")
+			}
+		case "RelatedProperties":
+			if err := func() error {
+				s.RelatedProperties.Reset()
+				if err := s.RelatedProperties.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"RelatedProperties\"")
+			}
+		case "Resolution":
+			if err := func() error {
+				s.Resolution.Reset()
+				if err := s.Resolution.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Resolution\"")
+			}
+		case "ResolutionSteps":
+			if err := func() error {
+				s.ResolutionSteps.Reset()
+				if err := s.ResolutionSteps.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ResolutionSteps\"")
+			}
+		case "Severity":
+			if err := func() error {
+				s.Severity.Reset()
+				if err := s.Severity.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Severity\"")
+			}
+		case "UserAuthenticationSource":
+			if err := func() error {
+				s.UserAuthenticationSource.Reset()
+				if err := s.UserAuthenticationSource.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"UserAuthenticationSource\"")
+			}
+		case "Username":
+			if err := func() error {
+				s.Username.Reset()
+				if err := s.Username.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Username\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.ActionParameters.Set {
+			e.FieldStart("ActionParameters")
+			s.ActionParameters.Encode(e)
+		}
+	}
+	{
+		if s.ActionURI.Set {
+			e.FieldStart("ActionURI")
+			s.ActionURI.Encode(e)
+		}
+	}
+	{
+		if len(s.Oem) != 0 {
+			e.FieldStart("Oem")
+			e.Raw(s.Oem)
+		}
+	}
+	{
+		if s.Priority.Set {
+			e.FieldStart("Priority")
+			s.Priority.Encode(e)
+		}
+	}
+	{
+		if s.ResolutionType.Set {
+			e.FieldStart("ResolutionType")
+			s.ResolutionType.Encode(e)
+		}
+	}
+	{
+		if s.RetryCount.Set {
+			e.FieldStart("RetryCount")
+			s.RetryCount.Encode(e)
+		}
+	}
+	{
+		if s.RetryIntervalSeconds.Set {
+			e.FieldStart("RetryIntervalSeconds")
+			s.RetryIntervalSeconds.Encode(e)
+		}
+	}
+	{
+		if s.TargetComponentURI.Set {
+			e.FieldStart("TargetComponentURI")
+			s.TargetComponentURI.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem = [8]string{
+	0: "ActionParameters",
+	1: "ActionURI",
+	2: "Oem",
+	3: "Priority",
+	4: "ResolutionType",
+	5: "RetryCount",
+	6: "RetryIntervalSeconds",
+	7: "TargetComponentURI",
+}
+
+// Decode decodes BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem from json.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "ActionParameters":
+			if err := func() error {
+				s.ActionParameters.Reset()
+				if err := s.ActionParameters.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ActionParameters\"")
+			}
+		case "ActionURI":
+			if err := func() error {
+				s.ActionURI.Reset()
+				if err := s.ActionURI.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ActionURI\"")
+			}
+		case "Oem":
+			if err := func() error {
+				v, err := d.RawAppend(nil)
+				s.Oem = jx.Raw(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Oem\"")
+			}
+		case "Priority":
+			if err := func() error {
+				s.Priority.Reset()
+				if err := s.Priority.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Priority\"")
+			}
+		case "ResolutionType":
+			if err := func() error {
+				s.ResolutionType.Reset()
+				if err := s.ResolutionType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ResolutionType\"")
+			}
+		case "RetryCount":
+			if err := func() error {
+				s.RetryCount.Reset()
+				if err := s.RetryCount.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"RetryCount\"")
+			}
+		case "RetryIntervalSeconds":
+			if err := func() error {
+				s.RetryIntervalSeconds.Reset()
+				if err := s.RetryIntervalSeconds.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"RetryIntervalSeconds\"")
+			}
+		case "TargetComponentURI":
+			if err := func() error {
+				s.TargetComponentURI.Reset()
+				if err := s.TargetComponentURI.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"TargetComponentURI\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.AllowableNumbers.Set {
+			e.FieldStart("AllowableNumbers")
+			s.AllowableNumbers.Encode(e)
+		}
+	}
+	{
+		if s.AllowablePattern.Set {
+			e.FieldStart("AllowablePattern")
+			s.AllowablePattern.Encode(e)
+		}
+	}
+	{
+		if s.AllowableValueDescriptions.Set {
+			e.FieldStart("AllowableValueDescriptions")
+			s.AllowableValueDescriptions.Encode(e)
+		}
+	}
+	{
+		if s.AllowableValues.Set {
+			e.FieldStart("AllowableValues")
+			s.AllowableValues.Encode(e)
+		}
+	}
+	{
+		if s.ArraySizeMaximum.Set {
+			e.FieldStart("ArraySizeMaximum")
+			s.ArraySizeMaximum.Encode(e)
+		}
+	}
+	{
+		if s.ArraySizeMinimum.Set {
+			e.FieldStart("ArraySizeMinimum")
+			s.ArraySizeMinimum.Encode(e)
+		}
+	}
+	{
+		if s.DataType.Set {
+			e.FieldStart("DataType")
+			s.DataType.Encode(e)
+		}
+	}
+	{
+		if s.DefaultValue.Set {
+			e.FieldStart("DefaultValue")
+			s.DefaultValue.Encode(e)
+		}
+	}
+	{
+		if s.MaximumValue.Set {
+			e.FieldStart("MaximumValue")
+			s.MaximumValue.Encode(e)
+		}
+	}
+	{
+		if s.MinimumValue.Set {
+			e.FieldStart("MinimumValue")
+			s.MinimumValue.Encode(e)
+		}
+	}
+	{
+		if s.Name.Set {
+			e.FieldStart("Name")
+			s.Name.Encode(e)
+		}
+	}
+	{
+		if s.NoDefaultValue.Set {
+			e.FieldStart("NoDefaultValue")
+			s.NoDefaultValue.Encode(e)
+		}
+	}
+	{
+		if s.ObjectDataType.Set {
+			e.FieldStart("ObjectDataType")
+			s.ObjectDataType.Encode(e)
+		}
+	}
+	{
+		if s.Required.Set {
+			e.FieldStart("Required")
+			s.Required.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem = [14]string{
+	0:  "AllowableNumbers",
+	1:  "AllowablePattern",
+	2:  "AllowableValueDescriptions",
+	3:  "AllowableValues",
+	4:  "ArraySizeMaximum",
+	5:  "ArraySizeMinimum",
+	6:  "DataType",
+	7:  "DefaultValue",
+	8:  "MaximumValue",
+	9:  "MinimumValue",
+	10: "Name",
+	11: "NoDefaultValue",
+	12: "ObjectDataType",
+	13: "Required",
+}
+
+// Decode decodes BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "AllowableNumbers":
+			if err := func() error {
+				s.AllowableNumbers.Reset()
+				if err := s.AllowableNumbers.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"AllowableNumbers\"")
+			}
+		case "AllowablePattern":
+			if err := func() error {
+				s.AllowablePattern.Reset()
+				if err := s.AllowablePattern.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"AllowablePattern\"")
+			}
+		case "AllowableValueDescriptions":
+			if err := func() error {
+				s.AllowableValueDescriptions.Reset()
+				if err := s.AllowableValueDescriptions.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"AllowableValueDescriptions\"")
+			}
+		case "AllowableValues":
+			if err := func() error {
+				s.AllowableValues.Reset()
+				if err := s.AllowableValues.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"AllowableValues\"")
+			}
+		case "ArraySizeMaximum":
+			if err := func() error {
+				s.ArraySizeMaximum.Reset()
+				if err := s.ArraySizeMaximum.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ArraySizeMaximum\"")
+			}
+		case "ArraySizeMinimum":
+			if err := func() error {
+				s.ArraySizeMinimum.Reset()
+				if err := s.ArraySizeMinimum.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ArraySizeMinimum\"")
+			}
+		case "DataType":
+			if err := func() error {
+				s.DataType.Reset()
+				if err := s.DataType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"DataType\"")
+			}
+		case "DefaultValue":
+			if err := func() error {
+				s.DefaultValue.Reset()
+				if err := s.DefaultValue.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"DefaultValue\"")
+			}
+		case "MaximumValue":
+			if err := func() error {
+				s.MaximumValue.Reset()
+				if err := s.MaximumValue.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"MaximumValue\"")
+			}
+		case "MinimumValue":
+			if err := func() error {
+				s.MinimumValue.Reset()
+				if err := s.MinimumValue.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"MinimumValue\"")
+			}
+		case "Name":
+			if err := func() error {
+				s.Name.Reset()
+				if err := s.Name.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Name\"")
+			}
+		case "NoDefaultValue":
+			if err := func() error {
+				s.NoDefaultValue.Reset()
+				if err := s.NoDefaultValue.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"NoDefaultValue\"")
+			}
+		case "ObjectDataType":
+			if err := func() error {
+				s.ObjectDataType.Reset()
+				if err := s.ObjectDataType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ObjectDataType\"")
+			}
+		case "Required":
+			if err := func() error {
+				s.Required.Reset()
+				if err := s.Required.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Required\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *BmcResponseModelRedfishSystemSummary) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *BmcResponseModelRedfishSystemSummary) encodeFields(e *jx.Encoder) {
+	{
+		if s.DurationMs.Set {
+			e.FieldStart("duration_ms")
+			s.DurationMs.Encode(e)
+		}
+	}
+	{
+		if s.Failed.Set {
+			e.FieldStart("failed")
+			s.Failed.Encode(e)
+		}
+	}
+	{
+		if s.FailedNodes.Set {
+			e.FieldStart("failed_nodes")
+			s.FailedNodes.Encode(e)
+		}
+	}
+	{
+		if s.Succeeded.Set {
+			e.FieldStart("succeeded")
+			s.Succeeded.Encode(e)
+		}
+	}
+	{
+		if s.Total.Set {
+			e.FieldStart("total")
+			s.Total.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfBmcResponseModelRedfishSystemSummary = [5]string{
+	0: "duration_ms",
+	1: "failed",
+	2: "failed_nodes",
+	3: "succeeded",
+	4: "total",
+}
+
+// Decode decodes BmcResponseModelRedfishSystemSummary from json.
+func (s *BmcResponseModelRedfishSystemSummary) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode BmcResponseModelRedfishSystemSummary to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "duration_ms":
+			if err := func() error {
+				s.DurationMs.Reset()
+				if err := s.DurationMs.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"duration_ms\"")
+			}
+		case "failed":
+			if err := func() error {
+				s.Failed.Reset()
+				if err := s.Failed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"failed\"")
+			}
+		case "failed_nodes":
+			if err := func() error {
+				s.FailedNodes.Reset()
+				if err := s.FailedNodes.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"failed_nodes\"")
+			}
+		case "succeeded":
+			if err := func() error {
+				s.Succeeded.Reset()
+				if err := s.Succeeded.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"succeeded\"")
+			}
+		case "total":
+			if err := func() error {
+				s.Total.Reset()
+				if err := s.Total.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"total\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode BmcResponseModelRedfishSystemSummary")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *BmcResponseModelRedfishSystemSummary) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *BmcResponseModelRedfishSystemSummary) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -3399,12 +8061,6 @@ func (s *EventJobMessagesItem) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *EventJobMessagesItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.Data.Set {
-			e.FieldStart("data")
-			s.Data.Encode(e)
-		}
-	}
-	{
 		if s.Host.Set {
 			e.FieldStart("host")
 			s.Host.Encode(e)
@@ -3417,12 +8073,6 @@ func (s *EventJobMessagesItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.RedfishError.Set {
-			e.FieldStart("redfish_error")
-			s.RedfishError.Encode(e)
-		}
-	}
-	{
 		if s.Status.Set {
 			e.FieldStart("status")
 			s.Status.Encode(e)
@@ -3430,12 +8080,10 @@ func (s *EventJobMessagesItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfEventJobMessagesItem = [5]string{
-	0: "data",
-	1: "host",
-	2: "msg",
-	3: "redfish_error",
-	4: "status",
+var jsonFieldsNameOfEventJobMessagesItem = [3]string{
+	0: "host",
+	1: "msg",
+	2: "status",
 }
 
 // Decode decodes EventJobMessagesItem from json.
@@ -3446,16 +8094,6 @@ func (s *EventJobMessagesItem) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "data":
-			if err := func() error {
-				s.Data.Reset()
-				if err := s.Data.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"data\"")
-			}
 		case "host":
 			if err := func() error {
 				s.Host.Reset()
@@ -3475,16 +8113,6 @@ func (s *EventJobMessagesItem) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"msg\"")
-			}
-		case "redfish_error":
-			if err := func() error {
-				s.RedfishError.Reset()
-				if err := s.RedfishError.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"redfish_error\"")
 			}
 		case "status":
 			if err := func() error {
@@ -3516,342 +8144,6 @@ func (s *EventJobMessagesItem) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *EventJobMessagesItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *EventJobMessagesItemRedfishError) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *EventJobMessagesItemRedfishError) encodeFields(e *jx.Encoder) {
-	{
-		if s.Code.Set {
-			e.FieldStart("code")
-			s.Code.Encode(e)
-		}
-	}
-	{
-		if s.Error.Set {
-			e.FieldStart("error")
-			s.Error.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfEventJobMessagesItemRedfishError = [2]string{
-	0: "code",
-	1: "error",
-}
-
-// Decode decodes EventJobMessagesItemRedfishError from json.
-func (s *EventJobMessagesItemRedfishError) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode EventJobMessagesItemRedfishError to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "code":
-			if err := func() error {
-				s.Code.Reset()
-				if err := s.Code.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"code\"")
-			}
-		case "error":
-			if err := func() error {
-				s.Error.Reset()
-				if err := s.Error.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"error\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode EventJobMessagesItemRedfishError")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *EventJobMessagesItemRedfishError) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *EventJobMessagesItemRedfishError) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *EventJobMessagesItemRedfishErrorError) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *EventJobMessagesItemRedfishErrorError) encodeFields(e *jx.Encoder) {
-	{
-		if s.MessageDotExtendedInfo != nil {
-			e.FieldStart("@Message.ExtendedInfo")
-			e.ArrStart()
-			for _, elem := range s.MessageDotExtendedInfo {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
-		}
-	}
-	{
-		if s.Code.Set {
-			e.FieldStart("code")
-			s.Code.Encode(e)
-		}
-	}
-	{
-		if s.Message.Set {
-			e.FieldStart("message")
-			s.Message.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfEventJobMessagesItemRedfishErrorError = [3]string{
-	0: "@Message.ExtendedInfo",
-	1: "code",
-	2: "message",
-}
-
-// Decode decodes EventJobMessagesItemRedfishErrorError from json.
-func (s *EventJobMessagesItemRedfishErrorError) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode EventJobMessagesItemRedfishErrorError to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "@Message.ExtendedInfo":
-			if err := func() error {
-				s.MessageDotExtendedInfo = make([]EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.MessageDotExtendedInfo = append(s.MessageDotExtendedInfo, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"@Message.ExtendedInfo\"")
-			}
-		case "code":
-			if err := func() error {
-				s.Code.Reset()
-				if err := s.Code.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"code\"")
-			}
-		case "message":
-			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"message\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode EventJobMessagesItemRedfishErrorError")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *EventJobMessagesItemRedfishErrorError) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *EventJobMessagesItemRedfishErrorError) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.Message.Set {
-			e.FieldStart("Message")
-			s.Message.Encode(e)
-		}
-	}
-	{
-		if s.MessageArgsDotOdataDotCount.Set {
-			e.FieldStart("MessageArgs.@odata.count")
-			s.MessageArgsDotOdataDotCount.Encode(e)
-		}
-	}
-	{
-		if s.MessageId.Set {
-			e.FieldStart("MessageId")
-			s.MessageId.Encode(e)
-		}
-	}
-	{
-		if s.RelatedPropertiesDotOdataDotCount.Set {
-			e.FieldStart("RelatedProperties.@odata.count")
-			s.RelatedPropertiesDotOdataDotCount.Encode(e)
-		}
-	}
-	{
-		if s.Resolution.Set {
-			e.FieldStart("Resolution")
-			s.Resolution.Encode(e)
-		}
-	}
-	{
-		if s.Severity.Set {
-			e.FieldStart("Severity")
-			s.Severity.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfEventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem = [6]string{
-	0: "Message",
-	1: "MessageArgs.@odata.count",
-	2: "MessageId",
-	3: "RelatedProperties.@odata.count",
-	4: "Resolution",
-	5: "Severity",
-}
-
-// Decode decodes EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem from json.
-func (s *EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "Message":
-			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Message\"")
-			}
-		case "MessageArgs.@odata.count":
-			if err := func() error {
-				s.MessageArgsDotOdataDotCount.Reset()
-				if err := s.MessageArgsDotOdataDotCount.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MessageArgs.@odata.count\"")
-			}
-		case "MessageId":
-			if err := func() error {
-				s.MessageId.Reset()
-				if err := s.MessageId.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MessageId\"")
-			}
-		case "RelatedProperties.@odata.count":
-			if err := func() error {
-				s.RelatedPropertiesDotOdataDotCount.Reset()
-				if err := s.RelatedPropertiesDotOdataDotCount.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RelatedProperties.@odata.count\"")
-			}
-		case "Resolution":
-			if err := func() error {
-				s.Resolution.Reset()
-				if err := s.Resolution.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Resolution\"")
-			}
-		case "Severity":
-			if err := func() error {
-				s.Severity.Reset()
-				if err := s.Severity.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Severity\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *EventJobMessagesItemRedfishErrorErrorMessageDotExtendedInfoItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -5242,462 +9534,6 @@ func (s *HostInterfacesItem) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
-func (s *JobMessage) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *JobMessage) encodeFields(e *jx.Encoder) {
-	{
-		if s.Data.Set {
-			e.FieldStart("data")
-			s.Data.Encode(e)
-		}
-	}
-	{
-		if s.Host.Set {
-			e.FieldStart("host")
-			s.Host.Encode(e)
-		}
-	}
-	{
-		if s.Msg.Set {
-			e.FieldStart("msg")
-			s.Msg.Encode(e)
-		}
-	}
-	{
-		if s.RedfishError.Set {
-			e.FieldStart("redfish_error")
-			s.RedfishError.Encode(e)
-		}
-	}
-	{
-		if s.Status.Set {
-			e.FieldStart("status")
-			s.Status.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfJobMessage = [5]string{
-	0: "data",
-	1: "host",
-	2: "msg",
-	3: "redfish_error",
-	4: "status",
-}
-
-// Decode decodes JobMessage from json.
-func (s *JobMessage) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode JobMessage to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "data":
-			if err := func() error {
-				s.Data.Reset()
-				if err := s.Data.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"data\"")
-			}
-		case "host":
-			if err := func() error {
-				s.Host.Reset()
-				if err := s.Host.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"host\"")
-			}
-		case "msg":
-			if err := func() error {
-				s.Msg.Reset()
-				if err := s.Msg.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"msg\"")
-			}
-		case "redfish_error":
-			if err := func() error {
-				s.RedfishError.Reset()
-				if err := s.RedfishError.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"redfish_error\"")
-			}
-		case "status":
-			if err := func() error {
-				s.Status.Reset()
-				if err := s.Status.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"status\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode JobMessage")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *JobMessage) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *JobMessage) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *JobMessageRedfishError) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *JobMessageRedfishError) encodeFields(e *jx.Encoder) {
-	{
-		if s.Code.Set {
-			e.FieldStart("code")
-			s.Code.Encode(e)
-		}
-	}
-	{
-		if s.Error.Set {
-			e.FieldStart("error")
-			s.Error.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfJobMessageRedfishError = [2]string{
-	0: "code",
-	1: "error",
-}
-
-// Decode decodes JobMessageRedfishError from json.
-func (s *JobMessageRedfishError) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode JobMessageRedfishError to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "code":
-			if err := func() error {
-				s.Code.Reset()
-				if err := s.Code.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"code\"")
-			}
-		case "error":
-			if err := func() error {
-				s.Error.Reset()
-				if err := s.Error.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"error\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode JobMessageRedfishError")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *JobMessageRedfishError) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *JobMessageRedfishError) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *JobMessageRedfishErrorError) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *JobMessageRedfishErrorError) encodeFields(e *jx.Encoder) {
-	{
-		if s.MessageDotExtendedInfo.Set {
-			e.FieldStart("@Message.ExtendedInfo")
-			s.MessageDotExtendedInfo.Encode(e)
-		}
-	}
-	{
-		if s.Code.Set {
-			e.FieldStart("code")
-			s.Code.Encode(e)
-		}
-	}
-	{
-		if s.Message.Set {
-			e.FieldStart("message")
-			s.Message.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfJobMessageRedfishErrorError = [3]string{
-	0: "@Message.ExtendedInfo",
-	1: "code",
-	2: "message",
-}
-
-// Decode decodes JobMessageRedfishErrorError from json.
-func (s *JobMessageRedfishErrorError) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode JobMessageRedfishErrorError to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "@Message.ExtendedInfo":
-			if err := func() error {
-				s.MessageDotExtendedInfo.Reset()
-				if err := s.MessageDotExtendedInfo.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"@Message.ExtendedInfo\"")
-			}
-		case "code":
-			if err := func() error {
-				s.Code.Reset()
-				if err := s.Code.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"code\"")
-			}
-		case "message":
-			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"message\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode JobMessageRedfishErrorError")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *JobMessageRedfishErrorError) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *JobMessageRedfishErrorError) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *JobMessageRedfishErrorErrorMessageDotExtendedInfoItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *JobMessageRedfishErrorErrorMessageDotExtendedInfoItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.Message.Set {
-			e.FieldStart("Message")
-			s.Message.Encode(e)
-		}
-	}
-	{
-		if s.MessageArgsDotOdataDotCount.Set {
-			e.FieldStart("MessageArgs.@odata.count")
-			s.MessageArgsDotOdataDotCount.Encode(e)
-		}
-	}
-	{
-		if s.MessageId.Set {
-			e.FieldStart("MessageId")
-			s.MessageId.Encode(e)
-		}
-	}
-	{
-		if s.RelatedPropertiesDotOdataDotCount.Set {
-			e.FieldStart("RelatedProperties.@odata.count")
-			s.RelatedPropertiesDotOdataDotCount.Encode(e)
-		}
-	}
-	{
-		if s.Resolution.Set {
-			e.FieldStart("Resolution")
-			s.Resolution.Encode(e)
-		}
-	}
-	{
-		if s.Severity.Set {
-			e.FieldStart("Severity")
-			s.Severity.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfJobMessageRedfishErrorErrorMessageDotExtendedInfoItem = [6]string{
-	0: "Message",
-	1: "MessageArgs.@odata.count",
-	2: "MessageId",
-	3: "RelatedProperties.@odata.count",
-	4: "Resolution",
-	5: "Severity",
-}
-
-// Decode decodes JobMessageRedfishErrorErrorMessageDotExtendedInfoItem from json.
-func (s *JobMessageRedfishErrorErrorMessageDotExtendedInfoItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode JobMessageRedfishErrorErrorMessageDotExtendedInfoItem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "Message":
-			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Message\"")
-			}
-		case "MessageArgs.@odata.count":
-			if err := func() error {
-				s.MessageArgsDotOdataDotCount.Reset()
-				if err := s.MessageArgsDotOdataDotCount.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MessageArgs.@odata.count\"")
-			}
-		case "MessageId":
-			if err := func() error {
-				s.MessageId.Reset()
-				if err := s.MessageId.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MessageId\"")
-			}
-		case "RelatedProperties.@odata.count":
-			if err := func() error {
-				s.RelatedPropertiesDotOdataDotCount.Reset()
-				if err := s.RelatedPropertiesDotOdataDotCount.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RelatedProperties.@odata.count\"")
-			}
-		case "Resolution":
-			if err := func() error {
-				s.Resolution.Reset()
-				if err := s.Resolution.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Resolution\"")
-			}
-		case "Severity":
-			if err := func() error {
-				s.Severity.Reset()
-				if err := s.Severity.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Severity\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode JobMessageRedfishErrorErrorMessageDotExtendedInfoItem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *JobMessageRedfishErrorErrorMessageDotExtendedInfoItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *JobMessageRedfishErrorErrorMessageDotExtendedInfoItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
 func (s *LLDP) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -5892,6 +9728,446 @@ func (s *LLDP) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *LLDP) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelBmcAckResultsItem as json.
+func (o NilBmcResponseModelBmcAckResultsItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcAckResultsItem from json.
+func (o *NilBmcResponseModelBmcAckResultsItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilBmcResponseModelBmcAckResultsItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelBmcAckResultsItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilBmcResponseModelBmcAckResultsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilBmcResponseModelBmcAckResultsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelBmcFirmwareUpdatesResultsItem as json.
+func (o NilBmcResponseModelBmcFirmwareUpdatesResultsItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcFirmwareUpdatesResultsItem from json.
+func (o *NilBmcResponseModelBmcFirmwareUpdatesResultsItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilBmcResponseModelBmcFirmwareUpdatesResultsItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelBmcFirmwareUpdatesResultsItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilBmcResponseModelBmcFirmwareUpdatesResultsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilBmcResponseModelBmcFirmwareUpdatesResultsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem as json.
+func (o NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem from json.
+func (o *NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelBmcJobListResultsItem as json.
+func (o NilBmcResponseModelBmcJobListResultsItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcJobListResultsItem from json.
+func (o *NilBmcResponseModelBmcJobListResultsItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilBmcResponseModelBmcJobListResultsItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelBmcJobListResultsItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilBmcResponseModelBmcJobListResultsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilBmcResponseModelBmcJobListResultsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelBmcJobListResultsItemDataJobsItem as json.
+func (o NilBmcResponseModelBmcJobListResultsItemDataJobsItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcJobListResultsItemDataJobsItem from json.
+func (o *NilBmcResponseModelBmcJobListResultsItemDataJobsItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilBmcResponseModelBmcJobListResultsItemDataJobsItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelBmcJobListResultsItemDataJobsItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilBmcResponseModelBmcJobListResultsItemDataJobsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilBmcResponseModelBmcJobListResultsItemDataJobsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelBmcSELLogResultsItem as json.
+func (o NilBmcResponseModelBmcSELLogResultsItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcSELLogResultsItem from json.
+func (o *NilBmcResponseModelBmcSELLogResultsItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilBmcResponseModelBmcSELLogResultsItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelBmcSELLogResultsItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilBmcResponseModelBmcSELLogResultsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilBmcResponseModelBmcSELLogResultsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelBmcSELLogResultsItemDataEntriesItem as json.
+func (o NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcSELLogResultsItemDataEntriesItem from json.
+func (o *NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelBmcSELLogResultsItemDataEntriesItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelRedfishSystemResultsItem as json.
+func (o NilBmcResponseModelRedfishSystemResultsItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelRedfishSystemResultsItem from json.
+func (o *NilBmcResponseModelRedfishSystemResultsItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilBmcResponseModelRedfishSystemResultsItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelRedfishSystemResultsItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilBmcResponseModelRedfishSystemResultsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilBmcResponseModelRedfishSystemResultsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem as json.
+func (o NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem from json.
+func (o *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem as json.
+func (o NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
+func (o *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -6248,52 +10524,6 @@ func (s *NilHostInterfacesItem) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes int as json.
-func (o NilInt) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.Int(int(o.Value))
-}
-
-// Decode decodes int from json.
-func (o *NilInt) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilInt to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v int
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	v, err := d.Int()
-	if err != nil {
-		return err
-	}
-	o.Value = int(v)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilInt) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilInt) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes NodeAddRequestNodeListItem as json.
 func (o NilNodeAddRequestNodeListItem) Encode(e *jx.Encoder) {
 	if o.Null {
@@ -6422,578 +10652,6 @@ func (s NilNodeAddRequestNodeListItemInterfacesItem) MarshalJSON() ([]byte, erro
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *NilNodeAddRequestNodeListItemInterfacesItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishDellUpgradeFirmwareUpdateListItem as json.
-func (o NilRedfishDellUpgradeFirmwareUpdateListItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishDellUpgradeFirmwareUpdateListItem from json.
-func (o *NilRedfishDellUpgradeFirmwareUpdateListItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilRedfishDellUpgradeFirmwareUpdateListItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v RedfishDellUpgradeFirmwareUpdateListItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilRedfishDellUpgradeFirmwareUpdateListItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilRedfishDellUpgradeFirmwareUpdateListItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishJobJobsItem as json.
-func (o NilRedfishJobJobsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishJobJobsItem from json.
-func (o *NilRedfishJobJobsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilRedfishJobJobsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v RedfishJobJobsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilRedfishJobJobsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilRedfishJobJobsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem as json.
-func (o NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem from json.
-func (o *NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem as json.
-func (o NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
-func (o *NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishJobJobsItemMessagesItem as json.
-func (o NilRedfishJobJobsItemMessagesItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishJobJobsItemMessagesItem from json.
-func (o *NilRedfishJobJobsItemMessagesItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilRedfishJobJobsItemMessagesItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v RedfishJobJobsItemMessagesItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilRedfishJobJobsItemMessagesItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilRedfishJobJobsItemMessagesItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishJobJobsItemMessagesItemResolutionStepsItem as json.
-func (o NilRedfishJobJobsItemMessagesItemResolutionStepsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishJobJobsItemMessagesItemResolutionStepsItem from json.
-func (o *NilRedfishJobJobsItemMessagesItemResolutionStepsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilRedfishJobJobsItemMessagesItemResolutionStepsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v RedfishJobJobsItemMessagesItemResolutionStepsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilRedfishJobJobsItemMessagesItemResolutionStepsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilRedfishJobJobsItemMessagesItemResolutionStepsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem as json.
-func (o NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem from json.
-func (o *NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishMetricReportReportsItem as json.
-func (o NilRedfishMetricReportReportsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishMetricReportReportsItem from json.
-func (o *NilRedfishMetricReportReportsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilRedfishMetricReportReportsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v RedfishMetricReportReportsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilRedfishMetricReportReportsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilRedfishMetricReportReportsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem as json.
-func (o NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem from json.
-func (o *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem as json.
-func (o NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
-func (o *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishMetricReportReportsItemMetricValuesItem as json.
-func (o NilRedfishMetricReportReportsItemMetricValuesItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishMetricReportReportsItemMetricValuesItem from json.
-func (o *NilRedfishMetricReportReportsItemMetricValuesItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilRedfishMetricReportReportsItemMetricValuesItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v RedfishMetricReportReportsItemMetricValuesItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilRedfishMetricReportReportsItemMetricValuesItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilRedfishMetricReportReportsItemMetricValuesItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem as json.
-func (o NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem from json.
-func (o *NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem as json.
-func (o NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
-func (o *NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -8093,21 +11751,20 @@ func (s *NodeTagsRequest) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes BmcJobDeleteRequestNodeJobList as json.
-func (o OptBmcJobDeleteRequestNodeJobList) Encode(e *jx.Encoder) {
+// Encode encodes BmcResponseModelBmcAckSummary as json.
+func (o OptBmcResponseModelBmcAckSummary) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
 	o.Value.Encode(e)
 }
 
-// Decode decodes BmcJobDeleteRequestNodeJobList from json.
-func (o *OptBmcJobDeleteRequestNodeJobList) Decode(d *jx.Decoder) error {
+// Decode decodes BmcResponseModelBmcAckSummary from json.
+func (o *OptBmcResponseModelBmcAckSummary) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptBmcJobDeleteRequestNodeJobList to nil")
+		return errors.New("invalid: unable to decode OptBmcResponseModelBmcAckSummary to nil")
 	}
 	o.Set = true
-	o.Value = make(BmcJobDeleteRequestNodeJobList)
 	if err := o.Value.Decode(d); err != nil {
 		return err
 	}
@@ -8115,14 +11772,146 @@ func (o *OptBmcJobDeleteRequestNodeJobList) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptBmcJobDeleteRequestNodeJobList) MarshalJSON() ([]byte, error) {
+func (s OptBmcResponseModelBmcAckSummary) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptBmcJobDeleteRequestNodeJobList) UnmarshalJSON(data []byte) error {
+func (s *OptBmcResponseModelBmcAckSummary) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelBmcFirmwareUpdatesSummary as json.
+func (o OptBmcResponseModelBmcFirmwareUpdatesSummary) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcFirmwareUpdatesSummary from json.
+func (o *OptBmcResponseModelBmcFirmwareUpdatesSummary) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptBmcResponseModelBmcFirmwareUpdatesSummary to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptBmcResponseModelBmcFirmwareUpdatesSummary) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptBmcResponseModelBmcFirmwareUpdatesSummary) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelBmcJobListSummary as json.
+func (o OptBmcResponseModelBmcJobListSummary) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcJobListSummary from json.
+func (o *OptBmcResponseModelBmcJobListSummary) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptBmcResponseModelBmcJobListSummary to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptBmcResponseModelBmcJobListSummary) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptBmcResponseModelBmcJobListSummary) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelBmcSELLogSummary as json.
+func (o OptBmcResponseModelBmcSELLogSummary) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcSELLogSummary from json.
+func (o *OptBmcResponseModelBmcSELLogSummary) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptBmcResponseModelBmcSELLogSummary to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptBmcResponseModelBmcSELLogSummary) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptBmcResponseModelBmcSELLogSummary) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelRedfishSystemSummary as json.
+func (o OptBmcResponseModelRedfishSystemSummary) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelRedfishSystemSummary from json.
+func (o *OptBmcResponseModelRedfishSystemSummary) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptBmcResponseModelRedfishSystemSummary to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptBmcResponseModelRedfishSystemSummary) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptBmcResponseModelRedfishSystemSummary) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -8195,72 +11984,6 @@ func (s OptDateTime) MarshalJSON() ([]byte, error) {
 func (s *OptDateTime) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d, json.DecodeDateTime)
-}
-
-// Encode encodes EventJobMessagesItemRedfishError as json.
-func (o OptEventJobMessagesItemRedfishError) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes EventJobMessagesItemRedfishError from json.
-func (o *OptEventJobMessagesItemRedfishError) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptEventJobMessagesItemRedfishError to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptEventJobMessagesItemRedfishError) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptEventJobMessagesItemRedfishError) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes EventJobMessagesItemRedfishErrorError as json.
-func (o OptEventJobMessagesItemRedfishErrorError) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes EventJobMessagesItemRedfishErrorError from json.
-func (o *OptEventJobMessagesItemRedfishErrorError) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptEventJobMessagesItemRedfishErrorError to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptEventJobMessagesItemRedfishErrorError) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptEventJobMessagesItemRedfishErrorError) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
 }
 
 // Encode encodes float32 as json.
@@ -8402,20 +12125,36 @@ func (s *OptInt64) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes JobMessageRedfishError as json.
-func (o OptJobMessageRedfishError) Encode(e *jx.Encoder) {
+// Encode encodes BmcResponseModelBmcFirmwareUpdatesResultsItemData as json.
+func (o OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemData) Encode(e *jx.Encoder) {
 	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
 		return
 	}
 	o.Value.Encode(e)
 }
 
-// Decode decodes JobMessageRedfishError from json.
-func (o *OptJobMessageRedfishError) Decode(d *jx.Decoder) error {
+// Decode decodes BmcResponseModelBmcFirmwareUpdatesResultsItemData from json.
+func (o *OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemData) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptJobMessageRedfishError to nil")
+		return errors.New("invalid: unable to decode OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemData to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelBmcFirmwareUpdatesResultsItemData
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
 	}
 	o.Set = true
+	o.Null = false
 	if err := o.Value.Decode(d); err != nil {
 		return err
 	}
@@ -8423,32 +12162,48 @@ func (o *OptJobMessageRedfishError) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptJobMessageRedfishError) MarshalJSON() ([]byte, error) {
+func (s OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemData) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptJobMessageRedfishError) UnmarshalJSON(data []byte) error {
+func (s *OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemData) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes JobMessageRedfishErrorError as json.
-func (o OptJobMessageRedfishErrorError) Encode(e *jx.Encoder) {
+// Encode encodes BmcResponseModelBmcJobListResultsItemData as json.
+func (o OptNilBmcResponseModelBmcJobListResultsItemData) Encode(e *jx.Encoder) {
 	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
 		return
 	}
 	o.Value.Encode(e)
 }
 
-// Decode decodes JobMessageRedfishErrorError from json.
-func (o *OptJobMessageRedfishErrorError) Decode(d *jx.Decoder) error {
+// Decode decodes BmcResponseModelBmcJobListResultsItemData from json.
+func (o *OptNilBmcResponseModelBmcJobListResultsItemData) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptJobMessageRedfishErrorError to nil")
+		return errors.New("invalid: unable to decode OptNilBmcResponseModelBmcJobListResultsItemData to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelBmcJobListResultsItemData
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
 	}
 	o.Set = true
+	o.Null = false
 	if err := o.Value.Decode(d); err != nil {
 		return err
 	}
@@ -8456,14 +12211,161 @@ func (o *OptJobMessageRedfishErrorError) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptJobMessageRedfishErrorError) MarshalJSON() ([]byte, error) {
+func (s OptNilBmcResponseModelBmcJobListResultsItemData) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptJobMessageRedfishErrorError) UnmarshalJSON(data []byte) error {
+func (s *OptNilBmcResponseModelBmcJobListResultsItemData) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelBmcSELLogResultsItemData as json.
+func (o OptNilBmcResponseModelBmcSELLogResultsItemData) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelBmcSELLogResultsItemData from json.
+func (o *OptNilBmcResponseModelBmcSELLogResultsItemData) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilBmcResponseModelBmcSELLogResultsItemData to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelBmcSELLogResultsItemData
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilBmcResponseModelBmcSELLogResultsItemData) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilBmcResponseModelBmcSELLogResultsItemData) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelRedfishSystemResultsItemData as json.
+func (o OptNilBmcResponseModelRedfishSystemResultsItemData) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelRedfishSystemResultsItemData from json.
+func (o *OptNilBmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilBmcResponseModelRedfishSystemResultsItemData to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelRedfishSystemResultsItemData
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilBmcResponseModelRedfishSystemResultsItemData) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilBmcResponseModelRedfishSystemResultsItemData) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes BmcResponseModelRedfishSystemResultsItemDataOemDell as json.
+func (o OptNilBmcResponseModelRedfishSystemResultsItemDataOemDell) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes BmcResponseModelRedfishSystemResultsItemDataOemDell from json.
+func (o *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDell) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilBmcResponseModelRedfishSystemResultsItemDataOemDell to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v BmcResponseModelRedfishSystemResultsItemDataOemDell
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilBmcResponseModelRedfishSystemResultsItemDataOemDell) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDell) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -8564,57 +12466,6 @@ func (s OptNilBootImageProvisionTemplates) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptNilBootImageProvisionTemplates) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []byte as json.
-func (o OptNilByte) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.Base64([]byte(o.Value))
-}
-
-// Decode decodes []byte from json.
-func (o *OptNilByte) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilByte to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []byte
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	v, err := d.Base64()
-	if err != nil {
-		return err
-	}
-	o.Value = []byte(v)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilByte) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilByte) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -8883,8 +12734,8 @@ func (s *OptNilInt64) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes []JobMessageRedfishErrorErrorMessageDotExtendedInfoItem as json.
-func (o OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) Encode(e *jx.Encoder) {
+// Encode encodes []NilBmcResponseModelBmcAckResultsItem as json.
+func (o OptNilNilBmcResponseModelBmcAckResultsItemArray) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
@@ -8899,17 +12750,17 @@ func (o OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) Encode
 	e.ArrEnd()
 }
 
-// Decode decodes []JobMessageRedfishErrorErrorMessageDotExtendedInfoItem from json.
-func (o *OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) Decode(d *jx.Decoder) error {
+// Decode decodes []NilBmcResponseModelBmcAckResultsItem from json.
+func (o *OptNilNilBmcResponseModelBmcAckResultsItemArray) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray to nil")
+		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcAckResultsItemArray to nil")
 	}
 	if d.Next() == jx.Null {
 		if err := d.Null(); err != nil {
 			return err
 		}
 
-		var v []JobMessageRedfishErrorErrorMessageDotExtendedInfoItem
+		var v []NilBmcResponseModelBmcAckResultsItem
 		o.Value = v
 		o.Set = true
 		o.Null = true
@@ -8917,9 +12768,9 @@ func (o *OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) Decod
 	}
 	o.Set = true
 	o.Null = false
-	o.Value = make([]JobMessageRedfishErrorErrorMessageDotExtendedInfoItem, 0)
+	o.Value = make([]NilBmcResponseModelBmcAckResultsItem, 0)
 	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem JobMessageRedfishErrorErrorMessageDotExtendedInfoItem
+		var elem NilBmcResponseModelBmcAckResultsItem
 		if err := elem.Decode(d); err != nil {
 			return err
 		}
@@ -8932,14 +12783,563 @@ func (o *OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) Decod
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) MarshalJSON() ([]byte, error) {
+func (s OptNilNilBmcResponseModelBmcAckResultsItemArray) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilJobMessageRedfishErrorErrorMessageDotExtendedInfoItemArray) UnmarshalJSON(data []byte) error {
+func (s *OptNilNilBmcResponseModelBmcAckResultsItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilBmcResponseModelBmcFirmwareUpdatesResultsItem as json.
+func (o OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilBmcResponseModelBmcFirmwareUpdatesResultsItem from json.
+func (o *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilBmcResponseModelBmcFirmwareUpdatesResultsItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilBmcResponseModelBmcFirmwareUpdatesResultsItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilBmcResponseModelBmcFirmwareUpdatesResultsItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem as json.
+func (o OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem from json.
+func (o *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilBmcResponseModelBmcJobListResultsItem as json.
+func (o OptNilNilBmcResponseModelBmcJobListResultsItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilBmcResponseModelBmcJobListResultsItem from json.
+func (o *OptNilNilBmcResponseModelBmcJobListResultsItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcJobListResultsItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilBmcResponseModelBmcJobListResultsItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilBmcResponseModelBmcJobListResultsItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilBmcResponseModelBmcJobListResultsItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilBmcResponseModelBmcJobListResultsItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilBmcResponseModelBmcJobListResultsItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilBmcResponseModelBmcJobListResultsItemDataJobsItem as json.
+func (o OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilBmcResponseModelBmcJobListResultsItemDataJobsItem from json.
+func (o *OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilBmcResponseModelBmcJobListResultsItemDataJobsItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilBmcResponseModelBmcJobListResultsItemDataJobsItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilBmcResponseModelBmcJobListResultsItemDataJobsItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilBmcResponseModelBmcSELLogResultsItem as json.
+func (o OptNilNilBmcResponseModelBmcSELLogResultsItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilBmcResponseModelBmcSELLogResultsItem from json.
+func (o *OptNilNilBmcResponseModelBmcSELLogResultsItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcSELLogResultsItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilBmcResponseModelBmcSELLogResultsItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilBmcResponseModelBmcSELLogResultsItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilBmcResponseModelBmcSELLogResultsItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilBmcResponseModelBmcSELLogResultsItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilBmcResponseModelBmcSELLogResultsItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem as json.
+func (o OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem from json.
+func (o *OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilBmcResponseModelRedfishSystemResultsItem as json.
+func (o OptNilNilBmcResponseModelRedfishSystemResultsItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilBmcResponseModelRedfishSystemResultsItem from json.
+func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelRedfishSystemResultsItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilBmcResponseModelRedfishSystemResultsItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilBmcResponseModelRedfishSystemResultsItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilBmcResponseModelRedfishSystemResultsItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilBmcResponseModelRedfishSystemResultsItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilBmcResponseModelRedfishSystemResultsItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem as json.
+func (o OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
+func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem as json.
+func (o OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem from json.
+func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -9005,860 +13405,6 @@ func (s *OptNilNilEventJobMessagesItemArray) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes []NilInt as json.
-func (o OptNilNilIntArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilInt from json.
-func (o *OptNilNilIntArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilIntArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilInt
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilInt, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilInt
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilIntArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilIntArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilRedfishDellUpgradeFirmwareUpdateListItem as json.
-func (o OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilRedfishDellUpgradeFirmwareUpdateListItem from json.
-func (o *OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilRedfishDellUpgradeFirmwareUpdateListItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilRedfishDellUpgradeFirmwareUpdateListItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilRedfishDellUpgradeFirmwareUpdateListItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilRedfishDellUpgradeFirmwareUpdateListItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilRedfishJobJobsItem as json.
-func (o OptNilNilRedfishJobJobsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilRedfishJobJobsItem from json.
-func (o *OptNilNilRedfishJobJobsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilRedfishJobJobsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilRedfishJobJobsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilRedfishJobJobsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilRedfishJobJobsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilRedfishJobJobsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilRedfishJobJobsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem as json.
-func (o OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
-func (o *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem as json.
-func (o OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem from json.
-func (o *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilRedfishJobJobsItemMessagesItem as json.
-func (o OptNilNilRedfishJobJobsItemMessagesItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilRedfishJobJobsItemMessagesItem from json.
-func (o *OptNilNilRedfishJobJobsItemMessagesItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilRedfishJobJobsItemMessagesItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilRedfishJobJobsItemMessagesItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilRedfishJobJobsItemMessagesItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilRedfishJobJobsItemMessagesItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilRedfishJobJobsItemMessagesItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilRedfishJobJobsItemMessagesItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem as json.
-func (o OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem from json.
-func (o *OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilRedfishJobJobsItemMessagesItemResolutionStepsItem as json.
-func (o OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilRedfishJobJobsItemMessagesItemResolutionStepsItem from json.
-func (o *OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilRedfishJobJobsItemMessagesItemResolutionStepsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilRedfishJobJobsItemMessagesItemResolutionStepsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilRedfishJobJobsItemMessagesItemResolutionStepsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilRedfishJobJobsItemMessagesItemResolutionStepsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilRedfishMetricReportReportsItem as json.
-func (o OptNilNilRedfishMetricReportReportsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilRedfishMetricReportReportsItem from json.
-func (o *OptNilNilRedfishMetricReportReportsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilRedfishMetricReportReportsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilRedfishMetricReportReportsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilRedfishMetricReportReportsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilRedfishMetricReportReportsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilRedfishMetricReportReportsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilRedfishMetricReportReportsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem as json.
-func (o OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
-func (o *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem as json.
-func (o OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem from json.
-func (o *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilRedfishMetricReportReportsItemMetricValuesItem as json.
-func (o OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilRedfishMetricReportReportsItemMetricValuesItem from json.
-func (o *OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilRedfishMetricReportReportsItemMetricValuesItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilRedfishMetricReportReportsItemMetricValuesItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilRedfishMetricReportReportsItemMetricValuesItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilRedfishMetricReportReportsItemMetricValuesItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem as json.
-func (o OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
-func (o *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem as json.
-func (o OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem from json.
-func (o *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes []NilString as json.
 func (o OptNilNilStringArray) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -9916,166 +13462,6 @@ func (s OptNilNilStringArray) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptNilNilStringArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishJobJobsItemParameters as json.
-func (o OptNilRedfishJobJobsItemParameters) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishJobJobsItemParameters from json.
-func (o *OptNilRedfishJobJobsItemParameters) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilRedfishJobJobsItemParameters to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v RedfishJobJobsItemParameters
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make(RedfishJobJobsItemParameters)
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilRedfishJobJobsItemParameters) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilRedfishJobJobsItemParameters) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishSystemOemDell as json.
-func (o OptNilRedfishSystemOemDell) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishSystemOemDell from json.
-func (o *OptNilRedfishSystemOemDell) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilRedfishSystemOemDell to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v RedfishSystemOemDell
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilRedfishSystemOemDell) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilRedfishSystemOemDell) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []RedfishSystemOemDellMessageDotExtendedInfoItem as json.
-func (o OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []RedfishSystemOemDellMessageDotExtendedInfoItem from json.
-func (o *OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []RedfishSystemOemDellMessageDotExtendedInfoItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]RedfishSystemOemDellMessageDotExtendedInfoItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem RedfishSystemOemDellMessageDotExtendedInfoItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilRedfishSystemOemDellMessageDotExtendedInfoItemArray) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -10190,72 +13576,6 @@ func (s OptNilStringArray) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptNilStringArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishJobJobsItemPayload as json.
-func (o OptRedfishJobJobsItemPayload) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishJobJobsItemPayload from json.
-func (o *OptRedfishJobJobsItemPayload) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptRedfishJobJobsItemPayload to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptRedfishJobJobsItemPayload) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptRedfishJobJobsItemPayload) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes RedfishJobJobsItemSchedule as json.
-func (o OptRedfishJobJobsItemSchedule) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes RedfishJobJobsItemSchedule from json.
-func (o *OptRedfishJobJobsItemSchedule) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptRedfishJobJobsItemSchedule to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptRedfishJobJobsItemSchedule) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptRedfishJobJobsItemSchedule) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -10542,6018 +13862,6 @@ func (s *PostRolesRequest) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *PostRolesRequest) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishDellUpgradeFirmware) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishDellUpgradeFirmware) encodeFields(e *jx.Encoder) {
-	{
-		if s.Message.Set {
-			e.FieldStart("Message")
-			s.Message.Encode(e)
-		}
-	}
-	{
-		if s.Name.Set {
-			e.FieldStart("Name")
-			s.Name.Encode(e)
-		}
-	}
-	{
-		if s.Status.Set {
-			e.FieldStart("Status")
-			s.Status.Encode(e)
-		}
-	}
-	{
-		if s.UpdateCount.Set {
-			e.FieldStart("UpdateCount")
-			s.UpdateCount.Encode(e)
-		}
-	}
-	{
-		if s.UpdateList.Set {
-			e.FieldStart("UpdateList")
-			s.UpdateList.Encode(e)
-		}
-	}
-	{
-		if s.UpdateRebootType.Set {
-			e.FieldStart("UpdateRebootType")
-			s.UpdateRebootType.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishDellUpgradeFirmware = [6]string{
-	0: "Message",
-	1: "Name",
-	2: "Status",
-	3: "UpdateCount",
-	4: "UpdateList",
-	5: "UpdateRebootType",
-}
-
-// Decode decodes RedfishDellUpgradeFirmware from json.
-func (s *RedfishDellUpgradeFirmware) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishDellUpgradeFirmware to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "Message":
-			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Message\"")
-			}
-		case "Name":
-			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Name\"")
-			}
-		case "Status":
-			if err := func() error {
-				s.Status.Reset()
-				if err := s.Status.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Status\"")
-			}
-		case "UpdateCount":
-			if err := func() error {
-				s.UpdateCount.Reset()
-				if err := s.UpdateCount.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"UpdateCount\"")
-			}
-		case "UpdateList":
-			if err := func() error {
-				s.UpdateList.Reset()
-				if err := s.UpdateList.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"UpdateList\"")
-			}
-		case "UpdateRebootType":
-			if err := func() error {
-				s.UpdateRebootType.Reset()
-				if err := s.UpdateRebootType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"UpdateRebootType\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishDellUpgradeFirmware")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishDellUpgradeFirmware) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishDellUpgradeFirmware) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishDellUpgradeFirmwareUpdateListItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishDellUpgradeFirmwareUpdateListItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.BaseLocation.Set {
-			e.FieldStart("BaseLocation")
-			s.BaseLocation.Encode(e)
-		}
-	}
-	{
-		if s.ComponentID.Set {
-			e.FieldStart("ComponentID")
-			s.ComponentID.Encode(e)
-		}
-	}
-	{
-		if s.ComponentInfoName.Set {
-			e.FieldStart("ComponentInfoName")
-			s.ComponentInfoName.Encode(e)
-		}
-	}
-	{
-		if s.ComponentInfoValue.Set {
-			e.FieldStart("ComponentInfoValue")
-			s.ComponentInfoValue.Encode(e)
-		}
-	}
-	{
-		if s.ComponentType.Set {
-			e.FieldStart("ComponentType")
-			s.ComponentType.Encode(e)
-		}
-	}
-	{
-		if s.Criticality.Set {
-			e.FieldStart("Criticality")
-			s.Criticality.Encode(e)
-		}
-	}
-	{
-		if s.DisplayName.Set {
-			e.FieldStart("DisplayName")
-			s.DisplayName.Encode(e)
-		}
-	}
-	{
-		if s.InstalledVersion.Set {
-			e.FieldStart("InstalledVersion")
-			s.InstalledVersion.Encode(e)
-		}
-	}
-	{
-		if s.JobID.Set {
-			e.FieldStart("JobID")
-			s.JobID.Encode(e)
-		}
-	}
-	{
-		if s.Name.Set {
-			e.FieldStart("Name")
-			s.Name.Encode(e)
-		}
-	}
-	{
-		if s.PackageName.Set {
-			e.FieldStart("PackageName")
-			s.PackageName.Encode(e)
-		}
-	}
-	{
-		if s.PackagePath.Set {
-			e.FieldStart("PackagePath")
-			s.PackagePath.Encode(e)
-		}
-	}
-	{
-		if s.PackageVersion.Set {
-			e.FieldStart("PackageVersion")
-			s.PackageVersion.Encode(e)
-		}
-	}
-	{
-		if s.RebootType.Set {
-			e.FieldStart("RebootType")
-			s.RebootType.Encode(e)
-		}
-	}
-	{
-		if s.Target.Set {
-			e.FieldStart("Target")
-			s.Target.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishDellUpgradeFirmwareUpdateListItem = [15]string{
-	0:  "BaseLocation",
-	1:  "ComponentID",
-	2:  "ComponentInfoName",
-	3:  "ComponentInfoValue",
-	4:  "ComponentType",
-	5:  "Criticality",
-	6:  "DisplayName",
-	7:  "InstalledVersion",
-	8:  "JobID",
-	9:  "Name",
-	10: "PackageName",
-	11: "PackagePath",
-	12: "PackageVersion",
-	13: "RebootType",
-	14: "Target",
-}
-
-// Decode decodes RedfishDellUpgradeFirmwareUpdateListItem from json.
-func (s *RedfishDellUpgradeFirmwareUpdateListItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishDellUpgradeFirmwareUpdateListItem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "BaseLocation":
-			if err := func() error {
-				s.BaseLocation.Reset()
-				if err := s.BaseLocation.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"BaseLocation\"")
-			}
-		case "ComponentID":
-			if err := func() error {
-				s.ComponentID.Reset()
-				if err := s.ComponentID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ComponentID\"")
-			}
-		case "ComponentInfoName":
-			if err := func() error {
-				s.ComponentInfoName.Reset()
-				if err := s.ComponentInfoName.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ComponentInfoName\"")
-			}
-		case "ComponentInfoValue":
-			if err := func() error {
-				s.ComponentInfoValue.Reset()
-				if err := s.ComponentInfoValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ComponentInfoValue\"")
-			}
-		case "ComponentType":
-			if err := func() error {
-				s.ComponentType.Reset()
-				if err := s.ComponentType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ComponentType\"")
-			}
-		case "Criticality":
-			if err := func() error {
-				s.Criticality.Reset()
-				if err := s.Criticality.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Criticality\"")
-			}
-		case "DisplayName":
-			if err := func() error {
-				s.DisplayName.Reset()
-				if err := s.DisplayName.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"DisplayName\"")
-			}
-		case "InstalledVersion":
-			if err := func() error {
-				s.InstalledVersion.Reset()
-				if err := s.InstalledVersion.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"InstalledVersion\"")
-			}
-		case "JobID":
-			if err := func() error {
-				s.JobID.Reset()
-				if err := s.JobID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"JobID\"")
-			}
-		case "Name":
-			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Name\"")
-			}
-		case "PackageName":
-			if err := func() error {
-				s.PackageName.Reset()
-				if err := s.PackageName.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"PackageName\"")
-			}
-		case "PackagePath":
-			if err := func() error {
-				s.PackagePath.Reset()
-				if err := s.PackagePath.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"PackagePath\"")
-			}
-		case "PackageVersion":
-			if err := func() error {
-				s.PackageVersion.Reset()
-				if err := s.PackageVersion.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"PackageVersion\"")
-			}
-		case "RebootType":
-			if err := func() error {
-				s.RebootType.Reset()
-				if err := s.RebootType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RebootType\"")
-			}
-		case "Target":
-			if err := func() error {
-				s.Target.Reset()
-				if err := s.Target.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Target\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishDellUpgradeFirmwareUpdateListItem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishDellUpgradeFirmwareUpdateListItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishDellUpgradeFirmwareUpdateListItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishJob) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishJob) encodeFields(e *jx.Encoder) {
-	{
-		if s.Jobs.Set {
-			e.FieldStart("jobs")
-			s.Jobs.Encode(e)
-		}
-	}
-	{
-		if s.Name.Set {
-			e.FieldStart("name")
-			s.Name.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishJob = [2]string{
-	0: "jobs",
-	1: "name",
-}
-
-// Decode decodes RedfishJob from json.
-func (s *RedfishJob) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishJob to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "jobs":
-			if err := func() error {
-				s.Jobs.Reset()
-				if err := s.Jobs.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"jobs\"")
-			}
-		case "name":
-			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"name\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishJob")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishJob) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishJob) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishJobJobsItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishJobJobsItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.MessageDotExtendedInfo != nil {
-			e.FieldStart("@Message.ExtendedInfo")
-			e.ArrStart()
-			for _, elem := range s.MessageDotExtendedInfo {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
-		}
-	}
-	{
-		if s.OdataDotContext.Set {
-			e.FieldStart("@odata.context")
-			s.OdataDotContext.Encode(e)
-		}
-	}
-	{
-		if s.OdataDotEtag.Set {
-			e.FieldStart("@odata.etag")
-			s.OdataDotEtag.Encode(e)
-		}
-	}
-	{
-		if s.OdataDotID.Set {
-			e.FieldStart("@odata.id")
-			s.OdataDotID.Encode(e)
-		}
-	}
-	{
-		if s.OdataDotType.Set {
-			e.FieldStart("@odata.type")
-			s.OdataDotType.Encode(e)
-		}
-	}
-	{
-		if s.CreatedBy.Set {
-			e.FieldStart("CreatedBy")
-			s.CreatedBy.Encode(e)
-		}
-	}
-	{
-		if s.CreationTime.Set {
-			e.FieldStart("CreationTime")
-			s.CreationTime.Encode(e)
-		}
-	}
-	{
-		if s.Description.Set {
-			e.FieldStart("Description")
-			s.Description.Encode(e)
-		}
-	}
-	{
-		if s.EndTime.Set {
-			e.FieldStart("EndTime")
-			s.EndTime.Encode(e)
-		}
-	}
-	{
-		if s.EstimatedCompletionTime.Set {
-			e.FieldStart("EstimatedCompletionTime")
-			s.EstimatedCompletionTime.Encode(e)
-		}
-	}
-	{
-		if s.EstimatedDuration.Set {
-			e.FieldStart("EstimatedDuration")
-			s.EstimatedDuration.Encode(e)
-		}
-	}
-	{
-		if s.HidePayload.Set {
-			e.FieldStart("HidePayload")
-			s.HidePayload.Encode(e)
-		}
-	}
-	{
-		if s.ID.Set {
-			e.FieldStart("Id")
-			s.ID.Encode(e)
-		}
-	}
-	{
-		if s.JobPriority.Set {
-			e.FieldStart("JobPriority")
-			s.JobPriority.Encode(e)
-		}
-	}
-	{
-		if s.JobState.Set {
-			e.FieldStart("JobState")
-			s.JobState.Encode(e)
-		}
-	}
-	{
-		if s.JobStatus.Set {
-			e.FieldStart("JobStatus")
-			s.JobStatus.Encode(e)
-		}
-	}
-	{
-		if s.JobType.Set {
-			e.FieldStart("JobType")
-			s.JobType.Encode(e)
-		}
-	}
-	{
-		if s.MaxExecutionTime.Set {
-			e.FieldStart("MaxExecutionTime")
-			s.MaxExecutionTime.Encode(e)
-		}
-	}
-	{
-		if s.Messages.Set {
-			e.FieldStart("Messages")
-			s.Messages.Encode(e)
-		}
-	}
-	{
-		if s.Name.Set {
-			e.FieldStart("Name")
-			s.Name.Encode(e)
-		}
-	}
-	{
-		if len(s.Oem) != 0 {
-			e.FieldStart("Oem")
-			e.Raw(s.Oem)
-		}
-	}
-	{
-		if s.Parameters.Set {
-			e.FieldStart("Parameters")
-			s.Parameters.Encode(e)
-		}
-	}
-	{
-		if s.Payload.Set {
-			e.FieldStart("Payload")
-			s.Payload.Encode(e)
-		}
-	}
-	{
-		if s.PercentComplete.Set {
-			e.FieldStart("PercentComplete")
-			s.PercentComplete.Encode(e)
-		}
-	}
-	{
-		if s.RawData.Set {
-			e.FieldStart("RawData")
-			s.RawData.Encode(e)
-		}
-	}
-	{
-		if s.Schedule.Set {
-			e.FieldStart("Schedule")
-			s.Schedule.Encode(e)
-		}
-	}
-	{
-		if s.StartTime.Set {
-			e.FieldStart("StartTime")
-			s.StartTime.Encode(e)
-		}
-	}
-	{
-		if s.StepOrder.Set {
-			e.FieldStart("StepOrder")
-			s.StepOrder.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishJobJobsItem = [28]string{
-	0:  "@Message.ExtendedInfo",
-	1:  "@odata.context",
-	2:  "@odata.etag",
-	3:  "@odata.id",
-	4:  "@odata.type",
-	5:  "CreatedBy",
-	6:  "CreationTime",
-	7:  "Description",
-	8:  "EndTime",
-	9:  "EstimatedCompletionTime",
-	10: "EstimatedDuration",
-	11: "HidePayload",
-	12: "Id",
-	13: "JobPriority",
-	14: "JobState",
-	15: "JobStatus",
-	16: "JobType",
-	17: "MaxExecutionTime",
-	18: "Messages",
-	19: "Name",
-	20: "Oem",
-	21: "Parameters",
-	22: "Payload",
-	23: "PercentComplete",
-	24: "RawData",
-	25: "Schedule",
-	26: "StartTime",
-	27: "StepOrder",
-}
-
-// Decode decodes RedfishJobJobsItem from json.
-func (s *RedfishJobJobsItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishJobJobsItem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "@Message.ExtendedInfo":
-			if err := func() error {
-				s.MessageDotExtendedInfo = make([]RedfishJobJobsItemMessageDotExtendedInfoItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishJobJobsItemMessageDotExtendedInfoItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.MessageDotExtendedInfo = append(s.MessageDotExtendedInfo, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"@Message.ExtendedInfo\"")
-			}
-		case "@odata.context":
-			if err := func() error {
-				s.OdataDotContext.Reset()
-				if err := s.OdataDotContext.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"@odata.context\"")
-			}
-		case "@odata.etag":
-			if err := func() error {
-				s.OdataDotEtag.Reset()
-				if err := s.OdataDotEtag.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"@odata.etag\"")
-			}
-		case "@odata.id":
-			if err := func() error {
-				s.OdataDotID.Reset()
-				if err := s.OdataDotID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"@odata.id\"")
-			}
-		case "@odata.type":
-			if err := func() error {
-				s.OdataDotType.Reset()
-				if err := s.OdataDotType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"@odata.type\"")
-			}
-		case "CreatedBy":
-			if err := func() error {
-				s.CreatedBy.Reset()
-				if err := s.CreatedBy.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"CreatedBy\"")
-			}
-		case "CreationTime":
-			if err := func() error {
-				s.CreationTime.Reset()
-				if err := s.CreationTime.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"CreationTime\"")
-			}
-		case "Description":
-			if err := func() error {
-				s.Description.Reset()
-				if err := s.Description.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Description\"")
-			}
-		case "EndTime":
-			if err := func() error {
-				s.EndTime.Reset()
-				if err := s.EndTime.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"EndTime\"")
-			}
-		case "EstimatedCompletionTime":
-			if err := func() error {
-				s.EstimatedCompletionTime.Reset()
-				if err := s.EstimatedCompletionTime.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"EstimatedCompletionTime\"")
-			}
-		case "EstimatedDuration":
-			if err := func() error {
-				s.EstimatedDuration.Reset()
-				if err := s.EstimatedDuration.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"EstimatedDuration\"")
-			}
-		case "HidePayload":
-			if err := func() error {
-				s.HidePayload.Reset()
-				if err := s.HidePayload.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"HidePayload\"")
-			}
-		case "Id":
-			if err := func() error {
-				s.ID.Reset()
-				if err := s.ID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Id\"")
-			}
-		case "JobPriority":
-			if err := func() error {
-				s.JobPriority.Reset()
-				if err := s.JobPriority.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"JobPriority\"")
-			}
-		case "JobState":
-			if err := func() error {
-				s.JobState.Reset()
-				if err := s.JobState.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"JobState\"")
-			}
-		case "JobStatus":
-			if err := func() error {
-				s.JobStatus.Reset()
-				if err := s.JobStatus.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"JobStatus\"")
-			}
-		case "JobType":
-			if err := func() error {
-				s.JobType.Reset()
-				if err := s.JobType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"JobType\"")
-			}
-		case "MaxExecutionTime":
-			if err := func() error {
-				s.MaxExecutionTime.Reset()
-				if err := s.MaxExecutionTime.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MaxExecutionTime\"")
-			}
-		case "Messages":
-			if err := func() error {
-				s.Messages.Reset()
-				if err := s.Messages.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Messages\"")
-			}
-		case "Name":
-			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Name\"")
-			}
-		case "Oem":
-			if err := func() error {
-				v, err := d.RawAppend(nil)
-				s.Oem = jx.Raw(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Oem\"")
-			}
-		case "Parameters":
-			if err := func() error {
-				s.Parameters.Reset()
-				if err := s.Parameters.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Parameters\"")
-			}
-		case "Payload":
-			if err := func() error {
-				s.Payload.Reset()
-				if err := s.Payload.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Payload\"")
-			}
-		case "PercentComplete":
-			if err := func() error {
-				s.PercentComplete.Reset()
-				if err := s.PercentComplete.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"PercentComplete\"")
-			}
-		case "RawData":
-			if err := func() error {
-				s.RawData.Reset()
-				if err := s.RawData.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RawData\"")
-			}
-		case "Schedule":
-			if err := func() error {
-				s.Schedule.Reset()
-				if err := s.Schedule.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Schedule\"")
-			}
-		case "StartTime":
-			if err := func() error {
-				s.StartTime.Reset()
-				if err := s.StartTime.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"StartTime\"")
-			}
-		case "StepOrder":
-			if err := func() error {
-				s.StepOrder.Reset()
-				if err := s.StepOrder.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"StepOrder\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishJobJobsItem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishJobJobsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishJobJobsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.Message.Set {
-			e.FieldStart("Message")
-			s.Message.Encode(e)
-		}
-	}
-	{
-		if s.MessageArgs.Set {
-			e.FieldStart("MessageArgs")
-			s.MessageArgs.Encode(e)
-		}
-	}
-	{
-		if s.MessageId.Set {
-			e.FieldStart("MessageId")
-			s.MessageId.Encode(e)
-		}
-	}
-	{
-		if s.MessageSeverity.Set {
-			e.FieldStart("MessageSeverity")
-			s.MessageSeverity.Encode(e)
-		}
-	}
-	{
-		if len(s.Oem) != 0 {
-			e.FieldStart("Oem")
-			e.Raw(s.Oem)
-		}
-	}
-	{
-		if s.RelatedProperties.Set {
-			e.FieldStart("RelatedProperties")
-			s.RelatedProperties.Encode(e)
-		}
-	}
-	{
-		if s.Resolution.Set {
-			e.FieldStart("Resolution")
-			s.Resolution.Encode(e)
-		}
-	}
-	{
-		if s.ResolutionSteps.Set {
-			e.FieldStart("ResolutionSteps")
-			s.ResolutionSteps.Encode(e)
-		}
-	}
-	{
-		if s.Severity.Set {
-			e.FieldStart("Severity")
-			s.Severity.Encode(e)
-		}
-	}
-	{
-		if s.UserAuthenticationSource.Set {
-			e.FieldStart("UserAuthenticationSource")
-			s.UserAuthenticationSource.Encode(e)
-		}
-	}
-	{
-		if s.Username.Set {
-			e.FieldStart("Username")
-			s.Username.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishJobJobsItemMessageDotExtendedInfoItem = [11]string{
-	0:  "Message",
-	1:  "MessageArgs",
-	2:  "MessageId",
-	3:  "MessageSeverity",
-	4:  "Oem",
-	5:  "RelatedProperties",
-	6:  "Resolution",
-	7:  "ResolutionSteps",
-	8:  "Severity",
-	9:  "UserAuthenticationSource",
-	10: "Username",
-}
-
-// Decode decodes RedfishJobJobsItemMessageDotExtendedInfoItem from json.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishJobJobsItemMessageDotExtendedInfoItem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "Message":
-			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Message\"")
-			}
-		case "MessageArgs":
-			if err := func() error {
-				s.MessageArgs.Reset()
-				if err := s.MessageArgs.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MessageArgs\"")
-			}
-		case "MessageId":
-			if err := func() error {
-				s.MessageId.Reset()
-				if err := s.MessageId.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MessageId\"")
-			}
-		case "MessageSeverity":
-			if err := func() error {
-				s.MessageSeverity.Reset()
-				if err := s.MessageSeverity.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MessageSeverity\"")
-			}
-		case "Oem":
-			if err := func() error {
-				v, err := d.RawAppend(nil)
-				s.Oem = jx.Raw(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Oem\"")
-			}
-		case "RelatedProperties":
-			if err := func() error {
-				s.RelatedProperties.Reset()
-				if err := s.RelatedProperties.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RelatedProperties\"")
-			}
-		case "Resolution":
-			if err := func() error {
-				s.Resolution.Reset()
-				if err := s.Resolution.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Resolution\"")
-			}
-		case "ResolutionSteps":
-			if err := func() error {
-				s.ResolutionSteps.Reset()
-				if err := s.ResolutionSteps.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ResolutionSteps\"")
-			}
-		case "Severity":
-			if err := func() error {
-				s.Severity.Reset()
-				if err := s.Severity.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Severity\"")
-			}
-		case "UserAuthenticationSource":
-			if err := func() error {
-				s.UserAuthenticationSource.Reset()
-				if err := s.UserAuthenticationSource.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"UserAuthenticationSource\"")
-			}
-		case "Username":
-			if err := func() error {
-				s.Username.Reset()
-				if err := s.Username.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Username\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishJobJobsItemMessageDotExtendedInfoItem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.ActionParameters.Set {
-			e.FieldStart("ActionParameters")
-			s.ActionParameters.Encode(e)
-		}
-	}
-	{
-		if s.ActionURI.Set {
-			e.FieldStart("ActionURI")
-			s.ActionURI.Encode(e)
-		}
-	}
-	{
-		if len(s.Oem) != 0 {
-			e.FieldStart("Oem")
-			e.Raw(s.Oem)
-		}
-	}
-	{
-		if s.Priority.Set {
-			e.FieldStart("Priority")
-			s.Priority.Encode(e)
-		}
-	}
-	{
-		if s.ResolutionType.Set {
-			e.FieldStart("ResolutionType")
-			s.ResolutionType.Encode(e)
-		}
-	}
-	{
-		if s.RetryCount.Set {
-			e.FieldStart("RetryCount")
-			s.RetryCount.Encode(e)
-		}
-	}
-	{
-		if s.RetryIntervalSeconds.Set {
-			e.FieldStart("RetryIntervalSeconds")
-			s.RetryIntervalSeconds.Encode(e)
-		}
-	}
-	{
-		if s.TargetComponentURI.Set {
-			e.FieldStart("TargetComponentURI")
-			s.TargetComponentURI.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem = [8]string{
-	0: "ActionParameters",
-	1: "ActionURI",
-	2: "Oem",
-	3: "Priority",
-	4: "ResolutionType",
-	5: "RetryCount",
-	6: "RetryIntervalSeconds",
-	7: "TargetComponentURI",
-}
-
-// Decode decodes RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem from json.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "ActionParameters":
-			if err := func() error {
-				s.ActionParameters.Reset()
-				if err := s.ActionParameters.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ActionParameters\"")
-			}
-		case "ActionURI":
-			if err := func() error {
-				s.ActionURI.Reset()
-				if err := s.ActionURI.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ActionURI\"")
-			}
-		case "Oem":
-			if err := func() error {
-				v, err := d.RawAppend(nil)
-				s.Oem = jx.Raw(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Oem\"")
-			}
-		case "Priority":
-			if err := func() error {
-				s.Priority.Reset()
-				if err := s.Priority.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Priority\"")
-			}
-		case "ResolutionType":
-			if err := func() error {
-				s.ResolutionType.Reset()
-				if err := s.ResolutionType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ResolutionType\"")
-			}
-		case "RetryCount":
-			if err := func() error {
-				s.RetryCount.Reset()
-				if err := s.RetryCount.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RetryCount\"")
-			}
-		case "RetryIntervalSeconds":
-			if err := func() error {
-				s.RetryIntervalSeconds.Reset()
-				if err := s.RetryIntervalSeconds.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RetryIntervalSeconds\"")
-			}
-		case "TargetComponentURI":
-			if err := func() error {
-				s.TargetComponentURI.Reset()
-				if err := s.TargetComponentURI.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"TargetComponentURI\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.AllowableNumbers.Set {
-			e.FieldStart("AllowableNumbers")
-			s.AllowableNumbers.Encode(e)
-		}
-	}
-	{
-		if s.AllowablePattern.Set {
-			e.FieldStart("AllowablePattern")
-			s.AllowablePattern.Encode(e)
-		}
-	}
-	{
-		if s.AllowableValueDescriptions.Set {
-			e.FieldStart("AllowableValueDescriptions")
-			s.AllowableValueDescriptions.Encode(e)
-		}
-	}
-	{
-		if s.AllowableValues.Set {
-			e.FieldStart("AllowableValues")
-			s.AllowableValues.Encode(e)
-		}
-	}
-	{
-		if s.ArraySizeMaximum.Set {
-			e.FieldStart("ArraySizeMaximum")
-			s.ArraySizeMaximum.Encode(e)
-		}
-	}
-	{
-		if s.ArraySizeMinimum.Set {
-			e.FieldStart("ArraySizeMinimum")
-			s.ArraySizeMinimum.Encode(e)
-		}
-	}
-	{
-		if s.DataType.Set {
-			e.FieldStart("DataType")
-			s.DataType.Encode(e)
-		}
-	}
-	{
-		if s.DefaultValue.Set {
-			e.FieldStart("DefaultValue")
-			s.DefaultValue.Encode(e)
-		}
-	}
-	{
-		if s.MaximumValue.Set {
-			e.FieldStart("MaximumValue")
-			s.MaximumValue.Encode(e)
-		}
-	}
-	{
-		if s.MinimumValue.Set {
-			e.FieldStart("MinimumValue")
-			s.MinimumValue.Encode(e)
-		}
-	}
-	{
-		if s.Name.Set {
-			e.FieldStart("Name")
-			s.Name.Encode(e)
-		}
-	}
-	{
-		if s.NoDefaultValue.Set {
-			e.FieldStart("NoDefaultValue")
-			s.NoDefaultValue.Encode(e)
-		}
-	}
-	{
-		if s.ObjectDataType.Set {
-			e.FieldStart("ObjectDataType")
-			s.ObjectDataType.Encode(e)
-		}
-	}
-	{
-		if s.Required.Set {
-			e.FieldStart("Required")
-			s.Required.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem = [14]string{
-	0:  "AllowableNumbers",
-	1:  "AllowablePattern",
-	2:  "AllowableValueDescriptions",
-	3:  "AllowableValues",
-	4:  "ArraySizeMaximum",
-	5:  "ArraySizeMinimum",
-	6:  "DataType",
-	7:  "DefaultValue",
-	8:  "MaximumValue",
-	9:  "MinimumValue",
-	10: "Name",
-	11: "NoDefaultValue",
-	12: "ObjectDataType",
-	13: "Required",
-}
-
-// Decode decodes RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "AllowableNumbers":
-			if err := func() error {
-				s.AllowableNumbers.Reset()
-				if err := s.AllowableNumbers.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"AllowableNumbers\"")
-			}
-		case "AllowablePattern":
-			if err := func() error {
-				s.AllowablePattern.Reset()
-				if err := s.AllowablePattern.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"AllowablePattern\"")
-			}
-		case "AllowableValueDescriptions":
-			if err := func() error {
-				s.AllowableValueDescriptions.Reset()
-				if err := s.AllowableValueDescriptions.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"AllowableValueDescriptions\"")
-			}
-		case "AllowableValues":
-			if err := func() error {
-				s.AllowableValues.Reset()
-				if err := s.AllowableValues.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"AllowableValues\"")
-			}
-		case "ArraySizeMaximum":
-			if err := func() error {
-				s.ArraySizeMaximum.Reset()
-				if err := s.ArraySizeMaximum.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ArraySizeMaximum\"")
-			}
-		case "ArraySizeMinimum":
-			if err := func() error {
-				s.ArraySizeMinimum.Reset()
-				if err := s.ArraySizeMinimum.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ArraySizeMinimum\"")
-			}
-		case "DataType":
-			if err := func() error {
-				s.DataType.Reset()
-				if err := s.DataType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"DataType\"")
-			}
-		case "DefaultValue":
-			if err := func() error {
-				s.DefaultValue.Reset()
-				if err := s.DefaultValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"DefaultValue\"")
-			}
-		case "MaximumValue":
-			if err := func() error {
-				s.MaximumValue.Reset()
-				if err := s.MaximumValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MaximumValue\"")
-			}
-		case "MinimumValue":
-			if err := func() error {
-				s.MinimumValue.Reset()
-				if err := s.MinimumValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MinimumValue\"")
-			}
-		case "Name":
-			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Name\"")
-			}
-		case "NoDefaultValue":
-			if err := func() error {
-				s.NoDefaultValue.Reset()
-				if err := s.NoDefaultValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"NoDefaultValue\"")
-			}
-		case "ObjectDataType":
-			if err := func() error {
-				s.ObjectDataType.Reset()
-				if err := s.ObjectDataType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ObjectDataType\"")
-			}
-		case "Required":
-			if err := func() error {
-				s.Required.Reset()
-				if err := s.Required.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Required\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishJobJobsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishJobJobsItemMessagesItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishJobJobsItemMessagesItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.Message.Set {
-			e.FieldStart("Message")
-			s.Message.Encode(e)
-		}
-	}
-	{
-		if s.MessageArgs.Set {
-			e.FieldStart("MessageArgs")
-			s.MessageArgs.Encode(e)
-		}
-	}
-	{
-		if s.MessageId.Set {
-			e.FieldStart("MessageId")
-			s.MessageId.Encode(e)
-		}
-	}
-	{
-		if s.MessageSeverity.Set {
-			e.FieldStart("MessageSeverity")
-			s.MessageSeverity.Encode(e)
-		}
-	}
-	{
-		if len(s.Oem) != 0 {
-			e.FieldStart("Oem")
-			e.Raw(s.Oem)
-		}
-	}
-	{
-		if s.RelatedProperties.Set {
-			e.FieldStart("RelatedProperties")
-			s.RelatedProperties.Encode(e)
-		}
-	}
-	{
-		if s.Resolution.Set {
-			e.FieldStart("Resolution")
-			s.Resolution.Encode(e)
-		}
-	}
-	{
-		if s.ResolutionSteps.Set {
-			e.FieldStart("ResolutionSteps")
-			s.ResolutionSteps.Encode(e)
-		}
-	}
-	{
-		if s.Severity.Set {
-			e.FieldStart("Severity")
-			s.Severity.Encode(e)
-		}
-	}
-	{
-		if s.UserAuthenticationSource.Set {
-			e.FieldStart("UserAuthenticationSource")
-			s.UserAuthenticationSource.Encode(e)
-		}
-	}
-	{
-		if s.Username.Set {
-			e.FieldStart("Username")
-			s.Username.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishJobJobsItemMessagesItem = [11]string{
-	0:  "Message",
-	1:  "MessageArgs",
-	2:  "MessageId",
-	3:  "MessageSeverity",
-	4:  "Oem",
-	5:  "RelatedProperties",
-	6:  "Resolution",
-	7:  "ResolutionSteps",
-	8:  "Severity",
-	9:  "UserAuthenticationSource",
-	10: "Username",
-}
-
-// Decode decodes RedfishJobJobsItemMessagesItem from json.
-func (s *RedfishJobJobsItemMessagesItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishJobJobsItemMessagesItem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "Message":
-			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Message\"")
-			}
-		case "MessageArgs":
-			if err := func() error {
-				s.MessageArgs.Reset()
-				if err := s.MessageArgs.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MessageArgs\"")
-			}
-		case "MessageId":
-			if err := func() error {
-				s.MessageId.Reset()
-				if err := s.MessageId.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MessageId\"")
-			}
-		case "MessageSeverity":
-			if err := func() error {
-				s.MessageSeverity.Reset()
-				if err := s.MessageSeverity.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MessageSeverity\"")
-			}
-		case "Oem":
-			if err := func() error {
-				v, err := d.RawAppend(nil)
-				s.Oem = jx.Raw(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Oem\"")
-			}
-		case "RelatedProperties":
-			if err := func() error {
-				s.RelatedProperties.Reset()
-				if err := s.RelatedProperties.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RelatedProperties\"")
-			}
-		case "Resolution":
-			if err := func() error {
-				s.Resolution.Reset()
-				if err := s.Resolution.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Resolution\"")
-			}
-		case "ResolutionSteps":
-			if err := func() error {
-				s.ResolutionSteps.Reset()
-				if err := s.ResolutionSteps.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ResolutionSteps\"")
-			}
-		case "Severity":
-			if err := func() error {
-				s.Severity.Reset()
-				if err := s.Severity.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Severity\"")
-			}
-		case "UserAuthenticationSource":
-			if err := func() error {
-				s.UserAuthenticationSource.Reset()
-				if err := s.UserAuthenticationSource.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"UserAuthenticationSource\"")
-			}
-		case "Username":
-			if err := func() error {
-				s.Username.Reset()
-				if err := s.Username.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Username\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishJobJobsItemMessagesItem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishJobJobsItemMessagesItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishJobJobsItemMessagesItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.ActionParameters.Set {
-			e.FieldStart("ActionParameters")
-			s.ActionParameters.Encode(e)
-		}
-	}
-	{
-		if s.ActionURI.Set {
-			e.FieldStart("ActionURI")
-			s.ActionURI.Encode(e)
-		}
-	}
-	{
-		if len(s.Oem) != 0 {
-			e.FieldStart("Oem")
-			e.Raw(s.Oem)
-		}
-	}
-	{
-		if s.Priority.Set {
-			e.FieldStart("Priority")
-			s.Priority.Encode(e)
-		}
-	}
-	{
-		if s.ResolutionType.Set {
-			e.FieldStart("ResolutionType")
-			s.ResolutionType.Encode(e)
-		}
-	}
-	{
-		if s.RetryCount.Set {
-			e.FieldStart("RetryCount")
-			s.RetryCount.Encode(e)
-		}
-	}
-	{
-		if s.RetryIntervalSeconds.Set {
-			e.FieldStart("RetryIntervalSeconds")
-			s.RetryIntervalSeconds.Encode(e)
-		}
-	}
-	{
-		if s.TargetComponentURI.Set {
-			e.FieldStart("TargetComponentURI")
-			s.TargetComponentURI.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishJobJobsItemMessagesItemResolutionStepsItem = [8]string{
-	0: "ActionParameters",
-	1: "ActionURI",
-	2: "Oem",
-	3: "Priority",
-	4: "ResolutionType",
-	5: "RetryCount",
-	6: "RetryIntervalSeconds",
-	7: "TargetComponentURI",
-}
-
-// Decode decodes RedfishJobJobsItemMessagesItemResolutionStepsItem from json.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishJobJobsItemMessagesItemResolutionStepsItem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "ActionParameters":
-			if err := func() error {
-				s.ActionParameters.Reset()
-				if err := s.ActionParameters.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ActionParameters\"")
-			}
-		case "ActionURI":
-			if err := func() error {
-				s.ActionURI.Reset()
-				if err := s.ActionURI.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ActionURI\"")
-			}
-		case "Oem":
-			if err := func() error {
-				v, err := d.RawAppend(nil)
-				s.Oem = jx.Raw(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Oem\"")
-			}
-		case "Priority":
-			if err := func() error {
-				s.Priority.Reset()
-				if err := s.Priority.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Priority\"")
-			}
-		case "ResolutionType":
-			if err := func() error {
-				s.ResolutionType.Reset()
-				if err := s.ResolutionType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ResolutionType\"")
-			}
-		case "RetryCount":
-			if err := func() error {
-				s.RetryCount.Reset()
-				if err := s.RetryCount.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RetryCount\"")
-			}
-		case "RetryIntervalSeconds":
-			if err := func() error {
-				s.RetryIntervalSeconds.Reset()
-				if err := s.RetryIntervalSeconds.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RetryIntervalSeconds\"")
-			}
-		case "TargetComponentURI":
-			if err := func() error {
-				s.TargetComponentURI.Reset()
-				if err := s.TargetComponentURI.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"TargetComponentURI\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishJobJobsItemMessagesItemResolutionStepsItem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.AllowableNumbers.Set {
-			e.FieldStart("AllowableNumbers")
-			s.AllowableNumbers.Encode(e)
-		}
-	}
-	{
-		if s.AllowablePattern.Set {
-			e.FieldStart("AllowablePattern")
-			s.AllowablePattern.Encode(e)
-		}
-	}
-	{
-		if s.AllowableValueDescriptions.Set {
-			e.FieldStart("AllowableValueDescriptions")
-			s.AllowableValueDescriptions.Encode(e)
-		}
-	}
-	{
-		if s.AllowableValues.Set {
-			e.FieldStart("AllowableValues")
-			s.AllowableValues.Encode(e)
-		}
-	}
-	{
-		if s.ArraySizeMaximum.Set {
-			e.FieldStart("ArraySizeMaximum")
-			s.ArraySizeMaximum.Encode(e)
-		}
-	}
-	{
-		if s.ArraySizeMinimum.Set {
-			e.FieldStart("ArraySizeMinimum")
-			s.ArraySizeMinimum.Encode(e)
-		}
-	}
-	{
-		if s.DataType.Set {
-			e.FieldStart("DataType")
-			s.DataType.Encode(e)
-		}
-	}
-	{
-		if s.DefaultValue.Set {
-			e.FieldStart("DefaultValue")
-			s.DefaultValue.Encode(e)
-		}
-	}
-	{
-		if s.MaximumValue.Set {
-			e.FieldStart("MaximumValue")
-			s.MaximumValue.Encode(e)
-		}
-	}
-	{
-		if s.MinimumValue.Set {
-			e.FieldStart("MinimumValue")
-			s.MinimumValue.Encode(e)
-		}
-	}
-	{
-		if s.Name.Set {
-			e.FieldStart("Name")
-			s.Name.Encode(e)
-		}
-	}
-	{
-		if s.NoDefaultValue.Set {
-			e.FieldStart("NoDefaultValue")
-			s.NoDefaultValue.Encode(e)
-		}
-	}
-	{
-		if s.ObjectDataType.Set {
-			e.FieldStart("ObjectDataType")
-			s.ObjectDataType.Encode(e)
-		}
-	}
-	{
-		if s.Required.Set {
-			e.FieldStart("Required")
-			s.Required.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem = [14]string{
-	0:  "AllowableNumbers",
-	1:  "AllowablePattern",
-	2:  "AllowableValueDescriptions",
-	3:  "AllowableValues",
-	4:  "ArraySizeMaximum",
-	5:  "ArraySizeMinimum",
-	6:  "DataType",
-	7:  "DefaultValue",
-	8:  "MaximumValue",
-	9:  "MinimumValue",
-	10: "Name",
-	11: "NoDefaultValue",
-	12: "ObjectDataType",
-	13: "Required",
-}
-
-// Decode decodes RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem from json.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "AllowableNumbers":
-			if err := func() error {
-				s.AllowableNumbers.Reset()
-				if err := s.AllowableNumbers.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"AllowableNumbers\"")
-			}
-		case "AllowablePattern":
-			if err := func() error {
-				s.AllowablePattern.Reset()
-				if err := s.AllowablePattern.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"AllowablePattern\"")
-			}
-		case "AllowableValueDescriptions":
-			if err := func() error {
-				s.AllowableValueDescriptions.Reset()
-				if err := s.AllowableValueDescriptions.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"AllowableValueDescriptions\"")
-			}
-		case "AllowableValues":
-			if err := func() error {
-				s.AllowableValues.Reset()
-				if err := s.AllowableValues.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"AllowableValues\"")
-			}
-		case "ArraySizeMaximum":
-			if err := func() error {
-				s.ArraySizeMaximum.Reset()
-				if err := s.ArraySizeMaximum.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ArraySizeMaximum\"")
-			}
-		case "ArraySizeMinimum":
-			if err := func() error {
-				s.ArraySizeMinimum.Reset()
-				if err := s.ArraySizeMinimum.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ArraySizeMinimum\"")
-			}
-		case "DataType":
-			if err := func() error {
-				s.DataType.Reset()
-				if err := s.DataType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"DataType\"")
-			}
-		case "DefaultValue":
-			if err := func() error {
-				s.DefaultValue.Reset()
-				if err := s.DefaultValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"DefaultValue\"")
-			}
-		case "MaximumValue":
-			if err := func() error {
-				s.MaximumValue.Reset()
-				if err := s.MaximumValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MaximumValue\"")
-			}
-		case "MinimumValue":
-			if err := func() error {
-				s.MinimumValue.Reset()
-				if err := s.MinimumValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MinimumValue\"")
-			}
-		case "Name":
-			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Name\"")
-			}
-		case "NoDefaultValue":
-			if err := func() error {
-				s.NoDefaultValue.Reset()
-				if err := s.NoDefaultValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"NoDefaultValue\"")
-			}
-		case "ObjectDataType":
-			if err := func() error {
-				s.ObjectDataType.Reset()
-				if err := s.ObjectDataType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ObjectDataType\"")
-			}
-		case "Required":
-			if err := func() error {
-				s.Required.Reset()
-				if err := s.Required.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Required\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishJobJobsItemMessagesItemResolutionStepsItemActionParametersItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s RedfishJobJobsItemParameters) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields implements json.Marshaler.
-func (s RedfishJobJobsItemParameters) encodeFields(e *jx.Encoder) {
-	for k, elem := range s {
-		e.FieldStart(k)
-
-		if len(elem) != 0 {
-			e.Raw(elem)
-		}
-	}
-}
-
-// Decode decodes RedfishJobJobsItemParameters from json.
-func (s *RedfishJobJobsItemParameters) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishJobJobsItemParameters to nil")
-	}
-	m := s.init()
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		var elem jx.Raw
-		if err := func() error {
-			v, err := d.RawAppend(nil)
-			elem = jx.Raw(v)
-			if err != nil {
-				return err
-			}
-			return nil
-		}(); err != nil {
-			return errors.Wrapf(err, "decode field %q", k)
-		}
-		m[string(k)] = elem
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishJobJobsItemParameters")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s RedfishJobJobsItemParameters) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishJobJobsItemParameters) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishJobJobsItemPayload) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishJobJobsItemPayload) encodeFields(e *jx.Encoder) {
-	{
-		if s.HttpHeaders.Set {
-			e.FieldStart("HttpHeaders")
-			s.HttpHeaders.Encode(e)
-		}
-	}
-	{
-		if s.HttpOperation.Set {
-			e.FieldStart("HttpOperation")
-			s.HttpOperation.Encode(e)
-		}
-	}
-	{
-		if s.JsonBody.Set {
-			e.FieldStart("JsonBody")
-			s.JsonBody.Encode(e)
-		}
-	}
-	{
-		if s.TargetUri.Set {
-			e.FieldStart("TargetUri")
-			s.TargetUri.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishJobJobsItemPayload = [4]string{
-	0: "HttpHeaders",
-	1: "HttpOperation",
-	2: "JsonBody",
-	3: "TargetUri",
-}
-
-// Decode decodes RedfishJobJobsItemPayload from json.
-func (s *RedfishJobJobsItemPayload) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishJobJobsItemPayload to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "HttpHeaders":
-			if err := func() error {
-				s.HttpHeaders.Reset()
-				if err := s.HttpHeaders.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"HttpHeaders\"")
-			}
-		case "HttpOperation":
-			if err := func() error {
-				s.HttpOperation.Reset()
-				if err := s.HttpOperation.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"HttpOperation\"")
-			}
-		case "JsonBody":
-			if err := func() error {
-				s.JsonBody.Reset()
-				if err := s.JsonBody.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"JsonBody\"")
-			}
-		case "TargetUri":
-			if err := func() error {
-				s.TargetUri.Reset()
-				if err := s.TargetUri.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"TargetUri\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishJobJobsItemPayload")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishJobJobsItemPayload) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishJobJobsItemPayload) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishJobJobsItemSchedule) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishJobJobsItemSchedule) encodeFields(e *jx.Encoder) {
-	{
-		if s.EnabledDaysOfMonth.Set {
-			e.FieldStart("EnabledDaysOfMonth")
-			s.EnabledDaysOfMonth.Encode(e)
-		}
-	}
-	{
-		if s.EnabledDaysOfWeek.Set {
-			e.FieldStart("EnabledDaysOfWeek")
-			s.EnabledDaysOfWeek.Encode(e)
-		}
-	}
-	{
-		if s.EnabledIntervals.Set {
-			e.FieldStart("EnabledIntervals")
-			s.EnabledIntervals.Encode(e)
-		}
-	}
-	{
-		if s.EnabledMonthsOfYear.Set {
-			e.FieldStart("EnabledMonthsOfYear")
-			s.EnabledMonthsOfYear.Encode(e)
-		}
-	}
-	{
-		if s.InitialStartTime.Set {
-			e.FieldStart("InitialStartTime")
-			s.InitialStartTime.Encode(e)
-		}
-	}
-	{
-		if s.Lifetime.Set {
-			e.FieldStart("Lifetime")
-			s.Lifetime.Encode(e)
-		}
-	}
-	{
-		if s.MaxOccurrences.Set {
-			e.FieldStart("MaxOccurrences")
-			s.MaxOccurrences.Encode(e)
-		}
-	}
-	{
-		if s.Name.Set {
-			e.FieldStart("Name")
-			s.Name.Encode(e)
-		}
-	}
-	{
-		if s.RecurrenceInterval.Set {
-			e.FieldStart("RecurrenceInterval")
-			s.RecurrenceInterval.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishJobJobsItemSchedule = [9]string{
-	0: "EnabledDaysOfMonth",
-	1: "EnabledDaysOfWeek",
-	2: "EnabledIntervals",
-	3: "EnabledMonthsOfYear",
-	4: "InitialStartTime",
-	5: "Lifetime",
-	6: "MaxOccurrences",
-	7: "Name",
-	8: "RecurrenceInterval",
-}
-
-// Decode decodes RedfishJobJobsItemSchedule from json.
-func (s *RedfishJobJobsItemSchedule) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishJobJobsItemSchedule to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "EnabledDaysOfMonth":
-			if err := func() error {
-				s.EnabledDaysOfMonth.Reset()
-				if err := s.EnabledDaysOfMonth.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"EnabledDaysOfMonth\"")
-			}
-		case "EnabledDaysOfWeek":
-			if err := func() error {
-				s.EnabledDaysOfWeek.Reset()
-				if err := s.EnabledDaysOfWeek.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"EnabledDaysOfWeek\"")
-			}
-		case "EnabledIntervals":
-			if err := func() error {
-				s.EnabledIntervals.Reset()
-				if err := s.EnabledIntervals.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"EnabledIntervals\"")
-			}
-		case "EnabledMonthsOfYear":
-			if err := func() error {
-				s.EnabledMonthsOfYear.Reset()
-				if err := s.EnabledMonthsOfYear.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"EnabledMonthsOfYear\"")
-			}
-		case "InitialStartTime":
-			if err := func() error {
-				s.InitialStartTime.Reset()
-				if err := s.InitialStartTime.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"InitialStartTime\"")
-			}
-		case "Lifetime":
-			if err := func() error {
-				s.Lifetime.Reset()
-				if err := s.Lifetime.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Lifetime\"")
-			}
-		case "MaxOccurrences":
-			if err := func() error {
-				s.MaxOccurrences.Reset()
-				if err := s.MaxOccurrences.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MaxOccurrences\"")
-			}
-		case "Name":
-			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Name\"")
-			}
-		case "RecurrenceInterval":
-			if err := func() error {
-				s.RecurrenceInterval.Reset()
-				if err := s.RecurrenceInterval.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RecurrenceInterval\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishJobJobsItemSchedule")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishJobJobsItemSchedule) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishJobJobsItemSchedule) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishMetricReport) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishMetricReport) encodeFields(e *jx.Encoder) {
-	{
-		if s.Name.Set {
-			e.FieldStart("name")
-			s.Name.Encode(e)
-		}
-	}
-	{
-		if s.Reports.Set {
-			e.FieldStart("reports")
-			s.Reports.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishMetricReport = [2]string{
-	0: "name",
-	1: "reports",
-}
-
-// Decode decodes RedfishMetricReport from json.
-func (s *RedfishMetricReport) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishMetricReport to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "name":
-			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"name\"")
-			}
-		case "reports":
-			if err := func() error {
-				s.Reports.Reset()
-				if err := s.Reports.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"reports\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishMetricReport")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishMetricReport) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishMetricReport) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishMetricReportReportsItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishMetricReportReportsItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.MessageDotExtendedInfo != nil {
-			e.FieldStart("@Message.ExtendedInfo")
-			e.ArrStart()
-			for _, elem := range s.MessageDotExtendedInfo {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
-		}
-	}
-	{
-		if s.OdataDotContext.Set {
-			e.FieldStart("@odata.context")
-			s.OdataDotContext.Encode(e)
-		}
-	}
-	{
-		if s.OdataDotEtag.Set {
-			e.FieldStart("@odata.etag")
-			s.OdataDotEtag.Encode(e)
-		}
-	}
-	{
-		if s.OdataDotID.Set {
-			e.FieldStart("@odata.id")
-			s.OdataDotID.Encode(e)
-		}
-	}
-	{
-		if s.OdataDotType.Set {
-			e.FieldStart("@odata.type")
-			s.OdataDotType.Encode(e)
-		}
-	}
-	{
-		if s.Context.Set {
-			e.FieldStart("Context")
-			s.Context.Encode(e)
-		}
-	}
-	{
-		if s.Description.Set {
-			e.FieldStart("Description")
-			s.Description.Encode(e)
-		}
-	}
-	{
-		if s.ID.Set {
-			e.FieldStart("Id")
-			s.ID.Encode(e)
-		}
-	}
-	{
-		if s.MetricValues.Set {
-			e.FieldStart("MetricValues")
-			s.MetricValues.Encode(e)
-		}
-	}
-	{
-		if s.Name.Set {
-			e.FieldStart("Name")
-			s.Name.Encode(e)
-		}
-	}
-	{
-		if len(s.Oem) != 0 {
-			e.FieldStart("Oem")
-			e.Raw(s.Oem)
-		}
-	}
-	{
-		if s.ReportSequence.Set {
-			e.FieldStart("ReportSequence")
-			s.ReportSequence.Encode(e)
-		}
-	}
-	{
-		if s.Timestamp.Set {
-			e.FieldStart("Timestamp")
-			s.Timestamp.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishMetricReportReportsItem = [13]string{
-	0:  "@Message.ExtendedInfo",
-	1:  "@odata.context",
-	2:  "@odata.etag",
-	3:  "@odata.id",
-	4:  "@odata.type",
-	5:  "Context",
-	6:  "Description",
-	7:  "Id",
-	8:  "MetricValues",
-	9:  "Name",
-	10: "Oem",
-	11: "ReportSequence",
-	12: "Timestamp",
-}
-
-// Decode decodes RedfishMetricReportReportsItem from json.
-func (s *RedfishMetricReportReportsItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishMetricReportReportsItem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "@Message.ExtendedInfo":
-			if err := func() error {
-				s.MessageDotExtendedInfo = make([]RedfishMetricReportReportsItemMessageDotExtendedInfoItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem RedfishMetricReportReportsItemMessageDotExtendedInfoItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.MessageDotExtendedInfo = append(s.MessageDotExtendedInfo, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"@Message.ExtendedInfo\"")
-			}
-		case "@odata.context":
-			if err := func() error {
-				s.OdataDotContext.Reset()
-				if err := s.OdataDotContext.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"@odata.context\"")
-			}
-		case "@odata.etag":
-			if err := func() error {
-				s.OdataDotEtag.Reset()
-				if err := s.OdataDotEtag.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"@odata.etag\"")
-			}
-		case "@odata.id":
-			if err := func() error {
-				s.OdataDotID.Reset()
-				if err := s.OdataDotID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"@odata.id\"")
-			}
-		case "@odata.type":
-			if err := func() error {
-				s.OdataDotType.Reset()
-				if err := s.OdataDotType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"@odata.type\"")
-			}
-		case "Context":
-			if err := func() error {
-				s.Context.Reset()
-				if err := s.Context.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Context\"")
-			}
-		case "Description":
-			if err := func() error {
-				s.Description.Reset()
-				if err := s.Description.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Description\"")
-			}
-		case "Id":
-			if err := func() error {
-				s.ID.Reset()
-				if err := s.ID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Id\"")
-			}
-		case "MetricValues":
-			if err := func() error {
-				s.MetricValues.Reset()
-				if err := s.MetricValues.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MetricValues\"")
-			}
-		case "Name":
-			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Name\"")
-			}
-		case "Oem":
-			if err := func() error {
-				v, err := d.RawAppend(nil)
-				s.Oem = jx.Raw(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Oem\"")
-			}
-		case "ReportSequence":
-			if err := func() error {
-				s.ReportSequence.Reset()
-				if err := s.ReportSequence.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ReportSequence\"")
-			}
-		case "Timestamp":
-			if err := func() error {
-				s.Timestamp.Reset()
-				if err := s.Timestamp.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Timestamp\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishMetricReportReportsItem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishMetricReportReportsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishMetricReportReportsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.Message.Set {
-			e.FieldStart("Message")
-			s.Message.Encode(e)
-		}
-	}
-	{
-		if s.MessageArgs.Set {
-			e.FieldStart("MessageArgs")
-			s.MessageArgs.Encode(e)
-		}
-	}
-	{
-		if s.MessageId.Set {
-			e.FieldStart("MessageId")
-			s.MessageId.Encode(e)
-		}
-	}
-	{
-		if s.MessageSeverity.Set {
-			e.FieldStart("MessageSeverity")
-			s.MessageSeverity.Encode(e)
-		}
-	}
-	{
-		if len(s.Oem) != 0 {
-			e.FieldStart("Oem")
-			e.Raw(s.Oem)
-		}
-	}
-	{
-		if s.RelatedProperties.Set {
-			e.FieldStart("RelatedProperties")
-			s.RelatedProperties.Encode(e)
-		}
-	}
-	{
-		if s.Resolution.Set {
-			e.FieldStart("Resolution")
-			s.Resolution.Encode(e)
-		}
-	}
-	{
-		if s.ResolutionSteps.Set {
-			e.FieldStart("ResolutionSteps")
-			s.ResolutionSteps.Encode(e)
-		}
-	}
-	{
-		if s.Severity.Set {
-			e.FieldStart("Severity")
-			s.Severity.Encode(e)
-		}
-	}
-	{
-		if s.UserAuthenticationSource.Set {
-			e.FieldStart("UserAuthenticationSource")
-			s.UserAuthenticationSource.Encode(e)
-		}
-	}
-	{
-		if s.Username.Set {
-			e.FieldStart("Username")
-			s.Username.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishMetricReportReportsItemMessageDotExtendedInfoItem = [11]string{
-	0:  "Message",
-	1:  "MessageArgs",
-	2:  "MessageId",
-	3:  "MessageSeverity",
-	4:  "Oem",
-	5:  "RelatedProperties",
-	6:  "Resolution",
-	7:  "ResolutionSteps",
-	8:  "Severity",
-	9:  "UserAuthenticationSource",
-	10: "Username",
-}
-
-// Decode decodes RedfishMetricReportReportsItemMessageDotExtendedInfoItem from json.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishMetricReportReportsItemMessageDotExtendedInfoItem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "Message":
-			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Message\"")
-			}
-		case "MessageArgs":
-			if err := func() error {
-				s.MessageArgs.Reset()
-				if err := s.MessageArgs.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MessageArgs\"")
-			}
-		case "MessageId":
-			if err := func() error {
-				s.MessageId.Reset()
-				if err := s.MessageId.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MessageId\"")
-			}
-		case "MessageSeverity":
-			if err := func() error {
-				s.MessageSeverity.Reset()
-				if err := s.MessageSeverity.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MessageSeverity\"")
-			}
-		case "Oem":
-			if err := func() error {
-				v, err := d.RawAppend(nil)
-				s.Oem = jx.Raw(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Oem\"")
-			}
-		case "RelatedProperties":
-			if err := func() error {
-				s.RelatedProperties.Reset()
-				if err := s.RelatedProperties.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RelatedProperties\"")
-			}
-		case "Resolution":
-			if err := func() error {
-				s.Resolution.Reset()
-				if err := s.Resolution.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Resolution\"")
-			}
-		case "ResolutionSteps":
-			if err := func() error {
-				s.ResolutionSteps.Reset()
-				if err := s.ResolutionSteps.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ResolutionSteps\"")
-			}
-		case "Severity":
-			if err := func() error {
-				s.Severity.Reset()
-				if err := s.Severity.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Severity\"")
-			}
-		case "UserAuthenticationSource":
-			if err := func() error {
-				s.UserAuthenticationSource.Reset()
-				if err := s.UserAuthenticationSource.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"UserAuthenticationSource\"")
-			}
-		case "Username":
-			if err := func() error {
-				s.Username.Reset()
-				if err := s.Username.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Username\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishMetricReportReportsItemMessageDotExtendedInfoItem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.ActionParameters.Set {
-			e.FieldStart("ActionParameters")
-			s.ActionParameters.Encode(e)
-		}
-	}
-	{
-		if s.ActionURI.Set {
-			e.FieldStart("ActionURI")
-			s.ActionURI.Encode(e)
-		}
-	}
-	{
-		if len(s.Oem) != 0 {
-			e.FieldStart("Oem")
-			e.Raw(s.Oem)
-		}
-	}
-	{
-		if s.Priority.Set {
-			e.FieldStart("Priority")
-			s.Priority.Encode(e)
-		}
-	}
-	{
-		if s.ResolutionType.Set {
-			e.FieldStart("ResolutionType")
-			s.ResolutionType.Encode(e)
-		}
-	}
-	{
-		if s.RetryCount.Set {
-			e.FieldStart("RetryCount")
-			s.RetryCount.Encode(e)
-		}
-	}
-	{
-		if s.RetryIntervalSeconds.Set {
-			e.FieldStart("RetryIntervalSeconds")
-			s.RetryIntervalSeconds.Encode(e)
-		}
-	}
-	{
-		if s.TargetComponentURI.Set {
-			e.FieldStart("TargetComponentURI")
-			s.TargetComponentURI.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem = [8]string{
-	0: "ActionParameters",
-	1: "ActionURI",
-	2: "Oem",
-	3: "Priority",
-	4: "ResolutionType",
-	5: "RetryCount",
-	6: "RetryIntervalSeconds",
-	7: "TargetComponentURI",
-}
-
-// Decode decodes RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem from json.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "ActionParameters":
-			if err := func() error {
-				s.ActionParameters.Reset()
-				if err := s.ActionParameters.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ActionParameters\"")
-			}
-		case "ActionURI":
-			if err := func() error {
-				s.ActionURI.Reset()
-				if err := s.ActionURI.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ActionURI\"")
-			}
-		case "Oem":
-			if err := func() error {
-				v, err := d.RawAppend(nil)
-				s.Oem = jx.Raw(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Oem\"")
-			}
-		case "Priority":
-			if err := func() error {
-				s.Priority.Reset()
-				if err := s.Priority.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Priority\"")
-			}
-		case "ResolutionType":
-			if err := func() error {
-				s.ResolutionType.Reset()
-				if err := s.ResolutionType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ResolutionType\"")
-			}
-		case "RetryCount":
-			if err := func() error {
-				s.RetryCount.Reset()
-				if err := s.RetryCount.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RetryCount\"")
-			}
-		case "RetryIntervalSeconds":
-			if err := func() error {
-				s.RetryIntervalSeconds.Reset()
-				if err := s.RetryIntervalSeconds.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RetryIntervalSeconds\"")
-			}
-		case "TargetComponentURI":
-			if err := func() error {
-				s.TargetComponentURI.Reset()
-				if err := s.TargetComponentURI.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"TargetComponentURI\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.AllowableNumbers.Set {
-			e.FieldStart("AllowableNumbers")
-			s.AllowableNumbers.Encode(e)
-		}
-	}
-	{
-		if s.AllowablePattern.Set {
-			e.FieldStart("AllowablePattern")
-			s.AllowablePattern.Encode(e)
-		}
-	}
-	{
-		if s.AllowableValueDescriptions.Set {
-			e.FieldStart("AllowableValueDescriptions")
-			s.AllowableValueDescriptions.Encode(e)
-		}
-	}
-	{
-		if s.AllowableValues.Set {
-			e.FieldStart("AllowableValues")
-			s.AllowableValues.Encode(e)
-		}
-	}
-	{
-		if s.ArraySizeMaximum.Set {
-			e.FieldStart("ArraySizeMaximum")
-			s.ArraySizeMaximum.Encode(e)
-		}
-	}
-	{
-		if s.ArraySizeMinimum.Set {
-			e.FieldStart("ArraySizeMinimum")
-			s.ArraySizeMinimum.Encode(e)
-		}
-	}
-	{
-		if s.DataType.Set {
-			e.FieldStart("DataType")
-			s.DataType.Encode(e)
-		}
-	}
-	{
-		if s.DefaultValue.Set {
-			e.FieldStart("DefaultValue")
-			s.DefaultValue.Encode(e)
-		}
-	}
-	{
-		if s.MaximumValue.Set {
-			e.FieldStart("MaximumValue")
-			s.MaximumValue.Encode(e)
-		}
-	}
-	{
-		if s.MinimumValue.Set {
-			e.FieldStart("MinimumValue")
-			s.MinimumValue.Encode(e)
-		}
-	}
-	{
-		if s.Name.Set {
-			e.FieldStart("Name")
-			s.Name.Encode(e)
-		}
-	}
-	{
-		if s.NoDefaultValue.Set {
-			e.FieldStart("NoDefaultValue")
-			s.NoDefaultValue.Encode(e)
-		}
-	}
-	{
-		if s.ObjectDataType.Set {
-			e.FieldStart("ObjectDataType")
-			s.ObjectDataType.Encode(e)
-		}
-	}
-	{
-		if s.Required.Set {
-			e.FieldStart("Required")
-			s.Required.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem = [14]string{
-	0:  "AllowableNumbers",
-	1:  "AllowablePattern",
-	2:  "AllowableValueDescriptions",
-	3:  "AllowableValues",
-	4:  "ArraySizeMaximum",
-	5:  "ArraySizeMinimum",
-	6:  "DataType",
-	7:  "DefaultValue",
-	8:  "MaximumValue",
-	9:  "MinimumValue",
-	10: "Name",
-	11: "NoDefaultValue",
-	12: "ObjectDataType",
-	13: "Required",
-}
-
-// Decode decodes RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "AllowableNumbers":
-			if err := func() error {
-				s.AllowableNumbers.Reset()
-				if err := s.AllowableNumbers.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"AllowableNumbers\"")
-			}
-		case "AllowablePattern":
-			if err := func() error {
-				s.AllowablePattern.Reset()
-				if err := s.AllowablePattern.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"AllowablePattern\"")
-			}
-		case "AllowableValueDescriptions":
-			if err := func() error {
-				s.AllowableValueDescriptions.Reset()
-				if err := s.AllowableValueDescriptions.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"AllowableValueDescriptions\"")
-			}
-		case "AllowableValues":
-			if err := func() error {
-				s.AllowableValues.Reset()
-				if err := s.AllowableValues.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"AllowableValues\"")
-			}
-		case "ArraySizeMaximum":
-			if err := func() error {
-				s.ArraySizeMaximum.Reset()
-				if err := s.ArraySizeMaximum.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ArraySizeMaximum\"")
-			}
-		case "ArraySizeMinimum":
-			if err := func() error {
-				s.ArraySizeMinimum.Reset()
-				if err := s.ArraySizeMinimum.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ArraySizeMinimum\"")
-			}
-		case "DataType":
-			if err := func() error {
-				s.DataType.Reset()
-				if err := s.DataType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"DataType\"")
-			}
-		case "DefaultValue":
-			if err := func() error {
-				s.DefaultValue.Reset()
-				if err := s.DefaultValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"DefaultValue\"")
-			}
-		case "MaximumValue":
-			if err := func() error {
-				s.MaximumValue.Reset()
-				if err := s.MaximumValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MaximumValue\"")
-			}
-		case "MinimumValue":
-			if err := func() error {
-				s.MinimumValue.Reset()
-				if err := s.MinimumValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MinimumValue\"")
-			}
-		case "Name":
-			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Name\"")
-			}
-		case "NoDefaultValue":
-			if err := func() error {
-				s.NoDefaultValue.Reset()
-				if err := s.NoDefaultValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"NoDefaultValue\"")
-			}
-		case "ObjectDataType":
-			if err := func() error {
-				s.ObjectDataType.Reset()
-				if err := s.ObjectDataType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ObjectDataType\"")
-			}
-		case "Required":
-			if err := func() error {
-				s.Required.Reset()
-				if err := s.Required.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Required\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishMetricReportReportsItemMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishMetricReportReportsItemMetricValuesItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishMetricReportReportsItemMetricValuesItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.MetricId.Set {
-			e.FieldStart("MetricId")
-			s.MetricId.Encode(e)
-		}
-	}
-	{
-		if s.MetricProperty.Set {
-			e.FieldStart("MetricProperty")
-			s.MetricProperty.Encode(e)
-		}
-	}
-	{
-		if s.MetricValue.Set {
-			e.FieldStart("MetricValue")
-			s.MetricValue.Encode(e)
-		}
-	}
-	{
-		if len(s.Oem) != 0 {
-			e.FieldStart("Oem")
-			e.Raw(s.Oem)
-		}
-	}
-	{
-		if s.Timestamp.Set {
-			e.FieldStart("Timestamp")
-			s.Timestamp.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishMetricReportReportsItemMetricValuesItem = [5]string{
-	0: "MetricId",
-	1: "MetricProperty",
-	2: "MetricValue",
-	3: "Oem",
-	4: "Timestamp",
-}
-
-// Decode decodes RedfishMetricReportReportsItemMetricValuesItem from json.
-func (s *RedfishMetricReportReportsItemMetricValuesItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishMetricReportReportsItemMetricValuesItem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "MetricId":
-			if err := func() error {
-				s.MetricId.Reset()
-				if err := s.MetricId.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MetricId\"")
-			}
-		case "MetricProperty":
-			if err := func() error {
-				s.MetricProperty.Reset()
-				if err := s.MetricProperty.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MetricProperty\"")
-			}
-		case "MetricValue":
-			if err := func() error {
-				s.MetricValue.Reset()
-				if err := s.MetricValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MetricValue\"")
-			}
-		case "Oem":
-			if err := func() error {
-				v, err := d.RawAppend(nil)
-				s.Oem = jx.Raw(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Oem\"")
-			}
-		case "Timestamp":
-			if err := func() error {
-				s.Timestamp.Reset()
-				if err := s.Timestamp.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Timestamp\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishMetricReportReportsItemMetricValuesItem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishMetricReportReportsItemMetricValuesItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishMetricReportReportsItemMetricValuesItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishSystem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishSystem) encodeFields(e *jx.Encoder) {
-	{
-		if s.BiosVersion.Set {
-			e.FieldStart("bios_version")
-			s.BiosVersion.Encode(e)
-		}
-	}
-	{
-		if s.BootNext.Set {
-			e.FieldStart("boot_next")
-			s.BootNext.Encode(e)
-		}
-	}
-	{
-		if s.BootOrder.Set {
-			e.FieldStart("boot_order")
-			s.BootOrder.Encode(e)
-		}
-	}
-	{
-		if s.Health.Set {
-			e.FieldStart("health")
-			s.Health.Encode(e)
-		}
-	}
-	{
-		if s.HostName.Set {
-			e.FieldStart("host_name")
-			s.HostName.Encode(e)
-		}
-	}
-	{
-		if s.Manufacturer.Set {
-			e.FieldStart("manufacturer")
-			s.Manufacturer.Encode(e)
-		}
-	}
-	{
-		if s.Model.Set {
-			e.FieldStart("model")
-			s.Model.Encode(e)
-		}
-	}
-	{
-		if s.Name.Set {
-			e.FieldStart("name")
-			s.Name.Encode(e)
-		}
-	}
-	{
-		if s.OemDell.Set {
-			e.FieldStart("oem_dell")
-			s.OemDell.Encode(e)
-		}
-	}
-	{
-		if s.PowerStatus.Set {
-			e.FieldStart("power_status")
-			s.PowerStatus.Encode(e)
-		}
-	}
-	{
-		if s.ProcessorCount.Set {
-			e.FieldStart("processor_count")
-			s.ProcessorCount.Encode(e)
-		}
-	}
-	{
-		if s.SerialNumber.Set {
-			e.FieldStart("serial_number")
-			s.SerialNumber.Encode(e)
-		}
-	}
-	{
-		if s.TotalMemory.Set {
-			e.FieldStart("total_memory")
-			s.TotalMemory.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishSystem = [13]string{
-	0:  "bios_version",
-	1:  "boot_next",
-	2:  "boot_order",
-	3:  "health",
-	4:  "host_name",
-	5:  "manufacturer",
-	6:  "model",
-	7:  "name",
-	8:  "oem_dell",
-	9:  "power_status",
-	10: "processor_count",
-	11: "serial_number",
-	12: "total_memory",
-}
-
-// Decode decodes RedfishSystem from json.
-func (s *RedfishSystem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishSystem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "bios_version":
-			if err := func() error {
-				s.BiosVersion.Reset()
-				if err := s.BiosVersion.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"bios_version\"")
-			}
-		case "boot_next":
-			if err := func() error {
-				s.BootNext.Reset()
-				if err := s.BootNext.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"boot_next\"")
-			}
-		case "boot_order":
-			if err := func() error {
-				s.BootOrder.Reset()
-				if err := s.BootOrder.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"boot_order\"")
-			}
-		case "health":
-			if err := func() error {
-				s.Health.Reset()
-				if err := s.Health.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"health\"")
-			}
-		case "host_name":
-			if err := func() error {
-				s.HostName.Reset()
-				if err := s.HostName.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"host_name\"")
-			}
-		case "manufacturer":
-			if err := func() error {
-				s.Manufacturer.Reset()
-				if err := s.Manufacturer.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"manufacturer\"")
-			}
-		case "model":
-			if err := func() error {
-				s.Model.Reset()
-				if err := s.Model.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"model\"")
-			}
-		case "name":
-			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"name\"")
-			}
-		case "oem_dell":
-			if err := func() error {
-				s.OemDell.Reset()
-				if err := s.OemDell.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"oem_dell\"")
-			}
-		case "power_status":
-			if err := func() error {
-				s.PowerStatus.Reset()
-				if err := s.PowerStatus.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"power_status\"")
-			}
-		case "processor_count":
-			if err := func() error {
-				s.ProcessorCount.Reset()
-				if err := s.ProcessorCount.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"processor_count\"")
-			}
-		case "serial_number":
-			if err := func() error {
-				s.SerialNumber.Reset()
-				if err := s.SerialNumber.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"serial_number\"")
-			}
-		case "total_memory":
-			if err := func() error {
-				s.TotalMemory.Reset()
-				if err := s.TotalMemory.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"total_memory\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishSystem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishSystem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishSystem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishSystemOemDell) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishSystemOemDell) encodeFields(e *jx.Encoder) {
-	{
-		if s.MessageDotExtendedInfo.Set {
-			e.FieldStart("@Message.ExtendedInfo")
-			s.MessageDotExtendedInfo.Encode(e)
-		}
-	}
-	{
-		if s.OdataDotContext.Set {
-			e.FieldStart("@odata.context")
-			s.OdataDotContext.Encode(e)
-		}
-	}
-	{
-		if s.OdataDotEtag.Set {
-			e.FieldStart("@odata.etag")
-			s.OdataDotEtag.Encode(e)
-		}
-	}
-	{
-		if s.OdataDotID.Set {
-			e.FieldStart("@odata.id")
-			s.OdataDotID.Encode(e)
-		}
-	}
-	{
-		if s.OdataDotType.Set {
-			e.FieldStart("@odata.type")
-			s.OdataDotType.Encode(e)
-		}
-	}
-	{
-		if s.BIOSReleaseDate.Set {
-			e.FieldStart("BIOSReleaseDate")
-			s.BIOSReleaseDate.Encode(e)
-		}
-	}
-	{
-		if s.BaseBoardChassisSlot.Set {
-			e.FieldStart("BaseBoardChassisSlot")
-			s.BaseBoardChassisSlot.Encode(e)
-		}
-	}
-	{
-		if s.BatteryRollupStatus.Set {
-			e.FieldStart("BatteryRollupStatus")
-			s.BatteryRollupStatus.Encode(e)
-		}
-	}
-	{
-		if s.BladeGeometry.Set {
-			e.FieldStart("BladeGeometry")
-			s.BladeGeometry.Encode(e)
-		}
-	}
-	{
-		if s.CMCIP.Set {
-			e.FieldStart("CMCIP")
-			s.CMCIP.Encode(e)
-		}
-	}
-	{
-		if s.CPURollupStatus.Set {
-			e.FieldStart("CPURollupStatus")
-			s.CPURollupStatus.Encode(e)
-		}
-	}
-	{
-		if s.ChassisModel.Set {
-			e.FieldStart("ChassisModel")
-			s.ChassisModel.Encode(e)
-		}
-	}
-	{
-		if s.ChassisName.Set {
-			e.FieldStart("ChassisName")
-			s.ChassisName.Encode(e)
-		}
-	}
-	{
-		if s.ChassisServiceTag.Set {
-			e.FieldStart("ChassisServiceTag")
-			s.ChassisServiceTag.Encode(e)
-		}
-	}
-	{
-		if s.ChassisSystemHeightUnit.Set {
-			e.FieldStart("ChassisSystemHeightUnit")
-			s.ChassisSystemHeightUnit.Encode(e)
-		}
-	}
-	{
-		if s.CurrentRollupStatus.Set {
-			e.FieldStart("CurrentRollupStatus")
-			s.CurrentRollupStatus.Encode(e)
-		}
-	}
-	{
-		if s.Description.Set {
-			e.FieldStart("Description")
-			s.Description.Encode(e)
-		}
-	}
-	{
-		if s.EstimatedExhaustTemperatureCelsius.Set {
-			e.FieldStart("EstimatedExhaustTemperatureCelsius")
-			s.EstimatedExhaustTemperatureCelsius.Encode(e)
-		}
-	}
-	{
-		if s.EstimatedSystemAirflowCFM.Set {
-			e.FieldStart("EstimatedSystemAirflowCFM")
-			s.EstimatedSystemAirflowCFM.Encode(e)
-		}
-	}
-	{
-		if s.ExpressServiceCode.Set {
-			e.FieldStart("ExpressServiceCode")
-			s.ExpressServiceCode.Encode(e)
-		}
-	}
-	{
-		if s.FanRollupStatus.Set {
-			e.FieldStart("FanRollupStatus")
-			s.FanRollupStatus.Encode(e)
-		}
-	}
-	{
-		if s.IDSDMRollupStatus.Set {
-			e.FieldStart("IDSDMRollupStatus")
-			s.IDSDMRollupStatus.Encode(e)
-		}
-	}
-	{
-		if s.ID.Set {
-			e.FieldStart("Id")
-			s.ID.Encode(e)
-		}
-	}
-	{
-		if s.IntrusionRollupStatus.Set {
-			e.FieldStart("IntrusionRollupStatus")
-			s.IntrusionRollupStatus.Encode(e)
-		}
-	}
-	{
-		if s.IsOEMBranded.Set {
-			e.FieldStart("IsOEMBranded")
-			s.IsOEMBranded.Encode(e)
-		}
-	}
-	{
-		if s.LastSystemInventoryTime.Set {
-			e.FieldStart("LastSystemInventoryTime")
-			s.LastSystemInventoryTime.Encode(e)
-		}
-	}
-	{
-		if s.LastUpdateTime.Set {
-			e.FieldStart("LastUpdateTime")
-			s.LastUpdateTime.Encode(e)
-		}
-	}
-	{
-		if s.LicensingRollupStatus.Set {
-			e.FieldStart("LicensingRollupStatus")
-			s.LicensingRollupStatus.Encode(e)
-		}
-	}
-	{
-		if s.ManagedSystemSize.Set {
-			e.FieldStart("ManagedSystemSize")
-			s.ManagedSystemSize.Encode(e)
-		}
-	}
-	{
-		if s.MaxCPUSockets.Set {
-			e.FieldStart("MaxCPUSockets")
-			s.MaxCPUSockets.Encode(e)
-		}
-	}
-	{
-		if s.MaxDIMMSlots.Set {
-			e.FieldStart("MaxDIMMSlots")
-			s.MaxDIMMSlots.Encode(e)
-		}
-	}
-	{
-		if s.MaxPCIeSlots.Set {
-			e.FieldStart("MaxPCIeSlots")
-			s.MaxPCIeSlots.Encode(e)
-		}
-	}
-	{
-		if s.MemoryOperationMode.Set {
-			e.FieldStart("MemoryOperationMode")
-			s.MemoryOperationMode.Encode(e)
-		}
-	}
-	{
-		if s.Name.Set {
-			e.FieldStart("Name")
-			s.Name.Encode(e)
-		}
-	}
-	{
-		if s.NodeID.Set {
-			e.FieldStart("NodeID")
-			s.NodeID.Encode(e)
-		}
-	}
-	{
-		if len(s.Oem) != 0 {
-			e.FieldStart("Oem")
-			e.Raw(s.Oem)
-		}
-	}
-	{
-		if s.PSRollupStatus.Set {
-			e.FieldStart("PSRollupStatus")
-			s.PSRollupStatus.Encode(e)
-		}
-	}
-	{
-		if s.PlatformGUID.Set {
-			e.FieldStart("PlatformGUID")
-			s.PlatformGUID.Encode(e)
-		}
-	}
-	{
-		if s.PopulatedDIMMSlots.Set {
-			e.FieldStart("PopulatedDIMMSlots")
-			s.PopulatedDIMMSlots.Encode(e)
-		}
-	}
-	{
-		if s.PopulatedPCIeSlots.Set {
-			e.FieldStart("PopulatedPCIeSlots")
-			s.PopulatedPCIeSlots.Encode(e)
-		}
-	}
-	{
-		if s.PowerCapEnabledState.Set {
-			e.FieldStart("PowerCapEnabledState")
-			s.PowerCapEnabledState.Encode(e)
-		}
-	}
-	{
-		if s.SDCardRollupStatus.Set {
-			e.FieldStart("SDCardRollupStatus")
-			s.SDCardRollupStatus.Encode(e)
-		}
-	}
-	{
-		if s.SELRollupStatus.Set {
-			e.FieldStart("SELRollupStatus")
-			s.SELRollupStatus.Encode(e)
-		}
-	}
-	{
-		if s.ServerAllocationWatts.Set {
-			e.FieldStart("ServerAllocationWatts")
-			s.ServerAllocationWatts.Encode(e)
-		}
-	}
-	{
-		if s.StorageRollupStatus.Set {
-			e.FieldStart("StorageRollupStatus")
-			s.StorageRollupStatus.Encode(e)
-		}
-	}
-	{
-		if s.SysMemErrorMethodology.Set {
-			e.FieldStart("SysMemErrorMethodology")
-			s.SysMemErrorMethodology.Encode(e)
-		}
-	}
-	{
-		if s.SysMemFailOverState.Set {
-			e.FieldStart("SysMemFailOverState")
-			s.SysMemFailOverState.Encode(e)
-		}
-	}
-	{
-		if s.SysMemLocation.Set {
-			e.FieldStart("SysMemLocation")
-			s.SysMemLocation.Encode(e)
-		}
-	}
-	{
-		if s.SysMemPrimaryStatus.Set {
-			e.FieldStart("SysMemPrimaryStatus")
-			s.SysMemPrimaryStatus.Encode(e)
-		}
-	}
-	{
-		if s.SystemGeneration.Set {
-			e.FieldStart("SystemGeneration")
-			s.SystemGeneration.Encode(e)
-		}
-	}
-	{
-		if s.SystemID.Set {
-			e.FieldStart("SystemID")
-			s.SystemID.Encode(e)
-		}
-	}
-	{
-		if s.SystemRevision.Set {
-			e.FieldStart("SystemRevision")
-			s.SystemRevision.Encode(e)
-		}
-	}
-	{
-		if s.TempRollupStatus.Set {
-			e.FieldStart("TempRollupStatus")
-			s.TempRollupStatus.Encode(e)
-		}
-	}
-	{
-		if s.TempStatisticsRollupStatus.Set {
-			e.FieldStart("TempStatisticsRollupStatus")
-			s.TempStatisticsRollupStatus.Encode(e)
-		}
-	}
-	{
-		if s.UUID.Set {
-			e.FieldStart("UUID")
-			s.UUID.Encode(e)
-		}
-	}
-	{
-		if s.VoltRollupStatus.Set {
-			e.FieldStart("VoltRollupStatus")
-			s.VoltRollupStatus.Encode(e)
-		}
-	}
-	{
-		if s.SmbiosGUID.Set {
-			e.FieldStart("smbiosGUID")
-			s.SmbiosGUID.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishSystemOemDell = [57]string{
-	0:  "@Message.ExtendedInfo",
-	1:  "@odata.context",
-	2:  "@odata.etag",
-	3:  "@odata.id",
-	4:  "@odata.type",
-	5:  "BIOSReleaseDate",
-	6:  "BaseBoardChassisSlot",
-	7:  "BatteryRollupStatus",
-	8:  "BladeGeometry",
-	9:  "CMCIP",
-	10: "CPURollupStatus",
-	11: "ChassisModel",
-	12: "ChassisName",
-	13: "ChassisServiceTag",
-	14: "ChassisSystemHeightUnit",
-	15: "CurrentRollupStatus",
-	16: "Description",
-	17: "EstimatedExhaustTemperatureCelsius",
-	18: "EstimatedSystemAirflowCFM",
-	19: "ExpressServiceCode",
-	20: "FanRollupStatus",
-	21: "IDSDMRollupStatus",
-	22: "Id",
-	23: "IntrusionRollupStatus",
-	24: "IsOEMBranded",
-	25: "LastSystemInventoryTime",
-	26: "LastUpdateTime",
-	27: "LicensingRollupStatus",
-	28: "ManagedSystemSize",
-	29: "MaxCPUSockets",
-	30: "MaxDIMMSlots",
-	31: "MaxPCIeSlots",
-	32: "MemoryOperationMode",
-	33: "Name",
-	34: "NodeID",
-	35: "Oem",
-	36: "PSRollupStatus",
-	37: "PlatformGUID",
-	38: "PopulatedDIMMSlots",
-	39: "PopulatedPCIeSlots",
-	40: "PowerCapEnabledState",
-	41: "SDCardRollupStatus",
-	42: "SELRollupStatus",
-	43: "ServerAllocationWatts",
-	44: "StorageRollupStatus",
-	45: "SysMemErrorMethodology",
-	46: "SysMemFailOverState",
-	47: "SysMemLocation",
-	48: "SysMemPrimaryStatus",
-	49: "SystemGeneration",
-	50: "SystemID",
-	51: "SystemRevision",
-	52: "TempRollupStatus",
-	53: "TempStatisticsRollupStatus",
-	54: "UUID",
-	55: "VoltRollupStatus",
-	56: "smbiosGUID",
-}
-
-// Decode decodes RedfishSystemOemDell from json.
-func (s *RedfishSystemOemDell) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishSystemOemDell to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "@Message.ExtendedInfo":
-			if err := func() error {
-				s.MessageDotExtendedInfo.Reset()
-				if err := s.MessageDotExtendedInfo.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"@Message.ExtendedInfo\"")
-			}
-		case "@odata.context":
-			if err := func() error {
-				s.OdataDotContext.Reset()
-				if err := s.OdataDotContext.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"@odata.context\"")
-			}
-		case "@odata.etag":
-			if err := func() error {
-				s.OdataDotEtag.Reset()
-				if err := s.OdataDotEtag.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"@odata.etag\"")
-			}
-		case "@odata.id":
-			if err := func() error {
-				s.OdataDotID.Reset()
-				if err := s.OdataDotID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"@odata.id\"")
-			}
-		case "@odata.type":
-			if err := func() error {
-				s.OdataDotType.Reset()
-				if err := s.OdataDotType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"@odata.type\"")
-			}
-		case "BIOSReleaseDate":
-			if err := func() error {
-				s.BIOSReleaseDate.Reset()
-				if err := s.BIOSReleaseDate.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"BIOSReleaseDate\"")
-			}
-		case "BaseBoardChassisSlot":
-			if err := func() error {
-				s.BaseBoardChassisSlot.Reset()
-				if err := s.BaseBoardChassisSlot.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"BaseBoardChassisSlot\"")
-			}
-		case "BatteryRollupStatus":
-			if err := func() error {
-				s.BatteryRollupStatus.Reset()
-				if err := s.BatteryRollupStatus.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"BatteryRollupStatus\"")
-			}
-		case "BladeGeometry":
-			if err := func() error {
-				s.BladeGeometry.Reset()
-				if err := s.BladeGeometry.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"BladeGeometry\"")
-			}
-		case "CMCIP":
-			if err := func() error {
-				s.CMCIP.Reset()
-				if err := s.CMCIP.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"CMCIP\"")
-			}
-		case "CPURollupStatus":
-			if err := func() error {
-				s.CPURollupStatus.Reset()
-				if err := s.CPURollupStatus.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"CPURollupStatus\"")
-			}
-		case "ChassisModel":
-			if err := func() error {
-				s.ChassisModel.Reset()
-				if err := s.ChassisModel.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ChassisModel\"")
-			}
-		case "ChassisName":
-			if err := func() error {
-				s.ChassisName.Reset()
-				if err := s.ChassisName.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ChassisName\"")
-			}
-		case "ChassisServiceTag":
-			if err := func() error {
-				s.ChassisServiceTag.Reset()
-				if err := s.ChassisServiceTag.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ChassisServiceTag\"")
-			}
-		case "ChassisSystemHeightUnit":
-			if err := func() error {
-				s.ChassisSystemHeightUnit.Reset()
-				if err := s.ChassisSystemHeightUnit.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ChassisSystemHeightUnit\"")
-			}
-		case "CurrentRollupStatus":
-			if err := func() error {
-				s.CurrentRollupStatus.Reset()
-				if err := s.CurrentRollupStatus.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"CurrentRollupStatus\"")
-			}
-		case "Description":
-			if err := func() error {
-				s.Description.Reset()
-				if err := s.Description.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Description\"")
-			}
-		case "EstimatedExhaustTemperatureCelsius":
-			if err := func() error {
-				s.EstimatedExhaustTemperatureCelsius.Reset()
-				if err := s.EstimatedExhaustTemperatureCelsius.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"EstimatedExhaustTemperatureCelsius\"")
-			}
-		case "EstimatedSystemAirflowCFM":
-			if err := func() error {
-				s.EstimatedSystemAirflowCFM.Reset()
-				if err := s.EstimatedSystemAirflowCFM.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"EstimatedSystemAirflowCFM\"")
-			}
-		case "ExpressServiceCode":
-			if err := func() error {
-				s.ExpressServiceCode.Reset()
-				if err := s.ExpressServiceCode.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ExpressServiceCode\"")
-			}
-		case "FanRollupStatus":
-			if err := func() error {
-				s.FanRollupStatus.Reset()
-				if err := s.FanRollupStatus.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"FanRollupStatus\"")
-			}
-		case "IDSDMRollupStatus":
-			if err := func() error {
-				s.IDSDMRollupStatus.Reset()
-				if err := s.IDSDMRollupStatus.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"IDSDMRollupStatus\"")
-			}
-		case "Id":
-			if err := func() error {
-				s.ID.Reset()
-				if err := s.ID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Id\"")
-			}
-		case "IntrusionRollupStatus":
-			if err := func() error {
-				s.IntrusionRollupStatus.Reset()
-				if err := s.IntrusionRollupStatus.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"IntrusionRollupStatus\"")
-			}
-		case "IsOEMBranded":
-			if err := func() error {
-				s.IsOEMBranded.Reset()
-				if err := s.IsOEMBranded.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"IsOEMBranded\"")
-			}
-		case "LastSystemInventoryTime":
-			if err := func() error {
-				s.LastSystemInventoryTime.Reset()
-				if err := s.LastSystemInventoryTime.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"LastSystemInventoryTime\"")
-			}
-		case "LastUpdateTime":
-			if err := func() error {
-				s.LastUpdateTime.Reset()
-				if err := s.LastUpdateTime.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"LastUpdateTime\"")
-			}
-		case "LicensingRollupStatus":
-			if err := func() error {
-				s.LicensingRollupStatus.Reset()
-				if err := s.LicensingRollupStatus.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"LicensingRollupStatus\"")
-			}
-		case "ManagedSystemSize":
-			if err := func() error {
-				s.ManagedSystemSize.Reset()
-				if err := s.ManagedSystemSize.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ManagedSystemSize\"")
-			}
-		case "MaxCPUSockets":
-			if err := func() error {
-				s.MaxCPUSockets.Reset()
-				if err := s.MaxCPUSockets.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MaxCPUSockets\"")
-			}
-		case "MaxDIMMSlots":
-			if err := func() error {
-				s.MaxDIMMSlots.Reset()
-				if err := s.MaxDIMMSlots.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MaxDIMMSlots\"")
-			}
-		case "MaxPCIeSlots":
-			if err := func() error {
-				s.MaxPCIeSlots.Reset()
-				if err := s.MaxPCIeSlots.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MaxPCIeSlots\"")
-			}
-		case "MemoryOperationMode":
-			if err := func() error {
-				s.MemoryOperationMode.Reset()
-				if err := s.MemoryOperationMode.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MemoryOperationMode\"")
-			}
-		case "Name":
-			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Name\"")
-			}
-		case "NodeID":
-			if err := func() error {
-				s.NodeID.Reset()
-				if err := s.NodeID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"NodeID\"")
-			}
-		case "Oem":
-			if err := func() error {
-				v, err := d.RawAppend(nil)
-				s.Oem = jx.Raw(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Oem\"")
-			}
-		case "PSRollupStatus":
-			if err := func() error {
-				s.PSRollupStatus.Reset()
-				if err := s.PSRollupStatus.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"PSRollupStatus\"")
-			}
-		case "PlatformGUID":
-			if err := func() error {
-				s.PlatformGUID.Reset()
-				if err := s.PlatformGUID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"PlatformGUID\"")
-			}
-		case "PopulatedDIMMSlots":
-			if err := func() error {
-				s.PopulatedDIMMSlots.Reset()
-				if err := s.PopulatedDIMMSlots.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"PopulatedDIMMSlots\"")
-			}
-		case "PopulatedPCIeSlots":
-			if err := func() error {
-				s.PopulatedPCIeSlots.Reset()
-				if err := s.PopulatedPCIeSlots.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"PopulatedPCIeSlots\"")
-			}
-		case "PowerCapEnabledState":
-			if err := func() error {
-				s.PowerCapEnabledState.Reset()
-				if err := s.PowerCapEnabledState.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"PowerCapEnabledState\"")
-			}
-		case "SDCardRollupStatus":
-			if err := func() error {
-				s.SDCardRollupStatus.Reset()
-				if err := s.SDCardRollupStatus.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"SDCardRollupStatus\"")
-			}
-		case "SELRollupStatus":
-			if err := func() error {
-				s.SELRollupStatus.Reset()
-				if err := s.SELRollupStatus.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"SELRollupStatus\"")
-			}
-		case "ServerAllocationWatts":
-			if err := func() error {
-				s.ServerAllocationWatts.Reset()
-				if err := s.ServerAllocationWatts.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ServerAllocationWatts\"")
-			}
-		case "StorageRollupStatus":
-			if err := func() error {
-				s.StorageRollupStatus.Reset()
-				if err := s.StorageRollupStatus.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"StorageRollupStatus\"")
-			}
-		case "SysMemErrorMethodology":
-			if err := func() error {
-				s.SysMemErrorMethodology.Reset()
-				if err := s.SysMemErrorMethodology.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"SysMemErrorMethodology\"")
-			}
-		case "SysMemFailOverState":
-			if err := func() error {
-				s.SysMemFailOverState.Reset()
-				if err := s.SysMemFailOverState.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"SysMemFailOverState\"")
-			}
-		case "SysMemLocation":
-			if err := func() error {
-				s.SysMemLocation.Reset()
-				if err := s.SysMemLocation.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"SysMemLocation\"")
-			}
-		case "SysMemPrimaryStatus":
-			if err := func() error {
-				s.SysMemPrimaryStatus.Reset()
-				if err := s.SysMemPrimaryStatus.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"SysMemPrimaryStatus\"")
-			}
-		case "SystemGeneration":
-			if err := func() error {
-				s.SystemGeneration.Reset()
-				if err := s.SystemGeneration.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"SystemGeneration\"")
-			}
-		case "SystemID":
-			if err := func() error {
-				s.SystemID.Reset()
-				if err := s.SystemID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"SystemID\"")
-			}
-		case "SystemRevision":
-			if err := func() error {
-				s.SystemRevision.Reset()
-				if err := s.SystemRevision.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"SystemRevision\"")
-			}
-		case "TempRollupStatus":
-			if err := func() error {
-				s.TempRollupStatus.Reset()
-				if err := s.TempRollupStatus.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"TempRollupStatus\"")
-			}
-		case "TempStatisticsRollupStatus":
-			if err := func() error {
-				s.TempStatisticsRollupStatus.Reset()
-				if err := s.TempStatisticsRollupStatus.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"TempStatisticsRollupStatus\"")
-			}
-		case "UUID":
-			if err := func() error {
-				s.UUID.Reset()
-				if err := s.UUID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"UUID\"")
-			}
-		case "VoltRollupStatus":
-			if err := func() error {
-				s.VoltRollupStatus.Reset()
-				if err := s.VoltRollupStatus.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"VoltRollupStatus\"")
-			}
-		case "smbiosGUID":
-			if err := func() error {
-				s.SmbiosGUID.Reset()
-				if err := s.SmbiosGUID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"smbiosGUID\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishSystemOemDell")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishSystemOemDell) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishSystemOemDell) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.Message.Set {
-			e.FieldStart("Message")
-			s.Message.Encode(e)
-		}
-	}
-	{
-		if s.MessageArgs.Set {
-			e.FieldStart("MessageArgs")
-			s.MessageArgs.Encode(e)
-		}
-	}
-	{
-		if s.MessageId.Set {
-			e.FieldStart("MessageId")
-			s.MessageId.Encode(e)
-		}
-	}
-	{
-		if s.MessageSeverity.Set {
-			e.FieldStart("MessageSeverity")
-			s.MessageSeverity.Encode(e)
-		}
-	}
-	{
-		if len(s.Oem) != 0 {
-			e.FieldStart("Oem")
-			e.Raw(s.Oem)
-		}
-	}
-	{
-		if s.RelatedProperties.Set {
-			e.FieldStart("RelatedProperties")
-			s.RelatedProperties.Encode(e)
-		}
-	}
-	{
-		if s.Resolution.Set {
-			e.FieldStart("Resolution")
-			s.Resolution.Encode(e)
-		}
-	}
-	{
-		if s.ResolutionSteps.Set {
-			e.FieldStart("ResolutionSteps")
-			s.ResolutionSteps.Encode(e)
-		}
-	}
-	{
-		if s.Severity.Set {
-			e.FieldStart("Severity")
-			s.Severity.Encode(e)
-		}
-	}
-	{
-		if s.UserAuthenticationSource.Set {
-			e.FieldStart("UserAuthenticationSource")
-			s.UserAuthenticationSource.Encode(e)
-		}
-	}
-	{
-		if s.Username.Set {
-			e.FieldStart("Username")
-			s.Username.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishSystemOemDellMessageDotExtendedInfoItem = [11]string{
-	0:  "Message",
-	1:  "MessageArgs",
-	2:  "MessageId",
-	3:  "MessageSeverity",
-	4:  "Oem",
-	5:  "RelatedProperties",
-	6:  "Resolution",
-	7:  "ResolutionSteps",
-	8:  "Severity",
-	9:  "UserAuthenticationSource",
-	10: "Username",
-}
-
-// Decode decodes RedfishSystemOemDellMessageDotExtendedInfoItem from json.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishSystemOemDellMessageDotExtendedInfoItem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "Message":
-			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Message\"")
-			}
-		case "MessageArgs":
-			if err := func() error {
-				s.MessageArgs.Reset()
-				if err := s.MessageArgs.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MessageArgs\"")
-			}
-		case "MessageId":
-			if err := func() error {
-				s.MessageId.Reset()
-				if err := s.MessageId.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MessageId\"")
-			}
-		case "MessageSeverity":
-			if err := func() error {
-				s.MessageSeverity.Reset()
-				if err := s.MessageSeverity.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MessageSeverity\"")
-			}
-		case "Oem":
-			if err := func() error {
-				v, err := d.RawAppend(nil)
-				s.Oem = jx.Raw(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Oem\"")
-			}
-		case "RelatedProperties":
-			if err := func() error {
-				s.RelatedProperties.Reset()
-				if err := s.RelatedProperties.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RelatedProperties\"")
-			}
-		case "Resolution":
-			if err := func() error {
-				s.Resolution.Reset()
-				if err := s.Resolution.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Resolution\"")
-			}
-		case "ResolutionSteps":
-			if err := func() error {
-				s.ResolutionSteps.Reset()
-				if err := s.ResolutionSteps.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ResolutionSteps\"")
-			}
-		case "Severity":
-			if err := func() error {
-				s.Severity.Reset()
-				if err := s.Severity.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Severity\"")
-			}
-		case "UserAuthenticationSource":
-			if err := func() error {
-				s.UserAuthenticationSource.Reset()
-				if err := s.UserAuthenticationSource.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"UserAuthenticationSource\"")
-			}
-		case "Username":
-			if err := func() error {
-				s.Username.Reset()
-				if err := s.Username.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Username\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishSystemOemDellMessageDotExtendedInfoItem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.ActionParameters.Set {
-			e.FieldStart("ActionParameters")
-			s.ActionParameters.Encode(e)
-		}
-	}
-	{
-		if s.ActionURI.Set {
-			e.FieldStart("ActionURI")
-			s.ActionURI.Encode(e)
-		}
-	}
-	{
-		if len(s.Oem) != 0 {
-			e.FieldStart("Oem")
-			e.Raw(s.Oem)
-		}
-	}
-	{
-		if s.Priority.Set {
-			e.FieldStart("Priority")
-			s.Priority.Encode(e)
-		}
-	}
-	{
-		if s.ResolutionType.Set {
-			e.FieldStart("ResolutionType")
-			s.ResolutionType.Encode(e)
-		}
-	}
-	{
-		if s.RetryCount.Set {
-			e.FieldStart("RetryCount")
-			s.RetryCount.Encode(e)
-		}
-	}
-	{
-		if s.RetryIntervalSeconds.Set {
-			e.FieldStart("RetryIntervalSeconds")
-			s.RetryIntervalSeconds.Encode(e)
-		}
-	}
-	{
-		if s.TargetComponentURI.Set {
-			e.FieldStart("TargetComponentURI")
-			s.TargetComponentURI.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem = [8]string{
-	0: "ActionParameters",
-	1: "ActionURI",
-	2: "Oem",
-	3: "Priority",
-	4: "ResolutionType",
-	5: "RetryCount",
-	6: "RetryIntervalSeconds",
-	7: "TargetComponentURI",
-}
-
-// Decode decodes RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem from json.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "ActionParameters":
-			if err := func() error {
-				s.ActionParameters.Reset()
-				if err := s.ActionParameters.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ActionParameters\"")
-			}
-		case "ActionURI":
-			if err := func() error {
-				s.ActionURI.Reset()
-				if err := s.ActionURI.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ActionURI\"")
-			}
-		case "Oem":
-			if err := func() error {
-				v, err := d.RawAppend(nil)
-				s.Oem = jx.Raw(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Oem\"")
-			}
-		case "Priority":
-			if err := func() error {
-				s.Priority.Reset()
-				if err := s.Priority.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Priority\"")
-			}
-		case "ResolutionType":
-			if err := func() error {
-				s.ResolutionType.Reset()
-				if err := s.ResolutionType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ResolutionType\"")
-			}
-		case "RetryCount":
-			if err := func() error {
-				s.RetryCount.Reset()
-				if err := s.RetryCount.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RetryCount\"")
-			}
-		case "RetryIntervalSeconds":
-			if err := func() error {
-				s.RetryIntervalSeconds.Reset()
-				if err := s.RetryIntervalSeconds.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"RetryIntervalSeconds\"")
-			}
-		case "TargetComponentURI":
-			if err := func() error {
-				s.TargetComponentURI.Reset()
-				if err := s.TargetComponentURI.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"TargetComponentURI\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.AllowableNumbers.Set {
-			e.FieldStart("AllowableNumbers")
-			s.AllowableNumbers.Encode(e)
-		}
-	}
-	{
-		if s.AllowablePattern.Set {
-			e.FieldStart("AllowablePattern")
-			s.AllowablePattern.Encode(e)
-		}
-	}
-	{
-		if s.AllowableValueDescriptions.Set {
-			e.FieldStart("AllowableValueDescriptions")
-			s.AllowableValueDescriptions.Encode(e)
-		}
-	}
-	{
-		if s.AllowableValues.Set {
-			e.FieldStart("AllowableValues")
-			s.AllowableValues.Encode(e)
-		}
-	}
-	{
-		if s.ArraySizeMaximum.Set {
-			e.FieldStart("ArraySizeMaximum")
-			s.ArraySizeMaximum.Encode(e)
-		}
-	}
-	{
-		if s.ArraySizeMinimum.Set {
-			e.FieldStart("ArraySizeMinimum")
-			s.ArraySizeMinimum.Encode(e)
-		}
-	}
-	{
-		if s.DataType.Set {
-			e.FieldStart("DataType")
-			s.DataType.Encode(e)
-		}
-	}
-	{
-		if s.DefaultValue.Set {
-			e.FieldStart("DefaultValue")
-			s.DefaultValue.Encode(e)
-		}
-	}
-	{
-		if s.MaximumValue.Set {
-			e.FieldStart("MaximumValue")
-			s.MaximumValue.Encode(e)
-		}
-	}
-	{
-		if s.MinimumValue.Set {
-			e.FieldStart("MinimumValue")
-			s.MinimumValue.Encode(e)
-		}
-	}
-	{
-		if s.Name.Set {
-			e.FieldStart("Name")
-			s.Name.Encode(e)
-		}
-	}
-	{
-		if s.NoDefaultValue.Set {
-			e.FieldStart("NoDefaultValue")
-			s.NoDefaultValue.Encode(e)
-		}
-	}
-	{
-		if s.ObjectDataType.Set {
-			e.FieldStart("ObjectDataType")
-			s.ObjectDataType.Encode(e)
-		}
-	}
-	{
-		if s.Required.Set {
-			e.FieldStart("Required")
-			s.Required.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfRedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem = [14]string{
-	0:  "AllowableNumbers",
-	1:  "AllowablePattern",
-	2:  "AllowableValueDescriptions",
-	3:  "AllowableValues",
-	4:  "ArraySizeMaximum",
-	5:  "ArraySizeMinimum",
-	6:  "DataType",
-	7:  "DefaultValue",
-	8:  "MaximumValue",
-	9:  "MinimumValue",
-	10: "Name",
-	11: "NoDefaultValue",
-	12: "ObjectDataType",
-	13: "Required",
-}
-
-// Decode decodes RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "AllowableNumbers":
-			if err := func() error {
-				s.AllowableNumbers.Reset()
-				if err := s.AllowableNumbers.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"AllowableNumbers\"")
-			}
-		case "AllowablePattern":
-			if err := func() error {
-				s.AllowablePattern.Reset()
-				if err := s.AllowablePattern.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"AllowablePattern\"")
-			}
-		case "AllowableValueDescriptions":
-			if err := func() error {
-				s.AllowableValueDescriptions.Reset()
-				if err := s.AllowableValueDescriptions.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"AllowableValueDescriptions\"")
-			}
-		case "AllowableValues":
-			if err := func() error {
-				s.AllowableValues.Reset()
-				if err := s.AllowableValues.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"AllowableValues\"")
-			}
-		case "ArraySizeMaximum":
-			if err := func() error {
-				s.ArraySizeMaximum.Reset()
-				if err := s.ArraySizeMaximum.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ArraySizeMaximum\"")
-			}
-		case "ArraySizeMinimum":
-			if err := func() error {
-				s.ArraySizeMinimum.Reset()
-				if err := s.ArraySizeMinimum.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ArraySizeMinimum\"")
-			}
-		case "DataType":
-			if err := func() error {
-				s.DataType.Reset()
-				if err := s.DataType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"DataType\"")
-			}
-		case "DefaultValue":
-			if err := func() error {
-				s.DefaultValue.Reset()
-				if err := s.DefaultValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"DefaultValue\"")
-			}
-		case "MaximumValue":
-			if err := func() error {
-				s.MaximumValue.Reset()
-				if err := s.MaximumValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MaximumValue\"")
-			}
-		case "MinimumValue":
-			if err := func() error {
-				s.MinimumValue.Reset()
-				if err := s.MinimumValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"MinimumValue\"")
-			}
-		case "Name":
-			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Name\"")
-			}
-		case "NoDefaultValue":
-			if err := func() error {
-				s.NoDefaultValue.Reset()
-				if err := s.NoDefaultValue.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"NoDefaultValue\"")
-			}
-		case "ObjectDataType":
-			if err := func() error {
-				s.ObjectDataType.Reset()
-				if err := s.ObjectDataType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ObjectDataType\"")
-			}
-		case "Required":
-			if err := func() error {
-				s.Required.Reset()
-				if err := s.Required.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"Required\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *RedfishSystemOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

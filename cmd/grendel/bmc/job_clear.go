@@ -18,45 +18,51 @@ var (
 	jobClearOptions *shared.TableOptions
 	jobClearColumns = []shared.Column{
 		{Name: "Node"},
-		{Name: "Status"},
+		{Name: "State"},
 		{Name: "Message"},
 	}
 	jobClearCmd = &cobra.Command{
 		Use:   "clear <nodeset | all> [JID]...",
 		Short: "Clear all jobs or by JID",
-		Long:  `Clear all jobs or by JID. Defaults to JID_CLEARALL to clear all jobs`,
+		Long:  `Clear all jobs or by JID. Clears the whole queue when no JID is given`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			jids := args[1:]
-			if len(jids) == 0 {
-				jids = []string{"JID_CLEARALL"}
+			req := &client.BmcClearJobsBody{}
+			if jids := args[1:]; len(jids) > 0 {
+				ids := make([]client.NilString, 0, len(jids))
+				for _, jid := range jids {
+					ids = append(ids, client.NewNilString(jid))
+				}
+				req.Ids = client.NewOptNilNilStringArray(ids)
+			} else {
+				req.All = client.NewOptBool(true)
 			}
-			nodeset := args[0]
-			if args[0] == "all" {
-				nodeset = ""
-			}
-			params := client.DELETEV1BmcJobsJidsParams{
-				Nodeset: client.NewOptString(nodeset),
+
+			nodeset, all := selector(args[0])
+			params := client.POSTV1BmcJobsClearParams{
+				Nodeset: nodeset,
+				All:     all,
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
-				Jids:    strings.Join(jids, ","),
 			}
-			jobs, err := apiclient.API.DELETEV1BmcJobsJids(command.Context(), params)
+
+			res, err := apiclient.API.POSTV1BmcJobsClear(command.Context(), req, params)
 			if err != nil {
 				return apiclient.NewApiError(err)
 			}
 
 			t := shared.NewTable(jobClearColumns, jobClearFilter).Options(*jobClearOptions).Empty("-")
-
-			for _, job := range jobs {
+			for _, r := range res.Results.Value {
+				result := r.Value
 				t.AppendRow(
-					job.Host.Value,
-					job.Status.Value,
-					job.Msg.Value,
+					result.Node.Value,
+					colorState(result.Success.Value),
+					result.Message.Value,
 				)
 			}
-
 			t.Print()
-			return nil
+
+			s := res.Summary.Value
+			return summaryLine(s.Total.Value, s.Succeeded.Value, s.Failed.Value, s.FailedNodes.Value, s.DurationMs.Value)
 		},
 	}
 )

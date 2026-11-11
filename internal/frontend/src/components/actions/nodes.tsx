@@ -1,4 +1,5 @@
-import JobsDeleteAction from "./jobs/delete";
+import { ActionSection } from "./action-card";
+import NodesAutoConfigAction from "./nodes/auto-config";
 import NodesBmcPowerAction from "./nodes/bmc-power";
 import NodesDeleteAction from "./nodes/delete";
 import NodesExportAction from "./nodes/export";
@@ -8,24 +9,28 @@ import NodesImportConfigAction from "./nodes/import-config";
 import NodesJobsAction from "./nodes/jobs";
 import NodesOsPowerAction from "./nodes/os-power";
 import NodesProvisionAction from "./nodes/provision";
+import NodesSelAction from "./nodes/sel";
 import NodesTagsAction from "./nodes/tags";
 
 export default function NodesAction({ nodes }: { nodes: string }) {
-  const list = new Map<string, string[]>();
-  nodes.split(",").map((node) => list.set(node, ["JID_CLEARALL"]));
-
   return (
-    <div className="mt-4 grid gap-4 sm:grid-cols-2">
-      <NodesDeleteAction nodes={nodes} />
-      <NodesExportAction nodes={nodes} />
+    <div className="grid gap-4 sm:grid-cols-2">
+      <ActionSection title="Grendel" />
       <NodesProvisionAction nodes={nodes} />
       <NodesImageAction nodes={nodes} />
       <NodesTagsAction nodes={nodes} />
+      <NodesExportAction nodes={nodes} />
+      <NodesDeleteAction nodes={nodes} />
+
+      <ActionSection title="BMC" />
       <NodesOsPowerAction nodes={nodes} />
-      <NodesImportConfigAction nodes={nodes} />
       <NodesBmcPowerAction nodes={nodes} />
+      <NodesSelAction nodes={nodes} />
       <NodesJobsAction nodes={nodes} />
-      <JobsDeleteAction list={Object.fromEntries(list)} />
+
+      <ActionSection title="Dell" />
+      <NodesImportConfigAction nodes={nodes} />
+      <NodesAutoConfigAction nodes={nodes} />
       <NodesFirmwareAction nodes={nodes} />
     </div>
   );

@@ -1,10 +1,11 @@
-import { getV1BmcUpgradeDellRepo, RedfishDellUpgradeFirmware } from "@/client";
+import { BmcResponseModelBmcFirmwareUpdates, getV1BmcFirmwareUpdates } from "@/client";
 import ActionsSheet from "@/components/actions-sheet";
 import FirmwareUpgradeAction from "@/components/actions/firmware/upgrade";
 import NodesJobsAction from "@/components/actions/nodes/jobs";
 import { DataTable, DataTableActions } from "@/components/data-table/data-table";
 import { DataTableColumnHeader } from "@/components/data-table/header";
 import SelectableCheckbox from "@/components/data-table/selectableCheckbox";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -18,15 +19,18 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import AuthRedirect from "@/lib/auth";
+import { severityColor } from "@/lib/utils";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { ChevronDown, ChevronLeft, CircleAlert, OctagonAlert, TriangleAlert } from "lucide-react";
 import { useState } from "react";
 
+type NodeFirmware = NonNullable<BmcResponseModelBmcFirmwareUpdates["results"]>[number];
+
 export const Route = createFileRoute("/nodes/dell-firmware/$nodes")({
   component: RouteComponent,
   beforeLoad: AuthRedirect,
-  loader: async ({ params: { nodes } }) => getV1BmcUpgradeDellRepo({ query: { nodeset: nodes } }),
+  loader: async ({ params: { nodes } }) => getV1BmcFirmwareUpdates({ query: { nodeset: nodes } }),
 });
 
 function RouteComponent() {
@@ -34,7 +38,7 @@ function RouteComponent() {
   const { isFetching } = Route.useMatch();
 
   const [lastSelectedID, setLastSelectedID] = useState(0);
-  const columns: ColumnDef<RedfishDellUpgradeFirmware>[] = [
+  const columns: ColumnDef<NodeFirmware>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -56,10 +60,10 @@ function RouteComponent() {
       ),
     },
     {
-      accessorKey: "Name",
+      accessorKey: "node",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Node" />,
       cell: ({ row }) => {
-        const name = row.original?.Name;
+        const name = row.original?.node;
         return (
           <Link
             to={"/nodes/$node/node"}
@@ -72,19 +76,30 @@ function RouteComponent() {
       },
     },
     {
-      accessorKey: "Status",
+      id: "status",
+      accessorFn: (row) => (row.success ? "success" : "failed"),
       header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+      cell: ({ row, getValue }) => (
+        <Badge
+          variant="secondary"
+          className={`rounded-sm ${severityColor(row.original.success ? "success" : "error")}`}
+        >
+          {getValue<string>()}
+        </Badge>
+      ),
     },
     {
-      accessorKey: "Message",
+      accessorKey: "message",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Message" />,
     },
     {
-      accessorKey: "UpdateCount",
+      id: "updates",
+      accessorFn: (row) => row.data?.updates?.length ?? 0,
       header: ({ column }) => <DataTableColumnHeader column={column} title="Updates" />,
     },
     {
-      accessorKey: "UpdateRebootType",
+      id: "reboot_type",
+      accessorFn: (row) => row.data?.reboot_type ?? "",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Reboot Type" />,
     },
     {
@@ -117,8 +132,8 @@ function RouteComponent() {
     },
   ];
 
-  const renderSubComponent = ({ row }: { row: Row<RedfishDellUpgradeFirmware> }) => {
-    const data = row.original.UpdateList;
+  const renderSubComponent = ({ row }: { row: Row<NodeFirmware> }) => {
+    const data = row.original.data?.updates;
     return (
       <Table className="border p-2">
         <TableHeader>
@@ -134,12 +149,12 @@ function RouteComponent() {
           {data &&
             data.map((row, i) => (
               <TableRow key={i}>
-                <TableCell>{displayCriticality(row?.Criticality ?? "")}</TableCell>
-                <TableCell>{row?.DisplayName}</TableCell>
-                <TableCell className="text-muted-foreground">{row?.InstalledVersion}</TableCell>
-                <TableCell>{row?.PackageVersion}</TableCell>
-                <TableCell className={row?.RebootType == "NONE" ? "text-muted-foreground" : ""}>
-                  {row?.RebootType}
+                <TableCell>{displayCriticality(row?.criticality ?? "")}</TableCell>
+                <TableCell>{row?.display_name}</TableCell>
+                <TableCell className="text-muted-foreground">{row?.installed_version}</TableCell>
+                <TableCell>{row?.package_version}</TableCell>
+                <TableCell className={row?.reboot_type == "NONE" ? "text-muted-foreground" : ""}>
+                  {row?.reboot_type}
                 </TableCell>
               </TableRow>
             ))}
@@ -148,21 +163,21 @@ function RouteComponent() {
     );
   };
 
-  const getRowCanExpand = (row: Row<RedfishDellUpgradeFirmware>) => {
-    const len = row.original.UpdateList?.length ?? 0;
+  const getRowCanExpand = (row: Row<NodeFirmware>) => {
+    const len = row.original.data?.updates?.length ?? 0;
     if (len > 0) return true;
     return false;
   };
 
-  const actions: DataTableActions<RedfishDellUpgradeFirmware> = ({ table }) => {
+  const actions: DataTableActions<NodeFirmware> = ({ table }) => {
     const checked = table
       .getSelectedRowModel()
-      .rows.map((v) => v.getAllCells()[1].getValue())
+      .rows.map((v) => v.original.node)
       .join(",");
     const length = table.getSelectedRowModel().rows.length;
     return (
       <ActionsSheet type="node" checked={checked} length={length}>
-        <div className="mt-4 grid gap-4 sm:grid-cols-1">
+        <div className="grid gap-4 sm:grid-cols-1">
           <FirmwareUpgradeAction nodes={checked} />
           <NodesJobsAction nodes={checked} />
         </div>
@@ -178,7 +193,7 @@ function RouteComponent() {
           renderSubComponent={renderSubComponent}
           getRowCanExpand={getRowCanExpand}
           Actions={actions}
-          data={data ?? []}
+          data={data?.results ?? []}
           progress={isFetching !== false}
         />
       </CardContent>

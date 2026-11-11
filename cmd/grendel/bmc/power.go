@@ -18,14 +18,14 @@ var (
 	powerOptions *shared.TableOptions
 	powerColumns = []shared.Column{
 		{Name: "Node"},
-		{Name: "Status"},
+		{Name: "State"},
 		{Name: "Message"},
 	}
 	override string
 	powerCmd = &cobra.Command{
 		Use:   "power {cycle | off | on | redfish.ResetType} {nodeset | all}",
 		Short: "Change power state of nodes",
-		Long:  "Valid redfish.ResetType options: On, ForceOn, ForceOff, ForceRestart, GracefulRestart, GracefulShutdown, PowerCycle",
+		Long:  "Valid redfish.ResetType options: On, ForceOn, ForceOff, ForceRestart, GracefulRestart, GracefulShutdown, PowerCycle, Nmi, PushPowerButton, Suspend, Pause, Resume, FullPowerCycle",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(command *cobra.Command, args []string) error {
 			// shorthand option syntax
@@ -41,36 +41,40 @@ var (
 				powerOption = args[0]
 			}
 
-			nodeset := args[1]
-			if args[1] == "all" {
-				nodeset = ""
+			req := &client.BmcPowerBody{
+				Target: client.NewOptString("host"),
+				Action: client.NewOptString(powerOption),
 			}
-			req := &client.BmcOsPowerBody{
-				PowerOption: client.NewOptString(powerOption),
-				BootOption:  client.NewOptString(override),
+			// the server rejects an unknown boot source, so only send one when it was asked for
+			if override != "" && override != "None" {
+				req.BootOverride = client.NewOptString(override)
 			}
 
-			params := client.POSTV1BmcPowerOsParams{
-				Nodeset: client.NewOptString(nodeset),
+			nodeset, all := selector(args[1])
+			params := client.POSTV1BmcPowerParams{
+				Nodeset: nodeset,
+				All:     all,
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			res, err := apiclient.API.POSTV1BmcPowerOs(command.Context(), req, params)
+
+			res, err := apiclient.API.POSTV1BmcPower(command.Context(), req, params)
 			if err != nil {
 				return apiclient.NewApiError(err)
 			}
 
 			t := shared.NewTable(powerColumns, powerFilter).Options(*powerOptions).Empty("-")
-
-			for _, jobMessage := range res {
+			for _, r := range res.Results.Value {
+				result := r.Value
 				t.AppendRow(
-					jobMessage.Host.Value,
-					jobMessage.Status.Value,
-					jobMessage.Msg.Value,
+					result.Node.Value,
+					colorState(result.Success.Value),
+					result.Message.Value,
 				)
 			}
-
 			t.Print()
-			return nil
+
+			s := res.Summary.Value
+			return summaryLine(s.Total.Value, s.Succeeded.Value, s.Failed.Value, s.FailedNodes.Value, s.DurationMs.Value)
 		},
 	}
 )

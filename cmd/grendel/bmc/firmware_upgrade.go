@@ -18,7 +18,7 @@ var (
 	firmwareUpgradeOptions *shared.TableOptions
 	firmwareUpgradeColumns = []shared.Column{
 		{Name: "Node"},
-		{Name: "Status"},
+		{Name: "State"},
 		{Name: "Message"},
 	}
 	firmwareUpgradeApplyUpdate       bool
@@ -30,43 +30,47 @@ var (
 	firmwareUpgradeShareName         string
 	firmwareUpgradeShareType         string
 	firmwareUpgradeCmd               = &cobra.Command{
-		Use:   "upgrade <nodeset>",
+		Use:   "upgrade <nodeset | all>",
 		Short: "Upgrade firmware on Dell servers",
+		Long:  "Upgrade firmware on Dell servers. Without --apply-update this only compares the installed firmware against the catalog, waiting for the comparison to finish, and bmc firmware check then lists the available updates",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			nodeset := args[0]
-
-			req := client.BmcDellInstallFromRepoRequest{
+			req := &client.BmcInstallFirmwareBody{
 				ApplyUpdate:       client.NewOptBool(firmwareUpgradeApplyUpdate),
 				CatalogFile:       client.NewOptString(firmwareUpgradeCatalogFile),
 				IPAddress:         client.NewOptString(firmwareUpgradeIpAddress),
 				IgnoreCertWarning: client.NewOptBool(firmwareUpgradeIgnoreCertWarning),
-				RebootNeeded:      client.NewOptBool(firmwareUpgradeRebootNeeded),
+				Reboot:            client.NewOptBool(firmwareUpgradeRebootNeeded),
 				ShareName:         client.NewOptString(firmwareUpgradeShareName),
 				ShareType:         client.NewOptString(firmwareUpgradeShareType),
-				ClearJobQueue:     client.NewOptBool(firmwareUpgradeClearJobs),
+				ClearJobs:         client.NewOptBool(firmwareUpgradeClearJobs),
 			}
-			params := client.POSTV1BmcUpgradeDellInstallfromrepoParams{
-				Nodeset: client.NewOptString(nodeset),
+
+			nodeset, all := selector(args[0])
+			params := client.POSTV1BmcFirmwareInstallParams{
+				Nodeset: nodeset,
+				All:     all,
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			jobs, err := apiclient.API.POSTV1BmcUpgradeDellInstallfromrepo(command.Context(), &req, params)
+
+			res, err := apiclient.API.POSTV1BmcFirmwareInstall(command.Context(), req, params)
 			if err != nil {
 				return apiclient.NewApiError(err)
 			}
 
 			t := shared.NewTable(firmwareUpgradeColumns, firmwareUpgradeFilter).Options(*firmwareUpgradeOptions).Empty("-")
-
-			for _, job := range jobs {
+			for _, r := range res.Results.Value {
+				result := r.Value
 				t.AppendRow(
-					job.Host.Value,
-					job.Status.Value,
-					job.Msg.Value,
+					result.Node.Value,
+					colorState(result.Success.Value),
+					result.Message.Value,
 				)
 			}
-
 			t.Print()
-			return nil
+
+			s := res.Summary.Value
+			return summaryLine(s.Total.Value, s.Succeeded.Value, s.Failed.Value, s.FailedNodes.Value, s.DurationMs.Value)
 		},
 	}
 )
@@ -82,8 +86,9 @@ func init() {
 	firmwareUpgradeCmd.Flags().BoolVar(&firmwareUpgradeIgnoreCertWarning, "ignore-cert-warning", true, "Pass this flag to ignore invalid certs")
 	firmwareUpgradeCmd.Flags().BoolVarP(&firmwareUpgradeRebootNeeded, "reboot", "r", false, "Reboot arg will immediately reboot the node when needed")
 	firmwareUpgradeCmd.Flags().BoolVar(&firmwareUpgradeClearJobs, "clear-jobs", false, "Clear all jobs in the job queue before upgrading. apply-update must be true")
-	firmwareUpgradeCmd.Flags().StringVar(&firmwareUpgradeShareName, "share-name", "", "")
-	firmwareUpgradeCmd.Flags().StringVar(&firmwareUpgradeShareType, "share-type", "HTTPS", "Valid options: HTTPS, HTTP, NFS, or CIFS")
+	firmwareUpgradeCmd.Flags().StringVar(&firmwareUpgradeShareName, "share-name", "", "Path of the catalog's directory on the share, or the NFS export")
+	firmwareUpgradeCmd.Flags().StringVar(&firmwareUpgradeShareType, "share-type", "HTTPS", "Valid options: HTTPS, HTTP or NFS")
+	firmwareUpgradeCmd.MarkFlagRequired("share-name")
 
 	firmwareCmd.AddCommand(firmwareUpgradeCmd)
 }

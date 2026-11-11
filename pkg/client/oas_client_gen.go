@@ -33,42 +33,6 @@ type Invoker interface {
 	//
 	// DELETE /v1/auth/signout
 	DELETEV1AuthSignout(ctx context.Context, params DELETEV1AuthSignoutParams) (*GenericResponse, error)
-	// DELETEV1BmcJobs invokes DELETE_/v1/bmc/jobs operation.
-	//
-	// #### Controller:
-	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobDeleteMany`
-	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
-	// ---
-	// Delete redfish jobs from many node(s).
-	//
-	// DELETE /v1/bmc/jobs
-	DELETEV1BmcJobs(ctx context.Context, request *BmcJobDeleteRequest, params DELETEV1BmcJobsParams) ([]JobMessage, error)
-	// DELETEV1BmcJobsJids invokes DELETE_/v1/bmc/jobs/:jids operation.
-	//
-	// #### Controller:
-	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobDelete`
-	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
-	// ---
-	// Delete redfish jobs from node(s) by JID.
-	//
-	// DELETE /v1/bmc/jobs/{jids}
-	DELETEV1BmcJobsJids(ctx context.Context, params DELETEV1BmcJobsJidsParams) ([]JobMessage, error)
-	// DELETEV1BmcSel invokes DELETE_/v1/bmc/sel operation.
-	//
-	// #### Controller:
-	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcSelClear`
-	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
-	// ---
-	// Clear system event log on node(s).
-	//
-	// DELETE /v1/bmc/sel
-	DELETEV1BmcSel(ctx context.Context, params DELETEV1BmcSelParams) ([]JobMessage, error)
 	// DELETEV1Images invokes DELETE_/v1/images operation.
 	//
 	// #### Controller:
@@ -117,54 +81,55 @@ type Invoker interface {
 	//
 	// DELETE /v1/users/{usernames}
 	DELETEV1UsersUsernames(ctx context.Context, params DELETEV1UsersUsernamesParams) (*GenericResponse, error)
-	// GETV1Bmc invokes GET_/v1/bmc operation.
+	// GETV1BmcFirmwareUpdates invokes GET_/v1/bmc/firmware/updates operation.
 	//
 	// #### Controller:
-	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcQuery`
+	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcFirmwareUpdates`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
-	// Get redfish info from node(s).
+	// List the firmware updates iDRAC(s) found in their last catalog comparison, which firmware/install
+	// with apply_update false runs. Dell only.
 	//
-	// GET /v1/bmc
-	GETV1Bmc(ctx context.Context, params GETV1BmcParams) ([]RedfishSystem, error)
+	// GET /v1/bmc/firmware/updates
+	GETV1BmcFirmwareUpdates(ctx context.Context, params GETV1BmcFirmwareUpdatesParams) (*BmcResponseModelBmcFirmwareUpdates, error)
 	// GETV1BmcJobs invokes GET_/v1/bmc/jobs operation.
 	//
 	// #### Controller:
-	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobList`
+	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobs`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
-	// Get redfish jobs from node(s).
+	// Get the redfish job queue of node(s).
 	//
 	// GET /v1/bmc/jobs
-	GETV1BmcJobs(ctx context.Context, params GETV1BmcJobsParams) ([]RedfishJob, error)
-	// GETV1BmcMetrics invokes GET_/v1/bmc/metrics operation.
+	GETV1BmcJobs(ctx context.Context, params GETV1BmcJobsParams) (*BmcResponseModelBmcJobList, error)
+	// GETV1BmcSel invokes GET_/v1/bmc/sel operation.
 	//
 	// #### Controller:
-	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcMetricReports`
+	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcSEL`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
-	// Get metric reports by nodeset.
+	// Get the system event log of node(s).
 	//
-	// GET /v1/bmc/metrics
-	GETV1BmcMetrics(ctx context.Context, params GETV1BmcMetricsParams) ([]RedfishMetricReport, error)
-	// GETV1BmcUpgradeDellRepo invokes GET_/v1/bmc/upgrade/dell/repo operation.
+	// GET /v1/bmc/sel
+	GETV1BmcSel(ctx context.Context, params GETV1BmcSelParams) (*BmcResponseModelBmcSELLog, error)
+	// GETV1BmcStatus invokes GET_/v1/bmc/status operation.
 	//
 	// #### Controller:
-	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcDellGetRepoUpdateList`
+	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcStatus`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
-	// Fetch which packages can be upgraded.
+	// Get redfish system information from node(s).
 	//
-	// GET /v1/bmc/upgrade/dell/repo
-	GETV1BmcUpgradeDellRepo(ctx context.Context, params GETV1BmcUpgradeDellRepoParams) ([]RedfishDellUpgradeFirmware, error)
+	// GET /v1/bmc/status
+	GETV1BmcStatus(ctx context.Context, params GETV1BmcStatusParams) (*BmcResponseModelRedfishSystem, error)
 	// GETV1DbDump invokes GET_/v1/db/dump operation.
 	//
 	// #### Controller:
@@ -422,23 +387,48 @@ type Invoker interface {
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
-	// Set BMC to autoconfigure.
+	// Set iDRAC(s) to auto configure once, on the node's next boot. Dell only.
 	//
 	// POST /v1/bmc/configure/auto
-	POSTV1BmcConfigureAuto(ctx context.Context, params POSTV1BmcConfigureAutoParams) ([]JobMessage, error)
+	POSTV1BmcConfigureAuto(ctx context.Context, params POSTV1BmcConfigureAutoParams) (*BmcResponseModelBmcAck, error)
 	// POSTV1BmcConfigureImport invokes POST_/v1/bmc/configure/import operation.
 	//
 	// #### Controller:
-	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfiguration`
+	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfig`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
-	// Manually import system configuration to BMC.
+	// Have iDRAC(s) download a config template from the provision server and import it. Dell only.
 	//
 	// POST /v1/bmc/configure/import
-	POSTV1BmcConfigureImport(ctx context.Context, request *BmcImportConfigurationRequest, params POSTV1BmcConfigureImportParams) ([]JobMessage, error)
-	// POSTV1BmcPowerBmc invokes POST_/v1/bmc/power/bmc operation.
+	POSTV1BmcConfigureImport(ctx context.Context, request *BmcImportConfigBody, params POSTV1BmcConfigureImportParams) (*BmcResponseModelBmcAck, error)
+	// POSTV1BmcFirmwareInstall invokes POST_/v1/bmc/firmware/install operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcInstallFirmware`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Compare the firmware of iDRAC(s) against an update catalog, and with apply_update queue the
+	// updates. A comparison waits for its job to finish, up to bmc.node_timeout. Dell only.
+	//
+	// POST /v1/bmc/firmware/install
+	POSTV1BmcFirmwareInstall(ctx context.Context, request *BmcInstallFirmwareBody, params POSTV1BmcFirmwareInstallParams) (*BmcResponseModelBmcAck, error)
+	// POSTV1BmcJobsClear invokes POST_/v1/bmc/jobs/clear operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcClearJobs`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Clear redfish jobs from node(s).
+	//
+	// POST /v1/bmc/jobs/clear
+	POSTV1BmcJobsClear(ctx context.Context, request *BmcClearJobsBody, params POSTV1BmcJobsClearParams) (*BmcResponseModelBmcAck, error)
+	// POSTV1BmcPower invokes POST_/v1/bmc/power operation.
 	//
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcPower`
@@ -446,34 +436,22 @@ type Invoker interface {
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
-	// Reboot node(s) BMC.
+	// Change the power state of node(s), or restart their BMCs.
 	//
-	// POST /v1/bmc/power/bmc
-	POSTV1BmcPowerBmc(ctx context.Context, params POSTV1BmcPowerBmcParams) ([]JobMessage, error)
-	// POSTV1BmcPowerOs invokes POST_/v1/bmc/power/os operation.
+	// POST /v1/bmc/power
+	POSTV1BmcPower(ctx context.Context, request *BmcPowerBody, params POSTV1BmcPowerParams) (*BmcResponseModelBmcAck, error)
+	// POSTV1BmcSelClear invokes POST_/v1/bmc/sel/clear operation.
 	//
 	// #### Controller:
-	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcOsPower`
+	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcClearSEL`
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
-	// Change power status of node(s).
+	// Clear the system event log on node(s).
 	//
-	// POST /v1/bmc/power/os
-	POSTV1BmcPowerOs(ctx context.Context, request *BmcOsPowerBody, params POSTV1BmcPowerOsParams) ([]JobMessage, error)
-	// POSTV1BmcUpgradeDellInstallfromrepo invokes POST_/v1/bmc/upgrade/dell/installfromrepo operation.
-	//
-	// #### Controller:
-	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcDellInstallFromRepo`
-	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
-	// ---
-	// Request iDRAC to download the latest firmware catalog and compare firmware versions.
-	//
-	// POST /v1/bmc/upgrade/dell/installfromrepo
-	POSTV1BmcUpgradeDellInstallfromrepo(ctx context.Context, request *BmcDellInstallFromRepoRequest, params POSTV1BmcUpgradeDellInstallfromrepoParams) ([]JobMessage, error)
+	// POST /v1/bmc/sel/clear
+	POSTV1BmcSelClear(ctx context.Context, params POSTV1BmcSelClearParams) (*BmcResponseModelBmcAck, error)
 	// POSTV1DbRestore invokes POST_/v1/db/restore operation.
 	//
 	// #### Controller:
@@ -673,456 +651,6 @@ func (c *Client) sendDELETEV1AuthSignout(ctx context.Context, params DELETEV1Aut
 	defer resp.Body.Close()
 
 	result, err := decodeDELETEV1AuthSignoutResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// DELETEV1BmcJobs invokes DELETE_/v1/bmc/jobs operation.
-//
-// #### Controller:
-// `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobDeleteMany`
-// #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
-// ---
-// Delete redfish jobs from many node(s).
-//
-// DELETE /v1/bmc/jobs
-func (c *Client) DELETEV1BmcJobs(ctx context.Context, request *BmcJobDeleteRequest, params DELETEV1BmcJobsParams) ([]JobMessage, error) {
-	res, err := c.sendDELETEV1BmcJobs(ctx, request, params)
-	return res, err
-}
-
-func (c *Client) sendDELETEV1BmcJobs(ctx context.Context, request *BmcJobDeleteRequest, params DELETEV1BmcJobsParams) (res []JobMessage, err error) {
-	// Validate request before sending.
-	if err := func() error {
-		if err := request.Validate(); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return res, errors.Wrap(err, "validate")
-	}
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [1]string
-	pathParts[0] = "/v1/bmc/jobs"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	q := uri.NewQueryEncoder()
-	{
-		// Encode "nodeset" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "nodeset",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Nodeset.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "tags" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "tags",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Tags.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	u.RawQuery = q.Values().Encode()
-
-	r, err := ht.NewRequest(ctx, "DELETE", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeDELETEV1BmcJobsRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
-
-	h := uri.NewHeaderEncoder(r.Header)
-	{
-		cfg := uri.HeaderParameterEncodingConfig{
-			Name:    "Accept",
-			Explode: false,
-		}
-		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Accept.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode header")
-		}
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securityHeaderAuth(ctx, DELETEV1BmcJobsOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"HeaderAuth\"")
-			}
-		}
-		{
-
-			switch err := c.securityCookieAuth(ctx, DELETEV1BmcJobsOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 1
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"CookieAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-				{0b00000010},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeDELETEV1BmcJobsResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// DELETEV1BmcJobsJids invokes DELETE_/v1/bmc/jobs/:jids operation.
-//
-// #### Controller:
-// `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobDelete`
-// #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
-// ---
-// Delete redfish jobs from node(s) by JID.
-//
-// DELETE /v1/bmc/jobs/{jids}
-func (c *Client) DELETEV1BmcJobsJids(ctx context.Context, params DELETEV1BmcJobsJidsParams) ([]JobMessage, error) {
-	res, err := c.sendDELETEV1BmcJobsJids(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendDELETEV1BmcJobsJids(ctx context.Context, params DELETEV1BmcJobsJidsParams) (res []JobMessage, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [2]string
-	pathParts[0] = "/v1/bmc/jobs/"
-	{
-		// Encode "jids" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "jids",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.Jids))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	uri.AddPathParts(u, pathParts[:]...)
-
-	q := uri.NewQueryEncoder()
-	{
-		// Encode "nodeset" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "nodeset",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Nodeset.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "tags" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "tags",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Tags.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	u.RawQuery = q.Values().Encode()
-
-	r, err := ht.NewRequest(ctx, "DELETE", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	h := uri.NewHeaderEncoder(r.Header)
-	{
-		cfg := uri.HeaderParameterEncodingConfig{
-			Name:    "Accept",
-			Explode: false,
-		}
-		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Accept.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode header")
-		}
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securityHeaderAuth(ctx, DELETEV1BmcJobsJidsOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"HeaderAuth\"")
-			}
-		}
-		{
-
-			switch err := c.securityCookieAuth(ctx, DELETEV1BmcJobsJidsOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 1
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"CookieAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-				{0b00000010},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeDELETEV1BmcJobsJidsResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// DELETEV1BmcSel invokes DELETE_/v1/bmc/sel operation.
-//
-// #### Controller:
-// `github.com/ubccr/grendel/internal/api.(*Handler).BmcSelClear`
-// #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
-// ---
-// Clear system event log on node(s).
-//
-// DELETE /v1/bmc/sel
-func (c *Client) DELETEV1BmcSel(ctx context.Context, params DELETEV1BmcSelParams) ([]JobMessage, error) {
-	res, err := c.sendDELETEV1BmcSel(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendDELETEV1BmcSel(ctx context.Context, params DELETEV1BmcSelParams) (res []JobMessage, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [1]string
-	pathParts[0] = "/v1/bmc/sel"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	q := uri.NewQueryEncoder()
-	{
-		// Encode "nodeset" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "nodeset",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Nodeset.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "tags" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "tags",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Tags.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	u.RawQuery = q.Values().Encode()
-
-	r, err := ht.NewRequest(ctx, "DELETE", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	h := uri.NewHeaderEncoder(r.Header)
-	{
-		cfg := uri.HeaderParameterEncodingConfig{
-			Name:    "Accept",
-			Explode: false,
-		}
-		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Accept.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode header")
-		}
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securityHeaderAuth(ctx, DELETEV1BmcSelOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"HeaderAuth\"")
-			}
-		}
-		{
-
-			switch err := c.securityCookieAuth(ctx, DELETEV1BmcSelOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 1
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"CookieAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-				{0b00000010},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodeDELETEV1BmcSelResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -1635,27 +1163,28 @@ func (c *Client) sendDELETEV1UsersUsernames(ctx context.Context, params DELETEV1
 	return result, nil
 }
 
-// GETV1Bmc invokes GET_/v1/bmc operation.
+// GETV1BmcFirmwareUpdates invokes GET_/v1/bmc/firmware/updates operation.
 //
 // #### Controller:
-// `github.com/ubccr/grendel/internal/api.(*Handler).BmcQuery`
+// `github.com/ubccr/grendel/internal/api.(*Handler).BmcFirmwareUpdates`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
-// Get redfish info from node(s).
+// List the firmware updates iDRAC(s) found in their last catalog comparison, which firmware/install
+// with apply_update false runs. Dell only.
 //
-// GET /v1/bmc
-func (c *Client) GETV1Bmc(ctx context.Context, params GETV1BmcParams) ([]RedfishSystem, error) {
-	res, err := c.sendGETV1Bmc(ctx, params)
+// GET /v1/bmc/firmware/updates
+func (c *Client) GETV1BmcFirmwareUpdates(ctx context.Context, params GETV1BmcFirmwareUpdatesParams) (*BmcResponseModelBmcFirmwareUpdates, error) {
+	res, err := c.sendGETV1BmcFirmwareUpdates(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGETV1Bmc(ctx context.Context, params GETV1BmcParams) (res []RedfishSystem, err error) {
+func (c *Client) sendGETV1BmcFirmwareUpdates(ctx context.Context, params GETV1BmcFirmwareUpdatesParams) (res *BmcResponseModelBmcFirmwareUpdates, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/v1/bmc"
+	pathParts[0] = "/v1/bmc/firmware/updates"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	q := uri.NewQueryEncoder()
@@ -1686,6 +1215,23 @@ func (c *Client) sendGETV1Bmc(ctx context.Context, params GETV1BmcParams) (res [
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.Tags.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "all" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "all",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.All.Get(); ok {
 				return e.EncodeValue(conv.StringToString(val))
 			}
 			return nil
@@ -1721,7 +1267,7 @@ func (c *Client) sendGETV1Bmc(ctx context.Context, params GETV1BmcParams) (res [
 		var satisfied bitset
 		{
 
-			switch err := c.securityHeaderAuth(ctx, GETV1BmcOperation, r); {
+			switch err := c.securityHeaderAuth(ctx, GETV1BmcFirmwareUpdatesOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -1732,7 +1278,7 @@ func (c *Client) sendGETV1Bmc(ctx context.Context, params GETV1BmcParams) (res [
 		}
 		{
 
-			switch err := c.securityCookieAuth(ctx, GETV1BmcOperation, r); {
+			switch err := c.securityCookieAuth(ctx, GETV1BmcFirmwareUpdatesOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 1
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -1767,7 +1313,7 @@ func (c *Client) sendGETV1Bmc(ctx context.Context, params GETV1BmcParams) (res [
 	}
 	defer resp.Body.Close()
 
-	result, err := decodeGETV1BmcResponse(resp)
+	result, err := decodeGETV1BmcFirmwareUpdatesResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -1778,20 +1324,20 @@ func (c *Client) sendGETV1Bmc(ctx context.Context, params GETV1BmcParams) (res [
 // GETV1BmcJobs invokes GET_/v1/bmc/jobs operation.
 //
 // #### Controller:
-// `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobList`
+// `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobs`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
-// Get redfish jobs from node(s).
+// Get the redfish job queue of node(s).
 //
 // GET /v1/bmc/jobs
-func (c *Client) GETV1BmcJobs(ctx context.Context, params GETV1BmcJobsParams) ([]RedfishJob, error) {
+func (c *Client) GETV1BmcJobs(ctx context.Context, params GETV1BmcJobsParams) (*BmcResponseModelBmcJobList, error) {
 	res, err := c.sendGETV1BmcJobs(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGETV1BmcJobs(ctx context.Context, params GETV1BmcJobsParams) (res []RedfishJob, err error) {
+func (c *Client) sendGETV1BmcJobs(ctx context.Context, params GETV1BmcJobsParams) (res *BmcResponseModelBmcJobList, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
@@ -1826,6 +1372,23 @@ func (c *Client) sendGETV1BmcJobs(ctx context.Context, params GETV1BmcJobsParams
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.Tags.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "all" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "all",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.All.Get(); ok {
 				return e.EncodeValue(conv.StringToString(val))
 			}
 			return nil
@@ -1915,30 +1478,47 @@ func (c *Client) sendGETV1BmcJobs(ctx context.Context, params GETV1BmcJobsParams
 	return result, nil
 }
 
-// GETV1BmcMetrics invokes GET_/v1/bmc/metrics operation.
+// GETV1BmcSel invokes GET_/v1/bmc/sel operation.
 //
 // #### Controller:
-// `github.com/ubccr/grendel/internal/api.(*Handler).BmcMetricReports`
+// `github.com/ubccr/grendel/internal/api.(*Handler).BmcSEL`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
-// Get metric reports by nodeset.
+// Get the system event log of node(s).
 //
-// GET /v1/bmc/metrics
-func (c *Client) GETV1BmcMetrics(ctx context.Context, params GETV1BmcMetricsParams) ([]RedfishMetricReport, error) {
-	res, err := c.sendGETV1BmcMetrics(ctx, params)
+// GET /v1/bmc/sel
+func (c *Client) GETV1BmcSel(ctx context.Context, params GETV1BmcSelParams) (*BmcResponseModelBmcSELLog, error) {
+	res, err := c.sendGETV1BmcSel(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGETV1BmcMetrics(ctx context.Context, params GETV1BmcMetricsParams) (res []RedfishMetricReport, err error) {
+func (c *Client) sendGETV1BmcSel(ctx context.Context, params GETV1BmcSelParams) (res *BmcResponseModelBmcSELLog, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/v1/bmc/metrics"
+	pathParts[0] = "/v1/bmc/sel"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	q := uri.NewQueryEncoder()
+	{
+		// Encode "limit" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "limit",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Limit.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
 	{
 		// Encode "nodeset" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
@@ -1966,6 +1546,23 @@ func (c *Client) sendGETV1BmcMetrics(ctx context.Context, params GETV1BmcMetrics
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.Tags.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "all" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "all",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.All.Get(); ok {
 				return e.EncodeValue(conv.StringToString(val))
 			}
 			return nil
@@ -2001,7 +1598,7 @@ func (c *Client) sendGETV1BmcMetrics(ctx context.Context, params GETV1BmcMetrics
 		var satisfied bitset
 		{
 
-			switch err := c.securityHeaderAuth(ctx, GETV1BmcMetricsOperation, r); {
+			switch err := c.securityHeaderAuth(ctx, GETV1BmcSelOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -2012,7 +1609,7 @@ func (c *Client) sendGETV1BmcMetrics(ctx context.Context, params GETV1BmcMetrics
 		}
 		{
 
-			switch err := c.securityCookieAuth(ctx, GETV1BmcMetricsOperation, r); {
+			switch err := c.securityCookieAuth(ctx, GETV1BmcSelOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 1
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -2047,7 +1644,7 @@ func (c *Client) sendGETV1BmcMetrics(ctx context.Context, params GETV1BmcMetrics
 	}
 	defer resp.Body.Close()
 
-	result, err := decodeGETV1BmcMetricsResponse(resp)
+	result, err := decodeGETV1BmcSelResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -2055,27 +1652,27 @@ func (c *Client) sendGETV1BmcMetrics(ctx context.Context, params GETV1BmcMetrics
 	return result, nil
 }
 
-// GETV1BmcUpgradeDellRepo invokes GET_/v1/bmc/upgrade/dell/repo operation.
+// GETV1BmcStatus invokes GET_/v1/bmc/status operation.
 //
 // #### Controller:
-// `github.com/ubccr/grendel/internal/api.(*Handler).BmcDellGetRepoUpdateList`
+// `github.com/ubccr/grendel/internal/api.(*Handler).BmcStatus`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
-// Fetch which packages can be upgraded.
+// Get redfish system information from node(s).
 //
-// GET /v1/bmc/upgrade/dell/repo
-func (c *Client) GETV1BmcUpgradeDellRepo(ctx context.Context, params GETV1BmcUpgradeDellRepoParams) ([]RedfishDellUpgradeFirmware, error) {
-	res, err := c.sendGETV1BmcUpgradeDellRepo(ctx, params)
+// GET /v1/bmc/status
+func (c *Client) GETV1BmcStatus(ctx context.Context, params GETV1BmcStatusParams) (*BmcResponseModelRedfishSystem, error) {
+	res, err := c.sendGETV1BmcStatus(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGETV1BmcUpgradeDellRepo(ctx context.Context, params GETV1BmcUpgradeDellRepoParams) (res []RedfishDellUpgradeFirmware, err error) {
+func (c *Client) sendGETV1BmcStatus(ctx context.Context, params GETV1BmcStatusParams) (res *BmcResponseModelRedfishSystem, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/v1/bmc/upgrade/dell/repo"
+	pathParts[0] = "/v1/bmc/status"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	q := uri.NewQueryEncoder()
@@ -2113,6 +1710,23 @@ func (c *Client) sendGETV1BmcUpgradeDellRepo(ctx context.Context, params GETV1Bm
 			return res, errors.Wrap(err, "encode query")
 		}
 	}
+	{
+		// Encode "all" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "all",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.All.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
 	u.RawQuery = q.Values().Encode()
 
 	r, err := ht.NewRequest(ctx, "GET", u)
@@ -2141,7 +1755,7 @@ func (c *Client) sendGETV1BmcUpgradeDellRepo(ctx context.Context, params GETV1Bm
 		var satisfied bitset
 		{
 
-			switch err := c.securityHeaderAuth(ctx, GETV1BmcUpgradeDellRepoOperation, r); {
+			switch err := c.securityHeaderAuth(ctx, GETV1BmcStatusOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -2152,7 +1766,7 @@ func (c *Client) sendGETV1BmcUpgradeDellRepo(ctx context.Context, params GETV1Bm
 		}
 		{
 
-			switch err := c.securityCookieAuth(ctx, GETV1BmcUpgradeDellRepoOperation, r); {
+			switch err := c.securityCookieAuth(ctx, GETV1BmcStatusOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 1
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -2187,7 +1801,7 @@ func (c *Client) sendGETV1BmcUpgradeDellRepo(ctx context.Context, params GETV1Bm
 	}
 	defer resp.Body.Close()
 
-	result, err := decodeGETV1BmcUpgradeDellRepoResponse(resp)
+	result, err := decodeGETV1BmcStatusResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -4788,15 +4402,15 @@ func (c *Client) sendPOSTV1AuthToken(ctx context.Context, request *AuthTokenRequ
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
-// Set BMC to autoconfigure.
+// Set iDRAC(s) to auto configure once, on the node's next boot. Dell only.
 //
 // POST /v1/bmc/configure/auto
-func (c *Client) POSTV1BmcConfigureAuto(ctx context.Context, params POSTV1BmcConfigureAutoParams) ([]JobMessage, error) {
+func (c *Client) POSTV1BmcConfigureAuto(ctx context.Context, params POSTV1BmcConfigureAutoParams) (*BmcResponseModelBmcAck, error) {
 	res, err := c.sendPOSTV1BmcConfigureAuto(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendPOSTV1BmcConfigureAuto(ctx context.Context, params POSTV1BmcConfigureAutoParams) (res []JobMessage, err error) {
+func (c *Client) sendPOSTV1BmcConfigureAuto(ctx context.Context, params POSTV1BmcConfigureAutoParams) (res *BmcResponseModelBmcAck, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
@@ -4831,6 +4445,23 @@ func (c *Client) sendPOSTV1BmcConfigureAuto(ctx context.Context, params POSTV1Bm
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.Tags.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "all" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "all",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.All.Get(); ok {
 				return e.EncodeValue(conv.StringToString(val))
 			}
 			return nil
@@ -4923,20 +4554,20 @@ func (c *Client) sendPOSTV1BmcConfigureAuto(ctx context.Context, params POSTV1Bm
 // POSTV1BmcConfigureImport invokes POST_/v1/bmc/configure/import operation.
 //
 // #### Controller:
-// `github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfiguration`
+// `github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfig`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
-// Manually import system configuration to BMC.
+// Have iDRAC(s) download a config template from the provision server and import it. Dell only.
 //
 // POST /v1/bmc/configure/import
-func (c *Client) POSTV1BmcConfigureImport(ctx context.Context, request *BmcImportConfigurationRequest, params POSTV1BmcConfigureImportParams) ([]JobMessage, error) {
+func (c *Client) POSTV1BmcConfigureImport(ctx context.Context, request *BmcImportConfigBody, params POSTV1BmcConfigureImportParams) (*BmcResponseModelBmcAck, error) {
 	res, err := c.sendPOSTV1BmcConfigureImport(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendPOSTV1BmcConfigureImport(ctx context.Context, request *BmcImportConfigurationRequest, params POSTV1BmcConfigureImportParams) (res []JobMessage, err error) {
+func (c *Client) sendPOSTV1BmcConfigureImport(ctx context.Context, request *BmcImportConfigBody, params POSTV1BmcConfigureImportParams) (res *BmcResponseModelBmcAck, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
@@ -4971,6 +4602,23 @@ func (c *Client) sendPOSTV1BmcConfigureImport(ctx context.Context, request *BmcI
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.Tags.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "all" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "all",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.All.Get(); ok {
 				return e.EncodeValue(conv.StringToString(val))
 			}
 			return nil
@@ -5063,7 +4711,337 @@ func (c *Client) sendPOSTV1BmcConfigureImport(ctx context.Context, request *BmcI
 	return result, nil
 }
 
-// POSTV1BmcPowerBmc invokes POST_/v1/bmc/power/bmc operation.
+// POSTV1BmcFirmwareInstall invokes POST_/v1/bmc/firmware/install operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).BmcInstallFirmware`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Compare the firmware of iDRAC(s) against an update catalog, and with apply_update queue the
+// updates. A comparison waits for its job to finish, up to bmc.node_timeout. Dell only.
+//
+// POST /v1/bmc/firmware/install
+func (c *Client) POSTV1BmcFirmwareInstall(ctx context.Context, request *BmcInstallFirmwareBody, params POSTV1BmcFirmwareInstallParams) (*BmcResponseModelBmcAck, error) {
+	res, err := c.sendPOSTV1BmcFirmwareInstall(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendPOSTV1BmcFirmwareInstall(ctx context.Context, request *BmcInstallFirmwareBody, params POSTV1BmcFirmwareInstallParams) (res *BmcResponseModelBmcAck, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/bmc/firmware/install"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "nodeset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "nodeset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Nodeset.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "tags" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "tags",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Tags.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "all" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "all",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.All.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePOSTV1BmcFirmwareInstallRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, POSTV1BmcFirmwareInstallOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, POSTV1BmcFirmwareInstallOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodePOSTV1BmcFirmwareInstallResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// POSTV1BmcJobsClear invokes POST_/v1/bmc/jobs/clear operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).BmcClearJobs`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Clear redfish jobs from node(s).
+//
+// POST /v1/bmc/jobs/clear
+func (c *Client) POSTV1BmcJobsClear(ctx context.Context, request *BmcClearJobsBody, params POSTV1BmcJobsClearParams) (*BmcResponseModelBmcAck, error) {
+	res, err := c.sendPOSTV1BmcJobsClear(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendPOSTV1BmcJobsClear(ctx context.Context, request *BmcClearJobsBody, params POSTV1BmcJobsClearParams) (res *BmcResponseModelBmcAck, err error) {
+	// Validate request before sending.
+	if err := func() error {
+		if err := request.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return res, errors.Wrap(err, "validate")
+	}
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/bmc/jobs/clear"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "nodeset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "nodeset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Nodeset.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "tags" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "tags",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Tags.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "all" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "all",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.All.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePOSTV1BmcJobsClearRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, POSTV1BmcJobsClearOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, POSTV1BmcJobsClearOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodePOSTV1BmcJobsClearResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// POSTV1BmcPower invokes POST_/v1/bmc/power operation.
 //
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcPower`
@@ -5071,19 +5049,19 @@ func (c *Client) sendPOSTV1BmcConfigureImport(ctx context.Context, request *BmcI
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
-// Reboot node(s) BMC.
+// Change the power state of node(s), or restart their BMCs.
 //
-// POST /v1/bmc/power/bmc
-func (c *Client) POSTV1BmcPowerBmc(ctx context.Context, params POSTV1BmcPowerBmcParams) ([]JobMessage, error) {
-	res, err := c.sendPOSTV1BmcPowerBmc(ctx, params)
+// POST /v1/bmc/power
+func (c *Client) POSTV1BmcPower(ctx context.Context, request *BmcPowerBody, params POSTV1BmcPowerParams) (*BmcResponseModelBmcAck, error) {
+	res, err := c.sendPOSTV1BmcPower(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendPOSTV1BmcPowerBmc(ctx context.Context, params POSTV1BmcPowerBmcParams) (res []JobMessage, err error) {
+func (c *Client) sendPOSTV1BmcPower(ctx context.Context, request *BmcPowerBody, params POSTV1BmcPowerParams) (res *BmcResponseModelBmcAck, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/v1/bmc/power/bmc"
+	pathParts[0] = "/v1/bmc/power"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	q := uri.NewQueryEncoder()
@@ -5121,139 +5099,16 @@ func (c *Client) sendPOSTV1BmcPowerBmc(ctx context.Context, params POSTV1BmcPowe
 			return res, errors.Wrap(err, "encode query")
 		}
 	}
-	u.RawQuery = q.Values().Encode()
-
-	r, err := ht.NewRequest(ctx, "POST", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	h := uri.NewHeaderEncoder(r.Header)
 	{
-		cfg := uri.HeaderParameterEncodingConfig{
-			Name:    "Accept",
-			Explode: false,
-		}
-		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Accept.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode header")
-		}
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securityHeaderAuth(ctx, POSTV1BmcPowerBmcOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"HeaderAuth\"")
-			}
-		}
-		{
-
-			switch err := c.securityCookieAuth(ctx, POSTV1BmcPowerBmcOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 1
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"CookieAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-				{0b00000010},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	result, err := decodePOSTV1BmcPowerBmcResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// POSTV1BmcPowerOs invokes POST_/v1/bmc/power/os operation.
-//
-// #### Controller:
-// `github.com/ubccr/grendel/internal/api.(*Handler).BmcOsPower`
-// #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
-// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
-// ---
-// Change power status of node(s).
-//
-// POST /v1/bmc/power/os
-func (c *Client) POSTV1BmcPowerOs(ctx context.Context, request *BmcOsPowerBody, params POSTV1BmcPowerOsParams) ([]JobMessage, error) {
-	res, err := c.sendPOSTV1BmcPowerOs(ctx, request, params)
-	return res, err
-}
-
-func (c *Client) sendPOSTV1BmcPowerOs(ctx context.Context, request *BmcOsPowerBody, params POSTV1BmcPowerOsParams) (res []JobMessage, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [1]string
-	pathParts[0] = "/v1/bmc/power/os"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	q := uri.NewQueryEncoder()
-	{
-		// Encode "nodeset" parameter.
+		// Encode "all" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "nodeset",
+			Name:    "all",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Nodeset.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "tags" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "tags",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Tags.Get(); ok {
+			if val, ok := params.All.Get(); ok {
 				return e.EncodeValue(conv.StringToString(val))
 			}
 			return nil
@@ -5267,7 +5122,7 @@ func (c *Client) sendPOSTV1BmcPowerOs(ctx context.Context, request *BmcOsPowerBo
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-	if err := encodePOSTV1BmcPowerOsRequest(request, r); err != nil {
+	if err := encodePOSTV1BmcPowerRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
 
@@ -5292,7 +5147,7 @@ func (c *Client) sendPOSTV1BmcPowerOs(ctx context.Context, request *BmcOsPowerBo
 		var satisfied bitset
 		{
 
-			switch err := c.securityHeaderAuth(ctx, POSTV1BmcPowerOsOperation, r); {
+			switch err := c.securityHeaderAuth(ctx, POSTV1BmcPowerOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -5303,7 +5158,7 @@ func (c *Client) sendPOSTV1BmcPowerOs(ctx context.Context, request *BmcOsPowerBo
 		}
 		{
 
-			switch err := c.securityCookieAuth(ctx, POSTV1BmcPowerOsOperation, r); {
+			switch err := c.securityCookieAuth(ctx, POSTV1BmcPowerOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 1
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -5338,7 +5193,7 @@ func (c *Client) sendPOSTV1BmcPowerOs(ctx context.Context, request *BmcOsPowerBo
 	}
 	defer resp.Body.Close()
 
-	result, err := decodePOSTV1BmcPowerOsResponse(resp)
+	result, err := decodePOSTV1BmcPowerResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -5346,27 +5201,27 @@ func (c *Client) sendPOSTV1BmcPowerOs(ctx context.Context, request *BmcOsPowerBo
 	return result, nil
 }
 
-// POSTV1BmcUpgradeDellInstallfromrepo invokes POST_/v1/bmc/upgrade/dell/installfromrepo operation.
+// POSTV1BmcSelClear invokes POST_/v1/bmc/sel/clear operation.
 //
 // #### Controller:
-// `github.com/ubccr/grendel/internal/api.(*Handler).BmcDellInstallFromRepo`
+// `github.com/ubccr/grendel/internal/api.(*Handler).BmcClearSEL`
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
-// Request iDRAC to download the latest firmware catalog and compare firmware versions.
+// Clear the system event log on node(s).
 //
-// POST /v1/bmc/upgrade/dell/installfromrepo
-func (c *Client) POSTV1BmcUpgradeDellInstallfromrepo(ctx context.Context, request *BmcDellInstallFromRepoRequest, params POSTV1BmcUpgradeDellInstallfromrepoParams) ([]JobMessage, error) {
-	res, err := c.sendPOSTV1BmcUpgradeDellInstallfromrepo(ctx, request, params)
+// POST /v1/bmc/sel/clear
+func (c *Client) POSTV1BmcSelClear(ctx context.Context, params POSTV1BmcSelClearParams) (*BmcResponseModelBmcAck, error) {
+	res, err := c.sendPOSTV1BmcSelClear(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendPOSTV1BmcUpgradeDellInstallfromrepo(ctx context.Context, request *BmcDellInstallFromRepoRequest, params POSTV1BmcUpgradeDellInstallfromrepoParams) (res []JobMessage, err error) {
+func (c *Client) sendPOSTV1BmcSelClear(ctx context.Context, params POSTV1BmcSelClearParams) (res *BmcResponseModelBmcAck, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/v1/bmc/upgrade/dell/installfromrepo"
+	pathParts[0] = "/v1/bmc/sel/clear"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	q := uri.NewQueryEncoder()
@@ -5404,14 +5259,28 @@ func (c *Client) sendPOSTV1BmcUpgradeDellInstallfromrepo(ctx context.Context, re
 			return res, errors.Wrap(err, "encode query")
 		}
 	}
+	{
+		// Encode "all" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "all",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.All.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
 	u.RawQuery = q.Values().Encode()
 
 	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodePOSTV1BmcUpgradeDellInstallfromrepoRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
 	}
 
 	h := uri.NewHeaderEncoder(r.Header)
@@ -5435,7 +5304,7 @@ func (c *Client) sendPOSTV1BmcUpgradeDellInstallfromrepo(ctx context.Context, re
 		var satisfied bitset
 		{
 
-			switch err := c.securityHeaderAuth(ctx, POSTV1BmcUpgradeDellInstallfromrepoOperation, r); {
+			switch err := c.securityHeaderAuth(ctx, POSTV1BmcSelClearOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -5446,7 +5315,7 @@ func (c *Client) sendPOSTV1BmcUpgradeDellInstallfromrepo(ctx context.Context, re
 		}
 		{
 
-			switch err := c.securityCookieAuth(ctx, POSTV1BmcUpgradeDellInstallfromrepoOperation, r); {
+			switch err := c.securityCookieAuth(ctx, POSTV1BmcSelClearOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 1
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -5481,7 +5350,7 @@ func (c *Client) sendPOSTV1BmcUpgradeDellInstallfromrepo(ctx context.Context, re
 	}
 	defer resp.Body.Close()
 
-	result, err := decodePOSTV1BmcUpgradeDellInstallfromrepoResponse(resp)
+	result, err := decodePOSTV1BmcSelClearResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

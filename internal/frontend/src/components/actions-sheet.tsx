@@ -1,3 +1,4 @@
+import { Card } from "@/components/ui/card";
 import {
   Sheet,
   SheetContent,
@@ -7,10 +8,10 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useRouter } from "@tanstack/react-router";
-import { Hammer } from "lucide-react";
-import React from "react";
-import { toast } from "sonner";
+import { CopyCheckIcon, CopyIcon, Hammer } from "lucide-react";
+import React, { useState } from "react";
 import { Button } from "./ui/button";
+import { ScrollArea } from "./ui/scroll-area";
 import NodesetView from "./nodeset-view";
 
 type props = {
@@ -19,6 +20,31 @@ type props = {
   children: React.ReactNode;
   type?: "other" | "node";
 };
+
+function SelectedItems({ checked }: { checked: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <div className="grid gap-2">
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium">Selected</span>
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={() => {
+            navigator.clipboard.writeText(checked);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 3000);
+          }}
+        >
+          {copied ? <CopyCheckIcon className="text-green-600" /> : <CopyIcon />}
+        </Button>
+      </div>
+      <ScrollArea className="max-h-36 overflow-y-scroll text-sm break-all text-muted-foreground">
+        {checked}
+      </ScrollArea>
+    </div>
+  );
+}
 
 export default function ActionsSheet({ checked, length, children, type = "other" }: props) {
   const router = useRouter();
@@ -37,30 +63,24 @@ export default function ActionsSheet({ checked, length, children, type = "other"
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent className="max-h-dvh w-full overflow-x-scroll sm:max-w-2xl">
+      <SheetContent className="flex max-h-dvh w-full flex-col overflow-y-auto sm:max-w-2xl">
         <SheetHeader>
-          <SheetTitle>Actions:</SheetTitle>
-          {type === "other" ? (
-            <>
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => {
-                  navigator.clipboard.writeText(checked);
-                  toast.success("Successfully copied item(s)");
-                }}
-              >
-                Copy {length} Selected item(s):
-              </Button>
-              <SheetDescription className="max-h-36 overflow-y-scroll rounded-md p-2">
-                {checked}
-              </SheetDescription>
-            </>
-          ) : (
-            <NodesetView nodes={checked} size="sm" />
-          )}
+          <SheetTitle>Actions</SheetTitle>
+          <SheetDescription>
+            {length} {type === "node" ? "node" : "item"}
+            {length === 1 ? "" : "s"} selected
+          </SheetDescription>
         </SheetHeader>
-        {children}
+        {checked && (
+          <Card className={`bg-muted/40 p-4 ${type === "node" ? "pt-2" : ""}`}>
+            {type === "node" ? (
+              <NodesetView nodes={checked} size="sm" />
+            ) : (
+              <SelectedItems checked={checked} />
+            )}
+          </Card>
+        )}
+        <div>{children}</div>
       </SheetContent>
     </Sheet>
   );

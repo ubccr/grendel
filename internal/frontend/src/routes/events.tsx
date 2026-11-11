@@ -85,7 +85,6 @@ function TableComponent() {
             <TableHead>Status</TableHead>
             <TableHead>Host</TableHead>
             <TableHead>Message</TableHead>
-            <TableHead>Error</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -98,7 +97,6 @@ function TableComponent() {
               </TableCell>
               <TableCell>{row.host}</TableCell>
               <TableCell>{row.msg}</TableCell>
-              <TableCell>{row.redfish_error?.code && JSON.stringify(row.redfish_error)}</TableCell>
             </TableRow>
           ))}
         </TableBody>

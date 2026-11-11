@@ -1,0 +1,213 @@
+import { BmcResponseModelBmcSelLog, getV1BmcSel } from "@/client";
+import ActionsSheet from "@/components/actions-sheet";
+import NodesSelAction from "@/components/actions/nodes/sel";
+import { DataTable, DataTableActions } from "@/components/data-table/data-table";
+import { DataTableColumnHeader } from "@/components/data-table/header";
+import SelectableCheckbox from "@/components/data-table/selectableCheckbox";
+import { countWith, nodeColumns, NodeRow, rowsPerNode } from "@/components/nodes/bmc-columns";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import AuthRedirect from "@/lib/auth";
+import { logSeverityColor } from "@/lib/bmc";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { ColumnDef } from "@tanstack/react-table";
+import { useMemo, useState } from "react";
+import { z } from "zod";
+
+type ArrayElement<T> = T extends (infer U)[] ? U : never;
+type Result = ArrayElement<NonNullable<BmcResponseModelBmcSelLog["results"]>>;
+type Entry = NodeRow & Partial<ArrayElement<NonNullable<NonNullable<Result["data"]>["entries"]>>>;
+
+const limits = ["25", "50", "100", "0"] as const;
+
+export const Route = createFileRoute("/nodes/sel/$nodes")({
+  component: RouteComponent,
+  beforeLoad: AuthRedirect,
+  validateSearch: z.object({
+    limit: z.enum(limits).default("50").catch("50"),
+  }),
+  loaderDeps: ({ search: { limit } }) => ({ limit }),
+  loader: async ({ params: { nodes }, deps: { limit } }) =>
+    getV1BmcSel({ query: { nodeset: nodes, limit } }),
+});
+
+function RouteComponent() {
+  const { data } = Route.useLoaderData();
+  const { isFetching } = Route.useMatch();
+  const { limit } = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
+  const [lastSelectedID, setLastSelectedID] = useState(0);
+
+  const entries = useMemo(
+    () => rowsPerNode((data?.results ?? []).map((r) => ({ ...r, items: r.data?.entries }))),
+    [data],
+  );
+
+  const columns: ColumnDef<Entry>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row, table }) => (
+        <SelectableCheckbox
+          row={row}
+          table={table}
+          lastSelectedID={lastSelectedID}
+          setLastSelectedID={setLastSelectedID}
+        />
+      ),
+      aggregatedCell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsAllSubRowsSelected() || (row.getIsSomeSelected() && "indeterminate")}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select all in group"
+        />
+      ),
+    },
+    {
+      accessorKey: "node",
+      header: ({ table }) => (
+        <div className="flex justify-between gap-2">
+          <span>Node</span>
+          <Switch
+            aria-description="expand all"
+            checked={table.getIsAllRowsExpanded()}
+            onCheckedChange={(value) => table.toggleAllRowsExpanded(!!value)}
+          />
+        </div>
+      ),
+      cell: ({ row }) => (
+        <Link
+          to="/nodes/$node/node"
+          params={{ node: row.original.node }}
+          className="hover:underline"
+        >
+          {row.original.node}
+        </Link>
+      ),
+    },
+    ...nodeColumns<Entry>(),
+    {
+      accessorKey: "created",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Time" />,
+      aggregationFn: countWith<Entry>("id"),
+      aggregatedCell: ({ getValue }) => (
+        <Badge variant="secondary">{getValue<number>()} entries</Badge>
+      ),
+      cell: ({ getValue }) => {
+        const created = getValue<string>();
+        return (
+          <span className="whitespace-nowrap">
+            {created ? new Date(created).toLocaleString() : ""}
+          </span>
+        );
+      },
+    },
+    {
+      accessorKey: "severity",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Severity" />,
+      aggregationFn: "unique",
+      cell: ({ getValue }) => {
+        const severity = getValue<string>();
+        if (!severity) return null;
+        return (
+          <Badge variant="secondary" className={`rounded-sm ${logSeverityColor(severity)}`}>
+            {severity}
+          </Badge>
+        );
+      },
+    },
+    {
+      accessorKey: "message",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Event" />,
+    },
+    {
+      accessorKey: "sensor_type",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Sensor" />,
+    },
+    {
+      accessorKey: "message_id",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Message ID" />,
+    },
+  ];
+
+  const actions: DataTableActions<Entry> = ({ table }) => {
+    const nodes = [
+      ...new Set(
+        table
+          .getSelectedRowModel()
+          .rows.map((v) => v.original.node)
+          .filter(Boolean),
+      ),
+    ];
+    return (
+      <ActionsSheet type="node" checked={nodes.join(",")} length={nodes.length}>
+        <div className="grid gap-4 sm:grid-cols-1">
+          <NodesSelAction nodes={nodes.join(",")} />
+        </div>
+      </ActionsSheet>
+    );
+  };
+
+  return (
+    <div className="grid gap-2">
+      <Card>
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-4 space-y-0">
+          <div className="space-y-1.5">
+            <CardTitle>
+              <Label htmlFor="sel-limit">Entries per node</Label>
+            </CardTitle>
+            <CardDescription>
+              A limit takes the entries the BMC lists first, which are the newest on most BMCs. All
+              reads the whole log and sorts it.
+            </CardDescription>
+          </div>
+          <Select
+            value={limit}
+            onValueChange={(value) => navigate({ search: { limit: value as typeof limit } })}
+          >
+            <SelectTrigger id="sel-limit" className="w-[110px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {limits.map((l) => (
+                <SelectItem key={l} value={l}>
+                  {l === "0" ? "All" : l}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardHeader>
+      </Card>
+      <Card>
+        <CardContent className="p-2">
+          <DataTable
+            columns={columns}
+            Actions={actions}
+            initialGrouping={["node"]}
+            initialVisibility={{ message_id: false }}
+            data={entries}
+            progress={isFetching !== false}
+          />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

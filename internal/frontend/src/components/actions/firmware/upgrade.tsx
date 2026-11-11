@@ -1,5 +1,5 @@
-import { BmcDellInstallFromRepoRequest } from "@/client";
-import { postV1BmcUpgradeDellInstallfromrepoMutation } from "@/client/@tanstack/react-query.gen";
+import { BmcInstallFirmwareBody } from "@/client";
+import { postV1BmcFirmwareInstallMutation } from "@/client/@tanstack/react-query.gen";
 import { useAppForm } from "@/components/form/form-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,16 +7,19 @@ import { Field, FieldGroup, FieldSeparator, FieldSet } from "@/components/ui/fie
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
+import { toastBmcResponse } from "@/lib/bmc";
 import { toast } from "sonner";
 
 export default function FirmwareUpgradeAction({ nodes }: { nodes: string }) {
   const router = useRouter();
-  const mutation = useMutation(postV1BmcUpgradeDellInstallfromrepoMutation());
+  const mutation = useMutation(postV1BmcFirmwareInstallMutation());
 
-  const defaultValues: BmcDellInstallFromRepoRequest = {
-    IgnoreCertWarning: true,
-    IPAddress: "downloads.dell.com",
-    ShareType: "HTTPS",
+  const defaultValues: BmcInstallFirmwareBody = {
+    ignore_cert_warning: true,
+    ip_address: "downloads.dell.com",
+    share_type: "HTTPS",
+    share_name: "",
+    catalog_file: "",
   };
   const form = useAppForm({
     defaultValues: defaultValues,
@@ -27,10 +30,8 @@ export default function FirmwareUpgradeAction({ nodes }: { nodes: string }) {
           body: data.value,
         },
         {
-          onSuccess: () => {
-            toast.success("Success", {
-              description: "successfully sent request",
-            });
+          onSuccess: (res) => {
+            toastBmcResponse(data.value.apply_update ? "Firmware install" : "Firmware check", res);
             router.invalidate();
           },
           onError: (e) =>
@@ -46,9 +47,6 @@ export default function FirmwareUpgradeAction({ nodes }: { nodes: string }) {
     ["HTTP", "HTTP"],
     ["HTTPS", "HTTPS"],
     ["NFS", "NFS"],
-    ["CIFS", "CIFS"],
-    ["FTP", "FTP"],
-    ["TFTP", "TFTP"],
   ]);
 
   return (
@@ -70,7 +68,7 @@ export default function FirmwareUpgradeAction({ nodes }: { nodes: string }) {
           <FieldSet>
             <FieldGroup>
               <form.AppField
-                name="ShareType"
+                name="share_type"
                 children={(field) => (
                   <field.SelectField
                     label="Share Type"
@@ -80,7 +78,7 @@ export default function FirmwareUpgradeAction({ nodes }: { nodes: string }) {
                 )}
               />
               <form.AppField
-                name="IPAddress"
+                name="ip_address"
                 children={(field) => (
                   <field.TextField
                     label="IP Address"
@@ -89,16 +87,16 @@ export default function FirmwareUpgradeAction({ nodes }: { nodes: string }) {
                 )}
               />
               <form.AppField
-                name="ShareName"
+                name="share_name"
                 children={(field) => (
                   <field.TextField
                     label="Share Name"
-                    description="Name of the CIFS share or full path to the NFS share. Optional for HTTP/HTTPS share, this may be treated as the path of the directory containing the file."
+                    description="Required. Path of the catalog's directory on the share, or the full path of the NFS export."
                   />
                 )}
               />
               <form.AppField
-                name="CatalogFile"
+                name="catalog_file"
                 children={(field) => (
                   <field.TextField
                     label="Catalog File"
@@ -108,16 +106,16 @@ export default function FirmwareUpgradeAction({ nodes }: { nodes: string }) {
               />
               <FieldSeparator />
               <form.AppField
-                name="ApplyUpdate"
+                name="apply_update"
                 children={(field) => (
                   <field.SwitchField
                     label="Apply Update"
-                    description="True will start / queue the install jobs, False will only check for updates which will be queriable."
+                    description="On queues the update jobs. Off only compares the installed firmware against the catalog, and waits for that to finish so this page can list the updates."
                   />
                 )}
               />
               <form.AppField
-                name="RebootNeeded"
+                name="reboot"
                 children={(field) => (
                   <field.SwitchField
                     label="Reboot"
@@ -126,16 +124,16 @@ export default function FirmwareUpgradeAction({ nodes }: { nodes: string }) {
                 )}
               />
               <form.AppField
-                name="ClearJobQueue"
+                name="clear_jobs"
                 children={(field) => (
                   <field.SwitchField
                     label="Clear Jobs"
-                    description="Remove all jobs from the job queue before upgrading. Only applicable when Apply Update = true"
+                    description="Remove all jobs from the job queue before upgrading. Requires Apply Update."
                   />
                 )}
               />
               <form.AppField
-                name="IgnoreCertWarning"
+                name="ignore_cert_warning"
                 children={(field) => (
                   <field.SwitchField
                     label="Ignore Certificate Warning"

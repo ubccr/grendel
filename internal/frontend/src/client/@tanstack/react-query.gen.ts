@@ -3,8 +3,8 @@
 import { queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { deleteV1AuthSignout, deleteV1BmcJobs, deleteV1BmcJobsJids, deleteV1BmcSel, deleteV1Images, deleteV1Nodes, deleteV1RolesNames, deleteV1UsersUsernames, getV1Bmc, getV1BmcJobs, getV1BmcMetrics, getV1BmcUpgradeDellRepo, getV1DbDump, getV1GrendelEvents, getV1GrendelVersion, getV1Images, getV1ImagesFind, getV1Nodes, getV1NodesFind, getV1NodesTokenInterface, getV1Roles, getV1SwitchNodesetLldp, getV1Users, type Options, patchV1AuthReset, patchV1NodesImage, patchV1NodesProvision, patchV1NodesTagsAction, patchV1Roles, patchV1UsersUsernamesEnable, patchV1UsersUsernamesRole, postV1AuthSignin, postV1AuthSignup, postV1AuthToken, postV1BmcConfigureAuto, postV1BmcConfigureImport, postV1BmcPowerBmc, postV1BmcPowerOs, postV1BmcUpgradeDellInstallfromrepo, postV1DbRestore, postV1Images, postV1Nodes, postV1Roles, postV1Users } from '../sdk.gen';
-import type { DeleteV1AuthSignoutData, DeleteV1AuthSignoutError, DeleteV1AuthSignoutResponse, DeleteV1BmcJobsData, DeleteV1BmcJobsError, DeleteV1BmcJobsJidsData, DeleteV1BmcJobsJidsError, DeleteV1BmcJobsJidsResponse, DeleteV1BmcJobsResponse, DeleteV1BmcSelData, DeleteV1BmcSelError, DeleteV1BmcSelResponse, DeleteV1ImagesData, DeleteV1ImagesError, DeleteV1ImagesResponse, DeleteV1NodesData, DeleteV1NodesError, DeleteV1NodesResponse, DeleteV1RolesNamesData, DeleteV1RolesNamesError, DeleteV1RolesNamesResponse, DeleteV1UsersUsernamesData, DeleteV1UsersUsernamesError, DeleteV1UsersUsernamesResponse, GetV1BmcData, GetV1BmcError, GetV1BmcJobsData, GetV1BmcJobsError, GetV1BmcJobsResponse, GetV1BmcMetricsData, GetV1BmcMetricsError, GetV1BmcMetricsResponse, GetV1BmcResponse, GetV1BmcUpgradeDellRepoData, GetV1BmcUpgradeDellRepoError, GetV1BmcUpgradeDellRepoResponse, GetV1DbDumpData, GetV1DbDumpError, GetV1DbDumpResponse, GetV1GrendelEventsData, GetV1GrendelEventsError, GetV1GrendelEventsResponse, GetV1GrendelVersionData, GetV1GrendelVersionError, GetV1GrendelVersionResponse, GetV1ImagesData, GetV1ImagesError, GetV1ImagesFindData, GetV1ImagesFindError, GetV1ImagesFindResponse, GetV1ImagesResponse, GetV1NodesData, GetV1NodesError, GetV1NodesFindData, GetV1NodesFindError, GetV1NodesFindResponse, GetV1NodesResponse, GetV1NodesTokenInterfaceData, GetV1NodesTokenInterfaceError, GetV1NodesTokenInterfaceResponse, GetV1RolesData, GetV1RolesError, GetV1RolesResponse, GetV1SwitchNodesetLldpData, GetV1SwitchNodesetLldpError, GetV1SwitchNodesetLldpResponse, GetV1UsersData, GetV1UsersError, GetV1UsersResponse, PatchV1AuthResetData, PatchV1AuthResetError, PatchV1AuthResetResponse, PatchV1NodesImageData, PatchV1NodesImageError, PatchV1NodesImageResponse, PatchV1NodesProvisionData, PatchV1NodesProvisionError, PatchV1NodesProvisionResponse, PatchV1NodesTagsActionData, PatchV1NodesTagsActionError, PatchV1NodesTagsActionResponse, PatchV1RolesData, PatchV1RolesError, PatchV1RolesResponse, PatchV1UsersUsernamesEnableData, PatchV1UsersUsernamesEnableError, PatchV1UsersUsernamesEnableResponse, PatchV1UsersUsernamesRoleData, PatchV1UsersUsernamesRoleError, PatchV1UsersUsernamesRoleResponse, PostV1AuthSigninData, PostV1AuthSigninError, PostV1AuthSigninResponse, PostV1AuthSignupData, PostV1AuthSignupError, PostV1AuthSignupResponse, PostV1AuthTokenData, PostV1AuthTokenError, PostV1AuthTokenResponse, PostV1BmcConfigureAutoData, PostV1BmcConfigureAutoError, PostV1BmcConfigureAutoResponse, PostV1BmcConfigureImportData, PostV1BmcConfigureImportError, PostV1BmcConfigureImportResponse, PostV1BmcPowerBmcData, PostV1BmcPowerBmcError, PostV1BmcPowerBmcResponse, PostV1BmcPowerOsData, PostV1BmcPowerOsError, PostV1BmcPowerOsResponse, PostV1BmcUpgradeDellInstallfromrepoData, PostV1BmcUpgradeDellInstallfromrepoError, PostV1BmcUpgradeDellInstallfromrepoResponse, PostV1DbRestoreData, PostV1DbRestoreError, PostV1DbRestoreResponse, PostV1ImagesData, PostV1ImagesError, PostV1ImagesResponse, PostV1NodesData, PostV1NodesError, PostV1NodesResponse, PostV1RolesData, PostV1RolesError, PostV1RolesResponse, PostV1UsersData, PostV1UsersError, PostV1UsersResponse } from '../types.gen';
+import { deleteV1AuthSignout, deleteV1Images, deleteV1Nodes, deleteV1RolesNames, deleteV1UsersUsernames, getV1BmcFirmwareUpdates, getV1BmcJobs, getV1BmcSel, getV1BmcStatus, getV1DbDump, getV1GrendelEvents, getV1GrendelVersion, getV1Images, getV1ImagesFind, getV1Nodes, getV1NodesFind, getV1NodesTokenInterface, getV1Roles, getV1SwitchNodesetLldp, getV1Users, type Options, patchV1AuthReset, patchV1NodesImage, patchV1NodesProvision, patchV1NodesTagsAction, patchV1Roles, patchV1UsersUsernamesEnable, patchV1UsersUsernamesRole, postV1AuthSignin, postV1AuthSignup, postV1AuthToken, postV1BmcConfigureAuto, postV1BmcConfigureImport, postV1BmcFirmwareInstall, postV1BmcJobsClear, postV1BmcPower, postV1BmcSelClear, postV1DbRestore, postV1Images, postV1Nodes, postV1Roles, postV1Users } from '../sdk.gen';
+import type { DeleteV1AuthSignoutData, DeleteV1AuthSignoutError, DeleteV1AuthSignoutResponse, DeleteV1ImagesData, DeleteV1ImagesError, DeleteV1ImagesResponse, DeleteV1NodesData, DeleteV1NodesError, DeleteV1NodesResponse, DeleteV1RolesNamesData, DeleteV1RolesNamesError, DeleteV1RolesNamesResponse, DeleteV1UsersUsernamesData, DeleteV1UsersUsernamesError, DeleteV1UsersUsernamesResponse, GetV1BmcFirmwareUpdatesData, GetV1BmcFirmwareUpdatesError, GetV1BmcFirmwareUpdatesResponse, GetV1BmcJobsData, GetV1BmcJobsError, GetV1BmcJobsResponse, GetV1BmcSelData, GetV1BmcSelError, GetV1BmcSelResponse, GetV1BmcStatusData, GetV1BmcStatusError, GetV1BmcStatusResponse, GetV1DbDumpData, GetV1DbDumpError, GetV1DbDumpResponse, GetV1GrendelEventsData, GetV1GrendelEventsError, GetV1GrendelEventsResponse, GetV1GrendelVersionData, GetV1GrendelVersionError, GetV1GrendelVersionResponse, GetV1ImagesData, GetV1ImagesError, GetV1ImagesFindData, GetV1ImagesFindError, GetV1ImagesFindResponse, GetV1ImagesResponse, GetV1NodesData, GetV1NodesError, GetV1NodesFindData, GetV1NodesFindError, GetV1NodesFindResponse, GetV1NodesResponse, GetV1NodesTokenInterfaceData, GetV1NodesTokenInterfaceError, GetV1NodesTokenInterfaceResponse, GetV1RolesData, GetV1RolesError, GetV1RolesResponse, GetV1SwitchNodesetLldpData, GetV1SwitchNodesetLldpError, GetV1SwitchNodesetLldpResponse, GetV1UsersData, GetV1UsersError, GetV1UsersResponse, PatchV1AuthResetData, PatchV1AuthResetError, PatchV1AuthResetResponse, PatchV1NodesImageData, PatchV1NodesImageError, PatchV1NodesImageResponse, PatchV1NodesProvisionData, PatchV1NodesProvisionError, PatchV1NodesProvisionResponse, PatchV1NodesTagsActionData, PatchV1NodesTagsActionError, PatchV1NodesTagsActionResponse, PatchV1RolesData, PatchV1RolesError, PatchV1RolesResponse, PatchV1UsersUsernamesEnableData, PatchV1UsersUsernamesEnableError, PatchV1UsersUsernamesEnableResponse, PatchV1UsersUsernamesRoleData, PatchV1UsersUsernamesRoleError, PatchV1UsersUsernamesRoleResponse, PostV1AuthSigninData, PostV1AuthSigninError, PostV1AuthSigninResponse, PostV1AuthSignupData, PostV1AuthSignupError, PostV1AuthSignupResponse, PostV1AuthTokenData, PostV1AuthTokenError, PostV1AuthTokenResponse, PostV1BmcConfigureAutoData, PostV1BmcConfigureAutoError, PostV1BmcConfigureAutoResponse, PostV1BmcConfigureImportData, PostV1BmcConfigureImportError, PostV1BmcConfigureImportResponse, PostV1BmcFirmwareInstallData, PostV1BmcFirmwareInstallError, PostV1BmcFirmwareInstallResponse, PostV1BmcJobsClearData, PostV1BmcJobsClearError, PostV1BmcJobsClearResponse, PostV1BmcPowerData, PostV1BmcPowerError, PostV1BmcPowerResponse, PostV1BmcSelClearData, PostV1BmcSelClearError, PostV1BmcSelClearResponse, PostV1DbRestoreData, PostV1DbRestoreError, PostV1DbRestoreResponse, PostV1ImagesData, PostV1ImagesError, PostV1ImagesResponse, PostV1NodesData, PostV1NodesError, PostV1NodesResponse, PostV1RolesData, PostV1RolesError, PostV1RolesResponse, PostV1UsersData, PostV1UsersError, PostV1UsersResponse } from '../types.gen';
 
 /**
  * auth reset
@@ -153,6 +153,96 @@ export const postV1AuthTokenMutation = (options?: Partial<Options<PostV1AuthToke
     return mutationOptions;
 };
 
+/**
+ * bmc auto configure
+ *
+ * #### Controller:
+ *
+ * `github.com/ubccr/grendel/internal/api.(*Handler).BmcAutoConfigure`
+ *
+ * #### Middlewares:
+ *
+ * - `github.com/go-fuego/fuego.defaultLogger.middleware`
+ * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+ *
+ * ---
+ *
+ * Set iDRAC(s) to auto configure once, on the node's next boot. Dell only
+ */
+export const postV1BmcConfigureAutoMutation = (options?: Partial<Options<PostV1BmcConfigureAutoData>>): UseMutationOptions<PostV1BmcConfigureAutoResponse, PostV1BmcConfigureAutoError, Options<PostV1BmcConfigureAutoData>> => {
+    const mutationOptions: UseMutationOptions<PostV1BmcConfigureAutoResponse, PostV1BmcConfigureAutoError, Options<PostV1BmcConfigureAutoData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await postV1BmcConfigureAuto({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * bmc import config
+ *
+ * #### Controller:
+ *
+ * `github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfig`
+ *
+ * #### Middlewares:
+ *
+ * - `github.com/go-fuego/fuego.defaultLogger.middleware`
+ * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+ *
+ * ---
+ *
+ * Have iDRAC(s) download a config template from the provision server and import it. Dell only
+ */
+export const postV1BmcConfigureImportMutation = (options?: Partial<Options<PostV1BmcConfigureImportData>>): UseMutationOptions<PostV1BmcConfigureImportResponse, PostV1BmcConfigureImportError, Options<PostV1BmcConfigureImportData>> => {
+    const mutationOptions: UseMutationOptions<PostV1BmcConfigureImportResponse, PostV1BmcConfigureImportError, Options<PostV1BmcConfigureImportData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await postV1BmcConfigureImport({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * bmc install firmware
+ *
+ * #### Controller:
+ *
+ * `github.com/ubccr/grendel/internal/api.(*Handler).BmcInstallFirmware`
+ *
+ * #### Middlewares:
+ *
+ * - `github.com/go-fuego/fuego.defaultLogger.middleware`
+ * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+ *
+ * ---
+ *
+ * Compare the firmware of iDRAC(s) against an update catalog, and with apply_update queue the updates. A comparison waits for its job to finish, up to bmc.node_timeout. Dell only
+ */
+export const postV1BmcFirmwareInstallMutation = (options?: Partial<Options<PostV1BmcFirmwareInstallData>>): UseMutationOptions<PostV1BmcFirmwareInstallResponse, PostV1BmcFirmwareInstallError, Options<PostV1BmcFirmwareInstallData>> => {
+    const mutationOptions: UseMutationOptions<PostV1BmcFirmwareInstallResponse, PostV1BmcFirmwareInstallError, Options<PostV1BmcFirmwareInstallData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await postV1BmcFirmwareInstall({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
         _id: string;
@@ -186,14 +276,14 @@ const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions
     return [params];
 };
 
-export const getV1BmcQueryKey = (options?: Options<GetV1BmcData>) => createQueryKey('getV1Bmc', options);
+export const getV1BmcFirmwareUpdatesQueryKey = (options?: Options<GetV1BmcFirmwareUpdatesData>) => createQueryKey('getV1BmcFirmwareUpdates', options);
 
 /**
- * bmc query
+ * bmc firmware updates
  *
  * #### Controller:
  *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcQuery`
+ * `github.com/ubccr/grendel/internal/api.(*Handler).BmcFirmwareUpdates`
  *
  * #### Middlewares:
  *
@@ -202,11 +292,11 @@ export const getV1BmcQueryKey = (options?: Options<GetV1BmcData>) => createQuery
  *
  * ---
  *
- * Get redfish info from node(s)
+ * List the firmware updates iDRAC(s) found in their last catalog comparison, which firmware/install with apply_update false runs. Dell only
  */
-export const getV1BmcOptions = (options?: Options<GetV1BmcData>) => queryOptions<GetV1BmcResponse, GetV1BmcError, GetV1BmcResponse, ReturnType<typeof getV1BmcQueryKey>>({
+export const getV1BmcFirmwareUpdatesOptions = (options?: Options<GetV1BmcFirmwareUpdatesData>) => queryOptions<GetV1BmcFirmwareUpdatesResponse, GetV1BmcFirmwareUpdatesError, GetV1BmcFirmwareUpdatesResponse, ReturnType<typeof getV1BmcFirmwareUpdatesQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getV1Bmc({
+        const { data } = await getV1BmcFirmwareUpdates({
             ...options,
             ...queryKey[0],
             signal,
@@ -214,107 +304,17 @@ export const getV1BmcOptions = (options?: Options<GetV1BmcData>) => queryOptions
         });
         return data;
     },
-    queryKey: getV1BmcQueryKey(options)
+    queryKey: getV1BmcFirmwareUpdatesQueryKey(options)
 });
-
-/**
- * bmc auto configure
- *
- * #### Controller:
- *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcAutoConfigure`
- *
- * #### Middlewares:
- *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
- * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
- *
- * ---
- *
- * Set BMC to autoconfigure
- */
-export const postV1BmcConfigureAutoMutation = (options?: Partial<Options<PostV1BmcConfigureAutoData>>): UseMutationOptions<PostV1BmcConfigureAutoResponse, PostV1BmcConfigureAutoError, Options<PostV1BmcConfigureAutoData>> => {
-    const mutationOptions: UseMutationOptions<PostV1BmcConfigureAutoResponse, PostV1BmcConfigureAutoError, Options<PostV1BmcConfigureAutoData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await postV1BmcConfigureAuto({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * bmc import configuration
- *
- * #### Controller:
- *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfiguration`
- *
- * #### Middlewares:
- *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
- * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
- *
- * ---
- *
- * Manually import system configuration to BMC
- */
-export const postV1BmcConfigureImportMutation = (options?: Partial<Options<PostV1BmcConfigureImportData>>): UseMutationOptions<PostV1BmcConfigureImportResponse, PostV1BmcConfigureImportError, Options<PostV1BmcConfigureImportData>> => {
-    const mutationOptions: UseMutationOptions<PostV1BmcConfigureImportResponse, PostV1BmcConfigureImportError, Options<PostV1BmcConfigureImportData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await postV1BmcConfigureImport({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * bmc job delete many
- *
- * #### Controller:
- *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobDeleteMany`
- *
- * #### Middlewares:
- *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
- * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
- *
- * ---
- *
- * Delete redfish jobs from many node(s)
- */
-export const deleteV1BmcJobsMutation = (options?: Partial<Options<DeleteV1BmcJobsData>>): UseMutationOptions<DeleteV1BmcJobsResponse, DeleteV1BmcJobsError, Options<DeleteV1BmcJobsData>> => {
-    const mutationOptions: UseMutationOptions<DeleteV1BmcJobsResponse, DeleteV1BmcJobsError, Options<DeleteV1BmcJobsData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await deleteV1BmcJobs({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
 
 export const getV1BmcJobsQueryKey = (options?: Options<GetV1BmcJobsData>) => createQueryKey('getV1BmcJobs', options);
 
 /**
- * bmc job list
+ * bmc jobs
  *
  * #### Controller:
  *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobList`
+ * `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobs`
  *
  * #### Middlewares:
  *
@@ -323,7 +323,7 @@ export const getV1BmcJobsQueryKey = (options?: Options<GetV1BmcJobsData>) => cre
  *
  * ---
  *
- * Get redfish jobs from node(s)
+ * Get the redfish job queue of node(s)
  */
 export const getV1BmcJobsOptions = (options?: Options<GetV1BmcJobsData>) => queryOptions<GetV1BmcJobsResponse, GetV1BmcJobsError, GetV1BmcJobsResponse, ReturnType<typeof getV1BmcJobsQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
@@ -339,11 +339,11 @@ export const getV1BmcJobsOptions = (options?: Options<GetV1BmcJobsData>) => quer
 });
 
 /**
- * bmc job delete
+ * bmc clear jobs
  *
  * #### Controller:
  *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobDelete`
+ * `github.com/ubccr/grendel/internal/api.(*Handler).BmcClearJobs`
  *
  * #### Middlewares:
  *
@@ -352,12 +352,12 @@ export const getV1BmcJobsOptions = (options?: Options<GetV1BmcJobsData>) => quer
  *
  * ---
  *
- * Delete redfish jobs from node(s) by JID
+ * Clear redfish jobs from node(s)
  */
-export const deleteV1BmcJobsJidsMutation = (options?: Partial<Options<DeleteV1BmcJobsJidsData>>): UseMutationOptions<DeleteV1BmcJobsJidsResponse, DeleteV1BmcJobsJidsError, Options<DeleteV1BmcJobsJidsData>> => {
-    const mutationOptions: UseMutationOptions<DeleteV1BmcJobsJidsResponse, DeleteV1BmcJobsJidsError, Options<DeleteV1BmcJobsJidsData>> = {
+export const postV1BmcJobsClearMutation = (options?: Partial<Options<PostV1BmcJobsClearData>>): UseMutationOptions<PostV1BmcJobsClearResponse, PostV1BmcJobsClearError, Options<PostV1BmcJobsClearData>> => {
+    const mutationOptions: UseMutationOptions<PostV1BmcJobsClearResponse, PostV1BmcJobsClearError, Options<PostV1BmcJobsClearData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await deleteV1BmcJobsJids({
+            const { data } = await postV1BmcJobsClear({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -367,37 +367,6 @@ export const deleteV1BmcJobsJidsMutation = (options?: Partial<Options<DeleteV1Bm
     };
     return mutationOptions;
 };
-
-export const getV1BmcMetricsQueryKey = (options?: Options<GetV1BmcMetricsData>) => createQueryKey('getV1BmcMetrics', options);
-
-/**
- * bmc metric reports
- *
- * #### Controller:
- *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcMetricReports`
- *
- * #### Middlewares:
- *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
- * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
- *
- * ---
- *
- * Get metric reports by nodeset
- */
-export const getV1BmcMetricsOptions = (options?: Options<GetV1BmcMetricsData>) => queryOptions<GetV1BmcMetricsResponse, GetV1BmcMetricsError, GetV1BmcMetricsResponse, ReturnType<typeof getV1BmcMetricsQueryKey>>({
-    queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getV1BmcMetrics({
-            ...options,
-            ...queryKey[0],
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: getV1BmcMetricsQueryKey(options)
-});
 
 /**
  * bmc power
@@ -413,12 +382,12 @@ export const getV1BmcMetricsOptions = (options?: Options<GetV1BmcMetricsData>) =
  *
  * ---
  *
- * Reboot node(s) BMC
+ * Change the power state of node(s), or restart their BMCs
  */
-export const postV1BmcPowerBmcMutation = (options?: Partial<Options<PostV1BmcPowerBmcData>>): UseMutationOptions<PostV1BmcPowerBmcResponse, PostV1BmcPowerBmcError, Options<PostV1BmcPowerBmcData>> => {
-    const mutationOptions: UseMutationOptions<PostV1BmcPowerBmcResponse, PostV1BmcPowerBmcError, Options<PostV1BmcPowerBmcData>> = {
+export const postV1BmcPowerMutation = (options?: Partial<Options<PostV1BmcPowerData>>): UseMutationOptions<PostV1BmcPowerResponse, PostV1BmcPowerError, Options<PostV1BmcPowerData>> => {
+    const mutationOptions: UseMutationOptions<PostV1BmcPowerResponse, PostV1BmcPowerError, Options<PostV1BmcPowerData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await postV1BmcPowerBmc({
+            const { data } = await postV1BmcPower({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -429,12 +398,14 @@ export const postV1BmcPowerBmcMutation = (options?: Partial<Options<PostV1BmcPow
     return mutationOptions;
 };
 
+export const getV1BmcSelQueryKey = (options?: Options<GetV1BmcSelData>) => createQueryKey('getV1BmcSel', options);
+
 /**
- * bmc os power
+ * bmc s e l
  *
  * #### Controller:
  *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcOsPower`
+ * `github.com/ubccr/grendel/internal/api.(*Handler).BmcSEL`
  *
  * #### Middlewares:
  *
@@ -443,103 +414,11 @@ export const postV1BmcPowerBmcMutation = (options?: Partial<Options<PostV1BmcPow
  *
  * ---
  *
- * Change power status of node(s)
+ * Get the system event log of node(s)
  */
-export const postV1BmcPowerOsMutation = (options?: Partial<Options<PostV1BmcPowerOsData>>): UseMutationOptions<PostV1BmcPowerOsResponse, PostV1BmcPowerOsError, Options<PostV1BmcPowerOsData>> => {
-    const mutationOptions: UseMutationOptions<PostV1BmcPowerOsResponse, PostV1BmcPowerOsError, Options<PostV1BmcPowerOsData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await postV1BmcPowerOs({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * bmc sel clear
- *
- * #### Controller:
- *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcSelClear`
- *
- * #### Middlewares:
- *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
- * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
- *
- * ---
- *
- * Clear system event log on node(s)
- */
-export const deleteV1BmcSelMutation = (options?: Partial<Options<DeleteV1BmcSelData>>): UseMutationOptions<DeleteV1BmcSelResponse, DeleteV1BmcSelError, Options<DeleteV1BmcSelData>> => {
-    const mutationOptions: UseMutationOptions<DeleteV1BmcSelResponse, DeleteV1BmcSelError, Options<DeleteV1BmcSelData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await deleteV1BmcSel({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-/**
- * bmc dell install from repo
- *
- * #### Controller:
- *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcDellInstallFromRepo`
- *
- * #### Middlewares:
- *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
- * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
- *
- * ---
- *
- * Request iDRAC to download the latest firmware catalog and compare firmware versions.
- */
-export const postV1BmcUpgradeDellInstallfromrepoMutation = (options?: Partial<Options<PostV1BmcUpgradeDellInstallfromrepoData>>): UseMutationOptions<PostV1BmcUpgradeDellInstallfromrepoResponse, PostV1BmcUpgradeDellInstallfromrepoError, Options<PostV1BmcUpgradeDellInstallfromrepoData>> => {
-    const mutationOptions: UseMutationOptions<PostV1BmcUpgradeDellInstallfromrepoResponse, PostV1BmcUpgradeDellInstallfromrepoError, Options<PostV1BmcUpgradeDellInstallfromrepoData>> = {
-        mutationFn: async (fnOptions) => {
-            const { data } = await postV1BmcUpgradeDellInstallfromrepo({
-                ...options,
-                ...fnOptions,
-                throwOnError: true
-            });
-            return data;
-        }
-    };
-    return mutationOptions;
-};
-
-export const getV1BmcUpgradeDellRepoQueryKey = (options?: Options<GetV1BmcUpgradeDellRepoData>) => createQueryKey('getV1BmcUpgradeDellRepo', options);
-
-/**
- * bmc dell get repo update list
- *
- * #### Controller:
- *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcDellGetRepoUpdateList`
- *
- * #### Middlewares:
- *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
- * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
- *
- * ---
- *
- * Fetch which packages can be upgraded
- */
-export const getV1BmcUpgradeDellRepoOptions = (options?: Options<GetV1BmcUpgradeDellRepoData>) => queryOptions<GetV1BmcUpgradeDellRepoResponse, GetV1BmcUpgradeDellRepoError, GetV1BmcUpgradeDellRepoResponse, ReturnType<typeof getV1BmcUpgradeDellRepoQueryKey>>({
+export const getV1BmcSelOptions = (options?: Options<GetV1BmcSelData>) => queryOptions<GetV1BmcSelResponse, GetV1BmcSelError, GetV1BmcSelResponse, ReturnType<typeof getV1BmcSelQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await getV1BmcUpgradeDellRepo({
+        const { data } = await getV1BmcSel({
             ...options,
             ...queryKey[0],
             signal,
@@ -547,7 +426,68 @@ export const getV1BmcUpgradeDellRepoOptions = (options?: Options<GetV1BmcUpgrade
         });
         return data;
     },
-    queryKey: getV1BmcUpgradeDellRepoQueryKey(options)
+    queryKey: getV1BmcSelQueryKey(options)
+});
+
+/**
+ * bmc clear s e l
+ *
+ * #### Controller:
+ *
+ * `github.com/ubccr/grendel/internal/api.(*Handler).BmcClearSEL`
+ *
+ * #### Middlewares:
+ *
+ * - `github.com/go-fuego/fuego.defaultLogger.middleware`
+ * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+ *
+ * ---
+ *
+ * Clear the system event log on node(s)
+ */
+export const postV1BmcSelClearMutation = (options?: Partial<Options<PostV1BmcSelClearData>>): UseMutationOptions<PostV1BmcSelClearResponse, PostV1BmcSelClearError, Options<PostV1BmcSelClearData>> => {
+    const mutationOptions: UseMutationOptions<PostV1BmcSelClearResponse, PostV1BmcSelClearError, Options<PostV1BmcSelClearData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await postV1BmcSelClear({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getV1BmcStatusQueryKey = (options?: Options<GetV1BmcStatusData>) => createQueryKey('getV1BmcStatus', options);
+
+/**
+ * bmc status
+ *
+ * #### Controller:
+ *
+ * `github.com/ubccr/grendel/internal/api.(*Handler).BmcStatus`
+ *
+ * #### Middlewares:
+ *
+ * - `github.com/go-fuego/fuego.defaultLogger.middleware`
+ * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+ *
+ * ---
+ *
+ * Get redfish system information from node(s)
+ */
+export const getV1BmcStatusOptions = (options?: Options<GetV1BmcStatusData>) => queryOptions<GetV1BmcStatusResponse, GetV1BmcStatusError, GetV1BmcStatusResponse, ReturnType<typeof getV1BmcStatusQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getV1BmcStatus({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getV1BmcStatusQueryKey(options)
 });
 
 export const getV1DbDumpQueryKey = (options?: Options<GetV1DbDumpData>) => createQueryKey('getV1DbDump', options);

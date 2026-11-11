@@ -53,5 +53,6 @@ nav:
       - HTTPS and Code Signing: advanced/https.md
       - Kickstarting Live Images: advanced/kslive.md
       - iPXE: advanced/ipxe.md
+      - BMC Compatibility Testing: advanced/bmc-compatibility.md
   - Integrations:
       - ClusterShell: integrations/clush.md

@@ -46,10 +46,7 @@ func setupSecurity() openapi3.SecuritySchemes {
 
 // redfishNulls holds the json name of every field in the redfish payloads whose zero value marshals as null
 var redfishNulls = nilableFields(
-	reflect.TypeOf(model.RedfishJob{}),
 	reflect.TypeOf(model.RedfishSystem{}),
-	reflect.TypeOf(model.RedfishMetricReport{}),
-	reflect.TypeOf(model.RedfishDellUpgradeFirmware{}),
 	reflect.TypeOf(model.Event{}),
 )
 

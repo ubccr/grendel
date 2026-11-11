@@ -32,11 +32,12 @@ func NewNetworkSwitch(host *model.Host) (NetworkSwitch, error) {
 	var sw NetworkSwitch
 	var err error
 
-	bmc := host.InterfaceBMC()
-	ip := ""
-	if bmc != nil {
-		ip = bmc.AddrString()
+	// TODO: use the management interface once interfaces have a type. The bmc flag cannot mark it, because it also decides which hosts the bmc commands contact
+	if len(host.Interfaces) == 0 {
+		return nil, errors.New("switch has no interfaces")
 	}
+	ip := host.Interfaces[0].AddrString()
+
 	// TODO: automatically determine NOS
 	if host.HasTags("arista") {
 		sw, err = NewArista(ip, username, password)

@@ -19,60 +19,62 @@ var (
 	jobListOptions *shared.TableOptions
 	jobListColumns = []shared.Column{
 		{Name: "Node"},
-		{Name: "Job Name"},
 		{Name: "State"},
+		{Name: "Message"},
+		{Name: "Job ID"},
+		{Name: "Job Name"},
+		{Name: "Job State"},
 		{Name: "Progress"},
-		{Name: "Messages"},
+		{Name: "Job Message"},
 	}
 	jobListCmd = &cobra.Command{
-		Use:   "list <nodeset | all>",
-		Short: "List all redfish jobs on the BMC",
-		Args:  cobra.ExactArgs(1),
+		Use:     "list <nodeset | all>",
+		Aliases: []string{"ls"},
+		Short:   "List all redfish jobs on the BMC",
+		Args:    cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			nodeset := args[0]
-			if args[0] == "all" {
-				nodeset = ""
-			}
+			nodeset, all := selector(args[0])
 			params := client.GETV1BmcJobsParams{
-				Nodeset: client.NewOptString(nodeset),
+				Nodeset: nodeset,
+				All:     all,
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
-			nodes, err := apiclient.API.GETV1BmcJobs(command.Context(), params)
+
+			res, err := apiclient.API.GETV1BmcJobs(command.Context(), params)
 			if err != nil {
 				return apiclient.NewApiError(err)
 			}
 
 			t := shared.NewTable(jobListColumns, jobListFilter).Options(*jobListOptions).Empty("-")
+			for _, r := range res.Results.Value {
+				result := r.Value
+				state := colorState(result.Success.Value)
 
-			for _, node := range nodes {
-				if len(node.Jobs.Value) == 0 {
-					t.AppendRow(
-						node.Name.Value,
-						"",
-						"",
-						"",
-						"",
-					)
+				// a node that was reached and has nothing queued still gets a row, which is how an empty queue is told apart from a bmc that never answered
+				jobs := result.Data.Value.Jobs.Value
+				if len(jobs) == 0 {
+					t.AppendRow(result.Node.Value, state, result.Message.Value, "", "", "", "", "")
 					continue
 				}
 
-				for _, job := range node.Jobs.Value {
-					messages := []string{}
-					for _, msg := range job.Value.Messages.Value {
-						messages = append(messages, msg.Value.Message.Value)
-					}
+				for _, j := range jobs {
+					job := j.Value
 					t.AppendRow(
-						node.Name.Value,
-						job.Value.Name.Value,
-						job.Value.JobState.Value,
-						fmt.Sprintf("%d%%", job.Value.PercentComplete.Value),
-						strings.Join(messages, "\n"),
+						result.Node.Value,
+						state,
+						result.Message.Value,
+						job.ID.Value,
+						job.Name.Value,
+						job.State.Value,
+						fmt.Sprintf("%d%%", job.PercentComplete.Value),
+						job.Message.Value,
 					)
 				}
 			}
-
 			t.Print()
-			return nil
+
+			s := res.Summary.Value
+			return summaryLine(s.Total.Value, s.Succeeded.Value, s.Failed.Value, s.FailedNodes.Value, s.DurationMs.Value)
 		},
 	}
 )

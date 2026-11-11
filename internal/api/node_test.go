@@ -5,11 +5,13 @@
 package api
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/go-fuego/fuego"
 	"github.com/ubccr/grendel/internal/tests"
 	"github.com/ubccr/grendel/pkg/model"
+	"github.com/ubccr/grendel/pkg/nodeset"
 )
 
 func TestNodeBootTokenArch(t *testing.T) {
@@ -90,5 +92,65 @@ func TestNodeBootTokenInterface(t *testing.T) {
 				t.Errorf("%s token has mac %s, want %s", iface, claims.MAC, want)
 			}
 		}
+	}
+}
+
+func TestNodeFind(t *testing.T) {
+	h := newTestHandler(t)
+
+	tagged := tests.HostFactory.MustCreate().(*model.Host)
+	untagged := tests.HostFactory.MustCreate().(*model.Host)
+	if err := h.DB.StoreHosts(model.HostList{tagged, untagged}); err != nil {
+		t.Fatal(err)
+	}
+
+	ns, err := nodeset.NewNodeSet(tagged.Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := h.DB.TagHosts(ns, []string{"gpu"}); err != nil {
+		t.Fatal(err)
+	}
+
+	cases := []struct {
+		name    string
+		nodeset string
+		tags    string
+		want    []string
+		wantErr bool
+	}{
+		{name: "no filter returns every node", want: []string{tagged.Name, untagged.Name}},
+		{name: "nodeset", nodeset: untagged.Name, want: []string{untagged.Name}},
+		{name: "tags", tags: "gpu", want: []string{tagged.Name}},
+		{name: "nodeset and tags intersect", nodeset: tagged.Name + "," + untagged.Name, tags: "gpu", want: []string{tagged.Name}},
+		{name: "a filter that matches nothing returns nothing rather than every node", nodeset: untagged.Name, tags: "gpu"},
+		{name: "a name not in the database returns nothing", nodeset: "notindb01"},
+		{name: "an unknown tag is an error", tags: "typo", wantErr: true},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.name, func(t *testing.T) {
+			c := fuego.NewMockContextNoBody()
+			c.SetQueryParam("nodeset", tt.nodeset)
+			c.SetQueryParam("tags", tt.tags)
+
+			hosts, err := h.NodeFind(c)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("err = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			got := make([]string, 0, len(hosts))
+			for _, host := range hosts {
+				got = append(got, host.Name)
+			}
+			slices.Sort(got)
+
+			want := slices.Clone(tt.want)
+			slices.Sort(want)
+
+			if !slices.Equal(got, want) {
+				t.Errorf("hosts = %v, want %v", got, want)
+			}
+		})
 	}
 }

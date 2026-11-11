@@ -1,20 +1,23 @@
+import { JobsClearDialog } from "@/components/actions/jobs/delete";
+import ActionCard from "@/components/actions/action-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@tanstack/react-router";
 
 export default function NodesJobsAction({ nodes }: { nodes: string }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>View Jobs</CardTitle>
-      </CardHeader>
-      <CardFooter className="flex gap-1">
-        <Button asChild>
-          <Link to="/nodes/jobs/$nodes" params={{ nodes: nodes }}>
-            Open
-          </Link>
-        </Button>
-      </CardFooter>
-    </Card>
+    <ActionCard
+      title="Job Queue"
+      description="View the BMC's job queue, or delete every job in it."
+      footer={
+        <>
+          <JobsClearDialog allNodes={nodes} />
+          <Button asChild>
+            <Link to="/nodes/jobs/$nodes" params={{ nodes: nodes }}>
+              Open
+            </Link>
+          </Button>
+        </>
+      }
+    />
   );
 }

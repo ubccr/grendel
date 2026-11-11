@@ -37,6 +37,7 @@ import { Route as NodesNodeNodeRouteImport } from './routes/nodes/$node/node'
 import { Route as NodesNodeRedfishRouteImport } from './routes/nodes/$node/redfish'
 import { Route as NodesDellFirmwareNodesRouteImport } from './routes/nodes/dell-firmware/$nodes'
 import { Route as NodesJobsNodesRouteImport } from './routes/nodes/jobs/$nodes'
+import { Route as NodesSelNodesRouteImport } from './routes/nodes/sel/$nodes'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -178,6 +179,11 @@ const NodesJobsNodesRoute = NodesJobsNodesRouteImport.update({
   path: '/nodes/jobs/$nodes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NodesSelNodesRoute = NodesSelNodesRouteImport.update({
+  id: '/nodes/sel/$nodes',
+  path: '/nodes/sel/$nodes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -206,6 +212,7 @@ export interface FileRoutesByFullPath {
   '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
   '/nodes/dell-firmware/$nodes': typeof NodesDellFirmwareNodesRoute
   '/nodes/jobs/$nodes': typeof NodesJobsNodesRoute
+  '/nodes/sel/$nodes': typeof NodesSelNodesRoute
   '/account/roles/': typeof AccountRolesIndexRoute
   '/account/users/': typeof AccountUsersIndexRoute
 }
@@ -236,6 +243,7 @@ export interface FileRoutesByTo {
   '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
   '/nodes/dell-firmware/$nodes': typeof NodesDellFirmwareNodesRoute
   '/nodes/jobs/$nodes': typeof NodesJobsNodesRoute
+  '/nodes/sel/$nodes': typeof NodesSelNodesRoute
   '/account/roles': typeof AccountRolesIndexRoute
   '/account/users': typeof AccountUsersIndexRoute
 }
@@ -267,6 +275,7 @@ export interface FileRoutesById {
   '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
   '/nodes/dell-firmware/$nodes': typeof NodesDellFirmwareNodesRoute
   '/nodes/jobs/$nodes': typeof NodesJobsNodesRoute
+  '/nodes/sel/$nodes': typeof NodesSelNodesRoute
   '/account/roles/': typeof AccountRolesIndexRoute
   '/account/users/': typeof AccountUsersIndexRoute
 }
@@ -299,6 +308,7 @@ export interface FileRouteTypes {
     | '/nodes/$node/redfish'
     | '/nodes/dell-firmware/$nodes'
     | '/nodes/jobs/$nodes'
+    | '/nodes/sel/$nodes'
     | '/account/roles/'
     | '/account/users/'
   fileRoutesByTo: FileRoutesByTo
@@ -329,6 +339,7 @@ export interface FileRouteTypes {
     | '/nodes/$node/redfish'
     | '/nodes/dell-firmware/$nodes'
     | '/nodes/jobs/$nodes'
+    | '/nodes/sel/$nodes'
     | '/account/roles'
     | '/account/users'
   id:
@@ -359,6 +370,7 @@ export interface FileRouteTypes {
     | '/nodes/$node/redfish'
     | '/nodes/dell-firmware/$nodes'
     | '/nodes/jobs/$nodes'
+    | '/nodes/sel/$nodes'
     | '/account/roles/'
     | '/account/users/'
   fileRoutesById: FileRoutesById
@@ -387,6 +399,7 @@ export interface RootRouteChildren {
   AccountRolesRoleRoute: typeof AccountRolesRoleRoute
   NodesDellFirmwareNodesRoute: typeof NodesDellFirmwareNodesRoute
   NodesJobsNodesRoute: typeof NodesJobsNodesRoute
+  NodesSelNodesRoute: typeof NodesSelNodesRoute
   AccountRolesIndexRoute: typeof AccountRolesIndexRoute
   AccountUsersIndexRoute: typeof AccountUsersIndexRoute
 }
@@ -589,6 +602,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NodesJobsNodesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/nodes/sel/$nodes': {
+      id: '/nodes/sel/$nodes'
+      path: '/nodes/sel/$nodes'
+      fullPath: '/nodes/sel/$nodes'
+      preLoaderRoute: typeof NodesSelNodesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -632,6 +652,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRolesRoleRoute: AccountRolesRoleRoute,
   NodesDellFirmwareNodesRoute: NodesDellFirmwareNodesRoute,
   NodesJobsNodesRoute: NodesJobsNodesRoute,
+  NodesSelNodesRoute: NodesSelNodesRoute,
   AccountRolesIndexRoute: AccountRolesIndexRoute,
   AccountUsersIndexRoute: AccountUsersIndexRoute,
 }

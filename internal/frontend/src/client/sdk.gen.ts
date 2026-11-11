@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteV1AuthSignoutData, DeleteV1AuthSignoutErrors, DeleteV1AuthSignoutResponses, DeleteV1BmcJobsData, DeleteV1BmcJobsErrors, DeleteV1BmcJobsJidsData, DeleteV1BmcJobsJidsErrors, DeleteV1BmcJobsJidsResponses, DeleteV1BmcJobsResponses, DeleteV1BmcSelData, DeleteV1BmcSelErrors, DeleteV1BmcSelResponses, DeleteV1ImagesData, DeleteV1ImagesErrors, DeleteV1ImagesResponses, DeleteV1NodesData, DeleteV1NodesErrors, DeleteV1NodesResponses, DeleteV1RolesNamesData, DeleteV1RolesNamesErrors, DeleteV1RolesNamesResponses, DeleteV1UsersUsernamesData, DeleteV1UsersUsernamesErrors, DeleteV1UsersUsernamesResponses, GetV1BmcData, GetV1BmcErrors, GetV1BmcJobsData, GetV1BmcJobsErrors, GetV1BmcJobsResponses, GetV1BmcMetricsData, GetV1BmcMetricsErrors, GetV1BmcMetricsResponses, GetV1BmcResponses, GetV1BmcUpgradeDellRepoData, GetV1BmcUpgradeDellRepoErrors, GetV1BmcUpgradeDellRepoResponses, GetV1DbDumpData, GetV1DbDumpErrors, GetV1DbDumpResponses, GetV1GrendelEventsData, GetV1GrendelEventsErrors, GetV1GrendelEventsResponses, GetV1GrendelVersionData, GetV1GrendelVersionErrors, GetV1GrendelVersionResponses, GetV1ImagesData, GetV1ImagesErrors, GetV1ImagesFindData, GetV1ImagesFindErrors, GetV1ImagesFindResponses, GetV1ImagesResponses, GetV1NodesData, GetV1NodesErrors, GetV1NodesFindData, GetV1NodesFindErrors, GetV1NodesFindResponses, GetV1NodesResponses, GetV1NodesTokenInterfaceData, GetV1NodesTokenInterfaceErrors, GetV1NodesTokenInterfaceResponses, GetV1RolesData, GetV1RolesErrors, GetV1RolesResponses, GetV1SwitchNodesetLldpData, GetV1SwitchNodesetLldpErrors, GetV1SwitchNodesetLldpResponses, GetV1UsersData, GetV1UsersErrors, GetV1UsersResponses, PatchV1AuthResetData, PatchV1AuthResetErrors, PatchV1AuthResetResponses, PatchV1NodesImageData, PatchV1NodesImageErrors, PatchV1NodesImageResponses, PatchV1NodesProvisionData, PatchV1NodesProvisionErrors, PatchV1NodesProvisionResponses, PatchV1NodesTagsActionData, PatchV1NodesTagsActionErrors, PatchV1NodesTagsActionResponses, PatchV1RolesData, PatchV1RolesErrors, PatchV1RolesResponses, PatchV1UsersUsernamesEnableData, PatchV1UsersUsernamesEnableErrors, PatchV1UsersUsernamesEnableResponses, PatchV1UsersUsernamesRoleData, PatchV1UsersUsernamesRoleErrors, PatchV1UsersUsernamesRoleResponses, PostV1AuthSigninData, PostV1AuthSigninErrors, PostV1AuthSigninResponses, PostV1AuthSignupData, PostV1AuthSignupErrors, PostV1AuthSignupResponses, PostV1AuthTokenData, PostV1AuthTokenErrors, PostV1AuthTokenResponses, PostV1BmcConfigureAutoData, PostV1BmcConfigureAutoErrors, PostV1BmcConfigureAutoResponses, PostV1BmcConfigureImportData, PostV1BmcConfigureImportErrors, PostV1BmcConfigureImportResponses, PostV1BmcPowerBmcData, PostV1BmcPowerBmcErrors, PostV1BmcPowerBmcResponses, PostV1BmcPowerOsData, PostV1BmcPowerOsErrors, PostV1BmcPowerOsResponses, PostV1BmcUpgradeDellInstallfromrepoData, PostV1BmcUpgradeDellInstallfromrepoErrors, PostV1BmcUpgradeDellInstallfromrepoResponses, PostV1DbRestoreData, PostV1DbRestoreErrors, PostV1DbRestoreResponses, PostV1ImagesData, PostV1ImagesErrors, PostV1ImagesResponses, PostV1NodesData, PostV1NodesErrors, PostV1NodesResponses, PostV1RolesData, PostV1RolesErrors, PostV1RolesResponses, PostV1UsersData, PostV1UsersErrors, PostV1UsersResponses } from './types.gen';
+import type { DeleteV1AuthSignoutData, DeleteV1AuthSignoutErrors, DeleteV1AuthSignoutResponses, DeleteV1ImagesData, DeleteV1ImagesErrors, DeleteV1ImagesResponses, DeleteV1NodesData, DeleteV1NodesErrors, DeleteV1NodesResponses, DeleteV1RolesNamesData, DeleteV1RolesNamesErrors, DeleteV1RolesNamesResponses, DeleteV1UsersUsernamesData, DeleteV1UsersUsernamesErrors, DeleteV1UsersUsernamesResponses, GetV1BmcFirmwareUpdatesData, GetV1BmcFirmwareUpdatesErrors, GetV1BmcFirmwareUpdatesResponses, GetV1BmcJobsData, GetV1BmcJobsErrors, GetV1BmcJobsResponses, GetV1BmcSelData, GetV1BmcSelErrors, GetV1BmcSelResponses, GetV1BmcStatusData, GetV1BmcStatusErrors, GetV1BmcStatusResponses, GetV1DbDumpData, GetV1DbDumpErrors, GetV1DbDumpResponses, GetV1GrendelEventsData, GetV1GrendelEventsErrors, GetV1GrendelEventsResponses, GetV1GrendelVersionData, GetV1GrendelVersionErrors, GetV1GrendelVersionResponses, GetV1ImagesData, GetV1ImagesErrors, GetV1ImagesFindData, GetV1ImagesFindErrors, GetV1ImagesFindResponses, GetV1ImagesResponses, GetV1NodesData, GetV1NodesErrors, GetV1NodesFindData, GetV1NodesFindErrors, GetV1NodesFindResponses, GetV1NodesResponses, GetV1NodesTokenInterfaceData, GetV1NodesTokenInterfaceErrors, GetV1NodesTokenInterfaceResponses, GetV1RolesData, GetV1RolesErrors, GetV1RolesResponses, GetV1SwitchNodesetLldpData, GetV1SwitchNodesetLldpErrors, GetV1SwitchNodesetLldpResponses, GetV1UsersData, GetV1UsersErrors, GetV1UsersResponses, PatchV1AuthResetData, PatchV1AuthResetErrors, PatchV1AuthResetResponses, PatchV1NodesImageData, PatchV1NodesImageErrors, PatchV1NodesImageResponses, PatchV1NodesProvisionData, PatchV1NodesProvisionErrors, PatchV1NodesProvisionResponses, PatchV1NodesTagsActionData, PatchV1NodesTagsActionErrors, PatchV1NodesTagsActionResponses, PatchV1RolesData, PatchV1RolesErrors, PatchV1RolesResponses, PatchV1UsersUsernamesEnableData, PatchV1UsersUsernamesEnableErrors, PatchV1UsersUsernamesEnableResponses, PatchV1UsersUsernamesRoleData, PatchV1UsersUsernamesRoleErrors, PatchV1UsersUsernamesRoleResponses, PostV1AuthSigninData, PostV1AuthSigninErrors, PostV1AuthSigninResponses, PostV1AuthSignupData, PostV1AuthSignupErrors, PostV1AuthSignupResponses, PostV1AuthTokenData, PostV1AuthTokenErrors, PostV1AuthTokenResponses, PostV1BmcConfigureAutoData, PostV1BmcConfigureAutoErrors, PostV1BmcConfigureAutoResponses, PostV1BmcConfigureImportData, PostV1BmcConfigureImportErrors, PostV1BmcConfigureImportResponses, PostV1BmcFirmwareInstallData, PostV1BmcFirmwareInstallErrors, PostV1BmcFirmwareInstallResponses, PostV1BmcJobsClearData, PostV1BmcJobsClearErrors, PostV1BmcJobsClearResponses, PostV1BmcPowerData, PostV1BmcPowerErrors, PostV1BmcPowerResponses, PostV1BmcSelClearData, PostV1BmcSelClearErrors, PostV1BmcSelClearResponses, PostV1DbRestoreData, PostV1DbRestoreErrors, PostV1DbRestoreResponses, PostV1ImagesData, PostV1ImagesErrors, PostV1ImagesResponses, PostV1NodesData, PostV1NodesErrors, PostV1NodesResponses, PostV1RolesData, PostV1RolesErrors, PostV1RolesResponses, PostV1UsersData, PostV1UsersErrors, PostV1UsersResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -182,36 +182,6 @@ export const postV1AuthToken = <ThrowOnError extends boolean = false>(options: O
 });
 
 /**
- * bmc query
- *
- * #### Controller:
- *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcQuery`
- *
- * #### Middlewares:
- *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
- * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
- *
- * ---
- *
- * Get redfish info from node(s)
- */
-export const getV1Bmc = <ThrowOnError extends boolean = false>(options?: Options<GetV1BmcData, ThrowOnError>): RequestResult<GetV1BmcResponses, GetV1BmcErrors, ThrowOnError> => (options?.client ?? client).get<GetV1BmcResponses, GetV1BmcErrors, ThrowOnError>({
-    security: [{
-            key: 'headerAuth',
-            scheme: 'bearer',
-            type: 'http'
-        }, {
-            key: 'cookieAuth',
-            scheme: 'bearer',
-            type: 'http'
-        }],
-    url: '/v1/bmc',
-    ...options
-});
-
-/**
  * bmc auto configure
  *
  * #### Controller:
@@ -225,7 +195,7 @@ export const getV1Bmc = <ThrowOnError extends boolean = false>(options?: Options
  *
  * ---
  *
- * Set BMC to autoconfigure
+ * Set iDRAC(s) to auto configure once, on the node's next boot. Dell only
  */
 export const postV1BmcConfigureAuto = <ThrowOnError extends boolean = false>(options?: Options<PostV1BmcConfigureAutoData, ThrowOnError>): RequestResult<PostV1BmcConfigureAutoResponses, PostV1BmcConfigureAutoErrors, ThrowOnError> => (options?.client ?? client).post<PostV1BmcConfigureAutoResponses, PostV1BmcConfigureAutoErrors, ThrowOnError>({
     security: [{
@@ -242,11 +212,11 @@ export const postV1BmcConfigureAuto = <ThrowOnError extends boolean = false>(opt
 });
 
 /**
- * bmc import configuration
+ * bmc import config
  *
  * #### Controller:
  *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfiguration`
+ * `github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfig`
  *
  * #### Middlewares:
  *
@@ -255,7 +225,7 @@ export const postV1BmcConfigureAuto = <ThrowOnError extends boolean = false>(opt
  *
  * ---
  *
- * Manually import system configuration to BMC
+ * Have iDRAC(s) download a config template from the provision server and import it. Dell only
  */
 export const postV1BmcConfigureImport = <ThrowOnError extends boolean = false>(options: Options<PostV1BmcConfigureImportData, ThrowOnError>): RequestResult<PostV1BmcConfigureImportResponses, PostV1BmcConfigureImportErrors, ThrowOnError> => (options.client ?? client).post<PostV1BmcConfigureImportResponses, PostV1BmcConfigureImportErrors, ThrowOnError>({
     security: [{
@@ -276,11 +246,11 @@ export const postV1BmcConfigureImport = <ThrowOnError extends boolean = false>(o
 });
 
 /**
- * bmc job delete many
+ * bmc install firmware
  *
  * #### Controller:
  *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobDeleteMany`
+ * `github.com/ubccr/grendel/internal/api.(*Handler).BmcInstallFirmware`
  *
  * #### Middlewares:
  *
@@ -289,9 +259,9 @@ export const postV1BmcConfigureImport = <ThrowOnError extends boolean = false>(o
  *
  * ---
  *
- * Delete redfish jobs from many node(s)
+ * Compare the firmware of iDRAC(s) against an update catalog, and with apply_update queue the updates. A comparison waits for its job to finish, up to bmc.node_timeout. Dell only
  */
-export const deleteV1BmcJobs = <ThrowOnError extends boolean = false>(options: Options<DeleteV1BmcJobsData, ThrowOnError>): RequestResult<DeleteV1BmcJobsResponses, DeleteV1BmcJobsErrors, ThrowOnError> => (options.client ?? client).delete<DeleteV1BmcJobsResponses, DeleteV1BmcJobsErrors, ThrowOnError>({
+export const postV1BmcFirmwareInstall = <ThrowOnError extends boolean = false>(options: Options<PostV1BmcFirmwareInstallData, ThrowOnError>): RequestResult<PostV1BmcFirmwareInstallResponses, PostV1BmcFirmwareInstallErrors, ThrowOnError> => (options.client ?? client).post<PostV1BmcFirmwareInstallResponses, PostV1BmcFirmwareInstallErrors, ThrowOnError>({
     security: [{
             key: 'headerAuth',
             scheme: 'bearer',
@@ -301,7 +271,7 @@ export const deleteV1BmcJobs = <ThrowOnError extends boolean = false>(options: O
             scheme: 'bearer',
             type: 'http'
         }],
-    url: '/v1/bmc/jobs',
+    url: '/v1/bmc/firmware/install',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -310,11 +280,11 @@ export const deleteV1BmcJobs = <ThrowOnError extends boolean = false>(options: O
 });
 
 /**
- * bmc job list
+ * bmc firmware updates
  *
  * #### Controller:
  *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobList`
+ * `github.com/ubccr/grendel/internal/api.(*Handler).BmcFirmwareUpdates`
  *
  * #### Middlewares:
  *
@@ -323,7 +293,37 @@ export const deleteV1BmcJobs = <ThrowOnError extends boolean = false>(options: O
  *
  * ---
  *
- * Get redfish jobs from node(s)
+ * List the firmware updates iDRAC(s) found in their last catalog comparison, which firmware/install with apply_update false runs. Dell only
+ */
+export const getV1BmcFirmwareUpdates = <ThrowOnError extends boolean = false>(options?: Options<GetV1BmcFirmwareUpdatesData, ThrowOnError>): RequestResult<GetV1BmcFirmwareUpdatesResponses, GetV1BmcFirmwareUpdatesErrors, ThrowOnError> => (options?.client ?? client).get<GetV1BmcFirmwareUpdatesResponses, GetV1BmcFirmwareUpdatesErrors, ThrowOnError>({
+    security: [{
+            key: 'headerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'cookieAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/v1/bmc/firmware/updates',
+    ...options
+});
+
+/**
+ * bmc jobs
+ *
+ * #### Controller:
+ *
+ * `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobs`
+ *
+ * #### Middlewares:
+ *
+ * - `github.com/go-fuego/fuego.defaultLogger.middleware`
+ * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+ *
+ * ---
+ *
+ * Get the redfish job queue of node(s)
  */
 export const getV1BmcJobs = <ThrowOnError extends boolean = false>(options?: Options<GetV1BmcJobsData, ThrowOnError>): RequestResult<GetV1BmcJobsResponses, GetV1BmcJobsErrors, ThrowOnError> => (options?.client ?? client).get<GetV1BmcJobsResponses, GetV1BmcJobsErrors, ThrowOnError>({
     security: [{
@@ -340,11 +340,11 @@ export const getV1BmcJobs = <ThrowOnError extends boolean = false>(options?: Opt
 });
 
 /**
- * bmc job delete
+ * bmc clear jobs
  *
  * #### Controller:
  *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobDelete`
+ * `github.com/ubccr/grendel/internal/api.(*Handler).BmcClearJobs`
  *
  * #### Middlewares:
  *
@@ -353,9 +353,9 @@ export const getV1BmcJobs = <ThrowOnError extends boolean = false>(options?: Opt
  *
  * ---
  *
- * Delete redfish jobs from node(s) by JID
+ * Clear redfish jobs from node(s)
  */
-export const deleteV1BmcJobsJids = <ThrowOnError extends boolean = false>(options: Options<DeleteV1BmcJobsJidsData, ThrowOnError>): RequestResult<DeleteV1BmcJobsJidsResponses, DeleteV1BmcJobsJidsErrors, ThrowOnError> => (options.client ?? client).delete<DeleteV1BmcJobsJidsResponses, DeleteV1BmcJobsJidsErrors, ThrowOnError>({
+export const postV1BmcJobsClear = <ThrowOnError extends boolean = false>(options: Options<PostV1BmcJobsClearData, ThrowOnError>): RequestResult<PostV1BmcJobsClearResponses, PostV1BmcJobsClearErrors, ThrowOnError> => (options.client ?? client).post<PostV1BmcJobsClearResponses, PostV1BmcJobsClearErrors, ThrowOnError>({
     security: [{
             key: 'headerAuth',
             scheme: 'bearer',
@@ -365,38 +365,12 @@ export const deleteV1BmcJobsJids = <ThrowOnError extends boolean = false>(option
             scheme: 'bearer',
             type: 'http'
         }],
-    url: '/v1/bmc/jobs/{jids}',
-    ...options
-});
-
-/**
- * bmc metric reports
- *
- * #### Controller:
- *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcMetricReports`
- *
- * #### Middlewares:
- *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
- * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
- *
- * ---
- *
- * Get metric reports by nodeset
- */
-export const getV1BmcMetrics = <ThrowOnError extends boolean = false>(options?: Options<GetV1BmcMetricsData, ThrowOnError>): RequestResult<GetV1BmcMetricsResponses, GetV1BmcMetricsErrors, ThrowOnError> => (options?.client ?? client).get<GetV1BmcMetricsResponses, GetV1BmcMetricsErrors, ThrowOnError>({
-    security: [{
-            key: 'headerAuth',
-            scheme: 'bearer',
-            type: 'http'
-        }, {
-            key: 'cookieAuth',
-            scheme: 'bearer',
-            type: 'http'
-        }],
-    url: '/v1/bmc/metrics',
-    ...options
+    url: '/v1/bmc/jobs/clear',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
@@ -413,9 +387,9 @@ export const getV1BmcMetrics = <ThrowOnError extends boolean = false>(options?: 
  *
  * ---
  *
- * Reboot node(s) BMC
+ * Change the power state of node(s), or restart their BMCs
  */
-export const postV1BmcPowerBmc = <ThrowOnError extends boolean = false>(options?: Options<PostV1BmcPowerBmcData, ThrowOnError>): RequestResult<PostV1BmcPowerBmcResponses, PostV1BmcPowerBmcErrors, ThrowOnError> => (options?.client ?? client).post<PostV1BmcPowerBmcResponses, PostV1BmcPowerBmcErrors, ThrowOnError>({
+export const postV1BmcPower = <ThrowOnError extends boolean = false>(options: Options<PostV1BmcPowerData, ThrowOnError>): RequestResult<PostV1BmcPowerResponses, PostV1BmcPowerErrors, ThrowOnError> => (options.client ?? client).post<PostV1BmcPowerResponses, PostV1BmcPowerErrors, ThrowOnError>({
     security: [{
             key: 'headerAuth',
             scheme: 'bearer',
@@ -425,37 +399,7 @@ export const postV1BmcPowerBmc = <ThrowOnError extends boolean = false>(options?
             scheme: 'bearer',
             type: 'http'
         }],
-    url: '/v1/bmc/power/bmc',
-    ...options
-});
-
-/**
- * bmc os power
- *
- * #### Controller:
- *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcOsPower`
- *
- * #### Middlewares:
- *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
- * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
- *
- * ---
- *
- * Change power status of node(s)
- */
-export const postV1BmcPowerOs = <ThrowOnError extends boolean = false>(options: Options<PostV1BmcPowerOsData, ThrowOnError>): RequestResult<PostV1BmcPowerOsResponses, PostV1BmcPowerOsErrors, ThrowOnError> => (options.client ?? client).post<PostV1BmcPowerOsResponses, PostV1BmcPowerOsErrors, ThrowOnError>({
-    security: [{
-            key: 'headerAuth',
-            scheme: 'bearer',
-            type: 'http'
-        }, {
-            key: 'cookieAuth',
-            scheme: 'bearer',
-            type: 'http'
-        }],
-    url: '/v1/bmc/power/os',
+    url: '/v1/bmc/power',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -464,11 +408,11 @@ export const postV1BmcPowerOs = <ThrowOnError extends boolean = false>(options: 
 });
 
 /**
- * bmc sel clear
+ * bmc s e l
  *
  * #### Controller:
  *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcSelClear`
+ * `github.com/ubccr/grendel/internal/api.(*Handler).BmcSEL`
  *
  * #### Middlewares:
  *
@@ -477,9 +421,9 @@ export const postV1BmcPowerOs = <ThrowOnError extends boolean = false>(options: 
  *
  * ---
  *
- * Clear system event log on node(s)
+ * Get the system event log of node(s)
  */
-export const deleteV1BmcSel = <ThrowOnError extends boolean = false>(options?: Options<DeleteV1BmcSelData, ThrowOnError>): RequestResult<DeleteV1BmcSelResponses, DeleteV1BmcSelErrors, ThrowOnError> => (options?.client ?? client).delete<DeleteV1BmcSelResponses, DeleteV1BmcSelErrors, ThrowOnError>({
+export const getV1BmcSel = <ThrowOnError extends boolean = false>(options?: Options<GetV1BmcSelData, ThrowOnError>): RequestResult<GetV1BmcSelResponses, GetV1BmcSelErrors, ThrowOnError> => (options?.client ?? client).get<GetV1BmcSelResponses, GetV1BmcSelErrors, ThrowOnError>({
     security: [{
             key: 'headerAuth',
             scheme: 'bearer',
@@ -494,11 +438,11 @@ export const deleteV1BmcSel = <ThrowOnError extends boolean = false>(options?: O
 });
 
 /**
- * bmc dell install from repo
+ * bmc clear s e l
  *
  * #### Controller:
  *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcDellInstallFromRepo`
+ * `github.com/ubccr/grendel/internal/api.(*Handler).BmcClearSEL`
  *
  * #### Middlewares:
  *
@@ -507,9 +451,9 @@ export const deleteV1BmcSel = <ThrowOnError extends boolean = false>(options?: O
  *
  * ---
  *
- * Request iDRAC to download the latest firmware catalog and compare firmware versions.
+ * Clear the system event log on node(s)
  */
-export const postV1BmcUpgradeDellInstallfromrepo = <ThrowOnError extends boolean = false>(options: Options<PostV1BmcUpgradeDellInstallfromrepoData, ThrowOnError>): RequestResult<PostV1BmcUpgradeDellInstallfromrepoResponses, PostV1BmcUpgradeDellInstallfromrepoErrors, ThrowOnError> => (options.client ?? client).post<PostV1BmcUpgradeDellInstallfromrepoResponses, PostV1BmcUpgradeDellInstallfromrepoErrors, ThrowOnError>({
+export const postV1BmcSelClear = <ThrowOnError extends boolean = false>(options?: Options<PostV1BmcSelClearData, ThrowOnError>): RequestResult<PostV1BmcSelClearResponses, PostV1BmcSelClearErrors, ThrowOnError> => (options?.client ?? client).post<PostV1BmcSelClearResponses, PostV1BmcSelClearErrors, ThrowOnError>({
     security: [{
             key: 'headerAuth',
             scheme: 'bearer',
@@ -519,20 +463,16 @@ export const postV1BmcUpgradeDellInstallfromrepo = <ThrowOnError extends boolean
             scheme: 'bearer',
             type: 'http'
         }],
-    url: '/v1/bmc/upgrade/dell/installfromrepo',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
+    url: '/v1/bmc/sel/clear',
+    ...options
 });
 
 /**
- * bmc dell get repo update list
+ * bmc status
  *
  * #### Controller:
  *
- * `github.com/ubccr/grendel/internal/api.(*Handler).BmcDellGetRepoUpdateList`
+ * `github.com/ubccr/grendel/internal/api.(*Handler).BmcStatus`
  *
  * #### Middlewares:
  *
@@ -541,9 +481,9 @@ export const postV1BmcUpgradeDellInstallfromrepo = <ThrowOnError extends boolean
  *
  * ---
  *
- * Fetch which packages can be upgraded
+ * Get redfish system information from node(s)
  */
-export const getV1BmcUpgradeDellRepo = <ThrowOnError extends boolean = false>(options?: Options<GetV1BmcUpgradeDellRepoData, ThrowOnError>): RequestResult<GetV1BmcUpgradeDellRepoResponses, GetV1BmcUpgradeDellRepoErrors, ThrowOnError> => (options?.client ?? client).get<GetV1BmcUpgradeDellRepoResponses, GetV1BmcUpgradeDellRepoErrors, ThrowOnError>({
+export const getV1BmcStatus = <ThrowOnError extends boolean = false>(options?: Options<GetV1BmcStatusData, ThrowOnError>): RequestResult<GetV1BmcStatusResponses, GetV1BmcStatusErrors, ThrowOnError> => (options?.client ?? client).get<GetV1BmcStatusResponses, GetV1BmcStatusErrors, ThrowOnError>({
     security: [{
             key: 'headerAuth',
             scheme: 'bearer',
@@ -553,7 +493,7 @@ export const getV1BmcUpgradeDellRepo = <ThrowOnError extends boolean = false>(op
             scheme: 'bearer',
             type: 'http'
         }],
-    url: '/v1/bmc/upgrade/dell/repo',
+    url: '/v1/bmc/status',
     ...options
 });
 

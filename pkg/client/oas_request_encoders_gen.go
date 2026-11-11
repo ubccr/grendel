@@ -11,20 +11,6 @@ import (
 	ht "github.com/ogen-go/ogen/http"
 )
 
-func encodeDELETEV1BmcJobsRequest(
-	req *BmcJobDeleteRequest,
-	r *http.Request,
-) error {
-	const contentType = "application/json"
-	e := new(jx.Encoder)
-	{
-		req.Encode(e)
-	}
-	encoded := e.Bytes()
-	ht.SetBody(r, bytes.NewReader(encoded), contentType)
-	return nil
-}
-
 func encodePATCHV1AuthResetRequest(
 	req *AuthResetRequest,
 	r *http.Request,
@@ -166,7 +152,7 @@ func encodePOSTV1AuthTokenRequest(
 }
 
 func encodePOSTV1BmcConfigureImportRequest(
-	req *BmcImportConfigurationRequest,
+	req *BmcImportConfigBody,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -179,8 +165,8 @@ func encodePOSTV1BmcConfigureImportRequest(
 	return nil
 }
 
-func encodePOSTV1BmcPowerOsRequest(
-	req *BmcOsPowerBody,
+func encodePOSTV1BmcFirmwareInstallRequest(
+	req *BmcInstallFirmwareBody,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -193,8 +179,22 @@ func encodePOSTV1BmcPowerOsRequest(
 	return nil
 }
 
-func encodePOSTV1BmcUpgradeDellInstallfromrepoRequest(
-	req *BmcDellInstallFromRepoRequest,
+func encodePOSTV1BmcJobsClearRequest(
+	req *BmcClearJobsBody,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodePOSTV1BmcPowerRequest(
+	req *BmcPowerBody,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"

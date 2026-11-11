@@ -18,7 +18,7 @@ var (
 	configureAutoOptions *shared.TableOptions
 	configureAutoColumns = []shared.Column{
 		{Name: "Node"},
-		{Name: "Status"},
+		{Name: "State"},
 		{Name: "Message"},
 	}
 	configureAutoCmd = &cobra.Command{
@@ -26,31 +26,31 @@ var (
 		Short: "Set iDRAC to Auto configure",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			nodeset := args[0]
-			if args[0] == "all" {
-				nodeset = ""
-			}
-
+			nodeset, all := selector(args[0])
 			params := client.POSTV1BmcConfigureAutoParams{
-				Nodeset: client.NewOptString(nodeset),
+				Nodeset: nodeset,
+				All:     all,
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
+
 			res, err := apiclient.API.POSTV1BmcConfigureAuto(command.Context(), params)
 			if err != nil {
 				return apiclient.NewApiError(err)
 			}
-			t := shared.NewTable(configureAutoColumns, configureAutoFilter).Options(*configureAutoOptions).Empty("-")
 
-			for _, jobMessage := range res {
+			t := shared.NewTable(configureAutoColumns, configureAutoFilter).Options(*configureAutoOptions).Empty("-")
+			for _, r := range res.Results.Value {
+				result := r.Value
 				t.AppendRow(
-					jobMessage.Host.Value,
-					jobMessage.Status.Value,
-					jobMessage.Msg.Value,
+					result.Node.Value,
+					colorState(result.Success.Value),
+					result.Message.Value,
 				)
 			}
-
 			t.Print()
-			return nil
+
+			s := res.Summary.Value
+			return summaryLine(s.Total.Value, s.Succeeded.Value, s.Failed.Value, s.FailedNodes.Value, s.DurationMs.Value)
 		},
 	}
 )

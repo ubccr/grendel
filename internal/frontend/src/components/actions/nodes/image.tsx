@@ -1,6 +1,6 @@
 import { patchV1NodesImageMutation } from "@/client/@tanstack/react-query.gen";
+import ActionCard from "@/components/actions/action-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useMutation } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
@@ -10,39 +10,30 @@ import { toast } from "sonner";
 export default function NodesImageAction({ nodes }: { nodes: string }) {
   const [image, setImage] = useState("");
   const { mutate, isPending } = useMutation(patchV1NodesImageMutation());
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Boot Image</CardTitle>
-      </CardHeader>
-      <CardContent className="grid grid-cols-1 gap-2">
-        <Input value={image} onChange={(e) => setImage(e.target.value)} />
-      </CardContent>
-      <CardFooter>
+    <ActionCard
+      title="Boot Image"
+      description="Set the image the nodes boot when they provision."
+      footer={
         <Button
+          disabled={isPending}
           onClick={() =>
             mutate(
+              { query: { nodeset: nodes }, body: { image: image } },
               {
-                query: { nodeset: nodes },
-                body: { image: image },
-              },
-              {
-                onSuccess: (data) => {
-                  toast.success(data?.title, {
-                    description: data?.detail,
-                  });
-                },
-                onError: (e) =>
-                  toast.error(e.title, {
-                    description: e.detail,
-                  }),
+                onSuccess: (data) => toast.success(data?.title, { description: data?.detail }),
+                onError: (e) => toast.error(e.title, { description: e.detail }),
               },
             )
           }
         >
-          {isPending ? <LoaderCircle className="animate-spin" /> : <span>Submit</span>}
+          {isPending && <LoaderCircle className="animate-spin" />}
+          Apply
         </Button>
-      </CardFooter>
-    </Card>
+      }
+    >
+      <Input placeholder="Image name" value={image} onChange={(e) => setImage(e.target.value)} />
+    </ActionCard>
   );
 }

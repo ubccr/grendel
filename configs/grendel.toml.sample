@@ -231,11 +231,18 @@ switch_admin_password_salt = ""
 # Allow unsigned https certs for redfish queries
 insecure = true
 
+# Scheme used to reach a BMC, https or http.
+scheme = "https"
+
 # bmc runner settings:
 # sets number of active queries allowed at one time
 fanout = 20
-# number of seconds after a query completes to wait before sending another
-delay = 1
+
+node_timeout = "60s"
+# how long a whole run over a nodeset may take
+run_timeout = "4m"
+# how many nodes to start contacting per second
+rate_limit_per_second = 30
 
 # IP sent to the BMC for import system config, should be an IP of the provision
 # server which is reachable by the BMCs
@@ -244,10 +251,18 @@ delay = 1
 # certificate on the provision server
 #config_ignore_certificate_warning = "Disabled"
 
+# Extra logins to try, useful for old bmc credentials or factory defaults
+#[[bmc.defaults.credentials]]
+#user = "root"
+#password = "calvin"
+
 [bmc.gofish]
-# Advanced gofish connection options. See https://github.com/ubccr/grendel/blob/main/internal/bmc/client.go#L40 for implementation details
+# Advanced gofish connection options. See https://github.com/ubccr/grendel/blob/main/internal/redfish/client.go for implementation details
 max_concurrent_requests = 1
 reuse_connections = false
+
+# Log in with basic auth instead of creating a Redfish session. Required for mockup server
+#basic_auth = false
 
 client_timeout = "60s"
 dial_timeout = "5s"

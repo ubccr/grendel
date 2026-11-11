@@ -27,7 +27,7 @@ function Form() {
               <div></div>
               <div className="flex justify-end gap-2">
                 <ActionsSheet checked={imageName} length={1}>
-                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-4 sm:grid-cols-2">
                     <ImagesDeleteAction images={imageName} />
                     <ImagesExportAction images={imageName} />
                   </div>
