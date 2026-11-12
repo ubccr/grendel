@@ -95,13 +95,22 @@ func (s *Service) assetTagOne(ctx context.Context, t Target, req AssetTagRequest
 		return nil, errors.New("no asset tag given for this node")
 	}
 
-	out.Changed = out.Desired != out.Current
+	staged, isStaged := stagedAssetTag(c, sys)
 	switch {
-	case !out.Changed:
+	case isStaged && staged == out.Desired:
+		out.Note = "already pending, applies at next reboot"
+		return out, nil
+	case !isStaged && out.Desired == out.Current:
 		out.Note = "already set"
 		return out, nil
-	case req.DryRun:
+	}
+
+	out.Changed = true
+	if req.DryRun {
 		out.Note = "would change, dry run"
+		if isStaged {
+			out.Note = fmt.Sprintf("would replace pending %q, dry run", staged)
+		}
 		return out, nil
 	}
 
@@ -110,8 +119,48 @@ func (s *Service) assetTagOne(ctx context.Context, t Target, req AssetTagRequest
 	if err != nil {
 		return nil, err
 	}
+
+	// a write over a staged tag is staged in turn, so only a bmc with nothing staged can have applied it already
 	out.Note = "asset tag set"
+	if applied, err := readAssetTag(c, sys.ODataID); isStaged || (err == nil && applied != out.Desired) {
+		out.Note = "asset tag pending, applies at next reboot"
+	}
 	return out, nil
+}
+
+// stagedAssetTag reads an asset tag waiting in the BIOS settings object. An iDRAC keeps the asset tag in the BIOS, so a write to the system stages a BIOS job and the system reports the old tag until the next reboot. Any failure reads as nothing staged, since this only refines the result
+func stagedAssetTag(c *conn, sys *schemas.ComputerSystem) (string, bool) {
+	bios, err := sys.Bios()
+	if err != nil || bios == nil {
+		return "", false
+	}
+	settings, err := redfishSettings(c, bios.ODataID)
+	if err != nil {
+		return "", false
+	}
+	b := &biosConn{conn: c, sys: sys, bios: bios, settings: settings}
+	staged, err := b.pending()
+	if err != nil {
+		return "", false
+	}
+	tag, ok := staged["AssetTag"].(string)
+	return tag, ok
+}
+
+// readAssetTag fetches the system again for the asset tag in effect, bypassing gofish's copy from before the write
+func readAssetTag(c *conn, uri string) (string, error) {
+	res, err := c.client.Get(uri)
+	defer schemas.DeferredCleanupHTTPResponse(res)
+	if err != nil {
+		return "", err
+	}
+	var sys struct {
+		AssetTag string
+	}
+	if err := json.NewDecoder(res.Body).Decode(&sys); err != nil {
+		return "", err
+	}
+	return sys.AssetTag, nil
 }
 
 func (s *Service) locationOne(ctx context.Context, t Target, req LocationRequest) (*LocationResult, error) {

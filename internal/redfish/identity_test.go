@@ -5,8 +5,13 @@
 package redfish
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
+	"io"
+	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -71,6 +76,7 @@ func TestSetAssetTag(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			f, patches := identityFixture(false)
+			applyAssetTag(f)
 			srv := f.serve(t)
 
 			r := testService(nil).SetAssetTag(context.Background(), []Target{{Name: "cpn-a01-01", Addr: srv.URL}}, tc.req)[0]
@@ -84,6 +90,74 @@ func TestSetAssetTag(t *testing.T) {
 				assert.Equal(t, map[string]any{"AssetTag": tc.patched}, got)
 				assert.Equal(t, "OLD-1", r.Data.Current)
 				assert.Equal(t, "ABCD123", r.Data.Serial)
+			}
+		})
+	}
+}
+
+// applyAssetTag makes the fixture's system take an asset tag write at once, as most bmcs do
+func applyAssetTag(f *fixture) {
+	record := f.handler
+	f.handler = func(w http.ResponseWriter, r *http.Request) bool {
+		body, _ := io.ReadAll(r.Body)
+		r.Body = io.NopCloser(bytes.NewReader(body))
+		var payload map[string]any
+		_ = json.Unmarshal(body, &payload)
+		if tag, ok := payload["AssetTag"].(string); ok && r.Method == http.MethodPatch {
+			sys := "/redfish/v1/Systems/System.Embedded.1"
+			f.tree[sys] = strings.Replace(f.tree[sys], `"AssetTag": "OLD-1"`, `"AssetTag": "`+tag+`"`, 1)
+		}
+		return record(w, r)
+	}
+}
+
+// stagedAssetTagFixture is an iDRAC that keeps the asset tag in the BIOS: a write to the system leaves the system's tag alone until a reboot, and staged is what the BIOS settings object holds
+func stagedAssetTagFixture(staged string) (*fixture, map[string]map[string]any) {
+	f, patches := indicatorFixture(`, "AssetTag": "OLD-1", "SKU": "ABCD123", "Bios": {"@odata.id": "/redfish/v1/Systems/System.Embedded.1/Bios"}`)
+	f.tree["/redfish/v1/Systems/System.Embedded.1/Bios"] = `{
+  "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Bios",
+  "Id": "Bios",
+  "Attributes": {"AssetTag": "OLD-1", "ProcCStates": "Enabled"},
+  "@Redfish.Settings": {"SettingsObject": {"@odata.id": "/redfish/v1/Systems/System.Embedded.1/Bios/Settings"}}
+}`
+	f.tree["/redfish/v1/Systems/System.Embedded.1/Bios/Settings"] = `{"@odata.id": "/redfish/v1/Systems/System.Embedded.1/Bios/Settings", "Attributes": ` + staged + `}`
+	return f, patches
+}
+
+func TestSetAssetTagStaged(t *testing.T) {
+	cases := []struct {
+		name    string
+		staged  string
+		desired string
+		dryRun  bool
+		changed bool
+		message string
+		patched bool
+	}{
+		{"written but not applied until reboot", `{}`, "NEW-1", false, true, "asset tag pending, applies at next reboot", true},
+		{"same tag already staged", `{"AssetTag": "NEW-1"}`, "NEW-1", false, false, "already pending, applies at next reboot", false},
+		{"a different tag staged is replaced", `{"AssetTag": "OTHER"}`, "NEW-1", false, true, "asset tag pending", true},
+		{"staged tag reported on a dry run", `{"AssetTag": "OTHER"}`, "NEW-1", true, true, `would replace pending "OTHER", dry run`, false},
+		{"back to the applied tag while another is staged", `{"AssetTag": "OTHER"}`, "OLD-1", false, true, "asset tag pending", true},
+		{"staged value equal to the applied one is not pending", `{"AssetTag": "OLD-1", "ProcCStates": "Disabled"}`, "OLD-1", false, false, "already set", false},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			f, patches := stagedAssetTagFixture(tc.staged)
+			srv := f.serve(t)
+
+			req := AssetTagRequest{ByNode: map[string]string{"cpn-a01-01": tc.desired}, DryRun: tc.dryRun}
+			r := testService(nil).SetAssetTag(context.Background(), []Target{{Name: "cpn-a01-01", Addr: srv.URL}}, req)[0]
+
+			require.True(t, r.Success, "message was: %s", r.Message)
+			assert.Contains(t, r.Message, tc.message)
+			assert.Equal(t, tc.changed, r.Data.Changed)
+			assert.Equal(t, "OLD-1", r.Data.Current)
+			if tc.patched {
+				assert.Equal(t, map[string]any{"AssetTag": tc.desired}, patches["/redfish/v1/Systems/System.Embedded.1"])
+			} else {
+				assert.Empty(t, patches)
 			}
 		})
 	}
