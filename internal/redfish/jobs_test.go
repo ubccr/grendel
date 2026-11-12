@@ -11,6 +11,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stmcginnis/gofish/schemas"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -137,4 +138,36 @@ func TestClearJobsTrailingSlash(t *testing.T) {
 
 	assert.True(t, r.Success, "message was: %s", r.Message)
 	assert.Equal(t, []string{jobServicePath + "/Jobs/JID_1"}, *deleted)
+}
+
+func TestSortJobsNewestFirst(t *testing.T) {
+	jobs := []*schemas.Job{
+		{Entity: schemas.Entity{ID: "JID_9"}, StartTime: "TIME_NOW"},
+		{Entity: schemas.Entity{ID: "JID_10"}, StartTime: "TIME_NA"},
+		{Entity: schemas.Entity{ID: "JID_1"}, StartTime: "2026-01-02T00:00:00Z"},
+		{Entity: schemas.Entity{ID: "JID_2"}, CreationTime: "2026-03-01T00:00:00-05:00", StartTime: "2026-01-01T00:00:00Z"},
+		{Entity: schemas.Entity{ID: "JID_3"}, EndTime: "2026-02-01T00:00:00Z"},
+	}
+
+	sortJobsNewestFirst(jobs)
+
+	ids := make([]string, 0, len(jobs))
+	for _, j := range jobs {
+		ids = append(ids, j.ID)
+	}
+	assert.Equal(t, []string{"JID_2", "JID_3", "JID_1", "JID_10", "JID_9"}, ids)
+}
+
+func TestJobsNewestFirst(t *testing.T) {
+	f, _ := jobFixture([]string{"JID_100", "JID_200", "JID_300"})
+
+	results := testService(nil).Jobs(context.Background(), []Target{{Name: "cpn-a01-01", Addr: f.serve(t).URL}})
+	require.Len(t, results, 1)
+	require.True(t, results[0].Success, results[0].Message)
+
+	var ids []string
+	for _, j := range results[0].Data.Jobs {
+		ids = append(ids, j.ID)
+	}
+	assert.Equal(t, []string{"JID_300", "JID_200", "JID_100"}, ids)
 }
