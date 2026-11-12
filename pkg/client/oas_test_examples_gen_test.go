@@ -1311,6 +1311,58 @@ func TestPostRolesRequest_EncodeDecode(t *testing.T) {
 	var typ2 PostRolesRequest
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestProvisionStatus_EncodeDecode(t *testing.T) {
+	var typ ProvisionStatus
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 ProvisionStatus
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestProvisionStatusFacts_EncodeDecode(t *testing.T) {
+	var typ ProvisionStatusFacts
+	typ = make(ProvisionStatusFacts)
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 ProvisionStatusFacts
+	typ2 = make(ProvisionStatusFacts)
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestProvisionStatusFailedUnitsItem_EncodeDecode(t *testing.T) {
+	var typ ProvisionStatusFailedUnitsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 ProvisionStatusFailedUnitsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestProvisionStatusStages_EncodeDecode(t *testing.T) {
+	var typ ProvisionStatusStages
+	typ = make(ProvisionStatusStages)
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 ProvisionStatusStages
+	typ2 = make(ProvisionStatusStages)
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestUser_EncodeDecode(t *testing.T) {
 	var typ User
 	typ.SetFake()

@@ -2408,6 +2408,94 @@
 				},
 				"type": "object"
 			},
+			"ProvisionStatus": {
+				"description": "ProvisionStatus schema",
+				"properties": {
+					"addr": {
+						"nullable": true,
+						"type": "string"
+					},
+					"boot_id": {
+						"nullable": true,
+						"type": "string"
+					},
+					"boot_image": {
+						"nullable": true,
+						"type": "string"
+					},
+					"boot_image_version": {
+						"nullable": true,
+						"type": "string"
+					},
+					"completed_at": {
+						"format": "date-time",
+						"nullable": true,
+						"type": "string"
+					},
+					"facts": {
+						"additionalProperties": {
+							"type": "string"
+						},
+						"nullable": true,
+						"type": "object"
+					},
+					"failed_units": {
+						"items": {
+							"properties": {
+								"active_state": {
+									"type": "string"
+								},
+								"description": {
+									"type": "string"
+								},
+								"name": {
+									"type": "string"
+								},
+								"result": {
+									"type": "string"
+								},
+								"sub_state": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"nullable": true,
+						"type": "array"
+					},
+					"message": {
+						"nullable": true,
+						"type": "string"
+					},
+					"node": {
+						"type": "string"
+					},
+					"queued_jobs": {
+						"nullable": true,
+						"type": "integer"
+					},
+					"stages": {
+						"additionalProperties": {
+							"format": "date-time",
+							"type": "string"
+						},
+						"nullable": true,
+						"type": "object"
+					},
+					"started_at": {
+						"format": "date-time",
+						"type": "string"
+					},
+					"state": {
+						"type": "string"
+					},
+					"updated_at": {
+						"format": "date-time",
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
 			"User": {
 				"description": "User schema",
 				"properties": {
@@ -5577,6 +5665,93 @@
 					}
 				],
 				"summary": "node provision",
+				"tags": [
+					"v1",
+					"nodes"
+				]
+			}
+		},
+		"/v1/nodes/provision-status": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeProvisionStatus`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the latest provision status of nodes by nodeset and/or tags, or of every node when neither is given",
+				"operationId": "GET_/v1/nodes/provision-status",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/ProvisionStatus"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/ProvisionStatus"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "node provision status",
 				"tags": [
 					"v1",
 					"nodes"

@@ -21,7 +21,6 @@ import (
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
 	"github.com/ubccr/grendel/pkg/netbox"
-	"github.com/ubccr/grendel/pkg/nodeset"
 )
 
 var netBoxClient *netbox.Client
@@ -73,9 +72,12 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 		e.GET("/pdu-service-discovery/:tag/:port", h.PDUServiceDiscovery).Name = "psd"
 	}
 
+	e.GET("/beacon/:arch", h.Beacon).Name = "beacon"
+
 	boot := e.Group("/boot/:token/")
 	boot.Use(TokenRequired)
 	boot.POST("complete", h.Complete)
+	boot.POST("status", h.Status)
 	boot.GET("ipxe", h.Ipxe)
 	boot.GET("kickstart", h.Kickstart)
 	boot.GET("file/kernel*", h.File)
@@ -173,6 +175,13 @@ func (h *Handler) verifyClaims(c echo.Context) (*model.BootImage, *model.Host, *
 		"host":       host,
 		"headers":    c.Request().Header,
 		"extra_vars": viper.GetStringMap("provision.extra_vars"),
+		"beacon": map[string]any{
+			"enabled":  viper.GetBool("provision.beacon.enabled"),
+			"served":   viper.GetString("provision.beacon.dir") != "",
+			"path":     viper.GetString("provision.beacon.path"),
+			"complete": viper.GetBool("provision.beacon.complete"),
+			"url":      endpoints.BeaconURL(host.ArchDebian()),
+		},
 	}
 
 	return bootImage, host, nic, data, nil
@@ -197,6 +206,7 @@ func (h *Handler) Ipxe(c echo.Context) error {
 	data["commandLine"] = commandLine
 
 	log.Infof("iPXE script requested: script=%s host=%s boot_image=%s", tmplName, host.Name, bootImage.Name)
+	h.recordStage(host, model.ProvisionStateIPXE, bootImage)
 	return c.Render(http.StatusOK, tmplName, data)
 }
 
@@ -264,7 +274,7 @@ func (h *Handler) serveBlob(c echo.Context, name string, data []byte) error {
 }
 
 func (h *Handler) Kickstart(c echo.Context) error {
-	bootImage, _, _, data, err := h.verifyClaims(c)
+	bootImage, host, _, data, err := h.verifyClaims(c)
 	if err != nil {
 		return err
 	}
@@ -274,29 +284,31 @@ func (h *Handler) Kickstart(c echo.Context) error {
 		tmplName = "kickstart.tmpl"
 	}
 
+	h.recordStage(host, model.ProvisionStateConfig, bootImage)
 	return c.Render(http.StatusOK, tmplName, data)
 }
 
+// Complete marks the node's provision completed and turns provisioning off. With ?unprovision=false it only records the status, for nodes that network boot every time
 func (h *Handler) Complete(c echo.Context) error {
 	_, host, _, _, err := h.verifyClaims(c)
 	if err != nil {
 		return err
 	}
 
-	log.Infof("Unprovisioning host %s", host.Name)
+	unprovision := true
+	if v := c.QueryParam("unprovision"); v != "" {
+		unprovision, err = strconv.ParseBool(v)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, "unprovision must be true or false")
+		}
+	}
 
-	// Only flip the provision flag, saving the whole host would persist the arch detected for this boot
-	ns, err := nodeset.NewNodeSet(host.Name)
-	if err == nil {
-		err = h.DB.ProvisionHosts(ns, false)
+	if unprovision {
+		if err := h.unprovision(host); err != nil {
+			return err
+		}
 	}
-	if err != nil {
-		log.WithFields(logrus.Fields{
-			"uid":  host.UID,
-			"name": host.Name,
-		}).Error("failed to unprovision host")
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to unprovision host").SetInternal(err)
-	}
+	h.recordCompleted(host)
 
 	resp := map[string]any{
 		"status": "ok",
@@ -316,6 +328,7 @@ func (h *Handler) UserData(c echo.Context) error {
 	}
 
 	log.Infof("Sending cloud-init user-data to host %s", host.Name)
+	h.recordStage(host, model.ProvisionStateConfig, bootImage)
 	c.Response().Header().Set(echo.HeaderContentType, "application/yaml; charset=utf-8")
 	return c.Render(http.StatusOK, tmplName, data)
 }
@@ -348,6 +361,7 @@ func (h *Handler) Ignition(c echo.Context) error {
 	}
 
 	log.Infof("Sending ignition config to host %s", host.Name)
+	h.recordStage(host, model.ProvisionStateConfig, bootImage)
 	renderer := c.Echo().Renderer.(*TemplateRenderer)
 	return renderer.RenderIgnition(http.StatusOK, tmplName, data, c)
 }

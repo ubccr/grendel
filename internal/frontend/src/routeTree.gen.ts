@@ -36,6 +36,7 @@ import { Route as NodesNodeBiosRouteImport } from './routes/nodes/$node/bios'
 import { Route as NodesNodeConsoleRouteImport } from './routes/nodes/$node/console'
 import { Route as NodesNodeLldpRouteImport } from './routes/nodes/$node/lldp'
 import { Route as NodesNodeNodeRouteImport } from './routes/nodes/$node/node'
+import { Route as NodesNodeProvisionRouteImport } from './routes/nodes/$node/provision'
 import { Route as NodesNodeRedfishRouteImport } from './routes/nodes/$node/redfish'
 import { Route as NodesBiosNodesRouteImport } from './routes/nodes/bios/$nodes'
 import { Route as NodesDellFirmwareNodesRouteImport } from './routes/nodes/dell-firmware/$nodes'
@@ -178,6 +179,11 @@ const NodesNodeNodeRoute = NodesNodeNodeRouteImport.update({
   path: '/node',
   getParentRoute: () => NodesNodeRouteRoute,
 } as any)
+const NodesNodeProvisionRoute = NodesNodeProvisionRouteImport.update({
+  id: '/provision',
+  path: '/provision',
+  getParentRoute: () => NodesNodeRouteRoute,
+} as any)
 const NodesNodeRedfishRoute = NodesNodeRedfishRouteImport.update({
   id: '/redfish',
   path: '/redfish',
@@ -235,6 +241,7 @@ export interface FileRoutesByFullPath {
   '/nodes/$node/console': typeof NodesNodeConsoleRoute
   '/nodes/$node/lldp': typeof NodesNodeLldpRoute
   '/nodes/$node/node': typeof NodesNodeNodeRoute
+  '/nodes/$node/provision': typeof NodesNodeProvisionRoute
   '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
   '/nodes/bios/$nodes': typeof NodesBiosNodesRoute
   '/nodes/dell-firmware/$nodes': typeof NodesDellFirmwareNodesRoute
@@ -270,6 +277,7 @@ export interface FileRoutesByTo {
   '/nodes/$node/console': typeof NodesNodeConsoleRoute
   '/nodes/$node/lldp': typeof NodesNodeLldpRoute
   '/nodes/$node/node': typeof NodesNodeNodeRoute
+  '/nodes/$node/provision': typeof NodesNodeProvisionRoute
   '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
   '/nodes/bios/$nodes': typeof NodesBiosNodesRoute
   '/nodes/dell-firmware/$nodes': typeof NodesDellFirmwareNodesRoute
@@ -306,6 +314,7 @@ export interface FileRoutesById {
   '/nodes/$node/console': typeof NodesNodeConsoleRoute
   '/nodes/$node/lldp': typeof NodesNodeLldpRoute
   '/nodes/$node/node': typeof NodesNodeNodeRoute
+  '/nodes/$node/provision': typeof NodesNodeProvisionRoute
   '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
   '/nodes/bios/$nodes': typeof NodesBiosNodesRoute
   '/nodes/dell-firmware/$nodes': typeof NodesDellFirmwareNodesRoute
@@ -343,6 +352,7 @@ export interface FileRouteTypes {
     | '/nodes/$node/console'
     | '/nodes/$node/lldp'
     | '/nodes/$node/node'
+    | '/nodes/$node/provision'
     | '/nodes/$node/redfish'
     | '/nodes/bios/$nodes'
     | '/nodes/dell-firmware/$nodes'
@@ -378,6 +388,7 @@ export interface FileRouteTypes {
     | '/nodes/$node/console'
     | '/nodes/$node/lldp'
     | '/nodes/$node/node'
+    | '/nodes/$node/provision'
     | '/nodes/$node/redfish'
     | '/nodes/bios/$nodes'
     | '/nodes/dell-firmware/$nodes'
@@ -413,6 +424,7 @@ export interface FileRouteTypes {
     | '/nodes/$node/console'
     | '/nodes/$node/lldp'
     | '/nodes/$node/node'
+    | '/nodes/$node/provision'
     | '/nodes/$node/redfish'
     | '/nodes/bios/$nodes'
     | '/nodes/dell-firmware/$nodes'
@@ -645,6 +657,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NodesNodeNodeRouteImport
       parentRoute: typeof NodesNodeRouteRoute
     }
+    '/nodes/$node/provision': {
+      id: '/nodes/$node/provision'
+      path: '/provision'
+      fullPath: '/nodes/$node/provision'
+      preLoaderRoute: typeof NodesNodeProvisionRouteImport
+      parentRoute: typeof NodesNodeRouteRoute
+    }
     '/nodes/$node/redfish': {
       id: '/nodes/$node/redfish'
       path: '/redfish'
@@ -695,6 +714,7 @@ interface NodesNodeRouteRouteChildren {
   NodesNodeConsoleRoute: typeof NodesNodeConsoleRoute
   NodesNodeLldpRoute: typeof NodesNodeLldpRoute
   NodesNodeNodeRoute: typeof NodesNodeNodeRoute
+  NodesNodeProvisionRoute: typeof NodesNodeProvisionRoute
   NodesNodeRedfishRoute: typeof NodesNodeRedfishRoute
 }
 
@@ -703,6 +723,7 @@ const NodesNodeRouteRouteChildren: NodesNodeRouteRouteChildren = {
   NodesNodeConsoleRoute: NodesNodeConsoleRoute,
   NodesNodeLldpRoute: NodesNodeLldpRoute,
   NodesNodeNodeRoute: NodesNodeNodeRoute,
+  NodesNodeProvisionRoute: NodesNodeProvisionRoute,
   NodesNodeRedfishRoute: NodesNodeRedfishRoute,
 }
 

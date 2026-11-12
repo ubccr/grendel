@@ -57,6 +57,7 @@ func (s *Server) bootingHandler4(host *model.Host, serverIP net.IP, req, resp *d
 		"name":     host.Name,
 		"firmware": fwtype.String(),
 	}).Info("Got valid PXE boot request")
+	provision.RecordPXE(s.DB, host)
 	log.Debugln(req.Summary())
 
 	// This logic was adopted from pixiecore

@@ -32,3 +32,33 @@ storage:
           Domains={{ Join $.nic.DomainSearch " " }}
           Address={{ $.nic.IP }}
           Gateway={{ $.nic.Gateway }}
+{{- if $.beacon.enabled }}
+{{- if $.beacon.served }}
+    - path: {{ $.beacon.path }}
+      mode: 0755
+      contents:
+        source: {{ $.beacon.url }}
+{{- end }}
+    - path: /etc/grendel/beacon.env
+      mode: 0600
+      contents:
+        inline: |
+          GRENDEL_STATUS_URL={{ $.endpoints.StatusURL }}
+systemd:
+  units:
+    - name: grendel-beacon.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Report provision status to grendel
+        Wants=network-online.target
+        After=network-online.target
+
+        [Service]
+        Type=simple
+        EnvironmentFile=/etc/grendel/beacon.env
+        ExecStart={{ $.beacon.path }} watch{{ if $.beacon.complete }} --complete{{ end }}
+
+        [Install]
+        WantedBy=multi-user.target
+{{- end }}

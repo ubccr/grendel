@@ -44,6 +44,22 @@ builds:
     tags:
       - osusergo
       - netgo
+  - id: grendel-beacon
+    main: ./cmd/grendel-beacon
+    binary: grendel-beacon-{{ .Arch }}
+    no_unique_dist_dir: true
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - amd64
+      - arm64
+    goos:
+      - linux
+    ldflags:
+      - -s -w -X github.com/ubccr/grendel/internal/version.Version={{.Version}}
+    tags:
+      - osusergo
+      - netgo
 archives:
   - ids:
       - grendeld
@@ -66,6 +82,12 @@ archives:
       - CHANGELOG.md
       - configs/grendel.toml.sample
       - completions/*
+  - id: grendel-beacon
+    ids:
+      - grendel-beacon
+    formats:
+      - binary
+    name_template: "grendel-beacon-{{ .Arch }}"
 dockers_v2:
   - id: grendel
     ids:
@@ -113,6 +135,14 @@ nfpms:
         type: "config|noreplace"
       - src: ./scripts/nfpm/grendel.service
         dst: /usr/lib/systemd/system/grendel.service
+      - src: ./dist/grendel-beacon-amd64
+        dst: /usr/lib/grendel/beacon/grendel-beacon-amd64
+        file_info:
+          mode: 0755
+      - src: ./dist/grendel-beacon-arm64
+        dst: /usr/lib/grendel/beacon/grendel-beacon-arm64
+        file_info:
+          mode: 0755
       - src: ./completions/grendeld.bash
         dst: /usr/share/bash-completion/completions/grendeld
         file_info:

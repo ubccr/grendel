@@ -249,6 +249,19 @@ type Invoker interface {
 	//
 	// GET /v1/nodes/find
 	GETV1NodesFind(ctx context.Context, params GETV1NodesFindParams) ([]Host, error)
+	// GETV1NodesProvisionStatus invokes GET_/v1/nodes/provision-status operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeProvisionStatus`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Get the latest provision status of nodes by nodeset and/or tags, or of every node when neither is
+	// given.
+	//
+	// GET /v1/nodes/provision-status
+	GETV1NodesProvisionStatus(ctx context.Context, params GETV1NodesProvisionStatusParams) ([]ProvisionStatus, error)
 	// GETV1NodesTokenInterface invokes GET_/v1/nodes/token/:interface operation.
 	//
 	// #### Controller:
@@ -3109,6 +3122,147 @@ func (c *Client) sendGETV1NodesFind(ctx context.Context, params GETV1NodesFindPa
 	defer resp.Body.Close()
 
 	result, err := decodeGETV1NodesFindResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GETV1NodesProvisionStatus invokes GET_/v1/nodes/provision-status operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).NodeProvisionStatus`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Get the latest provision status of nodes by nodeset and/or tags, or of every node when neither is
+// given.
+//
+// GET /v1/nodes/provision-status
+func (c *Client) GETV1NodesProvisionStatus(ctx context.Context, params GETV1NodesProvisionStatusParams) ([]ProvisionStatus, error) {
+	res, err := c.sendGETV1NodesProvisionStatus(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGETV1NodesProvisionStatus(ctx context.Context, params GETV1NodesProvisionStatusParams) (res []ProvisionStatus, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/nodes/provision-status"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "nodeset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "nodeset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Nodeset.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "tags" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "tags",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Tags.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, GETV1NodesProvisionStatusOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, GETV1NodesProvisionStatusOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGETV1NodesProvisionStatusResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

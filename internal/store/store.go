@@ -128,5 +128,14 @@ type Store interface {
 	// UpdateRolePermissions sets the permissions for the given role
 	UpdateRolePermissions(role string, permissions model.PermissionList) error
 
+	// LoadProvisionStatus returns the provision status of the host with the given ID, or ErrNotFound when it has none
+	LoadProvisionStatus(uid string) (*model.ProvisionStatus, error)
+
+	// StoreProvisionStatus replaces the provision status of the host with the given ID
+	StoreProvisionStatus(uid string, status *model.ProvisionStatus) error
+
+	// ProvisionStatuses returns the provision status of every host in ns that has one, or of every host when ns is nil
+	ProvisionStatuses(ns *nodeset.NodeSet) (model.ProvisionStatusList, error)
+
 	Close() error
 }

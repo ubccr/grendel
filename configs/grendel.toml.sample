@@ -89,11 +89,24 @@ prometheus_sd_refresh_interval = 3600
 # netbox_token=""
 # netbox_url=""
 
+# Verofy provision status reports come from the nodes IP
+status_check_source = true
+
 # Here is where you can pass extra variables into provision templates
 # They can be accessed like so: {{ $.extra_vars.root_password }}
 [provision.extra_vars]
 # root_password = ""
 # ssh_keys = ["ssh-rsa..."]
+
+[provision.beacon]
+# Add the beacon to the default butane template
+enabled = false
+# Directory holding grendel-beacon-amd64 and grendel-beacon-arm64, served at /beacon/<arch> for templates to download. The deb and rpm packages install both in /usr/lib/grendel/beacon.
+dir = "/usr/lib/grendel/beacon"
+# Where the beacon lives on the node
+path = "/opt/bin/grendel-beacon"
+# On a clean boot, also turn provisioning off for the node, as the complete endpoint does
+complete = false
 
 #------------------------------------------------------------------------------
 # DHCP Server

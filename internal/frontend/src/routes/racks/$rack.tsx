@@ -1,9 +1,10 @@
-import { getV1NodesFind, Host } from "@/client";
+import { getV1NodesFind, getV1NodesProvisionStatus, Host } from "@/client";
 import ActionsSheet from "@/components/actions-sheet";
 import NodeActions from "@/components/actions/nodes";
 import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 import { SquareArrowOutUpRight } from "@/components/animate-ui/icons/square-arrow-out-up-right";
 import ProvisionIcon from "@/components/nodes/provision-button";
+import { ProvisionStatusBadge, statusesByNode } from "@/components/nodes/provision-status";
 import TagsList from "@/components/tags";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,12 +27,20 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import AuthRedirect from "@/lib/auth";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Settings2 } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/racks/$rack")({
   component: RackTable,
   beforeLoad: AuthRedirect,
-  loader: ({ params: { rack } }) => getV1NodesFind({ query: { tags: `rack=${rack}` } }),
+  // the statuses load with the nodes so a refresh reloads both. A failure there only leaves the badges off
+  loader: async ({ params: { rack } }) => {
+    const tags = `rack=${rack}`;
+    const [nodes, statuses] = await Promise.all([
+      getV1NodesFind({ query: { tags } }),
+      getV1NodesProvisionStatus({ query: { tags } }),
+    ]);
+    return { ...nodes, statuses: statuses.data ?? [] };
+  },
 });
 
 type rackArr = {
@@ -40,7 +49,8 @@ type rackArr = {
 };
 
 function RackTable() {
-  const { data } = Route.useLoaderData();
+  const { data, statuses } = Route.useLoaderData();
+  const statusByNode = useMemo(() => statusesByNode(statuses), [statuses]);
   const [view, setView] = useState(["provision", "tags", "bmc"]);
   const [checked, setChecked] = useState<string[]>([]);
   const fields = ["provision", "tags", "firmware", "boot image", "bmc"];
@@ -117,7 +127,12 @@ function RackTable() {
                     <div key={i} className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                       <div className="flex justify-center gap-6 sm:justify-start">
                         {!!view.find((col) => col === "provision") && (
-                          <ProvisionIcon provision={host.provision} name={host.name} />
+                          <>
+                            <ProvisionIcon provision={host.provision} name={host.name} />
+                            <span className="my-auto">
+                              <ProvisionStatusBadge status={statusByNode.get(host.name ?? "")} />
+                            </span>
+                          </>
                         )}
                         {!!view.find((col) => col === "firmware") && (
                           <span className="my-auto">{host.firmware}</span>

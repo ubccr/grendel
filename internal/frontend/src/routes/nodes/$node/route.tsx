@@ -92,6 +92,18 @@ function RouteComponent() {
               )}
               {nodeType == "Server" && (
                 <Link
+                  to="/nodes/$node/provision"
+                  from="/nodes/$node"
+                  activeProps={{
+                    className: "shadow bg-background text-foreground",
+                  }}
+                  className="inline-flex items-center justify-center rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap ring-offset-background transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+                >
+                  Provision
+                </Link>
+              )}
+              {nodeType == "Server" && (
+                <Link
                   to="/nodes/$node/console"
                   from="/nodes/$node"
                   activeProps={{

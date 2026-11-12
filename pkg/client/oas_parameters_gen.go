@@ -153,6 +153,15 @@ type GETV1NodesFindParams struct {
 	Accept OptString
 }
 
+// GETV1NodesProvisionStatusParams is parameters of GET_/v1/nodes/provision-status operation.
+type GETV1NodesProvisionStatusParams struct {
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags   OptString
+	Accept OptString
+}
+
 // GETV1NodesTokenInterfaceParams is parameters of GET_/v1/nodes/token/:interface operation.
 type GETV1NodesTokenInterfaceParams struct {
 	// Interface token will be created for.

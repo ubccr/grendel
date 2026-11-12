@@ -25,6 +25,7 @@ const (
 	GETV1ImagesFindOperation             OperationName = "GETV1ImagesFind"
 	GETV1NodesOperation                  OperationName = "GETV1Nodes"
 	GETV1NodesFindOperation              OperationName = "GETV1NodesFind"
+	GETV1NodesProvisionStatusOperation   OperationName = "GETV1NodesProvisionStatus"
 	GETV1NodesTokenInterfaceOperation    OperationName = "GETV1NodesTokenInterface"
 	GETV1RolesOperation                  OperationName = "GETV1Roles"
 	GETV1SwitchNodesetLldpOperation      OperationName = "GETV1SwitchNodesetLldp"

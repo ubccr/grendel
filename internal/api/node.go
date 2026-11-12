@@ -368,3 +368,25 @@ func (h *Handler) filterByNodesetAndTags(f1, f2 string) (*nodeset.NodeSet, error
 
 	return nodeset.NewNodeSet(strings.Join(combined, ","))
 }
+
+// NodeProvisionStatus returns the latest provision status of the selected nodes, or of every node when none are selected. Nodes that have never network booted since the status was added have no entry
+func (h *Handler) NodeProvisionStatus(c fuego.ContextNoBody) (model.ProvisionStatusList, error) {
+	if c.QueryParam("nodeset") == "" && c.QueryParam("tags") == "" {
+		list, err := h.DB.ProvisionStatuses(nil)
+		if err != nil {
+			return nil, fuego.HTTPError{Err: err, Title: "Error", Detail: "failed to load provision status"}
+		}
+		return list, nil
+	}
+
+	ns, err := h.filterByNodesetAndTags(c.QueryParam("nodeset"), c.QueryParam("tags"))
+	if err != nil {
+		return nil, badRequest(err, "failed to filter nodes")
+	}
+
+	list, err := h.DB.ProvisionStatuses(ns)
+	if err != nil {
+		return nil, fuego.HTTPError{Err: err, Title: "Error", Detail: "failed to load provision status"}
+	}
+	return list, nil
+}

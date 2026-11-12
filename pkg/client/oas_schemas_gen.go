@@ -9445,6 +9445,69 @@ func (o OptNilDataDumpImagesItemProvisionTemplates) Or(d DataDumpImagesItemProvi
 	return d
 }
 
+// NewOptNilDateTime returns new OptNilDateTime with value set to v.
+func NewOptNilDateTime(v time.Time) OptNilDateTime {
+	return OptNilDateTime{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilDateTime is optional nullable time.Time.
+type OptNilDateTime struct {
+	Value time.Time
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilDateTime was set.
+func (o OptNilDateTime) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilDateTime) Reset() {
+	var v time.Time
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilDateTime) SetTo(v time.Time) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilDateTime) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilDateTime) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v time.Time
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilDateTime) Get() (v time.Time, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilDateTime) Or(d time.Time) time.Time {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilFloat64 returns new OptNilFloat64 with value set to v.
 func NewOptNilFloat64(v float64) OptNilFloat64 {
 	return OptNilFloat64{
@@ -10719,6 +10782,195 @@ func (o OptNilNilStringArray) Or(d []NilString) []NilString {
 	return d
 }
 
+// NewOptNilProvisionStatusFacts returns new OptNilProvisionStatusFacts with value set to v.
+func NewOptNilProvisionStatusFacts(v ProvisionStatusFacts) OptNilProvisionStatusFacts {
+	return OptNilProvisionStatusFacts{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilProvisionStatusFacts is optional nullable ProvisionStatusFacts.
+type OptNilProvisionStatusFacts struct {
+	Value ProvisionStatusFacts
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilProvisionStatusFacts was set.
+func (o OptNilProvisionStatusFacts) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilProvisionStatusFacts) Reset() {
+	var v ProvisionStatusFacts
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilProvisionStatusFacts) SetTo(v ProvisionStatusFacts) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilProvisionStatusFacts) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilProvisionStatusFacts) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v ProvisionStatusFacts
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilProvisionStatusFacts) Get() (v ProvisionStatusFacts, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilProvisionStatusFacts) Or(d ProvisionStatusFacts) ProvisionStatusFacts {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilProvisionStatusFailedUnitsItemArray returns new OptNilProvisionStatusFailedUnitsItemArray with value set to v.
+func NewOptNilProvisionStatusFailedUnitsItemArray(v []ProvisionStatusFailedUnitsItem) OptNilProvisionStatusFailedUnitsItemArray {
+	return OptNilProvisionStatusFailedUnitsItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilProvisionStatusFailedUnitsItemArray is optional nullable []ProvisionStatusFailedUnitsItem.
+type OptNilProvisionStatusFailedUnitsItemArray struct {
+	Value []ProvisionStatusFailedUnitsItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilProvisionStatusFailedUnitsItemArray was set.
+func (o OptNilProvisionStatusFailedUnitsItemArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilProvisionStatusFailedUnitsItemArray) Reset() {
+	var v []ProvisionStatusFailedUnitsItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilProvisionStatusFailedUnitsItemArray) SetTo(v []ProvisionStatusFailedUnitsItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilProvisionStatusFailedUnitsItemArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilProvisionStatusFailedUnitsItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []ProvisionStatusFailedUnitsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilProvisionStatusFailedUnitsItemArray) Get() (v []ProvisionStatusFailedUnitsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilProvisionStatusFailedUnitsItemArray) Or(d []ProvisionStatusFailedUnitsItem) []ProvisionStatusFailedUnitsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilProvisionStatusStages returns new OptNilProvisionStatusStages with value set to v.
+func NewOptNilProvisionStatusStages(v ProvisionStatusStages) OptNilProvisionStatusStages {
+	return OptNilProvisionStatusStages{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilProvisionStatusStages is optional nullable ProvisionStatusStages.
+type OptNilProvisionStatusStages struct {
+	Value ProvisionStatusStages
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilProvisionStatusStages was set.
+func (o OptNilProvisionStatusStages) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilProvisionStatusStages) Reset() {
+	var v ProvisionStatusStages
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilProvisionStatusStages) SetTo(v ProvisionStatusStages) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilProvisionStatusStages) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilProvisionStatusStages) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v ProvisionStatusStages
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilProvisionStatusStages) Get() (v ProvisionStatusStages, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilProvisionStatusStages) Or(d ProvisionStatusStages) ProvisionStatusStages {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilString returns new OptNilString with value set to v.
 func NewOptNilString(v string) OptNilString {
 	return OptNilString{
@@ -10968,6 +11220,245 @@ func (s *PostRolesRequest) SetInheritedRole(val OptString) {
 // SetRole sets the value of Role.
 func (s *PostRolesRequest) SetRole(val OptString) {
 	s.Role = val
+}
+
+// ProvisionStatus schema.
+// Ref: #/components/schemas/ProvisionStatus
+type ProvisionStatus struct {
+	Addr             OptNilString                              `json:"addr"`
+	BootID           OptNilString                              `json:"boot_id"`
+	BootImage        OptNilString                              `json:"boot_image"`
+	BootImageVersion OptNilString                              `json:"boot_image_version"`
+	CompletedAt      OptNilDateTime                            `json:"completed_at"`
+	Facts            OptNilProvisionStatusFacts                `json:"facts"`
+	FailedUnits      OptNilProvisionStatusFailedUnitsItemArray `json:"failed_units"`
+	Message          OptNilString                              `json:"message"`
+	Node             OptString                                 `json:"node"`
+	QueuedJobs       OptNilInt                                 `json:"queued_jobs"`
+	Stages           OptNilProvisionStatusStages               `json:"stages"`
+	StartedAt        OptDateTime                               `json:"started_at"`
+	State            OptString                                 `json:"state"`
+	UpdatedAt        OptDateTime                               `json:"updated_at"`
+}
+
+// GetAddr returns the value of Addr.
+func (s *ProvisionStatus) GetAddr() OptNilString {
+	return s.Addr
+}
+
+// GetBootID returns the value of BootID.
+func (s *ProvisionStatus) GetBootID() OptNilString {
+	return s.BootID
+}
+
+// GetBootImage returns the value of BootImage.
+func (s *ProvisionStatus) GetBootImage() OptNilString {
+	return s.BootImage
+}
+
+// GetBootImageVersion returns the value of BootImageVersion.
+func (s *ProvisionStatus) GetBootImageVersion() OptNilString {
+	return s.BootImageVersion
+}
+
+// GetCompletedAt returns the value of CompletedAt.
+func (s *ProvisionStatus) GetCompletedAt() OptNilDateTime {
+	return s.CompletedAt
+}
+
+// GetFacts returns the value of Facts.
+func (s *ProvisionStatus) GetFacts() OptNilProvisionStatusFacts {
+	return s.Facts
+}
+
+// GetFailedUnits returns the value of FailedUnits.
+func (s *ProvisionStatus) GetFailedUnits() OptNilProvisionStatusFailedUnitsItemArray {
+	return s.FailedUnits
+}
+
+// GetMessage returns the value of Message.
+func (s *ProvisionStatus) GetMessage() OptNilString {
+	return s.Message
+}
+
+// GetNode returns the value of Node.
+func (s *ProvisionStatus) GetNode() OptString {
+	return s.Node
+}
+
+// GetQueuedJobs returns the value of QueuedJobs.
+func (s *ProvisionStatus) GetQueuedJobs() OptNilInt {
+	return s.QueuedJobs
+}
+
+// GetStages returns the value of Stages.
+func (s *ProvisionStatus) GetStages() OptNilProvisionStatusStages {
+	return s.Stages
+}
+
+// GetStartedAt returns the value of StartedAt.
+func (s *ProvisionStatus) GetStartedAt() OptDateTime {
+	return s.StartedAt
+}
+
+// GetState returns the value of State.
+func (s *ProvisionStatus) GetState() OptString {
+	return s.State
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *ProvisionStatus) GetUpdatedAt() OptDateTime {
+	return s.UpdatedAt
+}
+
+// SetAddr sets the value of Addr.
+func (s *ProvisionStatus) SetAddr(val OptNilString) {
+	s.Addr = val
+}
+
+// SetBootID sets the value of BootID.
+func (s *ProvisionStatus) SetBootID(val OptNilString) {
+	s.BootID = val
+}
+
+// SetBootImage sets the value of BootImage.
+func (s *ProvisionStatus) SetBootImage(val OptNilString) {
+	s.BootImage = val
+}
+
+// SetBootImageVersion sets the value of BootImageVersion.
+func (s *ProvisionStatus) SetBootImageVersion(val OptNilString) {
+	s.BootImageVersion = val
+}
+
+// SetCompletedAt sets the value of CompletedAt.
+func (s *ProvisionStatus) SetCompletedAt(val OptNilDateTime) {
+	s.CompletedAt = val
+}
+
+// SetFacts sets the value of Facts.
+func (s *ProvisionStatus) SetFacts(val OptNilProvisionStatusFacts) {
+	s.Facts = val
+}
+
+// SetFailedUnits sets the value of FailedUnits.
+func (s *ProvisionStatus) SetFailedUnits(val OptNilProvisionStatusFailedUnitsItemArray) {
+	s.FailedUnits = val
+}
+
+// SetMessage sets the value of Message.
+func (s *ProvisionStatus) SetMessage(val OptNilString) {
+	s.Message = val
+}
+
+// SetNode sets the value of Node.
+func (s *ProvisionStatus) SetNode(val OptString) {
+	s.Node = val
+}
+
+// SetQueuedJobs sets the value of QueuedJobs.
+func (s *ProvisionStatus) SetQueuedJobs(val OptNilInt) {
+	s.QueuedJobs = val
+}
+
+// SetStages sets the value of Stages.
+func (s *ProvisionStatus) SetStages(val OptNilProvisionStatusStages) {
+	s.Stages = val
+}
+
+// SetStartedAt sets the value of StartedAt.
+func (s *ProvisionStatus) SetStartedAt(val OptDateTime) {
+	s.StartedAt = val
+}
+
+// SetState sets the value of State.
+func (s *ProvisionStatus) SetState(val OptString) {
+	s.State = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *ProvisionStatus) SetUpdatedAt(val OptDateTime) {
+	s.UpdatedAt = val
+}
+
+type ProvisionStatusFacts map[string]string
+
+func (s *ProvisionStatusFacts) init() ProvisionStatusFacts {
+	m := *s
+	if m == nil {
+		m = map[string]string{}
+		*s = m
+	}
+	return m
+}
+
+type ProvisionStatusFailedUnitsItem struct {
+	ActiveState OptString `json:"active_state"`
+	Description OptString `json:"description"`
+	Name        OptString `json:"name"`
+	Result      OptString `json:"result"`
+	SubState    OptString `json:"sub_state"`
+}
+
+// GetActiveState returns the value of ActiveState.
+func (s *ProvisionStatusFailedUnitsItem) GetActiveState() OptString {
+	return s.ActiveState
+}
+
+// GetDescription returns the value of Description.
+func (s *ProvisionStatusFailedUnitsItem) GetDescription() OptString {
+	return s.Description
+}
+
+// GetName returns the value of Name.
+func (s *ProvisionStatusFailedUnitsItem) GetName() OptString {
+	return s.Name
+}
+
+// GetResult returns the value of Result.
+func (s *ProvisionStatusFailedUnitsItem) GetResult() OptString {
+	return s.Result
+}
+
+// GetSubState returns the value of SubState.
+func (s *ProvisionStatusFailedUnitsItem) GetSubState() OptString {
+	return s.SubState
+}
+
+// SetActiveState sets the value of ActiveState.
+func (s *ProvisionStatusFailedUnitsItem) SetActiveState(val OptString) {
+	s.ActiveState = val
+}
+
+// SetDescription sets the value of Description.
+func (s *ProvisionStatusFailedUnitsItem) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetName sets the value of Name.
+func (s *ProvisionStatusFailedUnitsItem) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetResult sets the value of Result.
+func (s *ProvisionStatusFailedUnitsItem) SetResult(val OptString) {
+	s.Result = val
+}
+
+// SetSubState sets the value of SubState.
+func (s *ProvisionStatusFailedUnitsItem) SetSubState(val OptString) {
+	s.SubState = val
+}
+
+type ProvisionStatusStages map[string]time.Time
+
+func (s *ProvisionStatusStages) init() ProvisionStatusStages {
+	m := *s
+	if m == nil {
+		m = map[string]time.Time{}
+		*s = m
+	}
+	return m
 }
 
 // User schema.

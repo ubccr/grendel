@@ -55,5 +55,6 @@ nav:
       - iPXE: advanced/ipxe.md
       - BMC Compatibility Testing: advanced/bmc-compatibility.md
       - Serial Console: advanced/serial-console.md
+      - Provision Status: advanced/provision-status.md
   - Integrations:
       - ClusterShell: integrations/clush.md

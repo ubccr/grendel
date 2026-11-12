@@ -15,6 +15,8 @@ const (
 	endpointPrefix             string = "boot"
 	endpointRepo               string = "repo"
 	endpointComplete           string = "complete"
+	endpointStatus             string = "status"
+	endpointBeacon             string = "beacon"
 	endpointIPXE               string = "ipxe"
 	endpointKickstart          string = "kickstart"
 	endpointKernel             string = "file/kernel"
@@ -74,6 +76,16 @@ func (e *Endpoints) provisionURL(endpoint string) string {
 
 func (e *Endpoints) CompleteURL() string {
 	return e.provisionURL(endpointComplete)
+}
+
+// StatusURL is where the beacon running in the node's OS reports provision status
+func (e *Endpoints) StatusURL() string {
+	return e.provisionURL(endpointStatus)
+}
+
+// BeaconURL is where the beacon binary for arch (amd64 or arm64) is served from, when provision.beacon.dir is set
+func (e *Endpoints) BeaconURL(arch string) string {
+	return fmt.Sprintf("%s/%s/%s", e.BaseURL(), endpointBeacon, arch)
 }
 
 func (e *Endpoints) IpxeURL() string {

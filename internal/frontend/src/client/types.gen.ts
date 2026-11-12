@@ -956,6 +956,36 @@ export type PostRolesRequest = {
 };
 
 /**
+ * ProvisionStatus schema
+ */
+export type ProvisionStatus = {
+    addr?: string;
+    boot_id?: string;
+    boot_image?: string;
+    boot_image_version?: string;
+    completed_at?: string;
+    facts?: {
+        [key: string]: string;
+    };
+    failed_units?: Array<{
+        active_state?: string;
+        description?: string;
+        name?: string;
+        result?: string;
+        sub_state?: string;
+    }>;
+    message?: string;
+    node?: string;
+    queued_jobs?: number;
+    stages?: {
+        [key: string]: string;
+    };
+    started_at?: string;
+    state?: string;
+    updated_at?: string;
+};
+
+/**
  * User schema
  */
 export type User = {
@@ -2374,6 +2404,43 @@ export type PatchV1NodesProvisionResponses = {
 };
 
 export type PatchV1NodesProvisionResponse = PatchV1NodesProvisionResponses[keyof PatchV1NodesProvisionResponses];
+
+export type GetV1NodesProvisionStatusData = {
+    body?: never;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+    };
+    url: '/v1/nodes/provision-status';
+};
+
+export type GetV1NodesProvisionStatusErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type GetV1NodesProvisionStatusError = GetV1NodesProvisionStatusErrors[keyof GetV1NodesProvisionStatusErrors];
+
+export type GetV1NodesProvisionStatusResponses = {
+    /**
+     * OK
+     */
+    200: Array<ProvisionStatus>;
+};
+
+export type GetV1NodesProvisionStatusResponse = GetV1NodesProvisionStatusResponses[keyof GetV1NodesProvisionStatusResponses];
 
 export type PatchV1NodesTagsActionData = {
     /**

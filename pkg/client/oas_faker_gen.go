@@ -3757,6 +3757,12 @@ func (s *OptNilDataDumpImagesItemProvisionTemplates) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptNilDateTime) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
 func (s *OptNilFloat64) SetFake() {
 	s.Null = true
 	s.Set = true
@@ -3877,6 +3883,24 @@ func (s *OptNilNilStringArray) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptNilProvisionStatusFacts) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilProvisionStatusFailedUnitsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilProvisionStatusStages) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
 func (s *OptNilString) SetFake() {
 	s.Null = true
 	s.Set = true
@@ -3943,6 +3967,131 @@ func (s *PostRolesRequest) SetFake() {
 		{
 			s.Role.SetFake()
 		}
+	}
+}
+
+// SetFake set fake values.
+func (s *ProvisionStatus) SetFake() {
+	{
+		{
+			s.Addr.SetFake()
+		}
+	}
+	{
+		{
+			s.BootID.SetFake()
+		}
+	}
+	{
+		{
+			s.BootImage.SetFake()
+		}
+	}
+	{
+		{
+			s.BootImageVersion.SetFake()
+		}
+	}
+	{
+		{
+			s.CompletedAt.SetFake()
+		}
+	}
+	{
+		{
+			s.Facts.SetFake()
+		}
+	}
+	{
+		{
+			s.FailedUnits.SetFake()
+		}
+	}
+	{
+		{
+			s.Message.SetFake()
+		}
+	}
+	{
+		{
+			s.Node.SetFake()
+		}
+	}
+	{
+		{
+			s.QueuedJobs.SetFake()
+		}
+	}
+	{
+		{
+			s.Stages.SetFake()
+		}
+	}
+	{
+		{
+			s.StartedAt.SetFake()
+		}
+	}
+	{
+		{
+			s.State.SetFake()
+		}
+	}
+	{
+		{
+			s.UpdatedAt.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *ProvisionStatusFacts) SetFake() {
+	var (
+		elem string
+		m    map[string]string = s.init()
+	)
+	for i := 0; i < 0; i++ {
+		m[fmt.Sprintf("fake%d", i)] = elem
+	}
+}
+
+// SetFake set fake values.
+func (s *ProvisionStatusFailedUnitsItem) SetFake() {
+	{
+		{
+			s.ActiveState.SetFake()
+		}
+	}
+	{
+		{
+			s.Description.SetFake()
+		}
+	}
+	{
+		{
+			s.Name.SetFake()
+		}
+	}
+	{
+		{
+			s.Result.SetFake()
+		}
+	}
+	{
+		{
+			s.SubState.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *ProvisionStatusStages) SetFake() {
+	var (
+		elem time.Time
+		m    map[string]time.Time = s.init()
+	)
+	for i := 0; i < 0; i++ {
+		m[fmt.Sprintf("fake%d", i)] = elem
 	}
 }
 

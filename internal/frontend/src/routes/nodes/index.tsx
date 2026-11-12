@@ -1,29 +1,36 @@
-import { getV1Nodes, Host } from "@/client";
+import { getV1Nodes, getV1NodesProvisionStatus, Host } from "@/client";
 import ActionsSheet from "@/components/actions-sheet";
 import NodeActions from "@/components/actions/nodes";
 import { DataTable, DataTableActions } from "@/components/data-table/data-table";
 import { DataTableColumnHeader } from "@/components/data-table/header";
 import SelectableCheckbox from "@/components/data-table/selectableCheckbox";
 import ProvisionIcon from "@/components/nodes/provision-button";
+import { ProvisionStatusBadge, statusesByNode } from "@/components/nodes/provision-status";
 import TagsList from "@/components/tags";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import AuthRedirect from "@/lib/auth";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ColumnDef } from "@tanstack/react-table";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/nodes/")({
   component: TableComponent,
   beforeLoad: AuthRedirect,
-  loader: () => getV1Nodes(),
+  // the statuses load with the nodes so the table's refresh reloads both. A failure there only leaves the status column empty
+  loader: async () => {
+    const [nodes, statuses] = await Promise.all([getV1Nodes(), getV1NodesProvisionStatus()]);
+    return { ...nodes, statuses: statuses.data ?? [] };
+  },
 });
 
 function TableComponent() {
-  const { data } = Route.useLoaderData();
+  const { data, statuses } = Route.useLoaderData();
   const { isFetching } = Route.useMatch();
 
   const [lastSelectedID, setLastSelectedID] = useState(0);
+
+  const statusByNode = useMemo(() => statusesByNode(statuses), [statuses]);
 
   const columns: ColumnDef<Host>[] = [
     {
@@ -70,6 +77,14 @@ function TableComponent() {
         const val = row.getValue(columId) as boolean;
         return `${val}`.includes(filterValue);
       },
+    },
+    {
+      id: "provision_status",
+      accessorFn: (row) => statusByNode.get(row.name ?? "")?.state ?? "",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+      cell: ({ row }) => (
+        <ProvisionStatusBadge status={statusByNode.get(row.original?.name ?? "")} />
+      ),
     },
     {
       accessorKey: "boot_image",

@@ -5,6 +5,7 @@
 package db
 
 import (
+	"database/sql"
 	"time"
 
 	null "github.com/guregu/null/v5"
@@ -99,6 +100,15 @@ type Permission struct {
 	ID     int64  `json:"id"`
 	Method string `json:"method"`
 	Path   string `json:"path"`
+}
+
+type ProvisionStatus struct {
+	NodeID      int64        `json:"node_id"`
+	State       string       `json:"state"`
+	StartedAt   time.Time    `json:"started_at"`
+	UpdatedAt   time.Time    `json:"updated_at"`
+	CompletedAt sql.NullTime `json:"completed_at"`
+	Detail      string       `json:"detail"`
 }
 
 type Role struct {
