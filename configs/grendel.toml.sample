@@ -89,7 +89,7 @@ prometheus_sd_refresh_interval = 3600
 # netbox_token=""
 # netbox_url=""
 
-# Verofy provision status reports come from the nodes IP
+# Verify provision status reports come from the nodes IP
 status_check_source = true
 
 # Here is where you can pass extra variables into provision templates
