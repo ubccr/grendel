@@ -128,7 +128,7 @@
 
 /* the sidebar, header and page cards float over the node field on a soft shadow; shadow-float layers under each element's own ring, so their borders stay as shadcn draws them */
 :root {
-  --float-shadow: 0 24px 48px -16px rgb(20 30 25 / 0.22), 0 6px 14px -6px rgb(20 30 25 / 0.12);
+  --float-shadow: 0 24px 48px -16px rgb(0 0 0 / 0.22), 0 6px 14px -6px rgb(0 0 0 / 0.12);
 }
 .dark {
   --float-shadow: 0 24px 48px -12px rgb(0 0 0 / 0.7), 0 6px 14px -6px rgb(0 0 0 / 0.5);
@@ -187,13 +187,13 @@
 
 /* the node colours of the field behind the page, which reads them here so they follow the theme; they stay hex because the field blends them itself */
 :root {
-  --node-off: #e4e9e6;
+  --node-off: #e5e5e5;
   --node-amber: #e39b2d;
   --node-blue: #3b7fc4;
   --node-ready: #3aa776;
 }
 .dark {
-  --node-off: #2d3531;
+  --node-off: #262626;
   --node-amber: #e8a33d;
   --node-blue: #6ea8e6;
   --node-ready: #7fd1ae;
