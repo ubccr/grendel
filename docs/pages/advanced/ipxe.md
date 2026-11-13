@@ -32,3 +32,10 @@ If you run into any issues pxe booting, like the kernel download hanging or a gr
 - ipxe-x86_64.efi
 - snponly-x86_64.efi
 - snponly-arm64.efi
+
+## Serving your own builds
+
+`tftp.firmware_dir` serves the EFI builds in a directory in place of the embedded ones, under the
+same names as above, so they can be signed for UEFI secure boot. `grendeld firmware export <dir>`
+writes the embedded EFI builds there to start from. The BIOS builds are always the embedded ones.
+See [Secure Boot Keys](secure-boot.md#signing-ipxe).

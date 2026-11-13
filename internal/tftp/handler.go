@@ -81,14 +81,15 @@ func (s *Server) ReadHandler(token string, rf io.ReaderFrom) error {
 
 	log.Infof("Got read request for firmware type: %d", fwtype)
 
-	bs := fwtype.ToBytes()
+	bs := s.firmware.Bytes(fwtype)
 	if bs == nil {
-		log.Errorf("Failed to fetch firmware %d: %s", fwtype, err)
-		return fmt.Errorf("unknown firmware type %d", fwtype)
+		err := fmt.Errorf("no firmware build %q embedded or in the firmware directory", fwtype)
+		log.Error(err)
+		return err
 	}
 
 	rf.(tftp.OutgoingTransfer).SetSize(int64(len(bs)))
-	n, err := rf.ReadFrom(bytes.NewBuffer(bs))
+	n, err := rf.ReadFrom(bytes.NewReader(bs))
 	if err != nil && !strings.Contains(err.Error(), "User aborted") {
 		log.Errorf("Failed to send firmware via tftp: %s", err)
 		return err

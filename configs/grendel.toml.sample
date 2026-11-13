@@ -177,6 +177,9 @@ ttl = 86400
 [tftp]
 listen = "0.0.0.0:69"
 
+# Directory of iPXE EFI builds to serve instead of the embedded ones. See the Secure Boot and iPXE docs for more details.
+#firmware_dir = "/var/lib/grendel/firmware"
+
 #------------------------------------------------------------------------------
 # PXE Server
 #------------------------------------------------------------------------------

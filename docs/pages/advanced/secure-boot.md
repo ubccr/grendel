@@ -50,6 +50,47 @@ Each also has a read-only factory copy, such as `dbDefault`, which `keys --defau
 Changes take effect at the next boot. `status` shows a staged change under **Pending** on BMCs that
 stage it, such as an iDRAC.
 
+## Signing iPXE
+
+With secure boot on, a node's firmware refuses the iPXE build Grendel serves unless it is signed by
+a key in `db`. The builds embedded in grendeld are unsigned, so write them out, sign them with your
+key, and point grendeld at the signed copies. This runs on the grendeld host, not through the API:
+
+```
+grendeld firmware export /var/lib/grendel/firmware
+cd /var/lib/grendel/firmware
+sbsign --key db.key --cert db.crt --output snponly-x86_64.efi snponly-x86_64.efi
+```
+
+`export` writes only the EFI builds, since secure boot does not apply to BIOS boot, and does not
+overwrite files already there unless given `--force`. Then set the directory in `grendel.toml` and
+restart grendeld:
+
+```toml
+[tftp]
+firmware_dir = "/var/lib/grendel/firmware"
+```
+
+Only the EFI builds are read from the directory. An EFI build missing from it is served from the
+embedded copy, so the directory only needs the builds your nodes use, and the BIOS builds
+(`undionly.kpxe`, `ipxe.pxe`) are always the embedded ones; one left in the directory is ignored
+with a warning. The directory is read when grendeld starts. A file in it that is not an EFI binary
+stops grendeld from starting, and an unsigned EFI build is logged as a warning.
+`grendeld firmware list` shows where each build will come from, its SHA-256, whether it is signed,
+and whether it is still this grendeld's build, which is worth checking before the restart:
+
+```
+grendeld firmware list --dir /var/lib/grendel/firmware
+```
+
+`Signed` only says the file carries a signature, not whose. Enroll the certificate that signed it in
+`db`, as above. Secure boot also applies to the kernel iPXE goes on to boot, so that has to be signed
+by a key the node trusts too.
+
+When upgrading Grendel, export and sign again: the directory keeps serving the old iPXE builds until
+they are replaced. `list` shows such a build as not `Current`, and grendeld logs a warning for it at
+start. The comparison leaves the signature out, so a signed copy of the embedded build is current.
+
 ## Removing keys
 
 Each BMC numbers its keys differently, so a key is named by its fingerprint, which is the same on
