@@ -3,6 +3,9 @@
 version: 2
 before:
   hooks:
+    # the web UI is not committed; build it into internal/api/build so grendeld embeds it
+    - pnpm --dir internal/frontend install --frozen-lockfile
+    - pnpm --dir internal/frontend build
     - go mod tidy
     - rm -rf completions
     - mkdir completions

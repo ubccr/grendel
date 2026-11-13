@@ -12,3 +12,7 @@ key.gpg
 tmp
 .secrets
 .artifacts
+
+# the web UI is built by pnpm (goreleaser runs it before release builds); only the .gitkeep that lets go:embed compile on a fresh clone is tracked
+/internal/api/build/*
+!/internal/api/build/.gitkeep

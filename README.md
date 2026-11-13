@@ -150,6 +150,20 @@ go build ./cmd/grendel
 ./grendel --help
 ```
 
+The web UI is not committed, so a plain `go build` serves a page saying it isn't built.
+
+```
+cd internal/frontend
+pnpm install
+pnpm build
+cd -
+go build ./cmd/grendeld
+```
+
+When working on the UI itself, run `pnpm dev` in `internal/frontend` instead. It serves the UI with live reload and proxies API requests to a grendeld listening on `127.0.0.1:8080`.
+
+GoReleaser builds the UI automatically.
+
 Production builds will require building the iPXE submodule:
 
 >[!NOTE]

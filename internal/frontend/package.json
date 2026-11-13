@@ -5,9 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "rm -rf ../api/build",
     "build": "tsc -b && vite build",
-    "postbuild": "cp -r build ../api",
     "codegen": "openapi-ts",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
