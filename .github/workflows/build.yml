@@ -56,6 +56,19 @@ jobs:
         with:
           input: tests.json
 
+      # goreleaser's before hooks build the web UI with pnpm
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: internal/frontend/pnpm-lock.yaml
+
       - name: Run GoReleaser Snapshot
         uses: goreleaser/goreleaser-action@v6
         with:

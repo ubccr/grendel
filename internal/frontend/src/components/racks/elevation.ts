@@ -68,11 +68,31 @@ export function rackOrder(p: Placement): string[] {
     .filter(Boolean);
 }
 
-// sharedTags are the tags every node in the rack has, other than the rack tag itself, so they can be shown once instead of on every faceplate. A rack of one node has none, since nothing would be left to tell it apart
-export function sharedTags(hosts: Host[], rack: string): string[] {
-  if (hosts.length < 2) return [];
-  const [first, ...rest] = hosts;
-  return [...new Set(first.tags ?? [])]
-    .filter((t) => t !== `rack=${rack}` && rest.every((h) => h.tags?.includes(t)))
-    .sort();
+// RackTags sorts the tags of a rack's nodes, other than the rack tag itself, by how many nodes have them
+export type RackTags = {
+  // every are the tags every node has, so they can be shown once instead of on every faceplate. A rack of one node has none, since nothing would be left to tell it apart
+  every: string[];
+  // some are the tags on more than one node but not all, with how many have each, most common first. A tag on one node says nothing about the rack
+  some: [string, number][];
+};
+
+const byName = new Intl.Collator(undefined, { numeric: true }).compare;
+
+export function rackTags(hosts: Host[], rack: string): RackTags {
+  const counts = new Map<string, number>();
+  for (const h of hosts) for (const t of new Set(h.tags)) counts.set(t, (counts.get(t) ?? 0) + 1);
+  counts.delete(`rack=${rack}`);
+  const every: string[] = [];
+  const some: [string, number][] = [];
+  if (hosts.length < 2) return { every, some };
+  for (const [t, n] of counts) {
+    if (n === hosts.length) every.push(t);
+    else if (n > 1) some.push([t, n]);
+  }
+  return { every: every.sort(), some: some.sort(([a, x], [b, y]) => y - x || byName(a, b)) };
+}
+
+// hallRow is the row of the data hall a rack stands in, its name less the trailing number, so f01 and f12 share row f. A name with no trailing number, or nothing before it, has no row and gives ""
+export function hallRow(rack: string): string {
+  return rack.match(/^(.*?)[-_]?\d+$/)?.[1] ?? "";
 }

@@ -38,6 +38,28 @@ export function isFinished(state?: string) {
   return state === "completed" || state === "failed";
 }
 
+// LastProvisionCounts sums up how the last provisions of a group of nodes went, failures first, as "2 failed, 1 in progress, 18 completed"
+export function LastProvisionCounts({ statuses }: { statuses: ProvisionStatus[] }) {
+  const failed = statuses.filter((s) => s.state === "failed").length;
+  const running = statuses.filter((s) => s.state && !isFinished(s.state)).length;
+  const done = statuses.filter((s) => s.state === "completed").length;
+  return (
+    <>
+      {[
+        failed > 0 && (
+          <span key="f" className="text-destructive">
+            {failed} failed
+          </span>
+        ),
+        running > 0 && <span key="r">{running} in progress</span>,
+        done > 0 && <span key="d">{done} completed</span>,
+      ]
+        .filter(Boolean)
+        .flatMap((el, i) => (i ? [", ", el] : [el]))}
+    </>
+  );
+}
+
 export function ProvisionStateBadge({ state }: { state?: string }) {
   if (!state) return null;
   const label = stateLabels[state] ?? state;

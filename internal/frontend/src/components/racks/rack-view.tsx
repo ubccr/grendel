@@ -232,30 +232,38 @@ function Faceplate({
   );
 }
 
-// TagList shows the first max tags and folds the rest into a +N chip, which opens every tag in a hover card when hovered or focused, so a node with many tags keeps to its row
+// TagList shows the first max tags and folds the rest into a +N chip, which opens every tag in a hover card when hovered or focused, so a node with many tags keeps to its row. When linked, each tag opens the node list filtered by it
 export function TagList({
   tags,
   max,
   label,
   note,
+  linked,
   className,
 }: {
   tags: string[];
   max: number;
   label: string;
   note?: string;
+  linked?: boolean;
   className?: string;
 }) {
   const shown = tags.length > max ? tags.slice(0, max - 1) : tags;
   const hidden = tags.length - shown.length;
   const badge = "rounded-sm px-1.5 py-0 font-normal";
+  const tag = (t: string) => (
+    <Badge
+      key={t}
+      variant="secondary"
+      className={cn(badge, linked && "hover:bg-secondary/70")}
+      render={linked ? <Link to="/nodes" search={{ tags: [t] }} /> : undefined}
+    >
+      {t}
+    </Badge>
+  );
   return (
     <div className={cn("flex min-w-0 flex-wrap items-center justify-end gap-1", className)}>
-      {shown.map((t) => (
-        <Badge key={t} variant="secondary" className={badge}>
-          {t}
-        </Badge>
-      ))}
+      {shown.map(tag)}
       {hidden > 0 && (
         <HoverCard>
           <HoverCardTrigger
@@ -277,13 +285,7 @@ export function TagList({
             <p className="text-sm font-medium">
               {label} ({tags.length})
             </p>
-            <div className="flex flex-wrap gap-1">
-              {tags.map((t) => (
-                <Badge key={t} variant="secondary" className={badge}>
-                  {t}
-                </Badge>
-              ))}
-            </div>
+            <div className="flex flex-wrap gap-1">{tags.map(tag)}</div>
             {note && <p className="text-xs text-muted-foreground">{note}</p>}
           </HoverCardContent>
         </HoverCard>

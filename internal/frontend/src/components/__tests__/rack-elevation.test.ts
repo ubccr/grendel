@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  hallRow,
   placeNodes,
   rackOrder,
   rackRows,
   rackUnit,
-  sharedTags,
+  rackTags,
 } from "@/components/racks/elevation";
 
 const h = (name: string) => ({ name });
@@ -56,15 +57,43 @@ describe("rackOrder", () => {
   });
 });
 
-describe("sharedTags", () => {
-  it("finds the tags on every node, without the rack tag", () => {
+describe("rackTags", () => {
+  it("splits the tags on every node from those on some, without the rack tag", () => {
     const hosts = [
-      { name: "a", tags: ["rack=f01", "fern", "nvme", "gpu"] },
-      { name: "b", tags: ["nvme", "rack=f01", "fern"] },
+      { name: "a", tags: ["rack=f01", "fern", "nvme", "gpu", "ib"] },
+      { name: "b", tags: ["nvme", "rack=f01", "fern", "gpu"] },
+      { name: "c", tags: ["rack=f01", "fern", "nvme", "ib", "gpu"] },
+      { name: "d", tags: ["rack=f01", "fern", "nvme", "solo"] },
     ];
-    expect(sharedTags(hosts, "f01")).toEqual(["fern", "nvme"]);
+    expect(rackTags(hosts, "f01")).toEqual({
+      every: ["fern", "nvme"],
+      some: [
+        ["gpu", 3],
+        ["ib", 2],
+      ],
+    });
+  });
+  it("counts a tag a node repeats once", () => {
+    const hosts = [
+      { name: "a", tags: ["gpu", "gpu"] },
+      { name: "b", tags: [] },
+      { name: "c", tags: ["gpu"] },
+    ];
+    expect(rackTags(hosts, "f01").some).toEqual([["gpu", 2]]);
   });
   it("has none for a single node", () => {
-    expect(sharedTags([{ name: "a", tags: ["fern"] }], "f01")).toEqual([]);
+    expect(rackTags([{ name: "a", tags: ["fern"] }], "f01")).toEqual({ every: [], some: [] });
+  });
+});
+
+describe("hallRow", () => {
+  it("drops the trailing number", () => {
+    expect(hallRow("f01")).toBe("f");
+    expect(hallRow("rack-12")).toBe("rack");
+    expect(hallRow("b05_3")).toBe("b05");
+  });
+  it("gives no row when the name is all number or has none", () => {
+    expect(hallRow("12")).toBe("");
+    expect(hallRow("west")).toBe("");
   });
 });

@@ -3,8 +3,8 @@ import ActionsSheet from "@/components/actions-sheet";
 import NodeActions from "@/components/actions/nodes";
 import { DetailHeader, Fact, Unset } from "@/components/detail-header";
 import { ErrorPanel } from "@/components/error-panel";
-import { isFinished, statusesByNode } from "@/components/nodes/provision-status";
-import { placeNodes, rackOrder, sharedTags } from "@/components/racks/elevation";
+import { LastProvisionCounts, statusesByNode } from "@/components/nodes/provision-status";
+import { placeNodes, rackOrder, rackTags } from "@/components/racks/elevation";
 import { type Detail, RackElevation, TagList, UnplacedNodes } from "@/components/racks/rack-view";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -86,9 +86,6 @@ function RackFacts({
   statuses: ProvisionStatus[];
   common: string[];
 }) {
-  const failed = statuses.filter((s) => s.state === "failed").length;
-  const running = statuses.filter((s) => s.state && !isFinished(s.state)).length;
-  const done = statuses.filter((s) => s.state === "completed").length;
   const tags = [`rack=${rack}`];
 
   return (
@@ -119,17 +116,7 @@ function RackFacts({
       </Fact>
       {statuses.length > 0 && (
         <Fact label="Last provision">
-          {[
-            failed > 0 && (
-              <span key="f" className="text-destructive">
-                {failed} failed
-              </span>
-            ),
-            running > 0 && <span key="r">{running} in progress</span>,
-            done > 0 && <span key="d">{done} completed</span>,
-          ]
-            .filter(Boolean)
-            .flatMap((el, i) => (i ? [", ", el] : [el]))}
+          <LastProvisionCounts statuses={statuses} />
         </Fact>
       )}
       {common.length > 0 && (
@@ -148,7 +135,7 @@ function RackPage() {
   const hosts = data ?? [];
   const placement = useMemo(() => placeNodes(hosts), [hosts]);
   const order = useMemo(() => rackOrder(placement), [placement]);
-  const common = useMemo(() => sharedTags(hosts, rack), [hosts, rack]);
+  const common = useMemo(() => rackTags(hosts, rack).every, [hosts, rack]);
   const statusByNode = useMemo(() => statusesByNode(statuses), [statuses]);
   const [details, setDetails] = useDetails();
   const [selected, setSelected] = useState<Set<string>>(new Set());
