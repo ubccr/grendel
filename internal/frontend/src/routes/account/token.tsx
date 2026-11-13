@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -33,13 +34,14 @@ export const Route = createFileRoute("/account/token")({
   beforeLoad: AuthRedirect,
 });
 
-const EXPIRE_REGEX = /^[0-9]*[h,m,s]$|^infinite$/g;
+// one or more number-and-unit pairs, such as 30m or 1h30m, which time.ParseDuration on the server accepts, or "infinite". No g flag: zod reuses the regex, and a global regex keeps its lastIndex between tests, so a valid value would fail every other check
+const EXPIRE_REGEX = /^(\d+[hms])+$|^infinite$/;
 
 const reqSchema = z.object({
   username: z.string(),
   role: z.string(),
   expire: z.string().regex(EXPIRE_REGEX, {
-    message: "Invalid duration. Follow the Go time.ParseDuration sytax, ex: 30m",
+    message: "Invalid duration. Follow the Go time.ParseDuration syntax, ex: 30m",
   }),
 });
 
@@ -117,11 +119,7 @@ function RouteComponent() {
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
-                  {field.state.meta.errors ? (
-                    <em role="alert" className="text-red-600">
-                      {field.state.meta.errors.join(", ")}
-                    </em>
-                  ) : null}
+                  <FieldError errors={field.state.meta.errors} />
                 </div>
               )}
             />
@@ -131,16 +129,11 @@ function RouteComponent() {
                 <div>
                   <Label>Role:</Label>
                   <Input
-                    type="role"
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
-                  {field.state.meta.errors ? (
-                    <em role="alert" className="text-red-600">
-                      {field.state.meta.errors.join(", ")}
-                    </em>
-                  ) : null}
+                  <FieldError errors={field.state.meta.errors} />
                 </div>
               )}
             />
@@ -150,16 +143,11 @@ function RouteComponent() {
                 <div>
                   <Label>Expire:</Label>
                   <Input
-                    type="expire"
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
-                  {field.state.meta.errors ? (
-                    <em role="alert" className="text-red-600">
-                      {field.state.meta.errors.join(", ")}
-                    </em>
-                  ) : null}
+                  <FieldError errors={field.state.meta.errors} />
                 </div>
               )}
             />

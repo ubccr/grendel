@@ -63,12 +63,14 @@ func (h *Handler) AuthSignin(c fuego.ContextWithBody[AuthRequest]) (*AuthRespons
 		}
 	}
 
+	// an unknown user and a wrong password both fail VerifyUser, and both answer 401 so the client can tell bad credentials from a server fault
 	authenticated, role, err := h.DB.VerifyUser(body.Username, body.Password)
 	if err != nil {
 		return nil, fuego.HTTPError{
 			Err:    err,
 			Title:  "Authentication Error",
 			Detail: "failed to login, invalid credentials",
+			Status: http.StatusUnauthorized,
 		}
 	}
 	if !authenticated {
@@ -76,6 +78,7 @@ func (h *Handler) AuthSignin(c fuego.ContextWithBody[AuthRequest]) (*AuthRespons
 			Err:    errors.New("invalid credentials"),
 			Title:  "Authentication Error",
 			Detail: "failed to login, invalid credentials",
+			Status: http.StatusUnauthorized,
 		}
 	}
 
@@ -125,11 +128,7 @@ func (h *Handler) AuthSignup(c fuego.ContextWithBody[AuthSignupRequest]) (*AuthR
 
 	role, err := h.DB.StoreUser(body.Username, body.Password)
 	if err != nil {
-		return nil, fuego.HTTPError{
-			Err:    err,
-			Title:  "Authentication Error",
-			Detail: "failed to store user: " + body.Username,
-		}
+		return nil, storeUserError(err, body.Username, "Authentication Error")
 	}
 
 	exp := time.Now().Add(expireDuration)
@@ -331,7 +330,7 @@ func (h *Handler) AuthReset(c fuego.ContextWithBody[AuthResetRequest]) (*Generic
 		}
 	}
 
-	_, err = h.DB.StoreUser(username, body.NewPassword)
+	err = h.DB.UpdateUserPassword(username, body.NewPassword)
 	if err != nil {
 		return nil, fuego.HTTPError{
 			Err:    err,

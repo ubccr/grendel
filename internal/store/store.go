@@ -20,8 +20,11 @@ var (
 )
 
 type Store interface {
-	// StoreUser stores the User in the data store
+	// StoreUser creates a new user and returns its role. It fails with ErrDuplicateEntry when the username is taken, and never changes an existing account
 	StoreUser(username, password string) (string, error)
+
+	// UpdateUserPassword replaces the password of an existing user, failing with ErrNotFound when there is none
+	UpdateUserPassword(username, password string) error
 
 	// VerifyUser checks if the given username exists in the data store
 	VerifyUser(username, password string) (bool, string, error)

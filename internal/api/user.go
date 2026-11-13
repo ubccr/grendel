@@ -5,11 +5,14 @@
 package api
 
 import (
+	"errors"
 	"fmt"
+	"net/http"
 	"slices"
 	"strings"
 
 	"github.com/go-fuego/fuego"
+	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -154,15 +157,28 @@ func (h *Handler) UserStore(c fuego.ContextWithBody[UserStoreRequest]) (*UserSto
 
 	role, err := h.DB.StoreUser(body.Username, body.Password)
 	if err != nil {
-		return nil, fuego.HTTPError{
-			Err:    err,
-			Title:  "Error",
-			Detail: "failed to store user: " + body.Username,
-		}
+		return nil, storeUserError(err, body.Username, "Error")
 	}
 
 	return &UserStoreResponse{
 		Username: body.Username,
 		Role:     role,
 	}, nil
+}
+
+// storeUserError turns a failed StoreUser into an API error, a 409 when the username is already taken
+func storeUserError(err error, username, title string) error {
+	if errors.Is(err, store.ErrDuplicateEntry) {
+		return fuego.HTTPError{
+			Err:    err,
+			Title:  title,
+			Detail: "username already taken: " + username,
+			Status: http.StatusConflict,
+		}
+	}
+	return fuego.HTTPError{
+		Err:    err,
+		Title:  title,
+		Detail: "failed to store user: " + username,
+	}
 }

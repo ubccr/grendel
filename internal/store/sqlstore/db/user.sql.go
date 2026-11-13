@@ -27,12 +27,10 @@ func (q *Queries) UserCount(ctx context.Context, db DBTX) (int64, error) {
 }
 
 const userCreate = `-- name: UserCreate :one
-insert into user (username, password_hash, role_id, enabled) 
+insert into user (username, password_hash, role_id, enabled)
 select ?1, ?2, role.id, ?3
 from role
 where role.name = ?4
-on conflict (username)
-do update set password_hash = ?2
 returning id, username, role_id, password_hash, enabled, created_at, updated_at
 `
 
@@ -126,6 +124,43 @@ func (q *Queries) UserList(ctx context.Context, db DBTX) ([]UserView, error) {
 	return items, nil
 }
 
+const userRestore = `-- name: UserRestore :one
+insert into user (username, password_hash, role_id, enabled)
+select ?1, ?2, role.id, ?3
+from role
+where role.name = ?4
+on conflict (username)
+do update set password_hash = ?2
+returning id, username, role_id, password_hash, enabled, created_at, updated_at
+`
+
+type UserRestoreParams struct {
+	Username     string `json:"username"`
+	PasswordHash string `json:"password_hash"`
+	Enabled      bool   `json:"enabled"`
+	Role         string `json:"role"`
+}
+
+func (q *Queries) UserRestore(ctx context.Context, db DBTX, arg UserRestoreParams) (User, error) {
+	row := db.QueryRowContext(ctx, userRestore,
+		arg.Username,
+		arg.PasswordHash,
+		arg.Enabled,
+		arg.Role,
+	)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.RoleID,
+		&i.PasswordHash,
+		&i.Enabled,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const userUpdateEnable = `-- name: UserUpdateEnable :exec
 update user set enabled = ?1 where username = ?2
 returning id, username, role_id, password_hash, enabled, created_at, updated_at
@@ -139,6 +174,23 @@ type UserUpdateEnableParams struct {
 func (q *Queries) UserUpdateEnable(ctx context.Context, db DBTX, arg UserUpdateEnableParams) error {
 	_, err := db.ExecContext(ctx, userUpdateEnable, arg.Enabled, arg.Username)
 	return err
+}
+
+const userUpdatePassword = `-- name: UserUpdatePassword :execrows
+update user set password_hash = ?1 where username = ?2
+`
+
+type UserUpdatePasswordParams struct {
+	PasswordHash string `json:"password_hash"`
+	Username     string `json:"username"`
+}
+
+func (q *Queries) UserUpdatePassword(ctx context.Context, db DBTX, arg UserUpdatePasswordParams) (int64, error) {
+	result, err := db.ExecContext(ctx, userUpdatePassword, arg.PasswordHash, arg.Username)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
 
 const userUpdateRole = `-- name: UserUpdateRole :exec

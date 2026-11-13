@@ -15,7 +15,7 @@ import (
 	"strings"
 
 	null "github.com/guregu/null/v5"
-	_ "github.com/mattn/go-sqlite3"
+	sqlite3 "github.com/mattn/go-sqlite3"
 	"github.com/segmentio/ksuid"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -95,7 +95,7 @@ func New(filename string) (*SqlStore, error) {
 	return &SqlStore{rw: rw, ro: ro, q: db.New()}, nil
 }
 
-// StoreUser stores the User in the data store
+// StoreUser creates a new user and returns its role; it never touches an existing account, and returns store.ErrDuplicateEntry when the username is taken
 func (s *SqlStore) StoreUser(username, password string) (string, error) {
 	ctx := context.Background()
 
@@ -124,10 +124,35 @@ func (s *SqlStore) StoreUser(username, password string) (string, error) {
 		Enabled:      enabled,
 	})
 	if err != nil {
+		var sqliteErr sqlite3.Error
+		if errors.As(err, &sqliteErr) && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
+			return "", fmt.Errorf("user %s: %w", username, store.ErrDuplicateEntry)
+		}
 		return "", err
 	}
 
 	return role.String(), nil
+}
+
+// UpdateUserPassword replaces the password of an existing user, returning store.ErrNotFound when there is no such user
+func (s *SqlStore) UpdateUserPassword(username, password string) error {
+	hashed, err := bcrypt.GenerateFromPassword([]byte(password), 8)
+	if err != nil {
+		return err
+	}
+
+	n, err := s.q.UserUpdatePassword(context.Background(), s.rw, db.UserUpdatePasswordParams{
+		Username:     username,
+		PasswordHash: string(hashed),
+	})
+	if err != nil {
+		return err
+	}
+	if n == 0 {
+		return fmt.Errorf("user %s: %w", username, store.ErrNotFound)
+	}
+
+	return nil
 }
 
 // VerifyUser checks if the given username exists in the data store
@@ -883,7 +908,8 @@ func (s *SqlStore) RestoreFrom(data model.DataDump) error {
 	}
 
 	for _, user := range data.Users {
-		_, err := s.q.UserCreate(ctx, s.rw, db.UserCreateParams{
+		// restore runs against a live database, which always holds at least the user calling it, so a dumped user who already exists gets the dumped password rather than failing the restore
+		_, err := s.q.UserRestore(ctx, s.rw, db.UserRestoreParams{
 			Username:     user.Username,
 			Role:         user.Role,
 			Enabled:      user.Enabled,

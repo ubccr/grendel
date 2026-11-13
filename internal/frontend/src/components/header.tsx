@@ -24,27 +24,17 @@ export default function Header() {
 
   return (
     <div className="p-2 px-0">
-      <div className="flex justify-between gap-3 rounded-md border border-sidebar-border bg-sidebar p-1 align-middle">
+      <div
+        data-slot="app-header"
+        className="flex justify-between gap-3 rounded-md border border-sidebar-border bg-sidebar p-1 align-middle shadow-float"
+      >
         <SidebarTrigger className="my-auto" />
         <div className="flex gap-2">
           <ThemeSwitch />
           {!user ? (
-            <div className="flex gap-2">
-              <Button
-                variant="secondary"
-                render={<Link to="/account/signin" />}
-                nativeButton={false}
-              >
-                Login
-              </Button>
-              <Button
-                variant="secondary"
-                render={<Link to="/account/signup" />}
-                nativeButton={false}
-              >
-                Signup
-              </Button>
-            </div>
+            <Button variant="secondary" render={<Link to="/account/signin" />} nativeButton={false}>
+              Sign in
+            </Button>
           ) : (
             <DropdownMenu>
               <DropdownMenuTrigger

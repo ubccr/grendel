@@ -14,6 +14,9 @@ importers:
       '@fontsource-variable/geist':
         specifier: ^5.3.0
         version: 5.3.0
+      '@fontsource/unifrakturcook':
+        specifier: 5.3.0
+        version: 5.3.0
       '@monaco-editor/react':
         specifier: ^4.7.0
         version: 4.7.0(monaco-editor@0.57.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -348,6 +351,9 @@ packages:
 
   '@fontsource-variable/geist@5.3.0':
     resolution: {integrity: sha512-j0m+vLQuG5XAYoHtGCVu0spvlGreR3EzpECUVzkFmI1mTVnAO38l/NEPDCFgZ177JxzYJCLSmTQibIiYPilGrA==, tarball: https://registry.npmjs.org/@fontsource-variable/geist/-/geist-5.3.0.tgz}
+
+  '@fontsource/unifrakturcook@5.3.0':
+    resolution: {integrity: sha512-oOeUerPztcIBR6/+krMW4n/8VLF8A4NrjCNpR1C6F/C8JLekLMoSm5JzrxfPtyn5RtJdYQdTYigk4CtUCWxBCw==, tarball: https://registry.npmjs.org/@fontsource/unifrakturcook/-/unifrakturcook-5.3.0.tgz}
 
   '@hey-api/codegen-core@0.9.1':
     resolution: {integrity: sha512-s97jL1dgTMuiMHv2BZ1X4Tgd99Mf9GOvGdNqNcGwIMmnR+PgYNoraj4Zvp134MKsNCap/m7k0r0vKKnl56pj4w==, tarball: https://registry.npmjs.org/@hey-api/codegen-core/-/codegen-core-0.9.1.tgz}
@@ -3021,6 +3027,8 @@ snapshots:
   '@floating-ui/utils@0.2.12': {}
 
   '@fontsource-variable/geist@5.3.0': {}
+
+  '@fontsource/unifrakturcook@5.3.0': {}
 
   '@hey-api/codegen-core@0.9.1':
     dependencies:
