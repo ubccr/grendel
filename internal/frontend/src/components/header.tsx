@@ -30,19 +30,30 @@ export default function Header() {
           <ThemeSwitch />
           {!user ? (
             <div className="flex gap-2">
-              <Button variant="secondary" asChild>
-                <Link to="/account/signin">Login</Link>
+              <Button
+                variant="secondary"
+                render={<Link to="/account/signin" />}
+                nativeButton={false}
+              >
+                Login
               </Button>
-              <Button variant="secondary" asChild>
-                <Link to="/account/signup">Signup</Link>
+              <Button
+                variant="secondary"
+                render={<Link to="/account/signup" />}
+                nativeButton={false}
+              >
+                Signup
               </Button>
             </div>
           ) : (
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <div className="flex aspect-square size-9 cursor-pointer items-center justify-center rounded-lg bg-secondary text-primary">
-                  <UserRound className="size-4" />
-                </div>
+              <DropdownMenuTrigger
+                render={
+                  <div className="flex aspect-square size-9 cursor-pointer items-center justify-center rounded-lg bg-secondary text-primary" />
+                }
+                nativeButton={false}
+              >
+                <UserRound className="size-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="start">
                 <div className="flex gap-3 p-2">
@@ -55,13 +66,19 @@ export default function Header() {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuLabel>Account</DropdownMenuLabel>
                 <DropdownMenuGroup>
-                  <DropdownMenuItem className="cursor-pointer text-muted-foreground" asChild>
-                    <Link to="/account/token">API Token</Link>
+                  <DropdownMenuLabel>Account</DropdownMenuLabel>
+                  <DropdownMenuItem
+                    className="cursor-pointer text-muted-foreground"
+                    render={<Link to="/account/token" />}
+                  >
+                    API Token
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer text-muted-foreground" asChild>
-                    <Link to="/account/reset">Change Password</Link>
+                  <DropdownMenuItem
+                    className="cursor-pointer text-muted-foreground"
+                    render={<Link to="/account/reset" />}
+                  >
+                    Change Password
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="cursor-pointer text-muted-foreground"

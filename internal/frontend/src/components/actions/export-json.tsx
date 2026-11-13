@@ -18,19 +18,20 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { highlightJson } from "@/lib/highlight-json";
+import { useHighlightedCode } from "@/hooks/use-highlighted-code";
 import { cn } from "@/lib/utils";
 import { type QueryKey, useQuery, type UseQueryOptions } from "@tanstack/react-query";
 import { Download, FileJson } from "lucide-react";
-import { type ReactNode, useId, useMemo, useState } from "react";
+import { type ReactElement, useId, useMemo, useState } from "react";
 
 type Named = { name?: string };
 
-type Props<T extends Named> = {
-  trigger: ReactNode;
+// Props takes the query's error and key types from the caller, so generated options that throw the client's HttpError and carry their own key fit as is
+type Props<T extends Named, E, K extends QueryKey> = {
+  trigger: ReactElement;
   // noun is the CLI noun, so the dialog can name the import command: node or image
   noun: "node" | "image";
-  options: UseQueryOptions<T[] | undefined, Error, T[] | undefined, QueryKey>;
+  options: UseQueryOptions<T[], E, T[], K>;
 };
 
 // MAX_HIGHLIGHT is the most JSON that gets colored, so a very large export shows as plain text rather than stalling the page
@@ -59,7 +60,11 @@ function formatSize(bytes: number) {
 }
 
 // ExportJson shows records as the JSON the CLI's import command reads, to copy or save as a file. It only fetches while open, so the records are current each time
-export function ExportJson<T extends Named>({ trigger, noun, options }: Props<T>) {
+export function ExportJson<T extends Named, E, K extends QueryKey>({
+  trigger,
+  noun,
+  options,
+}: Props<T, E, K>) {
   const [open, setOpen] = useState(false);
   const [ids, setIds] = useState(false);
   const idsSwitch = useId();
@@ -71,10 +76,9 @@ export function ExportJson<T extends Named>({ trigger, noun, options }: Props<T>
     () => (data ? JSON.stringify(ids ? data : withoutIds(data), null, 2) : ""),
     [data, ids],
   );
-  const lines = useMemo(
-    () => (code.length > MAX_HIGHLIGHT ? code.split("\n") : highlightJson(code)),
-    [code],
-  );
+  const large = code.length > MAX_HIGHLIGHT;
+  const highlighted = useHighlightedCode(large ? "" : code, "json");
+  const lines = useMemo(() => (large ? code.split("\n") : highlighted), [large, code, highlighted]);
   const size = useMemo(() => new Blob([code]).size, [code]);
   const count = data?.length ?? 0;
   const plural = count === 1 ? noun : `${noun}s`;
@@ -91,7 +95,7 @@ export function ExportJson<T extends Named>({ trigger, noun, options }: Props<T>
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogTrigger render={trigger} />
       <DialogContent className="flex max-h-[calc(100dvh-2rem)] max-w-[calc(100%-2rem)] flex-col gap-4 overflow-hidden sm:max-w-4xl">
         <DialogHeader className="gap-1.5 pr-6">
           <DialogTitle>{data ? `Export ${count} ${plural}` : `Export ${noun}s`}</DialogTitle>
@@ -111,7 +115,7 @@ export function ExportJson<T extends Named>({ trigger, noun, options }: Props<T>
         >
           <Switch
             id={idsSwitch}
-            className="mt-0.5 data-[state=checked]:bg-amber-600"
+            className="mt-0.5 data-checked:bg-amber-600"
             checked={ids}
             onCheckedChange={setIds}
           />

@@ -19,11 +19,13 @@ export default function TemplateHelp({ example }: { example?: string }) {
 
   return (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-7 gap-1 px-2 text-muted-foreground">
-          <CircleHelp className="size-3.5" />
-          Template help
-        </Button>
+      <PopoverTrigger
+        render={
+          <Button variant="ghost" size="sm" className="h-7 gap-1 px-2 text-muted-foreground" />
+        }
+      >
+        <CircleHelp className="size-3.5" />
+        Template help
       </PopoverTrigger>
       <PopoverContent align="end" className="w-[26rem] text-sm">
         <div className="grid gap-3">

@@ -50,20 +50,19 @@ export default function ActionsSheet({ checked, length, children, type = "other"
   const router = useRouter();
   return (
     <Sheet onOpenChange={(open) => !open && router.invalidate()}>
-      <SheetTrigger asChild>
-        <Button variant="secondary" className="relative">
-          <Hammer />
-          <span className="sr-only md:not-sr-only">Actions</span>
-          {length > 0 && (
-            <span className="absolute -top-1 -right-1 flex size-4">
-              <span className="relative inline-flex size-full justify-center rounded-full bg-sky-400 text-xs text-black">
-                {Math.abs(length).toString().length > 2 ? "-" : length}
-              </span>
+      <SheetTrigger render={<Button variant="secondary" className="relative" />}>
+        <Hammer />
+        <span className="sr-only md:not-sr-only">Actions</span>
+        {length > 0 && (
+          <span className="absolute -top-1 -right-1 flex size-4">
+            <span className="relative inline-flex size-full justify-center rounded-full bg-sky-400 text-xs text-black">
+              {Math.abs(length).toString().length > 2 ? "-" : length}
             </span>
-          )}
-        </Button>
+          </span>
+        )}
       </SheetTrigger>
-      <SheetContent className="flex max-h-dvh w-full flex-col overflow-y-auto sm:max-w-2xl">
+      {/* Nova scopes the sheet width to its side, so the wider width has to be scoped the same way to win, and the body brings its own padding since only the header has any */}
+      <SheetContent className="flex max-h-dvh w-full flex-col overflow-y-auto data-[side=right]:sm:max-w-2xl">
         <SheetHeader>
           <SheetTitle>Actions</SheetTitle>
           <SheetDescription>
@@ -71,16 +70,18 @@ export default function ActionsSheet({ checked, length, children, type = "other"
             {length === 1 ? "" : "s"} selected
           </SheetDescription>
         </SheetHeader>
-        {checked && (
-          <Card className={`bg-muted/40 p-4 ${type === "node" ? "pt-2" : ""}`}>
-            {type === "node" ? (
-              <NodesetView nodes={checked} size="sm" />
-            ) : (
-              <SelectedItems checked={checked} />
-            )}
-          </Card>
-        )}
-        <div>{children}</div>
+        <div className="grid gap-4 px-4 pb-4">
+          {checked && (
+            <Card className={`bg-muted/40 p-4 ${type === "node" ? "pt-2" : ""}`}>
+              {type === "node" ? (
+                <NodesetView nodes={checked} size="sm" />
+              ) : (
+                <SelectedItems checked={checked} />
+              )}
+            </Card>
+          )}
+          <div>{children}</div>
+        </div>
       </SheetContent>
     </Sheet>
   );

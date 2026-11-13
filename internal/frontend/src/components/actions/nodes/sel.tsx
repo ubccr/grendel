@@ -41,10 +41,11 @@ export default function NodesSelAction({ nodes }: { nodes: string }) {
             Every entry in the system event log will be deleted on:
             <NodesetView nodes={nodes} />
           </ConfirmDialog>
-          <Button asChild>
-            <Link to="/nodes/sel/$nodes" params={{ nodes: nodes }}>
-              Open
-            </Link>
+          <Button
+            render={<Link to="/nodes/sel/$nodes" params={{ nodes: nodes }} />}
+            nativeButton={false}
+          >
+            Open
           </Button>
         </>
       }

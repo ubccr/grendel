@@ -3,7 +3,7 @@ import { ConfirmDialog } from "@/components/actions/action-card";
 import NodesetView from "@/components/nodeset-view";
 import { Button } from "@/components/ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { toastBmcResponse } from "@/lib/bmc";
 import { fold } from "@/lib/nodeset";
 import { expiry, groupFingerprint, hashName, type Coverage } from "@/lib/secureboot";
@@ -137,24 +137,24 @@ function Fingerprint({ value }: { value: string }) {
   };
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
+    <Tooltip>
+      <TooltipTrigger
+        render={
           <button
             type="button"
             onClick={copy}
             className="mt-1 inline-flex max-w-full items-center gap-1.5 rounded-sm font-mono text-xs text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-          >
-            <span className="truncate">{groupFingerprint(value.slice(0, 24))}…</span>
-            {copied ? <Check className="size-3 text-green-600" /> : <Copy className="size-3" />}
-            <span className="sr-only">Copy fingerprint</span>
-          </button>
-        </TooltipTrigger>
-        <TooltipContent className="max-w-sm font-mono break-all">
-          {groupFingerprint(value)}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+          />
+        }
+      >
+        <span className="truncate">{groupFingerprint(value.slice(0, 24))}…</span>
+        {copied ? <Check className="size-3 text-green-600" /> : <Copy className="size-3" />}
+        <span className="sr-only">Copy fingerprint</span>
+      </TooltipTrigger>
+      <TooltipContent className="max-w-sm font-mono break-all">
+        {groupFingerprint(value)}
+      </TooltipContent>
+    </Tooltip>
   );
 }
 

@@ -139,11 +139,9 @@ export default function EnrollDialog({ nodes, db: initial, onDone }: Props) {
         setOpen(next);
       }}
     >
-      <DialogTrigger asChild>
-        <Button>
-          <Plus />
-          Enroll key
-        </Button>
+      <DialogTrigger render={<Button />}>
+        <Plus />
+        Enroll key
       </DialogTrigger>
       <DialogContent className="max-h-dvh overflow-y-auto sm:max-w-xl">
         <DialogHeader>
@@ -202,7 +200,7 @@ export default function EnrollDialog({ nodes, db: initial, onDone }: Props) {
               )}
               {pems.length > 0 && (
                 <ul className="grid gap-2 rounded-lg border bg-muted/30 p-3 text-sm">
-                  {pems.map((p, i) => (
+                  {pems.map((_, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <FileKey className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
                       <div className="min-w-0">
@@ -225,7 +223,11 @@ export default function EnrollDialog({ nodes, db: initial, onDone }: Props) {
             <TabsContent value="hash" className="grid gap-3 pt-2">
               <div className="grid gap-1.5">
                 <Label htmlFor="enroll-hash-type">Type</Label>
-                <Select value={hashType} onValueChange={(v) => setHashType(v as SignatureType)}>
+                <Select
+                  value={hashType}
+                  onValueChange={(v) => setHashType(v as SignatureType)}
+                  items={signatureTypes.map((t) => ({ value: t, label: hashName(t) }))}
+                >
                   <SelectTrigger id="enroll-hash-type" className="w-56">
                     <SelectValue />
                   </SelectTrigger>
@@ -279,9 +281,7 @@ export default function EnrollDialog({ nodes, db: initial, onDone }: Props) {
         </div>
 
         <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="secondary">Cancel</Button>
-          </DialogClose>
+          <DialogClose render={<Button variant="secondary" />}>Cancel</DialogClose>
           <Button disabled={!ready || isPending} onClick={submit}>
             {isPending && <LoaderCircle className="animate-spin" />}
             {kind === "cert" && pems.length > 1 ? `Enroll ${pems.length} keys` : "Enroll key"}

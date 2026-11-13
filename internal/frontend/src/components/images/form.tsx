@@ -129,7 +129,7 @@ export default function ImageForm({ data, reset }: { data?: BootImage; reset?: b
                 <div className="flex h-9 items-center gap-2">
                   <Switch
                     id={id}
-                    className="data-[state=checked]:bg-emerald-600"
+                    className="data-checked:bg-emerald-600"
                     checked={field.state.value ?? false}
                     onBlur={field.handleBlur}
                     onCheckedChange={(e) => field.handleChange(e)}

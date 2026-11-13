@@ -8,10 +8,11 @@ export default function NodesSecureBootAction({ nodes }: { nodes: string }) {
       title="Secure Boot"
       description="Turn UEFI secure boot on or off, and see which nodes have each key."
       footer={
-        <Button asChild>
-          <Link to="/nodes/secureboot/$nodes" params={{ nodes }}>
-            Open
-          </Link>
+        <Button
+          render={<Link to="/nodes/secureboot/$nodes" params={{ nodes }} />}
+          nativeButton={false}
+        >
+          Open
         </Button>
       }
     />

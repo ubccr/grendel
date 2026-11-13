@@ -1,9 +1,5 @@
 import { getV1Nodes } from "@/client";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/animate-ui/primitives/radix/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +11,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import AuthRedirect from "@/lib/auth";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ChevronsUpDown, Copy, Info, SquareMenu, Zap, ZapOff } from "lucide-react";
@@ -90,18 +86,14 @@ function RouteComponent() {
             <CardTitle className="flex justify-between">
               <div>Filters</div>
               <Tooltip>
-                <TooltipProvider>
-                  <TooltipTrigger asChild>
-                    <Button type="button" size="icon" variant="secondary">
-                      <Info />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    Tags that are only on a single node per rack will not be displayed, however can
-                    still be filtered. <br />
-                    Tags with a count above them are only found on that number of nodes in a rack.
-                  </TooltipContent>
-                </TooltipProvider>
+                <TooltipTrigger render={<Button type="button" size="icon" variant="secondary" />}>
+                  <Info />
+                </TooltipTrigger>
+                <TooltipContent>
+                  Tags that are only on a single node per rack will not be displayed, however can
+                  still be filtered. <br />
+                  Tags with a count above them are only found on that number of nodes in a rack.
+                </TooltipContent>
               </Tooltip>
             </CardTitle>
           </CardHeader>
@@ -153,11 +145,9 @@ function RouteComponent() {
                   <Collapsible>
                     <div className="flex justify-end gap-2 align-middle">
                       <h4 className="my-auto text-sm font-semibold text-foreground">Nodeset</h4>
-                      <CollapsibleTrigger asChild>
-                        <Button variant="secondary" size="icon">
-                          <ChevronsUpDown />
-                          <span className="sr-only">Toggle Nodeset</span>
-                        </Button>
+                      <CollapsibleTrigger render={<Button variant="secondary" size="icon" />}>
+                        <ChevronsUpDown />
+                        <span className="sr-only">Toggle Nodeset</span>
                       </CollapsibleTrigger>
                       <Button
                         size="icon"
@@ -201,37 +191,49 @@ function RouteComponent() {
                       })}
                   </div>
                   <div className="flex gap-2">
-                    <Button className="relative" variant="secondary" size="icon" asChild>
-                      <Link
-                        to="/nodes"
-                        search={{
-                          provision: "true",
-                          tags: [`rack=${key}`],
-                        }}
-                      >
-                        <Zap className="text-green-600" />
-                        <span className="absolute -top-1.5 -right-2 flex min-w-4">
-                          <span className="relative inline-flex size-full justify-center rounded-full bg-sky-400 p-0.5 text-[10px] text-black">
-                            {value.Provision}
-                          </span>
+                    <Button
+                      className="relative"
+                      variant="secondary"
+                      size="icon"
+                      render={
+                        <Link
+                          to="/nodes"
+                          search={{
+                            provision: "true",
+                            tags: [`rack=${key}`],
+                          }}
+                        />
+                      }
+                      nativeButton={false}
+                    >
+                      <Zap className="text-green-600" />
+                      <span className="absolute -top-1.5 -right-2 flex min-w-4">
+                        <span className="relative inline-flex size-full justify-center rounded-full bg-sky-400 p-0.5 text-[10px] text-black">
+                          {value.Provision}
                         </span>
-                      </Link>
+                      </span>
                     </Button>
-                    <Button className="relative" variant="secondary" size="icon" asChild>
-                      <Link
-                        to="/nodes"
-                        search={{
-                          provision: "false",
-                          tags: [`rack=${key}`],
-                        }}
-                      >
-                        <ZapOff className="text-red-600" />
-                        <span className="absolute -top-1.5 -right-2 flex min-w-4">
-                          <span className="relative inline-flex size-full justify-center rounded-full bg-sky-400 p-0.5 text-[10px] text-black">
-                            {value.Unprovision}
-                          </span>
+                    <Button
+                      className="relative"
+                      variant="secondary"
+                      size="icon"
+                      render={
+                        <Link
+                          to="/nodes"
+                          search={{
+                            provision: "false",
+                            tags: [`rack=${key}`],
+                          }}
+                        />
+                      }
+                      nativeButton={false}
+                    >
+                      <ZapOff className="text-red-600" />
+                      <span className="absolute -top-1.5 -right-2 flex min-w-4">
+                        <span className="relative inline-flex size-full justify-center rounded-full bg-sky-400 p-0.5 text-[10px] text-black">
+                          {value.Unprovision}
                         </span>
-                      </Link>
+                      </span>
                     </Button>
                   </div>
                 </div>

@@ -76,7 +76,11 @@ export default function NodesOsPowerAction({ nodes }: { nodes: string }) {
       <div className="grid grid-cols-2 gap-2">
         <div className="grid gap-1.5">
           <Label htmlFor="power-option">Power</Label>
-          <Select value={powerOption} onValueChange={setPowerOption}>
+          <Select
+            value={powerOption}
+            onValueChange={(v) => setPowerOption(v ?? "")}
+            items={powerOptions}
+          >
             <SelectTrigger id="power-option">
               <SelectValue placeholder="Action" />
             </SelectTrigger>
@@ -91,7 +95,11 @@ export default function NodesOsPowerAction({ nodes }: { nodes: string }) {
         </div>
         <div className="grid gap-1.5">
           <Label htmlFor="boot-option">Boot</Label>
-          <Select value={bootOption} onValueChange={setBootOption}>
+          <Select
+            value={bootOption}
+            onValueChange={(v) => setBootOption(v ?? "")}
+            items={bootOptions}
+          >
             <SelectTrigger id="boot-option">
               <SelectValue />
             </SelectTrigger>

@@ -14,12 +14,12 @@ import { BiosAttribute, BiosValue, showValue } from "@/lib/bios";
 import { parseNodeSet } from "@/lib/nodeset";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Clock, Server, TriangleAlert } from "lucide-react";
-import { ReactNode } from "react";
+import { ReactElement, ReactNode } from "react";
 
 export type BiosChange = { name: string; attr?: BiosAttribute; from: BiosValue; to: BiosValue };
 
 type Props = {
-  trigger: ReactNode;
+  trigger: ReactElement;
   changes: BiosChange[];
   nodes: string;
   applyTime: string;
@@ -47,7 +47,7 @@ export default function ReviewDialog({
 
   return (
     <Dialog>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogTrigger render={trigger} />
       <DialogContent className="flex max-h-[90dvh] flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl">
         <DialogHeader className="gap-3 p-6 pb-4">
           <DialogTitle>Review BIOS changes</DialogTitle>
@@ -112,11 +112,9 @@ export default function ReviewDialog({
         )}
 
         <DialogFooter className="gap-2 p-6 pt-4">
-          <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DialogClose>
-          <DialogClose asChild>
-            <Button onClick={onConfirm}>Stage {changes.length} change(s)</Button>
+          <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
+          <DialogClose render={<Button onClick={onConfirm} />}>
+            Stage {changes.length} change(s)
           </DialogClose>
         </DialogFooter>
       </DialogContent>

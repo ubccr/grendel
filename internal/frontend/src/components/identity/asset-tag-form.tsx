@@ -106,12 +106,11 @@ export default function AssetTagForm({
     <div className="grid gap-4">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <ToggleGroup
-          type="single"
           variant="outline"
-          value={mode}
+          value={[mode]}
           onValueChange={(v) => {
-            if (!v) return;
-            setMode(v as "template" | "csv");
+            if (!v[0]) return;
+            setMode(v[0] as "template" | "csv");
             setPreview(undefined);
           }}
         >
@@ -246,6 +245,7 @@ function ColumnSelect({
       <Label className="text-xs">{label}</Label>
       <Select
         value={value >= 0 ? String(value) : undefined}
+        items={columns.map((c) => ({ value: String(c.i), label: c.label }))}
         onValueChange={(v) => onChange(Number(v))}
       >
         <SelectTrigger className="w-48">

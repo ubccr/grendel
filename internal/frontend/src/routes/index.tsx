@@ -9,7 +9,8 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <div className="flex justify-center">
-      <Card>
+      {/* the card needs a width of its own, because a Nova CardHeader is a size container and can't take its width from the title */}
+      <Card className="w-full max-w-lg">
         <CardHeader className="text-center">
           <CardTitle className="text-8xl">Grendel</CardTitle>
           <Separator />

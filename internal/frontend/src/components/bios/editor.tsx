@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   BiosAttribute,
   BiosValue,
@@ -152,164 +152,166 @@ export default function BiosEditor({
     );
 
   return (
-    <TooltipProvider>
-      <div className="grid gap-4">
-        {notice}
-        {!registry && (
-          <div className="flex items-start gap-2 rounded-md border border-dashed p-3 text-sm text-muted-foreground">
-            <TriangleAlert className="mt-0.5 size-4 shrink-0" />
-            This BMC publishes no attribute registry, so attributes are shown by their raw names
-            with no allowed values. The BMC still rejects a value it does not accept.
-          </div>
-        )}
+    <div className="grid gap-4">
+      {notice}
+      {!registry && (
+        <div className="flex items-start gap-2 rounded-md border border-dashed p-3 text-sm text-muted-foreground">
+          <TriangleAlert className="mt-0.5 size-4 shrink-0" />
+          This BMC publishes no attribute registry, so attributes are shown by their raw names with
+          no allowed values. The BMC still rejects a value it does not accept.
+        </div>
+      )}
 
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-          <div className="relative min-w-56 flex-1">
-            <Search className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
-            <Input
-              className="pl-8"
-              placeholder="Search every menu"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-          <Filter
-            id="bios-pending"
-            label="Pending only"
-            checked={pendingOnly}
-            onChange={setPendingOnly}
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+        <div className="relative min-w-56 flex-1">
+          <Search className="absolute top-2.5 left-2.5 size-4 text-muted-foreground" />
+          <Input
+            className="pl-8"
+            placeholder="Search every menu"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
-          {registry && (
-            <>
-              <Filter
-                id="bios-changed"
-                label="Changed from default"
-                checked={changedOnly}
-                onChange={setChangedOnly}
-              />
-              <Filter
-                id="bios-hidden"
-                label="Show hidden"
-                checked={showHidden}
-                onChange={setShowHidden}
-              />
-            </>
-          )}
         </div>
+        <Filter
+          id="bios-pending"
+          label="Pending only"
+          checked={pendingOnly}
+          onChange={setPendingOnly}
+        />
+        {registry && (
+          <>
+            <Filter
+              id="bios-changed"
+              label="Changed from default"
+              checked={changedOnly}
+              onChange={setChangedOnly}
+            />
+            <Filter
+              id="bios-hidden"
+              label="Show hidden"
+              checked={showHidden}
+              onChange={setShowHidden}
+            />
+          </>
+        )}
+      </div>
 
-        <div className="grid gap-4 md:grid-cols-[14rem_1fr]">
-          <nav className={cn("grid content-start gap-1", query && "opacity-50")}>
-            {sections.map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => {
-                  setSection(s);
-                  setSearch("");
-                }}
-                className={cn(
-                  "flex items-center justify-between rounded-md px-3 py-1.5 text-left text-sm hover:bg-muted",
-                  s === current && !query && "bg-muted font-medium",
-                )}
-              >
-                <span className="truncate">{s}</span>
-                <span className="text-xs text-muted-foreground">{counts.get(s)}</span>
-              </button>
-            ))}
-          </nav>
-
-          <Card>
-            <CardContent className="divide-y p-0">
-              {shown.length === 0 && (
-                <div className="p-6 text-center text-sm text-muted-foreground">
-                  No attributes match.
-                </div>
+      <div className="grid gap-4 md:grid-cols-[14rem_1fr]">
+        <nav className={cn("grid content-start gap-1", query && "opacity-50")}>
+          {sections.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => {
+                setSection(s);
+                setSearch("");
+              }}
+              className={cn(
+                "flex items-center justify-between rounded-md px-3 py-1.5 text-left text-sm hover:bg-muted",
+                s === current && !query && "bg-muted font-medium",
               )}
-              {shown.map((r) => (
-                <AttributeRow
-                  key={r.name}
-                  row={r}
-                  applied={values[r.name]}
-                  staged={pending[r.name]}
-                  isStaged={r.name in pending}
-                  value={r.name in edits ? edits[r.name] : effective(r.name)}
-                  edited={r.name in edits}
-                  onChange={(v) => edit(r.name, v)}
-                  onReset={() => edit(r.name, effective(r.name))}
-                />
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="sticky bottom-3 z-10 flex flex-wrap items-center justify-end gap-3 rounded-lg border bg-card/90 px-4 py-3 shadow-md backdrop-blur">
-          <span className="mr-auto text-sm text-muted-foreground">
-            {changes.length} change(s)
-            {pendingCount > 0 && ` · ${pendingCount} staged on the BMC`}
-          </span>
-          {pendingCount > 0 && (
-            <ConfirmDialog
-              trigger={
-                <Button variant="secondary" disabled={discard.isPending}>
-                  {discard.isPending && <LoaderCircle className="animate-spin" />}
-                  Discard pending
-                </Button>
-              }
-              onConfirm={() =>
-                discard.mutate(
-                  { query: { nodeset: nodes } },
-                  {
-                    onSuccess: (data) => {
-                      toastBmcResponse("Discard BIOS changes", data);
-                      onApplied();
-                    },
-                    onError: (e) => toast.error(e.title, { description: e.detail }),
-                  },
-                )
-              }
             >
-              Every staged BIOS change will be dropped on:
-              <NodesetView nodes={nodes} />
-            </ConfirmDialog>
-          )}
-          {applyTimes.length > 0 && (
-            <Select value={applyTime} onValueChange={setApplyTime}>
-              <SelectTrigger className="w-56" aria-label="Apply time">
-                <SelectValue placeholder="Apply time" />
-              </SelectTrigger>
-              <SelectContent>
-                {applyTimes.map((t) => (
-                  <SelectItem key={t} value={t}>
-                    {applyTimeLabels[t] ?? t}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-          <Button variant="ghost" disabled={changes.length === 0} onClick={() => setEdits({})}>
-            Reset
-          </Button>
-          <ReviewDialog
+              <span className="truncate">{s}</span>
+              <span className="text-xs text-muted-foreground">{counts.get(s)}</span>
+            </button>
+          ))}
+        </nav>
+
+        <Card>
+          <CardContent className="divide-y p-0">
+            {shown.length === 0 && (
+              <div className="p-6 text-center text-sm text-muted-foreground">
+                No attributes match.
+              </div>
+            )}
+            {shown.map((r) => (
+              <AttributeRow
+                key={r.name}
+                row={r}
+                applied={values[r.name]}
+                staged={pending[r.name]}
+                isStaged={r.name in pending}
+                value={r.name in edits ? edits[r.name] : effective(r.name)}
+                edited={r.name in edits}
+                onChange={(v) => edit(r.name, v)}
+                onReset={() => edit(r.name, effective(r.name))}
+              />
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="sticky bottom-3 z-10 flex flex-wrap items-center justify-end gap-3 rounded-lg border bg-card/90 px-4 py-3 shadow-md backdrop-blur">
+        <span className="mr-auto text-sm text-muted-foreground">
+          {changes.length} change(s)
+          {pendingCount > 0 && ` · ${pendingCount} staged on the BMC`}
+        </span>
+        {pendingCount > 0 && (
+          <ConfirmDialog
             trigger={
-              <Button disabled={changes.length === 0 || setBios.isPending}>
-                {setBios.isPending && <LoaderCircle className="animate-spin" />}
-                Review & apply
+              <Button variant="secondary" disabled={discard.isPending}>
+                {discard.isPending && <LoaderCircle className="animate-spin" />}
+                Discard pending
               </Button>
             }
-            changes={changes.map(([name, to]) => ({
-              name,
-              attr: rows.find((r) => r.name === name)?.attr,
-              from: effective(name),
-              to,
-            }))}
-            nodes={nodes}
-            applyTime={applyTime}
-            applyTimeLabel={applyTimeLabels[applyTime]}
-            onConfirm={apply}
-          />
-        </div>
+            onConfirm={() =>
+              discard.mutate(
+                { query: { nodeset: nodes } },
+                {
+                  onSuccess: (data) => {
+                    toastBmcResponse("Discard BIOS changes", data);
+                    onApplied();
+                  },
+                  onError: (e) => toast.error(e.title, { description: e.detail }),
+                },
+              )
+            }
+          >
+            Every staged BIOS change will be dropped on:
+            <NodesetView nodes={nodes} />
+          </ConfirmDialog>
+        )}
+        {applyTimes.length > 0 && (
+          <Select
+            value={applyTime}
+            onValueChange={(v) => setApplyTime(v ?? "")}
+            items={applyTimes.map((t) => ({ value: t, label: applyTimeLabels[t] ?? t }))}
+          >
+            <SelectTrigger className="w-56" aria-label="Apply time">
+              <SelectValue placeholder="Apply time" />
+            </SelectTrigger>
+            <SelectContent>
+              {applyTimes.map((t) => (
+                <SelectItem key={t} value={t}>
+                  {applyTimeLabels[t] ?? t}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+        <Button variant="ghost" disabled={changes.length === 0} onClick={() => setEdits({})}>
+          Reset
+        </Button>
+        <ReviewDialog
+          trigger={
+            <Button disabled={changes.length === 0 || setBios.isPending}>
+              {setBios.isPending && <LoaderCircle className="animate-spin" />}
+              Review & apply
+            </Button>
+          }
+          changes={changes.map(([name, to]) => ({
+            name,
+            attr: rows.find((r) => r.name === name)?.attr,
+            from: effective(name),
+            to,
+          }))}
+          nodes={nodes}
+          applyTime={applyTime}
+          applyTimeLabel={applyTimeLabels[applyTime]}
+          onConfirm={apply}
+        />
       </div>
-    </TooltipProvider>
+    </div>
   );
 }
 
@@ -376,9 +378,7 @@ function AttributeRow({
           <span className="font-medium">{attr?.display_name || name}</span>
           {attr?.help_text && (
             <Tooltip>
-              <TooltipTrigger asChild>
-                <CircleHelp className="size-3.5 text-muted-foreground" />
-              </TooltipTrigger>
+              <TooltipTrigger render={<CircleHelp className="size-3.5 text-muted-foreground" />} />
               <TooltipContent className="max-w-sm border bg-popover text-sm text-popover-foreground shadow-md">
                 {attr.help_text}
               </TooltipContent>
@@ -413,9 +413,9 @@ function AttributeRow({
         <span className="ml-2 flex w-5 shrink-0 justify-center">
           {!canEdit && kind !== "password" ? (
             <Tooltip>
-              <TooltipTrigger asChild>
-                <Lock className="size-4 text-muted-foreground" aria-label="Read only" />
-              </TooltipTrigger>
+              <TooltipTrigger
+                render={<Lock className="size-4 text-muted-foreground" aria-label="Read only" />}
+              />
               <TooltipContent className="border bg-popover text-sm text-popover-foreground shadow-md">
                 Read only
               </TooltipContent>
@@ -423,9 +423,14 @@ function AttributeRow({
           ) : (
             attr?.reset_required && (
               <Tooltip>
-                <TooltipTrigger asChild>
-                  <RotateCw className="size-4 text-muted-foreground" aria-label="Reboot required" />
-                </TooltipTrigger>
+                <TooltipTrigger
+                  render={
+                    <RotateCw
+                      className="size-4 text-muted-foreground"
+                      aria-label="Reboot required"
+                    />
+                  }
+                />
                 <TooltipContent className="border bg-popover text-sm text-popover-foreground shadow-md">
                   Reboot required
                 </TooltipContent>
@@ -469,7 +474,15 @@ function AttributeInput({
       const options = attr?.values ?? [];
       const current = String(value ?? "");
       return (
-        <Select value={current} disabled={disabled} onValueChange={onChange}>
+        <Select
+          value={current}
+          disabled={disabled}
+          onValueChange={onChange}
+          items={[
+            { value: current, label: current },
+            ...options.map((o) => ({ value: o.name ?? "", label: o.display_name || o.name })),
+          ]}
+        >
           <SelectTrigger className="w-full">
             <SelectValue />
           </SelectTrigger>

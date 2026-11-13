@@ -324,11 +324,9 @@ export function DataTable<TData extends RowData>({
         </div>
         <div className="flex flex-wrap justify-end gap-2">
           {add && (
-            <Button variant="secondary" asChild>
-              <Link to={add}>
-                <Plus />
-                <span className="sr-only sm:not-sr-only">Add</span>
-              </Link>
+            <Button variant="secondary" render={<Link to={add} />} nativeButton={false}>
+              <Plus />
+              <span className="sr-only sm:not-sr-only">Add</span>
             </Button>
           )}
           {/* use passed refresh func (tanstack query) or fallback to route cache invalidation*/}
@@ -378,7 +376,10 @@ export function DataTable<TData extends RowData>({
                 <TableRow className="border-0! hover:bg-transparent">
                   <TableCell className="relative h-0 p-0" colSpan={width}>
                     {progress && (
-                      <Progress className="absolute inset-x-0 top-0 z-10 h-0.5 rounded-none" />
+                      <Progress
+                        value={null}
+                        className="absolute inset-x-0 top-0 z-10 *:data-[slot=progress-track]:h-0.5 *:data-[slot=progress-track]:rounded-none"
+                      />
                     )}
                   </TableCell>
                 </TableRow>
@@ -433,7 +434,8 @@ const selectColumn: DisplayColumnDef<DataTableFeatures, any> = {
   header: ({ table }) => (
     <Checkbox
       aria-label="Select all"
-      checked={table.getIsAllRowsSelected() || (table.getIsSomeRowsSelected() && "indeterminate")}
+      checked={table.getIsAllRowsSelected()}
+      indeterminate={table.getIsSomeRowsSelected()}
       onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
     />
   ),
@@ -454,7 +456,8 @@ function SelectBox<TData extends RowData>({
   return (
     <Checkbox
       aria-label="Select row"
-      checked={checked || (row.getIsSomeSelected() && "indeterminate")}
+      checked={checked}
+      indeterminate={!checked && row.getIsSomeSelected()}
       onClick={(e) => {
         const value = !checked;
         const shown = table.getRowModel().rows;

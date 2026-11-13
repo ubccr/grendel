@@ -77,11 +77,9 @@ export default function ResetDialog({ nodes, onDone }: { nodes: string; onDone: 
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <RotateCcw />
-          Reset keys
-        </Button>
+      <DialogTrigger render={<Button variant="outline" />}>
+        <RotateCcw />
+        Reset keys
       </DialogTrigger>
       <DialogContent className="max-h-dvh overflow-y-auto sm:max-w-lg">
         <DialogHeader>
@@ -94,7 +92,7 @@ export default function ResetDialog({ nodes, onDone }: { nodes: string; onDone: 
             <Label
               key={t.value}
               htmlFor={`reset-${t.value}`}
-              className="flex cursor-pointer items-start gap-3 rounded-lg border p-3 font-normal has-[[data-state=checked]]:border-foreground"
+              className="flex cursor-pointer items-start gap-3 rounded-lg border p-3 font-normal has-data-checked:border-foreground"
             >
               <RadioGroupItem id={`reset-${t.value}`} value={t.value} className="mt-0.5" />
               <span className="grid gap-1">
@@ -109,7 +107,11 @@ export default function ResetDialog({ nodes, onDone }: { nodes: string; onDone: 
           <Label htmlFor="reset-scope">Databases</Label>
           <Select
             value={type === "delete-pk" ? "all" : scope}
-            onValueChange={setScope}
+            onValueChange={(v) => setScope(v ?? "all")}
+            items={{
+              all: "Every database",
+              ...Object.fromEntries(writable.map((d) => [d, `Only ${d}`])),
+            }}
             disabled={type === "delete-pk"}
           >
             <SelectTrigger id="reset-scope" className="w-48">
@@ -132,9 +134,7 @@ export default function ResetDialog({ nodes, onDone }: { nodes: string; onDone: 
         </div>
 
         <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="secondary">Cancel</Button>
-          </DialogClose>
+          <DialogClose render={<Button variant="secondary" />}>Cancel</DialogClose>
           <Button variant="destructive" disabled={isPending} onClick={run}>
             {isPending && <LoaderCircle className="animate-spin" />}
             {chosen.action}

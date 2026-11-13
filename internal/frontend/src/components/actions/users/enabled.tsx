@@ -22,7 +22,10 @@ export default function UsersEnabledAction({ users }: { users: string }) {
         <CardTitle>Change Enabled flag</CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-1 gap-2">
-        <Select onValueChange={(e) => setUserEnabled(e)}>
+        <Select
+          onValueChange={(v: string | null) => setUserEnabled(v ?? "")}
+          items={{ true: "True", false: "False" }}
+        >
           <SelectTrigger className="w-45">
             <SelectValue placeholder="Enabled" />
           </SelectTrigger>

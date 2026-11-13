@@ -377,11 +377,14 @@ function PanelLink({
   label: string;
 }) {
   return (
-    <Button asChild variant="ghost" size="sm">
-      <Link to={to} params={{ nodes: node }}>
-        {label}
-        <ArrowRight />
-      </Link>
+    <Button
+      variant="ghost"
+      size="sm"
+      render={<Link to={to} params={{ nodes: node }} />}
+      nativeButton={false}
+    >
+      {label}
+      <ArrowRight />
     </Button>
   );
 }

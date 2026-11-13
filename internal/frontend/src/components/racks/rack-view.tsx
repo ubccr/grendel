@@ -106,16 +106,20 @@ function ProvisionLed({ host }: { host: Host }) {
 function StatusCard({ status, node }: { status?: ProvisionStatus; node: string }) {
   if (!status?.state) return null;
   return (
-    <HoverCard openDelay={150} closeDelay={100}>
-      <HoverCardTrigger asChild>
-        <Link
-          to="/nodes/$node/provision"
-          params={{ node }}
-          aria-label={`Last provision of ${node}: ${status.state}`}
-          className="inline-flex rounded-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-        >
-          <ProvisionStateBadge state={status.state} />
-        </Link>
+    <HoverCard>
+      <HoverCardTrigger
+        delay={150}
+        closeDelay={100}
+        render={
+          <Link
+            to="/nodes/$node/provision"
+            params={{ node }}
+            aria-label={`Last provision of ${node}: ${status.state}`}
+            className="inline-flex rounded-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          />
+        }
+      >
+        <ProvisionStateBadge state={status.state} />
       </HoverCardTrigger>
       <HoverCardContent align="start" className="w-80">
         <ProvisionSummary status={status} node={node} />
@@ -241,17 +245,21 @@ export function TagList({
         </Badge>
       ))}
       {hidden > 0 && (
-        <HoverCard openDelay={150} closeDelay={100}>
-          <HoverCardTrigger asChild>
-            <button
-              type="button"
-              aria-label={`${label}: ${hidden} more`}
-              className="rounded-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-            >
-              <Badge variant="outline" className={cn(badge, "tabular-nums")}>
-                +{hidden}
-              </Badge>
-            </button>
+        <HoverCard>
+          <HoverCardTrigger
+            delay={150}
+            closeDelay={100}
+            render={
+              <button
+                type="button"
+                aria-label={`${label}: ${hidden} more`}
+                className="rounded-sm focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+              />
+            }
+          >
+            <Badge variant="outline" className={cn(badge, "tabular-nums")}>
+              +{hidden}
+            </Badge>
           </HoverCardTrigger>
           <HoverCardContent align="end" className="grid w-80 gap-2">
             <p className="text-sm font-medium">

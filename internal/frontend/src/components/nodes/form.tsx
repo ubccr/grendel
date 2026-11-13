@@ -67,7 +67,11 @@ function OptionSelect({
 }) {
   const all = value && !options.includes(value) ? [value, ...options] : options;
   return (
-    <Select value={value || unset} onValueChange={(v) => onChange(v === unset ? "" : v)}>
+    <Select
+      value={value || unset}
+      onValueChange={(v) => onChange(!v || v === unset ? "" : v)}
+      items={[{ value: unset, label: unsetLabel }, ...all.map((o) => ({ value: o, label: o }))]}
+    >
       <SelectTrigger id={id} className="w-full">
         <SelectValue />
       </SelectTrigger>
@@ -225,7 +229,7 @@ export default function NodeForm({ data, reset }: { data?: Host; reset?: boolean
                   <div className="flex h-9 items-center gap-2">
                     <Switch
                       id={id}
-                      className="data-[state=checked]:bg-emerald-600"
+                      className="data-checked:bg-emerald-600"
                       checked={field.state.value ?? false}
                       onBlur={field.handleBlur}
                       onCheckedChange={(e) => field.handleChange(e)}
@@ -240,7 +244,7 @@ export default function NodeForm({ data, reset }: { data?: Host; reset?: boolean
         {/* arch and firmware are detected when the node boots, so they start collapsed */}
         <Collapsible>
           <CollapsibleTrigger className="group inline-flex items-center gap-1 rounded-sm text-sm text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none">
-            <ChevronRight className="size-4 transition-transform group-data-[state=open]:rotate-90 motion-reduce:transition-none" />
+            <ChevronRight className="size-4 transition-transform group-data-panel-open:rotate-90 motion-reduce:transition-none" />
             Advanced
           </CollapsibleTrigger>
           <CollapsibleContent className="p-4">
@@ -476,19 +480,17 @@ export default function NodeForm({ data, reset }: { data?: Host; reset?: boolean
                             size="icon"
                             variant="ghost"
                             disabled={!nic?.fqdn}
-                            asChild={!!nic?.fqdn}
+                            nativeButton={!nic?.fqdn}
+                            render={
+                              nic?.fqdn ? (
+                                <a href={"https://" + nic.fqdn} target="_blank" rel="noreferrer" />
+                              ) : undefined
+                            }
                           >
-                            {nic?.fqdn ? (
-                              <a href={"https://" + nic.fqdn} target="_blank" rel="noreferrer">
-                                <ExternalLink />
-                                <span className="sr-only">Open {nic.fqdn}</span>
-                              </a>
-                            ) : (
-                              <>
-                                <ExternalLink />
-                                <span className="sr-only">Open FQDN</span>
-                              </>
-                            )}
+                            <ExternalLink />
+                            <span className="sr-only">
+                              {nic?.fqdn ? `Open ${nic.fqdn}` : "Open FQDN"}
+                            </span>
                           </Button>
                           <Button
                             type="button"

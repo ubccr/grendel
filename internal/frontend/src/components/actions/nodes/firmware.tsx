@@ -8,10 +8,11 @@ export default function NodesFirmwareAction({ nodes }: { nodes: string }) {
       title="Firmware Updates"
       description="Check the Dell catalog for firmware updates, then install them."
       footer={
-        <Button asChild>
-          <Link to="/nodes/dell-firmware/$nodes" params={{ nodes: nodes }}>
-            Open
-          </Link>
+        <Button
+          render={<Link to="/nodes/dell-firmware/$nodes" params={{ nodes: nodes }} />}
+          nativeButton={false}
+        >
+          Open
         </Button>
       }
     />

@@ -13,6 +13,7 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -224,7 +225,8 @@ function RackPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <label className="flex items-center gap-2 text-sm">
               <Checkbox
-                checked={all ? true : checked.length ? "indeterminate" : false}
+                checked={all}
+                indeterminate={!all && checked.length > 0}
                 onCheckedChange={() => setSelected(all ? new Set() : new Set(order))}
               />
               {checked.length ? (
@@ -240,26 +242,25 @@ function RackPage() {
               )}
             </label>
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="button" variant="secondary" size="sm">
-                  <Settings2 />
-                  Show
-                </Button>
+              <DropdownMenuTrigger render={<Button type="button" variant="secondary" size="sm" />}>
+                <Settings2 />
+                Show
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>On each node</DropdownMenuLabel>
-                {detailOptions.map(([key, label]) => (
-                  <DropdownMenuCheckboxItem
-                    key={key}
-                    checked={details.includes(key)}
-                    onSelect={(e) => e.preventDefault()}
-                    onCheckedChange={(on) =>
-                      setDetails(on ? [...details, key] : details.filter((d) => d !== key))
-                    }
-                  >
-                    {label}
-                  </DropdownMenuCheckboxItem>
-                ))}
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>On each node</DropdownMenuLabel>
+                  {detailOptions.map(([key, label]) => (
+                    <DropdownMenuCheckboxItem
+                      key={key}
+                      checked={details.includes(key)}
+                      onCheckedChange={(on) =>
+                        setDetails(on ? [...details, key] : details.filter((d) => d !== key))
+                      }
+                    >
+                      {label}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

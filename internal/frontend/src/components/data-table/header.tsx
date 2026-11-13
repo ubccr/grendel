@@ -10,7 +10,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { DataTableColumn } from "./features";
 
@@ -177,30 +177,30 @@ function TagsFilter({
         value={value}
         onValueChange={onValueChange}
       />
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
+      <Tooltip>
+        <TooltipTrigger
+          render={
             <Button
               type="button"
               size="icon"
               variant="ghost"
               className="size-6 text-muted-foreground"
-            >
-              <Info />
-              <span className="sr-only">Tag filter syntax</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            Valid search operators include: <br />
-            "example" filters for rows that contain example tag <br />
-            "!example" filters for rows that do not contain example tag <br />
-            "key=" matches any value with key <br />
-            "=value" matches any key with value <br />
-            "namespace:" matches any key and value in a namespace <br />
-            ":key" matches any namespace and value with that key <br />
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+            />
+          }
+        >
+          <Info />
+          <span className="sr-only">Tag filter syntax</span>
+        </TooltipTrigger>
+        <TooltipContent>
+          Valid search operators include: <br />
+          "example" filters for rows that contain example tag <br />
+          "!example" filters for rows that do not contain example tag <br />
+          "key=" matches any value with key <br />
+          "=value" matches any key with value <br />
+          "namespace:" matches any key and value in a namespace <br />
+          ":key" matches any namespace and value with that key <br />
+        </TooltipContent>
+      </Tooltip>
     </div>
   );
 }

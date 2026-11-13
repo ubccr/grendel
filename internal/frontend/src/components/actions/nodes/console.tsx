@@ -19,10 +19,11 @@ export default function NodesConsoleAction({ nodes }: { nodes: string }) {
       title="Serial Console"
       description="Watch the node boot or log in on its serial console, over IPMI SOL."
       footer={
-        <Button asChild>
-          <Link to="/nodes/$node/console" params={{ node: single }}>
-            Open
-          </Link>
+        <Button
+          render={<Link to="/nodes/$node/console" params={{ node: single }} />}
+          nativeButton={false}
+        >
+          Open
         </Button>
       }
     />

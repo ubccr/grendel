@@ -170,8 +170,14 @@ function RoleEditor({
             <Notice icon={Lock}>
               {name} is a built-in role, so its permissions can't be changed. To choose your own,
               add a role.
-              <Button asChild size="sm" variant="secondary" className="ml-auto">
-                <Link to="/add/role">Add role</Link>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="ml-auto"
+                render={<Link to="/add/role" />}
+                nativeButton={false}
+              >
+                Add role
               </Button>
             </Notice>
           ) : lost.length > 0 ? (
@@ -200,11 +206,10 @@ function RoleEditor({
               />
             </div>
             <ToggleGroup
-              type="single"
               variant="outline"
               size="sm"
-              value={show}
-              onValueChange={(v) => v && setShow(v as Show)}
+              value={[show]}
+              onValueChange={(v) => v[0] && setShow(v[0] as Show)}
               aria-label="Show permissions"
             >
               <ToggleGroupItem value="all">All</ToggleGroupItem>
@@ -352,7 +357,8 @@ function PermissionGroup({
         <Checkbox
           aria-label={`Grant every permission in ${group.name}`}
           disabled={locked}
-          checked={on === keys.length ? true : on ? "indeterminate" : false}
+          checked={on === keys.length}
+          indeterminate={on > 0 && on < keys.length}
           onCheckedChange={() => onSet(keys, on !== keys.length)}
         />
         <h2 className="text-sm font-semibold">{group.name}</h2>

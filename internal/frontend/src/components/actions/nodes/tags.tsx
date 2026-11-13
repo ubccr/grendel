@@ -52,7 +52,10 @@ export default function NodesTagsAction({ nodes }: { nodes: string }) {
         </Button>
       }
     >
-      <Select onValueChange={setAction}>
+      <Select
+        onValueChange={(v: string | null) => setAction(v ?? "")}
+        items={{ add: "Add", remove: "Remove" }}
+      >
         <SelectTrigger>
           <SelectValue placeholder="Add or remove" />
         </SelectTrigger>

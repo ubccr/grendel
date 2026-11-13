@@ -67,7 +67,11 @@ export default function NodesImportConfigAction({ nodes }: { nodes: string }) {
         </div>
         <div className="grid gap-1.5">
           <Label htmlFor="shutdown-type">Shutdown</Label>
-          <Select value={shutdownType} onValueChange={setShutdownType}>
+          <Select
+            value={shutdownType}
+            onValueChange={(v) => setShutdownType(v ?? "")}
+            items={shutdownTypes}
+          >
             <SelectTrigger id="shutdown-type">
               <SelectValue placeholder="Type" />
             </SelectTrigger>

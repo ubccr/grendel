@@ -132,6 +132,7 @@ function RouteComponent() {
           </div>
           <Select
             value={limit}
+            items={limits.map((l) => ({ value: l, label: l === "0" ? "All" : l }))}
             onValueChange={(value) => navigate({ search: { limit: value as typeof limit } })}
           >
             <SelectTrigger id="sel-limit" className="w-[110px]">

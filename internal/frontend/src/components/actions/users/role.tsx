@@ -30,7 +30,7 @@ export default function UsersRoleAction({ users }: { users: string }) {
         {isFetching ? (
           <LoaderCircle className="animate-spin" />
         ) : (
-          <Select onValueChange={(e) => setUserRole(e)}>
+          <Select onValueChange={(v: string | null) => setUserRole(v ?? "")}>
             <SelectTrigger className="w-45">
               <SelectValue placeholder="Action" />
             </SelectTrigger>

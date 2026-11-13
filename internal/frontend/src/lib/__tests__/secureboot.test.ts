@@ -29,7 +29,8 @@ describe("pem", () => {
   it("fingerprints the DER inside the PEM", async () => {
     const fp = await fingerprint(derToPem(der));
     const sum = await crypto.subtle.digest("SHA-256", der);
-    expect(fp).toBe(Buffer.from(sum).toString("hex"));
+    const hex = Array.from(new Uint8Array(sum), (b) => b.toString(16).padStart(2, "0")).join("");
+    expect(fp).toBe(hex);
   });
 });
 

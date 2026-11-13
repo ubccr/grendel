@@ -92,11 +92,9 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" variant="floating" side="left">
       <SidebarHeader>
-        <SidebarMenuButton asChild>
-          <Link to="/">
-            <img src={favicon} className="h-6 w-4" />
-            <span>Grendel</span>
-          </Link>
+        <SidebarMenuButton render={<Link to="/" />}>
+          <img src={favicon} className="h-6 w-4" />
+          <span>Grendel</span>
         </SidebarMenuButton>
       </SidebarHeader>
       <SidebarContent>
@@ -107,18 +105,18 @@ export function AppSidebar() {
               <SidebarMenu>
                 {group.items.map((item, x) => (
                   <SidebarMenuItem key={x}>
-                    <SidebarMenuButton asChild>
-                      <Link to={item.url} activeProps={{ className: "font-bold border" }}>
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </Link>
+                    <SidebarMenuButton
+                      render={
+                        <Link to={item.url} activeProps={{ className: "font-bold border" }} />
+                      }
+                    >
+                      <item.icon />
+                      <span>{item.title}</span>
                     </SidebarMenuButton>
                     {item.action && (
-                      <SidebarMenuAction asChild>
-                        <Link to={item.action.url}>
-                          <item.action.icon />
-                          <span className="sr-only">{item.action.title}</span>
-                        </Link>
+                      <SidebarMenuAction render={<Link to={item.action.url} />}>
+                        <item.action.icon />
+                        <span className="sr-only">{item.action.title}</span>
                       </SidebarMenuAction>
                     )}
                   </SidebarMenuItem>

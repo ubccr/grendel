@@ -72,11 +72,9 @@ function Code({ children }: { children: ReactNode }) {
 export function TemplateHelp() {
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button type="button" variant="secondary" size="icon">
-          <Info />
-          <span className="sr-only">Template syntax</span>
-        </Button>
+      <DialogTrigger render={<Button type="button" variant="secondary" size="icon" />}>
+        <Info />
+        <span className="sr-only">Template syntax</span>
       </DialogTrigger>
       <DialogContent className="max-h-[85dvh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>

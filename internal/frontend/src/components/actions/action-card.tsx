@@ -49,7 +49,7 @@ export function ActionSection({ title }: { title: string }) {
 }
 
 type confirmProps = {
-  trigger: React.ReactNode;
+  trigger: React.ReactElement;
   children: React.ReactNode;
   onConfirm: () => void;
 };
@@ -58,23 +58,17 @@ type confirmProps = {
 export function ConfirmDialog({ trigger, children, onConfirm }: confirmProps) {
   return (
     <Dialog>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogTrigger render={trigger} />
       <DialogContent className="max-h-dvh overflow-scroll">
         <DialogHeader>
           <DialogTitle>Are you sure?</DialogTitle>
-          <DialogDescription asChild>
-            <div>{children}</div>
-          </DialogDescription>
+          <DialogDescription render={<div />}>{children}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="destructive" onClick={onConfirm}>
-              Confirm
-            </Button>
+          <DialogClose render={<Button variant="destructive" onClick={onConfirm} />}>
+            Confirm
           </DialogClose>
-          <DialogClose asChild>
-            <Button>Cancel</Button>
-          </DialogClose>
+          <DialogClose render={<Button />}>Cancel</DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>

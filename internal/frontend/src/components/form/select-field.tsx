@@ -28,7 +28,12 @@ export function SelectField({ label, placeholder, description, items }: props) {
         {description && <FieldDescription>{description}</FieldDescription>}
         {isInvalid && <FieldError errors={field.state.meta.errors} />}
       </FieldContent>
-      <Select name={field.name} value={field.state.value} onValueChange={field.handleChange}>
+      <Select
+        name={field.name}
+        value={field.state.value}
+        items={itemArray.map(([value, label]) => ({ value, label }))}
+        onValueChange={(v) => field.handleChange(v ?? "")}
+      >
         <SelectTrigger aria-invalid={isInvalid}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

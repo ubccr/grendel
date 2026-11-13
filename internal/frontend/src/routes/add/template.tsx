@@ -58,7 +58,10 @@ function RouteComponent() {
               children={(field) => (
                 <div>
                   <Label>Type:</Label>
-                  <Select value={field.state.value} onValueChange={(e) => field.handleChange(e)}>
+                  <Select
+                    value={field.state.value}
+                    onValueChange={(v) => field.handleChange(v ?? "")}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -90,7 +93,10 @@ function RouteComponent() {
               children={(field) => (
                 <div>
                   <Label>Language:</Label>
-                  <Select value={field.state.value} onValueChange={(e) => field.handleChange(e)}>
+                  <Select
+                    value={field.state.value}
+                    onValueChange={(v) => field.handleChange(v ?? "")}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>

@@ -3,6 +3,8 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { client } from "./client/client.gen.ts";
 import { ThemeProvider } from "./hooks/theme-provider.tsx";
+// Geist is imported here rather than from main.css, because the Tailwind PostCSS plugin inlines CSS imports without rebasing their font urls
+import "@fontsource-variable/geist";
 import "./main.css";
 
 import { RouterProvider, createRouter } from "@tanstack/react-router";

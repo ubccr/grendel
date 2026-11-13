@@ -11,10 +11,11 @@ export default function NodesJobsAction({ nodes }: { nodes: string }) {
       footer={
         <>
           <JobsClearDialog allNodes={nodes} />
-          <Button asChild>
-            <Link to="/nodes/jobs/$nodes" params={{ nodes: nodes }}>
-              Open
-            </Link>
+          <Button
+            render={<Link to="/nodes/jobs/$nodes" params={{ nodes: nodes }} />}
+            nativeButton={false}
+          >
+            Open
           </Button>
         </>
       }
