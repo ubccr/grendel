@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import z from "zod";
 
 export const Route = createFileRoute("/add/image")({
+  staticData: { crumb: [{ label: "Images", to: "/images" }, "Add image"] },
   component: RouteComponent,
   validateSearch: z.object({
     tab: z.string().optional().catch("form"),

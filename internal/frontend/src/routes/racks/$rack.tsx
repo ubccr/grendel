@@ -23,6 +23,7 @@ import { RefreshCw, Server, Settings2 } from "lucide-react";
 import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
 export const Route = createFileRoute("/racks/$rack")({
+  staticData: { crumb: { param: "rack" } },
   component: RackPage,
   beforeLoad: AuthRedirect,
   // the statuses load with the nodes so a refresh reloads both. The client throws on an error, so a failed status request is caught here and only leaves the badges off, as for a role without that permission

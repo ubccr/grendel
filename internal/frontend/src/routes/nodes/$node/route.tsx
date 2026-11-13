@@ -6,15 +6,25 @@ import { NodeFacts } from "@/components/nodes/plate";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import AuthRedirect from "@/lib/auth";
-import { createFileRoute, Link, notFound, Outlet, useRouter } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  notFound,
+  Outlet,
+  retainSearchParams,
+  useRouter,
+} from "@tanstack/react-router";
 import { RefreshCw } from "lucide-react";
 import { z } from "zod";
 
 export const Route = createFileRoute("/nodes/$node")({
+  staticData: { crumb: { param: "node" } },
   component: RouteComponent,
   validateSearch: z.object({
-    tab: z.string().optional().catch("node"),
+    // from is the rack a node was opened from, which the breadcrumbs show in place of the node list; it is kept while moving between the node's tabs
+    from: z.string().optional(),
   }),
+  search: { middlewares: [retainSearchParams(["from"])] },
   beforeLoad: AuthRedirect,
   loader: async ({ params: { node } }) => {
     const res = await getV1NodesFind({ query: { nodeset: node } });

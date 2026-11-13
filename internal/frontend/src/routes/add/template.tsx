@@ -15,6 +15,7 @@ import { useForm } from "@tanstack/react-form";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/add/template")({
+  staticData: { crumb: [{ label: "Templates", to: "/templates" }, "Add template"] },
   component: RouteComponent,
   beforeLoad: AuthRedirect,
 });

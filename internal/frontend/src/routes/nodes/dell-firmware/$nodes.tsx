@@ -21,6 +21,7 @@ import { CircleAlert, OctagonAlert, TriangleAlert } from "lucide-react";
 type NodeFirmware = NonNullable<BmcResponseModelBmcFirmwareUpdates["results"]>[number];
 
 export const Route = createFileRoute("/nodes/dell-firmware/$nodes")({
+  staticData: { crumb: ["Dell firmware", { param: "nodes" }] },
   component: RouteComponent,
   beforeLoad: AuthRedirect,
   loader: async ({ params: { nodes } }) => getV1BmcFirmwareUpdates({ query: { nodeset: nodes } }),

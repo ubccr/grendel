@@ -30,6 +30,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 export const Route = createFileRoute("/account/token")({
+  staticData: { crumb: "API token" },
   component: RouteComponent,
   beforeLoad: AuthRedirect,
 });

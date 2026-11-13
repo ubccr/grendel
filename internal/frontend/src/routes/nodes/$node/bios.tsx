@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/nodes/$node/bios")({
+  staticData: { crumb: "BIOS" },
   component: RouteComponent,
   loader: ({ params: { node } }) => getV1BmcBios({ query: { nodeset: node } }),
   staleTime: 30_000,

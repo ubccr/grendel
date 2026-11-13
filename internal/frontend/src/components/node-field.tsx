@@ -2,12 +2,13 @@ import { useEffect, useRef } from "react";
 
 type Props = { full: boolean };
 
-// cell colours per theme; the field is drawn straight onto the page background
-const PALETTES = {
-  light: { off: "#e4e9e6", amber: "#e39b2d", blue: "#3b7fc4", ready: "#3aa776" },
-  dark: { off: "#2d3531", amber: "#e8a33d", blue: "#6ea8e6", ready: "#7fd1ae" },
+// cell colours come from the --node-* variables in main.css, so they change with the theme; they are hex so mix can blend them
+type Palette = { off: string; amber: string; blue: string; ready: string };
+const readPalette = (root: HTMLElement): Palette => {
+  const css = getComputedStyle(root);
+  const get = (name: string) => css.getPropertyValue(`--node-${name}`).trim();
+  return { off: get("off"), amber: get("amber"), blue: get("blue"), ready: get("ready") };
 };
-type Palette = (typeof PALETTES)["light"];
 
 const PITCH = 23;
 const CELL = 14;
@@ -117,8 +118,7 @@ export function NodeField({ full }: Props) {
 
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const root = document.documentElement;
-    const palette = () => (root.classList.contains("dark") ? PALETTES.dark : PALETTES.light);
-    let P = palette();
+    let P = readPalette(root);
     let w = 0;
     let h = 0;
     let dpr = 1;
@@ -258,7 +258,7 @@ export function NodeField({ full }: Props) {
 
     // the theme switch toggles a class on the root element
     const themeObserver = new MutationObserver(() => {
-      P = palette();
+      P = readPalette(root);
       if (still) {
         measure();
         render(0);

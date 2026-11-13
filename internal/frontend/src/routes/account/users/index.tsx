@@ -12,6 +12,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type { DataTableColumnDef } from "@/components/data-table/features";
 
 export const Route = createFileRoute("/account/users/")({
+  staticData: { crumb: "Users" },
   component: RouteComponent,
   beforeLoad: AuthRedirect,
   loader: () => getV1Users(),

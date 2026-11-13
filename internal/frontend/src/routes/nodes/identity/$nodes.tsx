@@ -12,6 +12,7 @@ import { useMemo } from "react";
 import { z } from "zod";
 
 export const Route = createFileRoute("/nodes/identity/$nodes")({
+  staticData: { crumb: ["Identity", { param: "nodes" }] },
   component: RouteComponent,
   beforeLoad: AuthRedirect,
   validateSearch: z.object({

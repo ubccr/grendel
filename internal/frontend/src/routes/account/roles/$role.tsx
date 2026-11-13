@@ -29,6 +29,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/account/roles/$role")({
+  staticData: { crumb: { param: "role" } },
   component: RouteComponent,
   beforeLoad: AuthRedirect,
   // the server answers an unknown role with an error, and the client throws on one, so it is caught here and shown in the page

@@ -1,105 +1,38 @@
-import { deleteV1AuthSignoutMutation } from "@/client/@tanstack/react-query.gen";
-import { useUser } from "@/hooks/user-provider";
-import { useMutation } from "@tanstack/react-query";
-import { Link, useRouter } from "@tanstack/react-router";
-import { UserRound } from "lucide-react";
-import { toast } from "sonner";
-import { ThemeSwitch } from "./theme-switch";
-import { Button } from "./ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+import { MotionConfig, motion } from "motion/react";
+import { AppBreadcrumbs, useCrumbs } from "./app-breadcrumbs";
+import { Separator } from "./ui/separator";
 import { SidebarTrigger } from "./ui/sidebar";
 
+// Header is a small island at the top left of the page, beside the sidebar, holding the sidebar toggle and where you are. It is only as wide as the breadcrumb and grows or shrinks with it as you move around; the theme and account live in the sidebar footer
 export default function Header() {
-  const { user, setUser } = useUser();
-  const router = useRouter();
-  const { mutate } = useMutation(deleteV1AuthSignoutMutation());
-
+  const crumbs = useCrumbs();
   return (
-    <div className="p-2 px-0">
-      <div
-        data-slot="app-header"
-        className="flex justify-between gap-3 rounded-md border border-sidebar-border bg-sidebar p-1 align-middle shadow-float"
-      >
-        <SidebarTrigger className="my-auto" />
-        <div className="flex gap-2">
-          <ThemeSwitch />
-          {!user ? (
-            <Button variant="secondary" render={<Link to="/account/signin" />} nativeButton={false}>
-              Sign in
-            </Button>
-          ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <div className="flex aspect-square size-9 cursor-pointer items-center justify-center rounded-lg bg-secondary text-primary" />
-                }
-                nativeButton={false}
-              >
-                <UserRound className="size-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="start">
-                <div className="flex gap-3 p-2">
-                  <div className="flex aspect-square size-11 items-center justify-center rounded-lg bg-secondary text-primary">
-                    <UserRound className="size-4" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="">{user?.username}</span>
-                    <span className="text-sm text-muted-foreground">{user?.role}</span>
-                  </div>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuLabel>Account</DropdownMenuLabel>
-                  <DropdownMenuItem
-                    className="cursor-pointer text-muted-foreground"
-                    render={<Link to="/account/token" />}
-                  >
-                    API Token
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer text-muted-foreground"
-                    render={<Link to="/account/reset" />}
-                  >
-                    Change Password
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer text-muted-foreground"
-                    onClick={() => {
-                      mutate(
-                        {},
-                        {
-                          onSuccess: (data) => {
-                            setUser(null);
-                            toast.success(data?.title, {
-                              description: data?.detail,
-                            });
-                            router.invalidate();
-                          },
-                          onError: (e) => {
-                            toast.error(e.title, {
-                              description: e.detail,
-                            });
-                          },
-                        },
-                      );
-                    }}
-                  >
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-        </div>
+    <MotionConfig reducedMotion="user">
+      <div className="my-2 flex">
+        {/* the radius matches the sidebar and cards' rounded-xl, var(--radius) + 4px; it is set as a style in pixels because motion only keeps a radius steady while the island changes size when it can read it there */}
+        <motion.header
+          layout
+          transition={{ type: "spring", bounce: 0.15, duration: 0.45 }}
+          style={{ borderRadius: 14 }}
+          data-slot="app-header"
+          className="flex h-10 max-w-full min-w-0 items-center bg-sidebar px-1 text-sidebar-foreground shadow-float ring-1 ring-sidebar-border"
+        >
+          {/* children of a layout animation are kept unstretched by giving them a layout of their own */}
+          <motion.div layout="position" className="flex min-w-0 items-center gap-2">
+            <SidebarTrigger />
+            {/* the divider comes with the crumbs, so the island is just the toggle when there are none */}
+            {crumbs.length > 0 && (
+              <>
+                <Separator
+                  orientation="vertical"
+                  className="data-vertical:h-4 data-vertical:self-center"
+                />
+                <AppBreadcrumbs crumbs={crumbs} className="pr-3" />
+              </>
+            )}
+          </motion.div>
+        </motion.header>
       </div>
-    </div>
+    </MotionConfig>
   );
 }

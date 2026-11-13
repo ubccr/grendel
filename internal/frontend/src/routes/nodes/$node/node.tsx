@@ -2,6 +2,7 @@ import NodeForm from "@/components/nodes/form";
 import { createFileRoute, useLoaderData } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/nodes/$node/node")({
+  staticData: { crumb: "Node" },
   component: RouteComponent,
 });
 

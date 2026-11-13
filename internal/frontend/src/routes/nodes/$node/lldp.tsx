@@ -4,6 +4,7 @@ import { DataTableColumnHeader } from "@/components/data-table/header";
 import { createFileRoute } from "@tanstack/react-router";
 import type { DataTableColumnDef } from "@/components/data-table/features";
 export const Route = createFileRoute("/nodes/$node/lldp")({
+  staticData: { crumb: "LLDP" },
   component: RouteComponent,
   loader: ({ params: { node } }) => getV1SwitchNodesetLldp({ path: { nodeset: node } }),
 });

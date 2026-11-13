@@ -17,6 +17,7 @@ import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/add/role")({
+  staticData: { crumb: [{ label: "Roles", to: "/account/roles" }, "Add role"] },
   component: RouteComponent,
 });
 

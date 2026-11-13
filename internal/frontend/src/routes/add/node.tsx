@@ -15,6 +15,7 @@ import z from "zod";
 import { themeToMonaco } from "../../hooks/theme-provider";
 
 export const Route = createFileRoute("/add/node")({
+  staticData: { crumb: [{ label: "Nodes", to: "/nodes" }, "Add node"] },
   component: RouteComponent,
   validateSearch: z.object({
     tab: z.string().optional().catch("form"),

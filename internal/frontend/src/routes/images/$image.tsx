@@ -13,6 +13,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ImageOff } from "lucide-react";
 
 export const Route = createFileRoute("/images/$image")({
+  staticData: { crumb: { param: "image" } },
   component: RouteComponent,
   beforeLoad: AuthRedirect,
   loader: ({ params: { image } }) => getV1ImagesFind({ query: { names: image } }),

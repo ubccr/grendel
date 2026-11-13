@@ -53,6 +53,7 @@ const columns: DataTableColumnDef<nodeJob, any>[] = [
 ];
 
 export const Route = createFileRoute("/nodes/jobs/$nodes")({
+  staticData: { crumb: ["Jobs", { param: "nodes" }] },
   component: RouteComponent,
   beforeLoad: AuthRedirect,
   loader: async ({ params: { nodes } }) => getV1BmcJobs({ query: { nodeset: nodes } }),

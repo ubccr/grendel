@@ -11,6 +11,7 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { ServerOff, type LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/nodes/secureboot/$nodes")({
+  staticData: { crumb: ["Secure boot", { param: "nodes" }] },
   component: RouteComponent,
   beforeLoad: AuthRedirect,
   // one request reads the state and the keys over a single login to each BMC

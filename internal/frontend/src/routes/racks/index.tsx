@@ -175,17 +175,21 @@ function RouteComponent() {
                         if (count < 2 || tag === `rack=${value.Rack}`) return;
 
                         return (
-                          <Link key={tag} to="/nodes" search={{ tags: [`rack=${key}`, tag] }}>
-                            <Badge className="relative">
-                              {tag}
-                              {count !== value.Size && (
-                                <span className="absolute -top-1.5 -right-2 flex min-w-4">
-                                  <span className="relative inline-flex size-full justify-center rounded-full bg-sky-400 p-0.5 text-[10px] text-black">
-                                    {count}
-                                  </span>
+                          // the count sits on the link rather than the badge, because a badge clips what overflows it
+                          <Link
+                            key={tag}
+                            to="/nodes"
+                            search={{ tags: [`rack=${key}`, tag] }}
+                            className="relative inline-flex"
+                          >
+                            <Badge>{tag}</Badge>
+                            {count !== value.Size && (
+                              <span className="absolute -top-1.5 -right-2 flex min-w-4">
+                                <span className="relative inline-flex size-full justify-center rounded-full bg-sky-400 p-0.5 text-[10px] text-black">
+                                  {count}
                                 </span>
-                              )}
-                            </Badge>
+                              </span>
+                            )}
                           </Link>
                         );
                       })}

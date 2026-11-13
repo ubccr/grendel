@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/nodes/$node/redfish")({
+  staticData: { crumb: "Redfish" },
   component: RouteComponent,
   loader: ({ params: { node } }) => getV1BmcStatus({ query: { nodeset: node } }),
   staleTime: 60_000,

@@ -8,6 +8,7 @@ import { Eraser, Plug, PlugZap, Unplug } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export const Route = createFileRoute("/nodes/$node/console")({
+  staticData: { crumb: "Console" },
   component: RouteComponent,
 });
 

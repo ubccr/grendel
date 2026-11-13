@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { themeToMonaco, useTheme } from "@/hooks/theme-provider";
 
 export const Route = createFileRoute("/templates/$template")({
+  staticData: { crumb: { param: "template" } },
   component: RouteComponent,
 });
 

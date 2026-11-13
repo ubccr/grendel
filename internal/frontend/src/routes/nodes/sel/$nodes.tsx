@@ -78,6 +78,7 @@ const columns: DataTableColumnDef<Entry, any>[] = [
 ];
 
 export const Route = createFileRoute("/nodes/sel/$nodes")({
+  staticData: { crumb: ["SEL", { param: "nodes" }] },
   component: RouteComponent,
   beforeLoad: AuthRedirect,
   validateSearch: z.object({

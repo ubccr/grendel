@@ -6,6 +6,7 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { ShieldQuestion } from "lucide-react";
 
 export const Route = createFileRoute("/nodes/$node/secureboot")({
+  staticData: { crumb: "Secure boot" },
   component: RouteComponent,
   // one request reads the state and the keys over a single login to the BMC
   loader: ({ params: { node } }) => getV1BmcSecureboot({ query: { nodeset: node, keys: true } }),

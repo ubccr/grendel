@@ -29,7 +29,7 @@ const schema = z
   });
 
 export const Route = createFileRoute("/account/signup")({
-  staticData: { nodeField: "full" },
+  staticData: { nodeField: "full", crumb: "Sign up" },
   component: RouteComponent,
   validateSearch: z.object({
     redirect: z.string().optional(),

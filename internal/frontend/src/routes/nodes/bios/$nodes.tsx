@@ -23,6 +23,7 @@ import { ReactNode, useMemo, useState } from "react";
 import { z } from "zod";
 
 export const Route = createFileRoute("/nodes/bios/$nodes")({
+  staticData: { crumb: ["BIOS", { param: "nodes" }] },
   component: RouteComponent,
   beforeLoad: AuthRedirect,
   validateSearch: z.object({

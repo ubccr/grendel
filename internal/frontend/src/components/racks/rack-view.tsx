@@ -103,7 +103,15 @@ function ProvisionLed({ host }: { host: Host }) {
 }
 
 // StatusCard is a node's provision state badge. Hovering or focusing it shows a summary of its last provision, and clicking it opens the node's provision tab
-function StatusCard({ status, node }: { status?: ProvisionStatus; node: string }) {
+function StatusCard({
+  status,
+  node,
+  rack,
+}: {
+  status?: ProvisionStatus;
+  node: string;
+  rack: string;
+}) {
   if (!status?.state) return null;
   return (
     <HoverCard>
@@ -114,6 +122,7 @@ function StatusCard({ status, node }: { status?: ProvisionStatus; node: string }
           <Link
             to="/nodes/$node/provision"
             params={{ node }}
+            search={{ from: rack }}
             aria-label={`Last provision of ${node}: ${status.state}`}
             className="inline-flex rounded-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
           />
@@ -161,7 +170,9 @@ function Faceplate({
           }}
         />
         <ProvisionLed host={host} />
-        {details.includes("status") && <StatusCard status={statuses.get(name)} node={name} />}
+        {details.includes("status") && (
+          <StatusCard status={statuses.get(name)} node={name} rack={rack} />
+        )}
         {details.includes("image") && host.boot_image && (
           <Link
             to="/images/$image"
@@ -186,6 +197,7 @@ function Faceplate({
       <Link
         to="/nodes/$node/node"
         params={{ node: name }}
+        search={{ from: rack }}
         className="truncate text-center font-mono text-sm font-medium underline-offset-4 hover:underline"
       >
         {name}

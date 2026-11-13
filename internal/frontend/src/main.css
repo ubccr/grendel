@@ -30,7 +30,7 @@
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
+  --sidebar: oklch(1 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
@@ -183,4 +183,18 @@
       transform: translateX(100%) scaleX(0.5);
     }
   }
+}
+
+/* the node colours of the field behind the page, which reads them here so they follow the theme; they stay hex because the field blends them itself */
+:root {
+  --node-off: #e4e9e6;
+  --node-amber: #e39b2d;
+  --node-blue: #3b7fc4;
+  --node-ready: #3aa776;
+}
+.dark {
+  --node-off: #2d3531;
+  --node-amber: #e8a33d;
+  --node-blue: #6ea8e6;
+  --node-ready: #7fd1ae;
 }

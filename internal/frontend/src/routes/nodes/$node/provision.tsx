@@ -2,6 +2,7 @@ import { ProvisionStatusPanel } from "@/components/nodes/provision-status";
 import { createFileRoute, useLoaderData } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/nodes/$node/provision")({
+  staticData: { crumb: "Provision" },
   component: RouteComponent,
 });
 

@@ -14,6 +14,7 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/account/reset")({
+  staticData: { crumb: "Change password" },
   component: RouteComponent,
   beforeLoad: AuthRedirect,
 });

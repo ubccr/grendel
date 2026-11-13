@@ -12,7 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as EventsRouteImport } from './routes/events'
+import { Route as ImagesRouteRouteImport } from './routes/images/route'
+import { Route as NodesRouteRouteImport } from './routes/nodes/route'
+import { Route as RacksRouteRouteImport } from './routes/racks/route'
+import { Route as TemplatesRouteRouteImport } from './routes/templates/route'
 import { Route as AccountResetRouteImport } from './routes/account/reset'
+import { Route as AccountRolesRouteRouteImport } from './routes/account/roles/route'
 import { Route as AccountSigninRouteImport } from './routes/account/signin'
 import { Route as AccountSignupRouteImport } from './routes/account/signup'
 import { Route as AccountTokenRouteImport } from './routes/account/token'
@@ -31,6 +36,7 @@ import { Route as TemplatesTemplateRouteImport } from './routes/templates/$templ
 import { Route as AccountRolesIndexRouteImport } from './routes/account/roles/index'
 import { Route as AccountRolesRoleRouteImport } from './routes/account/roles/$role'
 import { Route as AccountUsersIndexRouteImport } from './routes/account/users/index'
+import { Route as NodesNodeIndexRouteImport } from './routes/nodes/$node/index'
 import { Route as NodesNodeBiosRouteImport } from './routes/nodes/$node/bios'
 import { Route as NodesNodeConsoleRouteImport } from './routes/nodes/$node/console'
 import { Route as NodesNodeLldpRouteImport } from './routes/nodes/$node/lldp'
@@ -60,9 +66,34 @@ const EventsRoute = EventsRouteImport.update({
   path: '/events',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ImagesRouteRoute = ImagesRouteRouteImport.update({
+  id: '/images',
+  path: '/images',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NodesRouteRoute = NodesRouteRouteImport.update({
+  id: '/nodes',
+  path: '/nodes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RacksRouteRoute = RacksRouteRouteImport.update({
+  id: '/racks',
+  path: '/racks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TemplatesRouteRoute = TemplatesRouteRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AccountResetRoute = AccountResetRouteImport.update({
   id: '/account/reset',
   path: '/account/reset',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRolesRouteRoute = AccountRolesRouteRouteImport.update({
+  id: '/account/roles',
+  path: '/account/roles',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountSigninRoute = AccountSigninRouteImport.update({
@@ -101,59 +132,64 @@ const AddTemplateRoute = AddTemplateRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ImagesIndexRoute = ImagesIndexRouteImport.update({
-  id: '/images/',
-  path: '/images/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => ImagesRouteRoute,
 } as any)
 const ImagesImageRoute = ImagesImageRouteImport.update({
-  id: '/images/$image',
-  path: '/images/$image',
-  getParentRoute: () => rootRouteImport,
+  id: '/$image',
+  path: '/$image',
+  getParentRoute: () => ImagesRouteRoute,
 } as any)
 const NodesIndexRoute = NodesIndexRouteImport.update({
-  id: '/nodes/',
-  path: '/nodes/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => NodesRouteRoute,
 } as any)
 const NodesNodeRouteRoute = NodesNodeRouteRouteImport.update({
-  id: '/nodes/$node',
-  path: '/nodes/$node',
-  getParentRoute: () => rootRouteImport,
+  id: '/$node',
+  path: '/$node',
+  getParentRoute: () => NodesRouteRoute,
 } as any)
 const RacksIndexRoute = RacksIndexRouteImport.update({
-  id: '/racks/',
-  path: '/racks/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => RacksRouteRoute,
 } as any)
 const RacksRackRoute = RacksRackRouteImport.update({
-  id: '/racks/$rack',
-  path: '/racks/$rack',
-  getParentRoute: () => rootRouteImport,
+  id: '/$rack',
+  path: '/$rack',
+  getParentRoute: () => RacksRouteRoute,
 } as any)
 const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
-  id: '/templates/',
-  path: '/templates/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => TemplatesRouteRoute,
 } as any)
 const TemplatesTemplateRoute = TemplatesTemplateRouteImport.update({
-  id: '/templates/$template',
-  path: '/templates/$template',
-  getParentRoute: () => rootRouteImport,
+  id: '/$template',
+  path: '/$template',
+  getParentRoute: () => TemplatesRouteRoute,
 } as any)
 const AccountRolesIndexRoute = AccountRolesIndexRouteImport.update({
-  id: '/account/roles/',
-  path: '/account/roles/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AccountRolesRouteRoute,
 } as any)
 const AccountRolesRoleRoute = AccountRolesRoleRouteImport.update({
-  id: '/account/roles/$role',
-  path: '/account/roles/$role',
-  getParentRoute: () => rootRouteImport,
+  id: '/$role',
+  path: '/$role',
+  getParentRoute: () => AccountRolesRouteRoute,
 } as any)
 const AccountUsersIndexRoute = AccountUsersIndexRouteImport.update({
   id: '/account/users/',
   path: '/account/users/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const NodesNodeIndexRoute = NodesNodeIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => NodesNodeRouteRoute,
 } as any)
 const NodesNodeBiosRoute = NodesNodeBiosRouteImport.update({
   id: '/bios',
@@ -191,40 +227,45 @@ const NodesNodeSecurebootRoute = NodesNodeSecurebootRouteImport.update({
   getParentRoute: () => NodesNodeRouteRoute,
 } as any)
 const NodesBiosNodesRoute = NodesBiosNodesRouteImport.update({
-  id: '/nodes/bios/$nodes',
-  path: '/nodes/bios/$nodes',
-  getParentRoute: () => rootRouteImport,
+  id: '/bios/$nodes',
+  path: '/bios/$nodes',
+  getParentRoute: () => NodesRouteRoute,
 } as any)
 const NodesDellFirmwareNodesRoute = NodesDellFirmwareNodesRouteImport.update({
-  id: '/nodes/dell-firmware/$nodes',
-  path: '/nodes/dell-firmware/$nodes',
-  getParentRoute: () => rootRouteImport,
+  id: '/dell-firmware/$nodes',
+  path: '/dell-firmware/$nodes',
+  getParentRoute: () => NodesRouteRoute,
 } as any)
 const NodesIdentityNodesRoute = NodesIdentityNodesRouteImport.update({
-  id: '/nodes/identity/$nodes',
-  path: '/nodes/identity/$nodes',
-  getParentRoute: () => rootRouteImport,
+  id: '/identity/$nodes',
+  path: '/identity/$nodes',
+  getParentRoute: () => NodesRouteRoute,
 } as any)
 const NodesJobsNodesRoute = NodesJobsNodesRouteImport.update({
-  id: '/nodes/jobs/$nodes',
-  path: '/nodes/jobs/$nodes',
-  getParentRoute: () => rootRouteImport,
+  id: '/jobs/$nodes',
+  path: '/jobs/$nodes',
+  getParentRoute: () => NodesRouteRoute,
 } as any)
 const NodesSecurebootNodesRoute = NodesSecurebootNodesRouteImport.update({
-  id: '/nodes/secureboot/$nodes',
-  path: '/nodes/secureboot/$nodes',
-  getParentRoute: () => rootRouteImport,
+  id: '/secureboot/$nodes',
+  path: '/secureboot/$nodes',
+  getParentRoute: () => NodesRouteRoute,
 } as any)
 const NodesSelNodesRoute = NodesSelNodesRouteImport.update({
-  id: '/nodes/sel/$nodes',
-  path: '/nodes/sel/$nodes',
-  getParentRoute: () => rootRouteImport,
+  id: '/sel/$nodes',
+  path: '/sel/$nodes',
+  getParentRoute: () => NodesRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/images': typeof ImagesRouteRouteWithChildren
+  '/nodes': typeof NodesRouteRouteWithChildren
+  '/racks': typeof RacksRouteRouteWithChildren
+  '/templates': typeof TemplatesRouteRouteWithChildren
   '/$': typeof SplatRoute
   '/events': typeof EventsRoute
+  '/account/roles': typeof AccountRolesRouteRouteWithChildren
   '/nodes/$node': typeof NodesNodeRouteRouteWithChildren
   '/account/reset': typeof AccountResetRoute
   '/account/signin': typeof AccountSigninRoute
@@ -257,12 +298,12 @@ export interface FileRoutesByFullPath {
   '/nodes/sel/$nodes': typeof NodesSelNodesRoute
   '/account/roles/': typeof AccountRolesIndexRoute
   '/account/users/': typeof AccountUsersIndexRoute
+  '/nodes/$node/': typeof NodesNodeIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/events': typeof EventsRoute
-  '/nodes/$node': typeof NodesNodeRouteRouteWithChildren
   '/account/reset': typeof AccountResetRoute
   '/account/signin': typeof AccountSigninRoute
   '/account/signup': typeof AccountSignupRoute
@@ -294,12 +335,18 @@ export interface FileRoutesByTo {
   '/nodes/sel/$nodes': typeof NodesSelNodesRoute
   '/account/roles': typeof AccountRolesIndexRoute
   '/account/users': typeof AccountUsersIndexRoute
+  '/nodes/$node': typeof NodesNodeIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/images': typeof ImagesRouteRouteWithChildren
+  '/nodes': typeof NodesRouteRouteWithChildren
+  '/racks': typeof RacksRouteRouteWithChildren
+  '/templates': typeof TemplatesRouteRouteWithChildren
   '/$': typeof SplatRoute
   '/events': typeof EventsRoute
+  '/account/roles': typeof AccountRolesRouteRouteWithChildren
   '/nodes/$node': typeof NodesNodeRouteRouteWithChildren
   '/account/reset': typeof AccountResetRoute
   '/account/signin': typeof AccountSigninRoute
@@ -332,13 +379,19 @@ export interface FileRoutesById {
   '/nodes/sel/$nodes': typeof NodesSelNodesRoute
   '/account/roles/': typeof AccountRolesIndexRoute
   '/account/users/': typeof AccountUsersIndexRoute
+  '/nodes/$node/': typeof NodesNodeIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/images'
+    | '/nodes'
+    | '/racks'
+    | '/templates'
     | '/$'
     | '/events'
+    | '/account/roles'
     | '/nodes/$node'
     | '/account/reset'
     | '/account/signin'
@@ -371,12 +424,12 @@ export interface FileRouteTypes {
     | '/nodes/sel/$nodes'
     | '/account/roles/'
     | '/account/users/'
+    | '/nodes/$node/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/$'
     | '/events'
-    | '/nodes/$node'
     | '/account/reset'
     | '/account/signin'
     | '/account/signup'
@@ -408,11 +461,17 @@ export interface FileRouteTypes {
     | '/nodes/sel/$nodes'
     | '/account/roles'
     | '/account/users'
+    | '/nodes/$node'
   id:
     | '__root__'
     | '/'
+    | '/images'
+    | '/nodes'
+    | '/racks'
+    | '/templates'
     | '/$'
     | '/events'
+    | '/account/roles'
     | '/nodes/$node'
     | '/account/reset'
     | '/account/signin'
@@ -445,13 +504,18 @@ export interface FileRouteTypes {
     | '/nodes/sel/$nodes'
     | '/account/roles/'
     | '/account/users/'
+    | '/nodes/$node/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ImagesRouteRoute: typeof ImagesRouteRouteWithChildren
+  NodesRouteRoute: typeof NodesRouteRouteWithChildren
+  RacksRouteRoute: typeof RacksRouteRouteWithChildren
+  TemplatesRouteRoute: typeof TemplatesRouteRouteWithChildren
   SplatRoute: typeof SplatRoute
   EventsRoute: typeof EventsRoute
-  NodesNodeRouteRoute: typeof NodesNodeRouteRouteWithChildren
+  AccountRolesRouteRoute: typeof AccountRolesRouteRouteWithChildren
   AccountResetRoute: typeof AccountResetRoute
   AccountSigninRoute: typeof AccountSigninRoute
   AccountSignupRoute: typeof AccountSignupRoute
@@ -460,21 +524,6 @@ export interface RootRouteChildren {
   AddNodeRoute: typeof AddNodeRoute
   AddRoleRoute: typeof AddRoleRoute
   AddTemplateRoute: typeof AddTemplateRoute
-  ImagesImageRoute: typeof ImagesImageRoute
-  RacksRackRoute: typeof RacksRackRoute
-  TemplatesTemplateRoute: typeof TemplatesTemplateRoute
-  ImagesIndexRoute: typeof ImagesIndexRoute
-  NodesIndexRoute: typeof NodesIndexRoute
-  RacksIndexRoute: typeof RacksIndexRoute
-  TemplatesIndexRoute: typeof TemplatesIndexRoute
-  AccountRolesRoleRoute: typeof AccountRolesRoleRoute
-  NodesBiosNodesRoute: typeof NodesBiosNodesRoute
-  NodesDellFirmwareNodesRoute: typeof NodesDellFirmwareNodesRoute
-  NodesIdentityNodesRoute: typeof NodesIdentityNodesRoute
-  NodesJobsNodesRoute: typeof NodesJobsNodesRoute
-  NodesSecurebootNodesRoute: typeof NodesSecurebootNodesRoute
-  NodesSelNodesRoute: typeof NodesSelNodesRoute
-  AccountRolesIndexRoute: typeof AccountRolesIndexRoute
   AccountUsersIndexRoute: typeof AccountUsersIndexRoute
 }
 
@@ -501,11 +550,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/images': {
+      id: '/images'
+      path: '/images'
+      fullPath: '/images'
+      preLoaderRoute: typeof ImagesRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nodes': {
+      id: '/nodes'
+      path: '/nodes'
+      fullPath: '/nodes'
+      preLoaderRoute: typeof NodesRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/racks': {
+      id: '/racks'
+      path: '/racks'
+      fullPath: '/racks'
+      preLoaderRoute: typeof RacksRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/templates': {
+      id: '/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof TemplatesRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/account/reset': {
       id: '/account/reset'
       path: '/account/reset'
       fullPath: '/account/reset'
       preLoaderRoute: typeof AccountResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/roles': {
+      id: '/account/roles'
+      path: '/account/roles'
+      fullPath: '/account/roles'
+      preLoaderRoute: typeof AccountRolesRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account/signin': {
@@ -559,73 +643,73 @@ declare module '@tanstack/react-router' {
     }
     '/images/': {
       id: '/images/'
-      path: '/images'
+      path: '/'
       fullPath: '/images/'
       preLoaderRoute: typeof ImagesIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ImagesRouteRoute
     }
     '/images/$image': {
       id: '/images/$image'
-      path: '/images/$image'
+      path: '/$image'
       fullPath: '/images/$image'
       preLoaderRoute: typeof ImagesImageRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ImagesRouteRoute
     }
     '/nodes/': {
       id: '/nodes/'
-      path: '/nodes'
+      path: '/'
       fullPath: '/nodes/'
       preLoaderRoute: typeof NodesIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof NodesRouteRoute
     }
     '/nodes/$node': {
       id: '/nodes/$node'
-      path: '/nodes/$node'
+      path: '/$node'
       fullPath: '/nodes/$node'
       preLoaderRoute: typeof NodesNodeRouteRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof NodesRouteRoute
     }
     '/racks/': {
       id: '/racks/'
-      path: '/racks'
+      path: '/'
       fullPath: '/racks/'
       preLoaderRoute: typeof RacksIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof RacksRouteRoute
     }
     '/racks/$rack': {
       id: '/racks/$rack'
-      path: '/racks/$rack'
+      path: '/$rack'
       fullPath: '/racks/$rack'
       preLoaderRoute: typeof RacksRackRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof RacksRouteRoute
     }
     '/templates/': {
       id: '/templates/'
-      path: '/templates'
+      path: '/'
       fullPath: '/templates/'
       preLoaderRoute: typeof TemplatesIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof TemplatesRouteRoute
     }
     '/templates/$template': {
       id: '/templates/$template'
-      path: '/templates/$template'
+      path: '/$template'
       fullPath: '/templates/$template'
       preLoaderRoute: typeof TemplatesTemplateRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof TemplatesRouteRoute
     }
     '/account/roles/': {
       id: '/account/roles/'
-      path: '/account/roles'
+      path: '/'
       fullPath: '/account/roles/'
       preLoaderRoute: typeof AccountRolesIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AccountRolesRouteRoute
     }
     '/account/roles/$role': {
       id: '/account/roles/$role'
-      path: '/account/roles/$role'
+      path: '/$role'
       fullPath: '/account/roles/$role'
       preLoaderRoute: typeof AccountRolesRoleRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AccountRolesRouteRoute
     }
     '/account/users/': {
       id: '/account/users/'
@@ -633,6 +717,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/account/users/'
       preLoaderRoute: typeof AccountUsersIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/nodes/$node/': {
+      id: '/nodes/$node/'
+      path: '/'
+      fullPath: '/nodes/$node/'
+      preLoaderRoute: typeof NodesNodeIndexRouteImport
+      parentRoute: typeof NodesNodeRouteRoute
     }
     '/nodes/$node/bios': {
       id: '/nodes/$node/bios'
@@ -685,48 +776,62 @@ declare module '@tanstack/react-router' {
     }
     '/nodes/bios/$nodes': {
       id: '/nodes/bios/$nodes'
-      path: '/nodes/bios/$nodes'
+      path: '/bios/$nodes'
       fullPath: '/nodes/bios/$nodes'
       preLoaderRoute: typeof NodesBiosNodesRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof NodesRouteRoute
     }
     '/nodes/dell-firmware/$nodes': {
       id: '/nodes/dell-firmware/$nodes'
-      path: '/nodes/dell-firmware/$nodes'
+      path: '/dell-firmware/$nodes'
       fullPath: '/nodes/dell-firmware/$nodes'
       preLoaderRoute: typeof NodesDellFirmwareNodesRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof NodesRouteRoute
     }
     '/nodes/identity/$nodes': {
       id: '/nodes/identity/$nodes'
-      path: '/nodes/identity/$nodes'
+      path: '/identity/$nodes'
       fullPath: '/nodes/identity/$nodes'
       preLoaderRoute: typeof NodesIdentityNodesRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof NodesRouteRoute
     }
     '/nodes/jobs/$nodes': {
       id: '/nodes/jobs/$nodes'
-      path: '/nodes/jobs/$nodes'
+      path: '/jobs/$nodes'
       fullPath: '/nodes/jobs/$nodes'
       preLoaderRoute: typeof NodesJobsNodesRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof NodesRouteRoute
     }
     '/nodes/secureboot/$nodes': {
       id: '/nodes/secureboot/$nodes'
-      path: '/nodes/secureboot/$nodes'
+      path: '/secureboot/$nodes'
       fullPath: '/nodes/secureboot/$nodes'
       preLoaderRoute: typeof NodesSecurebootNodesRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof NodesRouteRoute
     }
     '/nodes/sel/$nodes': {
       id: '/nodes/sel/$nodes'
-      path: '/nodes/sel/$nodes'
+      path: '/sel/$nodes'
       fullPath: '/nodes/sel/$nodes'
       preLoaderRoute: typeof NodesSelNodesRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof NodesRouteRoute
     }
   }
 }
+
+interface ImagesRouteRouteChildren {
+  ImagesImageRoute: typeof ImagesImageRoute
+  ImagesIndexRoute: typeof ImagesIndexRoute
+}
+
+const ImagesRouteRouteChildren: ImagesRouteRouteChildren = {
+  ImagesImageRoute: ImagesImageRoute,
+  ImagesIndexRoute: ImagesIndexRoute,
+}
+
+const ImagesRouteRouteWithChildren = ImagesRouteRoute._addFileChildren(
+  ImagesRouteRouteChildren,
+)
 
 interface NodesNodeRouteRouteChildren {
   NodesNodeBiosRoute: typeof NodesNodeBiosRoute
@@ -736,6 +841,7 @@ interface NodesNodeRouteRouteChildren {
   NodesNodeProvisionRoute: typeof NodesNodeProvisionRoute
   NodesNodeRedfishRoute: typeof NodesNodeRedfishRoute
   NodesNodeSecurebootRoute: typeof NodesNodeSecurebootRoute
+  NodesNodeIndexRoute: typeof NodesNodeIndexRoute
 }
 
 const NodesNodeRouteRouteChildren: NodesNodeRouteRouteChildren = {
@@ -746,17 +852,89 @@ const NodesNodeRouteRouteChildren: NodesNodeRouteRouteChildren = {
   NodesNodeProvisionRoute: NodesNodeProvisionRoute,
   NodesNodeRedfishRoute: NodesNodeRedfishRoute,
   NodesNodeSecurebootRoute: NodesNodeSecurebootRoute,
+  NodesNodeIndexRoute: NodesNodeIndexRoute,
 }
 
 const NodesNodeRouteRouteWithChildren = NodesNodeRouteRoute._addFileChildren(
   NodesNodeRouteRouteChildren,
 )
 
+interface NodesRouteRouteChildren {
+  NodesNodeRouteRoute: typeof NodesNodeRouteRouteWithChildren
+  NodesIndexRoute: typeof NodesIndexRoute
+  NodesBiosNodesRoute: typeof NodesBiosNodesRoute
+  NodesDellFirmwareNodesRoute: typeof NodesDellFirmwareNodesRoute
+  NodesIdentityNodesRoute: typeof NodesIdentityNodesRoute
+  NodesJobsNodesRoute: typeof NodesJobsNodesRoute
+  NodesSecurebootNodesRoute: typeof NodesSecurebootNodesRoute
+  NodesSelNodesRoute: typeof NodesSelNodesRoute
+}
+
+const NodesRouteRouteChildren: NodesRouteRouteChildren = {
+  NodesNodeRouteRoute: NodesNodeRouteRouteWithChildren,
+  NodesIndexRoute: NodesIndexRoute,
+  NodesBiosNodesRoute: NodesBiosNodesRoute,
+  NodesDellFirmwareNodesRoute: NodesDellFirmwareNodesRoute,
+  NodesIdentityNodesRoute: NodesIdentityNodesRoute,
+  NodesJobsNodesRoute: NodesJobsNodesRoute,
+  NodesSecurebootNodesRoute: NodesSecurebootNodesRoute,
+  NodesSelNodesRoute: NodesSelNodesRoute,
+}
+
+const NodesRouteRouteWithChildren = NodesRouteRoute._addFileChildren(
+  NodesRouteRouteChildren,
+)
+
+interface RacksRouteRouteChildren {
+  RacksRackRoute: typeof RacksRackRoute
+  RacksIndexRoute: typeof RacksIndexRoute
+}
+
+const RacksRouteRouteChildren: RacksRouteRouteChildren = {
+  RacksRackRoute: RacksRackRoute,
+  RacksIndexRoute: RacksIndexRoute,
+}
+
+const RacksRouteRouteWithChildren = RacksRouteRoute._addFileChildren(
+  RacksRouteRouteChildren,
+)
+
+interface TemplatesRouteRouteChildren {
+  TemplatesTemplateRoute: typeof TemplatesTemplateRoute
+  TemplatesIndexRoute: typeof TemplatesIndexRoute
+}
+
+const TemplatesRouteRouteChildren: TemplatesRouteRouteChildren = {
+  TemplatesTemplateRoute: TemplatesTemplateRoute,
+  TemplatesIndexRoute: TemplatesIndexRoute,
+}
+
+const TemplatesRouteRouteWithChildren = TemplatesRouteRoute._addFileChildren(
+  TemplatesRouteRouteChildren,
+)
+
+interface AccountRolesRouteRouteChildren {
+  AccountRolesRoleRoute: typeof AccountRolesRoleRoute
+  AccountRolesIndexRoute: typeof AccountRolesIndexRoute
+}
+
+const AccountRolesRouteRouteChildren: AccountRolesRouteRouteChildren = {
+  AccountRolesRoleRoute: AccountRolesRoleRoute,
+  AccountRolesIndexRoute: AccountRolesIndexRoute,
+}
+
+const AccountRolesRouteRouteWithChildren =
+  AccountRolesRouteRoute._addFileChildren(AccountRolesRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ImagesRouteRoute: ImagesRouteRouteWithChildren,
+  NodesRouteRoute: NodesRouteRouteWithChildren,
+  RacksRouteRoute: RacksRouteRouteWithChildren,
+  TemplatesRouteRoute: TemplatesRouteRouteWithChildren,
   SplatRoute: SplatRoute,
   EventsRoute: EventsRoute,
-  NodesNodeRouteRoute: NodesNodeRouteRouteWithChildren,
+  AccountRolesRouteRoute: AccountRolesRouteRouteWithChildren,
   AccountResetRoute: AccountResetRoute,
   AccountSigninRoute: AccountSigninRoute,
   AccountSignupRoute: AccountSignupRoute,
@@ -765,21 +943,6 @@ const rootRouteChildren: RootRouteChildren = {
   AddNodeRoute: AddNodeRoute,
   AddRoleRoute: AddRoleRoute,
   AddTemplateRoute: AddTemplateRoute,
-  ImagesImageRoute: ImagesImageRoute,
-  RacksRackRoute: RacksRackRoute,
-  TemplatesTemplateRoute: TemplatesTemplateRoute,
-  ImagesIndexRoute: ImagesIndexRoute,
-  NodesIndexRoute: NodesIndexRoute,
-  RacksIndexRoute: RacksIndexRoute,
-  TemplatesIndexRoute: TemplatesIndexRoute,
-  AccountRolesRoleRoute: AccountRolesRoleRoute,
-  NodesBiosNodesRoute: NodesBiosNodesRoute,
-  NodesDellFirmwareNodesRoute: NodesDellFirmwareNodesRoute,
-  NodesIdentityNodesRoute: NodesIdentityNodesRoute,
-  NodesJobsNodesRoute: NodesJobsNodesRoute,
-  NodesSecurebootNodesRoute: NodesSecurebootNodesRoute,
-  NodesSelNodesRoute: NodesSelNodesRoute,
-  AccountRolesIndexRoute: AccountRolesIndexRoute,
   AccountUsersIndexRoute: AccountUsersIndexRoute,
 }
 export const routeTree = rootRouteImport

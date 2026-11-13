@@ -18,6 +18,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type { DataTableColumnDef, DataTableRow } from "@/components/data-table/features";
 
 export const Route = createFileRoute("/events")({
+  staticData: { crumb: "Events" },
   component: TableComponent,
   beforeLoad: AuthRedirect,
   loader: () => getV1GrendelEvents(),
