@@ -537,6 +537,47 @@ func (q *Queries) NodeUpsert(ctx context.Context, db DBTX, arg NodeUpsertParams)
 	return i, err
 }
 
+const tagCounts = `-- name: TagCounts :many
+select
+  t.key as tag_key,
+  nt.value as tag_value,
+  count(distinct nt.node_id) as nodes
+from tag as t
+join node_tag as nt
+  on nt.tag_id = t.id
+group by t.key, nt.value
+order by t.key, nt.value
+`
+
+type TagCountsRow struct {
+	TagKey   string `json:"tag_key"`
+	TagValue string `json:"tag_value"`
+	Nodes    int64  `json:"nodes"`
+}
+
+func (q *Queries) TagCounts(ctx context.Context, db DBTX) ([]TagCountsRow, error) {
+	rows, err := db.QueryContext(ctx, tagCounts)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []TagCountsRow
+	for rows.Next() {
+		var i TagCountsRow
+		if err := rows.Scan(&i.TagKey, &i.TagValue, &i.Nodes); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const tagID = `-- name: TagID :many
 select id from tag
 where key in (/*SLICE:tags*/?)

@@ -162,6 +162,11 @@ type GETV1NodesProvisionStatusParams struct {
 	Accept OptString
 }
 
+// GETV1NodesTagsParams is parameters of GET_/v1/nodes/tags operation.
+type GETV1NodesTagsParams struct {
+	Accept OptString
+}
+
 // GETV1NodesTokenInterfaceParams is parameters of GET_/v1/nodes/token/:interface operation.
 type GETV1NodesTokenInterfaceParams struct {
 	// Interface token will be created for.

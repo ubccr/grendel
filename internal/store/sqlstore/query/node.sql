@@ -106,3 +106,14 @@ delete from node_tag where node_id in (sqlc.slice(nodes)) and tag_id not in (sql
 
 -- name: NodeTagDelete :exec
 delete from node_tag where node_id in (sqlc.slice(nodes)) and tag_id in (sqlc.slice(tags));
+
+-- name: TagCounts :many
+select
+  t.key as tag_key,
+  nt.value as tag_value,
+  count(distinct nt.node_id) as nodes
+from tag as t
+join node_tag as nt
+  on nt.tag_id = t.id
+group by t.key, nt.value
+order by t.key, nt.value;

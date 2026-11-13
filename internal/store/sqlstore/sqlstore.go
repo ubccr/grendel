@@ -587,6 +587,25 @@ func (s *SqlStore) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
 	})
 }
 
+// TagCounts returns every tag on a host, with how many hosts have it. A tag no host has any more is left out
+func (s *SqlStore) TagCounts() (model.TagCountList, error) {
+	rows, err := s.q.TagCounts(context.Background(), s.ro)
+	if err != nil {
+		return nil, err
+	}
+
+	list := make(model.TagCountList, 0, len(rows))
+	for _, r := range rows {
+		tag := r.TagKey
+		if r.TagValue != "" {
+			tag += "=" + r.TagValue
+		}
+		list = append(list, model.TagCount{Tag: tag, Nodes: r.Nodes})
+	}
+
+	return list, nil
+}
+
 // TagHosts adds tags to all hosts in the given NodeSet
 func (s *SqlStore) TagHosts(ns *nodeset.NodeSet, tags []string) error {
 	nodeID, err := s.q.NodeID(context.Background(), s.ro, ns.Iterator().StringSlice())

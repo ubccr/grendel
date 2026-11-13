@@ -11461,6 +11461,33 @@ func (s *ProvisionStatusStages) init() ProvisionStatusStages {
 	return m
 }
 
+// TagCount schema.
+// Ref: #/components/schemas/TagCount
+type TagCount struct {
+	Nodes OptInt64  `json:"nodes"`
+	Tag   OptString `json:"tag"`
+}
+
+// GetNodes returns the value of Nodes.
+func (s *TagCount) GetNodes() OptInt64 {
+	return s.Nodes
+}
+
+// GetTag returns the value of Tag.
+func (s *TagCount) GetTag() OptString {
+	return s.Tag
+}
+
+// SetNodes sets the value of Nodes.
+func (s *TagCount) SetNodes(val OptInt64) {
+	s.Nodes = val
+}
+
+// SetTag sets the value of Tag.
+func (s *TagCount) SetTag(val OptString) {
+	s.Tag = val
+}
+
 // User schema.
 // Ref: #/components/schemas/User
 type User struct {

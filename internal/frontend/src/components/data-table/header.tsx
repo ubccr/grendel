@@ -2,7 +2,7 @@ import type { RowData } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown, Info, X } from "lucide-react";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 
-import { TagsInput } from "@/components/tags-input";
+import { TagCombobox } from "@/components/tag-combobox";
 import { Button } from "@/components/ui/button";
 import {
   InputGroup,
@@ -169,9 +169,11 @@ function TagsFilter({
 }) {
   return (
     <div className="flex w-full items-center gap-1">
-      <TagsInput
+      <TagCombobox
         placeholder={title}
-        className="w-full"
+        label={`Filter ${title}`}
+        // match the other filter boxes in the header row, whose column name is a medium weight placeholder, with chips darker than the default so they stand out in the busy header
+        className="min-h-8 py-1 **:data-[slot=combobox-chip]:bg-foreground/10 **:data-[slot=combobox-chip-input]:placeholder:font-medium dark:**:data-[slot=combobox-chip]:bg-black/40"
         value={value}
         onValueChange={onValueChange}
       />

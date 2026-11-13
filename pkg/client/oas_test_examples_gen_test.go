@@ -1363,6 +1363,18 @@ func TestProvisionStatusStages_EncodeDecode(t *testing.T) {
 	typ2 = make(ProvisionStatusStages)
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestTagCount_EncodeDecode(t *testing.T) {
+	var typ TagCount
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 TagCount
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestUser_EncodeDecode(t *testing.T) {
 	var typ User
 	typ.SetFake()

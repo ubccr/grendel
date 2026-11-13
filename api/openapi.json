@@ -2496,6 +2496,19 @@
 				},
 				"type": "object"
 			},
+			"TagCount": {
+				"description": "TagCount schema",
+				"properties": {
+					"nodes": {
+						"format": "int64",
+						"type": "integer"
+					},
+					"tag": {
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
 			"User": {
 				"description": "User schema",
 				"properties": {
@@ -5752,6 +5765,67 @@
 					}
 				],
 				"summary": "node provision status",
+				"tags": [
+					"v1",
+					"nodes"
+				]
+			}
+		},
+		"/v1/nodes/tags": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeTagList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList every tag on a node, with how many nodes have it",
+				"operationId": "GET_/v1/nodes/tags",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/TagCount"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/TagCount"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "node tag list",
 				"tags": [
 					"v1",
 					"nodes"

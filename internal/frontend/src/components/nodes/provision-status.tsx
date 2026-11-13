@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { ErrorPanel } from "@/components/error-panel";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Check, LoaderCircle, Minus, Rocket, X } from "lucide-react";
@@ -428,7 +429,7 @@ function FailedUnits({ units }: { units: NonNullable<ProvisionStatus["failed_uni
 }
 
 export function ProvisionStatusPanel({ node }: { node: string }) {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     ...getV1NodesProvisionStatusOptions({ query: { nodeset: node } }),
     // keep following a provision that is still going
     refetchInterval: (q) => (isFinished(q.state.data?.[0]?.state) ? false : 15_000),
@@ -437,6 +438,14 @@ export function ProvisionStatusPanel({ node }: { node: string }) {
   const s = data?.[0];
 
   if (isLoading) return null;
+  if (error)
+    return (
+      <ErrorPanel
+        title="Could not read the provision status"
+        message={error.detail || error.title}
+        icon={Rocket}
+      />
+    );
   if (!s) {
     return (
       <Empty className="my-4">

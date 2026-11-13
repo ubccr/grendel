@@ -986,6 +986,14 @@ export type ProvisionStatus = {
 };
 
 /**
+ * TagCount schema
+ */
+export type TagCount = {
+    nodes?: number;
+    tag?: string;
+};
+
+/**
  * User schema
  */
 export type User = {
@@ -2441,6 +2449,34 @@ export type GetV1NodesProvisionStatusResponses = {
 };
 
 export type GetV1NodesProvisionStatusResponse = GetV1NodesProvisionStatusResponses[keyof GetV1NodesProvisionStatusResponses];
+
+export type GetV1NodesTagsData = {
+    body?: never;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/nodes/tags';
+};
+
+export type GetV1NodesTagsErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type GetV1NodesTagsError = GetV1NodesTagsErrors[keyof GetV1NodesTagsErrors];
+
+export type GetV1NodesTagsResponses = {
+    /**
+     * OK
+     */
+    200: Array<TagCount>;
+};
+
+export type GetV1NodesTagsResponse = GetV1NodesTagsResponses[keyof GetV1NodesTagsResponses];
 
 export type PatchV1NodesTagsActionData = {
     /**

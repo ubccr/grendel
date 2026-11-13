@@ -3,6 +3,7 @@ import { getV1BmcJobsOptions, getV1BmcSelOptions } from "@/client/@tanstack/reac
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ErrorPanel } from "@/components/error-panel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { logSeverityColor } from "@/lib/bmc";
 import { formatLocation } from "@/lib/identity";
@@ -25,7 +26,6 @@ import {
   Plug,
   Power,
   ScrollText,
-  ServerCrash,
   ShieldAlert,
   Thermometer,
   Zap,
@@ -46,19 +46,8 @@ function RouteComponent() {
   const { data: res } = Route.useLoaderData();
   const result = res?.results?.[0];
 
-  if (result && !result.success) {
-    return (
-      <Card className="border-destructive">
-        <CardContent className="flex items-start gap-3 pt-6">
-          <ServerCrash className="mt-0.5 shrink-0 text-destructive" />
-          <div>
-            <div className="font-semibold">Could not read the BMC</div>
-            <div className="text-sm text-muted-foreground">{result.message}</div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  if (result && !result.success)
+    return <ErrorPanel title="Could not read the BMC" message={result.message} />;
 
   const system = result?.data;
   const dell = system?.oem_dell ?? undefined;

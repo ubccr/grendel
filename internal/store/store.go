@@ -74,6 +74,9 @@ type Store interface {
 	// ProvisionHosts sets all hosts in the given NodeSet to provision (true) or unprovision (false)
 	ProvisionHosts(ns *nodeset.NodeSet, provision bool) error
 
+	// TagCounts returns every tag on a host, with how many hosts have it
+	TagCounts() (model.TagCountList, error)
+
 	// TagHosts adds tags to all hosts in the given NodeSet
 	TagHosts(ns *nodeset.NodeSet, tags []string) error
 

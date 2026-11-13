@@ -521,6 +521,42 @@ func (s *StoreTestSuite) TestUpdateTags() {
 	}
 }
 
+func (s *StoreTestSuite) TestTagCounts() {
+	for i := 0; i < 5; i++ {
+		host := tests.HostFactory.MustCreate().(*model.Host)
+		host.Name = fmt.Sprintf("tux-%02d", i)
+		host.Tags = []string{"rack=f02"}
+		if i < 3 {
+			host.Tags = []string{"rack=f01", "gpu"}
+		}
+		err := s.db.StoreHost(host)
+		s.Assert().NoError(err)
+	}
+
+	tags, err := s.db.TagCounts()
+	if s.Assert().NoError(err) {
+		s.Assert().Equal(model.TagCountList{
+			{Tag: "gpu", Nodes: 3},
+			{Tag: "rack=f01", Nodes: 3},
+			{Tag: "rack=f02", Nodes: 2},
+		}, tags)
+	}
+
+	// a tag no node has any more is not listed
+	ns, err := nodeset.NewNodeSet("tux-[00-04]")
+	if s.Assert().NoError(err) {
+		s.Assert().NoError(s.db.UntagHosts(ns, []string{"gpu"}))
+	}
+
+	tags, err = s.db.TagCounts()
+	if s.Assert().NoError(err) {
+		s.Assert().Equal(model.TagCountList{
+			{Tag: "rack=f01", Nodes: 3},
+			{Tag: "rack=f02", Nodes: 2},
+		}, tags)
+	}
+}
+
 func (s *StoreTestSuite) TestProvision() {
 	size := 20
 	for i := 0; i < size; i++ {

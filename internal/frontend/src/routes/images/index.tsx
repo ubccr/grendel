@@ -32,11 +32,66 @@ const columns: DataTableColumnDef<BootImage, any>[] = [
   },
   {
     accessorKey: "version",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="version" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Version" />,
   },
   {
     accessorKey: "kernel",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="kernel" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Kernel" />,
+    cell: ({ row }) => <span className="font-mono text-xs break-all">{row.original.kernel}</span>,
+  },
+  {
+    // the paths joined, so a filter finds an image by any of its initrds
+    id: "initrd",
+    accessorFn: (image) => (image.initrd ?? []).join(" "),
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Initrds" />,
+    cell: ({ row }) => (
+      <div className="grid gap-0.5 font-mono text-xs">
+        {row.original.initrd?.map((path, i) => (
+          <span key={i} className="break-all">
+            {path}
+          </span>
+        ))}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "cmdline",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Command line" />,
+    // a command line can run to hundreds of characters, so it is cut to two lines with the whole of it on hover
+    cell: ({ row }) => (
+      <span
+        className="line-clamp-2 max-w-md font-mono text-xs break-all"
+        title={row.original.cmdline}
+      >
+        {row.original.cmdline}
+      </span>
+    ),
+  },
+  {
+    id: "verify",
+    accessorFn: (image) => (image.verify ? "on" : "off"),
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Verify" />,
+    cell: ({ row }) =>
+      row.original.verify ? "On" : <span className="text-muted-foreground">Off</span>,
+  },
+  {
+    // each template as name=file, so a filter finds an image by a template's name or its file
+    id: "provision_templates",
+    accessorFn: (image) =>
+      Object.entries(image.provision_templates ?? {})
+        .map(([name, file]) => `${name}=${file}`)
+        .join(" "),
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Templates" />,
+    cell: ({ row }) => (
+      <dl className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-0.5 text-xs">
+        {Object.entries(row.original.provision_templates ?? {}).map(([name, file]) => (
+          <div key={name} className="contents">
+            <dt className="text-muted-foreground">{name}</dt>
+            <dd className="font-mono break-all">{file}</dd>
+          </div>
+        ))}
+      </dl>
+    ),
   },
 ];
 
@@ -66,6 +121,7 @@ function TableComponent() {
           selectable
           // id is only optional on the type because an image being added has none yet; every listed image comes from the database and has one
           getRowId={(image) => String(image.id)}
+          initialVisibility={{ initrd: false, cmdline: false, provision_templates: false }}
           columns={columns}
           data={images.data ?? []}
           add={"/add/image"}

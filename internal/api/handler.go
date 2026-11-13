@@ -91,6 +91,9 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 		option.Description("Get the latest provision status of nodes by nodeset and/or tags, or of every node when neither is given"),
 		filterNodes,
 	)
+	fuego.Get(nodes, "/tags", h.NodeTagList,
+		option.Description("List every tag on a node, with how many nodes have it"),
+	)
 	fuego.Patch(nodes, "/tags/{action}", h.NodeTags,
 		option.Description("Update nodes tags by nodeset and/or tags"),
 		option.Path("action", "option to add or remove tags", param.Example("action", "add | remove")),

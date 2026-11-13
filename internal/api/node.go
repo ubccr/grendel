@@ -390,3 +390,12 @@ func (h *Handler) NodeProvisionStatus(c fuego.ContextNoBody) (model.ProvisionSta
 	}
 	return list, nil
 }
+
+// NodeTagList returns every tag on a node, with how many nodes have it, so a tag can be picked instead of retyped
+func (h *Handler) NodeTagList(c fuego.ContextNoBody) (model.TagCountList, error) {
+	list, err := h.DB.TagCounts()
+	if err != nil {
+		return nil, fuego.HTTPError{Err: err, Title: "Error", Detail: "failed to load tags"}
+	}
+	return list, nil
+}

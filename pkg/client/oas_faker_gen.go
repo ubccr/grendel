@@ -4096,6 +4096,20 @@ func (s *ProvisionStatusStages) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *TagCount) SetFake() {
+	{
+		{
+			s.Nodes.SetFake()
+		}
+	}
+	{
+		{
+			s.Tag.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
 func (s *User) SetFake() {
 	{
 		{

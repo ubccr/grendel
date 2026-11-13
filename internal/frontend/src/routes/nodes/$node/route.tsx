@@ -1,12 +1,13 @@
 import { getV1NodesFind } from "@/client";
 import ActionsSheet from "@/components/actions-sheet";
 import NodeActions from "@/components/actions/nodes";
+import { DetailHeader } from "@/components/detail-header";
+import { NodeFacts } from "@/components/nodes/plate";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import AuthRedirect from "@/lib/auth";
 import { createFileRoute, Link, notFound, Outlet, useRouter } from "@tanstack/react-router";
 import { RefreshCw } from "lucide-react";
-import { useState } from "react";
 import { z } from "zod";
 
 export const Route = createFileRoute("/nodes/$node")({
@@ -25,100 +26,34 @@ export const Route = createFileRoute("/nodes/$node")({
   },
 });
 
-type NodeType = "Server" | "Switch" | "PDU";
+const serverTabs = [
+  { to: "/nodes/$node/node", label: "Node" },
+  { to: "/nodes/$node/redfish", label: "Redfish" },
+  { to: "/nodes/$node/bios", label: "BIOS" },
+  { to: "/nodes/$node/provision", label: "Provision" },
+  { to: "/nodes/$node/console", label: "Console" },
+] as const;
+
+const switchTabs = [
+  { to: "/nodes/$node/node", label: "Node" },
+  { to: "/nodes/$node/lldp", label: "LLDP" },
+] as const;
 
 function RouteComponent() {
   const router = useRouter();
   const nodeName = Route.useParams().node;
   const { data } = Route.useLoaderData();
-  const [nodeType, setNodeType] = useState<NodeType>("Server");
-
-  if (nodeType != "Switch" && data?.[0].tags?.includes("switch")) {
-    setNodeType("Switch");
-  }
+  const host = data?.[0];
+  const tabs = host?.tags?.includes("switch") ? switchTabs : serverTabs;
 
   return (
     <Card>
-      <CardContent>
-        <div className="mb-2 grid grid-cols-2 gap-3 pt-2 sm:grid-cols-3">
-          <div className="hidden sm:block"></div>
-          <div className="sm:text-center">
-            <div className="inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
-              <Link
-                to="/nodes/$node/node"
-                from="/nodes/$node"
-                activeProps={{
-                  className: "shadow bg-background text-foreground",
-                }}
-                className="inline-flex items-center justify-center rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap ring-offset-background transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
-              >
-                Node
-              </Link>
-              {nodeType == "Switch" && (
-                <Link
-                  to="/nodes/$node/lldp"
-                  from="/nodes/$node"
-                  activeProps={{
-                    className: "shadow bg-background text-foreground",
-                  }}
-                  className="inline-flex items-center justify-center rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap ring-offset-background transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
-                >
-                  LLDP
-                </Link>
-              )}
-              {nodeType == "Server" && (
-                <Link
-                  to="/nodes/$node/redfish"
-                  from="/nodes/$node"
-                  activeProps={{
-                    className: "shadow bg-background text-foreground",
-                  }}
-                  className="inline-flex items-center justify-center rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap ring-offset-background transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
-                >
-                  Redfish
-                </Link>
-              )}
-              {nodeType == "Server" && (
-                <Link
-                  to="/nodes/$node/bios"
-                  from="/nodes/$node"
-                  activeProps={{
-                    className: "shadow bg-background text-foreground",
-                  }}
-                  className="inline-flex items-center justify-center rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap ring-offset-background transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
-                >
-                  BIOS
-                </Link>
-              )}
-              {nodeType == "Server" && (
-                <Link
-                  to="/nodes/$node/provision"
-                  from="/nodes/$node"
-                  activeProps={{
-                    className: "shadow bg-background text-foreground",
-                  }}
-                  className="inline-flex items-center justify-center rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap ring-offset-background transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
-                >
-                  Provision
-                </Link>
-              )}
-              {nodeType == "Server" && (
-                <Link
-                  to="/nodes/$node/console"
-                  from="/nodes/$node"
-                  activeProps={{
-                    className: "shadow bg-background text-foreground",
-                  }}
-                  className="inline-flex items-center justify-center rounded-md px-3 py-1 text-sm font-medium whitespace-nowrap ring-offset-background transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
-                >
-                  Console
-                </Link>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <div className="flex justify-end gap-2">
+      <CardContent className="p-0">
+        <DetailHeader
+          title={host?.name ?? nodeName}
+          facts={<NodeFacts host={host} name={nodeName} />}
+          actions={
+            <>
               <ActionsSheet type="node" checked={nodeName} length={1}>
                 <NodeActions nodes={nodeName} />
               </ActionsSheet>
@@ -126,10 +61,34 @@ function RouteComponent() {
                 <RefreshCw />
                 <span className="sr-only md:not-sr-only">Refresh</span>
               </Button>
-            </div>
-          </div>
+            </>
+          }
+          nav={
+            <nav aria-label="Node views" className="-mb-px flex gap-1 overflow-x-auto">
+              {tabs.map((t) => (
+                <Link
+                  key={t.to}
+                  to={t.to}
+                  from="/nodes/$node"
+                  activeProps={{
+                    className: "border-foreground text-foreground",
+                    "aria-current": "page",
+                  }}
+                  inactiveProps={{
+                    className:
+                      "border-transparent text-muted-foreground hover:text-foreground hover:border-border",
+                  }}
+                  className="rounded-t-sm border-b-2 px-3 pt-1 pb-2.5 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                >
+                  {t.label}
+                </Link>
+              ))}
+            </nav>
+          }
+        />
+        <div className="px-6 py-5">
+          <Outlet />
         </div>
-        <Outlet />
       </CardContent>
     </Card>
   );
