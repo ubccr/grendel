@@ -5,13 +5,10 @@ import ImagesDeleteAction from "@/components/actions/images/delete";
 import ImagesExportAction from "@/components/actions/images/export";
 import { DataTable, type DataTableActions } from "@/components/data-table/data-table";
 import { DataTableColumnHeader } from "@/components/data-table/header";
-import SelectableCheckbox from "@/components/data-table/selectableCheckbox";
 import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import AuthRedirect from "@/lib/auth";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import type { ColumnDef } from "@tanstack/react-table";
-import { useState } from "react";
+import type { DataTableColumnDef } from "@/components/data-table/features";
 
 export const Route = createFileRoute("/images/")({
   component: TableComponent,
@@ -19,57 +16,38 @@ export const Route = createFileRoute("/images/")({
   loader: () => getV1Images(),
 });
 
+// columns are defined once, outside the component, so the table keeps the same column definitions across renders
+const columns: DataTableColumnDef<BootImage, any>[] = [
+  {
+    accessorKey: "name",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
+    cell: ({ row }) => {
+      const name = row.original.name;
+      return (
+        <Link to={"/images/$image"} params={{ image: name }} className="hover:underline">
+          {name}
+        </Link>
+      );
+    },
+  },
+  {
+    accessorKey: "version",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="version" />,
+  },
+  {
+    accessorKey: "kernel",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="kernel" />,
+  },
+];
+
 function TableComponent() {
   const images = Route.useLoaderData();
   const { isFetching } = Route.useMatch();
 
-  const [lastSelectedID, setLastSelectedID] = useState(0);
-
-  const columns: ColumnDef<BootImage>[] = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={table.getIsAllRowsSelected()}
-          onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row, table }) => (
-        <SelectableCheckbox
-          row={row}
-          table={table}
-          lastSelectedID={lastSelectedID}
-          setLastSelectedID={setLastSelectedID}
-        />
-      ),
-    },
-    {
-      accessorKey: "name",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
-      cell: ({ row }) => {
-        const name = row.original.name;
-        return (
-          <Link to={"/images/$image"} params={{ image: name }} className="hover:underline">
-            {name}
-          </Link>
-        );
-      },
-    },
-    {
-      accessorKey: "version",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="version" />,
-    },
-    {
-      accessorKey: "kernel",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="kernel" />,
-    },
-  ];
-
   const actions: DataTableActions<BootImage> = ({ table }) => {
     const checked = table
       .getSelectedRowModel()
-      .rows.map((v) => v.getAllCells()[1].getValue())
+      .rows.map((v) => v.original.name)
       .join(",");
     return (
       <ActionsSheet checked={checked} length={table.getSelectedRowModel().rows.length}>
@@ -85,6 +63,9 @@ function TableComponent() {
     <Card>
       <CardContent>
         <DataTable
+          selectable
+          // id is only optional on the type because an image being added has none yet; every listed image comes from the database and has one
+          getRowId={(image) => String(image.id)}
           columns={columns}
           data={images.data ?? []}
           add={"/add/image"}

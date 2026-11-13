@@ -1,6 +1,5 @@
-"use client";
-
-import { Table } from "@tanstack/react-table";
+import type { RowData } from "@tanstack/react-table";
+import type { DataTableInstance } from "./features";
 import { Settings2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -13,11 +12,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-interface DataTableViewOptionsProps<TData> {
-  table: Table<TData>;
+interface DataTableViewOptionsProps<TData extends RowData> {
+  table: DataTableInstance<TData>;
 }
 
-export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps<TData>) {
+export function DataTableViewOptions<TData extends RowData>({
+  table,
+}: DataTableViewOptionsProps<TData>) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -39,6 +40,8 @@ export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps
                 className="capitalize"
                 checked={column.getIsVisible()}
                 onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                // keep the menu open after a toggle, so several columns can be shown or hidden in one visit
+                onSelect={(e) => e.preventDefault()}
               >
                 {column.id}
               </DropdownMenuCheckboxItem>

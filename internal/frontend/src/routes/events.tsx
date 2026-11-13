@@ -3,7 +3,6 @@ import { getV1GrendelEvents } from "@/client";
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTableColumnHeader } from "@/components/data-table/header";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -16,8 +15,7 @@ import {
 import AuthRedirect from "@/lib/auth";
 import { severityColor } from "@/lib/utils";
 import { createFileRoute } from "@tanstack/react-router";
-import type { ColumnDef, Row } from "@tanstack/react-table";
-import { ChevronDown, ChevronLeft } from "lucide-react";
+import type { DataTableColumnDef, DataTableRow } from "@/components/data-table/features";
 
 export const Route = createFileRoute("/events")({
   component: TableComponent,
@@ -28,7 +26,7 @@ export const Route = createFileRoute("/events")({
 function TableComponent() {
   const events = Route.useLoaderData();
 
-  const columns: ColumnDef<Event>[] = [
+  const columns: DataTableColumnDef<Event, any>[] = [
     {
       accessorKey: "Severity",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Severity" />,
@@ -54,32 +52,12 @@ function TableComponent() {
       accessorKey: "Message",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Message" />,
     },
-    {
-      id: "expand",
-      enableColumnFilter: false,
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Expand" />,
-      cell: ({ row }) => (
-        <div>
-          {row.getCanExpand() ? (
-            <Button
-              size="icon"
-              variant="secondary"
-              onClick={() => row.getCanExpand() && row.toggleExpanded()}
-            >
-              {row.getIsExpanded() ? <ChevronDown /> : <ChevronLeft />}
-            </Button>
-          ) : (
-            <span></span>
-          )}
-        </div>
-      ),
-    },
   ];
 
-  const renderSubComponent = ({ row }: { row: Row<Event> }) => {
+  const renderSubComponent = ({ row }: { row: DataTableRow<Event> }) => {
     const data = row.original.JobMessages;
     return (
-      <Table className="border p-2">
+      <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Status</TableHead>
@@ -104,7 +82,7 @@ function TableComponent() {
     );
   };
 
-  const getRowCanExpand = (row: Row<Event>) => {
+  const getRowCanExpand = (row: DataTableRow<Event>) => {
     if (row.original.JobMessages) return true;
     return false;
   };

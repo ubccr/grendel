@@ -1,4 +1,5 @@
-import { Table } from "@tanstack/react-table";
+import type { ReactTable } from "@tanstack/react-table";
+import type { RowData } from "@tanstack/react-table";
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -9,35 +10,77 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { DataTableFeatures, DataTableRow } from "./features";
 
-interface DataTablePaginationProps<TData> {
-  table: Table<TData>;
+interface DataTablePaginationProps<TData extends RowData> {
+  table: ReactTable<DataTableFeatures, TData>;
+  tree?: boolean;
 }
 
-export function DataTablePagination<TData>({ table }: DataTablePaginationProps<TData>) {
+export function DataTablePagination<TData extends RowData>({
+  table,
+  tree,
+}: DataTablePaginationProps<TData>) {
+  // a tree counts the rows its groups hold, the jobs or entries, rather than the nodes holding them
+  const counted = (r: DataTableRow<TData>) => !tree || r.depth > 0;
+  const { pageIndex, pageSize } = table.state.pagination;
+  const pageCount = Math.max(table.getPageCount(), 1);
+  const selected = table.getSelectedRowModel().flatRows.filter(counted).length;
+  const total = table.getFilteredRowModel().flatRows.filter(counted).length;
+  const groups = tree ? table.getPrePaginatedRowModel().rows.length : 0;
+
   return (
-    <div className="grid grid-cols-1 gap-2 px-2 sm:grid-cols-3">
-      <div className="flex-1 text-center text-sm text-muted-foreground sm:text-start">
-        {table.getFilteredSelectedRowModel().rows.length} of{" "}
-        {table.getFilteredRowModel().rows.length} row(s) selected.
+    <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 px-2 text-sm text-muted-foreground tabular-nums">
+      <div aria-live="polite">
+        {selected > 0 ? (
+          <span className="text-foreground">
+            {selected} of {total} selected
+          </span>
+        ) : groups > 0 ? (
+          <span>
+            {total} {total === 1 ? "row" : "rows"} across {groups}{" "}
+            {groups === 1 ? "group" : "groups"}
+          </span>
+        ) : (
+          <span>
+            {total} {total === 1 ? "row" : "rows"}
+          </span>
+        )}
       </div>
-      <div className="flex justify-center">
-        <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+      <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2">
+          <span>{groups > 0 ? "Groups per page" : "Rows per page"}</span>
+          <Select value={`${pageSize}`} onValueChange={(value) => table.setPageSize(Number(value))}>
+            <SelectTrigger className="h-8 w-[70px]" aria-label="Rows per page">
+              <SelectValue placeholder={pageSize} />
+            </SelectTrigger>
+            <SelectContent side="top">
+              {[10, 20, 30, 40, 50].map((size) => (
+                <SelectItem key={size} value={`${size}`}>
+                  {size}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-1">
+          <span className="mr-2">
+            Page {pageIndex + 1} of {pageCount}
+          </span>
           <Button
-            variant="secondary"
-            className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(0)}
+            variant="ghost"
+            size="icon"
+            className="hidden size-8 lg:inline-flex"
+            onClick={() => table.firstPage()}
             disabled={!table.getCanPreviousPage()}
           >
             <span className="sr-only">Go to first page</span>
             <ChevronsLeft />
           </Button>
           <Button
-            variant="secondary"
-            className="h-8 w-8 p-0"
+            variant="ghost"
+            size="icon"
+            className="size-8"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
@@ -45,8 +88,9 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
             <ChevronLeft />
           </Button>
           <Button
-            variant="secondary"
-            className="h-8 w-8 p-0"
+            variant="ghost"
+            size="icon"
+            className="size-8"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
@@ -54,35 +98,16 @@ export function DataTablePagination<TData>({ table }: DataTablePaginationProps<T
             <ChevronRight />
           </Button>
           <Button
-            variant="secondary"
-            className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+            variant="ghost"
+            size="icon"
+            className="hidden size-8 lg:inline-flex"
+            onClick={() => table.lastPage()}
             disabled={!table.getCanNextPage()}
           >
             <span className="sr-only">Go to last page</span>
             <ChevronsRight />
           </Button>
         </div>
-      </div>
-      <div className="flex items-center justify-center space-x-2 sm:justify-end">
-        <p className="text-sm font-medium">Rows per page</p>
-        <Select
-          value={`${table.getState().pagination.pageSize}`}
-          onValueChange={(value) => {
-            table.setPageSize(Number(value));
-          }}
-        >
-          <SelectTrigger className="h-8 w-[70px]">
-            <SelectValue placeholder={table.getState().pagination.pageSize} />
-          </SelectTrigger>
-          <SelectContent side="top">
-            {[10, 20, 30, 40, 50].map((pageSize) => (
-              <SelectItem key={pageSize} value={`${pageSize}`}>
-                {pageSize}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
       </div>
     </div>
   );

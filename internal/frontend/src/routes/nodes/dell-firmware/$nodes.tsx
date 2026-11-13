@@ -4,12 +4,7 @@ import FirmwareUpgradeAction from "@/components/actions/firmware/upgrade";
 import NodesJobsAction from "@/components/actions/nodes/jobs";
 import { DataTable, DataTableActions } from "@/components/data-table/data-table";
 import { DataTableColumnHeader } from "@/components/data-table/header";
-import SelectableCheckbox from "@/components/data-table/selectableCheckbox";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/components/ui/switch";
 import {
   Table,
   TableBody,
@@ -19,11 +14,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import AuthRedirect from "@/lib/auth";
-import { severityColor } from "@/lib/utils";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ColumnDef, Row } from "@tanstack/react-table";
-import { ChevronDown, ChevronLeft, CircleAlert, OctagonAlert, TriangleAlert } from "lucide-react";
-import { useState } from "react";
+import type { DataTableColumnDef, DataTableRow } from "@/components/data-table/features";
+import { CircleAlert, OctagonAlert, TriangleAlert } from "lucide-react";
 
 type NodeFirmware = NonNullable<BmcResponseModelBmcFirmwareUpdates["results"]>[number];
 
@@ -33,109 +26,53 @@ export const Route = createFileRoute("/nodes/dell-firmware/$nodes")({
   loader: async ({ params: { nodes } }) => getV1BmcFirmwareUpdates({ query: { nodeset: nodes } }),
 });
 
+// columns are defined once, outside the component, so the table keeps the same column definitions across renders
+const columns: DataTableColumnDef<NodeFirmware, any>[] = [
+  {
+    accessorKey: "node",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Node" />,
+    cell: ({ row }) => {
+      const name = row.original?.node;
+      return (
+        <Link
+          to={"/nodes/$node/node"}
+          params={{ node: name ?? "unknown" }}
+          className="hover:underline"
+        >
+          {name}
+        </Link>
+      );
+    },
+  },
+  {
+    id: "status",
+    accessorFn: (row) => (row.success ? "success" : "failed"),
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+  },
+  {
+    accessorKey: "message",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Message" />,
+  },
+  {
+    id: "updates",
+    accessorFn: (row) => row.data?.updates?.length ?? 0,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Updates" />,
+  },
+  {
+    id: "reboot_type",
+    accessorFn: (row) => row.data?.reboot_type ?? "",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Reboot Type" />,
+  },
+];
+
 function RouteComponent() {
   const { data } = Route.useLoaderData();
   const { isFetching } = Route.useMatch();
 
-  const [lastSelectedID, setLastSelectedID] = useState(0);
-  const columns: ColumnDef<NodeFirmware>[] = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllRowsSelected() || (table.getIsSomeRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row, table }) => (
-        <SelectableCheckbox
-          row={row}
-          table={table}
-          lastSelectedID={lastSelectedID}
-          setLastSelectedID={setLastSelectedID}
-        />
-      ),
-    },
-    {
-      accessorKey: "node",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Node" />,
-      cell: ({ row }) => {
-        const name = row.original?.node;
-        return (
-          <Link
-            to={"/nodes/$node/node"}
-            params={{ node: name ?? "unknown" }}
-            className="hover:underline"
-          >
-            {name}
-          </Link>
-        );
-      },
-    },
-    {
-      id: "status",
-      accessorFn: (row) => (row.success ? "success" : "failed"),
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
-      cell: ({ row, getValue }) => (
-        <Badge
-          variant="secondary"
-          className={`rounded-sm ${severityColor(row.original.success ? "success" : "error")}`}
-        >
-          {getValue<string>()}
-        </Badge>
-      ),
-    },
-    {
-      accessorKey: "message",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Message" />,
-    },
-    {
-      id: "updates",
-      accessorFn: (row) => row.data?.updates?.length ?? 0,
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Updates" />,
-    },
-    {
-      id: "reboot_type",
-      accessorFn: (row) => row.data?.reboot_type ?? "",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Reboot Type" />,
-    },
-    {
-      id: "expand",
-      enableColumnFilter: false,
-      header: ({ table }) => (
-        <Switch
-          aria-description="expand all"
-          checked={table.getIsAllRowsExpanded()}
-          onCheckedChange={(value) => {
-            table.toggleAllRowsExpanded(!!value);
-          }}
-        />
-      ),
-      cell: ({ row }) => (
-        <div>
-          {row.getCanExpand() ? (
-            <Button
-              size="icon"
-              variant="secondary"
-              onClick={() => row.getCanExpand() && row.toggleExpanded()}
-            >
-              {row.getIsExpanded() ? <ChevronDown /> : <ChevronLeft />}
-            </Button>
-          ) : (
-            <span></span>
-          )}
-        </div>
-      ),
-    },
-  ];
-
-  const renderSubComponent = ({ row }: { row: Row<NodeFirmware> }) => {
+  const renderSubComponent = ({ row }: { row: DataTableRow<NodeFirmware> }) => {
     const data = row.original.data?.updates;
     return (
-      <Table className="border p-2">
+      <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Criticality</TableHead>
@@ -163,7 +100,7 @@ function RouteComponent() {
     );
   };
 
-  const getRowCanExpand = (row: Row<NodeFirmware>) => {
+  const getRowCanExpand = (row: DataTableRow<NodeFirmware>) => {
     const len = row.original.data?.updates?.length ?? 0;
     if (len > 0) return true;
     return false;
@@ -189,9 +126,14 @@ function RouteComponent() {
     <Card>
       <CardContent className="p-2">
         <DataTable
+          selectable
+          getRowId={(result, i) => result.node ?? String(i)}
           columns={columns}
           renderSubComponent={renderSubComponent}
           getRowCanExpand={getRowCanExpand}
+          getRowTone={(row) =>
+            !row.original.success ? "error" : getRowCanExpand(row) ? "warn" : undefined
+          }
           Actions={actions}
           data={data?.results ?? []}
           progress={isFetching !== false}

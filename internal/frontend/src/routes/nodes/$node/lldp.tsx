@@ -2,7 +2,7 @@ import { getV1SwitchNodesetLldp, Lldp } from "@/client";
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTableColumnHeader } from "@/components/data-table/header";
 import { createFileRoute } from "@tanstack/react-router";
-import { ColumnDef } from "@tanstack/react-table";
+import type { DataTableColumnDef } from "@/components/data-table/features";
 export const Route = createFileRoute("/nodes/$node/lldp")({
   component: RouteComponent,
   loader: ({ params: { node } }) => getV1SwitchNodesetLldp({ path: { nodeset: node } }),
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/nodes/$node/lldp")({
 function RouteComponent() {
   const { data } = Route.useLoaderData();
 
-  const columns: ColumnDef<Lldp>[] = [
+  const columns: DataTableColumnDef<Lldp, any>[] = [
     {
       accessorKey: "port_name",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Port Name" />,
@@ -35,7 +35,11 @@ function RouteComponent() {
   ];
   return (
     <div className="my-4">
-      <DataTable columns={columns} data={data ?? []} />
+      <DataTable
+        getRowId={(port, i) => port.port_id ?? port.port_name ?? String(i)}
+        columns={columns}
+        data={data ?? []}
+      />
     </div>
   );
 }

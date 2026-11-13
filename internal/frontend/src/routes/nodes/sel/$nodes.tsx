@@ -3,11 +3,17 @@ import ActionsSheet from "@/components/actions-sheet";
 import NodesSelAction from "@/components/actions/nodes/sel";
 import { DataTable, DataTableActions } from "@/components/data-table/data-table";
 import { DataTableColumnHeader } from "@/components/data-table/header";
-import SelectableCheckbox from "@/components/data-table/selectableCheckbox";
-import { countWith, nodeColumns, NodeRow, rowsPerNode } from "@/components/nodes/bmc-columns";
+import {
+  nodeColumns,
+  nodeRowId,
+  nodeRowTone,
+  nodeTree,
+  nodeTreeTable,
+  type NodeTreeRow,
+} from "@/components/nodes/bmc-columns";
+import type { DataTableColumnDef } from "@/components/data-table/features";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -16,19 +22,60 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import AuthRedirect from "@/lib/auth";
 import { logSeverityColor } from "@/lib/bmc";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { ColumnDef } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { z } from "zod";
 
 type ArrayElement<T> = T extends (infer U)[] ? U : never;
 type Result = ArrayElement<NonNullable<BmcResponseModelBmcSelLog["results"]>>;
-type Entry = NodeRow & Partial<ArrayElement<NonNullable<NonNullable<Result["data"]>["entries"]>>>;
+type SelEntry = ArrayElement<NonNullable<NonNullable<Result["data"]>["entries"]>>;
+type Entry = NodeTreeRow<SelEntry>;
 
 const limits = ["25", "50", "100", "0"] as const;
+
+// columns are defined once, outside the component, so the table keeps the same column definitions across renders
+const columns: DataTableColumnDef<Entry, any>[] = [
+  ...nodeColumns<SelEntry>(),
+  {
+    accessorKey: "created",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Time" />,
+    cell: ({ getValue }) => {
+      const created = getValue<string>();
+      return (
+        <span className="whitespace-nowrap">
+          {created ? new Date(created).toLocaleString() : ""}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "severity",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Severity" />,
+    cell: ({ getValue }) => {
+      const severity = getValue<string>();
+      if (!severity) return null;
+      return (
+        <Badge variant="secondary" className={`rounded-sm ${logSeverityColor(severity)}`}>
+          {severity}
+        </Badge>
+      );
+    },
+  },
+  {
+    accessorKey: "message",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Event" />,
+  },
+  {
+    accessorKey: "sensor_type",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Sensor" />,
+  },
+  {
+    accessorKey: "message_id",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Message ID" />,
+  },
+];
 
 export const Route = createFileRoute("/nodes/sel/$nodes")({
   component: RouteComponent,
@@ -46,114 +93,18 @@ function RouteComponent() {
   const { isFetching } = Route.useMatch();
   const { limit } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
-  const [lastSelectedID, setLastSelectedID] = useState(0);
 
   const entries = useMemo(
-    () => rowsPerNode((data?.results ?? []).map((r) => ({ ...r, items: r.data?.entries }))),
+    () => nodeTree<SelEntry>((data?.results ?? []).map((r) => ({ ...r, items: r.data?.entries }))),
     [data],
   );
-
-  const columns: ColumnDef<Entry>[] = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row, table }) => (
-        <SelectableCheckbox
-          row={row}
-          table={table}
-          lastSelectedID={lastSelectedID}
-          setLastSelectedID={setLastSelectedID}
-        />
-      ),
-      aggregatedCell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsAllSubRowsSelected() || (row.getIsSomeSelected() && "indeterminate")}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select all in group"
-        />
-      ),
-    },
-    {
-      accessorKey: "node",
-      header: ({ table }) => (
-        <div className="flex justify-between gap-2">
-          <span>Node</span>
-          <Switch
-            aria-description="expand all"
-            checked={table.getIsAllRowsExpanded()}
-            onCheckedChange={(value) => table.toggleAllRowsExpanded(!!value)}
-          />
-        </div>
-      ),
-      cell: ({ row }) => (
-        <Link
-          to="/nodes/$node/node"
-          params={{ node: row.original.node }}
-          className="hover:underline"
-        >
-          {row.original.node}
-        </Link>
-      ),
-    },
-    ...nodeColumns<Entry>(),
-    {
-      accessorKey: "created",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Time" />,
-      aggregationFn: countWith<Entry>("id"),
-      aggregatedCell: ({ getValue }) => (
-        <Badge variant="secondary">{getValue<number>()} entries</Badge>
-      ),
-      cell: ({ getValue }) => {
-        const created = getValue<string>();
-        return (
-          <span className="whitespace-nowrap">
-            {created ? new Date(created).toLocaleString() : ""}
-          </span>
-        );
-      },
-    },
-    {
-      accessorKey: "severity",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Severity" />,
-      aggregationFn: "unique",
-      cell: ({ getValue }) => {
-        const severity = getValue<string>();
-        if (!severity) return null;
-        return (
-          <Badge variant="secondary" className={`rounded-sm ${logSeverityColor(severity)}`}>
-            {severity}
-          </Badge>
-        );
-      },
-    },
-    {
-      accessorKey: "message",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Event" />,
-    },
-    {
-      accessorKey: "sensor_type",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Sensor" />,
-    },
-    {
-      accessorKey: "message_id",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Message ID" />,
-    },
-  ];
 
   const actions: DataTableActions<Entry> = ({ table }) => {
     const nodes = [
       ...new Set(
         table
           .getSelectedRowModel()
-          .rows.map((v) => v.original.node)
+          .flatRows.map((v) => v.original.node)
           .filter(Boolean),
       ),
     ];
@@ -199,9 +150,12 @@ function RouteComponent() {
       <Card>
         <CardContent className="p-2">
           <DataTable
+            getRowId={nodeRowId}
             columns={columns}
             Actions={actions}
-            initialGrouping={["node"]}
+            selectable
+            tree={nodeTreeTable}
+            getRowTone={nodeRowTone}
             initialVisibility={{ message_id: false }}
             data={entries}
             progress={isFetching !== false}

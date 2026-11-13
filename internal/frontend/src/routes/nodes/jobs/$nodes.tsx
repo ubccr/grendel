@@ -3,22 +3,54 @@ import ActionsSheet from "@/components/actions-sheet";
 import JobsDeleteAction from "@/components/actions/jobs/delete";
 import { DataTable, DataTableActions } from "@/components/data-table/data-table";
 import { DataTableColumnHeader } from "@/components/data-table/header";
-import { countWith, nodeColumns, NodeRow, rowsPerNode } from "@/components/nodes/bmc-columns";
-import SelectableCheckbox from "@/components/data-table/selectableCheckbox";
-import { Badge } from "@/components/ui/badge";
+import {
+  nodeColumns,
+  nodeRowId,
+  nodeRowTone,
+  nodeTree,
+  nodeTreeTable,
+  type NodeTreeRow,
+} from "@/components/nodes/bmc-columns";
+import type { DataTableColumnDef } from "@/components/data-table/features";
 import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/components/ui/switch";
 import AuthRedirect from "@/lib/auth";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ColumnDef } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useMemo } from "react";
 
 type ArrayElement<T> = T extends (infer U)[] ? U : never;
 type Result = ArrayElement<NonNullable<BmcResponseModelBmcJobList["results"]>>;
 type Job = ArrayElement<NonNullable<NonNullable<Result["data"]>["jobs"]>>;
 
-type nodeJob = NodeRow & Partial<Job>;
+type nodeJob = NodeTreeRow<Job>;
+
+// columns are defined once, outside the component, so the table keeps the same column definitions across renders
+const columns: DataTableColumnDef<nodeJob, any>[] = [
+  ...nodeColumns<Job>(),
+  {
+    accessorKey: "id",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Job ID" />,
+  },
+  {
+    accessorKey: "status",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Job Status" />,
+  },
+  {
+    accessorKey: "state",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Job State" />,
+  },
+  {
+    accessorKey: "percent_complete",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Percent Complete" />,
+  },
+  {
+    accessorKey: "name",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Job Name" />,
+  },
+  {
+    accessorKey: "message",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Job Message" />,
+  },
+];
 
 export const Route = createFileRoute("/nodes/jobs/$nodes")({
   component: RouteComponent,
@@ -30,103 +62,15 @@ function RouteComponent() {
   const { data } = Route.useLoaderData();
   const { isFetching } = Route.useMatch();
 
-  const [lastSelectedID, setLastSelectedID] = useState(0);
   const nodeJobList = useMemo(
-    () => rowsPerNode((data?.results ?? []).map((r) => ({ ...r, items: r.data?.jobs }))),
+    () => nodeTree<Job>((data?.results ?? []).map((r) => ({ ...r, items: r.data?.jobs }))),
     [data],
   );
 
-  const columns: ColumnDef<nodeJob>[] = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row, table }) => (
-        <SelectableCheckbox
-          row={row}
-          table={table}
-          lastSelectedID={lastSelectedID}
-          setLastSelectedID={setLastSelectedID}
-        />
-      ),
-      aggregatedCell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsAllSubRowsSelected() || (row.getIsSomeSelected() && "indeterminate")}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select all in group"
-        />
-      ),
-    },
-    {
-      accessorKey: "node",
-      header: ({ table }) => (
-        <div className="flex justify-between gap-2">
-          <span>Node</span>
-          <Switch
-            aria-description="expand all"
-            checked={table.getIsAllRowsExpanded()}
-            onCheckedChange={(value) => {
-              table.toggleAllRowsExpanded(!!value);
-            }}
-          />
-        </div>
-      ),
-      cell: ({ row }) => {
-        const node = row.original?.node;
-        return (
-          <Link
-            to={"/nodes/$node/node"}
-            params={{ node: node ?? "unknown" }}
-            className="hover:underline"
-          >
-            {node}
-          </Link>
-        );
-      },
-    },
-    ...nodeColumns<nodeJob>(),
-    {
-      accessorKey: "id",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Job ID" />,
-      aggregationFn: countWith<nodeJob>("id"),
-      aggregatedCell: ({ getValue }) => <Badge variant="secondary">{getValue<number>()}</Badge>,
-    },
-    {
-      accessorKey: "status",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Job Status" />,
-      aggregationFn: "unique",
-    },
-    {
-      accessorKey: "state",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Job State" />,
-      aggregationFn: "unique",
-    },
-    {
-      accessorKey: "percent_complete",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Percent Complete" />,
-      aggregationFn: "min",
-      aggregatedCell: ({ getValue }) => <span>Minimum: {getValue<number>()}</span>,
-    },
-    {
-      accessorKey: "name",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Job Name" />,
-    },
-    {
-      accessorKey: "message",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Job Message" />,
-    },
-  ];
-
   const actions: DataTableActions<nodeJob> = ({ table }) => {
     const checked = new Map<string, string[]>();
-    const selected = table.getSelectedRowModel().rows.filter((v) => !v.getIsGrouped());
+    // the selection holds node rows too, when a whole node is checked, so take only the job rows under them
+    const selected = table.getSelectedRowModel().flatRows.filter((v) => v.depth > 0);
     selected.forEach((v) => {
       const { node, id } = v.original;
       if (!id) return;
@@ -145,9 +89,12 @@ function RouteComponent() {
     <Card>
       <CardContent className="p-2">
         <DataTable
+          getRowId={nodeRowId}
           columns={columns}
           Actions={actions}
-          initialGrouping={["node"]}
+          selectable
+          tree={nodeTreeTable}
+          getRowTone={nodeRowTone}
           data={nodeJobList}
           progress={isFetching !== false}
         />
