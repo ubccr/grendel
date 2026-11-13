@@ -21,6 +21,7 @@ import { ErrorPanel } from "@/components/error-panel";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Check, LoaderCircle, Minus, Rocket, X } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { Fragment, useEffect, useState } from "react";
 
 // match model.ProvisionState
@@ -501,6 +502,89 @@ export function ProvisionStatusPanel({ node }: { node: string }) {
       {failed.length > 0 && <FailedUnits units={failed} />}
 
       {s.facts && Object.keys(s.facts).length > 0 && <Facts facts={s.facts} />}
+    </div>
+  );
+}
+
+// ProvisionSummary is a node's last provision in brief, for a popover in a view of many nodes: where it got to, why it failed, and a way to the full tab
+export function ProvisionSummary({ status: s, node }: { status: ProvisionStatus; node: string }) {
+  const now = useNow(1000);
+  const states = stepStates(s.state, s.stages);
+  const failed = s.failed_units ?? [];
+  const image = imageText(s);
+  const { mismatch } = imageCheck(s);
+  const shown = failed.slice(0, 5);
+
+  return (
+    <div className="grid gap-3 text-sm">
+      <div className="grid gap-0.5">
+        <p className="font-medium">{headline(s, now)}</p>
+        {s.updated_at && (
+          <p className="text-xs text-muted-foreground" title={time(s.updated_at)}>
+            Last report {formatAgo(s.updated_at, now)}
+            {s.addr && ` from ${s.addr}`}
+          </p>
+        )}
+      </div>
+      <ol className="flex items-center gap-1" aria-label="Provision stages">
+        {steps.map((step, i) => (
+          <li key={step} className="flex items-center gap-1" title={stepLabels[step]}>
+            {i > 0 && (
+              <span
+                aria-hidden
+                className={cn(
+                  "h-0.5 w-3 rounded-full",
+                  states[i] === "pending" ? "bg-border" : "bg-emerald-600",
+                )}
+              />
+            )}
+            <span className="inline-flex scale-75">
+              <StepIcon state={states[i]} />
+            </span>
+            <span className="sr-only">
+              {stepLabels[step]}: {states[i]}
+            </span>
+          </li>
+        ))}
+      </ol>
+      {image && (
+        <p className={cn("text-xs", mismatch ? "text-destructive" : "text-muted-foreground")}>
+          {image}
+        </p>
+      )}
+      {s.message &&
+        (s.state === "failed" ? (
+          <pre className="max-h-40 overflow-y-auto rounded-md bg-muted px-3 py-2 font-mono text-xs break-words whitespace-pre-wrap">
+            {s.message}
+          </pre>
+        ) : (
+          <p className="text-muted-foreground">{s.message}</p>
+        ))}
+      {shown.length > 0 && (
+        <div className="grid gap-1">
+          <p className="text-xs font-medium">Failed units ({failed.length})</p>
+          <ul className="grid gap-0.5">
+            {shown.map((u) => (
+              <li key={u.name} className="flex justify-between gap-3 text-xs">
+                <span className="truncate font-mono" title={u.description}>
+                  {u.name}
+                </span>
+                <span className="shrink-0 text-destructive">{u.result}</span>
+              </li>
+            ))}
+          </ul>
+          {failed.length > shown.length && (
+            <p className="text-xs text-muted-foreground">and {failed.length - shown.length} more</p>
+          )}
+        </div>
+      )}
+      <Link
+        to="/nodes/$node/provision"
+        params={{ node }}
+        className="text-sm font-medium underline-offset-4 hover:underline"
+      >
+        Open the provision tab
+      </Link>
     </div>
   );
 }

@@ -1,11 +1,11 @@
-import { getV1NodesFind, getV1NodesProvisionStatus, Host } from "@/client";
+import { getV1NodesFind, getV1NodesProvisionStatus, type ProvisionStatus } from "@/client";
 import ActionsSheet from "@/components/actions-sheet";
 import NodeActions from "@/components/actions/nodes";
-import { AnimateIcon } from "@/components/animate-ui/icons/icon";
-import { SquareArrowOutUpRight } from "@/components/animate-ui/icons/square-arrow-out-up-right";
-import ProvisionIcon from "@/components/nodes/provision-button";
-import { ProvisionStatusBadge, statusesByNode } from "@/components/nodes/provision-status";
-import TagsList from "@/components/tags";
+import { DetailHeader, Fact, Unset } from "@/components/detail-header";
+import { ErrorPanel } from "@/components/error-panel";
+import { isFinished, statusesByNode } from "@/components/nodes/provision-status";
+import { placeNodes, rackOrder, sharedTags } from "@/components/racks/elevation";
+import { type Detail, RackElevation, TagList, UnplacedNodes } from "@/components/racks/rack-view";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -13,203 +13,260 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import AuthRedirect from "@/lib/auth";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Settings2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { RefreshCw, Server, Settings2 } from "lucide-react";
+import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
 export const Route = createFileRoute("/racks/$rack")({
-  component: RackTable,
+  component: RackPage,
   beforeLoad: AuthRedirect,
-  // the statuses load with the nodes so a refresh reloads both. A failure there only leaves the badges off
+  // the statuses load with the nodes so a refresh reloads both. The client throws on an error, so a failed status request is caught here and only leaves the badges off, as for a role without that permission
   loader: async ({ params: { rack } }) => {
     const tags = `rack=${rack}`;
     const [nodes, statuses] = await Promise.all([
       getV1NodesFind({ query: { tags } }),
-      getV1NodesProvisionStatus({ query: { tags } }),
+      getV1NodesProvisionStatus({ query: { tags } }).catch(() => undefined),
     ]);
-    return { ...nodes, statuses: statuses.data ?? [] };
+    return { ...nodes, statuses: statuses?.data ?? [] };
   },
 });
 
-type rackArr = {
-  u: string;
-  hosts: Host[];
-};
+const detailOptions: [Detail, string][] = [
+  ["status", "Last provision"],
+  ["image", "Boot image"],
+  ["arch", "Arch"],
+  ["firmware", "Firmware"],
+  ["tags", "Tags"],
+  ["bmc", "BMC link"],
+];
+const detailsKey = "grendel.rack.show";
 
-function RackTable() {
-  const { data, statuses } = Route.useLoaderData();
-  const statusByNode = useMemo(() => statusesByNode(statuses), [statuses]);
-  const [view, setView] = useState(["provision", "tags", "bmc"]);
-  const [checked, setChecked] = useState<string[]>([]);
-  const fields = ["provision", "tags", "firmware", "boot image", "bmc"];
+// useDetails remembers which details the rack shows, per browser
+function useDetails() {
+  const [details, setDetails] = useState<Detail[]>(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(detailsKey) ?? "null");
+      if (Array.isArray(saved)) return saved;
+    } catch {
+      // storage can be blocked, the defaults do
+    }
+    return ["status", "tags", "bmc"];
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem(detailsKey, JSON.stringify(details));
+    } catch {
+      // as above
+    }
+  }, [details]);
+  return [details, setDetails] as const;
+}
 
-  const arr: Array<rackArr> = [];
-  for (let x = 42; x >= 3; x--) {
-    let str = x.toString();
-    if (x < 10) str = "0" + str;
-
-    const found = data?.filter((host) => {
-      if (!host.name) return;
-      const parts = host.name.split("-");
-      if (parts.length < 3) return false;
-      if (parts[2] === str) return true;
-    });
-
-    arr.push({ u: str, hosts: found ?? [] });
-  }
+// RackFacts sum up the rack: how full it is, how many nodes will provision, and how their last provisions went
+function RackFacts({
+  rack,
+  nodes,
+  used,
+  height,
+  provisioning,
+  statuses,
+  common,
+}: {
+  rack: string;
+  nodes: number;
+  used: number;
+  height: number;
+  provisioning: number;
+  statuses: ProvisionStatus[];
+  common: string[];
+}) {
+  const failed = statuses.filter((s) => s.state === "failed").length;
+  const running = statuses.filter((s) => s.state && !isFinished(s.state)).length;
+  const done = statuses.filter((s) => s.state === "completed").length;
+  const tags = [`rack=${rack}`];
 
   return (
-    <Card>
-      <CardContent className="p-2">
-        <Table>
-          <TableHeader className="*:text-center">
-            <TableRow className="*:my-auto *:text-center">
-              <TableHead className="w-16">u</TableHead>
-              <TableHead className="grid grid-cols-3 *:my-auto *:text-center">
-                <div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button type="button" variant="secondary">
-                        <Settings2 />
-                        <span className="sr-only sm:not-sr-only">View</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      {fields.map((col, i) => (
-                        <DropdownMenuCheckboxItem
-                          key={i}
-                          className="capitalize"
-                          checked={!!view.find((view) => view == col)}
-                          onCheckedChange={(value) =>
-                            value
-                              ? setView([...view, col])
-                              : setView(view.filter((view) => view != col))
-                          }
-                        >
-                          {col}
-                        </DropdownMenuCheckboxItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-                <span>Node</span>
-                <div>
-                  <ActionsSheet type="node" checked={checked.join(",")} length={checked.length}>
-                    <NodeActions nodes={checked.join(",")} />
-                  </ActionsSheet>
-                </div>
-              </TableHead>
-              <TableHead className="w-16">
-                <Checkbox
-                  onCheckedChange={(e) => (e ? setChecked(checkAll(arr)) : setChecked([]))}
-                />
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {arr.map((u, i) => (
-              <TableRow key={i} className="*:text-center">
-                <TableCell>{u.u}</TableCell>
-                <TableCell className={`grid-cols-${u.hosts.length} grid gap-4`}>
-                  {u.hosts.map((host, i) => (
-                    <div key={i} className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                      <div className="flex justify-center gap-6 sm:justify-start">
-                        {!!view.find((col) => col === "provision") && (
-                          <>
-                            <ProvisionIcon provision={host.provision} name={host.name} />
-                            <span className="my-auto">
-                              <ProvisionStatusBadge status={statusByNode.get(host.name ?? "")} />
-                            </span>
-                          </>
-                        )}
-                        {!!view.find((col) => col === "firmware") && (
-                          <span className="my-auto">{host.firmware}</span>
-                        )}
-                      </div>
-                      <Link
-                        to={`/nodes/$node/node`}
-                        params={{ node: host.name ?? "unknown" }}
-                        className="my-auto"
-                      >
-                        {host.name}
-                      </Link>
-                      <div className="flex justify-center gap-6 sm:justify-end">
-                        {!!view.find((col) => col === "tags") && (
-                          <TagsList tags={host.tags ?? []} />
-                        )}
-                        {!!view.find((col) => col === "boot image") && (
-                          <span className="my-auto">{host.boot_image}</span>
-                        )}
-                        {!!view.find((col) => col === "bmc") && (
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <Button variant="secondary" type="button" size="icon" asChild>
-                                  <Link
-                                    to={
-                                      "https://" +
-                                      host.interfaces?.filter((v) => v?.bmc == true)?.[0]?.fqdn
-                                    }
-                                    target="_blank"
-                                  >
-                                    <AnimateIcon animateOnHover loop>
-                                      <SquareArrowOutUpRight animation="default-loop" />
-                                    </AnimateIcon>
-                                  </Link>
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <span>
-                                  https://
-                                  {host.interfaces?.filter((v) => v?.bmc == true)?.[0]?.fqdn}
-                                </span>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </TableCell>
-                <TableCell>
-                  <div className="flex justify-center gap-1">
-                    {u.hosts.map((host, i) => (
-                      <Checkbox
-                        key={i}
-                        checked={!!checked.find((v) => v === host.name)}
-                        onCheckedChange={(e) =>
-                          e
-                            ? setChecked([host.name ?? "unknown", ...checked])
-                            : setChecked(checked.filter((val) => val != host.name))
-                        }
-                      />
-                    ))}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+    <>
+      <Fact label="Nodes">
+        <Link to="/nodes" search={{ tags }} className="underline-offset-4 hover:underline">
+          {nodes}
+        </Link>
+      </Fact>
+      <Fact label="Units used">
+        {used} of {height}
+      </Fact>
+      <Fact label="Provision">
+        {provisioning ? (
+          <Link
+            to="/nodes"
+            search={{ tags, provision: "true" }}
+            className="underline-offset-4 hover:underline"
+          >
+            {provisioning} on
+          </Link>
+        ) : (
+          <Unset>all off</Unset>
+        )}
+        {provisioning > 0 && provisioning < nodes && (
+          <span className="text-muted-foreground">, {nodes - provisioning} off</span>
+        )}
+      </Fact>
+      {statuses.length > 0 && (
+        <Fact label="Last provision">
+          {[
+            failed > 0 && (
+              <span key="f" className="text-destructive">
+                {failed} failed
+              </span>
+            ),
+            running > 0 && <span key="r">{running} in progress</span>,
+            done > 0 && <span key="d">{done} completed</span>,
+          ]
+            .filter(Boolean)
+            .flatMap((el, i) => (i ? [", ", el] : [el]))}
+        </Fact>
+      )}
+      {common.length > 0 && (
+        <Fact label="Shared tags">
+          <TagList tags={common} max={6} label="Shared tags" className="justify-start py-0.5" />
+        </Fact>
+      )}
+    </>
   );
 }
 
-function checkAll(arr: rackArr[]) {
-  const allHosts: Array<string> = [];
-  arr.forEach((racku) => racku.hosts.forEach((host) => host.name && allHosts.push(host.name)));
+function RackPage() {
+  const router = useRouter();
+  const rack = Route.useParams().rack;
+  const { data, statuses } = Route.useLoaderData();
+  const hosts = data ?? [];
+  const placement = useMemo(() => placeNodes(hosts), [hosts]);
+  const order = useMemo(() => rackOrder(placement), [placement]);
+  const common = useMemo(() => sharedTags(hosts, rack), [hosts, rack]);
+  const statusByNode = useMemo(() => statusesByNode(statuses), [statuses]);
+  const [details, setDetails] = useDetails();
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const anchor = useRef<string | null>(null);
 
-  return allHosts;
+  // a shift-click selects or clears every node between it and the last one clicked, in the order the rack shows them
+  const onSelect = (name: string, on: boolean, e: MouseEvent) => {
+    const next = new Set(selected);
+    const from = anchor.current ? order.indexOf(anchor.current) : -1;
+    const to = order.indexOf(name);
+    const range =
+      e.shiftKey && from >= 0 && to >= 0
+        ? order.slice(Math.min(from, to), Math.max(from, to) + 1)
+        : [name];
+    for (const n of range)
+      if (on) next.add(n);
+      else next.delete(n);
+    anchor.current = name;
+    setSelected(next);
+  };
+
+  if (hosts.length === 0)
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <ErrorPanel
+            title="Rack not found"
+            message={`No nodes are tagged rack=${rack}. Tag the nodes in this rack to see them here.`}
+            icon={Server}
+          />
+        </CardContent>
+      </Card>
+    );
+
+  const checked = order.filter((n) => selected.has(n));
+  const all = checked.length === order.length;
+  const shared = {
+    rack,
+    common: new Set(common),
+    statuses: statusByNode,
+    details,
+    selected,
+    onSelect,
+  };
+
+  return (
+    <Card>
+      <CardContent className="p-0">
+        <DetailHeader
+          title={rack}
+          facts={
+            <RackFacts
+              rack={rack}
+              nodes={hosts.length}
+              used={placement.units.size}
+              height={placement.height}
+              provisioning={hosts.filter((h) => h.provision).length}
+              statuses={statuses}
+              common={common}
+            />
+          }
+          actions={
+            <>
+              <ActionsSheet type="node" checked={checked.join(",")} length={checked.length}>
+                <NodeActions nodes={checked.join(",")} />
+              </ActionsSheet>
+              <Button variant="secondary" type="button" onClick={() => router.invalidate()}>
+                <RefreshCw />
+                <span className="sr-only md:not-sr-only">Refresh</span>
+              </Button>
+            </>
+          }
+        />
+        <div className="mx-auto grid w-full max-w-6xl gap-4 px-6 py-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <label className="flex items-center gap-2 text-sm">
+              <Checkbox
+                checked={all ? true : checked.length ? "indeterminate" : false}
+                onCheckedChange={() => setSelected(all ? new Set() : new Set(order))}
+              />
+              {checked.length ? (
+                <span>
+                  {checked.length} of {order.length} selected
+                  <span className="text-muted-foreground">
+                    {" "}
+                    for Actions. Shift-click selects a range.
+                  </span>
+                </span>
+              ) : (
+                <span className="text-muted-foreground">Select all</span>
+              )}
+            </label>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button type="button" variant="secondary" size="sm">
+                  <Settings2 />
+                  Show
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>On each node</DropdownMenuLabel>
+                {detailOptions.map(([key, label]) => (
+                  <DropdownMenuCheckboxItem
+                    key={key}
+                    checked={details.includes(key)}
+                    onSelect={(e) => e.preventDefault()}
+                    onCheckedChange={(on) =>
+                      setDetails(on ? [...details, key] : details.filter((d) => d !== key))
+                    }
+                  >
+                    {label}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <RackElevation placement={placement} {...shared} />
+          <UnplacedNodes hosts={placement.unplaced} {...shared} />
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
