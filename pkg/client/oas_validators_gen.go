@@ -613,6 +613,36 @@ func (s *BmcResponseModelBmcSELLogResultsItemData) Validate() error {
 	return nil
 }
 
+func (s *BmcResponseModelBmcSecureBoot) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.Results.Get(); ok {
+			if err := func() error {
+				if value == nil {
+					return errors.New("nil is invalid value")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "results",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
 func (s *BmcResponseModelRedfishSystem) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -1125,6 +1155,94 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedIn
 		return &validate.Error{Fields: failures}
 	}
 	return nil
+}
+
+func (s *BmcSecureBootKeyBody) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.SignatureType.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "signature_type",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s BmcSecureBootKeyBodySignatureType) Validate() error {
+	switch s {
+	case "EFI_CERT_SHA256_GUID":
+		return nil
+	case "EFI_CERT_SHA384_GUID":
+		return nil
+	case "EFI_CERT_SHA512_GUID":
+		return nil
+	case "EFI_CERT_X509_SHA256_GUID":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s *BmcSecureBootResetBody) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.Type.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "type",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s BmcSecureBootResetBodyType) Validate() error {
+	switch s {
+	case "to-default":
+		return nil
+	case "delete-all":
+		return nil
+	case "delete-pk":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
 }
 
 func (s *DataDump) Validate() error {

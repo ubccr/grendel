@@ -9,9 +9,11 @@ import (
 	"encoding/json"
 	"errors"
 	"flag"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"slices"
 	"strings"
 	"testing"
@@ -24,13 +26,14 @@ import (
 //
 // The report is the test output, and it turns on one distinction. A skip means the hardware does not have the thing at all, which is correct behaviour. A failure means the hardware has it and Grendel gets it wrong. Nothing here fails because a bmc is missing a feature
 var (
-	compatEndpoint    = flag.String("redfish.endpoint", "", "Redfish base url to run the compatibility suite against. Empty skips the suite")
-	compatUser        = flag.String("redfish.user", "compat", "bmc username. Any non empty value works against a mockup server, which authenticates nothing")
-	compatPassword    = flag.String("redfish.password", "compat", "bmc password")
-	compatBasicAuth   = flag.Bool("redfish.basic-auth", false, "log in with basic auth instead of a redfish session. Required against a mockup server, which advertises no session service")
-	compatInsecure    = flag.Bool("redfish.insecure", true, "skip tls verification, which every bmc needs since they all ship a self signed cert")
-	compatDestructive = flag.Bool("redfish.destructive", false, "run the checks that actually write: power, job clear and sel clear. Off by default because this suite cannot tell a mockup server from a live bmc")
-	compatBiosChange  = flag.String("redfish.bios-change", "", "Name=Value of a harmless bios attribute to stage and then discard, such as NumLock=Off. Needs -redfish.destructive. The suite picks none itself, since no attribute is harmless on every machine")
+	compatEndpoint       = flag.String("redfish.endpoint", "", "Redfish base url to run the compatibility suite against. Empty skips the suite")
+	compatUser           = flag.String("redfish.user", "compat", "bmc username. Any non empty value works against a mockup server, which authenticates nothing")
+	compatPassword       = flag.String("redfish.password", "compat", "bmc password")
+	compatBasicAuth      = flag.Bool("redfish.basic-auth", false, "log in with basic auth instead of a redfish session. Required against a mockup server, which advertises no session service")
+	compatInsecure       = flag.Bool("redfish.insecure", true, "skip tls verification, which every bmc needs since they all ship a self signed cert")
+	compatDestructive    = flag.Bool("redfish.destructive", false, "run the checks that actually write: power, job clear and sel clear. Off by default because this suite cannot tell a mockup server from a live bmc")
+	compatBiosChange     = flag.String("redfish.bios-change", "", "Name=Value of a harmless bios attribute to stage and then discard, such as NumLock=Off. Needs -redfish.destructive. The suite picks none itself, since no attribute is harmless on every machine")
+	compatSecureBootCert = flag.String("redfish.secureboot-cert", "", "PEM certificate to enroll in db and then remove. Needs -redfish.destructive. Use a throwaway certificate, so a failed removal leaves nothing that signs anything")
 )
 
 // resetTypes the power command tells the operator it accepts, from cmd/grendel/bmc/power.go
@@ -68,6 +71,7 @@ func TestCompat(t *testing.T) {
 	t.Run("jobs", func(t *testing.T) { compatJobs(t, ctx) })
 	t.Run("sel", func(t *testing.T) { compatSEL(t, ctx) })
 	t.Run("bios", func(t *testing.T) { compatBios(t, ctx) })
+	t.Run("secureboot", func(t *testing.T) { compatSecureBoot(t, ctx) })
 	t.Run("identity", func(t *testing.T) { compatIdentity(t, ctx) })
 	t.Run("fanout", func(t *testing.T) { compatFanout(t, ctx) })
 }
@@ -567,6 +571,75 @@ func compatAssertSuccess(t *testing.T, success bool, message string) {
 	if message != "" {
 		t.Log(message)
 	}
+}
+
+func compatSecureBoot(t *testing.T, ctx context.Context) {
+	svc := compatService(*compatBasicAuth)
+
+	sb, err := svc.secureBootOne(ctx, compatTarget(), SecureBootRequest{})
+	if compatAbsent(err) || (err != nil && strings.Contains(err.Error(), "no secure boot resource")) {
+		t.Skipf("bmc has no secure boot resource: %s", err)
+	}
+	if err != nil {
+		t.Fatalf("cannot read secure boot: %s", err)
+	}
+	pending := "none"
+	if sb.PendingEnabled != nil {
+		pending = fmt.Sprint(*sb.PendingEnabled)
+	}
+	t.Logf("enabled=%t pending=%s mode=%q current_boot=%q databases=%v", sb.Enabled, pending, sb.Mode, sb.CurrentBoot, sb.Databases)
+
+	t.Run("keys", func(t *testing.T) {
+		if len(sb.Databases) == 0 {
+			t.Skip("the bmc lists no secure boot databases, so keys, add, delete and per database reset have nothing to work on")
+		}
+		keys, err := svc.secureBootOne(ctx, compatTarget(), SecureBootRequest{Keys: true, Defaults: true})
+		if err != nil {
+			t.Fatalf("cannot list the keys: %s", err)
+		}
+		for _, db := range keys.Keys {
+			unnamed := 0
+			for _, c := range db.Certificates {
+				if c.Fingerprint == "" {
+					unnamed++
+				}
+			}
+			t.Logf("%s: %d certificate(s), %d signature(s)", db.ID, len(db.Certificates), len(db.Signatures))
+			if unnamed > 0 {
+				t.Errorf("%s: %d certificate(s) come with neither the certificate nor a SHA-256 fingerprint, so delete by fingerprint cannot find them", db.ID, unnamed)
+			}
+		}
+	})
+
+	t.Run("enroll_and_remove", func(t *testing.T) {
+		compatRequireDestructive(t)
+		if *compatSecureBootCert == "" {
+			t.Skip("pass -redfish.secureboot-cert cert.pem to enroll a certificate in db and remove it")
+		}
+		raw, err := os.ReadFile(*compatSecureBootCert)
+		if err != nil {
+			t.Fatal(err)
+		}
+		cert, err := ParseCertificate(string(raw))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		added, err := svc.addSecureBootKeyOne(ctx, compatTarget(), AddSecureBootKeyRequest{Database: "db", Certificates: []SecureBootCert{{PEM: string(raw), Fingerprint: Fingerprint(cert.Raw)}}})
+		if err != nil {
+			t.Fatalf("cannot enroll the certificate: %s", err)
+		}
+		t.Log(added.Note)
+
+		removed, err := svc.deleteSecureBootKeyOne(ctx, compatTarget(), DeleteSecureBootKeyRequest{Database: "db", Fingerprint: Fingerprint(cert.Raw)})
+		if err != nil {
+			t.Fatalf("enrolled but cannot remove the certificate, remove it by hand: %s", err)
+		}
+		t.Log(removed.Note)
+		if strings.HasPrefix(removed.Note, "not enrolled") {
+			t.Error("the certificate was accepted but is not in db, or is listed without a fingerprint that matches it")
+		}
+	})
 }
 
 func compatIdentity(t *testing.T, ctx context.Context) {

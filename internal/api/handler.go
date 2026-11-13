@@ -205,6 +205,34 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 		filterNodes,
 		selectAll,
 	)
+	fuego.Get(bmc, "/secureboot", h.BmcSecureBoot,
+		option.Description("Get the UEFI secure boot state of node(s), with any staged change, and with keys the certificates and signatures in their databases"),
+		option.QueryBool("keys", "Also list the certificates and signatures in each database"),
+		option.Query("databases", "With keys, keep only these databases", param.Example("databases", "db,dbx")),
+		option.QueryBool("defaults", "With keys, also list the factory default databases, such as dbDefault"),
+		filterNodes,
+		selectAll,
+	)
+	fuego.Post(bmc, "/secureboot", h.BmcSetSecureBoot,
+		option.Description("Turn UEFI secure boot on or off on node(s), from their next boot"),
+		filterNodes,
+		selectAll,
+	)
+	fuego.Post(bmc, "/secureboot/keys", h.BmcAddSecureBootKey,
+		option.Description("Enroll certificates or a signature in a secure boot database on node(s). A key already enrolled is left alone"),
+		filterNodes,
+		selectAll,
+	)
+	fuego.Post(bmc, "/secureboot/keys/delete", h.BmcDeleteSecureBootKey,
+		option.Description("Remove a certificate or signature from a secure boot database on node(s)"),
+		filterNodes,
+		selectAll,
+	)
+	fuego.Post(bmc, "/secureboot/reset", h.BmcResetSecureBootKeys,
+		option.Description("Reset the secure boot databases of node(s) to their factory keys, or delete their keys"),
+		filterNodes,
+		selectAll,
+	)
 	fuego.Get(bmc, "/jobs", h.BmcJobs,
 		option.Description("Get the redfish job queue of node(s)"),
 		filterNodes,

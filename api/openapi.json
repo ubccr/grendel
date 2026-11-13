@@ -1045,6 +1045,144 @@
 				},
 				"type": "object"
 			},
+			"BmcResponse_model.BmcSecureBoot": {
+				"description": "BmcResponse_model.BmcSecureBoot schema",
+				"properties": {
+					"results": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"data": {
+									"nullable": true,
+									"properties": {
+										"current_boot": {
+											"type": "string"
+										},
+										"databases": {
+											"items": {
+												"type": "string"
+											},
+											"type": "array"
+										},
+										"enabled": {
+											"type": "boolean"
+										},
+										"keys": {
+											"items": {
+												"properties": {
+													"certificates": {
+														"items": {
+															"properties": {
+																"fingerprint": {
+																	"type": "string"
+																},
+																"id": {
+																	"type": "string"
+																},
+																"issuer": {
+																	"type": "string"
+																},
+																"not_after": {
+																	"type": "string"
+																},
+																"not_before": {
+																	"type": "string"
+																},
+																"owner": {
+																	"type": "string"
+																},
+																"subject": {
+																	"type": "string"
+																}
+															},
+															"type": "object"
+														},
+														"type": "array"
+													},
+													"id": {
+														"type": "string"
+													},
+													"signatures": {
+														"items": {
+															"properties": {
+																"hash": {
+																	"type": "string"
+																},
+																"id": {
+																	"type": "string"
+																},
+																"owner": {
+																	"type": "string"
+																},
+																"type": {
+																	"type": "string"
+																}
+															},
+															"type": "object"
+														},
+														"type": "array"
+													}
+												},
+												"type": "object"
+											},
+											"type": "array"
+										},
+										"mode": {
+											"type": "string"
+										},
+										"pending_enabled": {
+											"nullable": true,
+											"type": "boolean"
+										}
+									},
+									"type": "object"
+								},
+								"duration_ms": {
+									"format": "int64",
+									"type": "integer"
+								},
+								"message": {
+									"type": "string"
+								},
+								"node": {
+									"type": "string"
+								},
+								"success": {
+									"type": "boolean"
+								}
+							},
+							"type": "object"
+						},
+						"nullable": true,
+						"type": "array"
+					},
+					"run_id": {
+						"type": "string"
+					},
+					"summary": {
+						"properties": {
+							"duration_ms": {
+								"format": "int64",
+								"type": "integer"
+							},
+							"failed": {
+								"type": "integer"
+							},
+							"failed_nodes": {
+								"type": "string"
+							},
+							"succeeded": {
+								"type": "integer"
+							},
+							"total": {
+								"type": "integer"
+							}
+						},
+						"type": "object"
+					}
+				},
+				"type": "object"
+			},
 			"BmcResponse_model.RedfishSystem": {
 				"description": "BmcResponse_model.RedfishSystem schema",
 				"properties": {
@@ -1526,6 +1664,93 @@
 							}
 						},
 						"type": "object"
+					}
+				},
+				"type": "object"
+			},
+			"BmcSecureBootBody": {
+				"description": "BmcSecureBootBody schema",
+				"properties": {
+					"enabled": {
+						"description": "Whether secure boot is in effect from the next boot",
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"enabled"
+				],
+				"type": "object"
+			},
+			"BmcSecureBootDeleteBody": {
+				"description": "BmcSecureBootDeleteBody schema",
+				"properties": {
+					"database": {
+						"description": "PK, KEK, db or dbx",
+						"example": "db",
+						"type": "string"
+					},
+					"fingerprint": {
+						"description": "SHA-256 of a certificate, or the hash of a signature, in hex with or without colons. Mutually exclusive with id",
+						"type": "string"
+					},
+					"id": {
+						"description": "Id of the certificate or signature on the bmc. Ids differ between nodes, so this suits a single node. Mutually exclusive with fingerprint",
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"BmcSecureBootKeyBody": {
+				"description": "BmcSecureBootKeyBody schema",
+				"properties": {
+					"certificates": {
+						"description": "PEM encoded X.509 certificates, one per entry, enrolled in order. Mutually exclusive with signature",
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"database": {
+						"description": "PK, KEK, db or dbx",
+						"example": "db",
+						"type": "string"
+					},
+					"owner": {
+						"description": "UEFI signature owner GUID. Empty lets the bmc choose",
+						"type": "string"
+					},
+					"signature": {
+						"description": "Hex encoded signature data, such as the SHA-256 of a binary to revoke in dbx. Mutually exclusive with certificates",
+						"type": "string"
+					},
+					"signature_type": {
+						"description": "UEFI type of the signature. Defaults to EFI_CERT_SHA256_GUID",
+						"enum": [
+							"EFI_CERT_SHA256_GUID",
+							"EFI_CERT_SHA384_GUID",
+							"EFI_CERT_SHA512_GUID",
+							"EFI_CERT_X509_SHA256_GUID"
+						],
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"BmcSecureBootResetBody": {
+				"description": "BmcSecureBootResetBody schema",
+				"properties": {
+					"database": {
+						"description": "Reset only this database, PK, KEK, db or dbx. Empty resets every database",
+						"type": "string"
+					},
+					"type": {
+						"description": "to-default restores the factory keys, delete-all removes every key, which leaves the system in setup mode, and delete-pk removes only the platform key. delete-pk applies to every database, not one",
+						"enum": [
+							"to-default",
+							"delete-all",
+							"delete-pk"
+						],
+						"type": "string"
 					}
 				},
 				"type": "object"
@@ -4406,6 +4631,547 @@
 					}
 				],
 				"summary": "bmc power",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/secureboot": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcSecureBoot`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the UEFI secure boot state of node(s), with any staged change, and with keys the certificates and signatures in their databases",
+				"operationId": "GET_/v1/bmc/secureboot",
+				"parameters": [
+					{
+						"description": "Also list the certificates and signatures in each database",
+						"in": "query",
+						"name": "keys",
+						"schema": {
+							"type": "boolean"
+						}
+					},
+					{
+						"description": "With keys, keep only these databases",
+						"examples": {
+							"databases": {
+								"value": "db,dbx"
+							}
+						},
+						"in": "query",
+						"name": "databases",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "With keys, also list the factory default databases, such as dbDefault",
+						"in": "query",
+						"name": "defaults",
+						"schema": {
+							"type": "boolean"
+						}
+					},
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcSecureBoot"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcSecureBoot"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc secure boot",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			},
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcSetSecureBoot`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nTurn UEFI secure boot on or off on node(s), from their next boot",
+				"operationId": "POST_/v1/bmc/secureboot",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BmcSecureBootBody"
+							}
+						}
+					},
+					"description": "Request body for api.BmcSecureBootBody",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc set secure boot",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/secureboot/keys": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcAddSecureBootKey`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nEnroll certificates or a signature in a secure boot database on node(s). A key already enrolled is left alone",
+				"operationId": "POST_/v1/bmc/secureboot/keys",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BmcSecureBootKeyBody"
+							}
+						}
+					},
+					"description": "Request body for api.BmcSecureBootKeyBody",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc add secure boot key",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/secureboot/keys/delete": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcDeleteSecureBootKey`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nRemove a certificate or signature from a secure boot database on node(s)",
+				"operationId": "POST_/v1/bmc/secureboot/keys/delete",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BmcSecureBootDeleteBody"
+							}
+						}
+					},
+					"description": "Request body for api.BmcSecureBootDeleteBody",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc delete secure boot key",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/secureboot/reset": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcResetSecureBootKeys`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nReset the secure boot databases of node(s) to their factory keys, or delete their keys",
+				"operationId": "POST_/v1/bmc/secureboot/reset",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BmcSecureBootResetBody"
+							}
+						}
+					},
+					"description": "Request body for api.BmcSecureBootResetBody",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcAck"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc reset secure boot keys",
 				"tags": [
 					"v1",
 					"bmc"

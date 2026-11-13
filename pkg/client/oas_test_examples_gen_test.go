@@ -677,6 +677,90 @@ func TestBmcResponseModelBmcSELLogSummary_EncodeDecode(t *testing.T) {
 	var typ2 BmcResponseModelBmcSELLogSummary
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestBmcResponseModelBmcSecureBoot_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcSecureBoot
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcSecureBoot
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcSecureBootResultsItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcSecureBootResultsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcSecureBootResultsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcSecureBootResultsItemData_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcSecureBootResultsItemData
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcSecureBootResultsItemData
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcSecureBootResultsItemDataKeysItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcSecureBootResultsItemDataKeysItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcSecureBootResultsItemDataKeysItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcSecureBootSummary_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcSecureBootSummary
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcSecureBootSummary
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestBmcResponseModelRedfishSystem_EncodeDecode(t *testing.T) {
 	var typ BmcResponseModelRedfishSystem
 	typ.SetFake()
@@ -783,6 +867,78 @@ func TestBmcResponseModelRedfishSystemSummary_EncodeDecode(t *testing.T) {
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
 	var typ2 BmcResponseModelRedfishSystemSummary
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcSecureBootBody_EncodeDecode(t *testing.T) {
+	var typ BmcSecureBootBody
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcSecureBootBody
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcSecureBootDeleteBody_EncodeDecode(t *testing.T) {
+	var typ BmcSecureBootDeleteBody
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcSecureBootDeleteBody
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcSecureBootKeyBody_EncodeDecode(t *testing.T) {
+	var typ BmcSecureBootKeyBody
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcSecureBootKeyBody
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcSecureBootKeyBodySignatureType_EncodeDecode(t *testing.T) {
+	var typ BmcSecureBootKeyBodySignatureType
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcSecureBootKeyBodySignatureType
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcSecureBootResetBody_EncodeDecode(t *testing.T) {
+	var typ BmcSecureBootResetBody
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcSecureBootResetBody
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcSecureBootResetBodyType_EncodeDecode(t *testing.T) {
+	var typ BmcSecureBootResetBodyType
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcSecureBootResetBodyType
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestBmcSetBiosBody_EncodeDecode(t *testing.T) {

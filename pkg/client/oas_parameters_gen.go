@@ -88,6 +88,23 @@ type GETV1BmcJobsParams struct {
 	Accept OptString
 }
 
+// GETV1BmcSecurebootParams is parameters of GET_/v1/bmc/secureboot operation.
+type GETV1BmcSecurebootParams struct {
+	// Also list the certificates and signatures in each database.
+	Keys OptBool
+	// With keys, keep only these databases.
+	Databases OptString
+	// With keys, also list the factory default databases, such as dbDefault.
+	Defaults OptBool
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
+	Accept OptString
+}
+
 // GETV1BmcSelParams is parameters of GET_/v1/bmc/sel operation.
 type GETV1BmcSelParams struct {
 	// Keep only this many entries per node.
@@ -372,6 +389,50 @@ type POSTV1BmcLocationParams struct {
 
 // POSTV1BmcPowerParams is parameters of POST_/v1/bmc/power operation.
 type POSTV1BmcPowerParams struct {
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
+	Accept OptString
+}
+
+// POSTV1BmcSecurebootParams is parameters of POST_/v1/bmc/secureboot operation.
+type POSTV1BmcSecurebootParams struct {
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
+	Accept OptString
+}
+
+// POSTV1BmcSecurebootKeysParams is parameters of POST_/v1/bmc/secureboot/keys operation.
+type POSTV1BmcSecurebootKeysParams struct {
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
+	Accept OptString
+}
+
+// POSTV1BmcSecurebootKeysDeleteParams is parameters of POST_/v1/bmc/secureboot/keys/delete operation.
+type POSTV1BmcSecurebootKeysDeleteParams struct {
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags OptString
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString
+	Accept OptString
+}
+
+// POSTV1BmcSecurebootResetParams is parameters of POST_/v1/bmc/secureboot/reset operation.
+type POSTV1BmcSecurebootResetParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
 	Nodeset OptString
 	// Filter by tags. Minimum of one query parameter is required.

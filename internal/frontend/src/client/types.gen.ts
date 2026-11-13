@@ -474,6 +474,51 @@ export type BmcResponseModelBmcSelLog = {
 };
 
 /**
+ * BmcResponse_model.BmcSecureBoot schema
+ */
+export type BmcResponseModelBmcSecureBoot = {
+    results?: Array<{
+        data?: {
+            current_boot?: string;
+            databases?: Array<string>;
+            enabled?: boolean;
+            keys?: Array<{
+                certificates?: Array<{
+                    fingerprint?: string;
+                    id?: string;
+                    issuer?: string;
+                    not_after?: string;
+                    not_before?: string;
+                    owner?: string;
+                    subject?: string;
+                }>;
+                id?: string;
+                signatures?: Array<{
+                    hash?: string;
+                    id?: string;
+                    owner?: string;
+                    type?: string;
+                }>;
+            }>;
+            mode?: string;
+            pending_enabled?: boolean;
+        };
+        duration_ms?: number;
+        message?: string;
+        node?: string;
+        success?: boolean;
+    }>;
+    run_id?: string;
+    summary?: {
+        duration_ms?: number;
+        failed?: number;
+        failed_nodes?: string;
+        succeeded?: number;
+        total?: number;
+    };
+};
+
+/**
  * BmcResponse_model.RedfishSystem schema
  */
 export type BmcResponseModelRedfishSystem = {
@@ -617,6 +662,74 @@ export type BmcResponseModelRedfishSystem = {
         succeeded?: number;
         total?: number;
     };
+};
+
+/**
+ * BmcSecureBootBody schema
+ */
+export type BmcSecureBootBody = {
+    /**
+     * Whether secure boot is in effect from the next boot
+     */
+    enabled: boolean;
+};
+
+/**
+ * BmcSecureBootDeleteBody schema
+ */
+export type BmcSecureBootDeleteBody = {
+    /**
+     * PK, KEK, db or dbx
+     */
+    database?: string;
+    /**
+     * SHA-256 of a certificate, or the hash of a signature, in hex with or without colons. Mutually exclusive with id
+     */
+    fingerprint?: string;
+    /**
+     * Id of the certificate or signature on the bmc. Ids differ between nodes, so this suits a single node. Mutually exclusive with fingerprint
+     */
+    id?: string;
+};
+
+/**
+ * BmcSecureBootKeyBody schema
+ */
+export type BmcSecureBootKeyBody = {
+    /**
+     * PEM encoded X.509 certificates, one per entry, enrolled in order. Mutually exclusive with signature
+     */
+    certificates?: Array<string>;
+    /**
+     * PK, KEK, db or dbx
+     */
+    database?: string;
+    /**
+     * UEFI signature owner GUID. Empty lets the bmc choose
+     */
+    owner?: string;
+    /**
+     * Hex encoded signature data, such as the SHA-256 of a binary to revoke in dbx. Mutually exclusive with certificates
+     */
+    signature?: string;
+    /**
+     * UEFI type of the signature. Defaults to EFI_CERT_SHA256_GUID
+     */
+    signature_type?: 'EFI_CERT_SHA256_GUID' | 'EFI_CERT_SHA384_GUID' | 'EFI_CERT_SHA512_GUID' | 'EFI_CERT_X509_SHA256_GUID';
+};
+
+/**
+ * BmcSecureBootResetBody schema
+ */
+export type BmcSecureBootResetBody = {
+    /**
+     * Reset only this database, PK, KEK, db or dbx. Empty resets every database
+     */
+    database?: string;
+    /**
+     * to-default restores the factory keys, delete-all removes every key, which leaves the system in setup mode, and delete-pk removes only the platform key. delete-pk applies to every database, not one
+     */
+    type?: 'to-default' | 'delete-all' | 'delete-pk';
 };
 
 /**
@@ -1832,6 +1945,235 @@ export type PostV1BmcPowerResponses = {
 };
 
 export type PostV1BmcPowerResponse = PostV1BmcPowerResponses[keyof PostV1BmcPowerResponses];
+
+export type GetV1BmcSecurebootData = {
+    body?: never;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Also list the certificates and signatures in each database
+         */
+        keys?: boolean;
+        /**
+         * With keys, keep only these databases
+         */
+        databases?: string;
+        /**
+         * With keys, also list the factory default databases, such as dbDefault
+         */
+        defaults?: boolean;
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
+    };
+    url: '/v1/bmc/secureboot';
+};
+
+export type GetV1BmcSecurebootErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type GetV1BmcSecurebootError = GetV1BmcSecurebootErrors[keyof GetV1BmcSecurebootErrors];
+
+export type GetV1BmcSecurebootResponses = {
+    /**
+     * OK
+     */
+    200: BmcResponseModelBmcSecureBoot;
+};
+
+export type GetV1BmcSecurebootResponse = GetV1BmcSecurebootResponses[keyof GetV1BmcSecurebootResponses];
+
+export type PostV1BmcSecurebootData = {
+    /**
+     * Request body for api.BmcSecureBootBody
+     */
+    body: BmcSecureBootBody;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
+    };
+    url: '/v1/bmc/secureboot';
+};
+
+export type PostV1BmcSecurebootErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type PostV1BmcSecurebootError = PostV1BmcSecurebootErrors[keyof PostV1BmcSecurebootErrors];
+
+export type PostV1BmcSecurebootResponses = {
+    /**
+     * OK
+     */
+    200: BmcResponseModelBmcAck;
+};
+
+export type PostV1BmcSecurebootResponse = PostV1BmcSecurebootResponses[keyof PostV1BmcSecurebootResponses];
+
+export type PostV1BmcSecurebootKeysData = {
+    /**
+     * Request body for api.BmcSecureBootKeyBody
+     */
+    body: BmcSecureBootKeyBody;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
+    };
+    url: '/v1/bmc/secureboot/keys';
+};
+
+export type PostV1BmcSecurebootKeysErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type PostV1BmcSecurebootKeysError = PostV1BmcSecurebootKeysErrors[keyof PostV1BmcSecurebootKeysErrors];
+
+export type PostV1BmcSecurebootKeysResponses = {
+    /**
+     * OK
+     */
+    200: BmcResponseModelBmcAck;
+};
+
+export type PostV1BmcSecurebootKeysResponse = PostV1BmcSecurebootKeysResponses[keyof PostV1BmcSecurebootKeysResponses];
+
+export type PostV1BmcSecurebootKeysDeleteData = {
+    /**
+     * Request body for api.BmcSecureBootDeleteBody
+     */
+    body: BmcSecureBootDeleteBody;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
+    };
+    url: '/v1/bmc/secureboot/keys/delete';
+};
+
+export type PostV1BmcSecurebootKeysDeleteErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type PostV1BmcSecurebootKeysDeleteError = PostV1BmcSecurebootKeysDeleteErrors[keyof PostV1BmcSecurebootKeysDeleteErrors];
+
+export type PostV1BmcSecurebootKeysDeleteResponses = {
+    /**
+     * OK
+     */
+    200: BmcResponseModelBmcAck;
+};
+
+export type PostV1BmcSecurebootKeysDeleteResponse = PostV1BmcSecurebootKeysDeleteResponses[keyof PostV1BmcSecurebootKeysDeleteResponses];
+
+export type PostV1BmcSecurebootResetData = {
+    /**
+     * Request body for api.BmcSecureBootResetBody
+     */
+    body: BmcSecureBootResetBody;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
+    };
+    url: '/v1/bmc/secureboot/reset';
+};
+
+export type PostV1BmcSecurebootResetErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type PostV1BmcSecurebootResetError = PostV1BmcSecurebootResetErrors[keyof PostV1BmcSecurebootResetErrors];
+
+export type PostV1BmcSecurebootResetResponses = {
+    /**
+     * OK
+     */
+    200: BmcResponseModelBmcAck;
+};
+
+export type PostV1BmcSecurebootResetResponse = PostV1BmcSecurebootResetResponses[keyof PostV1BmcSecurebootResetResponses];
 
 export type GetV1BmcSelData = {
     body?: never;

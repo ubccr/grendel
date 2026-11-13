@@ -106,11 +106,21 @@ func schemaCustomizer() openapi3gen.SchemaCustomizerFn {
 			schema.Nullable = true
 		}
 
+		// enum lists the values a string field takes, so the generated clients get a type for it rather than any string
+		if enum := tag.Get("enum"); enum != "" {
+			for _, v := range strings.Split(enum, ",") {
+				schema.Enum = append(schema.Enum, v)
+			}
+		}
+
 		st := tag.Get("oai3")
 		for _, s := range strings.Split(st, ",") {
 			switch s {
 			case "nullable":
 				schema.Nullable = true
+			case "notnull":
+				// a pointer field is nullable by default, which a required field meant to be set must not be
+				schema.Nullable = false
 			case "typeStrArr":
 				schema.Items = openapi3.NewSchemaRef("", openapi3.NewStringSchema())
 			case "typeStr":

@@ -178,6 +178,43 @@ type BmcBiosRegistry struct {
 	Attributes []BmcBiosAttribute `json:"attributes"`
 }
 
+// BmcSecureBoot is one node's UEFI secure boot state, with the keys when asked for. Enabled is what the next boot uses, and PendingEnabled is a staged change to it, nil when none is staged
+type BmcSecureBoot struct {
+	Enabled        bool     `json:"enabled"`
+	PendingEnabled *bool    `json:"pending_enabled" oai3:"nullable"`
+	Mode           string   `json:"mode" description:"SetupMode, UserMode, AuditMode or DeployedMode"`
+	CurrentBoot    string   `json:"current_boot" description:"Whether secure boot was in effect for the current boot: Enabled or Disabled"`
+	Databases      []string `json:"databases" description:"The key databases the bmc exposes, such as PK, KEK, db and dbx"`
+	// Keys is the contents of the databases, present only when they were asked for
+	Keys []BmcSecureBootDatabase `json:"keys,omitempty"`
+}
+
+// BmcSecureBootCert is one certificate in a secure boot database. Fingerprint is the SHA-256 of the certificate, empty when the bmc reports neither the certificate nor a SHA-256 fingerprint
+type BmcSecureBootCert struct {
+	ID          string `json:"id"`
+	Subject     string `json:"subject"`
+	Issuer      string `json:"issuer"`
+	NotBefore   string `json:"not_before"`
+	NotAfter    string `json:"not_after"`
+	Fingerprint string `json:"fingerprint"`
+	Owner       string `json:"owner" description:"UEFI signature owner GUID"`
+}
+
+// BmcSecureBootSignature is one hash in a secure boot database, such as a revoked binary in dbx
+type BmcSecureBootSignature struct {
+	ID    string `json:"id"`
+	Type  string `json:"type" description:"UEFI signature type, such as EFI_CERT_SHA256_GUID"`
+	Hash  string `json:"hash" description:"Hex encoded signature data"`
+	Owner string `json:"owner" description:"UEFI signature owner GUID"`
+}
+
+// BmcSecureBootDatabase is the contents of one secure boot key database
+type BmcSecureBootDatabase struct {
+	ID           string                   `json:"id"`
+	Certificates []BmcSecureBootCert      `json:"certificates"`
+	Signatures   []BmcSecureBootSignature `json:"signatures"`
+}
+
 // BmcLocation is where a node sits, as its bmc records it. RackUnit is nil when unset
 type BmcLocation struct {
 	Datacenter string `json:"datacenter"`

@@ -1417,6 +1417,227 @@ func (s *BmcResponseModelBmcSELLogSummary) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *BmcResponseModelBmcSecureBoot) SetFake() {
+	{
+		{
+			s.Results.SetFake()
+		}
+	}
+	{
+		{
+			s.RunID.SetFake()
+		}
+	}
+	{
+		{
+			s.Summary.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcSecureBootResultsItem) SetFake() {
+	{
+		{
+			s.Data.SetFake()
+		}
+	}
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Message.SetFake()
+		}
+	}
+	{
+		{
+			s.Node.SetFake()
+		}
+	}
+	{
+		{
+			s.Success.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcSecureBootResultsItemData) SetFake() {
+	{
+		{
+			s.CurrentBoot.SetFake()
+		}
+	}
+	{
+		{
+			s.Databases = nil
+			for i := 0; i < 0; i++ {
+				var elem string
+				{
+					elem = "string"
+				}
+				s.Databases = append(s.Databases, elem)
+			}
+		}
+	}
+	{
+		{
+			s.Enabled.SetFake()
+		}
+	}
+	{
+		{
+			s.Keys = nil
+			for i := 0; i < 0; i++ {
+				var elem BmcResponseModelBmcSecureBootResultsItemDataKeysItem
+				{
+					elem.SetFake()
+				}
+				s.Keys = append(s.Keys, elem)
+			}
+		}
+	}
+	{
+		{
+			s.Mode.SetFake()
+		}
+	}
+	{
+		{
+			s.PendingEnabled.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) SetFake() {
+	{
+		{
+			s.Certificates = nil
+			for i := 0; i < 0; i++ {
+				var elem BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem
+				{
+					elem.SetFake()
+				}
+				s.Certificates = append(s.Certificates, elem)
+			}
+		}
+	}
+	{
+		{
+			s.ID.SetFake()
+		}
+	}
+	{
+		{
+			s.Signatures = nil
+			for i := 0; i < 0; i++ {
+				var elem BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem
+				{
+					elem.SetFake()
+				}
+				s.Signatures = append(s.Signatures, elem)
+			}
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetFake() {
+	{
+		{
+			s.Fingerprint.SetFake()
+		}
+	}
+	{
+		{
+			s.ID.SetFake()
+		}
+	}
+	{
+		{
+			s.Issuer.SetFake()
+		}
+	}
+	{
+		{
+			s.NotAfter.SetFake()
+		}
+	}
+	{
+		{
+			s.NotBefore.SetFake()
+		}
+	}
+	{
+		{
+			s.Owner.SetFake()
+		}
+	}
+	{
+		{
+			s.Subject.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) SetFake() {
+	{
+		{
+			s.Hash.SetFake()
+		}
+	}
+	{
+		{
+			s.ID.SetFake()
+		}
+	}
+	{
+		{
+			s.Owner.SetFake()
+		}
+	}
+	{
+		{
+			s.Type.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcSecureBootSummary) SetFake() {
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Failed.SetFake()
+		}
+	}
+	{
+		{
+			s.FailedNodes.SetFake()
+		}
+	}
+	{
+		{
+			s.Succeeded.SetFake()
+		}
+	}
+	{
+		{
+			s.Total.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
 func (s *BmcResponseModelRedfishSystem) SetFake() {
 	{
 		{
@@ -2117,6 +2338,94 @@ func (s *BmcResponseModelRedfishSystemSummary) SetFake() {
 			s.Total.SetFake()
 		}
 	}
+}
+
+// SetFake set fake values.
+func (s *BmcSecureBootBody) SetFake() {
+	{
+		{
+			s.Enabled = true
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcSecureBootDeleteBody) SetFake() {
+	{
+		{
+			s.Database.SetFake()
+		}
+	}
+	{
+		{
+			s.Fingerprint.SetFake()
+		}
+	}
+	{
+		{
+			s.ID.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcSecureBootKeyBody) SetFake() {
+	{
+		{
+			s.Certificates = nil
+			for i := 0; i < 0; i++ {
+				var elem string
+				{
+					elem = "string"
+				}
+				s.Certificates = append(s.Certificates, elem)
+			}
+		}
+	}
+	{
+		{
+			s.Database.SetFake()
+		}
+	}
+	{
+		{
+			s.Owner.SetFake()
+		}
+	}
+	{
+		{
+			s.Signature.SetFake()
+		}
+	}
+	{
+		{
+			s.SignatureType.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcSecureBootKeyBodySignatureType) SetFake() {
+	*s = BmcSecureBootKeyBodySignatureTypeEFICERTSHA256GUID
+}
+
+// SetFake set fake values.
+func (s *BmcSecureBootResetBody) SetFake() {
+	{
+		{
+			s.Database.SetFake()
+		}
+	}
+	{
+		{
+			s.Type.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcSecureBootResetBodyType) SetFake() {
+	*s = BmcSecureBootResetBodyTypeToDefault
 }
 
 // SetFake set fake values.
@@ -3177,6 +3486,11 @@ func (s *NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *NilBmcResponseModelBmcSecureBootResultsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
 func (s *NilBmcResponseModelRedfishSystemResultsItem) SetFake() {
 	s.Null = true
 }
@@ -3601,8 +3915,35 @@ func (s *OptBmcResponseModelBmcSELLogSummary) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptBmcResponseModelBmcSecureBootSummary) SetFake() {
+	var elem BmcResponseModelBmcSecureBootSummary
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
 func (s *OptBmcResponseModelRedfishSystemSummary) SetFake() {
 	var elem BmcResponseModelRedfishSystemSummary
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptBmcSecureBootKeyBodySignatureType) SetFake() {
+	var elem BmcSecureBootKeyBodySignatureType
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptBmcSecureBootResetBodyType) SetFake() {
+	var elem BmcSecureBootResetBodyType
 	{
 		elem.SetFake()
 	}
@@ -3721,6 +4062,12 @@ func (s *OptNilBmcResponseModelBmcSELLogResultsItemData) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptNilBmcResponseModelBmcSecureBootResultsItemData) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
 func (s *OptNilBmcResponseModelRedfishSystemResultsItemData) SetFake() {
 	s.Null = true
 	s.Set = true
@@ -3734,6 +4081,12 @@ func (s *OptNilBmcResponseModelRedfishSystemResultsItemDataLocation) SetFake() {
 
 // SetFake set fake values.
 func (s *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDell) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilBool) SetFake() {
 	s.Null = true
 	s.Set = true
 }
@@ -3848,6 +4201,12 @@ func (s *OptNilNilBmcResponseModelBmcSELLogResultsItemArray) SetFake() {
 
 // SetFake set fake values.
 func (s *OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) SetFake() {
 	s.Null = true
 	s.Set = true
 }

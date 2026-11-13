@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
 )
 
@@ -2797,6 +2798,392 @@ func (s *BmcResponseModelBmcSELLogSummary) SetTotal(val OptInt) {
 	s.Total = val
 }
 
+// BmcResponse_model.BmcSecureBoot schema.
+// Ref: #/components/schemas/BmcResponse_model.BmcSecureBoot
+type BmcResponseModelBmcSecureBoot struct {
+	Results OptNilNilBmcResponseModelBmcSecureBootResultsItemArray `json:"results"`
+	RunID   OptString                                              `json:"run_id"`
+	Summary OptBmcResponseModelBmcSecureBootSummary                `json:"summary"`
+}
+
+// GetResults returns the value of Results.
+func (s *BmcResponseModelBmcSecureBoot) GetResults() OptNilNilBmcResponseModelBmcSecureBootResultsItemArray {
+	return s.Results
+}
+
+// GetRunID returns the value of RunID.
+func (s *BmcResponseModelBmcSecureBoot) GetRunID() OptString {
+	return s.RunID
+}
+
+// GetSummary returns the value of Summary.
+func (s *BmcResponseModelBmcSecureBoot) GetSummary() OptBmcResponseModelBmcSecureBootSummary {
+	return s.Summary
+}
+
+// SetResults sets the value of Results.
+func (s *BmcResponseModelBmcSecureBoot) SetResults(val OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) {
+	s.Results = val
+}
+
+// SetRunID sets the value of RunID.
+func (s *BmcResponseModelBmcSecureBoot) SetRunID(val OptString) {
+	s.RunID = val
+}
+
+// SetSummary sets the value of Summary.
+func (s *BmcResponseModelBmcSecureBoot) SetSummary(val OptBmcResponseModelBmcSecureBootSummary) {
+	s.Summary = val
+}
+
+type BmcResponseModelBmcSecureBootResultsItem struct {
+	Data       OptNilBmcResponseModelBmcSecureBootResultsItemData `json:"data"`
+	DurationMs OptInt64                                           `json:"duration_ms"`
+	Message    OptString                                          `json:"message"`
+	Node       OptString                                          `json:"node"`
+	Success    OptBool                                            `json:"success"`
+}
+
+// GetData returns the value of Data.
+func (s *BmcResponseModelBmcSecureBootResultsItem) GetData() OptNilBmcResponseModelBmcSecureBootResultsItemData {
+	return s.Data
+}
+
+// GetDurationMs returns the value of DurationMs.
+func (s *BmcResponseModelBmcSecureBootResultsItem) GetDurationMs() OptInt64 {
+	return s.DurationMs
+}
+
+// GetMessage returns the value of Message.
+func (s *BmcResponseModelBmcSecureBootResultsItem) GetMessage() OptString {
+	return s.Message
+}
+
+// GetNode returns the value of Node.
+func (s *BmcResponseModelBmcSecureBootResultsItem) GetNode() OptString {
+	return s.Node
+}
+
+// GetSuccess returns the value of Success.
+func (s *BmcResponseModelBmcSecureBootResultsItem) GetSuccess() OptBool {
+	return s.Success
+}
+
+// SetData sets the value of Data.
+func (s *BmcResponseModelBmcSecureBootResultsItem) SetData(val OptNilBmcResponseModelBmcSecureBootResultsItemData) {
+	s.Data = val
+}
+
+// SetDurationMs sets the value of DurationMs.
+func (s *BmcResponseModelBmcSecureBootResultsItem) SetDurationMs(val OptInt64) {
+	s.DurationMs = val
+}
+
+// SetMessage sets the value of Message.
+func (s *BmcResponseModelBmcSecureBootResultsItem) SetMessage(val OptString) {
+	s.Message = val
+}
+
+// SetNode sets the value of Node.
+func (s *BmcResponseModelBmcSecureBootResultsItem) SetNode(val OptString) {
+	s.Node = val
+}
+
+// SetSuccess sets the value of Success.
+func (s *BmcResponseModelBmcSecureBootResultsItem) SetSuccess(val OptBool) {
+	s.Success = val
+}
+
+type BmcResponseModelBmcSecureBootResultsItemData struct {
+	CurrentBoot    OptString                                              `json:"current_boot"`
+	Databases      []string                                               `json:"databases"`
+	Enabled        OptBool                                                `json:"enabled"`
+	Keys           []BmcResponseModelBmcSecureBootResultsItemDataKeysItem `json:"keys"`
+	Mode           OptString                                              `json:"mode"`
+	PendingEnabled OptNilBool                                             `json:"pending_enabled"`
+}
+
+// GetCurrentBoot returns the value of CurrentBoot.
+func (s *BmcResponseModelBmcSecureBootResultsItemData) GetCurrentBoot() OptString {
+	return s.CurrentBoot
+}
+
+// GetDatabases returns the value of Databases.
+func (s *BmcResponseModelBmcSecureBootResultsItemData) GetDatabases() []string {
+	return s.Databases
+}
+
+// GetEnabled returns the value of Enabled.
+func (s *BmcResponseModelBmcSecureBootResultsItemData) GetEnabled() OptBool {
+	return s.Enabled
+}
+
+// GetKeys returns the value of Keys.
+func (s *BmcResponseModelBmcSecureBootResultsItemData) GetKeys() []BmcResponseModelBmcSecureBootResultsItemDataKeysItem {
+	return s.Keys
+}
+
+// GetMode returns the value of Mode.
+func (s *BmcResponseModelBmcSecureBootResultsItemData) GetMode() OptString {
+	return s.Mode
+}
+
+// GetPendingEnabled returns the value of PendingEnabled.
+func (s *BmcResponseModelBmcSecureBootResultsItemData) GetPendingEnabled() OptNilBool {
+	return s.PendingEnabled
+}
+
+// SetCurrentBoot sets the value of CurrentBoot.
+func (s *BmcResponseModelBmcSecureBootResultsItemData) SetCurrentBoot(val OptString) {
+	s.CurrentBoot = val
+}
+
+// SetDatabases sets the value of Databases.
+func (s *BmcResponseModelBmcSecureBootResultsItemData) SetDatabases(val []string) {
+	s.Databases = val
+}
+
+// SetEnabled sets the value of Enabled.
+func (s *BmcResponseModelBmcSecureBootResultsItemData) SetEnabled(val OptBool) {
+	s.Enabled = val
+}
+
+// SetKeys sets the value of Keys.
+func (s *BmcResponseModelBmcSecureBootResultsItemData) SetKeys(val []BmcResponseModelBmcSecureBootResultsItemDataKeysItem) {
+	s.Keys = val
+}
+
+// SetMode sets the value of Mode.
+func (s *BmcResponseModelBmcSecureBootResultsItemData) SetMode(val OptString) {
+	s.Mode = val
+}
+
+// SetPendingEnabled sets the value of PendingEnabled.
+func (s *BmcResponseModelBmcSecureBootResultsItemData) SetPendingEnabled(val OptNilBool) {
+	s.PendingEnabled = val
+}
+
+type BmcResponseModelBmcSecureBootResultsItemDataKeysItem struct {
+	Certificates []BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem `json:"certificates"`
+	ID           OptString                                                              `json:"id"`
+	Signatures   []BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem   `json:"signatures"`
+}
+
+// GetCertificates returns the value of Certificates.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) GetCertificates() []BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem {
+	return s.Certificates
+}
+
+// GetID returns the value of ID.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) GetID() OptString {
+	return s.ID
+}
+
+// GetSignatures returns the value of Signatures.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) GetSignatures() []BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem {
+	return s.Signatures
+}
+
+// SetCertificates sets the value of Certificates.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) SetCertificates(val []BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) {
+	s.Certificates = val
+}
+
+// SetID sets the value of ID.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) SetID(val OptString) {
+	s.ID = val
+}
+
+// SetSignatures sets the value of Signatures.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) SetSignatures(val []BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) {
+	s.Signatures = val
+}
+
+type BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem struct {
+	Fingerprint OptString `json:"fingerprint"`
+	ID          OptString `json:"id"`
+	Issuer      OptString `json:"issuer"`
+	NotAfter    OptString `json:"not_after"`
+	NotBefore   OptString `json:"not_before"`
+	Owner       OptString `json:"owner"`
+	Subject     OptString `json:"subject"`
+}
+
+// GetFingerprint returns the value of Fingerprint.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetFingerprint() OptString {
+	return s.Fingerprint
+}
+
+// GetID returns the value of ID.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetID() OptString {
+	return s.ID
+}
+
+// GetIssuer returns the value of Issuer.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetIssuer() OptString {
+	return s.Issuer
+}
+
+// GetNotAfter returns the value of NotAfter.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetNotAfter() OptString {
+	return s.NotAfter
+}
+
+// GetNotBefore returns the value of NotBefore.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetNotBefore() OptString {
+	return s.NotBefore
+}
+
+// GetOwner returns the value of Owner.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetOwner() OptString {
+	return s.Owner
+}
+
+// GetSubject returns the value of Subject.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetSubject() OptString {
+	return s.Subject
+}
+
+// SetFingerprint sets the value of Fingerprint.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetFingerprint(val OptString) {
+	s.Fingerprint = val
+}
+
+// SetID sets the value of ID.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetID(val OptString) {
+	s.ID = val
+}
+
+// SetIssuer sets the value of Issuer.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetIssuer(val OptString) {
+	s.Issuer = val
+}
+
+// SetNotAfter sets the value of NotAfter.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetNotAfter(val OptString) {
+	s.NotAfter = val
+}
+
+// SetNotBefore sets the value of NotBefore.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetNotBefore(val OptString) {
+	s.NotBefore = val
+}
+
+// SetOwner sets the value of Owner.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetOwner(val OptString) {
+	s.Owner = val
+}
+
+// SetSubject sets the value of Subject.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetSubject(val OptString) {
+	s.Subject = val
+}
+
+type BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem struct {
+	Hash  OptString `json:"hash"`
+	ID    OptString `json:"id"`
+	Owner OptString `json:"owner"`
+	Type  OptString `json:"type"`
+}
+
+// GetHash returns the value of Hash.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) GetHash() OptString {
+	return s.Hash
+}
+
+// GetID returns the value of ID.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) GetID() OptString {
+	return s.ID
+}
+
+// GetOwner returns the value of Owner.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) GetOwner() OptString {
+	return s.Owner
+}
+
+// GetType returns the value of Type.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) GetType() OptString {
+	return s.Type
+}
+
+// SetHash sets the value of Hash.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) SetHash(val OptString) {
+	s.Hash = val
+}
+
+// SetID sets the value of ID.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) SetID(val OptString) {
+	s.ID = val
+}
+
+// SetOwner sets the value of Owner.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) SetOwner(val OptString) {
+	s.Owner = val
+}
+
+// SetType sets the value of Type.
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) SetType(val OptString) {
+	s.Type = val
+}
+
+type BmcResponseModelBmcSecureBootSummary struct {
+	DurationMs  OptInt64  `json:"duration_ms"`
+	Failed      OptInt    `json:"failed"`
+	FailedNodes OptString `json:"failed_nodes"`
+	Succeeded   OptInt    `json:"succeeded"`
+	Total       OptInt    `json:"total"`
+}
+
+// GetDurationMs returns the value of DurationMs.
+func (s *BmcResponseModelBmcSecureBootSummary) GetDurationMs() OptInt64 {
+	return s.DurationMs
+}
+
+// GetFailed returns the value of Failed.
+func (s *BmcResponseModelBmcSecureBootSummary) GetFailed() OptInt {
+	return s.Failed
+}
+
+// GetFailedNodes returns the value of FailedNodes.
+func (s *BmcResponseModelBmcSecureBootSummary) GetFailedNodes() OptString {
+	return s.FailedNodes
+}
+
+// GetSucceeded returns the value of Succeeded.
+func (s *BmcResponseModelBmcSecureBootSummary) GetSucceeded() OptInt {
+	return s.Succeeded
+}
+
+// GetTotal returns the value of Total.
+func (s *BmcResponseModelBmcSecureBootSummary) GetTotal() OptInt {
+	return s.Total
+}
+
+// SetDurationMs sets the value of DurationMs.
+func (s *BmcResponseModelBmcSecureBootSummary) SetDurationMs(val OptInt64) {
+	s.DurationMs = val
+}
+
+// SetFailed sets the value of Failed.
+func (s *BmcResponseModelBmcSecureBootSummary) SetFailed(val OptInt) {
+	s.Failed = val
+}
+
+// SetFailedNodes sets the value of FailedNodes.
+func (s *BmcResponseModelBmcSecureBootSummary) SetFailedNodes(val OptString) {
+	s.FailedNodes = val
+}
+
+// SetSucceeded sets the value of Succeeded.
+func (s *BmcResponseModelBmcSecureBootSummary) SetSucceeded(val OptInt) {
+	s.Succeeded = val
+}
+
+// SetTotal sets the value of Total.
+func (s *BmcResponseModelBmcSecureBootSummary) SetTotal(val OptInt) {
+	s.Total = val
+}
+
 // BmcResponse_model.RedfishSystem schema.
 // Ref: #/components/schemas/BmcResponse_model.RedfishSystem
 type BmcResponseModelRedfishSystem struct {
@@ -4276,6 +4663,270 @@ func (s *BmcResponseModelRedfishSystemSummary) SetSucceeded(val OptInt) {
 // SetTotal sets the value of Total.
 func (s *BmcResponseModelRedfishSystemSummary) SetTotal(val OptInt) {
 	s.Total = val
+}
+
+// BmcSecureBootBody schema.
+// Ref: #/components/schemas/BmcSecureBootBody
+type BmcSecureBootBody struct {
+	// Whether secure boot is in effect from the next boot.
+	Enabled bool `json:"enabled"`
+}
+
+// GetEnabled returns the value of Enabled.
+func (s *BmcSecureBootBody) GetEnabled() bool {
+	return s.Enabled
+}
+
+// SetEnabled sets the value of Enabled.
+func (s *BmcSecureBootBody) SetEnabled(val bool) {
+	s.Enabled = val
+}
+
+// BmcSecureBootDeleteBody schema.
+// Ref: #/components/schemas/BmcSecureBootDeleteBody
+type BmcSecureBootDeleteBody struct {
+	// PK, KEK, db or dbx.
+	Database OptString `json:"database"`
+	// SHA-256 of a certificate, or the hash of a signature, in hex with or without colons. Mutually
+	// exclusive with id.
+	Fingerprint OptString `json:"fingerprint"`
+	// Id of the certificate or signature on the bmc. Ids differ between nodes, so this suits a single
+	// node. Mutually exclusive with fingerprint.
+	ID OptString `json:"id"`
+}
+
+// GetDatabase returns the value of Database.
+func (s *BmcSecureBootDeleteBody) GetDatabase() OptString {
+	return s.Database
+}
+
+// GetFingerprint returns the value of Fingerprint.
+func (s *BmcSecureBootDeleteBody) GetFingerprint() OptString {
+	return s.Fingerprint
+}
+
+// GetID returns the value of ID.
+func (s *BmcSecureBootDeleteBody) GetID() OptString {
+	return s.ID
+}
+
+// SetDatabase sets the value of Database.
+func (s *BmcSecureBootDeleteBody) SetDatabase(val OptString) {
+	s.Database = val
+}
+
+// SetFingerprint sets the value of Fingerprint.
+func (s *BmcSecureBootDeleteBody) SetFingerprint(val OptString) {
+	s.Fingerprint = val
+}
+
+// SetID sets the value of ID.
+func (s *BmcSecureBootDeleteBody) SetID(val OptString) {
+	s.ID = val
+}
+
+// BmcSecureBootKeyBody schema.
+// Ref: #/components/schemas/BmcSecureBootKeyBody
+type BmcSecureBootKeyBody struct {
+	// PEM encoded X.509 certificates, one per entry, enrolled in order. Mutually exclusive with signature.
+	Certificates []string `json:"certificates"`
+	// PK, KEK, db or dbx.
+	Database OptString `json:"database"`
+	// UEFI signature owner GUID. Empty lets the bmc choose.
+	Owner OptString `json:"owner"`
+	// Hex encoded signature data, such as the SHA-256 of a binary to revoke in dbx. Mutually exclusive
+	// with certificates.
+	Signature OptString `json:"signature"`
+	// UEFI type of the signature. Defaults to EFI_CERT_SHA256_GUID.
+	SignatureType OptBmcSecureBootKeyBodySignatureType `json:"signature_type"`
+}
+
+// GetCertificates returns the value of Certificates.
+func (s *BmcSecureBootKeyBody) GetCertificates() []string {
+	return s.Certificates
+}
+
+// GetDatabase returns the value of Database.
+func (s *BmcSecureBootKeyBody) GetDatabase() OptString {
+	return s.Database
+}
+
+// GetOwner returns the value of Owner.
+func (s *BmcSecureBootKeyBody) GetOwner() OptString {
+	return s.Owner
+}
+
+// GetSignature returns the value of Signature.
+func (s *BmcSecureBootKeyBody) GetSignature() OptString {
+	return s.Signature
+}
+
+// GetSignatureType returns the value of SignatureType.
+func (s *BmcSecureBootKeyBody) GetSignatureType() OptBmcSecureBootKeyBodySignatureType {
+	return s.SignatureType
+}
+
+// SetCertificates sets the value of Certificates.
+func (s *BmcSecureBootKeyBody) SetCertificates(val []string) {
+	s.Certificates = val
+}
+
+// SetDatabase sets the value of Database.
+func (s *BmcSecureBootKeyBody) SetDatabase(val OptString) {
+	s.Database = val
+}
+
+// SetOwner sets the value of Owner.
+func (s *BmcSecureBootKeyBody) SetOwner(val OptString) {
+	s.Owner = val
+}
+
+// SetSignature sets the value of Signature.
+func (s *BmcSecureBootKeyBody) SetSignature(val OptString) {
+	s.Signature = val
+}
+
+// SetSignatureType sets the value of SignatureType.
+func (s *BmcSecureBootKeyBody) SetSignatureType(val OptBmcSecureBootKeyBodySignatureType) {
+	s.SignatureType = val
+}
+
+// UEFI type of the signature. Defaults to EFI_CERT_SHA256_GUID.
+type BmcSecureBootKeyBodySignatureType string
+
+const (
+	BmcSecureBootKeyBodySignatureTypeEFICERTSHA256GUID     BmcSecureBootKeyBodySignatureType = "EFI_CERT_SHA256_GUID"
+	BmcSecureBootKeyBodySignatureTypeEFICERTSHA384GUID     BmcSecureBootKeyBodySignatureType = "EFI_CERT_SHA384_GUID"
+	BmcSecureBootKeyBodySignatureTypeEFICERTSHA512GUID     BmcSecureBootKeyBodySignatureType = "EFI_CERT_SHA512_GUID"
+	BmcSecureBootKeyBodySignatureTypeEFICERTX509SHA256GUID BmcSecureBootKeyBodySignatureType = "EFI_CERT_X509_SHA256_GUID"
+)
+
+// AllValues returns all BmcSecureBootKeyBodySignatureType values.
+func (BmcSecureBootKeyBodySignatureType) AllValues() []BmcSecureBootKeyBodySignatureType {
+	return []BmcSecureBootKeyBodySignatureType{
+		BmcSecureBootKeyBodySignatureTypeEFICERTSHA256GUID,
+		BmcSecureBootKeyBodySignatureTypeEFICERTSHA384GUID,
+		BmcSecureBootKeyBodySignatureTypeEFICERTSHA512GUID,
+		BmcSecureBootKeyBodySignatureTypeEFICERTX509SHA256GUID,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s BmcSecureBootKeyBodySignatureType) MarshalText() ([]byte, error) {
+	switch s {
+	case BmcSecureBootKeyBodySignatureTypeEFICERTSHA256GUID:
+		return []byte(s), nil
+	case BmcSecureBootKeyBodySignatureTypeEFICERTSHA384GUID:
+		return []byte(s), nil
+	case BmcSecureBootKeyBodySignatureTypeEFICERTSHA512GUID:
+		return []byte(s), nil
+	case BmcSecureBootKeyBodySignatureTypeEFICERTX509SHA256GUID:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *BmcSecureBootKeyBodySignatureType) UnmarshalText(data []byte) error {
+	switch BmcSecureBootKeyBodySignatureType(data) {
+	case BmcSecureBootKeyBodySignatureTypeEFICERTSHA256GUID:
+		*s = BmcSecureBootKeyBodySignatureTypeEFICERTSHA256GUID
+		return nil
+	case BmcSecureBootKeyBodySignatureTypeEFICERTSHA384GUID:
+		*s = BmcSecureBootKeyBodySignatureTypeEFICERTSHA384GUID
+		return nil
+	case BmcSecureBootKeyBodySignatureTypeEFICERTSHA512GUID:
+		*s = BmcSecureBootKeyBodySignatureTypeEFICERTSHA512GUID
+		return nil
+	case BmcSecureBootKeyBodySignatureTypeEFICERTX509SHA256GUID:
+		*s = BmcSecureBootKeyBodySignatureTypeEFICERTX509SHA256GUID
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// BmcSecureBootResetBody schema.
+// Ref: #/components/schemas/BmcSecureBootResetBody
+type BmcSecureBootResetBody struct {
+	// Reset only this database, PK, KEK, db or dbx. Empty resets every database.
+	Database OptString `json:"database"`
+	// To-default restores the factory keys, delete-all removes every key, which leaves the system in
+	// setup mode, and delete-pk removes only the platform key. delete-pk applies to every database, not
+	// one.
+	Type OptBmcSecureBootResetBodyType `json:"type"`
+}
+
+// GetDatabase returns the value of Database.
+func (s *BmcSecureBootResetBody) GetDatabase() OptString {
+	return s.Database
+}
+
+// GetType returns the value of Type.
+func (s *BmcSecureBootResetBody) GetType() OptBmcSecureBootResetBodyType {
+	return s.Type
+}
+
+// SetDatabase sets the value of Database.
+func (s *BmcSecureBootResetBody) SetDatabase(val OptString) {
+	s.Database = val
+}
+
+// SetType sets the value of Type.
+func (s *BmcSecureBootResetBody) SetType(val OptBmcSecureBootResetBodyType) {
+	s.Type = val
+}
+
+// To-default restores the factory keys, delete-all removes every key, which leaves the system in
+// setup mode, and delete-pk removes only the platform key. delete-pk applies to every database, not
+// one.
+type BmcSecureBootResetBodyType string
+
+const (
+	BmcSecureBootResetBodyTypeToDefault BmcSecureBootResetBodyType = "to-default"
+	BmcSecureBootResetBodyTypeDeleteAll BmcSecureBootResetBodyType = "delete-all"
+	BmcSecureBootResetBodyTypeDeletePk  BmcSecureBootResetBodyType = "delete-pk"
+)
+
+// AllValues returns all BmcSecureBootResetBodyType values.
+func (BmcSecureBootResetBodyType) AllValues() []BmcSecureBootResetBodyType {
+	return []BmcSecureBootResetBodyType{
+		BmcSecureBootResetBodyTypeToDefault,
+		BmcSecureBootResetBodyTypeDeleteAll,
+		BmcSecureBootResetBodyTypeDeletePk,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s BmcSecureBootResetBodyType) MarshalText() ([]byte, error) {
+	switch s {
+	case BmcSecureBootResetBodyTypeToDefault:
+		return []byte(s), nil
+	case BmcSecureBootResetBodyTypeDeleteAll:
+		return []byte(s), nil
+	case BmcSecureBootResetBodyTypeDeletePk:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *BmcSecureBootResetBodyType) UnmarshalText(data []byte) error {
+	switch BmcSecureBootResetBodyType(data) {
+	case BmcSecureBootResetBodyTypeToDefault:
+		*s = BmcSecureBootResetBodyTypeToDefault
+		return nil
+	case BmcSecureBootResetBodyTypeDeleteAll:
+		*s = BmcSecureBootResetBodyTypeDeleteAll
+		return nil
+	case BmcSecureBootResetBodyTypeDeletePk:
+		*s = BmcSecureBootResetBodyTypeDeletePk
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 // BmcSetBiosBody schema.
@@ -6552,6 +7203,51 @@ func (o NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) Or(d BmcResponse
 	return d
 }
 
+// NewNilBmcResponseModelBmcSecureBootResultsItem returns new NilBmcResponseModelBmcSecureBootResultsItem with value set to v.
+func NewNilBmcResponseModelBmcSecureBootResultsItem(v BmcResponseModelBmcSecureBootResultsItem) NilBmcResponseModelBmcSecureBootResultsItem {
+	return NilBmcResponseModelBmcSecureBootResultsItem{
+		Value: v,
+	}
+}
+
+// NilBmcResponseModelBmcSecureBootResultsItem is nullable BmcResponseModelBmcSecureBootResultsItem.
+type NilBmcResponseModelBmcSecureBootResultsItem struct {
+	Value BmcResponseModelBmcSecureBootResultsItem
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilBmcResponseModelBmcSecureBootResultsItem) SetTo(v BmcResponseModelBmcSecureBootResultsItem) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o NilBmcResponseModelBmcSecureBootResultsItem) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *NilBmcResponseModelBmcSecureBootResultsItem) SetToNull() {
+	o.Null = true
+	var v BmcResponseModelBmcSecureBootResultsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilBmcResponseModelBmcSecureBootResultsItem) Get() (v BmcResponseModelBmcSecureBootResultsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilBmcResponseModelBmcSecureBootResultsItem) Or(d BmcResponseModelBmcSecureBootResultsItem) BmcResponseModelBmcSecureBootResultsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewNilBmcResponseModelRedfishSystemResultsItem returns new NilBmcResponseModelRedfishSystemResultsItem with value set to v.
 func NewNilBmcResponseModelRedfishSystemResultsItem(v BmcResponseModelRedfishSystemResultsItem) NilBmcResponseModelRedfishSystemResultsItem {
 	return NilBmcResponseModelRedfishSystemResultsItem{
@@ -8195,6 +8891,52 @@ func (o OptBmcResponseModelBmcSELLogSummary) Or(d BmcResponseModelBmcSELLogSumma
 	return d
 }
 
+// NewOptBmcResponseModelBmcSecureBootSummary returns new OptBmcResponseModelBmcSecureBootSummary with value set to v.
+func NewOptBmcResponseModelBmcSecureBootSummary(v BmcResponseModelBmcSecureBootSummary) OptBmcResponseModelBmcSecureBootSummary {
+	return OptBmcResponseModelBmcSecureBootSummary{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptBmcResponseModelBmcSecureBootSummary is optional BmcResponseModelBmcSecureBootSummary.
+type OptBmcResponseModelBmcSecureBootSummary struct {
+	Value BmcResponseModelBmcSecureBootSummary
+	Set   bool
+}
+
+// IsSet returns true if OptBmcResponseModelBmcSecureBootSummary was set.
+func (o OptBmcResponseModelBmcSecureBootSummary) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptBmcResponseModelBmcSecureBootSummary) Reset() {
+	var v BmcResponseModelBmcSecureBootSummary
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptBmcResponseModelBmcSecureBootSummary) SetTo(v BmcResponseModelBmcSecureBootSummary) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptBmcResponseModelBmcSecureBootSummary) Get() (v BmcResponseModelBmcSecureBootSummary, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptBmcResponseModelBmcSecureBootSummary) Or(d BmcResponseModelBmcSecureBootSummary) BmcResponseModelBmcSecureBootSummary {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptBmcResponseModelRedfishSystemSummary returns new OptBmcResponseModelRedfishSystemSummary with value set to v.
 func NewOptBmcResponseModelRedfishSystemSummary(v BmcResponseModelRedfishSystemSummary) OptBmcResponseModelRedfishSystemSummary {
 	return OptBmcResponseModelRedfishSystemSummary{
@@ -8235,6 +8977,98 @@ func (o OptBmcResponseModelRedfishSystemSummary) Get() (v BmcResponseModelRedfis
 
 // Or returns value if set, or given parameter if does not.
 func (o OptBmcResponseModelRedfishSystemSummary) Or(d BmcResponseModelRedfishSystemSummary) BmcResponseModelRedfishSystemSummary {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptBmcSecureBootKeyBodySignatureType returns new OptBmcSecureBootKeyBodySignatureType with value set to v.
+func NewOptBmcSecureBootKeyBodySignatureType(v BmcSecureBootKeyBodySignatureType) OptBmcSecureBootKeyBodySignatureType {
+	return OptBmcSecureBootKeyBodySignatureType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptBmcSecureBootKeyBodySignatureType is optional BmcSecureBootKeyBodySignatureType.
+type OptBmcSecureBootKeyBodySignatureType struct {
+	Value BmcSecureBootKeyBodySignatureType
+	Set   bool
+}
+
+// IsSet returns true if OptBmcSecureBootKeyBodySignatureType was set.
+func (o OptBmcSecureBootKeyBodySignatureType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptBmcSecureBootKeyBodySignatureType) Reset() {
+	var v BmcSecureBootKeyBodySignatureType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptBmcSecureBootKeyBodySignatureType) SetTo(v BmcSecureBootKeyBodySignatureType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptBmcSecureBootKeyBodySignatureType) Get() (v BmcSecureBootKeyBodySignatureType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptBmcSecureBootKeyBodySignatureType) Or(d BmcSecureBootKeyBodySignatureType) BmcSecureBootKeyBodySignatureType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptBmcSecureBootResetBodyType returns new OptBmcSecureBootResetBodyType with value set to v.
+func NewOptBmcSecureBootResetBodyType(v BmcSecureBootResetBodyType) OptBmcSecureBootResetBodyType {
+	return OptBmcSecureBootResetBodyType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptBmcSecureBootResetBodyType is optional BmcSecureBootResetBodyType.
+type OptBmcSecureBootResetBodyType struct {
+	Value BmcSecureBootResetBodyType
+	Set   bool
+}
+
+// IsSet returns true if OptBmcSecureBootResetBodyType was set.
+func (o OptBmcSecureBootResetBodyType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptBmcSecureBootResetBodyType) Reset() {
+	var v BmcSecureBootResetBodyType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptBmcSecureBootResetBodyType) SetTo(v BmcSecureBootResetBodyType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptBmcSecureBootResetBodyType) Get() (v BmcSecureBootResetBodyType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptBmcSecureBootResetBodyType) Or(d BmcSecureBootResetBodyType) BmcSecureBootResetBodyType {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -9067,6 +9901,69 @@ func (o OptNilBmcResponseModelBmcSELLogResultsItemData) Or(d BmcResponseModelBmc
 	return d
 }
 
+// NewOptNilBmcResponseModelBmcSecureBootResultsItemData returns new OptNilBmcResponseModelBmcSecureBootResultsItemData with value set to v.
+func NewOptNilBmcResponseModelBmcSecureBootResultsItemData(v BmcResponseModelBmcSecureBootResultsItemData) OptNilBmcResponseModelBmcSecureBootResultsItemData {
+	return OptNilBmcResponseModelBmcSecureBootResultsItemData{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilBmcResponseModelBmcSecureBootResultsItemData is optional nullable BmcResponseModelBmcSecureBootResultsItemData.
+type OptNilBmcResponseModelBmcSecureBootResultsItemData struct {
+	Value BmcResponseModelBmcSecureBootResultsItemData
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilBmcResponseModelBmcSecureBootResultsItemData was set.
+func (o OptNilBmcResponseModelBmcSecureBootResultsItemData) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilBmcResponseModelBmcSecureBootResultsItemData) Reset() {
+	var v BmcResponseModelBmcSecureBootResultsItemData
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilBmcResponseModelBmcSecureBootResultsItemData) SetTo(v BmcResponseModelBmcSecureBootResultsItemData) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilBmcResponseModelBmcSecureBootResultsItemData) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilBmcResponseModelBmcSecureBootResultsItemData) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v BmcResponseModelBmcSecureBootResultsItemData
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilBmcResponseModelBmcSecureBootResultsItemData) Get() (v BmcResponseModelBmcSecureBootResultsItemData, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilBmcResponseModelBmcSecureBootResultsItemData) Or(d BmcResponseModelBmcSecureBootResultsItemData) BmcResponseModelBmcSecureBootResultsItemData {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilBmcResponseModelRedfishSystemResultsItemData returns new OptNilBmcResponseModelRedfishSystemResultsItemData with value set to v.
 func NewOptNilBmcResponseModelRedfishSystemResultsItemData(v BmcResponseModelRedfishSystemResultsItemData) OptNilBmcResponseModelRedfishSystemResultsItemData {
 	return OptNilBmcResponseModelRedfishSystemResultsItemData{
@@ -9250,6 +10147,69 @@ func (o OptNilBmcResponseModelRedfishSystemResultsItemDataOemDell) Get() (v BmcR
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilBmcResponseModelRedfishSystemResultsItemDataOemDell) Or(d BmcResponseModelRedfishSystemResultsItemDataOemDell) BmcResponseModelRedfishSystemResultsItemDataOemDell {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilBool returns new OptNilBool with value set to v.
+func NewOptNilBool(v bool) OptNilBool {
+	return OptNilBool{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilBool is optional nullable bool.
+type OptNilBool struct {
+	Value bool
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilBool was set.
+func (o OptNilBool) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilBool) Reset() {
+	var v bool
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilBool) SetTo(v bool) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilBool) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilBool) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v bool
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilBool) Get() (v bool, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilBool) Or(d bool) bool {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -10453,6 +11413,69 @@ func (o OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) Get()
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) Or(d []NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) []NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilNilBmcResponseModelBmcSecureBootResultsItemArray returns new OptNilNilBmcResponseModelBmcSecureBootResultsItemArray with value set to v.
+func NewOptNilNilBmcResponseModelBmcSecureBootResultsItemArray(v []NilBmcResponseModelBmcSecureBootResultsItem) OptNilNilBmcResponseModelBmcSecureBootResultsItemArray {
+	return OptNilNilBmcResponseModelBmcSecureBootResultsItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilNilBmcResponseModelBmcSecureBootResultsItemArray is optional nullable []NilBmcResponseModelBmcSecureBootResultsItem.
+type OptNilNilBmcResponseModelBmcSecureBootResultsItemArray struct {
+	Value []NilBmcResponseModelBmcSecureBootResultsItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilNilBmcResponseModelBmcSecureBootResultsItemArray was set.
+func (o OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) Reset() {
+	var v []NilBmcResponseModelBmcSecureBootResultsItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) SetTo(v []NilBmcResponseModelBmcSecureBootResultsItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []NilBmcResponseModelBmcSecureBootResultsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) Get() (v []NilBmcResponseModelBmcSecureBootResultsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) Or(d []NilBmcResponseModelBmcSecureBootResultsItem) []NilBmcResponseModelBmcSecureBootResultsItem {
 	if v, ok := o.Get(); ok {
 		return v
 	}

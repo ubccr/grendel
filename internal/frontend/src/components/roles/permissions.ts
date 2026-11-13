@@ -76,6 +76,16 @@ const catalog: [string, [string, string][]][] = [
     ],
   ],
   [
+    "Secure boot",
+    [
+      ["GET /v1/bmc/secureboot", "See secure boot status and keys"],
+      ["POST /v1/bmc/secureboot", "Turn secure boot on or off"],
+      ["POST /v1/bmc/secureboot/keys", "Enroll secure boot keys"],
+      ["POST /v1/bmc/secureboot/keys/delete", "Remove secure boot keys"],
+      ["POST /v1/bmc/secureboot/reset", "Reset secure boot keys"],
+    ],
+  ],
+  [
     "Location and asset tags",
     [
       ["GET /v1/bmc/identity/defaults", "See default locations and asset tags"],

@@ -55,6 +55,7 @@ nav:
       - iPXE: advanced/ipxe.md
       - BMC Compatibility Testing: advanced/bmc-compatibility.md
       - Serial Console: advanced/serial-console.md
+      - Secure Boot Keys: advanced/secure-boot.md
       - Provision Status: advanced/provision-status.md
   - Integrations:
       - ClusterShell: integrations/clush.md

@@ -13,6 +13,7 @@ import NodesIndicatorAction from "./nodes/indicator";
 import NodesJobsAction from "./nodes/jobs";
 import NodesOsPowerAction from "./nodes/os-power";
 import NodesProvisionAction from "./nodes/provision";
+import NodesSecureBootAction from "./nodes/secureboot";
 import NodesSelAction from "./nodes/sel";
 import NodesTagsAction from "./nodes/tags";
 
@@ -33,6 +34,7 @@ export default function NodesAction({ nodes }: { nodes: string }) {
       <NodesSelAction nodes={nodes} />
       <NodesJobsAction nodes={nodes} />
       <NodesBiosAction nodes={nodes} />
+      <NodesSecureBootAction nodes={nodes} />
       <NodesIdentityAction nodes={nodes} />
       <NodesConsoleAction nodes={nodes} />
 

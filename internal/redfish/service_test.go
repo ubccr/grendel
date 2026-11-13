@@ -5,9 +5,15 @@
 package redfish
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"io"
+	"maps"
 	"net/http"
 	"net/http/httptest"
+	"slices"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -23,15 +29,87 @@ type fixture struct {
 	delay   map[string]time.Duration
 	hits    map[string]int
 	handler func(w http.ResponseWriter, r *http.Request) bool
+	// collections are writable collections by uri, holding each member's body by its uri. A POST adds a member and a DELETE removes one, so the next GET sees the change
+	collections map[string]map[string]string
+	// writes records every request that is not a GET, in order
+	writes []fixtureWrite
+	nextID int
+}
+
+type fixtureWrite struct {
+	Method string
+	Path   string
+	Body   map[string]any
 }
 
 func newFixture() *fixture {
 	return &fixture{
-		tree:   map[string]string{},
-		status: map[string]int{},
-		delay:  map[string]time.Duration{},
-		hits:   map[string]int{},
+		tree:        map[string]string{},
+		status:      map[string]int{},
+		delay:       map[string]time.Duration{},
+		hits:        map[string]int{},
+		collections: map[string]map[string]string{},
 	}
+}
+
+// member puts a member in a collection, as if it was there before the test, creating the collection if need be
+func (f *fixture) member(coll, id string, body map[string]any) {
+	if f.collections[coll] == nil {
+		f.collections[coll] = map[string]string{}
+	}
+	uri := coll + "/" + id
+	full := map[string]any{"@odata.id": uri, "Id": id}
+	maps.Copy(full, body)
+	raw, _ := json.Marshal(full)
+	f.collections[coll][uri] = string(raw)
+}
+
+// written returns the bodies sent to a path with a method, in order
+func (f *fixture) written(method, path string) []map[string]any {
+	var out []map[string]any
+	for _, w := range f.writes {
+		if w.Method == method && w.Path == path {
+			out = append(out, w.Body)
+		}
+	}
+	return out
+}
+
+// serveCollection answers for the writable collections and their members, and reports whether it did
+func (f *fixture) serveCollection(w http.ResponseWriter, r *http.Request, body map[string]any) bool {
+	p := r.URL.Path
+	if coll, ok := f.collections[p]; ok {
+		switch r.Method {
+		case http.MethodGet:
+			refs := []string{}
+			for _, uri := range slices.Sorted(maps.Keys(coll)) {
+				refs = append(refs, `{"@odata.id": "`+uri+`"}`)
+			}
+			w.Write([]byte(`{"@odata.id": "` + p + `", "Members": [` + strings.Join(refs, ",") + `]}`))
+		case http.MethodPost:
+			f.nextID++
+			id := strconv.Itoa(f.nextID)
+			f.member(p, id, body)
+			w.WriteHeader(http.StatusCreated)
+			w.Write([]byte(coll[p+"/"+id]))
+		}
+		return true
+	}
+	for _, coll := range f.collections {
+		member, ok := coll[p]
+		if !ok {
+			continue
+		}
+		switch r.Method {
+		case http.MethodGet:
+			w.Write([]byte(member))
+		case http.MethodDelete:
+			delete(coll, p)
+			w.WriteHeader(http.StatusNoContent)
+		}
+		return true
+	}
+	return false
 }
 
 func (f *fixture) serve(t *testing.T) *httptest.Server {
@@ -40,7 +118,20 @@ func (f *fixture) serve(t *testing.T) *httptest.Server {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		f.hits[r.URL.Path]++
 
+		var sent map[string]any
+		if r.Method != http.MethodGet {
+			raw, _ := io.ReadAll(r.Body)
+			_ = json.Unmarshal(raw, &sent)
+			r.Body = io.NopCloser(bytes.NewReader(raw))
+			f.writes = append(f.writes, fixtureWrite{Method: r.Method, Path: r.URL.Path, Body: sent})
+		}
+
 		if f.handler != nil && f.handler(w, r) {
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		if f.serveCollection(w, r, sent) {
 			return
 		}
 

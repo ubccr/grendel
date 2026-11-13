@@ -263,6 +263,62 @@ func encodePOSTV1BmcPowerRequest(
 	return nil
 }
 
+func encodePOSTV1BmcSecurebootRequest(
+	req *BmcSecureBootBody,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodePOSTV1BmcSecurebootKeysRequest(
+	req *BmcSecureBootKeyBody,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodePOSTV1BmcSecurebootKeysDeleteRequest(
+	req *BmcSecureBootDeleteBody,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodePOSTV1BmcSecurebootResetRequest(
+	req *BmcSecureBootResetBody,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
 func encodePOSTV1DbRestoreRequest(
 	req *DataDump,
 	r *http.Request,

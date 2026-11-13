@@ -92,6 +92,7 @@ advertises no usable session service.
 | `-redfish.insecure` | `true` | Skip TLS verification, which every BMC needs |
 | `-redfish.destructive` | `false` | Also run the checks that write: power reset, job clear, SEL clear |
 | `-redfish.bios-change` | *(empty)* | `Name=Value` of a harmless BIOS attribute, such as `NumLock=Off`, to stage and then discard. Needs `-redfish.destructive`. Pick one that would do no harm if the discard failed and the next reboot applied it |
+| `-redfish.secureboot-cert` | *(empty)* | PEM certificate to enroll in `db` and then remove. Needs `-redfish.destructive`. Use a throwaway certificate that signs nothing, so a failed removal does no harm |
 
 ## 4. Read the report
 
@@ -131,6 +132,7 @@ actually declares, so a healthy R760 still reports that `ForceOn`, `Suspend`, `P
 | `jobs` | That the job service exists, that jobs parse, and that the URL Grendel builds to delete a job is where the service actually keeps it |
 | `sel` | Which log services are identified as the system event log, on the managers and then the systems; that entry timestamps are in a format Grendel can sort on; that `$top` returns the newest entries; that each one declares a `ClearLog` action |
 | `bios` | That the BIOS attributes can be read; whether changes are staged in a separate settings object, which pending values and discard need; whether the BMC serves its attribute registry, and which attributes it leaves undescribed; with `-redfish.bios-change`, that a staged change shows as pending and can be discarded |
+| `secureboot` | That the secure boot state can be read, and whether a change to it is staged in a separate settings object; that every database lists its keys, and that each certificate comes with the certificate itself or a SHA-256 fingerprint, which delete needs; with `-redfish.secureboot-cert`, that a certificate enrolled in `db` can be found and removed again |
 | `identity` | That the asset tag and chassis location can be read, and where the location is kept (the iDRAC's ServerTopology attributes, or the chassis `Location`); with `-redfish.destructive`, that a rack written there reads back and is restored |
 | `fanout` | That the concurrent runner and error classifier agree with the per-node results above |
 
