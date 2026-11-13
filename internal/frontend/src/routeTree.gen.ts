@@ -26,7 +26,6 @@ import { Route as NodesIndexRouteImport } from './routes/nodes/index'
 import { Route as NodesNodeRouteRouteImport } from './routes/nodes/$node/route'
 import { Route as RacksIndexRouteImport } from './routes/racks/index'
 import { Route as RacksRackRouteImport } from './routes/racks/$rack'
-import { Route as SearchInventoryRouteImport } from './routes/search/inventory'
 import { Route as TemplatesIndexRouteImport } from './routes/templates/index'
 import { Route as TemplatesTemplateRouteImport } from './routes/templates/$template'
 import { Route as AccountRolesIndexRouteImport } from './routes/account/roles/index'
@@ -129,11 +128,6 @@ const RacksIndexRoute = RacksIndexRouteImport.update({
 const RacksRackRoute = RacksRackRouteImport.update({
   id: '/racks/$rack',
   path: '/racks/$rack',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SearchInventoryRoute = SearchInventoryRouteImport.update({
-  id: '/search/inventory',
-  path: '/search/inventory',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
@@ -242,7 +236,6 @@ export interface FileRoutesByFullPath {
   '/add/template': typeof AddTemplateRoute
   '/images/$image': typeof ImagesImageRoute
   '/racks/$rack': typeof RacksRackRoute
-  '/search/inventory': typeof SearchInventoryRoute
   '/templates/$template': typeof TemplatesTemplateRoute
   '/images/': typeof ImagesIndexRoute
   '/nodes/': typeof NodesIndexRoute
@@ -280,7 +273,6 @@ export interface FileRoutesByTo {
   '/add/template': typeof AddTemplateRoute
   '/images/$image': typeof ImagesImageRoute
   '/racks/$rack': typeof RacksRackRoute
-  '/search/inventory': typeof SearchInventoryRoute
   '/templates/$template': typeof TemplatesTemplateRoute
   '/images': typeof ImagesIndexRoute
   '/nodes': typeof NodesIndexRoute
@@ -319,7 +311,6 @@ export interface FileRoutesById {
   '/add/template': typeof AddTemplateRoute
   '/images/$image': typeof ImagesImageRoute
   '/racks/$rack': typeof RacksRackRoute
-  '/search/inventory': typeof SearchInventoryRoute
   '/templates/$template': typeof TemplatesTemplateRoute
   '/images/': typeof ImagesIndexRoute
   '/nodes/': typeof NodesIndexRoute
@@ -359,7 +350,6 @@ export interface FileRouteTypes {
     | '/add/template'
     | '/images/$image'
     | '/racks/$rack'
-    | '/search/inventory'
     | '/templates/$template'
     | '/images/'
     | '/nodes/'
@@ -397,7 +387,6 @@ export interface FileRouteTypes {
     | '/add/template'
     | '/images/$image'
     | '/racks/$rack'
-    | '/search/inventory'
     | '/templates/$template'
     | '/images'
     | '/nodes'
@@ -435,7 +424,6 @@ export interface FileRouteTypes {
     | '/add/template'
     | '/images/$image'
     | '/racks/$rack'
-    | '/search/inventory'
     | '/templates/$template'
     | '/images/'
     | '/nodes/'
@@ -474,7 +462,6 @@ export interface RootRouteChildren {
   AddTemplateRoute: typeof AddTemplateRoute
   ImagesImageRoute: typeof ImagesImageRoute
   RacksRackRoute: typeof RacksRackRoute
-  SearchInventoryRoute: typeof SearchInventoryRoute
   TemplatesTemplateRoute: typeof TemplatesTemplateRoute
   ImagesIndexRoute: typeof ImagesIndexRoute
   NodesIndexRoute: typeof NodesIndexRoute
@@ -610,13 +597,6 @@ declare module '@tanstack/react-router' {
       path: '/racks/$rack'
       fullPath: '/racks/$rack'
       preLoaderRoute: typeof RacksRackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/search/inventory': {
-      id: '/search/inventory'
-      path: '/search/inventory'
-      fullPath: '/search/inventory'
-      preLoaderRoute: typeof SearchInventoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/templates/': {
@@ -787,7 +767,6 @@ const rootRouteChildren: RootRouteChildren = {
   AddTemplateRoute: AddTemplateRoute,
   ImagesImageRoute: ImagesImageRoute,
   RacksRackRoute: RacksRackRoute,
-  SearchInventoryRoute: SearchInventoryRoute,
   TemplatesTemplateRoute: TemplatesTemplateRoute,
   ImagesIndexRoute: ImagesIndexRoute,
   NodesIndexRoute: NodesIndexRoute,
