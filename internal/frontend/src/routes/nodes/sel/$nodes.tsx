@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import AuthRedirect from "@/lib/auth";
-import { logSeverityVariant } from "@/lib/bmc";
+import { severityVariant } from "@/lib/utils";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { z } from "zod";
@@ -56,7 +56,7 @@ const columns: DataTableColumnDef<Entry, any>[] = [
     cell: ({ getValue }) => {
       const severity = getValue<string>();
       if (!severity) return null;
-      return <Badge variant={logSeverityVariant(severity)}>{severity}</Badge>;
+      return <Badge variant={severityVariant(severity)}>{severity}</Badge>;
     },
   },
   {

@@ -1,4 +1,3 @@
-import { severityVariant } from "@/lib/utils";
 import { toast } from "sonner";
 
 type BmcSummary = {
@@ -40,14 +39,3 @@ export function toastBmcResponse(action: string, res: BmcResponse | undefined) {
     toast.error(`${action}: every node failed`, { description });
   }
 }
-
-// logSeverityVariant picks the Badge variant for a Redfish severity, the same one severityVariant gives an event's
-export function logSeverityVariant(severity?: string) {
-  return severityVariant(logSeverities[severity ?? ""]);
-}
-
-const logSeverities: Record<string, string> = {
-  Critical: "error",
-  Warning: "warning",
-  OK: "success",
-};

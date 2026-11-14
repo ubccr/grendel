@@ -1,17 +1,34 @@
 export { cn } from "cn";
 
-// severityVariant picks the Badge variant for an event's severity
-export function severityVariant(severity?: string) {
-  switch (severity?.toLowerCase()) {
-    case "error":
-      return "destructive";
+export type Severity = "success" | "info" | "warning" | "error";
+
+// severityOf reads the severities grendel writes (an event's Success, Info, Warning or Error, a node's success or error under it) and the ones Redfish reports (OK, Warning, Critical) as one of four, so every badge, dot and rail colours them the same way. Anything else has none
+export function severityOf(value?: string): Severity | undefined {
+  switch (value?.toLowerCase()) {
+    case "success":
+    case "ok":
+      return "success";
+    case "info":
+      return "info";
     case "warning":
       return "warning";
-    case "success":
-      return "success";
-    default:
-      return "secondary";
+    case "error":
+    case "critical":
+      return "error";
   }
+}
+
+const severityVariants = {
+  success: "success",
+  info: "secondary",
+  warning: "warning",
+  error: "destructive",
+} as const;
+
+// severityVariant picks the Badge variant for a severity
+export function severityVariant(value?: string) {
+  const severity = severityOf(value);
+  return severity ? severityVariants[severity] : "secondary";
 }
 
 const relativeUnits: Array<[Intl.RelativeTimeFormatUnit, number]> = [
@@ -25,9 +42,13 @@ const relativeUnits: Array<[Intl.RelativeTimeFormatUnit, number]> = [
 ];
 
 const relativeFormat = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+const narrowFormat = new Intl.RelativeTimeFormat(undefined, { numeric: "auto", style: "narrow" });
 
-// relativeTime describes a timestamp from now, such as "5 minutes ago", with the absolute local time for a tooltip. A value that does not parse as a date comes back as is
-export function relativeTime(value: string, now = Date.now()) {
+// relativeTime describes a timestamp from now, such as "5 minutes ago", or "5m ago" when narrow, with the absolute local time for a tooltip. A value that does not parse as a date comes back as is
+export function relativeTime(
+  value: string,
+  { now = Date.now(), narrow = false }: { now?: number; narrow?: boolean } = {},
+) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return { text: value, title: value };
 
@@ -36,7 +57,7 @@ export function relativeTime(value: string, now = Date.now()) {
     relativeUnits.find(([, size]) => Math.abs(seconds) >= size) ??
     relativeUnits[relativeUnits.length - 1];
   return {
-    text: relativeFormat.format(Math.round(seconds / size), unit),
+    text: (narrow ? narrowFormat : relativeFormat).format(Math.round(seconds / size), unit),
     title: date.toLocaleString(),
   };
 }

@@ -1,4 +1,5 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MutationCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { getV1GrendelEventsQueryKey } from "./client/@tanstack/react-query.gen.ts";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { client } from "./client/client.gen.ts";
@@ -17,13 +18,18 @@ import { routeTree } from "./routeTree.gen";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
-const queryClient = new QueryClient();
-queryClient.setDefaultOptions({
-  queries: {
-    retry: false,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
+const queryClient: QueryClient = new QueryClient({
+  // a change made through the ui writes an event, so the events are fetched again once any change settles rather than at the header's next poll
+  mutationCache: new MutationCache({
+    onSettled: () => queryClient.invalidateQueries({ queryKey: getV1GrendelEventsQueryKey() }),
+  }),
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    },
   },
 });
 

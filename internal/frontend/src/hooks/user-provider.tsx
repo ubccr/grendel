@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { createContext, useContext, useEffect, useState } from "react";
+import { useStoredValue } from "@/hooks/use-stored-value";
+import { createContext, useContext, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 
 const userStorageKey = "user";
@@ -27,42 +28,33 @@ const initialState: UserProviderState = {
 const UserProviderContext = createContext<UserProviderState>(initialState);
 
 export function UserProvider({ children, ...props }: UserProviderProps) {
-  const [id, setId] = useState<ReturnType<typeof setInterval> | undefined>(undefined);
-  const [user, setUser] = useState<User>(() => {
-    const user = localStorage.getItem(userStorageKey);
-    if (user == null) return null;
-    return JSON.parse(user) as User;
-  });
+  // the user is stored, so signing in or out in one tab does the same in the others. Stored data that does not parse reads as signed out
+  const [stored, setStored] = useStoredValue(userStorageKey);
+  const user = useMemo<User>(() => {
+    try {
+      return stored ? (JSON.parse(stored) as User) : null;
+    } catch {
+      return null;
+    }
+  }, [stored]);
   const queryClient = useQueryClient();
 
+  // a new session starts with an empty cache and ends when its token expires; the timer goes with the session, so signing out, here or in another tab, cancels it
   useEffect(() => {
-    if (user != null && user?.expire) {
-      const difference = new Date(user.expire).getTime() - new Date().getTime();
-      queryClient.clear();
-      setId(
-        setTimeout(() => {
-          setUser(null);
-          localStorage.removeItem(userStorageKey);
-          toast.warning("Session expired", {
-            description: "Authentication token has expired, please login again",
-          });
-        }, difference),
-      );
-    }
-  }, [user]);
+    if (!user?.expire) return;
+    queryClient.clear();
+    const timer = setTimeout(() => {
+      setStored(undefined);
+      toast.warning("Session expired", {
+        description: "Authentication token has expired, please login again",
+      });
+    }, user.expire - Date.now());
+    return () => clearTimeout(timer);
+  }, [user, queryClient, setStored]);
 
   const value = {
     user,
-    setUser: (user: User) => {
-      if (user !== null) {
-        localStorage.setItem(userStorageKey, JSON.stringify(user));
-      } else {
-        clearTimeout(id);
-        localStorage.removeItem(userStorageKey);
-      }
-
-      setUser(user);
-    },
+    setUser: (user: User) => setStored(user === null ? undefined : JSON.stringify(user)),
   };
 
   return (

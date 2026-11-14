@@ -10,9 +10,9 @@ import { ErrorPanel } from "@/components/error-panel";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Progress, ProgressLabel, ProgressValue } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { logSeverityVariant, toastBmcResponse } from "@/lib/bmc";
+import { toastBmcResponse } from "@/lib/bmc";
 import { formatLocation } from "@/lib/identity";
-import { cn, relativeTime } from "@/lib/utils";
+import { cn, relativeTime, severityOf, severityVariant, type Severity } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import type { ReactNode } from "react";
@@ -64,23 +64,26 @@ type Tone = "ok" | "changing" | "warning" | "critical" | "off" | "unknown" | "lo
 // toneOf reads a Redfish health or power state as the light an LED would show; power off is an unlit LED, not a fault
 function toneOf(value?: string): Tone {
   switch (value) {
-    case "OK":
     case "On":
       return "ok";
     case "PoweringOn":
     case "PoweringOff":
       return "changing";
-    case "Warning":
     case "Paused":
       return "warning";
-    case "Critical":
-      return "critical";
     case "Off":
       return "off";
-    default:
-      return "unknown";
   }
+  // a health is a severity, read the same way as an event's
+  return healthTones[severityOf(value) ?? "info"];
 }
+
+const healthTones: Record<Severity, Tone> = {
+  success: "ok",
+  info: "unknown",
+  warning: "warning",
+  error: "critical",
+};
 
 const ledClass: Record<Tone, string> = {
   ok: "bg-(--node-ready) shadow-[0_0_6px_var(--node-ready)]",
@@ -533,7 +536,7 @@ function RecentEvents({ node }: { node: string }) {
               key={e.id}
               className="col-span-2 grid grid-cols-subgrid items-start py-2.5 text-sm first:pt-0"
             >
-              <Badge variant={logSeverityVariant(e.severity)}>{e.severity || "-"}</Badge>
+              <Badge variant={severityVariant(e.severity)}>{e.severity || "-"}</Badge>
               <div className="min-w-0">
                 <div className="line-clamp-2">{e.message}</div>
                 {created && (
