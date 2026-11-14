@@ -1,15 +1,16 @@
 export { cn } from "cn";
 
-export function severityColor(severity?: string) {
+// severityVariant picks the Badge variant for an event's severity
+export function severityVariant(severity?: string) {
   switch (severity?.toLowerCase()) {
     case "error":
-      return "text-red-600 border-red-400";
+      return "destructive";
     case "warning":
-      return "text-yellow-600 border-yellow-400";
+      return "warning";
     case "success":
-      return "text-green-600 border-green-400";
+      return "success";
     default:
-      return "";
+      return "secondary";
   }
 }
 

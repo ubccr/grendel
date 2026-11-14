@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import AuthRedirect from "@/lib/auth";
-import { severityColor } from "@/lib/utils";
+import { severityVariant } from "@/lib/utils";
 import { createFileRoute } from "@tanstack/react-router";
 import type { DataTableColumnDef, DataTableRow } from "@/components/data-table/features";
 
@@ -32,9 +32,7 @@ function TableComponent() {
       accessorKey: "Severity",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Severity" />,
       cell: ({ row }) => (
-        <Badge className={`rounded-sm ${severityColor(row.original.Severity)}`} variant="secondary">
-          {row.original.Severity}
-        </Badge>
+        <Badge variant={severityVariant(row.original.Severity)}>{row.original.Severity}</Badge>
       ),
     },
     {
@@ -70,9 +68,7 @@ function TableComponent() {
           {data?.map((row) => (
             <TableRow key={row.host}>
               <TableCell>
-                <Badge variant="secondary" className={`rounded-sm ${severityColor(row.status)}`}>
-                  {row.status}
-                </Badge>
+                <Badge variant={severityVariant(row.status)}>{row.status}</Badge>
               </TableCell>
               <TableCell>{row.host}</TableCell>
               <TableCell>{row.msg}</TableCell>

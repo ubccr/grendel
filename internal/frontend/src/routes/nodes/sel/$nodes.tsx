@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import AuthRedirect from "@/lib/auth";
-import { logSeverityColor } from "@/lib/bmc";
+import { logSeverityVariant } from "@/lib/bmc";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { z } from "zod";
@@ -56,11 +56,7 @@ const columns: DataTableColumnDef<Entry, any>[] = [
     cell: ({ getValue }) => {
       const severity = getValue<string>();
       if (!severity) return null;
-      return (
-        <Badge variant="secondary" className={`rounded-sm ${logSeverityColor(severity)}`}>
-          {severity}
-        </Badge>
-      );
+      return <Badge variant={logSeverityVariant(severity)}>{severity}</Badge>;
     },
   },
   {

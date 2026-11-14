@@ -1,4 +1,4 @@
-import { severityColor } from "@/lib/utils";
+import { severityVariant } from "@/lib/utils";
 import { toast } from "sonner";
 
 type BmcSummary = {
@@ -41,16 +41,13 @@ export function toastBmcResponse(action: string, res: BmcResponse | undefined) {
   }
 }
 
-// logSeverityColor colours a Redfish severity the way severityColor colours an event's
-export function logSeverityColor(severity?: string) {
-  switch (severity) {
-    case "Critical":
-      return severityColor("error");
-    case "Warning":
-      return severityColor("warning");
-    case "OK":
-      return severityColor("success");
-    default:
-      return "";
-  }
+// logSeverityVariant picks the Badge variant for a Redfish severity, the same one severityVariant gives an event's
+export function logSeverityVariant(severity?: string) {
+  return severityVariant(logSeverities[severity ?? ""]);
 }
+
+const logSeverities: Record<string, string> = {
+  Critical: "error",
+  Warning: "warning",
+  OK: "success",
+};
