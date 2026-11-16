@@ -84,14 +84,17 @@ function CodeBlockActions({
   )
 }
 
+// CodeBlockCopyButton copies value, showing a check for a moment after. With children it is a labelled button, the icon before the label; without, an icon button. onCopyError runs when the browser refuses, as on a page not served over https
 function CodeBlockCopyButton({
   value,
   variant = "ghost",
   size = "icon-xs",
   className,
   onClick,
+  onCopyError,
+  children,
   ...props
-}: React.ComponentProps<typeof Button> & { value: string }) {
+}: React.ComponentProps<typeof Button> & { value: string; onCopyError?: () => void }) {
   const [copied, setCopied] = React.useState(false)
 
   React.useEffect(() => {
@@ -110,14 +113,14 @@ function CodeBlockCopyButton({
         data-copied={copied || undefined}
         variant={variant}
         size={size}
-        aria-label={copied ? "Copied" : "Copy"}
+        aria-label={children ? undefined : copied ? "Copied" : "Copy"}
         className={cn(className)}
         onClick={(event) => {
           onClick?.(event)
           navigator.clipboard
             .writeText(value)
             .then(() => setCopied(true))
-            .catch(() => {})
+            .catch(() => onCopyError?.())
         }}
         {...props}
       >
@@ -128,6 +131,7 @@ function CodeBlockCopyButton({
           <CopyIcon
           />
         )}
+        {children}
       </Button>
       <span aria-live="polite" className="sr-only">
         {copied ? "Copied" : ""}

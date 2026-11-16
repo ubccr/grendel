@@ -14,7 +14,7 @@ import (
 type User struct {
 	ID           int64     `json:"id"`
 	Username     string    `json:"username"`
-	PasswordHash string    `json:"hash"`
+	PasswordHash string    `json:"hash,omitempty"` // only the database dump carries it, so a restore keeps passwords; the user list leaves it out
 	Role         string    `json:"role"`
 	Enabled      bool      `json:"enabled"`
 	CreatedAt    time.Time `json:"created_at"`

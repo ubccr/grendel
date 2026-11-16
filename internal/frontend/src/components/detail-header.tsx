@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Link, type LinkProps } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
 // DetailHeader heads the page for one thing, a node or an image: its name, a row of the facts about it worth seeing at a glance, its actions, and the tabs of its views when it has more than one
@@ -53,4 +54,38 @@ export function Fact({
 // Unset is a fact's value when nothing is set, like a node with no image of its own
 export function Unset({ children }: { children: ReactNode }) {
   return <span className="text-muted-foreground">{children}</span>;
+}
+
+// a tab never links to the root, and leaving it out lets the paths be checked against from
+type Tab = { to: Exclude<LinkProps["to"], "/">; label: string };
+
+// DetailTabs are the tabs under a DetailHeader, one link for each view of the thing it heads, the current one underlined. from is the route the tabs' paths are relative to, which supplies their params, as a node's name
+export function DetailTabs({
+  label,
+  tabs,
+  from,
+}: {
+  label: string;
+  tabs: readonly Tab[];
+  from?: LinkProps["from"];
+}) {
+  return (
+    <nav aria-label={label} className="-mb-px flex gap-1 overflow-x-auto">
+      {tabs.map((t) => (
+        <Link
+          key={t.to}
+          to={t.to}
+          from={from}
+          activeProps={{ className: "border-foreground text-foreground", "aria-current": "page" }}
+          inactiveProps={{
+            className:
+              "border-transparent text-muted-foreground hover:text-foreground hover:border-border",
+          }}
+          className="rounded-t-sm border-b-2 px-3 pt-1 pb-2.5 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+        >
+          {t.label}
+        </Link>
+      ))}
+    </nav>
+  );
 }

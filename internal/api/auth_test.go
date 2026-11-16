@@ -117,3 +117,107 @@ func TestUpdateUserPassword(t *testing.T) {
 
 	assert.ErrorIs(t, db.UpdateUserPassword("nobody", "password-3"), store.ErrNotFound)
 }
+
+// send makes a request as the account whose session cookies are given
+func send(t *testing.T, mux http.Handler, method, path, body string, cookies []*http.Cookie) *httptest.ResponseRecorder {
+	t.Helper()
+	req := httptest.NewRequest(method, path, strings.NewReader(body))
+	req.Header.Set("Content-Type", "application/json")
+	for _, c := range cookies {
+		req.AddCookie(c)
+	}
+	rec := httptest.NewRecorder()
+	mux.ServeHTTP(rec, req)
+	return rec
+}
+
+func TestVerifyUserReportsBadCredentialsWithoutError(t *testing.T) {
+	db, err := sqlstore.New(":memory:")
+	require.NoError(t, err)
+	t.Cleanup(func() { db.Close() })
+	_, err = db.StoreUser("alice", "password-1")
+	require.NoError(t, err)
+
+	for _, c := range [][2]string{{"alice", "wrong-password"}, {"nobody", "password-1"}} {
+		ok, role, err := db.VerifyUser(c[0], c[1])
+		assert.NoError(t, err, c)
+		assert.False(t, ok, c)
+		assert.Empty(t, role, c)
+	}
+}
+
+// a fault in the store is not bad credentials, so it must not tell the person their password is wrong
+func TestSigninStoreFaultIs500(t *testing.T) {
+	db, mux := newAuthTestServer(t)
+	require.Equal(t, http.StatusOK, postJSON(t, mux, "/v1/auth/signup", `{"username":"alice","password":"password-1"}`).Code)
+	require.NoError(t, db.Close())
+
+	rec := postJSON(t, mux, "/v1/auth/signin", `{"username":"alice","password":"password-1"}`)
+	assert.Equal(t, http.StatusInternalServerError, rec.Code, rec.Body.String())
+}
+
+func TestResetWrongCurrentPasswordIs401(t *testing.T) {
+	db, mux := newAuthTestServer(t)
+	signup := postJSON(t, mux, "/v1/auth/signup", `{"username":"alice","password":"password-1"}`)
+	require.Equal(t, http.StatusOK, signup.Code)
+	session := signup.Result().Cookies()
+
+	rec := send(t, mux, http.MethodPatch, "/v1/auth/reset", `{"current_password":"wrong-password","new_password":"password-2"}`, session)
+	assert.Equal(t, http.StatusUnauthorized, rec.Code, rec.Body.String())
+	ok, _, _ := db.VerifyUser("alice", "password-1")
+	assert.True(t, ok, "a refused reset keeps the old password")
+
+	rec = send(t, mux, http.MethodPatch, "/v1/auth/reset", `{"current_password":"password-1","new_password":"password-2"}`, session)
+	assert.Equal(t, http.StatusOK, rec.Code, rec.Body.String())
+	ok, _, _ = db.VerifyUser("alice", "password-2")
+	assert.True(t, ok)
+}
+
+// the user list is readable by more than administrators, so it must not hand out password hashes; the database dump still carries them so a restore keeps passwords
+func TestUserListLeavesOutPasswordHashes(t *testing.T) {
+	_, mux := newAuthTestServer(t)
+	signup := postJSON(t, mux, "/v1/auth/signup", `{"username":"alice","password":"password-1"}`)
+	require.Equal(t, http.StatusOK, signup.Code)
+	session := signup.Result().Cookies()
+
+	list := send(t, mux, http.MethodGet, "/v1/users", "", session)
+	require.Equal(t, http.StatusOK, list.Code, list.Body.String())
+	assert.Contains(t, list.Body.String(), `"username":"alice"`)
+	assert.NotContains(t, list.Body.String(), `"hash"`)
+	assert.NotContains(t, list.Body.String(), "$2a$")
+
+	dump := send(t, mux, http.MethodGet, "/v1/db/dump", "", session)
+	require.Equal(t, http.StatusOK, dump.Code, dump.Body.String())
+	assert.Contains(t, dump.Body.String(), `"hash":"$2a$`)
+}
+
+// signinAs makes an enabled account with the given role and gives its session
+func signinAs(t *testing.T, db *sqlstore.SqlStore, mux http.Handler, username, role string) []*http.Cookie {
+	t.Helper()
+	require.Equal(t, http.StatusOK, postJSON(t, mux, "/v1/auth/signup", `{"username":"`+username+`","password":"password-1"}`).Code)
+	require.NoError(t, db.UpdateUserRole(username, role))
+	require.NoError(t, db.UpdateUserEnabled(username, true))
+	signin := postJSON(t, mux, "/v1/auth/signin", `{"username":"`+username+`","password":"password-1"}`)
+	require.Equal(t, http.StatusOK, signin.Code, signin.Body.String())
+	return signin.Result().Cookies()
+}
+
+// the user role may tag nodes and list roles; read-only may do neither
+func TestUserRoleMayTagNodesAndListRoles(t *testing.T) {
+	db, mux := newAuthTestServer(t)
+	signinAs(t, db, mux, "admin", model.RoleAdmin.String())
+	user := signinAs(t, db, mux, "alice", model.RoleUser.String())
+	readOnly := signinAs(t, db, mux, "bob", model.RoleReadOnly.String())
+
+	tag := func(session []*http.Cookie) int {
+		return send(t, mux, http.MethodPatch, "/v1/nodes/tags/add?nodeset=cpn-01", `{"tags":"test"}`, session).Code
+	}
+	roles := func(session []*http.Cookie) int {
+		return send(t, mux, http.MethodGet, "/v1/roles", "", session).Code
+	}
+
+	assert.NotEqual(t, http.StatusForbidden, tag(user))
+	assert.Equal(t, http.StatusOK, roles(user))
+	assert.Equal(t, http.StatusForbidden, tag(readOnly))
+	assert.Equal(t, http.StatusForbidden, roles(readOnly))
+}

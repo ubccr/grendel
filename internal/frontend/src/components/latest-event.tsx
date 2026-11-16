@@ -2,6 +2,7 @@ import type { Event } from "@/client";
 import { getV1GrendelEventsOptions } from "@/client/@tanstack/react-query.gen";
 import { RunRing } from "@/components/run-ring";
 import { useHoverPin } from "@/hooks/use-hover-pin";
+import { useNow } from "@/hooks/use-now";
 import { useStoredValue } from "@/hooks/use-stored-value";
 import { useUser } from "@/hooks/user-provider";
 import {
@@ -18,7 +19,7 @@ import { cn, relativeTime, severityOf } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useMatchRoute } from "@tanstack/react-router";
 import { AnimatePresence, motion, useIsPresent } from "motion/react";
-import { useEffect, useId, useReducer, useState } from "react";
+import { useEffect, useId, useState } from "react";
 
 // how often the events are fetched, while one is running and while none is; a change made in this browser also refetches them at once, through the query client's mutation cache in main.tsx
 const LIVE_POLL_MS = 5_000;
@@ -64,11 +65,7 @@ export function LatestEvent() {
   const { open, containerProps, triggerProps } = useHoverPin<HTMLDivElement, HTMLButtonElement>();
   const listId = useId();
   // the relative time is redrawn each minute, since a poll that finds nothing new leaves the query's data, and so this, untouched
-  const [, tick] = useReducer((n: number) => n + 1, 0);
-  useEffect(() => {
-    const id = setInterval(tick, 60_000);
-    return () => clearInterval(id);
-  }, []);
+  useNow(60_000);
 
   const events = data ?? [];
   const latest = events[0];

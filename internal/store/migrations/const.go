@@ -4,4 +4,4 @@
 
 package migrations
 
-const SchemaVersion = 20261117120000
+const SchemaVersion = 20261118120000

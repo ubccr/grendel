@@ -27,7 +27,7 @@ type Store interface {
 	// UpdateUserPassword replaces the password of an existing user, failing with ErrNotFound when there is none
 	UpdateUserPassword(username, password string) error
 
-	// VerifyUser checks if the given username exists in the data store
+	// VerifyUser checks a username and password, giving the user's role when they match. An unknown user or a wrong password is not authenticated with no error; an error means the check itself failed
 	VerifyUser(username, password string) (bool, string, error)
 
 	// GetUsers returns a list of all the usernames

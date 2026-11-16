@@ -16,11 +16,11 @@ import { Route as ImagesRouteRouteImport } from './routes/images/route'
 import { Route as NodesRouteRouteImport } from './routes/nodes/route'
 import { Route as RacksRouteRouteImport } from './routes/racks/route'
 import { Route as TemplatesRouteRouteImport } from './routes/templates/route'
-import { Route as AccountResetRouteImport } from './routes/account/reset'
+import { Route as AccountIndexRouteImport } from './routes/account/index'
+import { Route as AccountAccountRouteImport } from './routes/account/_account'
 import { Route as AccountRolesRouteRouteImport } from './routes/account/roles/route'
 import { Route as AccountSigninRouteImport } from './routes/account/signin'
 import { Route as AccountSignupRouteImport } from './routes/account/signup'
-import { Route as AccountTokenRouteImport } from './routes/account/token'
 import { Route as AddImageRouteImport } from './routes/add/image'
 import { Route as AddNodeRouteImport } from './routes/add/node'
 import { Route as AddRoleRouteImport } from './routes/add/role'
@@ -33,6 +33,8 @@ import { Route as RacksIndexRouteImport } from './routes/racks/index'
 import { Route as RacksRackRouteImport } from './routes/racks/$rack'
 import { Route as TemplatesIndexRouteImport } from './routes/templates/index'
 import { Route as TemplatesTemplateRouteImport } from './routes/templates/$template'
+import { Route as AccountAccountResetRouteImport } from './routes/account/_account/reset'
+import { Route as AccountAccountTokenRouteImport } from './routes/account/_account/token'
 import { Route as AccountRolesIndexRouteImport } from './routes/account/roles/index'
 import { Route as AccountRolesRoleRouteImport } from './routes/account/roles/$role'
 import { Route as AccountUsersIndexRouteImport } from './routes/account/users/index'
@@ -86,9 +88,14 @@ const TemplatesRouteRoute = TemplatesRouteRouteImport.update({
   path: '/templates',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AccountResetRoute = AccountResetRouteImport.update({
-  id: '/account/reset',
-  path: '/account/reset',
+const AccountIndexRoute = AccountIndexRouteImport.update({
+  id: '/account/',
+  path: '/account/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountAccountRoute = AccountAccountRouteImport.update({
+  id: '/account/_account',
+  path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountRolesRouteRoute = AccountRolesRouteRouteImport.update({
@@ -104,11 +111,6 @@ const AccountSigninRoute = AccountSigninRouteImport.update({
 const AccountSignupRoute = AccountSignupRouteImport.update({
   id: '/account/signup',
   path: '/account/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AccountTokenRoute = AccountTokenRouteImport.update({
-  id: '/account/token',
-  path: '/account/token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AddImageRoute = AddImageRouteImport.update({
@@ -170,6 +172,16 @@ const TemplatesTemplateRoute = TemplatesTemplateRouteImport.update({
   id: '/$template',
   path: '/$template',
   getParentRoute: () => TemplatesRouteRoute,
+} as any)
+const AccountAccountResetRoute = AccountAccountResetRouteImport.update({
+  id: '/reset',
+  path: '/reset',
+  getParentRoute: () => AccountAccountRoute,
+} as any)
+const AccountAccountTokenRoute = AccountAccountTokenRouteImport.update({
+  id: '/token',
+  path: '/token',
+  getParentRoute: () => AccountAccountRoute,
 } as any)
 const AccountRolesIndexRoute = AccountRolesIndexRouteImport.update({
   id: '/',
@@ -267,10 +279,9 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRoute
   '/account/roles': typeof AccountRolesRouteRouteWithChildren
   '/nodes/$node': typeof NodesNodeRouteRouteWithChildren
-  '/account/reset': typeof AccountResetRoute
+  '/account': typeof AccountAccountRouteWithChildren
   '/account/signin': typeof AccountSigninRoute
   '/account/signup': typeof AccountSignupRoute
-  '/account/token': typeof AccountTokenRoute
   '/add/image': typeof AddImageRoute
   '/add/node': typeof AddNodeRoute
   '/add/role': typeof AddRoleRoute
@@ -278,10 +289,13 @@ export interface FileRoutesByFullPath {
   '/images/$image': typeof ImagesImageRoute
   '/racks/$rack': typeof RacksRackRoute
   '/templates/$template': typeof TemplatesTemplateRoute
+  '/account/': typeof AccountIndexRoute
   '/images/': typeof ImagesIndexRoute
   '/nodes/': typeof NodesIndexRoute
   '/racks/': typeof RacksIndexRoute
   '/templates/': typeof TemplatesIndexRoute
+  '/account/reset': typeof AccountAccountResetRoute
+  '/account/token': typeof AccountAccountTokenRoute
   '/account/roles/$role': typeof AccountRolesRoleRoute
   '/nodes/$node/bios': typeof NodesNodeBiosRoute
   '/nodes/$node/console': typeof NodesNodeConsoleRoute
@@ -304,10 +318,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/events': typeof EventsRoute
-  '/account/reset': typeof AccountResetRoute
+  '/account': typeof AccountIndexRoute
   '/account/signin': typeof AccountSigninRoute
   '/account/signup': typeof AccountSignupRoute
-  '/account/token': typeof AccountTokenRoute
   '/add/image': typeof AddImageRoute
   '/add/node': typeof AddNodeRoute
   '/add/role': typeof AddRoleRoute
@@ -319,6 +332,8 @@ export interface FileRoutesByTo {
   '/nodes': typeof NodesIndexRoute
   '/racks': typeof RacksIndexRoute
   '/templates': typeof TemplatesIndexRoute
+  '/account/reset': typeof AccountAccountResetRoute
+  '/account/token': typeof AccountAccountTokenRoute
   '/account/roles/$role': typeof AccountRolesRoleRoute
   '/nodes/$node/bios': typeof NodesNodeBiosRoute
   '/nodes/$node/console': typeof NodesNodeConsoleRoute
@@ -348,10 +363,9 @@ export interface FileRoutesById {
   '/events': typeof EventsRoute
   '/account/roles': typeof AccountRolesRouteRouteWithChildren
   '/nodes/$node': typeof NodesNodeRouteRouteWithChildren
-  '/account/reset': typeof AccountResetRoute
+  '/account/_account': typeof AccountAccountRouteWithChildren
   '/account/signin': typeof AccountSigninRoute
   '/account/signup': typeof AccountSignupRoute
-  '/account/token': typeof AccountTokenRoute
   '/add/image': typeof AddImageRoute
   '/add/node': typeof AddNodeRoute
   '/add/role': typeof AddRoleRoute
@@ -359,10 +373,13 @@ export interface FileRoutesById {
   '/images/$image': typeof ImagesImageRoute
   '/racks/$rack': typeof RacksRackRoute
   '/templates/$template': typeof TemplatesTemplateRoute
+  '/account/': typeof AccountIndexRoute
   '/images/': typeof ImagesIndexRoute
   '/nodes/': typeof NodesIndexRoute
   '/racks/': typeof RacksIndexRoute
   '/templates/': typeof TemplatesIndexRoute
+  '/account/_account/reset': typeof AccountAccountResetRoute
+  '/account/_account/token': typeof AccountAccountTokenRoute
   '/account/roles/$role': typeof AccountRolesRoleRoute
   '/nodes/$node/bios': typeof NodesNodeBiosRoute
   '/nodes/$node/console': typeof NodesNodeConsoleRoute
@@ -393,10 +410,9 @@ export interface FileRouteTypes {
     | '/events'
     | '/account/roles'
     | '/nodes/$node'
-    | '/account/reset'
+    | '/account'
     | '/account/signin'
     | '/account/signup'
-    | '/account/token'
     | '/add/image'
     | '/add/node'
     | '/add/role'
@@ -404,10 +420,13 @@ export interface FileRouteTypes {
     | '/images/$image'
     | '/racks/$rack'
     | '/templates/$template'
+    | '/account/'
     | '/images/'
     | '/nodes/'
     | '/racks/'
     | '/templates/'
+    | '/account/reset'
+    | '/account/token'
     | '/account/roles/$role'
     | '/nodes/$node/bios'
     | '/nodes/$node/console'
@@ -430,10 +449,9 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/events'
-    | '/account/reset'
+    | '/account'
     | '/account/signin'
     | '/account/signup'
-    | '/account/token'
     | '/add/image'
     | '/add/node'
     | '/add/role'
@@ -445,6 +463,8 @@ export interface FileRouteTypes {
     | '/nodes'
     | '/racks'
     | '/templates'
+    | '/account/reset'
+    | '/account/token'
     | '/account/roles/$role'
     | '/nodes/$node/bios'
     | '/nodes/$node/console'
@@ -473,10 +493,9 @@ export interface FileRouteTypes {
     | '/events'
     | '/account/roles'
     | '/nodes/$node'
-    | '/account/reset'
+    | '/account/_account'
     | '/account/signin'
     | '/account/signup'
-    | '/account/token'
     | '/add/image'
     | '/add/node'
     | '/add/role'
@@ -484,10 +503,13 @@ export interface FileRouteTypes {
     | '/images/$image'
     | '/racks/$rack'
     | '/templates/$template'
+    | '/account/'
     | '/images/'
     | '/nodes/'
     | '/racks/'
     | '/templates/'
+    | '/account/_account/reset'
+    | '/account/_account/token'
     | '/account/roles/$role'
     | '/nodes/$node/bios'
     | '/nodes/$node/console'
@@ -516,14 +538,14 @@ export interface RootRouteChildren {
   SplatRoute: typeof SplatRoute
   EventsRoute: typeof EventsRoute
   AccountRolesRouteRoute: typeof AccountRolesRouteRouteWithChildren
-  AccountResetRoute: typeof AccountResetRoute
+  AccountAccountRoute: typeof AccountAccountRouteWithChildren
   AccountSigninRoute: typeof AccountSigninRoute
   AccountSignupRoute: typeof AccountSignupRoute
-  AccountTokenRoute: typeof AccountTokenRoute
   AddImageRoute: typeof AddImageRoute
   AddNodeRoute: typeof AddNodeRoute
   AddRoleRoute: typeof AddRoleRoute
   AddTemplateRoute: typeof AddTemplateRoute
+  AccountIndexRoute: typeof AccountIndexRoute
   AccountUsersIndexRoute: typeof AccountUsersIndexRoute
 }
 
@@ -578,11 +600,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TemplatesRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/account/reset': {
-      id: '/account/reset'
-      path: '/account/reset'
-      fullPath: '/account/reset'
-      preLoaderRoute: typeof AccountResetRouteImport
+    '/account/': {
+      id: '/account/'
+      path: '/account'
+      fullPath: '/account/'
+      preLoaderRoute: typeof AccountIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/_account': {
+      id: '/account/_account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountAccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/account/roles': {
@@ -604,13 +633,6 @@ declare module '@tanstack/react-router' {
       path: '/account/signup'
       fullPath: '/account/signup'
       preLoaderRoute: typeof AccountSignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/account/token': {
-      id: '/account/token'
-      path: '/account/token'
-      fullPath: '/account/token'
-      preLoaderRoute: typeof AccountTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/add/image': {
@@ -696,6 +718,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/templates/$template'
       preLoaderRoute: typeof TemplatesTemplateRouteImport
       parentRoute: typeof TemplatesRouteRoute
+    }
+    '/account/_account/reset': {
+      id: '/account/_account/reset'
+      path: '/reset'
+      fullPath: '/account/reset'
+      preLoaderRoute: typeof AccountAccountResetRouteImport
+      parentRoute: typeof AccountAccountRoute
+    }
+    '/account/_account/token': {
+      id: '/account/_account/token'
+      path: '/token'
+      fullPath: '/account/token'
+      preLoaderRoute: typeof AccountAccountTokenRouteImport
+      parentRoute: typeof AccountAccountRoute
     }
     '/account/roles/': {
       id: '/account/roles/'
@@ -926,6 +962,20 @@ const AccountRolesRouteRouteChildren: AccountRolesRouteRouteChildren = {
 const AccountRolesRouteRouteWithChildren =
   AccountRolesRouteRoute._addFileChildren(AccountRolesRouteRouteChildren)
 
+interface AccountAccountRouteChildren {
+  AccountAccountResetRoute: typeof AccountAccountResetRoute
+  AccountAccountTokenRoute: typeof AccountAccountTokenRoute
+}
+
+const AccountAccountRouteChildren: AccountAccountRouteChildren = {
+  AccountAccountResetRoute: AccountAccountResetRoute,
+  AccountAccountTokenRoute: AccountAccountTokenRoute,
+}
+
+const AccountAccountRouteWithChildren = AccountAccountRoute._addFileChildren(
+  AccountAccountRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ImagesRouteRoute: ImagesRouteRouteWithChildren,
@@ -935,14 +985,14 @@ const rootRouteChildren: RootRouteChildren = {
   SplatRoute: SplatRoute,
   EventsRoute: EventsRoute,
   AccountRolesRouteRoute: AccountRolesRouteRouteWithChildren,
-  AccountResetRoute: AccountResetRoute,
+  AccountAccountRoute: AccountAccountRouteWithChildren,
   AccountSigninRoute: AccountSigninRoute,
   AccountSignupRoute: AccountSignupRoute,
-  AccountTokenRoute: AccountTokenRoute,
   AddImageRoute: AddImageRoute,
   AddNodeRoute: AddNodeRoute,
   AddRoleRoute: AddRoleRoute,
   AddTemplateRoute: AddTemplateRoute,
+  AccountIndexRoute: AccountIndexRoute,
   AccountUsersIndexRoute: AccountUsersIndexRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,14 +1,13 @@
 import { getV1NodesFind } from "@/client";
 import ActionsSheet from "@/components/actions-sheet";
 import NodeActions from "@/components/actions/nodes";
-import { DetailHeader } from "@/components/detail-header";
+import { DetailHeader, DetailTabs } from "@/components/detail-header";
 import { NodeFacts } from "@/components/nodes/plate";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import AuthRedirect from "@/lib/auth";
 import {
   createFileRoute,
-  Link,
   notFound,
   Outlet,
   retainSearchParams,
@@ -74,28 +73,7 @@ function RouteComponent() {
               </Button>
             </>
           }
-          nav={
-            <nav aria-label="Node views" className="-mb-px flex gap-1 overflow-x-auto">
-              {tabs.map((t) => (
-                <Link
-                  key={t.to}
-                  to={t.to}
-                  from="/nodes/$node"
-                  activeProps={{
-                    className: "border-foreground text-foreground",
-                    "aria-current": "page",
-                  }}
-                  inactiveProps={{
-                    className:
-                      "border-transparent text-muted-foreground hover:text-foreground hover:border-border",
-                  }}
-                  className="rounded-t-sm border-b-2 px-3 pt-1 pb-2.5 text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                >
-                  {t.label}
-                </Link>
-              ))}
-            </nav>
-          }
+          nav={<DetailTabs label="Node views" tabs={tabs} from="/nodes/$node" />}
         />
         <div className="px-6 py-5">
           <Outlet />

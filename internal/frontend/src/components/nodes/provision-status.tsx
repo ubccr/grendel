@@ -23,7 +23,8 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Check, LoaderCircle, Minus, Rocket, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import { Fragment, useEffect, useState } from "react";
+import { useNow } from "@/hooks/use-now";
+import { Fragment, useState } from "react";
 
 export function isFinished(state?: string) {
   return state === "completed" || state === "failed";
@@ -131,16 +132,6 @@ export function formatAgo(t: string | undefined, now: number) {
   const h = Math.floor(min / 60);
   if (h < 24) return `${h}h ago`;
   return `${Math.floor(h / 24)}d ago`;
-}
-
-// re-renders on an interval so relative times stay current
-function useNow(ms: number) {
-  const [now, setNow] = useState(() => Date.now());
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), ms);
-    return () => clearInterval(id);
-  }, [ms]);
-  return now;
 }
 
 // the stages a provision goes through, the last one is completed or failed

@@ -155,16 +155,22 @@ func (s *SqlStore) UpdateUserPassword(username, password string) error {
 	return nil
 }
 
-// VerifyUser checks if the given username exists in the data store
+// VerifyUser checks a username and password, giving the user's role when they match. An unknown user and a wrong password are both reported as not authenticated rather than as errors, so an error means the check itself failed
 func (s *SqlStore) VerifyUser(username, password string) (bool, string, error) {
 	ctx := context.Background()
 
 	user, err := s.q.UserFetch(ctx, s.ro, username)
+	if errors.Is(err, sql.ErrNoRows) {
+		return false, "", nil
+	}
 	if err != nil {
 		return false, "", err
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
+	if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+		return false, "", nil
+	}
 	if err != nil {
 		return false, "", err
 	}

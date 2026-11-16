@@ -43,6 +43,11 @@ func (h *Handler) UserList(c fuego.ContextNoBody) ([]model.User, error) {
 		}
 	}
 
+	// password hashes stay on the server: anyone allowed to list users could otherwise try to crack them
+	for i := range users {
+		users[i].PasswordHash = ""
+	}
+
 	if c.QueryParam("usernames") != "" {
 		usersFilter := strings.Split(c.QueryParam("usernames"), ",")
 		filteredUsers := make([]model.User, 0)

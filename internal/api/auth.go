@@ -63,14 +63,13 @@ func (h *Handler) AuthSignin(c fuego.ContextWithBody[AuthRequest]) (*AuthRespons
 		}
 	}
 
-	// an unknown user and a wrong password both fail VerifyUser, and both answer 401 so the client can tell bad credentials from a server fault
+	// an unknown user and a wrong password both answer 401, so the client can tell bad credentials from a server fault, which answers 500
 	authenticated, role, err := h.DB.VerifyUser(body.Username, body.Password)
 	if err != nil {
 		return nil, fuego.HTTPError{
 			Err:    err,
 			Title:  "Authentication Error",
-			Detail: "failed to login, invalid credentials",
-			Status: http.StatusUnauthorized,
+			Detail: "failed to check credentials",
 		}
 	}
 	if !authenticated {
@@ -313,17 +312,19 @@ func (h *Handler) AuthReset(c fuego.ContextWithBody[AuthResetRequest]) (*Generic
 		return nil, errors.New("failed to parse username from context")
 	}
 
+	// a wrong current password answers 401 as signin does, so the client can tell it from a server fault
 	authenticated, _, err := h.DB.VerifyUser(username, body.CurrentPassword)
 	if err != nil {
 		return nil, fuego.HTTPError{
 			Err:    err,
 			Title:  "Authentication Error",
-			Detail: "failed to login, invalid credentials",
+			Detail: "failed to check credentials",
 		}
 	}
 
 	if !authenticated {
 		return nil, fuego.HTTPError{
+			Status: http.StatusUnauthorized,
 			Err:    errors.New("invalid credentials"),
 			Title:  "Authentication Error",
 			Detail: "failed to login, invalid credentials",

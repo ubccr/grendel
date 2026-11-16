@@ -44,13 +44,13 @@ const relativeUnits: Array<[Intl.RelativeTimeFormatUnit, number]> = [
 const relativeFormat = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
 const narrowFormat = new Intl.RelativeTimeFormat(undefined, { numeric: "auto", style: "narrow" });
 
-// relativeTime describes a timestamp from now, such as "5 minutes ago", or "5m ago" when narrow, with the absolute local time for a tooltip. A value that does not parse as a date comes back as is
+// relativeTime describes a time from now, such as "5 minutes ago", or "5m ago" when narrow, with the absolute local time for a tooltip. It takes a timestamp string, a Date, or milliseconds since the epoch; a string that does not parse as a date comes back as is
 export function relativeTime(
-  value: string,
+  value: string | number | Date,
   { now = Date.now(), narrow = false }: { now?: number; narrow?: boolean } = {},
 ) {
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return { text: value, title: value };
+  if (Number.isNaN(date.getTime())) return { text: String(value), title: String(value) };
 
   const seconds = Math.round((date.getTime() - now) / 1000);
   const [unit, size] =

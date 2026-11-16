@@ -22,7 +22,7 @@ import {
 import { useUser } from "@/hooks/user-provider";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useRouter } from "@tanstack/react-router";
-import { ChevronsUpDown, KeyRound, LockKeyhole, LogIn, LogOut } from "lucide-react";
+import { ChevronsUpDown, LogIn, LogOut, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { ThemeIcon, ThemeRadioGroup } from "./theme-switch";
 
@@ -105,13 +105,9 @@ export function NavUser() {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem render={<Link to="/account/token" />}>
-                <KeyRound />
-                API token
-              </DropdownMenuItem>
-              <DropdownMenuItem render={<Link to="/account/reset" />}>
-                <LockKeyhole />
-                Change password
+              <DropdownMenuItem render={<Link to="/account" />}>
+                <UserRound />
+                Account
               </DropdownMenuItem>
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
