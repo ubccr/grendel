@@ -164,7 +164,7 @@ func (s *Service) installFirmwareOne(ctx context.Context, t Target, req InstallF
 	}
 
 	if apply {
-		return doneWith("queued firmware update job %s", job.ID)
+		return &Ack{Note: fmt.Sprintf("queued firmware update job %s", job.ID), Job: job.ID}, nil
 	}
 
 	if err := waitForDellJob(ctx, sis.GetClient(), job); err != nil {

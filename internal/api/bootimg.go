@@ -41,7 +41,7 @@ func (h *Handler) BootImageAdd(c fuego.ContextWithBody[BootImageAddRequest]) (*G
 		names = append(names, image.Name)
 	}
 
-	h.writeEvent(c.Context(), "Success", fmt.Sprintf("Successfully saved image(s): %s", strings.Join(names, ",")))
+	h.audit(c.Context(), model.SeveritySuccess, "image.save", "Saved images", strings.Join(names, ", "))
 
 	return &GenericResponse{
 		Title:   "Success",
@@ -103,7 +103,7 @@ func (h *Handler) BootImageDelete(c fuego.ContextNoBody) (*GenericResponse, erro
 		}
 	}
 
-	h.writeEvent(c.Context(), "Success", fmt.Sprintf("Successfully deleted image(s): %s", names))
+	h.audit(c.Context(), model.SeveritySuccess, "image.delete", "Deleted images", strings.Join(names, ", "))
 
 	return &GenericResponse{
 		Title:   "Success",

@@ -1,59 +1,173 @@
 import type { Event } from "@/client";
+import { stateLabels } from "@/lib/provision";
 import { severityOf, type Severity } from "@/lib/utils";
 
-// EventRow is a row of the events table: an event, with a row under it for each node a bmc action reached. Each node's row carries its event's fields too, so a filter on an event column still finds the nodes under it
-export type EventRow = {
+// Tally is an event's nodes by how it went on them. going are the nodes it is not over for, whether it has got to them yet or not
+export type Tally = {
+  total: number;
+  succeeded: number;
+  failed: number;
+  going: number;
+  stalled: number;
+};
+
+export function eventTally({ counts: c }: Pick<Event, "counts">): Tally {
+  return {
+    total: c.total,
+    succeeded: c.succeeded,
+    failed: c.failed,
+    going: c.pending + c.running,
+    stalled: c.stalled,
+  };
+}
+
+// a tracked event is written while it is running and updated as its nodes report in
+export function isRunning(e?: Pick<Event, "state">) {
+  return e?.state === "running";
+}
+
+// eventTime is when an event counts as having happened: when it ended, or when it started while it is running
+export function eventTime(e: Pick<Event, "ended_at" | "started_at">) {
+  return e.ended_at ?? e.started_at;
+}
+
+const nodes = (n: number) => `${n} ${n === 1 ? "node" : "nodes"}`;
+
+// eventText says what an event did and to what. A provisioning is nodes arriving on their own, so it is said by how many there are, and once it is over by how many made it
+export function eventText(e: Pick<Event, "kind" | "state" | "counts" | "summary" | "subject">) {
+  if (e.kind === "provision") {
+    const t = eventTally(e);
+    if (isRunning(e)) return `Provisioning ${nodes(t.total)}`;
+    if (t.succeeded === t.total) return `Provisioned ${nodes(t.total)}`;
+    return `Provisioned ${t.succeeded} of ${nodes(t.total)}`;
+  }
+  return [e.summary, e.subject].filter(Boolean).join(" ");
+}
+
+// eventResult says how an event went across its nodes, such as "1 of 6 failed". An event with no nodes has none
+export function eventResult(e: Pick<Event, "counts">) {
+  const t = eventTally(e);
+  if (t.total === 0) return "";
+  if (t.going > 0) return `${t.succeeded + t.failed + t.stalled} of ${t.total} done`;
+  if (t.failed > 0) return `${t.failed} of ${t.total} failed`;
+  if (t.stalled > 0) return `${t.stalled} of ${t.total} stalled`;
+  return `${t.succeeded} of ${t.total} succeeded`;
+}
+
+// EventPart is the nodes of an event at one point, with the colour that stands for it. state is the provision state the nodes list filters on, for the parts that have one
+export type EventPart = {
+  key: string;
+  label: string;
+  count: number;
+  color: string;
+  state?: string;
+};
+
+// a fainter blue the further a stage is from done, for up to four stages
+const stageColors = [
+  "bg-(--node-blue)",
+  "bg-(--node-blue)/75",
+  "bg-(--node-blue)/55",
+  "bg-(--node-blue)/35",
+];
+
+// the stages of a provision, the furthest along first
+const provisionStages = ["booting", "config", "ipxe", "pxe"];
+
+// eventParts are an event's nodes by how far they got, the furthest first, so drawn in order they read as progress filling from the left: done, failed, each stage still running, not started, stalled. Parts with no nodes are left out
+export function eventParts(e: Pick<Event, "kind" | "counts" | "stages">): EventPart[] {
+  const c = e.counts;
+  const provision = e.kind === "provision";
+  const stages = e.stages ?? {};
+  const names = provision ? provisionStages.filter((s) => s in stages) : Object.keys(stages).sort();
+  const staged = names.reduce((n, s) => n + stages[s], 0);
+
+  return [
+    {
+      key: "succeeded",
+      label: provision ? stateLabels.completed : "succeeded",
+      count: c.succeeded,
+      color: "bg-(--node-ready)",
+      state: provision ? "completed" : undefined,
+    },
+    {
+      key: "failed",
+      label: "failed",
+      count: c.failed,
+      color: "bg-destructive",
+      state: provision ? "failed" : undefined,
+    },
+    ...names.map((s, i) => ({
+      key: `stage:${s}`,
+      label: provision ? (stateLabels[s] ?? s) : s,
+      count: stages[s],
+      color: stageColors[Math.min(i, stageColors.length - 1)],
+      state: provision ? s : undefined,
+    })),
+    {
+      key: "running",
+      label: "running",
+      count: c.running - staged,
+      color: "bg-(--node-blue)",
+    },
+    { key: "pending", label: "waiting", count: c.pending, color: "bg-muted-foreground/40" },
+    { key: "stalled", label: "stalled", count: c.stalled, color: "bg-(--node-amber)" },
+  ].filter((p) => p.count > 0);
+}
+
+// EventRow is a row of the events table. An event's nodes are fetched when its row is opened, so the list stays small however many nodes events had
+export type EventRow = Tally & {
   id: string;
   time: string;
+  // updated is when the event or any of its nodes last changed
+  updated: string;
+  kind: string;
+  state: string;
   severity: string;
   user: string;
-  // message is the event's text, less the run summary a bmc action adds
   message: string;
   result: string;
   run: string;
-  // succeeded, failed and total count a bmc action's nodes; total is 0 for any other event
-  succeeded: number;
-  failed: number;
-  total: number;
-  host?: string;
-  status?: string;
-  items?: EventRow[];
 };
-
-// a bmc action's event reads "bmc power on: 3 succeeded, 1 failed of 4 (run <id>)", as runBmc in internal/api/bmc.go writes it
-const runPattern = /^(.*): (\d+) succeeded, (\d+) failed of (\d+) \(run (\w+)\)$/;
-
-type Run = Pick<EventRow, "message" | "result" | "run" | "succeeded" | "failed" | "total">;
-
-// parseRun splits a bmc action's event into what was done, how it went and its run id. Any other event is all message, with no nodes counted
-export function parseRun(message: string): Run {
-  const m = runPattern.exec(message);
-  if (!m) return { message, result: "", run: "", succeeded: 0, failed: 0, total: 0 };
-  const [, action, ok, bad, all, run] = m;
-  const [succeeded, failed, total] = [ok, bad, all].map(Number);
-  const result = failed === 0 ? `${ok} of ${all} succeeded` : `${bad} of ${all} failed`;
-  return { message: action, result, run, succeeded, failed, total };
-}
 
 // eventRows turns the api's events, newest first, into the events table's rows
 export function eventRows(events: Event[]): EventRow[] {
-  return events.map((e, i) => {
-    const time = e.Time ?? "";
-    const event = {
-      id: time || String(i),
-      time,
-      severity: e.Severity ?? "",
-      user: e.User ?? "",
-      ...parseRun(e.Message ?? ""),
-    };
-    const items = (e.JobMessages ?? []).map((j): EventRow => ({
-      ...event,
-      id: `${event.id}/${j.host}`,
-      host: j.host ?? "",
-      status: j.status ?? "",
-    }));
-    return { ...event, items };
-  });
+  return events.map((e) => ({
+    id: e.id,
+    time: eventTime(e),
+    updated: e.updated_at,
+    kind: e.kind,
+    state: e.state,
+    severity: e.severity,
+    user: e.actor,
+    message: eventText(e),
+    result: eventResult(e),
+    run: e.detail?.run ?? "",
+    ...eventTally(e),
+  }));
+}
+
+// EventNode is how an event went on one node, which the client inlines rather than naming
+export type EventNode = NonNullable<Event["nodes"]>[number];
+
+// nodeNote is what a node's row says beside its state: the stage it is at while it runs, or what it had to say once it finished
+export function nodeNote(n: EventNode) {
+  return [n.stage, n.message].filter(Boolean).join(": ");
+}
+
+// nodeSeverity reads how an event went on a node as a severity, for the badge that shows it
+export function nodeSeverity(state?: string): Severity | undefined {
+  switch (state) {
+    case "succeeded":
+      return "success";
+    case "failed":
+      return "error";
+    case "stalled":
+      return "warning";
+    case "running":
+    case "pending":
+      return "info";
+  }
 }
 
 // severityDot is the colour of an event's severity in the node field's palette, for the dots and cells that stand for an event

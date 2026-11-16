@@ -8,6 +8,7 @@ package store
 import (
 	"context"
 	"net"
+	"time"
 
 	"github.com/ubccr/grendel/internal/logger"
 	"github.com/ubccr/grendel/pkg/model"
@@ -142,6 +143,30 @@ type Store interface {
 
 	// ProvisionStatuses returns the provision status of every host in ns that has one, or of every host when ns is nil
 	ProvisionStatuses(ns *nodeset.NodeSet) (model.ProvisionStatusList, error)
+
+	// StoreEvent writes an event, replacing what can change about one already stored with the same ID, and writes the rows of its Nodes, leaving its other nodes as they were
+	StoreEvent(event *model.Event) error
+
+	// StoreEventNodes writes how an event is going on the given nodes, leaving its other nodes and the event itself as they were, but for when it was last updated. It is ErrNotFound when there is no such event
+	StoreEventNodes(id string, nodes model.EventNodeList, now time.Time) error
+
+	// SettleEvent brings an event up to date with how it is going on its nodes, as model.Event.Settle does, reading and writing in one transaction. It is ErrNotFound when there is no such event
+	SettleEvent(id string, now time.Time) error
+
+	// TrackEventNodes writes how a tracked event is going on nodes that report in on their own, as nodes provisioning do, in one transaction: a node joins the running event of open's kind, which open is stored as when there is none, and a node finishing after its event ended finishes in that event. The events written to are then settled
+	TrackEventNodes(open *model.Event, nodes model.EventNodeList, now time.Time) error
+
+	// LoadEvent returns the event with the given ID with its nodes, or ErrNotFound
+	LoadEvent(id string) (*model.Event, error)
+
+	// Events returns the events the filter picks, newest first, with their counts, and with their nodes when the filter asks
+	Events(filter model.EventFilter) (model.EventList, error)
+
+	// StallEventNodes marks the nodes of running events of a kind as stalled when they were last updated before the given time, and returns how many
+	StallEventNodes(kind model.EventKind, before time.Time) (int64, error)
+
+	// PruneEvents deletes the finished events that started before the given time, and returns how many
+	PruneEvents(before time.Time) (int64, error)
 
 	Close() error
 }

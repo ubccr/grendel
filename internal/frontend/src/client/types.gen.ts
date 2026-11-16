@@ -861,15 +861,39 @@ export type DataDump = {
  * Event schema
  */
 export type Event = {
-    JobMessages?: Array<{
-        host?: string;
-        msg?: string;
-        status?: string;
+    action: string;
+    actor: string;
+    counts: {
+        failed: number;
+        pending: number;
+        running: number;
+        stalled: number;
+        succeeded: number;
+        total: number;
+    };
+    detail?: {
+        [key: string]: string;
+    };
+    ended_at?: string;
+    id: string;
+    kind: 'audit' | 'bmc' | 'provision' | 'firmware';
+    nodes?: Array<{
+        message?: string;
+        node?: string;
+        ref?: string;
+        stage?: string;
+        state?: 'pending' | 'running' | 'succeeded' | 'failed' | 'stalled';
+        updated_at?: string;
     }>;
-    Message?: string;
-    Severity?: string;
-    Time?: string;
-    User?: string;
+    severity: 'success' | 'info' | 'warning' | 'error';
+    stages?: {
+        [key: string]: number;
+    };
+    started_at: string;
+    state: 'running' | 'done';
+    subject?: string;
+    summary: string;
+    updated_at: string;
 };
 
 /**
@@ -2367,7 +2391,24 @@ export type GetV1GrendelEventsData = {
         Accept?: string;
     };
     path?: never;
-    query?: never;
+    query?: {
+        /**
+         * Only events at this state
+         */
+        state?: string;
+        /**
+         * Only events of this kind
+         */
+        kind?: string;
+        /**
+         * Only events older than the event with this id, for reading further back
+         */
+        before?: string;
+        /**
+         * The most events to return, never more than 1000
+         */
+        limit?: number;
+    };
     url: '/v1/grendel/events';
 };
 
@@ -2388,6 +2429,39 @@ export type GetV1GrendelEventsResponses = {
 };
 
 export type GetV1GrendelEventsResponse = GetV1GrendelEventsResponses[keyof GetV1GrendelEventsResponses];
+
+export type GetV1GrendelEventsIdData = {
+    body?: never;
+    headers?: {
+        Accept?: string;
+    };
+    path: {
+        /**
+         * id of the event
+         */
+        id: string;
+    };
+    query?: never;
+    url: '/v1/grendel/events/{id}';
+};
+
+export type GetV1GrendelEventsIdErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type GetV1GrendelEventsIdError = GetV1GrendelEventsIdErrors[keyof GetV1GrendelEventsIdErrors];
+
+export type GetV1GrendelEventsIdResponses = {
+    /**
+     * OK
+     */
+    200: Event;
+};
+
+export type GetV1GrendelEventsIdResponse = GetV1GrendelEventsIdResponses[keyof GetV1GrendelEventsIdResponses];
 
 export type GetV1GrendelVersionData = {
     body?: never;

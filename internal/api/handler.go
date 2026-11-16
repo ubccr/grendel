@@ -12,20 +12,22 @@ import (
 	"github.com/go-fuego/fuego/option"
 	"github.com/go-fuego/fuego/param"
 	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/events"
 	"github.com/ubccr/grendel/internal/redfish"
 	"github.com/ubccr/grendel/internal/store"
-	"github.com/ubccr/grendel/internal/store/eventstore"
+	"github.com/ubccr/grendel/pkg/model"
 )
 
 type Handler struct {
-	DB     store.Store
-	Events eventstore.Store
+	DB store.Store
+	// Events records what is done through the api
+	Events *events.Recorder
 	// Redfish serves the bmc routes
 	Redfish *redfish.Service
 }
 
 func NewHandler(db store.Store) (*Handler, error) {
-	h := &Handler{DB: db, Redfish: redfish.NewFromViper()}
+	h := &Handler{DB: db, Events: events.New(db), Redfish: redfish.NewFromViper()}
 
 	return h, nil
 }
@@ -70,7 +72,17 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 	sw := fuego.Group(v1, "/switch", option.Middleware(h.authMiddleware), globalOptions)
 
 	// Routes
-	fuego.Get(grendel, "/events", h.GetEvents)
+	fuego.Get(grendel, "/events", h.GetEvents,
+		option.Description("List the latest events, newest first, with how many of their nodes are at each state"),
+		option.Query("state", "Only events at this state", param.Example("state", "running | done")),
+		option.Query("kind", "Only events of this kind", param.Example("kind", "audit | bmc | provision | firmware")),
+		option.Query("before", "Only events older than the event with this id, for reading further back"),
+		option.QueryInt("limit", "The most events to return, never more than 1000", param.Default(model.DefaultEventLimit)),
+	)
+	fuego.Get(grendel, "/events/{id}", h.GetEvent,
+		option.Description("Get one event with how it went on each of its nodes"),
+		option.Path("id", "id of the event"),
+	)
 	fuego.Get(grendel, "/version", h.GetVersion, option.Description("Get the server version"))
 
 	fuego.Post(nodes, "", h.NodeAdd, option.Description("Add nodes"))

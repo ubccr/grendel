@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/ubccr/grendel/internal/beacon"
+	"github.com/ubccr/grendel/internal/events"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
 	"github.com/ubccr/grendel/pkg/nodeset"
@@ -423,4 +424,82 @@ func TestStatusRecordsImage(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "frosty", s.BootImage, "the image is the one sent with the iPXE script")
 	assert.Equal(t, "2026.11.3", s.BootImageVersion)
+}
+
+func TestProvisionEvent(t *testing.T) {
+	h := &Handler{DB: newTestDB(t)}
+	// the node that reports its status is the one at the address test requests come from
+	second := statusHost(t, h, true)
+	first := &model.Host{
+		Name:      "cpn-02",
+		BootImage: second.BootImage,
+		Provision: true,
+		Interfaces: []*model.NetInterface{{
+			MAC: net.HardwareAddr{0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xfe},
+			IP:  netip.MustParsePrefix("192.0.2.2/24"),
+		}},
+	}
+	require.NoError(t, h.DB.StoreHost(first))
+
+	// reports are written by the recorder's next flush, which is done here before each look
+	provisionings := func() model.EventList {
+		t.Helper()
+		events.New(h.DB).Flush()
+		list, err := h.DB.Events(model.EventFilter{Kind: model.EventKindProvision})
+		require.NoError(t, err)
+		return list
+	}
+
+	// the first node to network boot opens the event, and the next joins it
+	RecordPXE(h.DB, first)
+	h.recordStage(second, model.ProvisionStateIPXE, nil)
+	list := provisionings()
+	require.Len(t, list, 1)
+	assert.Equal(t, model.EventStateRunning, list[0].State)
+	assert.Equal(t, model.EventActorSystem, list[0].Actor)
+	assert.Equal(t, model.EventCounts{Total: 2, Running: 2}, list[0].Counts)
+	assert.Equal(t, map[string]int{"pxe": 1, "ipxe": 1}, list[0].Stages)
+
+	// it stays open while any node is on its way
+	h.recordCompleted(first)
+	list = provisionings()
+	require.Len(t, list, 1)
+	assert.Equal(t, model.EventStateRunning, list[0].State)
+	assert.Equal(t, model.EventCounts{Total: 2, Running: 1, Succeeded: 1}, list[0].Counts)
+
+	// and ends with the last node, as a warning since one failed
+	_, err := postStatus(t, h, second, `{"state":"failed","boot_id":"b1","message":"timed out waiting for network"}`)
+	require.NoError(t, err)
+	list = provisionings()
+	require.Len(t, list, 1)
+	assert.Equal(t, model.EventStateDone, list[0].State)
+	assert.Equal(t, model.SeverityWarning, list[0].Severity)
+	assert.NotNil(t, list[0].EndedAt)
+
+	// the node's row carries what it reported, so the events page can say why it failed
+	event, err := h.DB.LoadEvent(list[0].ID)
+	require.NoError(t, err)
+	for _, n := range event.Nodes {
+		if n.Node == second.Name {
+			assert.Equal(t, model.EventNodeFailed, n.State)
+			assert.Equal(t, "timed out waiting for network", n.Message)
+		}
+	}
+
+	// a node that then succeeds in the same boot changes how the event went, and does not start another
+	_, err = postStatus(t, h, second, `{"state":"completed","boot_id":"b1"}`)
+	require.NoError(t, err)
+	list = provisionings()
+	require.Len(t, list, 1)
+	assert.Equal(t, model.SeveritySuccess, list[0].Severity)
+	assert.Equal(t, model.EventStateDone, list[0].State)
+
+	// a node network booting again is a new provisioning
+	time.Sleep(10 * time.Millisecond)
+	RecordPXE(h.DB, first)
+	list = provisionings()
+	require.Len(t, list, 2)
+	assert.Equal(t, model.EventStateRunning, list[0].State)
+	assert.Equal(t, model.EventCounts{Total: 1, Running: 1}, list[0].Counts)
+	assert.Equal(t, model.EventStateDone, list[1].State)
 }

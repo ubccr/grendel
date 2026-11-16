@@ -8,6 +8,7 @@ import { ProvisionStatusBadge, statusesByNode } from "@/components/nodes/provisi
 import TagsList from "@/components/tags";
 import { Card, CardContent } from "@/components/ui/card";
 import AuthRedirect from "@/lib/auth";
+import { stateLabels } from "@/lib/provision";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { DataTableColumnDef } from "@/components/data-table/features";
 import { useMemo } from "react";
@@ -65,6 +66,13 @@ function TableComponent() {
         cell: ({ row }) => (
           <ProvisionStatusBadge status={statusByNode.get(row.original?.name ?? "")} />
         ),
+        // a whole state matches only that state, so pxe does not also list the nodes at ipxe; anything else typed matches part of a state
+        filterFn: (row, columnId, filterValue: string) => {
+          const state = row.getValue<string>(columnId);
+          return Object.keys(stateLabels).includes(filterValue)
+            ? state === filterValue
+            : state.includes(filterValue);
+        },
       },
       {
         accessorKey: "boot_image",

@@ -5901,97 +5901,544 @@ func (s *DataDumpUsersItem) SetUsername(val OptString) {
 // Event schema.
 // Ref: #/components/schemas/Event
 type Event struct {
-	JobMessages OptNilNilEventJobMessagesItemArray `json:"JobMessages"`
-	Message     OptString                          `json:"Message"`
-	Severity    OptString                          `json:"Severity"`
-	Time        OptDateTime                        `json:"Time"`
-	User        OptString                          `json:"User"`
+	Action    string                    `json:"action"`
+	Actor     string                    `json:"actor"`
+	Counts    EventCounts               `json:"counts"`
+	Detail    OptNilEventDetail         `json:"detail"`
+	EndedAt   OptNilDateTime            `json:"ended_at"`
+	ID        string                    `json:"id"`
+	Kind      EventKind                 `json:"kind"`
+	Nodes     OptNilEventNodesItemArray `json:"nodes"`
+	Severity  EventSeverity             `json:"severity"`
+	Stages    OptNilEventStages         `json:"stages"`
+	StartedAt time.Time                 `json:"started_at"`
+	State     EventState                `json:"state"`
+	Subject   OptNilString              `json:"subject"`
+	Summary   string                    `json:"summary"`
+	UpdatedAt time.Time                 `json:"updated_at"`
 }
 
-// GetJobMessages returns the value of JobMessages.
-func (s *Event) GetJobMessages() OptNilNilEventJobMessagesItemArray {
-	return s.JobMessages
+// GetAction returns the value of Action.
+func (s *Event) GetAction() string {
+	return s.Action
 }
 
-// GetMessage returns the value of Message.
-func (s *Event) GetMessage() OptString {
-	return s.Message
+// GetActor returns the value of Actor.
+func (s *Event) GetActor() string {
+	return s.Actor
+}
+
+// GetCounts returns the value of Counts.
+func (s *Event) GetCounts() EventCounts {
+	return s.Counts
+}
+
+// GetDetail returns the value of Detail.
+func (s *Event) GetDetail() OptNilEventDetail {
+	return s.Detail
+}
+
+// GetEndedAt returns the value of EndedAt.
+func (s *Event) GetEndedAt() OptNilDateTime {
+	return s.EndedAt
+}
+
+// GetID returns the value of ID.
+func (s *Event) GetID() string {
+	return s.ID
+}
+
+// GetKind returns the value of Kind.
+func (s *Event) GetKind() EventKind {
+	return s.Kind
+}
+
+// GetNodes returns the value of Nodes.
+func (s *Event) GetNodes() OptNilEventNodesItemArray {
+	return s.Nodes
 }
 
 // GetSeverity returns the value of Severity.
-func (s *Event) GetSeverity() OptString {
+func (s *Event) GetSeverity() EventSeverity {
 	return s.Severity
 }
 
-// GetTime returns the value of Time.
-func (s *Event) GetTime() OptDateTime {
-	return s.Time
+// GetStages returns the value of Stages.
+func (s *Event) GetStages() OptNilEventStages {
+	return s.Stages
 }
 
-// GetUser returns the value of User.
-func (s *Event) GetUser() OptString {
-	return s.User
+// GetStartedAt returns the value of StartedAt.
+func (s *Event) GetStartedAt() time.Time {
+	return s.StartedAt
 }
 
-// SetJobMessages sets the value of JobMessages.
-func (s *Event) SetJobMessages(val OptNilNilEventJobMessagesItemArray) {
-	s.JobMessages = val
+// GetState returns the value of State.
+func (s *Event) GetState() EventState {
+	return s.State
 }
 
-// SetMessage sets the value of Message.
-func (s *Event) SetMessage(val OptString) {
-	s.Message = val
+// GetSubject returns the value of Subject.
+func (s *Event) GetSubject() OptNilString {
+	return s.Subject
+}
+
+// GetSummary returns the value of Summary.
+func (s *Event) GetSummary() string {
+	return s.Summary
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *Event) GetUpdatedAt() time.Time {
+	return s.UpdatedAt
+}
+
+// SetAction sets the value of Action.
+func (s *Event) SetAction(val string) {
+	s.Action = val
+}
+
+// SetActor sets the value of Actor.
+func (s *Event) SetActor(val string) {
+	s.Actor = val
+}
+
+// SetCounts sets the value of Counts.
+func (s *Event) SetCounts(val EventCounts) {
+	s.Counts = val
+}
+
+// SetDetail sets the value of Detail.
+func (s *Event) SetDetail(val OptNilEventDetail) {
+	s.Detail = val
+}
+
+// SetEndedAt sets the value of EndedAt.
+func (s *Event) SetEndedAt(val OptNilDateTime) {
+	s.EndedAt = val
+}
+
+// SetID sets the value of ID.
+func (s *Event) SetID(val string) {
+	s.ID = val
+}
+
+// SetKind sets the value of Kind.
+func (s *Event) SetKind(val EventKind) {
+	s.Kind = val
+}
+
+// SetNodes sets the value of Nodes.
+func (s *Event) SetNodes(val OptNilEventNodesItemArray) {
+	s.Nodes = val
 }
 
 // SetSeverity sets the value of Severity.
-func (s *Event) SetSeverity(val OptString) {
+func (s *Event) SetSeverity(val EventSeverity) {
 	s.Severity = val
 }
 
-// SetTime sets the value of Time.
-func (s *Event) SetTime(val OptDateTime) {
-	s.Time = val
+// SetStages sets the value of Stages.
+func (s *Event) SetStages(val OptNilEventStages) {
+	s.Stages = val
 }
 
-// SetUser sets the value of User.
-func (s *Event) SetUser(val OptString) {
-	s.User = val
+// SetStartedAt sets the value of StartedAt.
+func (s *Event) SetStartedAt(val time.Time) {
+	s.StartedAt = val
 }
 
-type EventJobMessagesItem struct {
-	Host   OptString `json:"host"`
-	Msg    OptString `json:"msg"`
-	Status OptString `json:"status"`
+// SetState sets the value of State.
+func (s *Event) SetState(val EventState) {
+	s.State = val
 }
 
-// GetHost returns the value of Host.
-func (s *EventJobMessagesItem) GetHost() OptString {
-	return s.Host
+// SetSubject sets the value of Subject.
+func (s *Event) SetSubject(val OptNilString) {
+	s.Subject = val
 }
 
-// GetMsg returns the value of Msg.
-func (s *EventJobMessagesItem) GetMsg() OptString {
-	return s.Msg
+// SetSummary sets the value of Summary.
+func (s *Event) SetSummary(val string) {
+	s.Summary = val
 }
 
-// GetStatus returns the value of Status.
-func (s *EventJobMessagesItem) GetStatus() OptString {
-	return s.Status
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *Event) SetUpdatedAt(val time.Time) {
+	s.UpdatedAt = val
 }
 
-// SetHost sets the value of Host.
-func (s *EventJobMessagesItem) SetHost(val OptString) {
-	s.Host = val
+type EventCounts struct {
+	Failed    int `json:"failed"`
+	Pending   int `json:"pending"`
+	Running   int `json:"running"`
+	Stalled   int `json:"stalled"`
+	Succeeded int `json:"succeeded"`
+	Total     int `json:"total"`
 }
 
-// SetMsg sets the value of Msg.
-func (s *EventJobMessagesItem) SetMsg(val OptString) {
-	s.Msg = val
+// GetFailed returns the value of Failed.
+func (s *EventCounts) GetFailed() int {
+	return s.Failed
 }
 
-// SetStatus sets the value of Status.
-func (s *EventJobMessagesItem) SetStatus(val OptString) {
-	s.Status = val
+// GetPending returns the value of Pending.
+func (s *EventCounts) GetPending() int {
+	return s.Pending
+}
+
+// GetRunning returns the value of Running.
+func (s *EventCounts) GetRunning() int {
+	return s.Running
+}
+
+// GetStalled returns the value of Stalled.
+func (s *EventCounts) GetStalled() int {
+	return s.Stalled
+}
+
+// GetSucceeded returns the value of Succeeded.
+func (s *EventCounts) GetSucceeded() int {
+	return s.Succeeded
+}
+
+// GetTotal returns the value of Total.
+func (s *EventCounts) GetTotal() int {
+	return s.Total
+}
+
+// SetFailed sets the value of Failed.
+func (s *EventCounts) SetFailed(val int) {
+	s.Failed = val
+}
+
+// SetPending sets the value of Pending.
+func (s *EventCounts) SetPending(val int) {
+	s.Pending = val
+}
+
+// SetRunning sets the value of Running.
+func (s *EventCounts) SetRunning(val int) {
+	s.Running = val
+}
+
+// SetStalled sets the value of Stalled.
+func (s *EventCounts) SetStalled(val int) {
+	s.Stalled = val
+}
+
+// SetSucceeded sets the value of Succeeded.
+func (s *EventCounts) SetSucceeded(val int) {
+	s.Succeeded = val
+}
+
+// SetTotal sets the value of Total.
+func (s *EventCounts) SetTotal(val int) {
+	s.Total = val
+}
+
+type EventDetail map[string]string
+
+func (s *EventDetail) init() EventDetail {
+	m := *s
+	if m == nil {
+		m = map[string]string{}
+		*s = m
+	}
+	return m
+}
+
+type EventKind string
+
+const (
+	EventKindAudit     EventKind = "audit"
+	EventKindBmc       EventKind = "bmc"
+	EventKindProvision EventKind = "provision"
+	EventKindFirmware  EventKind = "firmware"
+)
+
+// AllValues returns all EventKind values.
+func (EventKind) AllValues() []EventKind {
+	return []EventKind{
+		EventKindAudit,
+		EventKindBmc,
+		EventKindProvision,
+		EventKindFirmware,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s EventKind) MarshalText() ([]byte, error) {
+	switch s {
+	case EventKindAudit:
+		return []byte(s), nil
+	case EventKindBmc:
+		return []byte(s), nil
+	case EventKindProvision:
+		return []byte(s), nil
+	case EventKindFirmware:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *EventKind) UnmarshalText(data []byte) error {
+	switch EventKind(data) {
+	case EventKindAudit:
+		*s = EventKindAudit
+		return nil
+	case EventKindBmc:
+		*s = EventKindBmc
+		return nil
+	case EventKindProvision:
+		*s = EventKindProvision
+		return nil
+	case EventKindFirmware:
+		*s = EventKindFirmware
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type EventNodesItem struct {
+	Message   OptString              `json:"message"`
+	Node      OptString              `json:"node"`
+	Ref       OptString              `json:"ref"`
+	Stage     OptString              `json:"stage"`
+	State     OptEventNodesItemState `json:"state"`
+	UpdatedAt OptDateTime            `json:"updated_at"`
+}
+
+// GetMessage returns the value of Message.
+func (s *EventNodesItem) GetMessage() OptString {
+	return s.Message
+}
+
+// GetNode returns the value of Node.
+func (s *EventNodesItem) GetNode() OptString {
+	return s.Node
+}
+
+// GetRef returns the value of Ref.
+func (s *EventNodesItem) GetRef() OptString {
+	return s.Ref
+}
+
+// GetStage returns the value of Stage.
+func (s *EventNodesItem) GetStage() OptString {
+	return s.Stage
+}
+
+// GetState returns the value of State.
+func (s *EventNodesItem) GetState() OptEventNodesItemState {
+	return s.State
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *EventNodesItem) GetUpdatedAt() OptDateTime {
+	return s.UpdatedAt
+}
+
+// SetMessage sets the value of Message.
+func (s *EventNodesItem) SetMessage(val OptString) {
+	s.Message = val
+}
+
+// SetNode sets the value of Node.
+func (s *EventNodesItem) SetNode(val OptString) {
+	s.Node = val
+}
+
+// SetRef sets the value of Ref.
+func (s *EventNodesItem) SetRef(val OptString) {
+	s.Ref = val
+}
+
+// SetStage sets the value of Stage.
+func (s *EventNodesItem) SetStage(val OptString) {
+	s.Stage = val
+}
+
+// SetState sets the value of State.
+func (s *EventNodesItem) SetState(val OptEventNodesItemState) {
+	s.State = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *EventNodesItem) SetUpdatedAt(val OptDateTime) {
+	s.UpdatedAt = val
+}
+
+type EventNodesItemState string
+
+const (
+	EventNodesItemStatePending   EventNodesItemState = "pending"
+	EventNodesItemStateRunning   EventNodesItemState = "running"
+	EventNodesItemStateSucceeded EventNodesItemState = "succeeded"
+	EventNodesItemStateFailed    EventNodesItemState = "failed"
+	EventNodesItemStateStalled   EventNodesItemState = "stalled"
+)
+
+// AllValues returns all EventNodesItemState values.
+func (EventNodesItemState) AllValues() []EventNodesItemState {
+	return []EventNodesItemState{
+		EventNodesItemStatePending,
+		EventNodesItemStateRunning,
+		EventNodesItemStateSucceeded,
+		EventNodesItemStateFailed,
+		EventNodesItemStateStalled,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s EventNodesItemState) MarshalText() ([]byte, error) {
+	switch s {
+	case EventNodesItemStatePending:
+		return []byte(s), nil
+	case EventNodesItemStateRunning:
+		return []byte(s), nil
+	case EventNodesItemStateSucceeded:
+		return []byte(s), nil
+	case EventNodesItemStateFailed:
+		return []byte(s), nil
+	case EventNodesItemStateStalled:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *EventNodesItemState) UnmarshalText(data []byte) error {
+	switch EventNodesItemState(data) {
+	case EventNodesItemStatePending:
+		*s = EventNodesItemStatePending
+		return nil
+	case EventNodesItemStateRunning:
+		*s = EventNodesItemStateRunning
+		return nil
+	case EventNodesItemStateSucceeded:
+		*s = EventNodesItemStateSucceeded
+		return nil
+	case EventNodesItemStateFailed:
+		*s = EventNodesItemStateFailed
+		return nil
+	case EventNodesItemStateStalled:
+		*s = EventNodesItemStateStalled
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type EventSeverity string
+
+const (
+	EventSeveritySuccess EventSeverity = "success"
+	EventSeverityInfo    EventSeverity = "info"
+	EventSeverityWarning EventSeverity = "warning"
+	EventSeverityError   EventSeverity = "error"
+)
+
+// AllValues returns all EventSeverity values.
+func (EventSeverity) AllValues() []EventSeverity {
+	return []EventSeverity{
+		EventSeveritySuccess,
+		EventSeverityInfo,
+		EventSeverityWarning,
+		EventSeverityError,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s EventSeverity) MarshalText() ([]byte, error) {
+	switch s {
+	case EventSeveritySuccess:
+		return []byte(s), nil
+	case EventSeverityInfo:
+		return []byte(s), nil
+	case EventSeverityWarning:
+		return []byte(s), nil
+	case EventSeverityError:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *EventSeverity) UnmarshalText(data []byte) error {
+	switch EventSeverity(data) {
+	case EventSeveritySuccess:
+		*s = EventSeveritySuccess
+		return nil
+	case EventSeverityInfo:
+		*s = EventSeverityInfo
+		return nil
+	case EventSeverityWarning:
+		*s = EventSeverityWarning
+		return nil
+	case EventSeverityError:
+		*s = EventSeverityError
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type EventStages map[string]int
+
+func (s *EventStages) init() EventStages {
+	m := *s
+	if m == nil {
+		m = map[string]int{}
+		*s = m
+	}
+	return m
+}
+
+type EventState string
+
+const (
+	EventStateRunning EventState = "running"
+	EventStateDone    EventState = "done"
+)
+
+// AllValues returns all EventState values.
+func (EventState) AllValues() []EventState {
+	return []EventState{
+		EventStateRunning,
+		EventStateDone,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s EventState) MarshalText() ([]byte, error) {
+	switch s {
+	case EventStateRunning:
+		return []byte(s), nil
+	case EventStateDone:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *EventState) UnmarshalText(data []byte) error {
+	switch EventState(data) {
+	case EventStateRunning:
+		*s = EventStateRunning
+		return nil
+	case EventStateDone:
+		*s = EventStateDone
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 // GenericResponse schema.
@@ -7612,51 +8059,6 @@ func (o NilDataDumpImagesItem) Or(d DataDumpImagesItem) DataDumpImagesItem {
 	return d
 }
 
-// NewNilEventJobMessagesItem returns new NilEventJobMessagesItem with value set to v.
-func NewNilEventJobMessagesItem(v EventJobMessagesItem) NilEventJobMessagesItem {
-	return NilEventJobMessagesItem{
-		Value: v,
-	}
-}
-
-// NilEventJobMessagesItem is nullable EventJobMessagesItem.
-type NilEventJobMessagesItem struct {
-	Value EventJobMessagesItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilEventJobMessagesItem) SetTo(v EventJobMessagesItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsSet returns true if value is Null.
-func (o NilEventJobMessagesItem) IsNull() bool { return o.Null }
-
-// SetNull sets value to null.
-func (o *NilEventJobMessagesItem) SetToNull() {
-	o.Null = true
-	var v EventJobMessagesItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilEventJobMessagesItem) Get() (v EventJobMessagesItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilEventJobMessagesItem) Or(d EventJobMessagesItem) EventJobMessagesItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewNilHostBondsItem returns new NilHostBondsItem with value set to v.
 func NewNilHostBondsItem(v HostBondsItem) NilHostBondsItem {
 	return NilHostBondsItem{
@@ -9213,6 +9615,52 @@ func (o OptDateTime) Or(d time.Time) time.Time {
 	return d
 }
 
+// NewOptEventNodesItemState returns new OptEventNodesItemState with value set to v.
+func NewOptEventNodesItemState(v EventNodesItemState) OptEventNodesItemState {
+	return OptEventNodesItemState{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptEventNodesItemState is optional EventNodesItemState.
+type OptEventNodesItemState struct {
+	Value EventNodesItemState
+	Set   bool
+}
+
+// IsSet returns true if OptEventNodesItemState was set.
+func (o OptEventNodesItemState) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptEventNodesItemState) Reset() {
+	var v EventNodesItemState
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptEventNodesItemState) SetTo(v EventNodesItemState) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptEventNodesItemState) Get() (v EventNodesItemState, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptEventNodesItemState) Or(d EventNodesItemState) EventNodesItemState {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptFloat32 returns new OptFloat32 with value set to v.
 func NewOptFloat32(v float32) OptFloat32 {
 	return OptFloat32{
@@ -10468,6 +10916,195 @@ func (o OptNilDateTime) Or(d time.Time) time.Time {
 	return d
 }
 
+// NewOptNilEventDetail returns new OptNilEventDetail with value set to v.
+func NewOptNilEventDetail(v EventDetail) OptNilEventDetail {
+	return OptNilEventDetail{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilEventDetail is optional nullable EventDetail.
+type OptNilEventDetail struct {
+	Value EventDetail
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilEventDetail was set.
+func (o OptNilEventDetail) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilEventDetail) Reset() {
+	var v EventDetail
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilEventDetail) SetTo(v EventDetail) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilEventDetail) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilEventDetail) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v EventDetail
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilEventDetail) Get() (v EventDetail, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilEventDetail) Or(d EventDetail) EventDetail {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilEventNodesItemArray returns new OptNilEventNodesItemArray with value set to v.
+func NewOptNilEventNodesItemArray(v []EventNodesItem) OptNilEventNodesItemArray {
+	return OptNilEventNodesItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilEventNodesItemArray is optional nullable []EventNodesItem.
+type OptNilEventNodesItemArray struct {
+	Value []EventNodesItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilEventNodesItemArray was set.
+func (o OptNilEventNodesItemArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilEventNodesItemArray) Reset() {
+	var v []EventNodesItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilEventNodesItemArray) SetTo(v []EventNodesItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilEventNodesItemArray) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilEventNodesItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []EventNodesItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilEventNodesItemArray) Get() (v []EventNodesItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilEventNodesItemArray) Or(d []EventNodesItem) []EventNodesItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilEventStages returns new OptNilEventStages with value set to v.
+func NewOptNilEventStages(v EventStages) OptNilEventStages {
+	return OptNilEventStages{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilEventStages is optional nullable EventStages.
+type OptNilEventStages struct {
+	Value EventStages
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilEventStages was set.
+func (o OptNilEventStages) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilEventStages) Reset() {
+	var v EventStages
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilEventStages) SetTo(v EventStages) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilEventStages) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilEventStages) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v EventStages
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilEventStages) Get() (v EventStages, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilEventStages) Or(d EventStages) EventStages {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilFloat64 returns new OptNilFloat64 with value set to v.
 func NewOptNilFloat64(v float64) OptNilFloat64 {
 	return OptNilFloat64{
@@ -11673,69 +12310,6 @@ func (o OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotEx
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Or(d []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilNilEventJobMessagesItemArray returns new OptNilNilEventJobMessagesItemArray with value set to v.
-func NewOptNilNilEventJobMessagesItemArray(v []NilEventJobMessagesItem) OptNilNilEventJobMessagesItemArray {
-	return OptNilNilEventJobMessagesItemArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilEventJobMessagesItemArray is optional nullable []NilEventJobMessagesItem.
-type OptNilNilEventJobMessagesItemArray struct {
-	Value []NilEventJobMessagesItem
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilEventJobMessagesItemArray was set.
-func (o OptNilNilEventJobMessagesItemArray) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilNilEventJobMessagesItemArray) Reset() {
-	var v []NilEventJobMessagesItem
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilEventJobMessagesItemArray) SetTo(v []NilEventJobMessagesItem) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsSet returns true if value is Null.
-func (o OptNilNilEventJobMessagesItemArray) IsNull() bool { return o.Null }
-
-// SetNull sets value to null.
-func (o *OptNilNilEventJobMessagesItemArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilEventJobMessagesItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilEventJobMessagesItemArray) Get() (v []NilEventJobMessagesItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilEventJobMessagesItemArray) Or(d []NilEventJobMessagesItem) []NilEventJobMessagesItem {
 	if v, ok := o.Get(); ok {
 		return v
 	}

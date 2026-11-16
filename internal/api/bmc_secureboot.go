@@ -61,7 +61,7 @@ func (h *Handler) BmcSecureBoot(c fuego.ContextNoBody) (model.BmcResponse[model.
 		return model.BmcResponse[model.BmcSecureBoot]{}, err
 	}
 
-	return runBmc(h, c, "bmc secureboot", false,
+	return runBmc(h, c, "bmc secureboot", nil,
 		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[model.BmcSecureBoot] {
 			return h.Redfish.SecureBoot(ctx, t, req)
 		},

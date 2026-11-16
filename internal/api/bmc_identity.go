@@ -113,7 +113,7 @@ func (h *Handler) BmcAssetTag(c fuego.ContextWithBody[BmcAssetTagBody]) (model.B
 		operation = "bmc asset tag set to " + text
 	}
 
-	return runBmc(h, c, operation, !body.DryRun,
+	return runBmc(h, c, operation, trackBmc[redfish.AssetTagResult](!body.DryRun, "bmc.asset-tag.set"),
 		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.AssetTagResult] {
 			return h.Redfish.SetAssetTag(ctx, t, req)
 		},
@@ -153,7 +153,7 @@ func (h *Handler) BmcLocation(c fuego.ContextWithBody[BmcLocationBody]) (model.B
 	for _, f := range fields {
 		names = append(names, f.name)
 	}
-	return runBmc(h, c, "bmc location set "+strings.Join(names, ","), !body.DryRun,
+	return runBmc(h, c, "bmc location set "+strings.Join(names, ","), trackBmc[redfish.LocationResult](!body.DryRun, "bmc.location.set"),
 		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.LocationResult] {
 			return h.Redfish.SetLocation(ctx, t, req)
 		},

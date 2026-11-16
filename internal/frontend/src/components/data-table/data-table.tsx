@@ -20,7 +20,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Link, useNavigate, useRouter, useSearch } from "@tanstack/react-router";
 import { ChevronRight, ChevronsDownUp, ChevronsUpDown, Plus, RefreshCw } from "lucide-react";
-import React, { createContext, JSX, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, JSX, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
@@ -122,6 +122,15 @@ export function DataTable<TData extends RowData>({
     [columns, selectable, hasDetail],
   );
 
+  // the filters the url holds, taking only the parameters that name a column, since a page can have search parameters of its own
+  const urlFilters = useMemo(
+    () =>
+      Object.entries(search)
+        .filter(([id]) => allColumns.some((c) => columnId(c) === id))
+        .map(([id, value]) => ({ id, value })) as ColumnFiltersState,
+    [search, allColumns],
+  );
+
   const table = useTable({
     features,
     columns: allColumns,
@@ -138,10 +147,8 @@ export function DataTable<TData extends RowData>({
     initialState: {
       sorting: initialSorting ?? [],
       columnVisibility: initialVisibility ?? {},
-      // filters start from the url, taking only the parameters that name a column, since a page can have search parameters of its own
-      columnFilters: Object.entries(search)
-        .filter(([id]) => allColumns.some((c) => columnId(c) === id))
-        .map(([id, value]) => ({ id, value })) as ColumnFiltersState,
+      // filters start from the url
+      columnFilters: urlFilters,
       // groups start open, since the rows under a node are what the page is for. Tables with detail panels start closed, as each panel can be large
       expanded: tree ? true : {},
       pagination: { pageIndex: 0, pageSize: 20 },
@@ -159,25 +166,43 @@ export function DataTable<TData extends RowData>({
     });
   }, [data, table]);
 
+  // the url can also change under the table, as when a link elsewhere on the page leads back to it with other filters, and the table then takes its filters from it. The table's own changes are left alone: it already holds them, and the url trails behind while typing, so taking it then would put back an earlier value
+  const ownChanges = useRef(0);
+  const urlKey = JSON.stringify(urlFilters);
+  const seenUrlKey = useRef(urlKey);
+  useEffect(() => {
+    if (urlKey === seenUrlKey.current) return;
+    seenUrlKey.current = urlKey;
+    if (ownChanges.current > 0) return;
+    table.resetRowSelection();
+    table.setColumnFilters(JSON.parse(urlKey) as ColumnFiltersState);
+  }, [urlKey, table]);
+  const own = (navigated: Promise<void>) => {
+    ownChanges.current++;
+    void navigated.finally(() => ownChanges.current--);
+  };
+
   // every filter change goes through here, so the filter lands in the url and the selection is cleared, since it could otherwise hold rows the filter now hides
   const setFilter = (id: string, value: unknown) => {
-    navigate({ to: ".", search: (prev) => ({ ...prev, [id]: value }), replace: true });
+    own(navigate({ to: ".", search: (prev) => ({ ...prev, [id]: value }), replace: true }));
     table.resetRowSelection();
     table.getColumn(id)?.setFilterValue(value);
   };
 
   const filters = table.state.columnFilters;
   const clearFilters = () => {
-    navigate({
-      to: ".",
-      search: (prev) =>
-        Object.fromEntries(
-          Object.entries(prev as Record<string, unknown>).filter(
-            ([k]) => !filters.some((f) => f.id === k),
+    own(
+      navigate({
+        to: ".",
+        search: (prev) =>
+          Object.fromEntries(
+            Object.entries(prev as Record<string, unknown>).filter(
+              ([k]) => !filters.some((f) => f.id === k),
+            ),
           ),
-        ),
-      replace: true,
-    });
+        replace: true,
+      }),
+    );
     table.resetRowSelection();
     table.resetColumnFilters(true);
   };

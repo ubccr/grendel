@@ -174,6 +174,16 @@ func (s *Server) Serve() error {
 	return nil
 }
 
+// Background follows the firmware updates queued on BMCs until ctx ends
+func (s *Server) Background(ctx context.Context) error {
+	h, err := NewHandler(s.DB)
+	if err != nil {
+		return err
+	}
+	h.trackFirmware(ctx)
+	return nil
+}
+
 func (s *Server) Shutdown(ctx context.Context) error {
 	// Serve assigns the server, so a nil one means a shutdown landed before it got that far and there is nothing to stop
 	if s.server == nil {

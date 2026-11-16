@@ -60,6 +60,9 @@ func jobTime(j *schemas.Job) time.Time {
 	return time.Time{}
 }
 
+// CompareJobIDs is compareJobIDs for other packages, which use it to tell the jobs queued after a known one
+func CompareJobIDs(a, b string) int { return compareJobIDs(a, b) }
+
 // compareJobIDs compares IDs by their trailing number when both have one, so JID_10 comes after JID_9. iDRAC job IDs encode when the job was created, which keeps the order right when the timestamps are missing
 func compareJobIDs(a, b string) int {
 	na, oka := trailingNumber(a)

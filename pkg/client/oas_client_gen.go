@@ -198,10 +198,23 @@ type Invoker interface {
 	// #### Middlewares:
 	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
-	// ---.
+	// ---
+	// List the latest events, newest first, with how many of their nodes are at each state.
 	//
 	// GET /v1/grendel/events
 	GETV1GrendelEvents(ctx context.Context, params GETV1GrendelEventsParams) ([]Event, error)
+	// GETV1GrendelEventsID invokes GET_/v1/grendel/events/:id operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).GetEvent`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Get one event with how it went on each of its nodes.
+	//
+	// GET /v1/grendel/events/{id}
+	GETV1GrendelEventsID(ctx context.Context, params GETV1GrendelEventsIDParams) (*Event, error)
 	// GETV1GrendelVersion invokes GET_/v1/grendel/version operation.
 	//
 	// #### Controller:
@@ -2745,7 +2758,8 @@ func (c *Client) sendGETV1DbDump(ctx context.Context, params GETV1DbDumpParams) 
 // #### Middlewares:
 // - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
-// ---.
+// ---
+// List the latest events, newest first, with how many of their nodes are at each state.
 //
 // GET /v1/grendel/events
 func (c *Client) GETV1GrendelEvents(ctx context.Context, params GETV1GrendelEventsParams) ([]Event, error) {
@@ -2759,6 +2773,77 @@ func (c *Client) sendGETV1GrendelEvents(ctx context.Context, params GETV1Grendel
 	var pathParts [1]string
 	pathParts[0] = "/v1/grendel/events"
 	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "state" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "state",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.State.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "kind" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "kind",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Kind.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "before" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "before",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Before.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "limit" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "limit",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Limit.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
 
 	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
@@ -2833,6 +2918,127 @@ func (c *Client) sendGETV1GrendelEvents(ctx context.Context, params GETV1Grendel
 	defer resp.Body.Close()
 
 	result, err := decodeGETV1GrendelEventsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GETV1GrendelEventsID invokes GET_/v1/grendel/events/:id operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).GetEvent`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Get one event with how it went on each of its nodes.
+//
+// GET /v1/grendel/events/{id}
+func (c *Client) GETV1GrendelEventsID(ctx context.Context, params GETV1GrendelEventsIDParams) (*Event, error) {
+	res, err := c.sendGETV1GrendelEventsID(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGETV1GrendelEventsID(ctx context.Context, params GETV1GrendelEventsIDParams) (res *Event, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/v1/grendel/events/"
+	{
+		// Encode "id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.ID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, GETV1GrendelEventsIDOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, GETV1GrendelEventsIDOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	result, err := decodeGETV1GrendelEventsIDResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

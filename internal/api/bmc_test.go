@@ -179,7 +179,7 @@ func TestRunBmcMistypedNodeContactsNothing(t *testing.T) {
 	if contacted {
 		t.Error("a bmc was contacted despite the bad name")
 	}
-	if events := h.Events.GetEvents(); len(events) != 0 {
+	if events := listEvents(t, h); len(events) != 0 {
 		t.Errorf("wrote %d events for a run that did nothing", len(events))
 	}
 }
@@ -187,20 +187,29 @@ func TestRunBmcMistypedNodeContactsNothing(t *testing.T) {
 func TestRunBmc(t *testing.T) {
 	h := newTestHandler(t)
 
-	host := tests.HostFactory.MustCreate().(*model.Host)
-	if err := h.DB.StoreHost(host); err != nil {
-		t.Fatal(err)
-	}
-
-	stub := func(context.Context, []redfish.Target) []redfish.NodeResult[redfish.Ack] {
-		return []redfish.NodeResult[redfish.Ack]{
-			{Node: "cpn-10", Success: true, Data: &redfish.Ack{}},
-			{Node: "cpn-3", Message: "connection refused"},
-			{Node: "cpn-2", Message: "timed out"},
+	for _, name := range []string{"cpn-2", "cpn-3", "cpn-10"} {
+		host := tests.HostFactory.MustCreate().(*model.Host)
+		host.Name = name
+		if err := h.DB.StoreHost(host); err != nil {
+			t.Fatal(err)
 		}
 	}
 
-	c := newFakeBmcContext(map[string]string{"nodeset": host.Name})
+	// like redfish.Run, it reports on every target, though out of order
+	stub := func(_ context.Context, targets []redfish.Target) []redfish.NodeResult[redfish.Ack] {
+		outcome := map[string]redfish.NodeResult[redfish.Ack]{
+			"cpn-10": {Node: "cpn-10", Success: true, Data: &redfish.Ack{}},
+			"cpn-3":  {Node: "cpn-3", Message: "connection refused"},
+			"cpn-2":  {Node: "cpn-2", Message: "timed out"},
+		}
+		results := make([]redfish.NodeResult[redfish.Ack], 0, len(targets))
+		for i := len(targets) - 1; i >= 0; i-- {
+			results = append(results, outcome[targets[i].Name])
+		}
+		return results
+	}
+
+	c := newFakeBmcContext(map[string]string{"nodeset": "cpn-[2-3],cpn-10"})
 
 	res, err := runAck(h, c, "bmc power ForceOff", stub)
 	if err != nil {
@@ -222,31 +231,42 @@ func TestRunBmc(t *testing.T) {
 		t.Errorf("X-Grendel-Failed = %q", got)
 	}
 
-	events := h.Events.GetEvents()
+	events := listEvents(t, h)
 	if len(events) != 1 {
 		t.Fatalf("got %d events, want 1", len(events))
 	}
 
-	event := events[0]
-	if event.Severity != model.SeverityWarning.String() {
+	event, err := h.DB.LoadEvent(events[0].ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if event.Kind != model.EventKindBmc || event.Action != "bmc.power.forceoff" || event.Summary != "bmc power ForceOff" {
+		t.Errorf("event is %s %q %q", event.Kind, event.Action, event.Summary)
+	}
+	if event.State != model.EventStateDone || event.EndedAt == nil {
+		t.Errorf("state = %q, ended = %v, a finished run is closed", event.State, event.EndedAt)
+	}
+	if event.Severity != model.SeverityWarning {
 		t.Errorf("severity = %q for a partly failed run", event.Severity)
 	}
-	if want := "bmc power ForceOff: 1 succeeded, 2 failed of 3 (run " + res.RunID + ")"; event.Message != want {
-		t.Errorf("message = %q, want %q", event.Message, want)
+	if event.Detail["run"] != res.RunID {
+		t.Errorf("run = %q, want the response's run id %q", event.Detail["run"], res.RunID)
 	}
-	if len(event.JobMessages) != 3 {
-		t.Fatalf("got %d job messages, want one per node", len(event.JobMessages))
+	if want := (model.EventCounts{Total: 3, Succeeded: 1, Failed: 2}); events[0].Counts != want {
+		t.Errorf("counts = %+v, want %+v", events[0].Counts, want)
 	}
-	for _, m := range event.JobMessages {
-		want := "error"
-		if m.Host == "cpn-10" {
-			want = "success"
-		}
-		if m.Status != want {
-			t.Errorf("%s status = %q, want %q", m.Host, m.Status, want)
-		}
-		if m.Msg != "" {
-			t.Errorf("%s carries error detail %q, the event only records the outcome", m.Host, m.Msg)
+	// each node's row says how it went and, when it failed, why
+	want := map[string]model.EventNode{
+		"cpn-2":  {State: model.EventNodeFailed, Message: "timed out"},
+		"cpn-3":  {State: model.EventNodeFailed, Message: "connection refused"},
+		"cpn-10": {State: model.EventNodeSucceeded},
+	}
+	if len(event.Nodes) != len(want) {
+		t.Fatalf("got %d nodes, want %d", len(event.Nodes), len(want))
+	}
+	for _, n := range event.Nodes {
+		if n.State != want[n.Node].State || n.Message != want[n.Node].Message {
+			t.Errorf("%s is %q %q, want %q %q", n.Node, n.State, n.Message, want[n.Node].State, want[n.Node].Message)
 		}
 	}
 }
@@ -260,7 +280,7 @@ func TestRunBmcReadsStayOutOfTheEventLog(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, err := runBmc(h, newFakeBmcContext(map[string]string{"nodeset": host.Name}), "bmc status", false,
+	_, err := runBmc(h, newFakeBmcContext(map[string]string{"nodeset": host.Name}), "bmc status", nil,
 		func(context.Context, []redfish.Target) []redfish.NodeResult[model.RedfishSystem] { return nil },
 		func(d *model.RedfishSystem) *model.RedfishSystem { return d },
 	)
@@ -268,7 +288,7 @@ func TestRunBmcReadsStayOutOfTheEventLog(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if events := h.Events.GetEvents(); len(events) != 0 {
+	if events := listEvents(t, h); len(events) != 0 {
 		t.Errorf("a read wrote %d events", len(events))
 	}
 }
@@ -345,4 +365,13 @@ func TestValidJobID(t *testing.T) {
 			t.Errorf("%q should be rejected", id)
 		}
 	}
+}
+
+func listEvents(t *testing.T, h *Handler) model.EventList {
+	t.Helper()
+	events, err := h.DB.Events(model.EventFilter{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return events
 }

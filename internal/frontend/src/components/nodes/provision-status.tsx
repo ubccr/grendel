@@ -18,21 +18,12 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { ErrorPanel } from "@/components/error-panel";
+import { stateLabels } from "@/lib/provision";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Check, LoaderCircle, Minus, Rocket, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Fragment, useEffect, useState } from "react";
-
-// match model.ProvisionState
-const stateLabels: Record<string, string> = {
-  pxe: "PXE boot",
-  ipxe: "iPXE",
-  config: "fetched config",
-  booting: "booting",
-  failed: "failed",
-  completed: "completed",
-};
 
 export function isFinished(state?: string) {
   return state === "completed" || state === "failed";

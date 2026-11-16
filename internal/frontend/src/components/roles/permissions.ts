@@ -121,6 +121,7 @@ const catalog: [string, [string, string][]][] = [
       ["POST /v1/auth/token", "Create API tokens"],
       ["GET /v1/grendel/version", "See the server version"],
       ["GET /v1/grendel/events", "Follow live events"],
+      ["GET /v1/grendel/events/%", "See how an event went on each node"],
       ["GET /v1/db/dump", "Download a database backup"],
       ["POST /v1/db/restore", "Restore a database backup"],
     ],

@@ -220,6 +220,13 @@ swagger_ui = false
 cors = false
 
 #------------------------------------------------------------------------------
+# Events
+#------------------------------------------------------------------------------
+[events]
+# How long finished events are kept before they are deleted, as a Go duration. 0 keeps them forever
+#retention = 60d"
+
+#------------------------------------------------------------------------------
 # Client Config
 #------------------------------------------------------------------------------
 [client]
@@ -259,6 +266,10 @@ node_timeout = "60s"
 run_timeout = "4m"
 # how many nodes to start contacting per second
 rate_limit_per_second = 30
+
+# After a firmware update is submitted with apply_update, the BMC job queues are polled every firmware_poll_interval until the update finishes. A node whose update has not finished after firmware_timeout is marked stalled
+#firmware_poll_interval = "1m"
+#firmware_timeout = "2h"
 
 # IP sent to the BMC for import system config, should be an IP of the provision
 # server which is reachable by the BMCs

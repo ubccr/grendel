@@ -36,7 +36,7 @@ func (h *Handler) BmcBios(c fuego.ContextNoBody) (model.BmcResponse[model.BmcBio
 		}
 	}
 
-	return runBmc(h, c, "bmc bios", false,
+	return runBmc(h, c, "bmc bios", nil,
 		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[model.BmcBios] {
 			return h.Redfish.Bios(ctx, t, redfish.BiosRequest{Names: names})
 		},
@@ -85,7 +85,7 @@ func (h *Handler) BmcBiosRegistry(c fuego.ContextNoBody) (model.BmcResponse[mode
 		return model.BmcResponse[model.BmcBiosRegistry]{}, badRequest(fmt.Errorf("%d nodes selected", len(targets)), "the bios registry is read from one node at a time")
 	}
 
-	return runBmc(h, c, "bmc bios registry", false,
+	return runBmc(h, c, "bmc bios registry", nil,
 		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[model.BmcBiosRegistry] {
 			return h.Redfish.BiosRegistry(ctx, t)
 		},

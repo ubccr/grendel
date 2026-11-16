@@ -9,6 +9,8 @@ import "time"
 // Ack is the payload of an operation that reports nothing but its outcome. Note explains any place where what was done differs from what was asked
 type Ack struct {
 	Note string
+	// Job is the id of the job an operation left queued on the BMC, for following it afterwards
+	Job string
 }
 
 func (a Ack) note() string { return a.Note }

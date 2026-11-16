@@ -16,6 +16,11 @@ type Runner interface {
 	Shutdown(context.Context) error
 }
 
+// Backgrounder is a Runner with work to do alongside serving, such as following firmware updates. Background runs until ctx ends
+type Backgrounder interface {
+	Background(ctx context.Context) error
+}
+
 type Service struct {
 	Name string
 	New  func() (Runner, error)

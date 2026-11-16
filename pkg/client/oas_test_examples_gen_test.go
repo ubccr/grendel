@@ -1165,8 +1165,8 @@ func TestEvent_EncodeDecode(t *testing.T) {
 	var typ2 Event
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
-func TestEventJobMessagesItem_EncodeDecode(t *testing.T) {
-	var typ EventJobMessagesItem
+func TestEventCounts_EncodeDecode(t *testing.T) {
+	var typ EventCounts
 	typ.SetFake()
 
 	e := jx.Encoder{}
@@ -1174,7 +1174,95 @@ func TestEventJobMessagesItem_EncodeDecode(t *testing.T) {
 	data := e.Bytes()
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
-	var typ2 EventJobMessagesItem
+	var typ2 EventCounts
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestEventDetail_EncodeDecode(t *testing.T) {
+	var typ EventDetail
+	typ = make(EventDetail)
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 EventDetail
+	typ2 = make(EventDetail)
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestEventKind_EncodeDecode(t *testing.T) {
+	var typ EventKind
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 EventKind
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestEventNodesItem_EncodeDecode(t *testing.T) {
+	var typ EventNodesItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 EventNodesItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestEventNodesItemState_EncodeDecode(t *testing.T) {
+	var typ EventNodesItemState
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 EventNodesItemState
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestEventSeverity_EncodeDecode(t *testing.T) {
+	var typ EventSeverity
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 EventSeverity
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestEventStages_EncodeDecode(t *testing.T) {
+	var typ EventStages
+	typ = make(EventStages)
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 EventStages
+	typ2 = make(EventStages)
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestEventState_EncodeDecode(t *testing.T) {
+	var typ EventState
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 EventState
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestGenericResponse_EncodeDecode(t *testing.T) {

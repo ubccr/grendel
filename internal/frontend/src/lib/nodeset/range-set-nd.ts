@@ -13,9 +13,7 @@ export class RangeSetND {
 
   update(other: RangeSetND): void {
     if (this.dim() !== other.dim()) {
-      throw new MismatchedDimensionsError(
-        `mismatched dimensions ${this.dim()} != ${other.dim()}`,
-      );
+      throw new MismatchedDimensionsError(`mismatched dimensions ${this.dim()} != ${other.dim()}`);
     }
     this.rangesData.push(...other.rangesData);
     this.dirty = true;

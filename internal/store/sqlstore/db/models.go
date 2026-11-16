@@ -18,6 +18,32 @@ type Arch struct {
 	Name string `json:"name"`
 }
 
+type Event struct {
+	ID        string       `json:"id"`
+	Kind      string       `json:"kind"`
+	Action    string       `json:"action"`
+	Summary   string       `json:"summary"`
+	Subject   string       `json:"subject"`
+	Actor     string       `json:"actor"`
+	State     string       `json:"state"`
+	Severity  string       `json:"severity"`
+	StartedAt time.Time    `json:"started_at"`
+	UpdatedAt time.Time    `json:"updated_at"`
+	EndedAt   sql.NullTime `json:"ended_at"`
+	Detail    string       `json:"detail"`
+	Counts    string       `json:"counts"`
+}
+
+type EventNode struct {
+	EventID   string    `json:"event_id"`
+	Node      string    `json:"node"`
+	State     string    `json:"state"`
+	Stage     string    `json:"stage"`
+	Message   string    `json:"message"`
+	Ref       string    `json:"ref"`
+	UpdatedAt time.Time `json:"updated_at"`
+}
+
 type Initrd struct {
 	ID        int64     `json:"id"`
 	KernelID  int64     `json:"kernel_id"`

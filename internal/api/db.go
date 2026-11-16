@@ -32,7 +32,7 @@ func (h *Handler) Restore(c fuego.ContextWithBody[model.DataDump]) (*GenericResp
 	}
 
 	log.Infof("Database restored successfully")
-	h.writeEvent(c.Context(), "Success", "Successfully restored DB.")
+	h.audit(c.Context(), model.SeveritySuccess, "db.restore", "Restored the database", "")
 
 	return &GenericResponse{
 		Title:  "Success",

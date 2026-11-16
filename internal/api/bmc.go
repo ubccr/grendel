@@ -46,7 +46,7 @@ type BmcClearJobsBody struct {
 // BmcStatus reports one row per node
 func (h *Handler) BmcStatus(c fuego.ContextNoBody) (model.BmcResponse[model.RedfishSystem], error) {
 	// this does not tag hosts with grendel:serial. Status is a read and changes nothing in the store
-	return runBmc(h, c, "bmc status", false,
+	return runBmc(h, c, "bmc status", nil,
 		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[model.RedfishSystem] {
 			return h.Redfish.Status(ctx, t)
 		},
@@ -94,7 +94,7 @@ func (h *Handler) BmcIndicator(c fuego.ContextWithBody[BmcIndicatorBody]) (model
 
 // BmcJobs lists the jobs queued on node(s)
 func (h *Handler) BmcJobs(c fuego.ContextNoBody) (model.BmcResponse[model.BmcJobList], error) {
-	return runBmc(h, c, "bmc jobs", false,
+	return runBmc(h, c, "bmc jobs", nil,
 		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.JobList] {
 			return h.Redfish.Jobs(ctx, t)
 		},
@@ -141,7 +141,7 @@ func (h *Handler) BmcSEL(c fuego.ContextNoBody) (model.BmcResponse[model.BmcSELL
 		return model.BmcResponse[model.BmcSELLog]{}, err
 	}
 
-	return runBmc(h, c, "bmc sel", false,
+	return runBmc(h, c, "bmc sel", nil,
 		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.SELLog] {
 			return h.Redfish.SEL(ctx, t, redfish.SELRequest{Limit: limit})
 		},
@@ -165,17 +165,24 @@ type bmcContext interface {
 
 // runAck runs an operation that changes something and returns no data, which is the kind recorded in the event log
 func runAck(h *Handler, c bmcContext, operation string, run func(context.Context, []redfish.Target) []redfish.NodeResult[redfish.Ack]) (model.BmcResponse[model.BmcAck], error) {
-	return runBmc(h, c, operation, true, run, func(*redfish.Ack) *model.BmcAck { return nil })
+	return runBmc(h, c, operation, trackBmc[redfish.Ack](true, actionName(operation)), run, func(*redfish.Ack) *model.BmcAck { return nil })
 }
 
-// runBmc is every bmc route: pick the nodes, contact them, and report. audit is for operations that change something. Reads stay out of the event log, which keeps only a few dozen events and would otherwise lose the power actions to status polling
+// bmcTrack is how a bmc operation is recorded as an event. node, when set, adjusts a node's row from its result, which is how an operation that only queued work leaves its nodes running
+type bmcTrack[T any] struct {
+	kind   model.EventKind
+	action string
+	node   func(row *model.EventNode, success bool, data *T)
+}
+
+// runBmc is every bmc route: pick the nodes, contact them, and report. track is for operations that change something. Reads have none and stay out of the event log, which status polling would otherwise fill
 //
 // A completed run always returns 200, since one that found every node unreachable is an accurate report rather than a failed request. The failure count goes in a header so a script can see it without parsing the body
 func runBmc[T, D any](
 	h *Handler,
 	c bmcContext,
 	operation string,
-	audit bool,
+	track *bmcTrack[T],
 	run func(context.Context, []redfish.Target) []redfish.NodeResult[T],
 	data func(*T) *D,
 ) (model.BmcResponse[D], error) {
@@ -193,25 +200,47 @@ func runBmc[T, D any](
 	started := time.Now()
 	log.Debugf("%s run=%s nodes=%d", operation, runID, len(targets))
 
+	// the event is written before the BMCs are contacted, so a long run shows while it is going. A run that leaves its event open, as queued firmware updates do, has it closed by whatever follows it
+	var event *model.Event
+	if track != nil {
+		pending := make(model.EventNodeList, 0, len(targets))
+		for _, t := range targets {
+			pending = append(pending, model.EventNode{Node: t.Name, State: model.EventNodePending})
+		}
+		event = h.Events.Open(model.Event{
+			Kind:    track.kind,
+			Action:  track.action,
+			Summary: operation,
+			Actor:   actor(c.Context()),
+			Detail:  map[string]string{"run": runID},
+			Nodes:   pending,
+		})
+	}
+
 	results := run(c.Context(), targets)
 
 	sort.SliceStable(results, func(i, j int) bool { return natsort.Compare(results[i].Node, results[j].Node) })
 
 	out := make([]model.BmcResult[D], 0, len(results))
 	summary := model.BmcSummary{Total: len(results), DurationMs: time.Since(started).Milliseconds()}
-	messages := make(model.JobMessageList, 0, len(results))
+	nodes := make([]model.EventNode, 0, len(results))
 	var failed []string
 
 	for _, r := range results {
-		status := "success"
+		state := model.EventNodeSucceeded
 		if r.Success {
 			summary.Succeeded++
 		} else {
 			summary.Failed++
-			status = "error"
+			state = model.EventNodeFailed
 			failed = append(failed, r.Node)
 		}
-		messages = append(messages, model.JobMessage{Status: status, Host: r.Node})
+		// redfish.Run reports on every target, so no node is left pending
+		node := model.EventNode{Node: r.Node, State: state, Message: r.Message}
+		if track != nil && track.node != nil {
+			track.node(&node, r.Success, r.Data)
+		}
+		nodes = append(nodes, node)
 
 		out = append(out, model.BmcResult[D]{
 			Node:       r.Node,
@@ -225,21 +254,25 @@ func runBmc[T, D any](
 
 	c.Response().Header().Set("X-Grendel-Failed", strconv.Itoa(summary.Failed))
 
-	if audit {
-		severity := model.SeveritySuccess
-		switch {
-		case summary.Failed > 0 && summary.Succeeded == 0:
-			severity = model.SeverityError
-		case summary.Failed > 0:
-			severity = model.SeverityWarning
-		}
-
-		h.writeEvent(c.Context(), severity.String(),
-			fmt.Sprintf("%s: %d succeeded, %d failed of %d (run %s)", operation, summary.Succeeded, summary.Failed, summary.Total, runID),
-			messages...)
+	if event != nil {
+		h.Events.SetNodes(event, nodes...)
+		h.Events.Settle(event)
 	}
 
 	return model.BmcResponse[D]{RunID: runID, Summary: summary, Results: out}, nil
+}
+
+// trackBmc records a bmc operation as an event when on, which a dry run is not
+func trackBmc[T any](on bool, action string) *bmcTrack[T] {
+	if !on {
+		return nil
+	}
+	return &bmcTrack[T]{kind: model.EventKindBmc, action: action}
+}
+
+// actionName turns what an operation is called for people, such as "bmc power ForceOff", into the name programs read, bmc.power.forceoff
+func actionName(operation string) string {
+	return strings.ToLower(strings.Join(strings.Fields(operation), "."))
 }
 
 // foldNodes joins names into a nodeset string, or a plain list if they do not fold

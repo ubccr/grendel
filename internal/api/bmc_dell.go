@@ -94,7 +94,7 @@ func (h *Handler) BmcImportConfig(c fuego.ContextWithBody[BmcImportConfigBody]) 
 
 // BmcFirmwareUpdates lists the firmware updates iDRAC(s) found in their last catalog comparison
 func (h *Handler) BmcFirmwareUpdates(c fuego.ContextNoBody) (model.BmcResponse[model.BmcFirmwareUpdates], error) {
-	return runBmc(h, c, "bmc firmware updates", false,
+	return runBmc(h, c, "bmc firmware updates", nil,
 		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.FirmwareUpdates] {
 			return h.Redfish.FirmwareUpdates(ctx, t)
 		},
@@ -120,7 +120,11 @@ func (h *Handler) BmcInstallFirmware(c fuego.ContextWithBody[BmcInstallFirmwareB
 	}
 
 	// a comparison changes nothing on the node, so only an install is recorded in the event log
-	return runBmc(h, c, operation, body.ApplyUpdate,
+	var track *bmcTrack[redfish.Ack]
+	if body.ApplyUpdate {
+		track = &bmcTrack[redfish.Ack]{kind: model.EventKindFirmware, action: "bmc.firmware.install", node: firmwareQueued}
+	}
+	return runBmc(h, c, operation, track,
 		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
 			return h.Redfish.InstallFirmware(ctx, t, req)
 		},

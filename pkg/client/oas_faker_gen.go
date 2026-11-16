@@ -3009,12 +3009,42 @@ func (s *DataDumpUsersItem) SetFake() {
 func (s *Event) SetFake() {
 	{
 		{
-			s.JobMessages.SetFake()
+			s.Action = "string"
 		}
 	}
 	{
 		{
-			s.Message.SetFake()
+			s.Actor = "string"
+		}
+	}
+	{
+		{
+			s.Counts.SetFake()
+		}
+	}
+	{
+		{
+			s.Detail.SetFake()
+		}
+	}
+	{
+		{
+			s.EndedAt.SetFake()
+		}
+	}
+	{
+		{
+			s.ID = "string"
+		}
+	}
+	{
+		{
+			s.Kind.SetFake()
+		}
+	}
+	{
+		{
+			s.Nodes.SetFake()
 		}
 	}
 	{
@@ -3024,33 +3054,144 @@ func (s *Event) SetFake() {
 	}
 	{
 		{
-			s.Time.SetFake()
+			s.Stages.SetFake()
 		}
 	}
 	{
 		{
-			s.User.SetFake()
+			s.StartedAt = time.Now()
+		}
+	}
+	{
+		{
+			s.State.SetFake()
+		}
+	}
+	{
+		{
+			s.Subject.SetFake()
+		}
+	}
+	{
+		{
+			s.Summary = "string"
+		}
+	}
+	{
+		{
+			s.UpdatedAt = time.Now()
 		}
 	}
 }
 
 // SetFake set fake values.
-func (s *EventJobMessagesItem) SetFake() {
+func (s *EventCounts) SetFake() {
 	{
 		{
-			s.Host.SetFake()
+			s.Failed = int(0)
 		}
 	}
 	{
 		{
-			s.Msg.SetFake()
+			s.Pending = int(0)
 		}
 	}
 	{
 		{
-			s.Status.SetFake()
+			s.Running = int(0)
 		}
 	}
+	{
+		{
+			s.Stalled = int(0)
+		}
+	}
+	{
+		{
+			s.Succeeded = int(0)
+		}
+	}
+	{
+		{
+			s.Total = int(0)
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *EventDetail) SetFake() {
+	var (
+		elem string
+		m    map[string]string = s.init()
+	)
+	for i := 0; i < 0; i++ {
+		m[fmt.Sprintf("fake%d", i)] = elem
+	}
+}
+
+// SetFake set fake values.
+func (s *EventKind) SetFake() {
+	*s = EventKindAudit
+}
+
+// SetFake set fake values.
+func (s *EventNodesItem) SetFake() {
+	{
+		{
+			s.Message.SetFake()
+		}
+	}
+	{
+		{
+			s.Node.SetFake()
+		}
+	}
+	{
+		{
+			s.Ref.SetFake()
+		}
+	}
+	{
+		{
+			s.Stage.SetFake()
+		}
+	}
+	{
+		{
+			s.State.SetFake()
+		}
+	}
+	{
+		{
+			s.UpdatedAt.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *EventNodesItemState) SetFake() {
+	*s = EventNodesItemStatePending
+}
+
+// SetFake set fake values.
+func (s *EventSeverity) SetFake() {
+	*s = EventSeveritySuccess
+}
+
+// SetFake set fake values.
+func (s *EventStages) SetFake() {
+	var (
+		elem int
+		m    map[string]int = s.init()
+	)
+	for i := 0; i < 0; i++ {
+		m[fmt.Sprintf("fake%d", i)] = elem
+	}
+}
+
+// SetFake set fake values.
+func (s *EventState) SetFake() {
+	*s = EventStateRunning
 }
 
 // SetFake set fake values.
@@ -3531,11 +3672,6 @@ func (s *NilDataDumpImagesItem) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *NilEventJobMessagesItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
 func (s *NilHostBondsItem) SetFake() {
 	s.Null = true
 }
@@ -3978,6 +4114,15 @@ func (s *OptDateTime) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptEventNodesItemState) SetFake() {
+	var elem EventNodesItemState
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
 func (s *OptFloat32) SetFake() {
 	var elem float32
 	{
@@ -4116,6 +4261,24 @@ func (s *OptNilDateTime) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptNilEventDetail) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilEventNodesItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilEventStages) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
 func (s *OptNilFloat64) SetFake() {
 	s.Null = true
 	s.Set = true
@@ -4225,12 +4388,6 @@ func (s *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotE
 
 // SetFake set fake values.
 func (s *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilEventJobMessagesItemArray) SetFake() {
 	s.Null = true
 	s.Set = true
 }

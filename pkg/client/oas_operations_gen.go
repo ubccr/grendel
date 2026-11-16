@@ -21,6 +21,7 @@ const (
 	GETV1BmcStatusOperation                OperationName = "GETV1BmcStatus"
 	GETV1DbDumpOperation                   OperationName = "GETV1DbDump"
 	GETV1GrendelEventsOperation            OperationName = "GETV1GrendelEvents"
+	GETV1GrendelEventsIDOperation          OperationName = "GETV1GrendelEventsID"
 	GETV1GrendelVersionOperation           OperationName = "GETV1GrendelVersion"
 	GETV1ImagesOperation                   OperationName = "GETV1Images"
 	GETV1ImagesFindOperation               OperationName = "GETV1ImagesFind"

@@ -2128,17 +2128,94 @@
 			"Event": {
 				"description": "Event schema",
 				"properties": {
-					"JobMessages": {
+					"action": {
+						"type": "string"
+					},
+					"actor": {
+						"type": "string"
+					},
+					"counts": {
+						"properties": {
+							"failed": {
+								"type": "integer"
+							},
+							"pending": {
+								"type": "integer"
+							},
+							"running": {
+								"type": "integer"
+							},
+							"stalled": {
+								"type": "integer"
+							},
+							"succeeded": {
+								"type": "integer"
+							},
+							"total": {
+								"type": "integer"
+							}
+						},
+						"required": [
+							"total",
+							"pending",
+							"running",
+							"succeeded",
+							"failed",
+							"stalled"
+						],
+						"type": "object"
+					},
+					"detail": {
+						"additionalProperties": {
+							"type": "string"
+						},
+						"nullable": true,
+						"type": "object"
+					},
+					"ended_at": {
+						"format": "date-time",
+						"nullable": true,
+						"type": "string"
+					},
+					"id": {
+						"type": "string"
+					},
+					"kind": {
+						"enum": [
+							"audit",
+							"bmc",
+							"provision",
+							"firmware"
+						],
+						"type": "string"
+					},
+					"nodes": {
 						"items": {
-							"nullable": true,
 							"properties": {
-								"host": {
+								"message": {
 									"type": "string"
 								},
-								"msg": {
+								"node": {
 									"type": "string"
 								},
-								"status": {
+								"ref": {
+									"type": "string"
+								},
+								"stage": {
+									"type": "string"
+								},
+								"state": {
+									"enum": [
+										"pending",
+										"running",
+										"succeeded",
+										"failed",
+										"stalled"
+									],
+									"type": "string"
+								},
+								"updated_at": {
+									"format": "date-time",
 									"type": "string"
 								}
 							},
@@ -2147,20 +2224,57 @@
 						"nullable": true,
 						"type": "array"
 					},
-					"Message": {
+					"severity": {
+						"enum": [
+							"success",
+							"info",
+							"warning",
+							"error"
+						],
 						"type": "string"
 					},
-					"Severity": {
-						"type": "string"
+					"stages": {
+						"additionalProperties": {
+							"type": "integer"
+						},
+						"nullable": true,
+						"type": "object"
 					},
-					"Time": {
+					"started_at": {
 						"format": "date-time",
 						"type": "string"
 					},
-					"User": {
+					"state": {
+						"enum": [
+							"running",
+							"done"
+						],
+						"type": "string"
+					},
+					"subject": {
+						"nullable": true,
+						"type": "string"
+					},
+					"summary": {
+						"type": "string"
+					},
+					"updated_at": {
+						"format": "date-time",
 						"type": "string"
 					}
 				},
+				"required": [
+					"id",
+					"kind",
+					"action",
+					"summary",
+					"actor",
+					"state",
+					"severity",
+					"started_at",
+					"updated_at",
+					"counts"
+				],
 				"type": "object"
 			},
 			"GenericResponse": {
@@ -5596,9 +5710,52 @@
 		},
 		"/v1/grendel/events": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).GetEvents`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\n",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).GetEvents`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList the latest events, newest first, with how many of their nodes are at each state",
 				"operationId": "GET_/v1/grendel/events",
 				"parameters": [
+					{
+						"description": "Only events at this state",
+						"examples": {
+							"state": {
+								"value": "running | done"
+							}
+						},
+						"in": "query",
+						"name": "state",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Only events of this kind",
+						"examples": {
+							"kind": {
+								"value": "audit | bmc | provision | firmware"
+							}
+						},
+						"in": "query",
+						"name": "kind",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Only events older than the event with this id, for reading further back",
+						"in": "query",
+						"name": "before",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "The most events to return, never more than 1000",
+						"in": "query",
+						"name": "limit",
+						"schema": {
+							"default": 100,
+							"type": "integer"
+						}
+					},
 					{
 						"in": "header",
 						"name": "Accept",
@@ -5649,6 +5806,70 @@
 					}
 				],
 				"summary": "get events",
+				"tags": [
+					"v1",
+					"grendel"
+				]
+			}
+		},
+		"/v1/grendel/events/{id}": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).GetEvent`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet one event with how it went on each of its nodes",
+				"operationId": "GET_/v1/grendel/events/:id",
+				"parameters": [
+					{
+						"description": "id of the event",
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Event"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/Event"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "get event",
 				"tags": [
 					"v1",
 					"grendel"

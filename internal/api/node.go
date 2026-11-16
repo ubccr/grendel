@@ -60,7 +60,7 @@ func (h *Handler) NodeAdd(c fuego.ContextWithBody[NodeAddRequest]) (*GenericResp
 
 	ns, err := body.NodeList.ToNodeSet()
 	if err == nil {
-		h.writeEvent(c.Context(), "Success", fmt.Sprintf("Successfully saved node(s): %s", ns.String()))
+		h.audit(c.Context(), model.SeveritySuccess, "node.save", "Saved nodes", ns.String())
 	}
 
 	return &GenericResponse{
@@ -132,7 +132,7 @@ func (h *Handler) NodeDelete(c fuego.ContextNoBody) (*GenericResponse, error) {
 		}
 	}
 
-	h.writeEvent(c.Context(), "Success", fmt.Sprintf("Successfully deleted node(s): %s", ns.String()))
+	h.audit(c.Context(), model.SeveritySuccess, "node.delete", "Deleted nodes", ns.String())
 
 	return &GenericResponse{
 		Title:   "Success",
@@ -371,17 +371,13 @@ func (h *Handler) filterByNodesetAndTags(f1, f2 string) (*nodeset.NodeSet, error
 
 // NodeProvisionStatus returns the latest provision status of the selected nodes, or of every node when none are selected. Nodes that have never network booted since the status was added have no entry
 func (h *Handler) NodeProvisionStatus(c fuego.ContextNoBody) (model.ProvisionStatusList, error) {
-	if c.QueryParam("nodeset") == "" && c.QueryParam("tags") == "" {
-		list, err := h.DB.ProvisionStatuses(nil)
+	var ns *nodeset.NodeSet
+	if c.QueryParam("nodeset") != "" || c.QueryParam("tags") != "" {
+		var err error
+		ns, err = h.filterByNodesetAndTags(c.QueryParam("nodeset"), c.QueryParam("tags"))
 		if err != nil {
-			return nil, fuego.HTTPError{Err: err, Title: "Error", Detail: "failed to load provision status"}
+			return nil, badRequest(err, "failed to filter nodes")
 		}
-		return list, nil
-	}
-
-	ns, err := h.filterByNodesetAndTags(c.QueryParam("nodeset"), c.QueryParam("tags"))
-	if err != nil {
-		return nil, badRequest(err, "failed to filter nodes")
 	}
 
 	list, err := h.DB.ProvisionStatuses(ns)

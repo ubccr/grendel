@@ -111,15 +111,15 @@ func (h *Handler) BmcConsole(w http.ResponseWriter, r *http.Request) {
 		OnActive: func() {
 			attached = true
 			_ = conn.Write(ctx, websocket.MessageText, []byte(ConsoleAttached))
-			msg := "bmc console opened on " + node
+			summary := "Opened the bmc console"
 			if force {
-				msg += ", taking it over"
+				summary = "Took over the bmc console"
 			}
-			h.writeEvent(ctx, model.SeverityInfo.String(), msg)
+			h.audit(ctx, model.SeverityInfo, "bmc.console.open", summary, node)
 		},
 	})
 	if attached {
-		h.writeEvent(ctx, model.SeverityInfo.String(), fmt.Sprintf("bmc console closed on %s after %s", node, time.Since(started).Round(time.Second)))
+		h.audit(ctx, model.SeverityInfo, "bmc.console.close", fmt.Sprintf("Closed the bmc console after %s", time.Since(started).Round(time.Second)), node)
 	}
 
 	switch {

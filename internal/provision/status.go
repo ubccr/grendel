@@ -19,6 +19,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/events"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
 	"github.com/ubccr/grendel/pkg/nodeset"
@@ -86,7 +87,29 @@ func recordStatus(db store.Store, host *model.Host, update func(s *model.Provisi
 
 	if err := db.StoreProvisionStatus(uid, status); err != nil {
 		log.Warnf("failed to store provision status for %s: %s", host.Name, err)
+		return
 	}
+
+	trackProvision(db, host.Name, status.State, status.Message)
+}
+
+// trackProvision keeps the node's row in the provisioning event up to date. Provisions are not started in batches, so nodes are grouped as they arrive: a node starting out joins the provisioning already running, or opens one, and the event ends once it is over for every node in it. Every report is written, the same state again too, since a node that goes quiet is what counts as stalled
+func trackProvision(db store.Store, node string, state model.ProvisionState, message string) {
+	if state == "" {
+		return
+	}
+
+	// the node's message, such as why its boot failed, is carried onto its row so the events page can show it
+	row := model.EventNode{Node: node, State: model.EventNodeRunning, Stage: string(state), Message: message}
+	switch state {
+	case model.ProvisionStateCompleted:
+		row.State = model.EventNodeSucceeded
+	case model.ProvisionStateFailed:
+		row.State = model.EventNodeFailed
+	}
+
+	// this is on the node's boot path, so the report is only queued, and written with the others within a second
+	events.TrackProvision(db, row)
 }
 
 // restart starts a new provision attempt, dropping everything the last one reported

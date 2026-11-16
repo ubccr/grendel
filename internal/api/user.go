@@ -6,7 +6,6 @@ package api
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"slices"
 	"strings"
@@ -72,7 +71,7 @@ func (h *Handler) UserDelete(c fuego.ContextNoBody) (*GenericResponse, error) {
 		}
 	}
 
-	h.writeEvent(c.Context(), "Success", fmt.Sprintf("Successfully deleted user(s): %s", strings.Join(users, ", ")))
+	h.audit(c.Context(), model.SeveritySuccess, "user.delete", "Deleted users", strings.Join(users, ", "))
 
 	return &GenericResponse{
 		Title:   "Success",
@@ -104,7 +103,7 @@ func (h *Handler) UserRole(c fuego.ContextWithBody[UserRoleRequest]) (*GenericRe
 		}
 	}
 
-	h.writeEvent(c.Context(), "Success", fmt.Sprintf("Successfully updated user(s) role: %s", strings.Join(users, ", ")))
+	h.audit(c.Context(), model.SeveritySuccess, "user.role", "Changed the role of users", strings.Join(users, ", "))
 
 	return &GenericResponse{
 		Title:   "Success",
@@ -136,7 +135,11 @@ func (h *Handler) UserEnable(c fuego.ContextWithBody[UserEnableRequest]) (*Gener
 		}
 	}
 
-	h.writeEvent(c.Context(), "Success", fmt.Sprintf("Successfully updated user(s) enable flag: users=%s enabled=%t", strings.Join(users, ", "), body.Enabled))
+	summary := "Disabled users"
+	if body.Enabled {
+		summary = "Enabled users"
+	}
+	h.audit(c.Context(), model.SeveritySuccess, "user.enable", summary, strings.Join(users, ", "))
 
 	return &GenericResponse{
 		Title:   "Success",

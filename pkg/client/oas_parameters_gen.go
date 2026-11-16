@@ -136,6 +136,21 @@ type GETV1DbDumpParams struct {
 
 // GETV1GrendelEventsParams is parameters of GET_/v1/grendel/events operation.
 type GETV1GrendelEventsParams struct {
+	// Only events at this state.
+	State OptString
+	// Only events of this kind.
+	Kind OptString
+	// Only events older than the event with this id, for reading further back.
+	Before OptString
+	// The most events to return, never more than 1000.
+	Limit  OptInt
+	Accept OptString
+}
+
+// GETV1GrendelEventsIDParams is parameters of GET_/v1/grendel/events/:id operation.
+type GETV1GrendelEventsIDParams struct {
+	// Id of the event.
+	ID     string
 	Accept OptString
 }
 

@@ -8,15 +8,6 @@ import (
 	"github.com/stmcginnis/gofish/oem/dell"
 )
 
-// JobMessage is one node's outcome as the event log records it
-type JobMessage struct {
-	Status string `json:"status"`
-	Host   string `json:"host"`
-	Msg    string `json:"msg"`
-}
-
-type JobMessageList []JobMessage
-
 type RedfishSystem struct {
 	Name           string  `json:"name"`
 	HostName       string  `json:"host_name"`

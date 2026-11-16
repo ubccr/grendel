@@ -6,7 +6,7 @@ const R = (16 - STROKE) / 2;
 // lengths along the ring are shares of it, since each arc's pathLength is 1
 // MIN_SHARE is the least a result gets, so one failure among hundreds of nodes still shows
 const MIN_SHARE = 0.12;
-// GAP parts the two arcs, so a partial result reads as two parts
+// GAP parts the arcs, so a mixed result reads as its parts
 const GAP = 0.03;
 
 // Arc is a stretch of the ring, share long, starting offset along it from the top
@@ -34,40 +34,60 @@ function Arc({
   );
 }
 
-// RunRing shows how a bmc action went across its nodes: green for the share that succeeded, red for the share that failed. A run that touched no nodes draws an empty ring
+// ringShares turns counts into each one's share of the ring. A count that is not zero gets at least MIN_SHARE, taken from the larger shares in proportion to what they have to spare
+export function ringShares(counts: number[]): number[] {
+  const total = counts.reduce((a, b) => a + b, 0);
+  if (!total) return counts.map(() => 0);
+  const shares = counts.map((n) => (n > 0 ? Math.max(MIN_SHARE, n / total) : 0));
+  const over = shares.reduce((a, b) => a + b, 0) - 1;
+  const spare = shares.reduce((a, s) => a + Math.max(0, s - MIN_SHARE), 0);
+  if (over <= 0 || spare <= 0) return shares;
+  return shares.map((s) => (s > MIN_SHARE ? s - (over * (s - MIN_SHARE)) / spare : s));
+}
+
+// RunRing shows how an action went across its nodes: green for the share that succeeded, red for the share that failed. A run that touched no nodes draws an empty ring. An action still under way, as a provision is, also has a blue share for the nodes still going, which pulses, and an amber one for those that stalled
 export function RunRing({
   succeeded,
   failed,
+  going = 0,
+  stalled = 0,
   className,
 }: {
   succeeded: number;
   failed: number;
+  going?: number;
+  stalled?: number;
   className?: string;
 }) {
-  const total = succeeded + failed;
-  const split = failed > 0 && succeeded > 0;
-  const bad = !total
-    ? 0
-    : split
-      ? Math.min(1 - MIN_SHARE, Math.max(MIN_SHARE, failed / total))
-      : failed / total;
-  // with both present, each arc gives up half the gap at either end
-  const gap = split ? GAP : 0;
+  const total = succeeded + failed + going + stalled;
+  const colors = [
+    "stroke-(--node-ready)",
+    "stroke-destructive",
+    "stroke-(--node-blue) motion-safe:animate-pulse",
+    "stroke-(--node-amber)",
+  ];
+  const shares = ringShares([succeeded, failed, going, stalled]);
+  // with more than one present, each arc gives up half the gap at either end
+  const gap = shares.filter((s) => s > 0).length > 1 ? GAP : 0;
+  const arcs = shares.map((share, i) => ({
+    share: share - gap,
+    offset: shares.slice(0, i).reduce((a, b) => a + b, 0) + gap / 2,
+    className: colors[i],
+  }));
+  const label =
+    going + stalled > 0
+      ? `${succeeded} of ${total} nodes done${failed ? `, ${failed} failed` : ""}`
+      : `${succeeded} of ${total} nodes succeeded`;
 
   return (
     <svg
       viewBox="0 0 16 16"
       role="img"
-      aria-label={`${succeeded} of ${total} nodes succeeded`}
+      aria-label={label}
       className={cn("size-3.5 shrink-0 -rotate-90", className)}
     >
       {total === 0 && <Arc className="stroke-muted-foreground/30" />}
-      {succeeded > 0 && (
-        <Arc share={1 - bad - gap} offset={gap / 2} className="stroke-(--node-ready)" />
-      )}
-      {failed > 0 && (
-        <Arc share={bad - gap} offset={1 - bad + gap / 2} className="stroke-destructive" />
-      )}
+      {arcs.map((arc) => arc.share > 0 && <Arc key={arc.className} {...arc} />)}
     </svg>
   );
 }
