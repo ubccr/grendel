@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/go-fuego/fuego"
@@ -122,7 +123,13 @@ func (h *Handler) BmcInstallFirmware(c fuego.ContextWithBody[BmcInstallFirmwareB
 	// a comparison changes nothing on the node, so only an install is recorded in the event log
 	var track *bmcTrack[redfish.Ack]
 	if body.ApplyUpdate {
-		track = &bmcTrack[redfish.Ack]{kind: model.EventKindFirmware, action: "bmc.firmware.install", node: firmwareQueued}
+		track = &bmcTrack[redfish.Ack]{
+			kind:   model.EventKindFirmware,
+			action: "bmc.firmware.install",
+			// the tracker reads this to tell an update left waiting for a reboot it was asked not to do from one that is stuck
+			detail: map[string]string{firmwareDetailReboot: strconv.FormatBool(body.Reboot)},
+			node:   firmwareQueued,
+		}
 	}
 	return runBmc(h, c, operation, track,
 		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {

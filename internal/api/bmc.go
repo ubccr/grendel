@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"net/http"
 	"regexp"
 	"slices"
@@ -172,6 +173,8 @@ func runAck(h *Handler, c bmcContext, operation string, run func(context.Context
 type bmcTrack[T any] struct {
 	kind   model.EventKind
 	action string
+	// detail is added to the event's detail, beside the run id
+	detail map[string]string
 	node   func(row *model.EventNode, success bool, data *T)
 }
 
@@ -207,12 +210,14 @@ func runBmc[T, D any](
 		for _, t := range targets {
 			pending = append(pending, model.EventNode{Node: t.Name, State: model.EventNodePending})
 		}
+		detail := map[string]string{"run": runID}
+		maps.Copy(detail, track.detail)
 		event = h.Events.Open(model.Event{
 			Kind:    track.kind,
 			Action:  track.action,
 			Summary: operation,
 			Actor:   actor(c.Context()),
-			Detail:  map[string]string{"run": runID},
+			Detail:  detail,
 			Nodes:   pending,
 		})
 	}
