@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/go-faster/errors"
-
 	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/ogenerrors"
@@ -275,6 +274,33 @@ type Invoker interface {
 	//
 	// GET /v1/nodes/find
 	GETV1NodesFind(ctx context.Context, params GETV1NodesFindParams) ([]Host, error)
+	// GETV1NodesIpsNext invokes GET_/v1/nodes/ips/next operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeNextAddress`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Suggest free addresses in a range: the lowest ones no node holds, and the ones after the highest
+	// held. Suggestions are pinged, and one that answers is listed but marked.
+	//
+	// GET /v1/nodes/ips/next
+	GETV1NodesIpsNext(ctx context.Context, params GETV1NodesIpsNextParams) (*NextAddressResponse, error)
+	// GETV1NodesIpsRanges invokes GET_/v1/nodes/ips/ranges operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeAddressRanges`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// List the ranges the ports of some nodes sit in, each once however many ports share it: a /24 of a
+	// larger subnet, or a /24 to /30 subnet whole. Every node is taken when neither nodeset nor tags is
+	// given.
+	//
+	// GET /v1/nodes/ips/ranges
+	GETV1NodesIpsRanges(ctx context.Context, params GETV1NodesIpsRangesParams) ([]AddressRange, error)
 	// GETV1NodesProvisionStatus invokes GET_/v1/nodes/provision-status operation.
 	//
 	// #### Controller:
@@ -844,7 +870,8 @@ func (c *Client) sendDELETEV1AuthSignout(ctx context.Context, params DELETEV1Aut
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeDELETEV1AuthSignoutResponse(resp)
 	if err != nil {
@@ -967,7 +994,8 @@ func (c *Client) sendDELETEV1Images(ctx context.Context, params DELETEV1ImagesPa
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeDELETEV1ImagesResponse(resp)
 	if err != nil {
@@ -1107,7 +1135,8 @@ func (c *Client) sendDELETEV1Nodes(ctx context.Context, params DELETEV1NodesPara
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeDELETEV1NodesResponse(resp)
 	if err != nil {
@@ -1228,7 +1257,8 @@ func (c *Client) sendDELETEV1RolesNames(ctx context.Context, params DELETEV1Role
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeDELETEV1RolesNamesResponse(resp)
 	if err != nil {
@@ -1349,7 +1379,8 @@ func (c *Client) sendDELETEV1UsersUsernames(ctx context.Context, params DELETEV1
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeDELETEV1UsersUsernamesResponse(resp)
 	if err != nil {
@@ -1523,7 +1554,8 @@ func (c *Client) sendGETV1BmcBios(ctx context.Context, params GETV1BmcBiosParams
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1BmcBiosResponse(resp)
 	if err != nil {
@@ -1680,7 +1712,8 @@ func (c *Client) sendGETV1BmcBiosRegistry(ctx context.Context, params GETV1BmcBi
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1BmcBiosRegistryResponse(resp)
 	if err != nil {
@@ -1838,7 +1871,8 @@ func (c *Client) sendGETV1BmcFirmwareUpdates(ctx context.Context, params GETV1Bm
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1BmcFirmwareUpdatesResponse(resp)
 	if err != nil {
@@ -1941,7 +1975,8 @@ func (c *Client) sendGETV1BmcIdentityDefaults(ctx context.Context, params GETV1B
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1BmcIdentityDefaultsResponse(resp)
 	if err != nil {
@@ -2098,7 +2133,8 @@ func (c *Client) sendGETV1BmcJobs(ctx context.Context, params GETV1BmcJobsParams
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1BmcJobsResponse(resp)
 	if err != nil {
@@ -2307,7 +2343,8 @@ func (c *Client) sendGETV1BmcSecureboot(ctx context.Context, params GETV1BmcSecu
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1BmcSecurebootResponse(resp)
 	if err != nil {
@@ -2481,7 +2518,8 @@ func (c *Client) sendGETV1BmcSel(ctx context.Context, params GETV1BmcSelParams) 
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1BmcSelResponse(resp)
 	if err != nil {
@@ -2638,7 +2676,8 @@ func (c *Client) sendGETV1BmcStatus(ctx context.Context, params GETV1BmcStatusPa
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1BmcStatusResponse(resp)
 	if err != nil {
@@ -2741,7 +2780,8 @@ func (c *Client) sendGETV1DbDump(ctx context.Context, params GETV1DbDumpParams) 
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1DbDumpResponse(resp)
 	if err != nil {
@@ -2915,7 +2955,8 @@ func (c *Client) sendGETV1GrendelEvents(ctx context.Context, params GETV1Grendel
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1GrendelEventsResponse(resp)
 	if err != nil {
@@ -3036,7 +3077,8 @@ func (c *Client) sendGETV1GrendelEventsID(ctx context.Context, params GETV1Grend
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1GrendelEventsIDResponse(resp)
 	if err != nil {
@@ -3139,7 +3181,8 @@ func (c *Client) sendGETV1GrendelVersion(ctx context.Context, params GETV1Grende
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1GrendelVersionResponse(resp)
 	if err != nil {
@@ -3242,7 +3285,8 @@ func (c *Client) sendGETV1Images(ctx context.Context, params GETV1ImagesParams) 
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1ImagesResponse(resp)
 	if err != nil {
@@ -3365,7 +3409,8 @@ func (c *Client) sendGETV1ImagesFind(ctx context.Context, params GETV1ImagesFind
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1ImagesFindResponse(resp)
 	if err != nil {
@@ -3468,7 +3513,8 @@ func (c *Client) sendGETV1Nodes(ctx context.Context, params GETV1NodesParams) (r
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1NodesResponse(resp)
 	if err != nil {
@@ -3608,9 +3654,360 @@ func (c *Client) sendGETV1NodesFind(ctx context.Context, params GETV1NodesFindPa
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1NodesFindResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GETV1NodesIpsNext invokes GET_/v1/nodes/ips/next operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).NodeNextAddress`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Suggest free addresses in a range: the lowest ones no node holds, and the ones after the highest
+// held. Suggestions are pinged, and one that answers is listed but marked.
+//
+// GET /v1/nodes/ips/next
+func (c *Client) GETV1NodesIpsNext(ctx context.Context, params GETV1NodesIpsNextParams) (*NextAddressResponse, error) {
+	res, err := c.sendGETV1NodesIpsNext(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGETV1NodesIpsNext(ctx context.Context, params GETV1NodesIpsNextParams) (res *NextAddressResponse, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/nodes/ips/next"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "cidr" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "cidr",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(params.Cidr))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "from" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "from",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.From.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "count" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "count",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Count.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "ping" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "ping",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Ping.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "exclude" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Exclude.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, GETV1NodesIpsNextOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, GETV1NodesIpsNextOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer body.Close()
+
+	result, err := decodeGETV1NodesIpsNextResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GETV1NodesIpsRanges invokes GET_/v1/nodes/ips/ranges operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).NodeAddressRanges`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// List the ranges the ports of some nodes sit in, each once however many ports share it: a /24 of a
+// larger subnet, or a /24 to /30 subnet whole. Every node is taken when neither nodeset nor tags is
+// given.
+//
+// GET /v1/nodes/ips/ranges
+func (c *Client) GETV1NodesIpsRanges(ctx context.Context, params GETV1NodesIpsRangesParams) ([]AddressRange, error) {
+	res, err := c.sendGETV1NodesIpsRanges(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGETV1NodesIpsRanges(ctx context.Context, params GETV1NodesIpsRangesParams) (res []AddressRange, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/nodes/ips/ranges"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "nodeset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "nodeset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Nodeset.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "tags" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "tags",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Tags.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "bmc" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "bmc",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Bmc.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, GETV1NodesIpsRangesOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, GETV1NodesIpsRangesOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer body.Close()
+
+	result, err := decodeGETV1NodesIpsRangesResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -3749,7 +4146,8 @@ func (c *Client) sendGETV1NodesProvisionStatus(ctx context.Context, params GETV1
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1NodesProvisionStatusResponse(resp)
 	if err != nil {
@@ -3852,7 +4250,8 @@ func (c *Client) sendGETV1NodesTags(ctx context.Context, params GETV1NodesTagsPa
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1NodesTagsResponse(resp)
 	if err != nil {
@@ -4027,7 +4426,8 @@ func (c *Client) sendGETV1NodesTokenInterface(ctx context.Context, params GETV1N
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1NodesTokenInterfaceResponse(resp)
 	if err != nil {
@@ -4150,7 +4550,8 @@ func (c *Client) sendGETV1Roles(ctx context.Context, params GETV1RolesParams) (r
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1RolesResponse(resp)
 	if err != nil {
@@ -4292,7 +4693,8 @@ func (c *Client) sendGETV1SwitchNodesetLldp(ctx context.Context, params GETV1Swi
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1SwitchNodesetLldpResponse(resp)
 	if err != nil {
@@ -4415,7 +4817,8 @@ func (c *Client) sendGETV1Users(ctx context.Context, params GETV1UsersParams) (r
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodeGETV1UsersResponse(resp)
 	if err != nil {
@@ -4530,7 +4933,8 @@ func (c *Client) sendPATCHV1AuthReset(ctx context.Context, request *AuthResetReq
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePATCHV1AuthResetResponse(resp)
 	if err != nil {
@@ -4673,7 +5077,8 @@ func (c *Client) sendPATCHV1NodesImage(ctx context.Context, request *NodeBootIma
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePATCHV1NodesImageResponse(resp)
 	if err != nil {
@@ -4816,7 +5221,8 @@ func (c *Client) sendPATCHV1NodesProvision(ctx context.Context, request *NodePro
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePATCHV1NodesProvisionResponse(resp)
 	if err != nil {
@@ -4977,7 +5383,8 @@ func (c *Client) sendPATCHV1NodesTagsAction(ctx context.Context, request *NodeTa
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePATCHV1NodesTagsActionResponse(resp)
 	if err != nil {
@@ -5083,7 +5490,8 @@ func (c *Client) sendPATCHV1Roles(ctx context.Context, request *PatchRolesReques
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePATCHV1RolesResponse(resp)
 	if err != nil {
@@ -5208,7 +5616,8 @@ func (c *Client) sendPATCHV1UsersUsernamesEnable(ctx context.Context, request *U
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePATCHV1UsersUsernamesEnableResponse(resp)
 	if err != nil {
@@ -5333,7 +5742,8 @@ func (c *Client) sendPATCHV1UsersUsernamesRole(ctx context.Context, request *Use
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePATCHV1UsersUsernamesRoleResponse(resp)
 	if err != nil {
@@ -5439,7 +5849,8 @@ func (c *Client) sendPOSTV1AuthSignin(ctx context.Context, request *AuthRequest,
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1AuthSigninResponse(resp)
 	if err != nil {
@@ -5554,7 +5965,8 @@ func (c *Client) sendPOSTV1AuthSignup(ctx context.Context, request *AuthSignupRe
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1AuthSignupResponse(resp)
 	if err != nil {
@@ -5660,7 +6072,8 @@ func (c *Client) sendPOSTV1AuthToken(ctx context.Context, request *AuthTokenRequ
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1AuthTokenResponse(resp)
 	if err != nil {
@@ -5820,7 +6233,8 @@ func (c *Client) sendPOSTV1BmcAssetTag(ctx context.Context, request *BmcAssetTag
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1BmcAssetTagResponse(resp)
 	if err != nil {
@@ -5980,7 +6394,8 @@ func (c *Client) sendPOSTV1BmcBios(ctx context.Context, request *BmcSetBiosBody,
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1BmcBiosResponse(resp)
 	if err != nil {
@@ -6137,7 +6552,8 @@ func (c *Client) sendPOSTV1BmcBiosDiscard(ctx context.Context, params POSTV1BmcB
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1BmcBiosDiscardResponse(resp)
 	if err != nil {
@@ -6294,7 +6710,8 @@ func (c *Client) sendPOSTV1BmcConfigureAuto(ctx context.Context, params POSTV1Bm
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1BmcConfigureAutoResponse(resp)
 	if err != nil {
@@ -6454,7 +6871,8 @@ func (c *Client) sendPOSTV1BmcConfigureImport(ctx context.Context, request *BmcI
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1BmcConfigureImportResponse(resp)
 	if err != nil {
@@ -6615,7 +7033,8 @@ func (c *Client) sendPOSTV1BmcFirmwareInstall(ctx context.Context, request *BmcI
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1BmcFirmwareInstallResponse(resp)
 	if err != nil {
@@ -6775,7 +7194,8 @@ func (c *Client) sendPOSTV1BmcIndicator(ctx context.Context, request *BmcIndicat
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1BmcIndicatorResponse(resp)
 	if err != nil {
@@ -6944,7 +7364,8 @@ func (c *Client) sendPOSTV1BmcJobsClear(ctx context.Context, request *BmcClearJo
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1BmcJobsClearResponse(resp)
 	if err != nil {
@@ -7104,7 +7525,8 @@ func (c *Client) sendPOSTV1BmcLocation(ctx context.Context, request *BmcLocation
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1BmcLocationResponse(resp)
 	if err != nil {
@@ -7264,7 +7686,8 @@ func (c *Client) sendPOSTV1BmcPower(ctx context.Context, request *BmcPowerBody, 
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1BmcPowerResponse(resp)
 	if err != nil {
@@ -7424,7 +7847,8 @@ func (c *Client) sendPOSTV1BmcSecureboot(ctx context.Context, request *BmcSecure
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1BmcSecurebootResponse(resp)
 	if err != nil {
@@ -7594,7 +8018,8 @@ func (c *Client) sendPOSTV1BmcSecurebootKeys(ctx context.Context, request *BmcSe
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1BmcSecurebootKeysResponse(resp)
 	if err != nil {
@@ -7754,7 +8179,8 @@ func (c *Client) sendPOSTV1BmcSecurebootKeysDelete(ctx context.Context, request 
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1BmcSecurebootKeysDeleteResponse(resp)
 	if err != nil {
@@ -7923,7 +8349,8 @@ func (c *Client) sendPOSTV1BmcSecurebootReset(ctx context.Context, request *BmcS
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1BmcSecurebootResetResponse(resp)
 	if err != nil {
@@ -8080,7 +8507,8 @@ func (c *Client) sendPOSTV1BmcSelClear(ctx context.Context, params POSTV1BmcSelC
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1BmcSelClearResponse(resp)
 	if err != nil {
@@ -8195,7 +8623,8 @@ func (c *Client) sendPOSTV1DbRestore(ctx context.Context, request *DataDump, par
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1DbRestoreResponse(resp)
 	if err != nil {
@@ -8301,7 +8730,8 @@ func (c *Client) sendPOSTV1Images(ctx context.Context, request *BootImageAddRequ
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1ImagesResponse(resp)
 	if err != nil {
@@ -8416,7 +8846,8 @@ func (c *Client) sendPOSTV1Nodes(ctx context.Context, request *NodeAddRequest, p
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1NodesResponse(resp)
 	if err != nil {
@@ -8522,7 +8953,8 @@ func (c *Client) sendPOSTV1Roles(ctx context.Context, request *PostRolesRequest,
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1RolesResponse(resp)
 	if err != nil {
@@ -8628,7 +9060,8 @@ func (c *Client) sendPOSTV1Users(ctx context.Context, request *UserStoreRequest,
 	if err != nil {
 		return res, errors.Wrap(err, "do request")
 	}
-	defer resp.Body.Close()
+	body := resp.Body
+	defer body.Close()
 
 	result, err := decodePOSTV1UsersResponse(resp)
 	if err != nil {

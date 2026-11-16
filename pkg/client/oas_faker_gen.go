@@ -10,6 +10,35 @@ import (
 )
 
 // SetFake set fake values.
+func (s *AddressRange) SetFake() {
+	{
+		{
+			s.BmcPorts.SetFake()
+		}
+	}
+	{
+		{
+			s.Nodes.SetFake()
+		}
+	}
+	{
+		{
+			s.Ports.SetFake()
+		}
+	}
+	{
+		{
+			s.PrefixLen.SetFake()
+		}
+	}
+	{
+		{
+			s.Range.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
 func (s *AuthRequest) SetFake() {
 	{
 		{
@@ -3567,6 +3596,140 @@ func (s *LLDP) SetFake() {
 	{
 		{
 			s.SystemName.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *NextAddressResponse) SetFake() {
+	{
+		{
+			s.AfterHighest = nil
+			for i := 0; i < 0; i++ {
+				var elem NextAddressResponseAfterHighestItem
+				{
+					elem.SetFake()
+				}
+				s.AfterHighest = append(s.AfterHighest, elem)
+			}
+		}
+	}
+	{
+		{
+			s.Free.SetFake()
+		}
+	}
+	{
+		{
+			s.Highest.SetFake()
+		}
+	}
+	{
+		{
+			s.Lowest = nil
+			for i := 0; i < 0; i++ {
+				var elem NextAddressResponseLowestItem
+				{
+					elem.SetFake()
+				}
+				s.Lowest = append(s.Lowest, elem)
+			}
+		}
+	}
+	{
+		{
+			s.PingError.SetFake()
+		}
+	}
+	{
+		{
+			s.Pinged.SetFake()
+		}
+	}
+	{
+		{
+			s.PrefixLen.SetFake()
+		}
+	}
+	{
+		{
+			s.Range.SetFake()
+		}
+	}
+	{
+		{
+			s.Reserved = nil
+			for i := 0; i < 0; i++ {
+				var elem string
+				{
+					elem = "string"
+				}
+				s.Reserved = append(s.Reserved, elem)
+			}
+		}
+	}
+	{
+		{
+			s.Subnet.SetFake()
+		}
+	}
+	{
+		{
+			s.Used = nil
+			for i := 0; i < 0; i++ {
+				var elem NextAddressResponseUsedItem
+				{
+					elem.SetFake()
+				}
+				s.Used = append(s.Used, elem)
+			}
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *NextAddressResponseAfterHighestItem) SetFake() {
+	{
+		{
+			s.Answered.SetFake()
+		}
+	}
+	{
+		{
+			s.IP.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *NextAddressResponseLowestItem) SetFake() {
+	{
+		{
+			s.Answered.SetFake()
+		}
+	}
+	{
+		{
+			s.IP.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *NextAddressResponseUsedItem) SetFake() {
+	{
+		{
+			s.Bmc.SetFake()
+		}
+	}
+	{
+		{
+			s.IP.SetFake()
+		}
+	}
+	{
+		{
+			s.Node.SetFake()
 		}
 	}
 }

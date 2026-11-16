@@ -9,10 +9,140 @@ import (
 
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
-
 	"github.com/ogen-go/ogen/json"
 	"github.com/ogen-go/ogen/validate"
 )
+
+// Encode implements json.Marshaler.
+func (s *AddressRange) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *AddressRange) encodeFields(e *jx.Encoder) {
+	{
+		if s.BmcPorts.Set {
+			e.FieldStart("bmc_ports")
+			s.BmcPorts.Encode(e)
+		}
+	}
+	{
+		if s.Nodes.Set {
+			e.FieldStart("nodes")
+			s.Nodes.Encode(e)
+		}
+	}
+	{
+		if s.Ports.Set {
+			e.FieldStart("ports")
+			s.Ports.Encode(e)
+		}
+	}
+	{
+		if s.PrefixLen.Set {
+			e.FieldStart("prefix_len")
+			s.PrefixLen.Encode(e)
+		}
+	}
+	{
+		if s.Range.Set {
+			e.FieldStart("range")
+			s.Range.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfAddressRange = [5]string{
+	0: "bmc_ports",
+	1: "nodes",
+	2: "ports",
+	3: "prefix_len",
+	4: "range",
+}
+
+// Decode decodes AddressRange from json.
+func (s *AddressRange) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode AddressRange to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "bmc_ports":
+			if err := func() error {
+				s.BmcPorts.Reset()
+				if err := s.BmcPorts.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"bmc_ports\"")
+			}
+		case "nodes":
+			if err := func() error {
+				s.Nodes.Reset()
+				if err := s.Nodes.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"nodes\"")
+			}
+		case "ports":
+			if err := func() error {
+				s.Ports.Reset()
+				if err := s.Ports.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ports\"")
+			}
+		case "prefix_len":
+			if err := func() error {
+				s.PrefixLen.Reset()
+				if err := s.PrefixLen.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"prefix_len\"")
+			}
+		case "range":
+			if err := func() error {
+				s.Range.Reset()
+				if err := s.Range.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"range\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode AddressRange")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *AddressRange) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *AddressRange) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
 
 // Encode implements json.Marshaler.
 func (s *AuthRequest) Encode(e *jx.Encoder) {
@@ -15527,6 +15657,542 @@ func (s *LLDP) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *LLDP) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *NextAddressResponse) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *NextAddressResponse) encodeFields(e *jx.Encoder) {
+	{
+		if s.AfterHighest != nil {
+			e.FieldStart("after_highest")
+			e.ArrStart()
+			for _, elem := range s.AfterHighest {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.Free.Set {
+			e.FieldStart("free")
+			s.Free.Encode(e)
+		}
+	}
+	{
+		if s.Highest.Set {
+			e.FieldStart("highest")
+			s.Highest.Encode(e)
+		}
+	}
+	{
+		if s.Lowest != nil {
+			e.FieldStart("lowest")
+			e.ArrStart()
+			for _, elem := range s.Lowest {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.PingError.Set {
+			e.FieldStart("ping_error")
+			s.PingError.Encode(e)
+		}
+	}
+	{
+		if s.Pinged.Set {
+			e.FieldStart("pinged")
+			s.Pinged.Encode(e)
+		}
+	}
+	{
+		if s.PrefixLen.Set {
+			e.FieldStart("prefix_len")
+			s.PrefixLen.Encode(e)
+		}
+	}
+	{
+		if s.Range.Set {
+			e.FieldStart("range")
+			s.Range.Encode(e)
+		}
+	}
+	{
+		if s.Reserved != nil {
+			e.FieldStart("reserved")
+			e.ArrStart()
+			for _, elem := range s.Reserved {
+				e.Str(elem)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.Subnet.Set {
+			e.FieldStart("subnet")
+			s.Subnet.Encode(e)
+		}
+	}
+	{
+		if s.Used != nil {
+			e.FieldStart("used")
+			e.ArrStart()
+			for _, elem := range s.Used {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+}
+
+var jsonFieldsNameOfNextAddressResponse = [11]string{
+	0:  "after_highest",
+	1:  "free",
+	2:  "highest",
+	3:  "lowest",
+	4:  "ping_error",
+	5:  "pinged",
+	6:  "prefix_len",
+	7:  "range",
+	8:  "reserved",
+	9:  "subnet",
+	10: "used",
+}
+
+// Decode decodes NextAddressResponse from json.
+func (s *NextAddressResponse) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode NextAddressResponse to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "after_highest":
+			if err := func() error {
+				s.AfterHighest = make([]NextAddressResponseAfterHighestItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem NextAddressResponseAfterHighestItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.AfterHighest = append(s.AfterHighest, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"after_highest\"")
+			}
+		case "free":
+			if err := func() error {
+				s.Free.Reset()
+				if err := s.Free.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"free\"")
+			}
+		case "highest":
+			if err := func() error {
+				s.Highest.Reset()
+				if err := s.Highest.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"highest\"")
+			}
+		case "lowest":
+			if err := func() error {
+				s.Lowest = make([]NextAddressResponseLowestItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem NextAddressResponseLowestItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Lowest = append(s.Lowest, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"lowest\"")
+			}
+		case "ping_error":
+			if err := func() error {
+				s.PingError.Reset()
+				if err := s.PingError.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ping_error\"")
+			}
+		case "pinged":
+			if err := func() error {
+				s.Pinged.Reset()
+				if err := s.Pinged.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"pinged\"")
+			}
+		case "prefix_len":
+			if err := func() error {
+				s.PrefixLen.Reset()
+				if err := s.PrefixLen.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"prefix_len\"")
+			}
+		case "range":
+			if err := func() error {
+				s.Range.Reset()
+				if err := s.Range.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"range\"")
+			}
+		case "reserved":
+			if err := func() error {
+				s.Reserved = make([]string, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem string
+					v, err := d.Str()
+					elem = string(v)
+					if err != nil {
+						return err
+					}
+					s.Reserved = append(s.Reserved, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"reserved\"")
+			}
+		case "subnet":
+			if err := func() error {
+				s.Subnet.Reset()
+				if err := s.Subnet.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"subnet\"")
+			}
+		case "used":
+			if err := func() error {
+				s.Used = make([]NextAddressResponseUsedItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem NextAddressResponseUsedItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Used = append(s.Used, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"used\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode NextAddressResponse")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *NextAddressResponse) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NextAddressResponse) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *NextAddressResponseAfterHighestItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *NextAddressResponseAfterHighestItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Answered.Set {
+			e.FieldStart("answered")
+			s.Answered.Encode(e)
+		}
+	}
+	{
+		if s.IP.Set {
+			e.FieldStart("ip")
+			s.IP.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfNextAddressResponseAfterHighestItem = [2]string{
+	0: "answered",
+	1: "ip",
+}
+
+// Decode decodes NextAddressResponseAfterHighestItem from json.
+func (s *NextAddressResponseAfterHighestItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode NextAddressResponseAfterHighestItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "answered":
+			if err := func() error {
+				s.Answered.Reset()
+				if err := s.Answered.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"answered\"")
+			}
+		case "ip":
+			if err := func() error {
+				s.IP.Reset()
+				if err := s.IP.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ip\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode NextAddressResponseAfterHighestItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *NextAddressResponseAfterHighestItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NextAddressResponseAfterHighestItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *NextAddressResponseLowestItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *NextAddressResponseLowestItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Answered.Set {
+			e.FieldStart("answered")
+			s.Answered.Encode(e)
+		}
+	}
+	{
+		if s.IP.Set {
+			e.FieldStart("ip")
+			s.IP.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfNextAddressResponseLowestItem = [2]string{
+	0: "answered",
+	1: "ip",
+}
+
+// Decode decodes NextAddressResponseLowestItem from json.
+func (s *NextAddressResponseLowestItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode NextAddressResponseLowestItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "answered":
+			if err := func() error {
+				s.Answered.Reset()
+				if err := s.Answered.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"answered\"")
+			}
+		case "ip":
+			if err := func() error {
+				s.IP.Reset()
+				if err := s.IP.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ip\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode NextAddressResponseLowestItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *NextAddressResponseLowestItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NextAddressResponseLowestItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *NextAddressResponseUsedItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *NextAddressResponseUsedItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Bmc.Set {
+			e.FieldStart("bmc")
+			s.Bmc.Encode(e)
+		}
+	}
+	{
+		if s.IP.Set {
+			e.FieldStart("ip")
+			s.IP.Encode(e)
+		}
+	}
+	{
+		if s.Node.Set {
+			e.FieldStart("node")
+			s.Node.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfNextAddressResponseUsedItem = [3]string{
+	0: "bmc",
+	1: "ip",
+	2: "node",
+}
+
+// Decode decodes NextAddressResponseUsedItem from json.
+func (s *NextAddressResponseUsedItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode NextAddressResponseUsedItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "bmc":
+			if err := func() error {
+				s.Bmc.Reset()
+				if err := s.Bmc.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"bmc\"")
+			}
+		case "ip":
+			if err := func() error {
+				s.IP.Reset()
+				if err := s.IP.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ip\"")
+			}
+		case "node":
+			if err := func() error {
+				s.Node.Reset()
+				if err := s.Node.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"node\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode NextAddressResponseUsedItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *NextAddressResponseUsedItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NextAddressResponseUsedItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

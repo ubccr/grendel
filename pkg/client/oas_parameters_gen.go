@@ -4,199 +4,229 @@ package client
 
 // DELETEV1AuthSignoutParams is parameters of DELETE_/v1/auth/signout operation.
 type DELETEV1AuthSignoutParams struct {
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // DELETEV1ImagesParams is parameters of DELETE_/v1/images operation.
 type DELETEV1ImagesParams struct {
 	// Filter by name.
-	Names  OptString
-	Accept OptString
+	Names  OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // DELETEV1NodesParams is parameters of DELETE_/v1/nodes operation.
 type DELETEV1NodesParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
-	Accept OptString
+	Tags   OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // DELETEV1RolesNamesParams is parameters of DELETE_/v1/roles/:names operation.
 type DELETEV1RolesNamesParams struct {
 	// Delete by name.
 	Names  string
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // DELETEV1UsersUsernamesParams is parameters of DELETE_/v1/users/:usernames operation.
 type DELETEV1UsersUsernamesParams struct {
 	// Target usernames.
 	Usernames string
-	Accept    OptString
+	Accept    OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1BmcBiosParams is parameters of GET_/v1/bmc/bios operation.
 type GETV1BmcBiosParams struct {
 	// Keep only these attributes.
-	Names OptString
+	Names OptString `json:",omitempty,omitzero"`
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1BmcBiosRegistryParams is parameters of GET_/v1/bmc/bios/registry operation.
 type GETV1BmcBiosRegistryParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1BmcFirmwareUpdatesParams is parameters of GET_/v1/bmc/firmware/updates operation.
 type GETV1BmcFirmwareUpdatesParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1BmcIdentityDefaultsParams is parameters of GET_/v1/bmc/identity/defaults operation.
 type GETV1BmcIdentityDefaultsParams struct {
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1BmcJobsParams is parameters of GET_/v1/bmc/jobs operation.
 type GETV1BmcJobsParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1BmcSecurebootParams is parameters of GET_/v1/bmc/secureboot operation.
 type GETV1BmcSecurebootParams struct {
 	// Also list the certificates and signatures in each database.
-	Keys OptBool
+	Keys OptBool `json:",omitempty,omitzero"`
 	// With keys, keep only these databases.
-	Databases OptString
+	Databases OptString `json:",omitempty,omitzero"`
 	// With keys, also list the factory default databases, such as dbDefault.
-	Defaults OptBool
+	Defaults OptBool `json:",omitempty,omitzero"`
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1BmcSelParams is parameters of GET_/v1/bmc/sel operation.
 type GETV1BmcSelParams struct {
 	// Keep only this many entries per node.
-	Limit OptString
+	Limit OptString `json:",omitempty,omitzero"`
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1BmcStatusParams is parameters of GET_/v1/bmc/status operation.
 type GETV1BmcStatusParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1DbDumpParams is parameters of GET_/v1/db/dump operation.
 type GETV1DbDumpParams struct {
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1GrendelEventsParams is parameters of GET_/v1/grendel/events operation.
 type GETV1GrendelEventsParams struct {
 	// Only events at this state.
-	State OptString
+	State OptString `json:",omitempty,omitzero"`
 	// Only events of this kind.
-	Kind OptString
+	Kind OptString `json:",omitempty,omitzero"`
 	// Only events older than the event with this id, for reading further back.
-	Before OptString
+	Before OptString `json:",omitempty,omitzero"`
 	// The most events to return, never more than 1000.
-	Limit  OptInt
-	Accept OptString
+	Limit  OptInt    `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1GrendelEventsIDParams is parameters of GET_/v1/grendel/events/:id operation.
 type GETV1GrendelEventsIDParams struct {
 	// Id of the event.
 	ID     string
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1GrendelVersionParams is parameters of GET_/v1/grendel/version operation.
 type GETV1GrendelVersionParams struct {
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1ImagesParams is parameters of GET_/v1/images operation.
 type GETV1ImagesParams struct {
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1ImagesFindParams is parameters of GET_/v1/images/find operation.
 type GETV1ImagesFindParams struct {
 	// Filter by name.
-	Names  OptString
-	Accept OptString
+	Names  OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1NodesParams is parameters of GET_/v1/nodes operation.
 type GETV1NodesParams struct {
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1NodesFindParams is parameters of GET_/v1/nodes/find operation.
 type GETV1NodesFindParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
-	Accept OptString
+	Tags   OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
+}
+
+// GETV1NodesIpsNextParams is parameters of GET_/v1/nodes/ips/next operation.
+type GETV1NodesIpsNextParams struct {
+	// The IPv4 range to search, a /16 or smaller: a CIDR, an address standing for its /24, or three
+	// octets like 10.17.25.
+	Cidr string
+	// Suggest only the lowest free addresses, or only those after the highest used. Both lists are
+	// returned without it.
+	From OptString `json:",omitempty,omitzero"`
+	// How many unanswered addresses to suggest for each list, from 1 to 8 when pinging or to 64 without.
+	Count OptInt `json:",omitempty,omitzero"`
+	// Ping the suggestions.
+	Ping OptBool `json:",omitempty,omitzero"`
+	// Addresses to treat as taken, like ones on unsaved ports, with or without a prefix length.
+	Exclude OptString `json:",omitempty,omitzero"`
+	Accept  OptString `json:",omitempty,omitzero"`
+}
+
+// GETV1NodesIpsRangesParams is parameters of GET_/v1/nodes/ips/ranges operation.
+type GETV1NodesIpsRangesParams struct {
+	// Nodes by name: a nodeset like cpn-u25-[01-40] picks the nodes it names, and other text picks the
+	// names holding it.
+	Nodeset OptString `json:",omitempty,omitzero"`
+	// Nodes with any of these tags, as tags select nodes elsewhere in the API.
+	Tags OptString `json:",omitempty,omitzero"`
+	// Put the ranges holding BMC ports first when true, or the other ports when false. Without it the
+	// ranges are in address order.
+	Bmc    OptBool   `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1NodesProvisionStatusParams is parameters of GET_/v1/nodes/provision-status operation.
 type GETV1NodesProvisionStatusParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
-	Accept OptString
+	Tags   OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1NodesTagsParams is parameters of GET_/v1/nodes/tags operation.
 type GETV1NodesTagsParams struct {
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1NodesTokenInterfaceParams is parameters of GET_/v1/nodes/token/:interface operation.
@@ -204,58 +234,58 @@ type GETV1NodesTokenInterfaceParams struct {
 	// Interface token will be created for.
 	Interface string
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Arch to embed in the token, used in templates when the node has no arch set. Simulates the arch
 	// detected during a PXE boot.
-	Arch   OptString
-	Accept OptString
+	Arch   OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1RolesParams is parameters of GET_/v1/roles operation.
 type GETV1RolesParams struct {
 	// Filter by name.
-	Name   OptString
-	Accept OptString
+	Name   OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1SwitchNodesetLldpParams is parameters of GET_/v1/switch/:nodeset/lldp operation.
 type GETV1SwitchNodesetLldpParams struct {
 	// Filter by port name.
-	Ports   OptString
-	Accept  OptString
+	Ports   OptString `json:",omitempty,omitzero"`
+	Accept  OptString `json:",omitempty,omitzero"`
 	Nodeset string
 }
 
 // GETV1UsersParams is parameters of GET_/v1/users operation.
 type GETV1UsersParams struct {
 	// Filter by usernames.
-	Usernames OptString
-	Accept    OptString
+	Usernames OptString `json:",omitempty,omitzero"`
+	Accept    OptString `json:",omitempty,omitzero"`
 }
 
 // PATCHV1AuthResetParams is parameters of PATCH_/v1/auth/reset operation.
 type PATCHV1AuthResetParams struct {
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // PATCHV1NodesImageParams is parameters of PATCH_/v1/nodes/image operation.
 type PATCHV1NodesImageParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
-	Accept OptString
+	Tags   OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // PATCHV1NodesProvisionParams is parameters of PATCH_/v1/nodes/provision operation.
 type PATCHV1NodesProvisionParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
-	Accept OptString
+	Tags   OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // PATCHV1NodesTagsActionParams is parameters of PATCH_/v1/nodes/tags/:action operation.
@@ -263,232 +293,232 @@ type PATCHV1NodesTagsActionParams struct {
 	// Option to add or remove tags.
 	Action string
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags   OptString
-	Accept OptString
+	Tags   OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // PATCHV1RolesParams is parameters of PATCH_/v1/roles operation.
 type PATCHV1RolesParams struct {
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // PATCHV1UsersUsernamesEnableParams is parameters of PATCH_/v1/users/:usernames/enable operation.
 type PATCHV1UsersUsernamesEnableParams struct {
 	// Target usernames.
 	Usernames string
-	Accept    OptString
+	Accept    OptString `json:",omitempty,omitzero"`
 }
 
 // PATCHV1UsersUsernamesRoleParams is parameters of PATCH_/v1/users/:usernames/role operation.
 type PATCHV1UsersUsernamesRoleParams struct {
 	// Target usernames.
 	Usernames string
-	Accept    OptString
+	Accept    OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1AuthSigninParams is parameters of POST_/v1/auth/signin operation.
 type POSTV1AuthSigninParams struct {
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1AuthSignupParams is parameters of POST_/v1/auth/signup operation.
 type POSTV1AuthSignupParams struct {
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1AuthTokenParams is parameters of POST_/v1/auth/token operation.
 type POSTV1AuthTokenParams struct {
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1BmcAssetTagParams is parameters of POST_/v1/bmc/asset-tag operation.
 type POSTV1BmcAssetTagParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1BmcBiosParams is parameters of POST_/v1/bmc/bios operation.
 type POSTV1BmcBiosParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1BmcBiosDiscardParams is parameters of POST_/v1/bmc/bios/discard operation.
 type POSTV1BmcBiosDiscardParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1BmcConfigureAutoParams is parameters of POST_/v1/bmc/configure/auto operation.
 type POSTV1BmcConfigureAutoParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1BmcConfigureImportParams is parameters of POST_/v1/bmc/configure/import operation.
 type POSTV1BmcConfigureImportParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1BmcFirmwareInstallParams is parameters of POST_/v1/bmc/firmware/install operation.
 type POSTV1BmcFirmwareInstallParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1BmcIndicatorParams is parameters of POST_/v1/bmc/indicator operation.
 type POSTV1BmcIndicatorParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1BmcJobsClearParams is parameters of POST_/v1/bmc/jobs/clear operation.
 type POSTV1BmcJobsClearParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1BmcLocationParams is parameters of POST_/v1/bmc/location operation.
 type POSTV1BmcLocationParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1BmcPowerParams is parameters of POST_/v1/bmc/power operation.
 type POSTV1BmcPowerParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1BmcSecurebootParams is parameters of POST_/v1/bmc/secureboot operation.
 type POSTV1BmcSecurebootParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1BmcSecurebootKeysParams is parameters of POST_/v1/bmc/secureboot/keys operation.
 type POSTV1BmcSecurebootKeysParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1BmcSecurebootKeysDeleteParams is parameters of POST_/v1/bmc/secureboot/keys/delete operation.
 type POSTV1BmcSecurebootKeysDeleteParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1BmcSecurebootResetParams is parameters of POST_/v1/bmc/secureboot/reset operation.
 type POSTV1BmcSecurebootResetParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1BmcSelClearParams is parameters of POST_/v1/bmc/sel/clear operation.
 type POSTV1BmcSelClearParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
-	Nodeset OptString
+	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
-	Tags OptString
+	Tags OptString `json:",omitempty,omitzero"`
 	// Select every node in the database. Required when no nodeset or tags are given.
-	All    OptString
-	Accept OptString
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1DbRestoreParams is parameters of POST_/v1/db/restore operation.
 type POSTV1DbRestoreParams struct {
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1ImagesParams is parameters of POST_/v1/images operation.
 type POSTV1ImagesParams struct {
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1NodesParams is parameters of POST_/v1/nodes operation.
 type POSTV1NodesParams struct {
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1RolesParams is parameters of POST_/v1/roles operation.
 type POSTV1RolesParams struct {
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // POSTV1UsersParams is parameters of POST_/v1/users operation.
 type POSTV1UsersParams struct {
-	Accept OptString
+	Accept OptString `json:",omitempty,omitzero"`
 }

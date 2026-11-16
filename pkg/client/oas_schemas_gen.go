@@ -14,6 +14,70 @@ func (s *HTTPErrorStatusCode) Error() string {
 	return fmt.Sprintf("code %d: %+v", s.StatusCode, s.Response)
 }
 
+// AddressRange schema.
+// Ref: #/components/schemas/AddressRange
+type AddressRange struct {
+	// How many of those ports are BMCs.
+	BmcPorts OptInt `json:"bmc_ports"`
+	// How many nodes those ports belong to.
+	Nodes OptInt `json:"nodes"`
+	// How many of the nodes' ports have an address in the range.
+	Ports OptInt `json:"ports"`
+	// The prefix length most of the range's ports carry.
+	PrefixLen OptInt    `json:"prefix_len"`
+	Range     OptString `json:"range"`
+}
+
+// GetBmcPorts returns the value of BmcPorts.
+func (s *AddressRange) GetBmcPorts() OptInt {
+	return s.BmcPorts
+}
+
+// GetNodes returns the value of Nodes.
+func (s *AddressRange) GetNodes() OptInt {
+	return s.Nodes
+}
+
+// GetPorts returns the value of Ports.
+func (s *AddressRange) GetPorts() OptInt {
+	return s.Ports
+}
+
+// GetPrefixLen returns the value of PrefixLen.
+func (s *AddressRange) GetPrefixLen() OptInt {
+	return s.PrefixLen
+}
+
+// GetRange returns the value of Range.
+func (s *AddressRange) GetRange() OptString {
+	return s.Range
+}
+
+// SetBmcPorts sets the value of BmcPorts.
+func (s *AddressRange) SetBmcPorts(val OptInt) {
+	s.BmcPorts = val
+}
+
+// SetNodes sets the value of Nodes.
+func (s *AddressRange) SetNodes(val OptInt) {
+	s.Nodes = val
+}
+
+// SetPorts sets the value of Ports.
+func (s *AddressRange) SetPorts(val OptInt) {
+	s.Ports = val
+}
+
+// SetPrefixLen sets the value of PrefixLen.
+func (s *AddressRange) SetPrefixLen(val OptInt) {
+	s.PrefixLen = val
+}
+
+// SetRange sets the value of Range.
+func (s *AddressRange) SetRange(val OptString) {
+	s.Range = val
+}
+
 // AuthRequest schema.
 // Ref: #/components/schemas/AuthRequest
 type AuthRequest struct {
@@ -5241,6 +5305,7 @@ func (s *BootImageProvisionTemplates) init() BootImageProvisionTemplates {
 
 type CookieAuth struct {
 	Token string
+	Roles []string
 }
 
 // GetToken returns the value of Token.
@@ -5248,9 +5313,19 @@ func (s *CookieAuth) GetToken() string {
 	return s.Token
 }
 
+// GetRoles returns the value of Roles.
+func (s *CookieAuth) GetRoles() []string {
+	return s.Roles
+}
+
 // SetToken sets the value of Token.
 func (s *CookieAuth) SetToken(val string) {
 	s.Token = val
+}
+
+// SetRoles sets the value of Roles.
+func (s *CookieAuth) SetRoles(val []string) {
+	s.Roles = val
 }
 
 // DataDump schema.
@@ -6731,6 +6806,7 @@ func (s *HTTPErrorStatusCode) SetResponse(val HTTPError) {
 
 type HeaderAuth struct {
 	Token string
+	Roles []string
 }
 
 // GetToken returns the value of Token.
@@ -6738,9 +6814,19 @@ func (s *HeaderAuth) GetToken() string {
 	return s.Token
 }
 
+// GetRoles returns the value of Roles.
+func (s *HeaderAuth) GetRoles() []string {
+	return s.Roles
+}
+
 // SetToken sets the value of Token.
 func (s *HeaderAuth) SetToken(val string) {
 	s.Token = val
+}
+
+// SetRoles sets the value of Roles.
+func (s *HeaderAuth) SetRoles(val []string) {
+	s.Roles = val
 }
 
 // Host schema.
@@ -7155,6 +7241,228 @@ func (s *LLDP) SetSystemName(val OptString) {
 	s.SystemName = val
 }
 
+// NextAddressResponse schema.
+// Ref: #/components/schemas/NextAddressResponse
+type NextAddressResponse struct {
+	// The free addresses after the highest one in use.
+	AfterHighest []NextAddressResponseAfterHighestItem `json:"after_highest"`
+	// How many addresses in the range no node holds, that aren't excluded or reserved.
+	Free OptInt `json:"free"`
+	// The highest address in the range a node holds or that is excluded, which after_highest starts from.
+	Highest OptNilString `json:"highest"`
+	// The lowest free addresses in the range.
+	Lowest    []NextAddressResponseLowestItem `json:"lowest"`
+	PingError OptNilString                    `json:"ping_error"`
+	Pinged    OptBool                         `json:"pinged"`
+	// The prefix length to give a port with one of the suggested addresses.
+	PrefixLen OptInt    `json:"prefix_len"`
+	Range     OptString `json:"range"`
+	// Addresses in the range never suggested: the subnet's network and broadcast addresses, and in a
+	// subnet larger than a /24, ones ending in .0 or .255.
+	Reserved []string `json:"reserved"`
+	// The subnet the range lies in, taken from the prefix length of the nodes in and around it, or the
+	// range itself when there are none.
+	Subnet OptString `json:"subnet"`
+	// Addresses in the range a node's port holds, lowest first.
+	Used []NextAddressResponseUsedItem `json:"used"`
+}
+
+// GetAfterHighest returns the value of AfterHighest.
+func (s *NextAddressResponse) GetAfterHighest() []NextAddressResponseAfterHighestItem {
+	return s.AfterHighest
+}
+
+// GetFree returns the value of Free.
+func (s *NextAddressResponse) GetFree() OptInt {
+	return s.Free
+}
+
+// GetHighest returns the value of Highest.
+func (s *NextAddressResponse) GetHighest() OptNilString {
+	return s.Highest
+}
+
+// GetLowest returns the value of Lowest.
+func (s *NextAddressResponse) GetLowest() []NextAddressResponseLowestItem {
+	return s.Lowest
+}
+
+// GetPingError returns the value of PingError.
+func (s *NextAddressResponse) GetPingError() OptNilString {
+	return s.PingError
+}
+
+// GetPinged returns the value of Pinged.
+func (s *NextAddressResponse) GetPinged() OptBool {
+	return s.Pinged
+}
+
+// GetPrefixLen returns the value of PrefixLen.
+func (s *NextAddressResponse) GetPrefixLen() OptInt {
+	return s.PrefixLen
+}
+
+// GetRange returns the value of Range.
+func (s *NextAddressResponse) GetRange() OptString {
+	return s.Range
+}
+
+// GetReserved returns the value of Reserved.
+func (s *NextAddressResponse) GetReserved() []string {
+	return s.Reserved
+}
+
+// GetSubnet returns the value of Subnet.
+func (s *NextAddressResponse) GetSubnet() OptString {
+	return s.Subnet
+}
+
+// GetUsed returns the value of Used.
+func (s *NextAddressResponse) GetUsed() []NextAddressResponseUsedItem {
+	return s.Used
+}
+
+// SetAfterHighest sets the value of AfterHighest.
+func (s *NextAddressResponse) SetAfterHighest(val []NextAddressResponseAfterHighestItem) {
+	s.AfterHighest = val
+}
+
+// SetFree sets the value of Free.
+func (s *NextAddressResponse) SetFree(val OptInt) {
+	s.Free = val
+}
+
+// SetHighest sets the value of Highest.
+func (s *NextAddressResponse) SetHighest(val OptNilString) {
+	s.Highest = val
+}
+
+// SetLowest sets the value of Lowest.
+func (s *NextAddressResponse) SetLowest(val []NextAddressResponseLowestItem) {
+	s.Lowest = val
+}
+
+// SetPingError sets the value of PingError.
+func (s *NextAddressResponse) SetPingError(val OptNilString) {
+	s.PingError = val
+}
+
+// SetPinged sets the value of Pinged.
+func (s *NextAddressResponse) SetPinged(val OptBool) {
+	s.Pinged = val
+}
+
+// SetPrefixLen sets the value of PrefixLen.
+func (s *NextAddressResponse) SetPrefixLen(val OptInt) {
+	s.PrefixLen = val
+}
+
+// SetRange sets the value of Range.
+func (s *NextAddressResponse) SetRange(val OptString) {
+	s.Range = val
+}
+
+// SetReserved sets the value of Reserved.
+func (s *NextAddressResponse) SetReserved(val []string) {
+	s.Reserved = val
+}
+
+// SetSubnet sets the value of Subnet.
+func (s *NextAddressResponse) SetSubnet(val OptString) {
+	s.Subnet = val
+}
+
+// SetUsed sets the value of Used.
+func (s *NextAddressResponse) SetUsed(val []NextAddressResponseUsedItem) {
+	s.Used = val
+}
+
+type NextAddressResponseAfterHighestItem struct {
+	Answered OptBool   `json:"answered"`
+	IP       OptString `json:"ip"`
+}
+
+// GetAnswered returns the value of Answered.
+func (s *NextAddressResponseAfterHighestItem) GetAnswered() OptBool {
+	return s.Answered
+}
+
+// GetIP returns the value of IP.
+func (s *NextAddressResponseAfterHighestItem) GetIP() OptString {
+	return s.IP
+}
+
+// SetAnswered sets the value of Answered.
+func (s *NextAddressResponseAfterHighestItem) SetAnswered(val OptBool) {
+	s.Answered = val
+}
+
+// SetIP sets the value of IP.
+func (s *NextAddressResponseAfterHighestItem) SetIP(val OptString) {
+	s.IP = val
+}
+
+type NextAddressResponseLowestItem struct {
+	Answered OptBool   `json:"answered"`
+	IP       OptString `json:"ip"`
+}
+
+// GetAnswered returns the value of Answered.
+func (s *NextAddressResponseLowestItem) GetAnswered() OptBool {
+	return s.Answered
+}
+
+// GetIP returns the value of IP.
+func (s *NextAddressResponseLowestItem) GetIP() OptString {
+	return s.IP
+}
+
+// SetAnswered sets the value of Answered.
+func (s *NextAddressResponseLowestItem) SetAnswered(val OptBool) {
+	s.Answered = val
+}
+
+// SetIP sets the value of IP.
+func (s *NextAddressResponseLowestItem) SetIP(val OptString) {
+	s.IP = val
+}
+
+type NextAddressResponseUsedItem struct {
+	Bmc  OptBool   `json:"bmc"`
+	IP   OptString `json:"ip"`
+	Node OptString `json:"node"`
+}
+
+// GetBmc returns the value of Bmc.
+func (s *NextAddressResponseUsedItem) GetBmc() OptBool {
+	return s.Bmc
+}
+
+// GetIP returns the value of IP.
+func (s *NextAddressResponseUsedItem) GetIP() OptString {
+	return s.IP
+}
+
+// GetNode returns the value of Node.
+func (s *NextAddressResponseUsedItem) GetNode() OptString {
+	return s.Node
+}
+
+// SetBmc sets the value of Bmc.
+func (s *NextAddressResponseUsedItem) SetBmc(val OptBool) {
+	s.Bmc = val
+}
+
+// SetIP sets the value of IP.
+func (s *NextAddressResponseUsedItem) SetIP(val OptString) {
+	s.IP = val
+}
+
+// SetNode sets the value of Node.
+func (s *NextAddressResponseUsedItem) SetNode(val OptString) {
+	s.Node = val
+}
+
 // NewNilBmcResponseModelBmcAckResultsItem returns new NilBmcResponseModelBmcAckResultsItem with value set to v.
 func NewNilBmcResponseModelBmcAckResultsItem(v BmcResponseModelBmcAckResultsItem) NilBmcResponseModelBmcAckResultsItem {
 	return NilBmcResponseModelBmcAckResultsItem{
@@ -7174,10 +7482,10 @@ func (o *NilBmcResponseModelBmcAckResultsItem) SetTo(v BmcResponseModelBmcAckRes
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilBmcResponseModelBmcAckResultsItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilBmcResponseModelBmcAckResultsItem) SetToNull() {
 	o.Null = true
 	var v BmcResponseModelBmcAckResultsItem
@@ -7219,10 +7527,10 @@ func (o *NilBmcResponseModelBmcAssetTagResultResultsItem) SetTo(v BmcResponseMod
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilBmcResponseModelBmcAssetTagResultResultsItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilBmcResponseModelBmcAssetTagResultResultsItem) SetToNull() {
 	o.Null = true
 	var v BmcResponseModelBmcAssetTagResultResultsItem
@@ -7264,10 +7572,10 @@ func (o *NilBmcResponseModelBmcBiosRegistryResultsItem) SetTo(v BmcResponseModel
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilBmcResponseModelBmcBiosRegistryResultsItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilBmcResponseModelBmcBiosRegistryResultsItem) SetToNull() {
 	o.Null = true
 	var v BmcResponseModelBmcBiosRegistryResultsItem
@@ -7309,10 +7617,10 @@ func (o *NilBmcResponseModelBmcBiosResultsItem) SetTo(v BmcResponseModelBmcBiosR
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilBmcResponseModelBmcBiosResultsItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilBmcResponseModelBmcBiosResultsItem) SetToNull() {
 	o.Null = true
 	var v BmcResponseModelBmcBiosResultsItem
@@ -7354,10 +7662,10 @@ func (o *NilBmcResponseModelBmcFirmwareUpdatesResultsItem) SetTo(v BmcResponseMo
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilBmcResponseModelBmcFirmwareUpdatesResultsItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilBmcResponseModelBmcFirmwareUpdatesResultsItem) SetToNull() {
 	o.Null = true
 	var v BmcResponseModelBmcFirmwareUpdatesResultsItem
@@ -7399,10 +7707,10 @@ func (o *NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetTo(
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetToNull() {
 	o.Null = true
 	var v BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
@@ -7444,10 +7752,10 @@ func (o *NilBmcResponseModelBmcJobListResultsItem) SetTo(v BmcResponseModelBmcJo
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilBmcResponseModelBmcJobListResultsItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilBmcResponseModelBmcJobListResultsItem) SetToNull() {
 	o.Null = true
 	var v BmcResponseModelBmcJobListResultsItem
@@ -7489,10 +7797,10 @@ func (o *NilBmcResponseModelBmcJobListResultsItemDataJobsItem) SetTo(v BmcRespon
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilBmcResponseModelBmcJobListResultsItemDataJobsItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilBmcResponseModelBmcJobListResultsItemDataJobsItem) SetToNull() {
 	o.Null = true
 	var v BmcResponseModelBmcJobListResultsItemDataJobsItem
@@ -7534,10 +7842,10 @@ func (o *NilBmcResponseModelBmcLocationResultResultsItem) SetTo(v BmcResponseMod
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilBmcResponseModelBmcLocationResultResultsItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilBmcResponseModelBmcLocationResultResultsItem) SetToNull() {
 	o.Null = true
 	var v BmcResponseModelBmcLocationResultResultsItem
@@ -7579,10 +7887,10 @@ func (o *NilBmcResponseModelBmcSELLogResultsItem) SetTo(v BmcResponseModelBmcSEL
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilBmcResponseModelBmcSELLogResultsItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilBmcResponseModelBmcSELLogResultsItem) SetToNull() {
 	o.Null = true
 	var v BmcResponseModelBmcSELLogResultsItem
@@ -7624,10 +7932,10 @@ func (o *NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetTo(v BmcResp
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetToNull() {
 	o.Null = true
 	var v BmcResponseModelBmcSELLogResultsItemDataEntriesItem
@@ -7669,10 +7977,10 @@ func (o *NilBmcResponseModelBmcSecureBootResultsItem) SetTo(v BmcResponseModelBm
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilBmcResponseModelBmcSecureBootResultsItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilBmcResponseModelBmcSecureBootResultsItem) SetToNull() {
 	o.Null = true
 	var v BmcResponseModelBmcSecureBootResultsItem
@@ -7714,10 +8022,10 @@ func (o *NilBmcResponseModelRedfishSystemResultsItem) SetTo(v BmcResponseModelRe
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilBmcResponseModelRedfishSystemResultsItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilBmcResponseModelRedfishSystemResultsItem) SetToNull() {
 	o.Null = true
 	var v BmcResponseModelRedfishSystemResultsItem
@@ -7759,12 +8067,12 @@ func (o *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtende
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) IsNull() bool {
 	return o.Null
 }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetToNull() {
 	o.Null = true
 	var v BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
@@ -7806,12 +8114,12 @@ func (o *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtende
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) IsNull() bool {
 	return o.Null
 }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetToNull() {
 	o.Null = true
 	var v BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
@@ -7853,10 +8161,10 @@ func (o *NilBootImageAddRequestBootImagesItem) SetTo(v BootImageAddRequestBootIm
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilBootImageAddRequestBootImagesItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilBootImageAddRequestBootImagesItem) SetToNull() {
 	o.Null = true
 	var v BootImageAddRequestBootImagesItem
@@ -7898,10 +8206,10 @@ func (o *NilDataDumpHostsItem) SetTo(v DataDumpHostsItem) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilDataDumpHostsItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilDataDumpHostsItem) SetToNull() {
 	o.Null = true
 	var v DataDumpHostsItem
@@ -7943,10 +8251,10 @@ func (o *NilDataDumpHostsItemBondsItem) SetTo(v DataDumpHostsItemBondsItem) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilDataDumpHostsItemBondsItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilDataDumpHostsItemBondsItem) SetToNull() {
 	o.Null = true
 	var v DataDumpHostsItemBondsItem
@@ -7988,10 +8296,10 @@ func (o *NilDataDumpHostsItemInterfacesItem) SetTo(v DataDumpHostsItemInterfaces
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilDataDumpHostsItemInterfacesItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilDataDumpHostsItemInterfacesItem) SetToNull() {
 	o.Null = true
 	var v DataDumpHostsItemInterfacesItem
@@ -8033,10 +8341,10 @@ func (o *NilDataDumpImagesItem) SetTo(v DataDumpImagesItem) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilDataDumpImagesItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilDataDumpImagesItem) SetToNull() {
 	o.Null = true
 	var v DataDumpImagesItem
@@ -8078,10 +8386,10 @@ func (o *NilHostBondsItem) SetTo(v HostBondsItem) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilHostBondsItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilHostBondsItem) SetToNull() {
 	o.Null = true
 	var v HostBondsItem
@@ -8123,10 +8431,10 @@ func (o *NilHostInterfacesItem) SetTo(v HostInterfacesItem) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilHostInterfacesItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilHostInterfacesItem) SetToNull() {
 	o.Null = true
 	var v HostInterfacesItem
@@ -8168,10 +8476,10 @@ func (o *NilNodeAddRequestNodeListItem) SetTo(v NodeAddRequestNodeListItem) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilNodeAddRequestNodeListItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilNodeAddRequestNodeListItem) SetToNull() {
 	o.Null = true
 	var v NodeAddRequestNodeListItem
@@ -8213,10 +8521,10 @@ func (o *NilNodeAddRequestNodeListItemBondsItem) SetTo(v NodeAddRequestNodeListI
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilNodeAddRequestNodeListItemBondsItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilNodeAddRequestNodeListItemBondsItem) SetToNull() {
 	o.Null = true
 	var v NodeAddRequestNodeListItemBondsItem
@@ -8258,10 +8566,10 @@ func (o *NilNodeAddRequestNodeListItemInterfacesItem) SetTo(v NodeAddRequestNode
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilNodeAddRequestNodeListItemInterfacesItem) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilNodeAddRequestNodeListItemInterfacesItem) SetToNull() {
 	o.Null = true
 	var v NodeAddRequestNodeListItemInterfacesItem
@@ -8303,10 +8611,10 @@ func (o *NilString) SetTo(v string) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o NilString) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *NilString) SetToNull() {
 	o.Null = true
 	var v string
@@ -9878,10 +10186,10 @@ func (o *OptNilBmcAssetTagBodyBySerial) SetTo(v BmcAssetTagBodyBySerial) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilBmcAssetTagBodyBySerial) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilBmcAssetTagBodyBySerial) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -9941,10 +10249,10 @@ func (o *OptNilBmcResponseModelBmcAssetTagResultResultsItemData) SetTo(v BmcResp
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilBmcResponseModelBmcAssetTagResultResultsItemData) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilBmcResponseModelBmcAssetTagResultResultsItemData) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -10004,10 +10312,10 @@ func (o *OptNilBmcResponseModelBmcBiosRegistryResultsItemData) SetTo(v BmcRespon
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilBmcResponseModelBmcBiosRegistryResultsItemData) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilBmcResponseModelBmcBiosRegistryResultsItemData) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -10067,10 +10375,10 @@ func (o *OptNilBmcResponseModelBmcBiosResultsItemData) SetTo(v BmcResponseModelB
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilBmcResponseModelBmcBiosResultsItemData) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilBmcResponseModelBmcBiosResultsItemData) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -10130,10 +10438,10 @@ func (o *OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemData) SetTo(v BmcRes
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemData) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemData) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -10193,10 +10501,10 @@ func (o *OptNilBmcResponseModelBmcJobListResultsItemData) SetTo(v BmcResponseMod
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilBmcResponseModelBmcJobListResultsItemData) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilBmcResponseModelBmcJobListResultsItemData) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -10256,10 +10564,10 @@ func (o *OptNilBmcResponseModelBmcLocationResultResultsItemData) SetTo(v BmcResp
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilBmcResponseModelBmcLocationResultResultsItemData) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilBmcResponseModelBmcLocationResultResultsItemData) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -10319,10 +10627,10 @@ func (o *OptNilBmcResponseModelBmcSELLogResultsItemData) SetTo(v BmcResponseMode
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilBmcResponseModelBmcSELLogResultsItemData) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilBmcResponseModelBmcSELLogResultsItemData) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -10382,10 +10690,10 @@ func (o *OptNilBmcResponseModelBmcSecureBootResultsItemData) SetTo(v BmcResponse
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilBmcResponseModelBmcSecureBootResultsItemData) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilBmcResponseModelBmcSecureBootResultsItemData) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -10445,10 +10753,10 @@ func (o *OptNilBmcResponseModelRedfishSystemResultsItemData) SetTo(v BmcResponse
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilBmcResponseModelRedfishSystemResultsItemData) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilBmcResponseModelRedfishSystemResultsItemData) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -10508,10 +10816,10 @@ func (o *OptNilBmcResponseModelRedfishSystemResultsItemDataLocation) SetTo(v Bmc
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilBmcResponseModelRedfishSystemResultsItemDataLocation) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilBmcResponseModelRedfishSystemResultsItemDataLocation) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -10571,10 +10879,10 @@ func (o *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDell) SetTo(v BmcR
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilBmcResponseModelRedfishSystemResultsItemDataOemDell) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDell) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -10634,10 +10942,10 @@ func (o *OptNilBool) SetTo(v bool) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilBool) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilBool) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -10697,10 +11005,10 @@ func (o *OptNilBootImageAddRequestBootImagesItemProvisionTemplates) SetTo(v Boot
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilBootImageAddRequestBootImagesItemProvisionTemplates) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilBootImageAddRequestBootImagesItemProvisionTemplates) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -10760,10 +11068,10 @@ func (o *OptNilBootImageProvisionTemplates) SetTo(v BootImageProvisionTemplates)
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilBootImageProvisionTemplates) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilBootImageProvisionTemplates) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -10823,10 +11131,10 @@ func (o *OptNilDataDumpImagesItemProvisionTemplates) SetTo(v DataDumpImagesItemP
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilDataDumpImagesItemProvisionTemplates) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilDataDumpImagesItemProvisionTemplates) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -10886,10 +11194,10 @@ func (o *OptNilDateTime) SetTo(v time.Time) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilDateTime) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilDateTime) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -10949,10 +11257,10 @@ func (o *OptNilEventDetail) SetTo(v EventDetail) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilEventDetail) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilEventDetail) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -11012,10 +11320,10 @@ func (o *OptNilEventNodesItemArray) SetTo(v []EventNodesItem) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilEventNodesItemArray) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilEventNodesItemArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -11075,10 +11383,10 @@ func (o *OptNilEventStages) SetTo(v EventStages) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilEventStages) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilEventStages) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -11138,10 +11446,10 @@ func (o *OptNilFloat64) SetTo(v float64) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilFloat64) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilFloat64) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -11201,10 +11509,10 @@ func (o *OptNilHTTPErrorErrorsItemArray) SetTo(v []HTTPErrorErrorsItem) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilHTTPErrorErrorsItemArray) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilHTTPErrorErrorsItemArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -11264,10 +11572,10 @@ func (o *OptNilInt) SetTo(v int) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilInt) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilInt) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -11327,10 +11635,10 @@ func (o *OptNilInt64) SetTo(v int64) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilInt64) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilInt64) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -11390,10 +11698,10 @@ func (o *OptNilNilBmcResponseModelBmcAckResultsItemArray) SetTo(v []NilBmcRespon
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilNilBmcResponseModelBmcAckResultsItemArray) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilNilBmcResponseModelBmcAckResultsItemArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -11453,10 +11761,10 @@ func (o *OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) SetTo(v []N
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -11516,10 +11824,10 @@ func (o *OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) SetTo(v []Nil
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -11579,10 +11887,10 @@ func (o *OptNilNilBmcResponseModelBmcBiosResultsItemArray) SetTo(v []NilBmcRespo
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilNilBmcResponseModelBmcBiosResultsItemArray) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilNilBmcResponseModelBmcBiosResultsItemArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -11642,10 +11950,10 @@ func (o *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) SetTo(v []
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -11707,12 +12015,12 @@ func (o *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemAr
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) IsNull() bool {
 	return o.Null
 }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -11772,10 +12080,10 @@ func (o *OptNilNilBmcResponseModelBmcJobListResultsItemArray) SetTo(v []NilBmcRe
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilNilBmcResponseModelBmcJobListResultsItemArray) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilNilBmcResponseModelBmcJobListResultsItemArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -11835,10 +12143,10 @@ func (o *OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) SetTo(
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -11898,10 +12206,10 @@ func (o *OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) SetTo(v []N
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -11961,10 +12269,10 @@ func (o *OptNilNilBmcResponseModelBmcSELLogResultsItemArray) SetTo(v []NilBmcRes
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilNilBmcResponseModelBmcSELLogResultsItemArray) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilNilBmcResponseModelBmcSELLogResultsItemArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -12024,12 +12332,12 @@ func (o *OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) SetT
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) IsNull() bool {
 	return o.Null
 }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -12089,10 +12397,10 @@ func (o *OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) SetTo(v []NilBm
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -12152,10 +12460,10 @@ func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemArray) SetTo(v []NilBm
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilNilBmcResponseModelRedfishSystemResultsItemArray) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -12217,12 +12525,12 @@ func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotE
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) IsNull() bool {
 	return o.Null
 }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -12284,12 +12592,12 @@ func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotE
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) IsNull() bool {
 	return o.Null
 }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -12349,10 +12657,10 @@ func (o *OptNilNilStringArray) SetTo(v []NilString) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilNilStringArray) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilNilStringArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -12412,10 +12720,10 @@ func (o *OptNilProvisionStatusFacts) SetTo(v ProvisionStatusFacts) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilProvisionStatusFacts) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilProvisionStatusFacts) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -12475,10 +12783,10 @@ func (o *OptNilProvisionStatusFailedUnitsItemArray) SetTo(v []ProvisionStatusFai
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilProvisionStatusFailedUnitsItemArray) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilProvisionStatusFailedUnitsItemArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -12538,10 +12846,10 @@ func (o *OptNilProvisionStatusStages) SetTo(v ProvisionStatusStages) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilProvisionStatusStages) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilProvisionStatusStages) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -12601,10 +12909,10 @@ func (o *OptNilString) SetTo(v string) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilString) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilString) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -12664,10 +12972,10 @@ func (o *OptNilStringArray) SetTo(v []string) {
 	o.Value = v
 }
 
-// IsSet returns true if value is Null.
+// IsNull returns true if value is Null.
 func (o OptNilStringArray) IsNull() bool { return o.Null }
 
-// SetNull sets value to null.
+// SetToNull sets value to null.
 func (o *OptNilStringArray) SetToNull() {
 	o.Set = true
 	o.Null = true
@@ -13088,13 +13396,13 @@ func (s *TagCount) SetTag(val OptString) {
 // User schema.
 // Ref: #/components/schemas/User
 type User struct {
-	CreatedAt  OptDateTime `json:"created_at"`
-	Enabled    OptBool     `json:"enabled"`
-	Hash       OptString   `json:"hash"`
-	ID         OptInt64    `json:"id"`
-	ModifiedAt OptDateTime `json:"modified_at"`
-	Role       OptString   `json:"role"`
-	Username   OptString   `json:"username"`
+	CreatedAt  OptDateTime  `json:"created_at"`
+	Enabled    OptBool      `json:"enabled"`
+	Hash       OptNilString `json:"hash"`
+	ID         OptInt64     `json:"id"`
+	ModifiedAt OptDateTime  `json:"modified_at"`
+	Role       OptString    `json:"role"`
+	Username   OptString    `json:"username"`
 }
 
 // GetCreatedAt returns the value of CreatedAt.
@@ -13108,7 +13416,7 @@ func (s *User) GetEnabled() OptBool {
 }
 
 // GetHash returns the value of Hash.
-func (s *User) GetHash() OptString {
+func (s *User) GetHash() OptNilString {
 	return s.Hash
 }
 
@@ -13143,7 +13451,7 @@ func (s *User) SetEnabled(val OptBool) {
 }
 
 // SetHash sets the value of Hash.
-func (s *User) SetHash(val OptString) {
+func (s *User) SetHash(val OptNilString) {
 	s.Hash = val
 }
 

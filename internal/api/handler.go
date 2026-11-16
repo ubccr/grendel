@@ -106,6 +106,20 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 	fuego.Get(nodes, "/tags", h.NodeTagList,
 		option.Description("List every tag on a node, with how many nodes have it"),
 	)
+	fuego.Get(nodes, "/ips/next", h.NodeNextAddress,
+		option.Description("Suggest free addresses in a range: the lowest ones no node holds, and the ones after the highest held. Suggestions are pinged, and one that answers is listed but marked"),
+		option.Query("cidr", "The IPv4 range to search, a /16 or smaller: a CIDR, an address standing for its /24, or three octets like 10.17.25", param.Required(), param.Example("cidr", "10.17.25.0/24")),
+		option.Query("from", "Suggest only the lowest free addresses, or only those after the highest used. Both lists are returned without it", param.Example("from", "lowest | after_highest")),
+		option.QueryInt("count", "How many unanswered addresses to suggest for each list, from 1 to 8 when pinging or to 64 without", param.Default(defaultNextCount)),
+		option.QueryBool("ping", "Ping the suggestions", param.Default(true)),
+		option.Query("exclude", "Addresses to treat as taken, like ones on unsaved ports, with or without a prefix length", param.Example("exclude", "10.17.25.7/18,10.17.25.8")),
+	)
+	fuego.Get(nodes, "/ips/ranges", h.NodeAddressRanges,
+		option.Description("List the ranges the ports of some nodes sit in, each once however many ports share it: a /24 of a larger subnet, or a /24 to /30 subnet whole. Every node is taken when neither nodeset nor tags is given"),
+		option.Query("nodeset", "Nodes by name: a nodeset like cpn-u25-[01-40] picks the nodes it names, and other text picks the names holding it", param.Example("nodeset", "cpn-u25")),
+		option.Query("tags", "Nodes with any of these tags, as tags select nodes elsewhere in the API", param.Example("tags", "rack=u25")),
+		option.QueryBool("bmc", "Put the ranges holding BMC ports first when true, or the other ports when false. Without it the ranges are in address order"),
+	)
 	fuego.Patch(nodes, "/tags/{action}", h.NodeTags,
 		option.Description("Update nodes tags by nodeset and/or tags"),
 		option.Path("action", "option to add or remove tags", param.Example("action", "add | remove")),

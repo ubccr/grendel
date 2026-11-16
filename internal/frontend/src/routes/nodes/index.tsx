@@ -7,6 +7,7 @@ import ProvisionIcon from "@/components/nodes/provision-button";
 import { ProvisionStatusBadge, statusesByNode } from "@/components/nodes/provision-status";
 import TagsList from "@/components/tags";
 import { Card, CardContent } from "@/components/ui/card";
+import { matchesTags } from "@/lib/tags";
 import AuthRedirect from "@/lib/auth";
 import { stateLabels } from "@/lib/provision";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -89,27 +90,7 @@ function TableComponent() {
           const tags = row.original?.tags;
           return <TagsList tags={tags ?? []} />;
         },
-        filterFn: (row, _, filterValue: string[]) => {
-          const match = filterValue.filter((filterTag) => {
-            if (row.original?.tags == undefined) {
-              return false;
-            }
-
-            if (filterTag.startsWith("!")) {
-              return !row.original?.tags.includes(filterTag.substring(1));
-            } else if (filterTag.startsWith("=") || filterTag.endsWith("=")) {
-              const match = row.original?.tags.filter((tag) => tag.includes(filterTag)) ?? [];
-              return match.length > 0;
-            } else if (filterTag.startsWith(":") || filterTag.endsWith(":")) {
-              const match = row.original?.tags.filter((tag) => tag.includes(filterTag)) ?? [];
-              return match.length > 0;
-            }
-
-            return row.original?.tags.includes(filterTag);
-          });
-
-          return match.length === filterValue.length;
-        },
+        filterFn: (row, _, filterValue: string[]) => matchesTags(row.original?.tags, filterValue),
       },
       {
         accessorKey: "interfaces.ip",

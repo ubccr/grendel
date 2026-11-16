@@ -1,6 +1,33 @@
 {
 	"components": {
 		"schemas": {
+			"AddressRange": {
+				"description": "AddressRange schema",
+				"properties": {
+					"bmc_ports": {
+						"description": "how many of those ports are BMCs",
+						"type": "integer"
+					},
+					"nodes": {
+						"description": "how many nodes those ports belong to",
+						"type": "integer"
+					},
+					"ports": {
+						"description": "how many of the nodes' ports have an address in the range",
+						"type": "integer"
+					},
+					"prefix_len": {
+						"description": "the prefix length most of the range's ports carry",
+						"example": 18,
+						"type": "integer"
+					},
+					"range": {
+						"example": "10.17.25.0/24",
+						"type": "string"
+					}
+				},
+				"type": "object"
+			},
 			"AuthRequest": {
 				"description": "AuthRequest schema",
 				"properties": {
@@ -2533,6 +2560,97 @@
 					},
 					"system_name": {
 						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"NextAddressResponse": {
+				"description": "NextAddressResponse schema",
+				"properties": {
+					"after_highest": {
+						"description": "the free addresses after the highest one in use",
+						"items": {
+							"properties": {
+								"answered": {
+									"type": "boolean"
+								},
+								"ip": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					},
+					"free": {
+						"description": "how many addresses in the range no node holds, that aren't excluded or reserved",
+						"type": "integer"
+					},
+					"highest": {
+						"description": "the highest address in the range a node holds or that is excluded, which after_highest starts from",
+						"nullable": true,
+						"type": "string"
+					},
+					"lowest": {
+						"description": "the lowest free addresses in the range",
+						"items": {
+							"properties": {
+								"answered": {
+									"type": "boolean"
+								},
+								"ip": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					},
+					"ping_error": {
+						"nullable": true,
+						"type": "string"
+					},
+					"pinged": {
+						"type": "boolean"
+					},
+					"prefix_len": {
+						"description": "the prefix length to give a port with one of the suggested addresses",
+						"example": 18,
+						"type": "integer"
+					},
+					"range": {
+						"example": "10.17.25.0/24",
+						"type": "string"
+					},
+					"reserved": {
+						"description": "addresses in the range never suggested: the subnet's network and broadcast addresses, and in a subnet larger than a /24, ones ending in .0 or .255",
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"subnet": {
+						"description": "the subnet the range lies in, taken from the prefix length of the nodes in and around it, or the range itself when there are none",
+						"example": "10.17.0.0/18",
+						"type": "string"
+					},
+					"used": {
+						"description": "addresses in the range a node's port holds, lowest first",
+						"items": {
+							"properties": {
+								"bmc": {
+									"type": "boolean"
+								},
+								"ip": {
+									"type": "string"
+								},
+								"node": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
 					}
 				},
 				"type": "object"
@@ -6574,6 +6692,214 @@
 					}
 				],
 				"summary": "node boot image",
+				"tags": [
+					"v1",
+					"nodes"
+				]
+			}
+		},
+		"/v1/nodes/ips/next": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeNextAddress`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nSuggest free addresses in a range: the lowest ones no node holds, and the ones after the highest held. Suggestions are pinged, and one that answers is listed but marked",
+				"operationId": "GET_/v1/nodes/ips/next",
+				"parameters": [
+					{
+						"description": "The IPv4 range to search, a /16 or smaller: a CIDR, an address standing for its /24, or three octets like 10.17.25",
+						"examples": {
+							"cidr": {
+								"value": "10.17.25.0/24"
+							}
+						},
+						"in": "query",
+						"name": "cidr",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Suggest only the lowest free addresses, or only those after the highest used. Both lists are returned without it",
+						"examples": {
+							"from": {
+								"value": "lowest | after_highest"
+							}
+						},
+						"in": "query",
+						"name": "from",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "How many unanswered addresses to suggest for each list, from 1 to 8 when pinging or to 64 without",
+						"in": "query",
+						"name": "count",
+						"schema": {
+							"default": 3,
+							"type": "integer"
+						}
+					},
+					{
+						"description": "Ping the suggestions",
+						"in": "query",
+						"name": "ping",
+						"schema": {
+							"default": true,
+							"type": "boolean"
+						}
+					},
+					{
+						"description": "Addresses to treat as taken, like ones on unsaved ports, with or without a prefix length",
+						"examples": {
+							"exclude": {
+								"value": "10.17.25.7/18,10.17.25.8"
+							}
+						},
+						"in": "query",
+						"name": "exclude",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NextAddressResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/NextAddressResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "node next address",
+				"tags": [
+					"v1",
+					"nodes"
+				]
+			}
+		},
+		"/v1/nodes/ips/ranges": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeAddressRanges`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList the ranges the ports of some nodes sit in, each once however many ports share it: a /24 of a larger subnet, or a /24 to /30 subnet whole. Every node is taken when neither nodeset nor tags is given",
+				"operationId": "GET_/v1/nodes/ips/ranges",
+				"parameters": [
+					{
+						"description": "Nodes by name: a nodeset like cpn-u25-[01-40] picks the nodes it names, and other text picks the names holding it",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-u25"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Nodes with any of these tags, as tags select nodes elsewhere in the API",
+						"examples": {
+							"tags": {
+								"value": "rack=u25"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Put the ranges holding BMC ports first when true, or the other ports when false. Without it the ranges are in address order",
+						"in": "query",
+						"name": "bmc",
+						"schema": {
+							"type": "boolean"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/AddressRange"
+									},
+									"type": "array"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/AddressRange"
+									},
+									"type": "array"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "node address ranges",
 				"tags": [
 					"v1",
 					"nodes"

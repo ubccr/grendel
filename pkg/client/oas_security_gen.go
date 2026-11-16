@@ -19,6 +19,174 @@ type SecuritySource interface {
 	HeaderAuth(ctx context.Context, operationName OperationName, client *Client) (HeaderAuth, error)
 }
 
+// operationRolesCookieAuth is a private map storing roles per operation.
+var operationRolesCookieAuth = map[string][]string{
+	DELETEV1AuthSignoutOperation:           []string{},
+	DELETEV1ImagesOperation:                []string{},
+	DELETEV1NodesOperation:                 []string{},
+	DELETEV1RolesNamesOperation:            []string{},
+	DELETEV1UsersUsernamesOperation:        []string{},
+	GETV1BmcBiosOperation:                  []string{},
+	GETV1BmcBiosRegistryOperation:          []string{},
+	GETV1BmcFirmwareUpdatesOperation:       []string{},
+	GETV1BmcIdentityDefaultsOperation:      []string{},
+	GETV1BmcJobsOperation:                  []string{},
+	GETV1BmcSecurebootOperation:            []string{},
+	GETV1BmcSelOperation:                   []string{},
+	GETV1BmcStatusOperation:                []string{},
+	GETV1DbDumpOperation:                   []string{},
+	GETV1GrendelEventsOperation:            []string{},
+	GETV1GrendelEventsIDOperation:          []string{},
+	GETV1GrendelVersionOperation:           []string{},
+	GETV1ImagesOperation:                   []string{},
+	GETV1ImagesFindOperation:               []string{},
+	GETV1NodesOperation:                    []string{},
+	GETV1NodesFindOperation:                []string{},
+	GETV1NodesIpsNextOperation:             []string{},
+	GETV1NodesIpsRangesOperation:           []string{},
+	GETV1NodesProvisionStatusOperation:     []string{},
+	GETV1NodesTagsOperation:                []string{},
+	GETV1NodesTokenInterfaceOperation:      []string{},
+	GETV1RolesOperation:                    []string{},
+	GETV1SwitchNodesetLldpOperation:        []string{},
+	GETV1UsersOperation:                    []string{},
+	PATCHV1AuthResetOperation:              []string{},
+	PATCHV1NodesImageOperation:             []string{},
+	PATCHV1NodesProvisionOperation:         []string{},
+	PATCHV1NodesTagsActionOperation:        []string{},
+	PATCHV1RolesOperation:                  []string{},
+	PATCHV1UsersUsernamesEnableOperation:   []string{},
+	PATCHV1UsersUsernamesRoleOperation:     []string{},
+	POSTV1AuthSigninOperation:              []string{},
+	POSTV1AuthSignupOperation:              []string{},
+	POSTV1AuthTokenOperation:               []string{},
+	POSTV1BmcAssetTagOperation:             []string{},
+	POSTV1BmcBiosOperation:                 []string{},
+	POSTV1BmcBiosDiscardOperation:          []string{},
+	POSTV1BmcConfigureAutoOperation:        []string{},
+	POSTV1BmcConfigureImportOperation:      []string{},
+	POSTV1BmcFirmwareInstallOperation:      []string{},
+	POSTV1BmcIndicatorOperation:            []string{},
+	POSTV1BmcJobsClearOperation:            []string{},
+	POSTV1BmcLocationOperation:             []string{},
+	POSTV1BmcPowerOperation:                []string{},
+	POSTV1BmcSecurebootOperation:           []string{},
+	POSTV1BmcSecurebootKeysOperation:       []string{},
+	POSTV1BmcSecurebootKeysDeleteOperation: []string{},
+	POSTV1BmcSecurebootResetOperation:      []string{},
+	POSTV1BmcSelClearOperation:             []string{},
+	POSTV1DbRestoreOperation:               []string{},
+	POSTV1ImagesOperation:                  []string{},
+	POSTV1NodesOperation:                   []string{},
+	POSTV1RolesOperation:                   []string{},
+	POSTV1UsersOperation:                   []string{},
+}
+
+// GetRolesForCookieAuth returns the required roles for the given operation.
+//
+// This is useful for authorization scenarios where you need to know which roles
+// are required for an operation.
+//
+// Example:
+//
+//	requiredRoles := GetRolesForCookieAuth(AddPetOperation)
+//
+// Returns nil if the operation has no role requirements or if the operation is unknown.
+func GetRolesForCookieAuth(operation string) []string {
+	roles, ok := operationRolesCookieAuth[operation]
+	if !ok {
+		return nil
+	}
+	// Return a copy to prevent external modification
+	result := make([]string, len(roles))
+	copy(result, roles)
+	return result
+}
+
+// operationRolesHeaderAuth is a private map storing roles per operation.
+var operationRolesHeaderAuth = map[string][]string{
+	DELETEV1AuthSignoutOperation:           []string{},
+	DELETEV1ImagesOperation:                []string{},
+	DELETEV1NodesOperation:                 []string{},
+	DELETEV1RolesNamesOperation:            []string{},
+	DELETEV1UsersUsernamesOperation:        []string{},
+	GETV1BmcBiosOperation:                  []string{},
+	GETV1BmcBiosRegistryOperation:          []string{},
+	GETV1BmcFirmwareUpdatesOperation:       []string{},
+	GETV1BmcIdentityDefaultsOperation:      []string{},
+	GETV1BmcJobsOperation:                  []string{},
+	GETV1BmcSecurebootOperation:            []string{},
+	GETV1BmcSelOperation:                   []string{},
+	GETV1BmcStatusOperation:                []string{},
+	GETV1DbDumpOperation:                   []string{},
+	GETV1GrendelEventsOperation:            []string{},
+	GETV1GrendelEventsIDOperation:          []string{},
+	GETV1GrendelVersionOperation:           []string{},
+	GETV1ImagesOperation:                   []string{},
+	GETV1ImagesFindOperation:               []string{},
+	GETV1NodesOperation:                    []string{},
+	GETV1NodesFindOperation:                []string{},
+	GETV1NodesIpsNextOperation:             []string{},
+	GETV1NodesIpsRangesOperation:           []string{},
+	GETV1NodesProvisionStatusOperation:     []string{},
+	GETV1NodesTagsOperation:                []string{},
+	GETV1NodesTokenInterfaceOperation:      []string{},
+	GETV1RolesOperation:                    []string{},
+	GETV1SwitchNodesetLldpOperation:        []string{},
+	GETV1UsersOperation:                    []string{},
+	PATCHV1AuthResetOperation:              []string{},
+	PATCHV1NodesImageOperation:             []string{},
+	PATCHV1NodesProvisionOperation:         []string{},
+	PATCHV1NodesTagsActionOperation:        []string{},
+	PATCHV1RolesOperation:                  []string{},
+	PATCHV1UsersUsernamesEnableOperation:   []string{},
+	PATCHV1UsersUsernamesRoleOperation:     []string{},
+	POSTV1AuthSigninOperation:              []string{},
+	POSTV1AuthSignupOperation:              []string{},
+	POSTV1AuthTokenOperation:               []string{},
+	POSTV1BmcAssetTagOperation:             []string{},
+	POSTV1BmcBiosOperation:                 []string{},
+	POSTV1BmcBiosDiscardOperation:          []string{},
+	POSTV1BmcConfigureAutoOperation:        []string{},
+	POSTV1BmcConfigureImportOperation:      []string{},
+	POSTV1BmcFirmwareInstallOperation:      []string{},
+	POSTV1BmcIndicatorOperation:            []string{},
+	POSTV1BmcJobsClearOperation:            []string{},
+	POSTV1BmcLocationOperation:             []string{},
+	POSTV1BmcPowerOperation:                []string{},
+	POSTV1BmcSecurebootOperation:           []string{},
+	POSTV1BmcSecurebootKeysOperation:       []string{},
+	POSTV1BmcSecurebootKeysDeleteOperation: []string{},
+	POSTV1BmcSecurebootResetOperation:      []string{},
+	POSTV1BmcSelClearOperation:             []string{},
+	POSTV1DbRestoreOperation:               []string{},
+	POSTV1ImagesOperation:                  []string{},
+	POSTV1NodesOperation:                   []string{},
+	POSTV1RolesOperation:                   []string{},
+	POSTV1UsersOperation:                   []string{},
+}
+
+// GetRolesForHeaderAuth returns the required roles for the given operation.
+//
+// This is useful for authorization scenarios where you need to know which roles
+// are required for an operation.
+//
+// Example:
+//
+//	requiredRoles := GetRolesForHeaderAuth(AddPetOperation)
+//
+// Returns nil if the operation has no role requirements or if the operation is unknown.
+func GetRolesForHeaderAuth(operation string) []string {
+	roles, ok := operationRolesHeaderAuth[operation]
+	if !ok {
+		return nil
+	}
+	// Return a copy to prevent external modification
+	result := make([]string, len(roles))
+	copy(result, roles)
+	return result
+}
+
 func (s *Client) securityCookieAuth(ctx context.Context, operationName OperationName, req *http.Request) error {
 	t, err := s.sec.CookieAuth(ctx, operationName, s)
 	if err != nil {

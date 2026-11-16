@@ -5,6 +5,29 @@ export type ClientOptions = {
 };
 
 /**
+ * AddressRange schema
+ */
+export type AddressRange = {
+    /**
+     * how many of those ports are BMCs
+     */
+    bmc_ports?: number;
+    /**
+     * how many nodes those ports belong to
+     */
+    nodes?: number;
+    /**
+     * how many of the nodes' ports have an address in the range
+     */
+    ports?: number;
+    /**
+     * the prefix length most of the range's ports carry
+     */
+    prefix_len?: number;
+    range?: string;
+};
+
+/**
  * AuthRequest schema
  */
 export type AuthRequest = {
@@ -1000,6 +1023,57 @@ export type Lldp = {
     port_name?: string;
     system_description?: string;
     system_name?: string;
+};
+
+/**
+ * NextAddressResponse schema
+ */
+export type NextAddressResponse = {
+    /**
+     * the free addresses after the highest one in use
+     */
+    after_highest?: Array<{
+        answered?: boolean;
+        ip?: string;
+    }>;
+    /**
+     * how many addresses in the range no node holds, that aren't excluded or reserved
+     */
+    free?: number;
+    /**
+     * the highest address in the range a node holds or that is excluded, which after_highest starts from
+     */
+    highest?: string;
+    /**
+     * the lowest free addresses in the range
+     */
+    lowest?: Array<{
+        answered?: boolean;
+        ip?: string;
+    }>;
+    ping_error?: string;
+    pinged?: boolean;
+    /**
+     * the prefix length to give a port with one of the suggested addresses
+     */
+    prefix_len?: number;
+    range?: string;
+    /**
+     * addresses in the range never suggested: the subnet's network and broadcast addresses, and in a subnet larger than a /24, ones ending in .0 or .255
+     */
+    reserved?: Array<string>;
+    /**
+     * the subnet the range lies in, taken from the prefix length of the nodes in and around it, or the range itself when there are none
+     */
+    subnet?: string;
+    /**
+     * addresses in the range a node's port holds, lowest first
+     */
+    used?: Array<{
+        bmc?: boolean;
+        ip?: string;
+        node?: string;
+    }>;
 };
 
 /**
@@ -2788,6 +2862,96 @@ export type PatchV1NodesImageResponses = {
 };
 
 export type PatchV1NodesImageResponse = PatchV1NodesImageResponses[keyof PatchV1NodesImageResponses];
+
+export type GetV1NodesIpsNextData = {
+    body?: never;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query: {
+        /**
+         * The IPv4 range to search, a /16 or smaller: a CIDR, an address standing for its /24, or three octets like 10.17.25
+         */
+        cidr: string;
+        /**
+         * Suggest only the lowest free addresses, or only those after the highest used. Both lists are returned without it
+         */
+        from?: string;
+        /**
+         * How many unanswered addresses to suggest for each list, from 1 to 8 when pinging or to 64 without
+         */
+        count?: number;
+        /**
+         * Ping the suggestions
+         */
+        ping?: boolean;
+        /**
+         * Addresses to treat as taken, like ones on unsaved ports, with or without a prefix length
+         */
+        exclude?: string;
+    };
+    url: '/v1/nodes/ips/next';
+};
+
+export type GetV1NodesIpsNextErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type GetV1NodesIpsNextError = GetV1NodesIpsNextErrors[keyof GetV1NodesIpsNextErrors];
+
+export type GetV1NodesIpsNextResponses = {
+    /**
+     * OK
+     */
+    200: NextAddressResponse;
+};
+
+export type GetV1NodesIpsNextResponse = GetV1NodesIpsNextResponses[keyof GetV1NodesIpsNextResponses];
+
+export type GetV1NodesIpsRangesData = {
+    body?: never;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Nodes by name: a nodeset like cpn-u25-[01-40] picks the nodes it names, and other text picks the names holding it
+         */
+        nodeset?: string;
+        /**
+         * Nodes with any of these tags, as tags select nodes elsewhere in the API
+         */
+        tags?: string;
+        /**
+         * Put the ranges holding BMC ports first when true, or the other ports when false. Without it the ranges are in address order
+         */
+        bmc?: boolean;
+    };
+    url: '/v1/nodes/ips/ranges';
+};
+
+export type GetV1NodesIpsRangesErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type GetV1NodesIpsRangesError = GetV1NodesIpsRangesErrors[keyof GetV1NodesIpsRangesErrors];
+
+export type GetV1NodesIpsRangesResponses = {
+    /**
+     * OK
+     */
+    200: Array<AddressRange>;
+};
+
+export type GetV1NodesIpsRangesResponse = GetV1NodesIpsRangesResponses[keyof GetV1NodesIpsRangesResponses];
 
 export type PatchV1NodesProvisionData = {
     /**

@@ -14,6 +14,7 @@ import {
   SaveBar,
   Section,
 } from "@/components/form-layout";
+import { AddressInput } from "@/components/nodes/address-finder";
 import { TagCombobox } from "@/components/tag-combobox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -91,7 +92,7 @@ function OptionSelect({
 
 // the port table's columns on a wide screen; below lg each port stacks into a labelled grid
 const portColumns =
-  "lg:grid-cols-[3.25rem_minmax(4.5rem,0.6fr)_10.5rem_minmax(8rem,0.9fr)_minmax(12rem,2fr)_4rem_4.5rem_2.75rem_4.5rem]";
+  "lg:grid-cols-[3.25rem_minmax(4.5rem,0.6fr)_10.5rem_minmax(12rem,1fr)_minmax(12rem,2fr)_4rem_4.5rem_2.75rem_4.5rem]";
 
 // Cell labels a port input; the label is only shown when the ports stack on a narrow screen, the column header names it otherwise
 function Cell({
@@ -128,10 +129,15 @@ export function checkNode({ value }: { value?: Host }) {
   return { form: ports, fields: name ? { name } : {} };
 }
 
-// role names what the server uses a port for, by the same rule as Host.BootInterface and Host.InterfaceBMC
-function role(nics: Nic[], i: number) {
-  if (nics[i]?.bmc) return nics.findIndex((n) => n.bmc) === i ? "BMC" : undefined;
-  return nics.findIndex((n) => !n.bmc) === i ? "boot" : undefined;
+// sameItems says whether two lists hold the same items in the same order
+function sameItems<T>(a: T[], b: T[]) {
+  return a.length === b.length && a.every((x, i) => x === b[i]);
+}
+
+// role names what the server uses a port for, by the same rule as Host.BootInterface and Host.InterfaceBMC, from whether each port is a BMC
+function role(bmc: boolean[], i: number) {
+  if (bmc[i]) return bmc.indexOf(true) === i ? "BMC" : undefined;
+  return bmc.indexOf(false) === i ? "boot" : undefined;
 }
 
 export default function NodeForm({ data, reset }: { data?: Host; reset?: boolean }) {
@@ -172,6 +178,18 @@ export default function NodeForm({ data, reset }: { data?: Host; reset?: boolean
 
   // fields are only marked once a save has been tried, so a port isn't red while it is still being filled in
   const attempted = useStore(form.store, (st) => st.submissionAttempts > 0);
+
+  // the ports' list renders again only when a port is added or removed, so what a row shows from its port's fields, its role and whether it is empty, is read from the form as those fields change. sameItems keeps the form from rendering again unless one of them did
+  const bmcPorts = useStore(
+    form.store,
+    (st) => (st.values?.interfaces ?? []).map((n) => !!n?.bmc),
+    sameItems,
+  );
+  const emptyPorts = useStore(
+    form.store,
+    (st) => (st.values?.interfaces ?? []).map((n) => emptyPort(n)),
+    sameItems,
+  );
 
   useEffect(() => {
     form.reset();
@@ -346,9 +364,9 @@ export default function NodeForm({ data, reset }: { data?: Host; reset?: boolean
                       <span className="sr-only">Actions</span>
                     </span>
                   </div>
-                  {nics.map((nic, i) => {
-                    const r = role(nics, i);
-                    const missing = attempted && emptyPort(nic);
+                  {nics.map((_, i) => {
+                    const r = role(bmcPorts, i);
+                    const missing = attempted && emptyPorts[i];
                     return (
                       <div
                         key={i}
@@ -406,11 +424,18 @@ export default function NodeForm({ data, reset }: { data?: Host; reset?: boolean
                         <form.Field name={`interfaces[${i}].ip`}>
                           {(f) => (
                             <Cell label="IP" className="col-span-2 lg:col-span-1">
-                              <Input
-                                aria-invalid={missing}
-                                className={cellInput}
+                              <AddressInput
+                                invalid={missing}
                                 value={f.state.value ?? ""}
-                                onChange={(e) => f.handleChange(e.target.value)}
+                                onChange={f.handleChange}
+                                label={`port ${i + 1}`}
+                                port={() => {
+                                  const all = form.getFieldValue("interfaces") ?? [];
+                                  return {
+                                    bmc: all[i]?.bmc ?? false,
+                                    others: all.filter((_, j) => j !== i).map((n) => n?.ip ?? ""),
+                                  };
+                                }}
                               />
                             </Cell>
                           )}
@@ -475,23 +500,27 @@ export default function NodeForm({ data, reset }: { data?: Host; reset?: boolean
                           )}
                         </form.Field>
                         <div className="flex justify-end gap-1 sm:max-lg:col-span-3" role="cell">
-                          <Button
-                            type="button"
-                            size="icon"
-                            variant="ghost"
-                            disabled={!nic?.fqdn}
-                            nativeButton={!nic?.fqdn}
-                            render={
-                              nic?.fqdn ? (
-                                <a href={"https://" + nic.fqdn} target="_blank" rel="noreferrer" />
-                              ) : undefined
-                            }
-                          >
-                            <ExternalLink />
-                            <span className="sr-only">
-                              {nic?.fqdn ? `Open ${nic.fqdn}` : "Open FQDN"}
-                            </span>
-                          </Button>
+                          <form.Subscribe selector={(st) => st.values?.interfaces?.[i]?.fqdn}>
+                            {(fqdn) => (
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                disabled={!fqdn}
+                                nativeButton={!fqdn}
+                                render={
+                                  fqdn ? (
+                                    <a href={"https://" + fqdn} target="_blank" rel="noreferrer" />
+                                  ) : undefined
+                                }
+                              >
+                                <ExternalLink />
+                                <span className="sr-only">
+                                  {fqdn ? `Open ${fqdn}` : "Open FQDN"}
+                                </span>
+                              </Button>
+                            )}
+                          </form.Subscribe>
                           <Button
                             type="button"
                             size="icon"

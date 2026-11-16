@@ -11,6 +11,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestAddressRange_EncodeDecode(t *testing.T) {
+	var typ AddressRange
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 AddressRange
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestAuthRequest_EncodeDecode(t *testing.T) {
 	var typ AuthRequest
 	typ.SetFake()
@@ -1409,6 +1421,54 @@ func TestLLDP_EncodeDecode(t *testing.T) {
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
 	var typ2 LLDP
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestNextAddressResponse_EncodeDecode(t *testing.T) {
+	var typ NextAddressResponse
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 NextAddressResponse
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestNextAddressResponseAfterHighestItem_EncodeDecode(t *testing.T) {
+	var typ NextAddressResponseAfterHighestItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 NextAddressResponseAfterHighestItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestNextAddressResponseLowestItem_EncodeDecode(t *testing.T) {
+	var typ NextAddressResponseLowestItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 NextAddressResponseLowestItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestNextAddressResponseUsedItem_EncodeDecode(t *testing.T) {
+	var typ NextAddressResponseUsedItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 NextAddressResponseUsedItem
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestNodeAddRequest_EncodeDecode(t *testing.T) {

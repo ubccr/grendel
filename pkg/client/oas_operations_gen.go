@@ -27,6 +27,8 @@ const (
 	GETV1ImagesFindOperation               OperationName = "GETV1ImagesFind"
 	GETV1NodesOperation                    OperationName = "GETV1Nodes"
 	GETV1NodesFindOperation                OperationName = "GETV1NodesFind"
+	GETV1NodesIpsNextOperation             OperationName = "GETV1NodesIpsNext"
+	GETV1NodesIpsRangesOperation           OperationName = "GETV1NodesIpsRanges"
 	GETV1NodesProvisionStatusOperation     OperationName = "GETV1NodesProvisionStatus"
 	GETV1NodesTagsOperation                OperationName = "GETV1NodesTags"
 	GETV1NodesTokenInterfaceOperation      OperationName = "GETV1NodesTokenInterface"
