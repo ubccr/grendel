@@ -26,9 +26,11 @@ func init() {
 	viper.SetDefault("bmc.run_timeout", time.Minute*4)
 	viper.SetDefault("bmc.rate_limit_per_second", 0)
 
-	viper.SetDefault("bmc.gofish.basic_auth", false)
+	// basic auth sends the credentials with each request rather than logging in and out of a Redfish session, which saves a login and a logout per node per operation and never holds one of the few sessions a BMC allows
+	viper.SetDefault("bmc.gofish.basic_auth", true)
 	viper.SetDefault("bmc.gofish.max_concurrent_requests", 1)
-	viper.SetDefault("bmc.gofish.reuse_connections", false)
+	// reusing connections keeps one connection open for all of an operation's requests to a BMC, rather than a TCP connection and TLS handshake for each. It lasts as long as the operation, since each one builds its own client
+	viper.SetDefault("bmc.gofish.reuse_connections", true)
 	viper.SetDefault("bmc.gofish.client_timeout", time.Second*60)
 	viper.SetDefault("bmc.gofish.dial_timeout", time.Second*5)
 	viper.SetDefault("bmc.gofish.dial_keep_alive_timeout", time.Second*30)

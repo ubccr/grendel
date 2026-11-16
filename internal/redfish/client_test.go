@@ -210,3 +210,15 @@ func TestCloseAfterNodeDeadline(t *testing.T) {
 	require.False(t, results[0].Success)
 	assert.Equal(t, 1, f.hits[sessionsPath+"/1"], "the session must not be left open")
 }
+
+// TestBasicAuthSendsNoLogout keeps basic auth free of session traffic: with no session, gofish's Logout has nothing to delete and sends nothing
+func TestBasicAuthSendsNoLogout(t *testing.T) {
+	f := dellFixture()
+	srv := f.serve(t)
+
+	results := testService(nil).Status(context.Background(), []Target{{Name: "cpn-a01-01", Addr: srv.URL}})
+
+	require.Len(t, results, 1)
+	require.True(t, results[0].Success, "message was: %s", results[0].Message)
+	assert.Empty(t, f.writes, "a status read under basic auth writes nothing, a logout included")
+}

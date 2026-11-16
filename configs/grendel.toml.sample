@@ -224,7 +224,7 @@ cors = false
 #------------------------------------------------------------------------------
 [events]
 # How long finished events are kept before they are deleted, as a Go duration. 0 keeps them forever
-#retention = 60d"
+retention = 60d"
 
 #------------------------------------------------------------------------------
 # Client Config
@@ -308,10 +308,10 @@ cipher_suites = [17, 3]
 [bmc.gofish]
 # Advanced gofish connection options. See https://github.com/ubccr/grendel/blob/main/internal/redfish/client.go for implementation details
 max_concurrent_requests = 1
-reuse_connections = false
+reuse_connections = true
 
-# Log in with basic auth instead of creating a Redfish session. Required for mockup server
-#basic_auth = false
+# Use basic auth instead of creating a Redfish session. Required for mockup server
+basic_auth = true
 
 client_timeout = "60s"
 dial_timeout = "5s"
