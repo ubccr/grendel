@@ -128,13 +128,3 @@ export function tokenClaims(token: string): TokenClaims {
     return {};
   }
 }
-
-// clientConfig is the part of grendel.toml that points the CLI at this server with the token. insecure is left commented out, for a server whose certificate the CLI can't verify, such as a self-signed one
-export function clientConfig(endpoint: string, token: string) {
-  return [
-    "[client]",
-    `api_endpoint = "${endpoint}"`,
-    `api_key = "${token}"`,
-    "# insecure = true  # only if this server's certificate is self-signed",
-  ].join("\n");
-}

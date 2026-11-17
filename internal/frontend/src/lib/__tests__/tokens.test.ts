@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  clientConfig,
   expirySeconds,
   expiryLabel,
   expiryOptions,
@@ -151,15 +150,5 @@ describe("tokenClaims", () => {
 describe("tokenParts", () => {
   it("splits a token at its dots", () => {
     expect(tokenParts("a.b.c")).toEqual({ header: "a", claims: "b", signature: "c" });
-  });
-});
-
-describe("clientConfig", () => {
-  it("writes the client section of grendel.toml", () => {
-    expect(clientConfig("https://grendel:8080", "t").split("\n").slice(0, 3)).toEqual([
-      "[client]",
-      'api_endpoint = "https://grendel:8080"',
-      'api_key = "t"',
-    ]);
   });
 });

@@ -6,14 +6,7 @@ import {
 import { AccountPanel, SideNote } from "@/components/account-panel";
 import { Fact } from "@/components/detail-header";
 import { Button } from "@/components/ui/button";
-import {
-  CodeBlock,
-  CodeBlockActions,
-  CodeBlockContent,
-  CodeBlockCopyButton,
-  CodeBlockHeader,
-  CodeBlockTitle,
-} from "@/components/ui/code-block";
+import { CodeBlockCopyButton } from "@/components/ui/code-block";
 import {
   Combobox,
   ComboboxContent,
@@ -34,7 +27,6 @@ import {
 import { useUser } from "@/hooks/user-provider";
 import { authErrorMessage } from "@/lib/auth-form";
 import {
-  clientConfig,
   DEFAULT_EXPIRY,
   expiryLabel,
   expiryOptions,
@@ -49,7 +41,7 @@ import { relativeTime } from "@/lib/utils";
 import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { FileCog, LoaderCircle } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -274,12 +266,11 @@ function AboutTokens() {
   );
 }
 
-// TokenSlip shows a token just made, once: who it acts as, until when, the token itself, and the lines that point the CLI at this server with it
+// TokenSlip shows a token just made, once: who it acts as, until when, and the token itself
 function TokenSlip({ token }: { token: string }) {
   const ref = useRef<HTMLElement>(null);
   const claims = tokenClaims(token);
   const parts = tokenParts(token);
-  const config = clientConfig(window.location.origin, token);
   const expires = claims.exp ? claims.exp * 1000 : undefined;
   const expiresIn = expires ? relativeTime(expires) : undefined;
   const copyFailed = () =>
