@@ -18,7 +18,7 @@ to 1500 nodes.
   * [Frontend demo](https://grendel-demo.ccr.buffalo.edu) User/pass = `grendel-demo`
 * DHCP/PXE/TFTP provisioning
 * DNS forward and reverse resolution
-* Automatic host discovery
+* Bulk node import from switch MAC tables and BMC network interfaces
 * Diskful and Stateless provisioning
 * BMC/iDRAC control via RedFish and IPMI
 * Authorized provisioning using Branca tokens
@@ -109,9 +109,8 @@ Create the following JSON file `host.json`:
 
 ### Start Grendel services
 
-Grendel ships as two binaries. `grendeld` is the server: it runs the services
-and the node discovery commands, and is the only one that needs to run
-privileged. `grendel` is the command line client, and talks to a running server
+Grendel ships as two binaries. `grendeld` is the server: it runs the services,
+and is the only one that needs to run privileged. `grendel` is the command line client, and talks to a running server
 over the API.
 
 ```

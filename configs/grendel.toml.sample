@@ -242,14 +242,54 @@ api_endpoint = "/var/lib/grendel/grendel-api.socket"
 insecure = false
 
 #------------------------------------------------------------------------------
+# Network switches
+#------------------------------------------------------------------------------
+# Switches are nodes tagged "switch" plus one of arista, sonic or dellos10, and Grendel reaches them on their first interface. Arista and SONiC are read over gNMI, Dell OS10 over SNMP.
+[switch]
+# gNMI login. Either left empty falls back to the older bmc.switch_admin_username or bmc.switch_admin_password.
+username = ""
+password = ""
+timeout = "30s"
+
+[switch.gnmi]
+port = 6030
+# Plaintext gRPC with no TLS, which is the EOS default for "management api gnmi".
+plaintext = false
+# Accept the switch's self-signed certificate. Ignored when ca_cert is set.
+skip_verify = true
+ca_cert = ""
+# Network instance holding the MAC table. Some SONiC builds need "*" or a VLAN name here.
+network_instance = "default"
+# gNMI target sent in the request prefix, for switches or proxies that serve several targets. Empty sends none.
+target = ""
+
+# Any gNMI setting above can be overridden per NOS.
+[switch.gnmi.arista]
+plaintext = true
+
+[switch.gnmi.sonic]
+port = 8080
+
+[switch.snmp]
+# "2c" or "3"
+version = "2c"
+community = "public"
+port = 161
+timeout = "5s"
+retries = 2
+# SNMPv3 only. auth_proto: MD5, SHA, SHA224, SHA256, SHA384, SHA512. priv_proto: DES, AES, AES192, AES256, AES192C, AES256C.
+#user = ""
+#auth_proto = "SHA"
+#auth_pass = ""
+#priv_proto = "AES"
+#priv_pass = ""
+
+#------------------------------------------------------------------------------
 # Global BMC Config
 #------------------------------------------------------------------------------
 [bmc]
 user = ""
 password = ""
-switch_admin_username = "admin"
-switch_admin_password = ""
-switch_admin_password_salt = ""
 
 # Allow unsigned https certs for redfish queries
 insecure = true
@@ -318,11 +358,3 @@ dial_timeout = "5s"
 dial_keep_alive_timeout = "30s"
 tls_handshake_timeout = "10s"
 idle_conn_timeout = "90s"
-
-#------------------------------------------------------------------------------
-# Automatic Host Discovery Config
-#------------------------------------------------------------------------------
-[discovery]
-user = ""
-password = ""
-domain = ""

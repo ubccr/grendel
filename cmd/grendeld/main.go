@@ -5,7 +5,6 @@
 package main
 
 import (
-	_ "github.com/ubccr/grendel/cmd/grendeld/discover"
 	_ "github.com/ubccr/grendel/cmd/grendeld/fwcmd"
 	_ "github.com/ubccr/grendel/cmd/grendeld/serve"
 	"github.com/ubccr/grendel/cmd/shared"

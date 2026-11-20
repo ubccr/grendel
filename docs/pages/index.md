@@ -14,7 +14,7 @@ from 200 to 1500 nodes.
 
 * DHCP/PXE/TFTP provisioning
 * DNS forward and reverse resolution
-* Automatic host discovery
+* Bulk node import from switch MAC tables and BMC network interfaces
 * Diskful and Stateless (Live image) provisioning
 * BMC/iDRAC control via RedFish and IPMI
 * Authorized provisioning using Branca tokens

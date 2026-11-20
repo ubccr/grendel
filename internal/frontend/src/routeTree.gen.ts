@@ -42,6 +42,7 @@ import { Route as NodesNodeIndexRouteImport } from './routes/nodes/$node/index'
 import { Route as NodesNodeBiosRouteImport } from './routes/nodes/$node/bios'
 import { Route as NodesNodeConsoleRouteImport } from './routes/nodes/$node/console'
 import { Route as NodesNodeLldpRouteImport } from './routes/nodes/$node/lldp'
+import { Route as NodesNodeMacsRouteImport } from './routes/nodes/$node/macs'
 import { Route as NodesNodeNodeRouteImport } from './routes/nodes/$node/node'
 import { Route as NodesNodeProvisionRouteImport } from './routes/nodes/$node/provision'
 import { Route as NodesNodeRedfishRouteImport } from './routes/nodes/$node/redfish'
@@ -218,6 +219,11 @@ const NodesNodeLldpRoute = NodesNodeLldpRouteImport.update({
   path: '/lldp',
   getParentRoute: () => NodesNodeRouteRoute,
 } as any)
+const NodesNodeMacsRoute = NodesNodeMacsRouteImport.update({
+  id: '/macs',
+  path: '/macs',
+  getParentRoute: () => NodesNodeRouteRoute,
+} as any)
 const NodesNodeNodeRoute = NodesNodeNodeRouteImport.update({
   id: '/node',
   path: '/node',
@@ -300,6 +306,7 @@ export interface FileRoutesByFullPath {
   '/nodes/$node/bios': typeof NodesNodeBiosRoute
   '/nodes/$node/console': typeof NodesNodeConsoleRoute
   '/nodes/$node/lldp': typeof NodesNodeLldpRoute
+  '/nodes/$node/macs': typeof NodesNodeMacsRoute
   '/nodes/$node/node': typeof NodesNodeNodeRoute
   '/nodes/$node/provision': typeof NodesNodeProvisionRoute
   '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
@@ -338,6 +345,7 @@ export interface FileRoutesByTo {
   '/nodes/$node/bios': typeof NodesNodeBiosRoute
   '/nodes/$node/console': typeof NodesNodeConsoleRoute
   '/nodes/$node/lldp': typeof NodesNodeLldpRoute
+  '/nodes/$node/macs': typeof NodesNodeMacsRoute
   '/nodes/$node/node': typeof NodesNodeNodeRoute
   '/nodes/$node/provision': typeof NodesNodeProvisionRoute
   '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
@@ -384,6 +392,7 @@ export interface FileRoutesById {
   '/nodes/$node/bios': typeof NodesNodeBiosRoute
   '/nodes/$node/console': typeof NodesNodeConsoleRoute
   '/nodes/$node/lldp': typeof NodesNodeLldpRoute
+  '/nodes/$node/macs': typeof NodesNodeMacsRoute
   '/nodes/$node/node': typeof NodesNodeNodeRoute
   '/nodes/$node/provision': typeof NodesNodeProvisionRoute
   '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
@@ -431,6 +440,7 @@ export interface FileRouteTypes {
     | '/nodes/$node/bios'
     | '/nodes/$node/console'
     | '/nodes/$node/lldp'
+    | '/nodes/$node/macs'
     | '/nodes/$node/node'
     | '/nodes/$node/provision'
     | '/nodes/$node/redfish'
@@ -469,6 +479,7 @@ export interface FileRouteTypes {
     | '/nodes/$node/bios'
     | '/nodes/$node/console'
     | '/nodes/$node/lldp'
+    | '/nodes/$node/macs'
     | '/nodes/$node/node'
     | '/nodes/$node/provision'
     | '/nodes/$node/redfish'
@@ -514,6 +525,7 @@ export interface FileRouteTypes {
     | '/nodes/$node/bios'
     | '/nodes/$node/console'
     | '/nodes/$node/lldp'
+    | '/nodes/$node/macs'
     | '/nodes/$node/node'
     | '/nodes/$node/provision'
     | '/nodes/$node/redfish'
@@ -782,6 +794,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NodesNodeLldpRouteImport
       parentRoute: typeof NodesNodeRouteRoute
     }
+    '/nodes/$node/macs': {
+      id: '/nodes/$node/macs'
+      path: '/macs'
+      fullPath: '/nodes/$node/macs'
+      preLoaderRoute: typeof NodesNodeMacsRouteImport
+      parentRoute: typeof NodesNodeRouteRoute
+    }
     '/nodes/$node/node': {
       id: '/nodes/$node/node'
       path: '/node'
@@ -873,6 +892,7 @@ interface NodesNodeRouteRouteChildren {
   NodesNodeBiosRoute: typeof NodesNodeBiosRoute
   NodesNodeConsoleRoute: typeof NodesNodeConsoleRoute
   NodesNodeLldpRoute: typeof NodesNodeLldpRoute
+  NodesNodeMacsRoute: typeof NodesNodeMacsRoute
   NodesNodeNodeRoute: typeof NodesNodeNodeRoute
   NodesNodeProvisionRoute: typeof NodesNodeProvisionRoute
   NodesNodeRedfishRoute: typeof NodesNodeRedfishRoute
@@ -884,6 +904,7 @@ const NodesNodeRouteRouteChildren: NodesNodeRouteRouteChildren = {
   NodesNodeBiosRoute: NodesNodeBiosRoute,
   NodesNodeConsoleRoute: NodesNodeConsoleRoute,
   NodesNodeLldpRoute: NodesNodeLldpRoute,
+  NodesNodeMacsRoute: NodesNodeMacsRoute,
   NodesNodeNodeRoute: NodesNodeNodeRoute,
   NodesNodeProvisionRoute: NodesNodeProvisionRoute,
   NodesNodeRedfishRoute: NodesNodeRedfishRoute,

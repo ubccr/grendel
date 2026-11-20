@@ -1,4 +1,5 @@
 import { getV1Nodes, getV1NodesProvisionStatus, Host } from "@/client";
+import { NodeLink } from "@/components/nodes/node-link";
 import ActionsSheet from "@/components/actions-sheet";
 import NodeActions from "@/components/actions/nodes";
 import { DataTable, DataTableActions } from "@/components/data-table/data-table";
@@ -10,7 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { matchesTags } from "@/lib/tags";
 import AuthRedirect from "@/lib/auth";
 import { stateLabels } from "@/lib/provision";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import type { DataTableColumnDef } from "@/components/data-table/features";
 import { useMemo } from "react";
 
@@ -38,15 +39,7 @@ function TableComponent() {
         header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
         cell: ({ row }) => {
           const name = row.original?.name;
-          return (
-            <Link
-              to={"/nodes/$node/node"}
-              params={{ node: name ?? "unknown" }}
-              className="hover:underline"
-            >
-              {name}
-            </Link>
-          );
+          return <NodeLink node={name ?? "unknown"}>{name}</NodeLink>;
         },
       },
       {

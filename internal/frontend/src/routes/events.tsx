@@ -2,6 +2,7 @@ import {
   getV1GrendelEventsIdOptions,
   getV1GrendelEventsOptions,
 } from "@/client/@tanstack/react-query.gen";
+import { NodeLink } from "@/components/nodes/node-link";
 import { DataTable, type RowTone } from "@/components/data-table/data-table";
 import type { DataTableColumnDef, DataTableRow } from "@/components/data-table/features";
 import { DataTableColumnHeader } from "@/components/data-table/header";
@@ -21,7 +22,7 @@ import AuthRedirect from "@/lib/auth";
 import { eventRows, isRunning, nodeNote, nodeSeverity, type EventRow } from "@/lib/events";
 import { relativeTime, severityOf, severityVariant, type Severity } from "@/lib/utils";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
 import { useMemo } from "react";
 
@@ -197,13 +198,7 @@ function EventNodes({ event }: { event: EventRow }) {
         {data.nodes?.map((n) => (
           <TableRow key={n.node}>
             <TableCell>
-              <Link
-                to="/nodes/$node/node"
-                params={{ node: n.node ?? "" }}
-                className="hover:underline"
-              >
-                {n.node}
-              </Link>
+              <NodeLink node={n.node ?? ""} />
             </TableCell>
             <TableCell>
               <Badge variant={severityVariant(nodeSeverity(n.state))}>{n.state}</Badge>

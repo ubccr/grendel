@@ -5,7 +5,7 @@ The following are tips for deploying Grendel in a production environment.
 ## CLI
 
 Grendel installs two binaries. `grendeld` is the server: it runs the
-services and the node discovery commands. `grendel` is the command
+services. `grendel` is the command
 line client for everything else — nodes, images, users, roles, BMCs — and reaches
 a running server over the API, either the unix socket or a TCP endpoint.
 

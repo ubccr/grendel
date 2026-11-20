@@ -3,6 +3,13 @@ import { ArrowDown, ArrowUp, ArrowUpDown, Info, X } from "lucide-react";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 import { TagCombobox } from "@/components/tag-combobox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import {
   InputGroup,
@@ -23,6 +30,8 @@ interface DataTableColumnHeaderProps<TData extends RowData> {
   column: DataTableColumn<TData, any>;
   title: string;
   className?: string;
+  // options turns the filter into a choice of these, for a column whose values are a few known kinds. Given here rather than in the column definition, they can carry counts that change without the columns being rebuilt
+  options?: FilterOption[];
 }
 
 // DataTableColumnHeader is a column's whole header in one line: a filter box named for the column, with the sort control at its end. The name is the box's placeholder and gives way to what is typed, since the column being filtered is already known. A column that cannot be filtered shows its name with the sort control beside it
@@ -30,6 +39,7 @@ export function DataTableColumnHeader<TData extends RowData>({
   column,
   title,
   className,
+  options,
 }: DataTableColumnHeaderProps<TData>) {
   const filterValue = column.getFilterValue();
   const setFilter =
@@ -40,6 +50,20 @@ export function DataTableColumnHeader<TData extends RowData>({
     return (
       <div className={cn("flex h-8 items-center gap-1", className)}>
         <span>{title}</span>
+        {sort}
+      </div>
+    );
+  }
+
+  if (options) {
+    return (
+      <div className={cn("flex items-center gap-1", className)}>
+        <ChoiceFilter
+          title={title}
+          options={options}
+          value={(filterValue as string) ?? ""}
+          onValueChange={(v) => setFilter(column.id, v || undefined)}
+        />
         {sort}
       </div>
     );
@@ -69,19 +93,70 @@ export function DataTableColumnHeader<TData extends RowData>({
   );
 }
 
-// FilterBox is a column's filter input. It keeps what is typed in its own state and hands it to the table after a short pause, so typing never waits on the table filtering and rendering its rows. A change made elsewhere, such as clearing all filters, still reaches the box
-function FilterBox({
+// FilterOption is one choice of a column's choice filter: the value its filter function is given, and how many rows it would show
+export type FilterOption = { value: string; label: string; count?: number };
+
+// ChoiceFilter is the filter of a column whose values are a few known kinds, like a status, picked from a list rather than typed
+function ChoiceFilter({
   title,
+  options,
+  value,
+  onValueChange,
+}: {
+  title: string;
+  options: FilterOption[];
+  value: string;
+  onValueChange: (value: string) => void;
+}) {
+  const items = [{ value: "", label: title }, ...options];
+  return (
+    <Select items={items} value={value} onValueChange={(v) => onValueChange((v as string) ?? "")}>
+      <SelectTrigger
+        size="sm"
+        aria-label={`Filter ${title}`}
+        className={cn(
+          "h-8 w-full min-w-28 bg-background font-normal",
+          !value && "font-medium text-muted-foreground",
+        )}
+      >
+        <SelectValue />
+      </SelectTrigger>
+      {/* sized to its options rather than the narrow header box, and dropped below it, so the counts line up in a column */}
+      <SelectContent
+        align="end"
+        alignItemWithTrigger={false}
+        className="w-auto min-w-(--anchor-width)"
+      >
+        <SelectItem value="">All</SelectItem>
+        {options.map((o) => (
+          <SelectItem key={o.value} value={o.value}>
+            {o.label}
+            {o.count !== undefined && (
+              <span className="ml-auto pl-3 text-muted-foreground tabular-nums">{o.count}</span>
+            )}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
+// FilterBox is a column's filter input. It keeps what is typed in its own state and hands it to the table after a short pause, so typing never waits on the table filtering and rendering its rows. A change made elsewhere, such as clearing all filters, still reaches the box
+export function FilterBox({
+  title,
+  hint,
   className,
   value,
   onValueChange,
   sort,
 }: {
   title: string;
+  // hint is shown on hover, for a box that reads more than plain text
+  hint?: string;
   className?: string;
   value: string;
   onValueChange: (value: string) => void;
-  sort: React.ReactNode;
+  sort?: React.ReactNode;
 }) {
   const [draft, setDraft] = useState(value);
   const sent = useRef(value);
@@ -110,6 +185,7 @@ function FilterBox({
         className="h-8 px-2.5 placeholder:font-medium placeholder:text-muted-foreground"
         placeholder={title}
         aria-label={`Filter ${title}`}
+        title={hint}
         value={draft}
         onChange={(e) => send(e.target.value, 150)}
       />

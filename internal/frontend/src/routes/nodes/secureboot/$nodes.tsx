@@ -1,4 +1,5 @@
 import { getV1BmcSecureboot } from "@/client";
+import { NodeLink } from "@/components/nodes/node-link";
 import KeysPanel from "@/components/secureboot/keys-panel";
 import { look, type Tone } from "@/components/secureboot/state";
 import SecureBootToggle from "@/components/secureboot/toggle";
@@ -7,7 +8,7 @@ import AuthRedirect from "@/lib/auth";
 import { fold } from "@/lib/nodeset";
 import type { SecureBootResult } from "@/lib/secureboot";
 import { cn } from "@/lib/utils";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { ServerOff, type LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/nodes/secureboot/$nodes")({
@@ -98,13 +99,9 @@ function RouteComponent() {
                     </div>
                     <div className="truncate text-xs text-muted-foreground" title={folded}>
                       {g.nodes.length === 1 ? (
-                        <Link
-                          to="/nodes/$node/secureboot"
-                          params={{ node: g.nodes[0] }}
-                          className="hover:underline"
-                        >
+                        <NodeLink node={g.nodes[0]} to="/nodes/$node/secureboot">
                           {folded}
-                        </Link>
+                        </NodeLink>
                       ) : (
                         folded
                       )}

@@ -88,6 +88,17 @@ type GETV1BmcJobsParams struct {
 	Accept OptString `json:",omitempty,omitzero"`
 }
 
+// GETV1BmcNicsParams is parameters of GET_/v1/bmc/nics operation.
+type GETV1BmcNicsParams struct {
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString `json:",omitempty,omitzero"`
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags OptString `json:",omitempty,omitzero"`
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
+}
+
 // GETV1BmcSecurebootParams is parameters of GET_/v1/bmc/secureboot operation.
 type GETV1BmcSecurebootParams struct {
 	// Also list the certificates and signatures in each database.
@@ -256,6 +267,17 @@ type GETV1SwitchNodesetLldpParams struct {
 	Ports   OptString `json:",omitempty,omitzero"`
 	Accept  OptString `json:",omitempty,omitzero"`
 	Nodeset string
+}
+
+// GETV1SwitchScanParams is parameters of GET_/v1/switch/scan operation.
+type GETV1SwitchScanParams struct {
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString `json:",omitempty,omitzero"`
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags OptString `json:",omitempty,omitzero"`
+	// Select every node in the database. Required when no nodeset or tags are given.
+	All    OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
 }
 
 // GETV1UsersParams is parameters of GET_/v1/users operation.
@@ -510,6 +532,11 @@ type POSTV1ImagesParams struct {
 
 // POSTV1NodesParams is parameters of POST_/v1/nodes operation.
 type POSTV1NodesParams struct {
+	Accept OptString `json:",omitempty,omitzero"`
+}
+
+// POSTV1NodesImportParams is parameters of POST_/v1/nodes/import operation.
+type POSTV1NodesImportParams struct {
 	Accept OptString `json:",omitempty,omitzero"`
 }
 

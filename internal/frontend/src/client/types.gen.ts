@@ -465,6 +465,36 @@ export type BmcResponseModelBmcLocationResult = {
 };
 
 /**
+ * BmcResponse_model.BmcNICList schema
+ */
+export type BmcResponseModelBmcNicList = {
+    results?: Array<{
+        data?: {
+            nics?: Array<{
+                enabled?: boolean;
+                id?: string;
+                link?: string;
+                mac?: string;
+                name?: string;
+                speed_mbps?: number;
+            }>;
+        };
+        duration_ms?: number;
+        message?: string;
+        node?: string;
+        success?: boolean;
+    }>;
+    run_id?: string;
+    summary?: {
+        duration_ms?: number;
+        failed?: number;
+        failed_nodes?: string;
+        succeeded?: number;
+        total?: number;
+    };
+};
+
+/**
  * BmcResponse_model.BmcSELLog schema
  */
 export type BmcResponseModelBmcSelLog = {
@@ -1131,6 +1161,68 @@ export type NodeBootTokenResponse = {
 };
 
 /**
+ * NodeImportRequest schema
+ */
+export type NodeImportRequest = {
+    dry_run?: boolean;
+    /**
+     * Where in a range to start: lowest, the default, or after_highest
+     */
+    from?: string;
+    /**
+     * Ping the addresses taken from a range and skip any that answer. Only done on a dry run
+     */
+    ping?: boolean;
+    ranges?: {
+        bmc?: string;
+        boot?: string;
+    };
+    rows?: Array<{
+        bmc?: boolean;
+        fqdn?: string;
+        ifname?: string;
+        ip?: string;
+        mac?: string;
+        mtu?: number;
+        node?: string;
+        tags?: Array<string>;
+        vlan?: string;
+    }>;
+};
+
+/**
+ * NodeImportResponse schema
+ */
+export type NodeImportResponse = {
+    committed?: boolean;
+    ping_error?: string;
+    pinged?: boolean;
+    rows?: Array<{
+        action?: string;
+        answered?: boolean;
+        assigned?: boolean;
+        bmc?: boolean;
+        fqdn?: string;
+        ifname?: string;
+        ip?: string;
+        mac?: string;
+        mtu?: number;
+        node?: string;
+        reason?: string;
+        replaces?: string;
+        tags?: Array<string>;
+        vlan?: string;
+    }>;
+    summary?: {
+        add?: number;
+        conflict?: number;
+        create?: number;
+        replace?: number;
+        unchanged?: number;
+    };
+};
+
+/**
  * NodeProvisionRequest schema
  */
 export type NodeProvisionRequest = {
@@ -1194,6 +1286,30 @@ export type ProvisionStatus = {
     started_at?: string;
     state?: string;
     updated_at?: string;
+};
+
+/**
+ * SwitchScanResponse schema
+ */
+export type SwitchScanResponse = {
+    switches?: Array<{
+        address?: string;
+        error?: string;
+        error_code?: string;
+        name?: string;
+        nos?: string;
+        ports?: Array<{
+            description?: string;
+            ifname?: string;
+            macs?: Array<{
+                bmc?: boolean;
+                mac?: string;
+                owner?: string;
+                vlan?: string;
+            }>;
+        }>;
+        warnings?: Array<string>;
+    }>;
 };
 
 /**
@@ -1999,6 +2115,47 @@ export type PostV1BmcLocationResponses = {
 };
 
 export type PostV1BmcLocationResponse = PostV1BmcLocationResponses[keyof PostV1BmcLocationResponses];
+
+export type GetV1BmcNicsData = {
+    body?: never;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
+    };
+    url: '/v1/bmc/nics';
+};
+
+export type GetV1BmcNicsErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type GetV1BmcNicsError = GetV1BmcNicsErrors[keyof GetV1BmcNicsErrors];
+
+export type GetV1BmcNicsResponses = {
+    /**
+     * OK
+     */
+    200: BmcResponseModelBmcNicList;
+};
+
+export type GetV1BmcNicsResponse = GetV1BmcNicsResponses[keyof GetV1BmcNicsResponses];
 
 export type PostV1BmcPowerData = {
     /**
@@ -2863,6 +3020,37 @@ export type PatchV1NodesImageResponses = {
 
 export type PatchV1NodesImageResponse = PatchV1NodesImageResponses[keyof PatchV1NodesImageResponses];
 
+export type PostV1NodesImportData = {
+    /**
+     * Request body for api.NodeImportRequest
+     */
+    body: NodeImportRequest;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/v1/nodes/import';
+};
+
+export type PostV1NodesImportErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type PostV1NodesImportError = PostV1NodesImportErrors[keyof PostV1NodesImportErrors];
+
+export type PostV1NodesImportResponses = {
+    /**
+     * OK
+     */
+    200: NodeImportResponse;
+};
+
+export type PostV1NodesImportResponse = PostV1NodesImportResponses[keyof PostV1NodesImportResponses];
+
 export type GetV1NodesIpsNextData = {
     body?: never;
     headers?: {
@@ -3276,6 +3464,47 @@ export type DeleteV1RolesNamesResponses = {
 };
 
 export type DeleteV1RolesNamesResponse = DeleteV1RolesNamesResponses[keyof DeleteV1RolesNamesResponses];
+
+export type GetV1SwitchScanData = {
+    body?: never;
+    headers?: {
+        Accept?: string;
+    };
+    path?: never;
+    query?: {
+        /**
+         * Filter by nodeset. Minimum of one query parameter is required
+         */
+        nodeset?: string;
+        /**
+         * Filter by tags. Minimum of one query parameter is required
+         */
+        tags?: string;
+        /**
+         * Select every node in the database. Required when no nodeset or tags are given
+         */
+        all?: string;
+    };
+    url: '/v1/switch/scan';
+};
+
+export type GetV1SwitchScanErrors = {
+    /**
+     * Default Error
+     */
+    default: HttpError;
+};
+
+export type GetV1SwitchScanError = GetV1SwitchScanErrors[keyof GetV1SwitchScanErrors];
+
+export type GetV1SwitchScanResponses = {
+    /**
+     * OK
+     */
+    200: SwitchScanResponse;
+};
+
+export type GetV1SwitchScanResponse = GetV1SwitchScanResponses[keyof GetV1SwitchScanResponses];
 
 export type GetV1SwitchNodesetLldpData = {
     body?: never;

@@ -84,6 +84,11 @@ func (s *Service) Status(ctx context.Context, targets []Target) []NodeResult[mod
 	return run(ctx, s, targets, s.statusOne)
 }
 
+// NICs lists the host network ports of every target
+func (s *Service) NICs(ctx context.Context, targets []Target) []NodeResult[model.BmcNICList] {
+	return run(ctx, s, targets, s.nicsOne)
+}
+
 // Power changes the power state of every target, or of their BMCs
 func (s *Service) Power(ctx context.Context, targets []Target, req PowerRequest) []NodeResult[Ack] {
 	return run(ctx, s, targets, func(ctx context.Context, t Target) (*Ack, error) { return s.powerOne(ctx, t, req) })

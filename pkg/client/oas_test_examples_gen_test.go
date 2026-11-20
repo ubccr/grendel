@@ -629,6 +629,66 @@ func TestBmcResponseModelBmcLocationResultSummary_EncodeDecode(t *testing.T) {
 	var typ2 BmcResponseModelBmcLocationResultSummary
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestBmcResponseModelBmcNICList_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcNICList
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcNICList
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcNICListResultsItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcNICListResultsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcNICListResultsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcNICListResultsItemData_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcNICListResultsItemData
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcNICListResultsItemData
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcNICListResultsItemDataNicsItem_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcNICListResultsItemDataNicsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcNICListResultsItemDataNicsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestBmcResponseModelBmcNICListSummary_EncodeDecode(t *testing.T) {
+	var typ BmcResponseModelBmcNICListSummary
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 BmcResponseModelBmcNICListSummary
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestBmcResponseModelBmcSELLog_EncodeDecode(t *testing.T) {
 	var typ BmcResponseModelBmcSELLog
 	typ.SetFake()
@@ -1555,6 +1615,78 @@ func TestNodeBootTokenResponseNodesItem_EncodeDecode(t *testing.T) {
 	var typ2 NodeBootTokenResponseNodesItem
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestNodeImportRequest_EncodeDecode(t *testing.T) {
+	var typ NodeImportRequest
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 NodeImportRequest
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestNodeImportRequestRanges_EncodeDecode(t *testing.T) {
+	var typ NodeImportRequestRanges
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 NodeImportRequestRanges
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestNodeImportRequestRowsItem_EncodeDecode(t *testing.T) {
+	var typ NodeImportRequestRowsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 NodeImportRequestRowsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestNodeImportResponse_EncodeDecode(t *testing.T) {
+	var typ NodeImportResponse
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 NodeImportResponse
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestNodeImportResponseRowsItem_EncodeDecode(t *testing.T) {
+	var typ NodeImportResponseRowsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 NodeImportResponseRowsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestNodeImportResponseSummary_EncodeDecode(t *testing.T) {
+	var typ NodeImportResponseSummary
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 NodeImportResponseSummary
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestNodeProvisionRequest_EncodeDecode(t *testing.T) {
 	var typ NodeProvisionRequest
 	typ.SetFake()
@@ -1665,6 +1797,54 @@ func TestProvisionStatusStages_EncodeDecode(t *testing.T) {
 
 	var typ2 ProvisionStatusStages
 	typ2 = make(ProvisionStatusStages)
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestSwitchScanResponse_EncodeDecode(t *testing.T) {
+	var typ SwitchScanResponse
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 SwitchScanResponse
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestSwitchScanResponseSwitchesItem_EncodeDecode(t *testing.T) {
+	var typ SwitchScanResponseSwitchesItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 SwitchScanResponseSwitchesItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestSwitchScanResponseSwitchesItemPortsItem_EncodeDecode(t *testing.T) {
+	var typ SwitchScanResponseSwitchesItemPortsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 SwitchScanResponseSwitchesItemPortsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestSwitchScanResponseSwitchesItemPortsItemMacsItem_EncodeDecode(t *testing.T) {
+	var typ SwitchScanResponseSwitchesItemPortsItemMacsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 SwitchScanResponseSwitchesItemPortsItemMacsItem
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestTagCount_EncodeDecode(t *testing.T) {

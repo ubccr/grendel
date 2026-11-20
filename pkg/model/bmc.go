@@ -229,3 +229,18 @@ type BmcLocationResult struct {
 	Desired BmcLocation `json:"desired"`
 	Changed bool        `json:"changed"`
 }
+
+// BmcNIC is one of a host's network ports as its BMC reports it
+type BmcNIC struct {
+	ID        string `json:"id" example:"NIC.Slot.3-1-1"`
+	Name      string `json:"name"`
+	MAC       string `json:"mac" example:"b8:ca:3a:6e:00:10"`
+	Link      string `json:"link" description:"LinkUp, LinkDown or NoLink, or empty when the BMC does not say" example:"LinkUp"`
+	SpeedMbps int    `json:"speed_mbps"`
+	Enabled   bool   `json:"enabled"`
+}
+
+// BmcNICList is the payload of a NIC query. Like BmcJobList it is a struct so a host with no ports reported is distinguishable from one never reached
+type BmcNICList struct {
+	NICs []BmcNIC `json:"nics" oai3:"nullable"`
+}

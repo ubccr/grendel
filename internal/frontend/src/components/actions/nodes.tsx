@@ -1,6 +1,7 @@
 import { ActionSection } from "./action-card";
 import NodesAutoConfigAction from "./nodes/auto-config";
 import NodesBiosAction from "./nodes/bios";
+import NodesBootNicsAction from "./nodes/boot-nics";
 import NodesIdentityAction from "./nodes/identity";
 import NodesConsoleAction from "./nodes/console";
 import NodesBmcPowerAction from "./nodes/bmc-power";
@@ -33,6 +34,7 @@ export default function NodesAction({ nodes }: { nodes: string }) {
       <NodesIndicatorAction nodes={nodes} />
       <NodesSelAction nodes={nodes} />
       <NodesJobsAction nodes={nodes} />
+      <NodesBootNicsAction nodes={nodes} />
       <NodesBiosAction nodes={nodes} />
       <NodesSecureBootAction nodes={nodes} />
       <NodesIdentityAction nodes={nodes} />

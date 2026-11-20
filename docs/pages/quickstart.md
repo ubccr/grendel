@@ -93,26 +93,10 @@ Nodes can be imported into Grendel from a file in a simple JSON format:
 }]
 ```
 
-You can use any process you wish for assembling your nodes into this format. To
-make this easier, Grendel comes with a few built-in ways to auto-discover nodes
-from querying a switch, snooping DHCP packets, parsing a `dhcpd.leases` file,
-or importing from a simple `TSV` file. As a simple example, suppose you've
-harvested the required information for each of your nodes in a TAB separated
-file `hosts.tsv`:
-
-```
-name         mac                 ip             fqdn
-cpn-d13-18   41:69:AE:E6:61:06   10.64.25.36    cpn-d13-18.compute.ccr.buffalo.edu
-cpn-d13-19   41:69:AE:E6:71:16   10.64.25.35    cpn-d13-19.compute.ccr.buffalo.edu
-cpn-d13-20   41:69:AE:E6:81:02   10.64.25.34    cpn-d13-20.compute.ccr.buffalo.edu
-```
-
-We can convert this into Grendel's host JSON format using the following
-command:
-
-```
-./grendeld discover file --input hosts.tsv > hosts.json
-```
+You can use any process you wish for assembling your nodes into this format.
+Once Grendel is running, the **Add node** page of the web frontend can also
+import nodes in bulk from the MAC tables of your switches and the network
+interfaces their BMCs report. See [Importing Hosts](background.md#importing-hosts).
 
 ## Start services
 

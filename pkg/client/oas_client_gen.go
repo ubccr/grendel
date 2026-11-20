@@ -141,6 +141,18 @@ type Invoker interface {
 	//
 	// GET /v1/bmc/jobs
 	GETV1BmcJobs(ctx context.Context, params GETV1BmcJobsParams) (*BmcResponseModelBmcJobList, error)
+	// GETV1BmcNics invokes GET_/v1/bmc/nics operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcNICs`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// List the host network ports each node's BMC reports.
+	//
+	// GET /v1/bmc/nics
+	GETV1BmcNics(ctx context.Context, params GETV1BmcNicsParams) (*BmcResponseModelBmcNICList, error)
 	// GETV1BmcSecureboot invokes GET_/v1/bmc/secureboot operation.
 	//
 	// #### Controller:
@@ -362,6 +374,19 @@ type Invoker interface {
 	//
 	// GET /v1/switch/{nodeset}/lldp
 	GETV1SwitchNodesetLldp(ctx context.Context, params GETV1SwitchNodesetLldpParams) ([]LLDP, error)
+	// GETV1SwitchScan invokes GET_/v1/switch/scan operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).SwitchScan`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Read the MAC table and interface status of switch(es), merged per port, with the node that already
+	// holds each MAC.
+	//
+	// GET /v1/switch/scan
+	GETV1SwitchScan(ctx context.Context, params GETV1SwitchScanParams) (*SwitchScanResponse, error)
 	// GETV1Users invokes GET_/v1/users operation.
 	//
 	// #### Controller:
@@ -710,6 +735,19 @@ type Invoker interface {
 	//
 	// POST /v1/nodes
 	POSTV1Nodes(ctx context.Context, request *NodeAddRequest, params POSTV1NodesParams) (*GenericResponse, error)
+	// POSTV1NodesImport invokes POST_/v1/nodes/import operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeImport`
+	// #### Middlewares:
+	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Add a BMC or boot port to each node, creating nodes that do not exist, with addresses taken from
+	// ranges. A dry run reports what would change; a commit stores every row or none.
+	//
+	// POST /v1/nodes/import
+	POSTV1NodesImport(ctx context.Context, request *NodeImportRequest, params POSTV1NodesImportParams) (*NodeImportResponse, error)
 	// POSTV1Roles invokes POST_/v1/roles operation.
 	//
 	// #### Controller:
@@ -2137,6 +2175,164 @@ func (c *Client) sendGETV1BmcJobs(ctx context.Context, params GETV1BmcJobsParams
 	defer body.Close()
 
 	result, err := decodeGETV1BmcJobsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GETV1BmcNics invokes GET_/v1/bmc/nics operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).BmcNICs`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// List the host network ports each node's BMC reports.
+//
+// GET /v1/bmc/nics
+func (c *Client) GETV1BmcNics(ctx context.Context, params GETV1BmcNicsParams) (*BmcResponseModelBmcNICList, error) {
+	res, err := c.sendGETV1BmcNics(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGETV1BmcNics(ctx context.Context, params GETV1BmcNicsParams) (res *BmcResponseModelBmcNICList, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/bmc/nics"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "nodeset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "nodeset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Nodeset.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "tags" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "tags",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Tags.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "all" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "all",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.All.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, GETV1BmcNicsOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, GETV1BmcNicsOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer body.Close()
+
+	result, err := decodeGETV1BmcNicsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -4697,6 +4893,165 @@ func (c *Client) sendGETV1SwitchNodesetLldp(ctx context.Context, params GETV1Swi
 	defer body.Close()
 
 	result, err := decodeGETV1SwitchNodesetLldpResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GETV1SwitchScan invokes GET_/v1/switch/scan operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).SwitchScan`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Read the MAC table and interface status of switch(es), merged per port, with the node that already
+// holds each MAC.
+//
+// GET /v1/switch/scan
+func (c *Client) GETV1SwitchScan(ctx context.Context, params GETV1SwitchScanParams) (*SwitchScanResponse, error) {
+	res, err := c.sendGETV1SwitchScan(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGETV1SwitchScan(ctx context.Context, params GETV1SwitchScanParams) (res *SwitchScanResponse, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/switch/scan"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "nodeset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "nodeset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Nodeset.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "tags" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "tags",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Tags.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "all" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "all",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.All.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, GETV1SwitchScanOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, GETV1SwitchScanOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer body.Close()
+
+	result, err := decodeGETV1SwitchScanResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -8850,6 +9205,123 @@ func (c *Client) sendPOSTV1Nodes(ctx context.Context, request *NodeAddRequest, p
 	defer body.Close()
 
 	result, err := decodePOSTV1NodesResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// POSTV1NodesImport invokes POST_/v1/nodes/import operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).NodeImport`
+// #### Middlewares:
+// - `github.com/go-fuego/fuego.defaultLogger.middleware`
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Add a BMC or boot port to each node, creating nodes that do not exist, with addresses taken from
+// ranges. A dry run reports what would change; a commit stores every row or none.
+//
+// POST /v1/nodes/import
+func (c *Client) POSTV1NodesImport(ctx context.Context, request *NodeImportRequest, params POSTV1NodesImportParams) (*NodeImportResponse, error) {
+	res, err := c.sendPOSTV1NodesImport(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendPOSTV1NodesImport(ctx context.Context, request *NodeImportRequest, params POSTV1NodesImportParams) (res *NodeImportResponse, err error) {
+	// Validate request before sending.
+	if err := func() error {
+		if err := request.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return res, errors.Wrap(err, "validate")
+	}
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/nodes/import"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePOSTV1NodesImportRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, POSTV1NodesImportOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, POSTV1NodesImportOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer body.Close()
+
+	result, err := decodePOSTV1NodesImportResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

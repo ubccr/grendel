@@ -1,4 +1,4 @@
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 
 // listeners are the components reading each key, told when this tab writes it; other tabs' writes arrive as storage events
 const listeners = new Map<string, Set<() => void>>();
@@ -43,4 +43,18 @@ export function useStoredValue(key: string) {
   );
 
   return [value, write] as const;
+}
+
+// useStoredJSON is a stored object read over defaults, so a field added later falls back to its default and unreadable text reads as the defaults. defaults must keep one reference, such as a module constant
+export function useStoredJSON<T extends object>(key: string, defaults: T) {
+  const [raw, write] = useStoredValue(key);
+  const value = useMemo(() => {
+    try {
+      return raw ? ({ ...defaults, ...JSON.parse(raw) } as T) : defaults;
+    } catch {
+      return defaults;
+    }
+  }, [raw, defaults]);
+  const set = useCallback((next: T) => write(JSON.stringify(next)), [write]);
+  return [value, set] as const;
 }

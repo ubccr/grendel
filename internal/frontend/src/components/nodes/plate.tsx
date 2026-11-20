@@ -1,4 +1,4 @@
-import type { Host } from "@/client";
+import type { Host, ProvisionStatus } from "@/client";
 import { getV1NodesProvisionStatusOptions } from "@/client/@tanstack/react-query.gen";
 import { Fact, Unset } from "@/components/detail-header";
 import { cn, relativeTime } from "@/lib/utils";
@@ -25,13 +25,44 @@ const provisionText: Record<string, string> = {
   completed: "completed",
 };
 
+// ProvisionLight is whether a node provisions: a green light when it does
+export function ProvisionLight({ on, className }: { on?: boolean; className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "size-2 shrink-0 rounded-full",
+        on ? "bg-emerald-500" : "bg-muted-foreground/40",
+        className,
+      )}
+    />
+  );
+}
+
+// LastProvision is how a node's last provision went and when, linked to its provision tab
+export function LastProvision({ status, node }: { status: ProvisionStatus; node: string }) {
+  const updated = status.updated_at ? relativeTime(status.updated_at) : undefined;
+  return (
+    <Link
+      to="/nodes/$node/provision"
+      params={{ node }}
+      className={cn(
+        "underline-offset-4 hover:underline",
+        status.state === "failed" && "text-destructive",
+      )}
+      title={updated?.title}
+    >
+      {provisionText[status.state ?? ""] ?? status.state} {updated?.text}
+    </Link>
+  );
+}
+
 // NodeFacts are the facts about a node that every tab of the node view needs at a glance, like the asset label on the front of a server
 export function NodeFacts({ host, name }: { host?: Host; name: string }) {
   const { data: statuses } = useQuery(
     getV1NodesProvisionStatusOptions({ query: { nodeset: name } }),
   );
   const status = statuses?.[0];
-  const updated = status?.updated_at ? relativeTime(status.updated_at) : undefined;
   const boot = bootNic(host?.interfaces);
   const bmc = bmcNic(host?.interfaces);
   const bmcHost = bmc?.fqdn || bmc?.ip?.split("/")[0];
@@ -42,13 +73,7 @@ export function NodeFacts({ host, name }: { host?: Host; name: string }) {
       {!isSwitch && (
         <Fact label="Provision">
           <span className="inline-flex items-center gap-1.5">
-            <span
-              aria-hidden
-              className={cn(
-                "size-2 rounded-full",
-                host?.provision ? "bg-emerald-500" : "bg-muted-foreground/40",
-              )}
-            />
+            <ProvisionLight on={host?.provision} />
             {host?.provision ? "On" : "Off"}
           </span>
         </Fact>
@@ -96,17 +121,7 @@ export function NodeFacts({ host, name }: { host?: Host; name: string }) {
       )}
       {status?.state && (
         <Fact label="Last provision">
-          <Link
-            to="/nodes/$node/provision"
-            params={{ node: name }}
-            className={cn(
-              "underline-offset-4 hover:underline",
-              status.state === "failed" && "text-destructive",
-            )}
-            title={updated?.title}
-          >
-            {provisionText[status.state] ?? status.state} {updated?.text}
-          </Link>
+          <LastProvision status={status} node={name} />
         </Fact>
       )}
     </>

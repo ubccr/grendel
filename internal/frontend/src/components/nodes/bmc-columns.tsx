@@ -1,7 +1,7 @@
 import type { DataTableTree, RowTone } from "@/components/data-table/data-table";
+import { NodeLink } from "@/components/nodes/node-link";
 import type { DataTableColumnDef, DataTableRow } from "@/components/data-table/features";
 import { DataTableColumnHeader } from "@/components/data-table/header";
-import { Link } from "@tanstack/react-router";
 
 // NodeRow is what every row of a per node bmc table carries about its node
 export type NodeRow = {
@@ -58,15 +58,7 @@ export function nodeColumns<T>(): Array<DataTableColumnDef<NodeTreeRow<T>, any>>
     {
       accessorKey: "node",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Node" />,
-      cell: ({ row }) => (
-        <Link
-          to="/nodes/$node/node"
-          params={{ node: row.original.node }}
-          className="hover:underline"
-        >
-          {row.original.node}
-        </Link>
-      ),
+      cell: ({ row }) => <NodeLink node={row.original.node} />,
     },
     {
       id: "node_state",

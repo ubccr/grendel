@@ -106,6 +106,9 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 	fuego.Get(nodes, "/tags", h.NodeTagList,
 		option.Description("List every tag on a node, with how many nodes have it"),
 	)
+	fuego.Post(nodes, "/import", h.NodeImport,
+		option.Description("Add a BMC or boot port to each node, creating nodes that do not exist, with addresses taken from ranges. A dry run reports what would change; a commit stores every row or none"),
+	)
 	fuego.Get(nodes, "/ips/next", h.NodeNextAddress,
 		option.Description("Suggest free addresses in a range: the lowest ones no node holds, and the ones after the highest held. Suggestions are pinged, and one that answers is listed but marked"),
 		option.Query("cidr", "The IPv4 range to search, a /16 or smaller: a CIDR, an address standing for its /24, or three octets like 10.17.25", param.Required(), param.Example("cidr", "10.17.25.0/24")),
@@ -180,6 +183,11 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 	fuego.Post(db, "/restore", h.Restore, option.Description("Restore a backup of the DB"))
 	fuego.Get(db, "/dump", h.Dump, option.Description("Get a backup of the DB"))
 
+	fuego.Get(bmc, "/nics", h.BmcNICs,
+		option.Description("List the host network ports each node's BMC reports"),
+		filterNodes,
+		selectAll,
+	)
 	fuego.Get(bmc, "/status", h.BmcStatus,
 		option.Description("Get redfish system information from node(s)"),
 		filterNodes,
@@ -301,6 +309,11 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 		selectAll,
 	)
 
+	fuego.Get(sw, "/scan", h.SwitchScan,
+		option.Description("Read the MAC table and interface status of switch(es), merged per port, with the node that already holds each MAC"),
+		filterNodes,
+		selectAll,
+	)
 	fuego.Get(sw, "/{nodeset}/lldp", h.SwitchGetLLDP,
 		option.Description("Get switch LLDP info"),
 		option.Query("ports", "Filter by port name", param.Example("ports", "Et1,Et2")),

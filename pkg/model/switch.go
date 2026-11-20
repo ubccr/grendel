@@ -6,15 +6,16 @@ import (
 )
 
 type InterfaceStatus struct {
-	Name                string           `json:"name"`
-	LineProtocolStatus  string           `json:"line_protocol_status"`
-	InterfaceStatus     string           `json:"interface_status"`
-	PhysicalAddress     net.HardwareAddr `json:"physical_address"`
-	Description         string           `json:"description"`
-	Hardware            string           `json:"hardware"`
-	Bandwidth           int              `json:"bandwidth"`
-	MTU                 int              `json:"mtu"`
-	InterfaceMembership string           `json:"interface_membership"`
+	Name               string           `json:"name"`
+	LineProtocolStatus string           `json:"line_protocol_status"`
+	InterfaceStatus    string           `json:"interface_status"`
+	PhysicalAddress    net.HardwareAddr `json:"physical_address"`
+	Description        string           `json:"description"`
+	Hardware           string           `json:"hardware"`
+	// Bandwidth is in Mb/s.
+	Bandwidth           int    `json:"bandwidth"`
+	MTU                 int    `json:"mtu"`
+	InterfaceMembership string `json:"interface_membership"`
 	// Duplex              string           // `json:"duplex"`
 	// AutoNegotiate       string           // `json:"auto_negotiate"`
 	// Lanes               string           // `json:"lanes"`
@@ -22,7 +23,6 @@ type InterfaceStatus struct {
 
 type MACTableEntry struct {
 	Ifname string           `json:"ifname"`
-	Port   int              `json:"port"`
 	VLAN   string           `json:"vlan"`
 	Type   string           `json:"type"`
 	MAC    net.HardwareAddr `json:"mac"`
@@ -40,31 +40,20 @@ type LLDP struct {
 	PortIdType        string `json:"port_id_type"`
 }
 
-type InterfaceTable map[int]*InterfaceStatus
+type InterfaceTable map[string]*InterfaceStatus
 
-type MACTable map[string]*MACTableEntry
+type MACTable []*MACTableEntry
 
 type LLDPNeighbors map[string]*LLDP
 
-type SwitchHostTree struct {
-	Host      *Host  `json:"host"`
-	LLDP      *LLDP  `json:"lldp"`
-	Interface string `json:"interface"`
-}
-
-type SwitchHostTreeList []SwitchHostTree
-
 type SwitchLLDPList []LLDP
 
-func (mt MACTable) Port(port int) []*MACTableEntry {
-	entries := make([]*MACTableEntry, 0)
+func (mt MACTable) ByIfname() map[string][]*MACTableEntry {
+	out := make(map[string][]*MACTableEntry)
 	for _, entry := range mt {
-		if entry.Port == port {
-			entries = append(entries, entry)
-		}
+		out[entry.Ifname] = append(out[entry.Ifname], entry)
 	}
-
-	return entries
+	return out
 }
 
 func (m *MACTableEntry) MarshalJSON() ([]byte, error) {

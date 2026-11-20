@@ -47,6 +47,7 @@ const serverTabs = [
 const switchTabs = [
   { to: "/nodes/$node/node", label: "Node" },
   { to: "/nodes/$node/lldp", label: "LLDP" },
+  { to: "/nodes/$node/macs", label: "MAC table" },
 ] as const;
 
 function RouteComponent() {

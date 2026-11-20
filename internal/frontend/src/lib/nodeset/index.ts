@@ -34,3 +34,12 @@ export function contains(input: string, node: string): boolean {
   }
   return false;
 }
+
+// expandOrEmpty expands a nodeset, reading text that isn't one as no nodes
+export function expandOrEmpty(input: string): string[] {
+  try {
+    return input ? expand(input) : [];
+  } catch {
+    return [];
+  }
+}

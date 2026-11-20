@@ -1,4 +1,5 @@
 import { BmcResponseModelBmcFirmwareUpdates, getV1BmcFirmwareUpdates } from "@/client";
+import { NodeLink } from "@/components/nodes/node-link";
 import ActionsSheet from "@/components/actions-sheet";
 import FirmwareUpgradeAction from "@/components/actions/firmware/upgrade";
 import NodesJobsAction from "@/components/actions/nodes/jobs";
@@ -14,7 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import AuthRedirect from "@/lib/auth";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import type { DataTableColumnDef, DataTableRow } from "@/components/data-table/features";
 import { CircleAlert, OctagonAlert, TriangleAlert } from "lucide-react";
 
@@ -34,15 +35,7 @@ const columns: DataTableColumnDef<NodeFirmware, any>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title="Node" />,
     cell: ({ row }) => {
       const name = row.original?.node;
-      return (
-        <Link
-          to={"/nodes/$node/node"}
-          params={{ node: name ?? "unknown" }}
-          className="hover:underline"
-        >
-          {name}
-        </Link>
-      );
+      return <NodeLink node={name ?? "unknown"}>{name}</NodeLink>;
     },
   },
   {

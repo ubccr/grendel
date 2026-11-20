@@ -5,49 +5,90 @@
 package tors
 
 import (
+	"context"
 	"errors"
+	"fmt"
 
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/logger"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
 var log = logger.GetLogger("SWITCH")
 
-type NetworkSwitch interface {
-	GetInterfaceStatus() (model.InterfaceTable, error)
-	GetMACTable() (model.MACTable, error)
-	GetLLDPNeighbors() (model.LLDPNeighbors, error)
+const (
+	NOSArista   = "arista"
+	NOSSonic    = "sonic"
+	NOSDellOS10 = "dellos10"
+)
+
+var (
+	ErrUnknownNOS    = errors.New("failed to determine switch NOS")
+	ErrNoCredentials = errors.New("failed to get switch credentials from config file")
+	ErrNoInterfaces  = errors.New("switch has no interfaces")
+)
+
+// Codes name why a switch couldn't be read, for clients that explain how to fix each case. Unlike the messages they are part of the API and must not change
+const (
+	CodeUnknownNOS    = "unknown_nos"
+	CodeNoCredentials = "no_credentials"
+	CodeNoInterfaces  = "no_interfaces"
+	CodeUnreachable   = "unreachable"
+)
+
+// ErrorCode is the code for an error from New or a driver call; anything not a setup problem is the switch not answering as expected
+func ErrorCode(err error) string {
+	switch {
+	case errors.Is(err, ErrUnknownNOS):
+		return CodeUnknownNOS
+	case errors.Is(err, ErrNoCredentials):
+		return CodeNoCredentials
+	case errors.Is(err, ErrNoInterfaces):
+		return CodeNoInterfaces
+	}
+	return CodeUnreachable
 }
 
-func NewNetworkSwitch(host *model.Host) (NetworkSwitch, error) {
-	username := viper.GetString("bmc.switch_admin_username")
-	password := viper.GetString("bmc.switch_admin_password")
+// NetworkSwitch reuses one connection across its calls, so a caller makes all of them on one value and then closes it
+type NetworkSwitch interface {
+	GetInterfaceStatus(ctx context.Context) (model.InterfaceTable, error)
+	GetMACTable(ctx context.Context) (model.MACTable, error)
+	GetLLDPNeighbors(ctx context.Context) (model.LLDPNeighbors, error)
+	Close() error
+}
 
-	if username == "" || password == "" {
-		log.Warn("Please set both bmc.switch_admin_username and bmc.switch_admin_password in your toml configuration file in order to query network switches")
-		return nil, errors.New("failed to get switch credentials from config file")
+func HostNOS(host *model.Host) string {
+	for _, nos := range []string{NOSArista, NOSSonic, NOSDellOS10} {
+		if host.HasTags(nos) {
+			return nos
+		}
 	}
+	return ""
+}
 
-	var sw NetworkSwitch
-	var err error
-
+func New(host *model.Host, cfg Config) (NetworkSwitch, error) {
+	nos := HostNOS(host)
+	if nos == "" {
+		return nil, ErrUnknownNOS
+	}
 	// TODO: use the management interface once interfaces have a type. The bmc flag cannot mark it, because it also decides which hosts the bmc commands contact
 	if len(host.Interfaces) == 0 {
-		return nil, errors.New("switch has no interfaces")
-	}
-	ip := host.Interfaces[0].AddrString()
-
-	// TODO: automatically determine NOS
-	if host.HasTags("arista") {
-		sw, err = NewArista(ip, username, password)
-	} else if host.HasTags("sonic") {
-		sw, err = NewSonic(ip, username, password, "", true)
-	} else if host.HasTags("dellos10") {
-		sw, err = NewDellOS10("https://"+ip, username, password, "", true)
-	} else {
-		return nil, errors.New("failed to determine switch NOS")
+		return nil, ErrNoInterfaces
 	}
 
-	return sw, err
+	return NewFromAddr(host.Interfaces[0].AddrString(), nos, cfg)
+}
+
+func NewFromAddr(addr, nos string, cfg Config) (NetworkSwitch, error) {
+	switch nos {
+	case NOSArista, NOSSonic:
+		if cfg.Username == "" || cfg.Password == "" {
+			log.Warn("Set switch.username and switch.password in grendel.toml to query switches over gNMI")
+			return nil, ErrNoCredentials
+		}
+		return NewGNMI(addr, nos, cfg), nil
+	case NOSDellOS10:
+		return NewSNMP(addr, cfg)
+	default:
+		return nil, fmt.Errorf("%w: %q", ErrUnknownNOS, nos)
+	}
 }

@@ -21,6 +21,7 @@ const catalog: [string, [string, string][]][] = [
       ["GET /v1/nodes", "List nodes"],
       ["GET /v1/nodes/find", "Find nodes"],
       ["POST /v1/nodes", "Add and edit nodes"],
+      ["POST /v1/nodes/import", "Import nodes from switches and BMCs"],
       ["DELETE /v1/nodes", "Delete nodes"],
       ["GET /v1/nodes/tags", "List tags"],
       ["PATCH /v1/nodes/tags/%", "Add and remove tags"],
@@ -48,6 +49,7 @@ const catalog: [string, [string, string][]][] = [
     "Power and console",
     [
       ["GET /v1/bmc/status", "See BMC status"],
+      ["GET /v1/bmc/nics", "List host network ports from the BMC"],
       ["POST /v1/bmc/power", "Change power state"],
       ["POST /v1/bmc/indicator", "Turn the locator light on or off"],
       ["GET /v1/bmc/console", "Open the serial console"],
@@ -97,6 +99,7 @@ const catalog: [string, [string, string][]][] = [
     "Switches",
     [
       ["GET /v1/switch/%/lldp", "Read LLDP neighbors"],
+      ["GET /v1/switch/scan", "Scan switches for MAC addresses"],
       ["GET /v1/switch/%/hosttree", "Read the host tree"],
     ],
   ],

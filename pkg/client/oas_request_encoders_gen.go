@@ -360,6 +360,20 @@ func encodePOSTV1NodesRequest(
 	return nil
 }
 
+func encodePOSTV1NodesImportRequest(
+	req *NodeImportRequest,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
 func encodePOSTV1RolesRequest(
 	req *PostRolesRequest,
 	r *http.Request,

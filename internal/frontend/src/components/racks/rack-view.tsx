@@ -1,4 +1,5 @@
 import type { Host, ProvisionStatus } from "@/client";
+import { NodeLink } from "@/components/nodes/node-link";
 import { patchV1NodesProvisionMutation } from "@/client/@tanstack/react-query.gen";
 import { bmcNic } from "@/components/nodes/plate";
 import { ProvisionStateBadge, ProvisionSummary } from "@/components/nodes/provision-status";
@@ -194,14 +195,11 @@ function Faceplate({
           </span>
         )}
       </div>
-      <Link
-        to="/nodes/$node/node"
-        params={{ node: name }}
+      <NodeLink
+        node={name}
         search={{ from: rack }}
-        className="truncate text-center font-mono text-sm font-medium underline-offset-4 hover:underline"
-      >
-        {name}
-      </Link>
+        className="truncate text-center font-mono text-sm font-medium"
+      />
       <div className="ml-auto flex min-w-0 flex-wrap items-center justify-end gap-x-3 gap-y-1">
         {details.includes("tags") && tags.length > 0 && (
           <TagList

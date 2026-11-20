@@ -1316,6 +1316,126 @@ func (s *BmcResponseModelBmcLocationResultSummary) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *BmcResponseModelBmcNICList) SetFake() {
+	{
+		{
+			s.Results.SetFake()
+		}
+	}
+	{
+		{
+			s.RunID.SetFake()
+		}
+	}
+	{
+		{
+			s.Summary.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcNICListResultsItem) SetFake() {
+	{
+		{
+			s.Data.SetFake()
+		}
+	}
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Message.SetFake()
+		}
+	}
+	{
+		{
+			s.Node.SetFake()
+		}
+	}
+	{
+		{
+			s.Success.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcNICListResultsItemData) SetFake() {
+	{
+		{
+			s.Nics.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) SetFake() {
+	{
+		{
+			s.Enabled.SetFake()
+		}
+	}
+	{
+		{
+			s.ID.SetFake()
+		}
+	}
+	{
+		{
+			s.Link.SetFake()
+		}
+	}
+	{
+		{
+			s.MAC.SetFake()
+		}
+	}
+	{
+		{
+			s.Name.SetFake()
+		}
+	}
+	{
+		{
+			s.SpeedMbps.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *BmcResponseModelBmcNICListSummary) SetFake() {
+	{
+		{
+			s.DurationMs.SetFake()
+		}
+	}
+	{
+		{
+			s.Failed.SetFake()
+		}
+	}
+	{
+		{
+			s.FailedNodes.SetFake()
+		}
+	}
+	{
+		{
+			s.Succeeded.SetFake()
+		}
+	}
+	{
+		{
+			s.Total.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
 func (s *BmcResponseModelBmcSELLog) SetFake() {
 	{
 		{
@@ -3780,6 +3900,16 @@ func (s *NilBmcResponseModelBmcLocationResultResultsItem) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *NilBmcResponseModelBmcNICListResultsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
+func (s *NilBmcResponseModelBmcNICListResultsItemDataNicsItem) SetFake() {
+	s.Null = true
+}
+
+// SetFake set fake values.
 func (s *NilBmcResponseModelBmcSELLogResultsItem) SetFake() {
 	s.Null = true
 }
@@ -4088,6 +4218,244 @@ func (s *NodeBootTokenResponseNodesItem) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *NodeImportRequest) SetFake() {
+	{
+		{
+			s.DryRun.SetFake()
+		}
+	}
+	{
+		{
+			s.From.SetFake()
+		}
+	}
+	{
+		{
+			s.Ping.SetFake()
+		}
+	}
+	{
+		{
+			s.Ranges.SetFake()
+		}
+	}
+	{
+		{
+			s.Rows = nil
+			for i := 0; i < 0; i++ {
+				var elem NodeImportRequestRowsItem
+				{
+					elem.SetFake()
+				}
+				s.Rows = append(s.Rows, elem)
+			}
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *NodeImportRequestRanges) SetFake() {
+	{
+		{
+			s.Bmc.SetFake()
+		}
+	}
+	{
+		{
+			s.Boot.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *NodeImportRequestRowsItem) SetFake() {
+	{
+		{
+			s.Bmc.SetFake()
+		}
+	}
+	{
+		{
+			s.Fqdn.SetFake()
+		}
+	}
+	{
+		{
+			s.Ifname.SetFake()
+		}
+	}
+	{
+		{
+			s.IP.SetFake()
+		}
+	}
+	{
+		{
+			s.MAC.SetFake()
+		}
+	}
+	{
+		{
+			s.Mtu.SetFake()
+		}
+	}
+	{
+		{
+			s.Node.SetFake()
+		}
+	}
+	{
+		{
+			s.Tags.SetFake()
+		}
+	}
+	{
+		{
+			s.Vlan.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *NodeImportResponse) SetFake() {
+	{
+		{
+			s.Committed.SetFake()
+		}
+	}
+	{
+		{
+			s.PingError.SetFake()
+		}
+	}
+	{
+		{
+			s.Pinged.SetFake()
+		}
+	}
+	{
+		{
+			s.Rows = nil
+			for i := 0; i < 0; i++ {
+				var elem NodeImportResponseRowsItem
+				{
+					elem.SetFake()
+				}
+				s.Rows = append(s.Rows, elem)
+			}
+		}
+	}
+	{
+		{
+			s.Summary.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *NodeImportResponseRowsItem) SetFake() {
+	{
+		{
+			s.Action.SetFake()
+		}
+	}
+	{
+		{
+			s.Answered.SetFake()
+		}
+	}
+	{
+		{
+			s.Assigned.SetFake()
+		}
+	}
+	{
+		{
+			s.Bmc.SetFake()
+		}
+	}
+	{
+		{
+			s.Fqdn.SetFake()
+		}
+	}
+	{
+		{
+			s.Ifname.SetFake()
+		}
+	}
+	{
+		{
+			s.IP.SetFake()
+		}
+	}
+	{
+		{
+			s.MAC.SetFake()
+		}
+	}
+	{
+		{
+			s.Mtu.SetFake()
+		}
+	}
+	{
+		{
+			s.Node.SetFake()
+		}
+	}
+	{
+		{
+			s.Reason.SetFake()
+		}
+	}
+	{
+		{
+			s.Replaces.SetFake()
+		}
+	}
+	{
+		{
+			s.Tags.SetFake()
+		}
+	}
+	{
+		{
+			s.Vlan.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *NodeImportResponseSummary) SetFake() {
+	{
+		{
+			s.Add.SetFake()
+		}
+	}
+	{
+		{
+			s.Conflict.SetFake()
+		}
+	}
+	{
+		{
+			s.Create.SetFake()
+		}
+	}
+	{
+		{
+			s.Replace.SetFake()
+		}
+	}
+	{
+		{
+			s.Unchanged.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
 func (s *NodeProvisionRequest) SetFake() {
 	{
 		{
@@ -4198,6 +4566,15 @@ func (s *OptBmcResponseModelBmcLocationResultResultsItemDataDesired) SetFake() {
 // SetFake set fake values.
 func (s *OptBmcResponseModelBmcLocationResultSummary) SetFake() {
 	var elem BmcResponseModelBmcLocationResultSummary
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptBmcResponseModelBmcNICListSummary) SetFake() {
+	var elem BmcResponseModelBmcNICListSummary
 	{
 		elem.SetFake()
 	}
@@ -4364,6 +4741,12 @@ func (s *OptNilBmcResponseModelBmcLocationResultResultsItemData) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptNilBmcResponseModelBmcNICListResultsItemData) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
 func (s *OptNilBmcResponseModelBmcSELLogResultsItemData) SetFake() {
 	s.Null = true
 	s.Set = true
@@ -4520,6 +4903,18 @@ func (s *OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptNilNilBmcResponseModelBmcNICListResultsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
 func (s *OptNilNilBmcResponseModelBmcSELLogResultsItemArray) SetFake() {
 	s.Null = true
 	s.Set = true
@@ -4589,6 +4984,24 @@ func (s *OptNilString) SetFake() {
 func (s *OptNilStringArray) SetFake() {
 	s.Null = true
 	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNodeImportRequestRanges) SetFake() {
+	var elem NodeImportRequestRanges
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptNodeImportResponseSummary) SetFake() {
+	var elem NodeImportResponseSummary
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
 }
 
 // SetFake set fake values.
@@ -4771,6 +5184,118 @@ func (s *ProvisionStatusStages) SetFake() {
 	)
 	for i := 0; i < 0; i++ {
 		m[fmt.Sprintf("fake%d", i)] = elem
+	}
+}
+
+// SetFake set fake values.
+func (s *SwitchScanResponse) SetFake() {
+	{
+		{
+			s.Switches = nil
+			for i := 0; i < 0; i++ {
+				var elem SwitchScanResponseSwitchesItem
+				{
+					elem.SetFake()
+				}
+				s.Switches = append(s.Switches, elem)
+			}
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *SwitchScanResponseSwitchesItem) SetFake() {
+	{
+		{
+			s.Address.SetFake()
+		}
+	}
+	{
+		{
+			s.Error.SetFake()
+		}
+	}
+	{
+		{
+			s.ErrorCode.SetFake()
+		}
+	}
+	{
+		{
+			s.Name.SetFake()
+		}
+	}
+	{
+		{
+			s.Nos.SetFake()
+		}
+	}
+	{
+		{
+			s.Ports = nil
+			for i := 0; i < 0; i++ {
+				var elem SwitchScanResponseSwitchesItemPortsItem
+				{
+					elem.SetFake()
+				}
+				s.Ports = append(s.Ports, elem)
+			}
+		}
+	}
+	{
+		{
+			s.Warnings.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *SwitchScanResponseSwitchesItemPortsItem) SetFake() {
+	{
+		{
+			s.Description.SetFake()
+		}
+	}
+	{
+		{
+			s.Ifname.SetFake()
+		}
+	}
+	{
+		{
+			s.Macs = nil
+			for i := 0; i < 0; i++ {
+				var elem SwitchScanResponseSwitchesItemPortsItemMacsItem
+				{
+					elem.SetFake()
+				}
+				s.Macs = append(s.Macs, elem)
+			}
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *SwitchScanResponseSwitchesItemPortsItemMacsItem) SetFake() {
+	{
+		{
+			s.Bmc.SetFake()
+		}
+	}
+	{
+		{
+			s.MAC.SetFake()
+		}
+	}
+	{
+		{
+			s.Owner.SetFake()
+		}
+	}
+	{
+		{
+			s.Vlan.SetFake()
+		}
 	}
 }
 

@@ -97,55 +97,40 @@ addressing scheme described in the sections above:
 
 ![Diagram](images/tor.png)
 
-## Auto-Discovery of Hosts
+## Importing Hosts
 
 Depending on how the BIOS are configured from the factory, after the compute
-nodes are powered on for the very first time they will typically attempt to a
-network boot via PXE. The ToR switches are typically configured to relay DHCP
-packets to one or more DHCP servers in the data center. Here we configure all
-ToR switches to relay DHCP requests to our Grendel server. Grendel can now be
-used to harvest the MAC addresses of each compute node using one of the host
-auto-discovery methods. After the hosts are loaded into Grendel they can be
-provisioned.
+nodes are powered on for the very first time they will typically attempt a
+network boot via PXE, and their BMCs will request an address over DHCP. Either
+way the ToR switches learn their MAC addresses. Grendel can read those MAC
+tables to add the nodes in bulk, then ask each BMC for the host's network
+interfaces. After the hosts are loaded into Grendel they can be provisioned.
 
-### Discover hosts using switch
+Both imports are on the **Add node** page of the web frontend.
 
-Assuming we're using the IP addressing scheme described in the previous section
-we can interrogate the ToR switch MAC address table to auto-discover hosts and
-load them into Grendel. This works by using either SNMP or the RedFish API on
-the switch to obtain the MAC address table listing out the MAC address, port
-number, and VLANID. We can then provide Grendel a simple text file of hostname
-to port mapping to automatically load hosts into Grendel.
+### Import BMCs from switches
 
-```
-$ grendeld discover switch --endpoint swe-d13-25 --mapping hosts.txt --subnet 10.64.0.0
-```
+The **Switch** tab scans the ToR switches the new nodes are cabled to and lists
+the MAC addresses learned on each port. Switches are nodes tagged `switch` and
+one of `arista`, `sonic` or `dellos10`, with their management address on their
+first interface; Arista and SONiC are read over gNMI and Dell OS10 over SNMP,
+configured in the `[switch]` section of `grendel.toml`. Nodes are named from a
+template such as `cpn-{sw.1}-{port:02}`, any row can be renamed or given another
+MAC, and BMC addresses are handed out in order from a range. A preview shows
+what will be created or changed before anything is stored.
 
-### Discover hosts using DHCP
+### Add host interfaces from BMCs
 
-If we're not concerned with mapping host names to physical locations or don't
-have a particular IP addressing scheme we can use DHCP to auto-discover hosts
-and load them into Grendel. Here we assume we have a rack of hosts continuously
-sending out DHCP boot requests. The goal here is to capture the MAC addresses
-of the requests and assign them a hostname and IP address in a contiguous
-manner. We can run Grendel with the following command providing a subnet and a
-nodeset for assigning host names:
+Once the BMCs have addresses, the **Add Interfaces** tab reads each node's
+network interfaces over Redfish and picks the one to add, by default the one a
+scanned switch has seen. Nodes with the same interface layout share a rule, any
+node can be given another interface, and addresses come from a range as above.
+The first interface that is not the BMC is the one a node boots from.
 
-```
-$ grendeld discover dhcp --subnet 10.64.0.0 --nodeset tux-[01-100]
-```
+### Import from a file
 
-### Discover hosts using a file
-
-If you have an existing DHCP server you can load hosts into Grendel using a
-`dhcpd.leases` file. Grendel also supports loading hosts via a simple tab
-delimited text file. You can use this method if you have obtained the host
-names, IP, and MAC addresses via other means and simply want to load these into
-Grendel.
-
-```
-$ grendeld discover file --input hosts.txt
-```
+Hosts gathered by other means can be loaded from Grendel's host JSON format
+with `grendel node import`, or pasted into the **JSON** tab of the Add node page.
 
 ## Boot process overview
 

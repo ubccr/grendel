@@ -16,6 +16,7 @@ const (
 	GETV1BmcFirmwareUpdatesOperation       OperationName = "GETV1BmcFirmwareUpdates"
 	GETV1BmcIdentityDefaultsOperation      OperationName = "GETV1BmcIdentityDefaults"
 	GETV1BmcJobsOperation                  OperationName = "GETV1BmcJobs"
+	GETV1BmcNicsOperation                  OperationName = "GETV1BmcNics"
 	GETV1BmcSecurebootOperation            OperationName = "GETV1BmcSecureboot"
 	GETV1BmcSelOperation                   OperationName = "GETV1BmcSel"
 	GETV1BmcStatusOperation                OperationName = "GETV1BmcStatus"
@@ -34,6 +35,7 @@ const (
 	GETV1NodesTokenInterfaceOperation      OperationName = "GETV1NodesTokenInterface"
 	GETV1RolesOperation                    OperationName = "GETV1Roles"
 	GETV1SwitchNodesetLldpOperation        OperationName = "GETV1SwitchNodesetLldp"
+	GETV1SwitchScanOperation               OperationName = "GETV1SwitchScan"
 	GETV1UsersOperation                    OperationName = "GETV1Users"
 	PATCHV1AuthResetOperation              OperationName = "PATCHV1AuthReset"
 	PATCHV1NodesImageOperation             OperationName = "PATCHV1NodesImage"
@@ -63,6 +65,7 @@ const (
 	POSTV1DbRestoreOperation               OperationName = "POSTV1DbRestore"
 	POSTV1ImagesOperation                  OperationName = "POSTV1Images"
 	POSTV1NodesOperation                   OperationName = "POSTV1Nodes"
+	POSTV1NodesImportOperation             OperationName = "POSTV1NodesImport"
 	POSTV1RolesOperation                   OperationName = "POSTV1Roles"
 	POSTV1UsersOperation                   OperationName = "POSTV1Users"
 )

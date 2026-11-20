@@ -979,6 +979,93 @@
 				},
 				"type": "object"
 			},
+			"BmcResponse_model.BmcNICList": {
+				"description": "BmcResponse_model.BmcNICList schema",
+				"properties": {
+					"results": {
+						"items": {
+							"nullable": true,
+							"properties": {
+								"data": {
+									"nullable": true,
+									"properties": {
+										"nics": {
+											"items": {
+												"nullable": true,
+												"properties": {
+													"enabled": {
+														"type": "boolean"
+													},
+													"id": {
+														"type": "string"
+													},
+													"link": {
+														"type": "string"
+													},
+													"mac": {
+														"type": "string"
+													},
+													"name": {
+														"type": "string"
+													},
+													"speed_mbps": {
+														"type": "integer"
+													}
+												},
+												"type": "object"
+											},
+											"nullable": true,
+											"type": "array"
+										}
+									},
+									"type": "object"
+								},
+								"duration_ms": {
+									"format": "int64",
+									"type": "integer"
+								},
+								"message": {
+									"type": "string"
+								},
+								"node": {
+									"type": "string"
+								},
+								"success": {
+									"type": "boolean"
+								}
+							},
+							"type": "object"
+						},
+						"nullable": true,
+						"type": "array"
+					},
+					"run_id": {
+						"type": "string"
+					},
+					"summary": {
+						"properties": {
+							"duration_ms": {
+								"format": "int64",
+								"type": "integer"
+							},
+							"failed": {
+								"type": "integer"
+							},
+							"failed_nodes": {
+								"type": "string"
+							},
+							"succeeded": {
+								"type": "integer"
+							},
+							"total": {
+								"type": "integer"
+							}
+						},
+						"type": "object"
+					}
+				},
+				"type": "object"
+			},
 			"BmcResponse_model.BmcSELLog": {
 				"description": "BmcResponse_model.BmcSELLog schema",
 				"properties": {
@@ -2810,6 +2897,175 @@
 				},
 				"type": "object"
 			},
+			"NodeImportRequest": {
+				"description": "NodeImportRequest schema",
+				"properties": {
+					"dry_run": {
+						"type": "boolean"
+					},
+					"from": {
+						"description": "Where in a range to start: lowest, the default, or after_highest",
+						"example": "lowest",
+						"nullable": true,
+						"type": "string"
+					},
+					"ping": {
+						"description": "Ping the addresses taken from a range and skip any that answer. Only done on a dry run",
+						"type": "boolean"
+					},
+					"ranges": {
+						"properties": {
+							"bmc": {
+								"example": "10.1.0.0/22",
+								"nullable": true,
+								"type": "string"
+							},
+							"boot": {
+								"example": "10.2.0.0/22",
+								"nullable": true,
+								"type": "string"
+							}
+						},
+						"type": "object"
+					},
+					"rows": {
+						"items": {
+							"properties": {
+								"bmc": {
+									"type": "boolean"
+								},
+								"fqdn": {
+									"type": "string"
+								},
+								"ifname": {
+									"type": "string"
+								},
+								"ip": {
+									"type": "string"
+								},
+								"mac": {
+									"type": "string"
+								},
+								"mtu": {
+									"maximum": 65535,
+									"minimum": 0,
+									"type": "integer"
+								},
+								"node": {
+									"type": "string"
+								},
+								"tags": {
+									"items": {
+										"nullable": true,
+										"type": "string"
+									},
+									"nullable": true,
+									"type": "array"
+								},
+								"vlan": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					}
+				},
+				"type": "object"
+			},
+			"NodeImportResponse": {
+				"description": "NodeImportResponse schema",
+				"properties": {
+					"committed": {
+						"type": "boolean"
+					},
+					"ping_error": {
+						"nullable": true,
+						"type": "string"
+					},
+					"pinged": {
+						"type": "boolean"
+					},
+					"rows": {
+						"items": {
+							"properties": {
+								"action": {
+									"type": "string"
+								},
+								"answered": {
+									"type": "boolean"
+								},
+								"assigned": {
+									"type": "boolean"
+								},
+								"bmc": {
+									"type": "boolean"
+								},
+								"fqdn": {
+									"type": "string"
+								},
+								"ifname": {
+									"type": "string"
+								},
+								"ip": {
+									"type": "string"
+								},
+								"mac": {
+									"type": "string"
+								},
+								"mtu": {
+									"maximum": 65535,
+									"minimum": 0,
+									"type": "integer"
+								},
+								"node": {
+									"type": "string"
+								},
+								"reason": {
+									"type": "string"
+								},
+								"replaces": {
+									"type": "string"
+								},
+								"tags": {
+									"items": {
+										"nullable": true,
+										"type": "string"
+									},
+									"nullable": true,
+									"type": "array"
+								},
+								"vlan": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					},
+					"summary": {
+						"properties": {
+							"add": {
+								"type": "integer"
+							},
+							"conflict": {
+								"type": "integer"
+							},
+							"create": {
+								"type": "integer"
+							},
+							"replace": {
+								"type": "integer"
+							},
+							"unchanged": {
+								"type": "integer"
+							}
+						},
+						"type": "object"
+					}
+				},
+				"type": "object"
+			},
 			"NodeProvisionRequest": {
 				"description": "NodeProvisionRequest schema",
 				"properties": {
@@ -2949,6 +3205,77 @@
 					"updated_at": {
 						"format": "date-time",
 						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"SwitchScanResponse": {
+				"description": "SwitchScanResponse schema",
+				"properties": {
+					"switches": {
+						"items": {
+							"properties": {
+								"address": {
+									"type": "string"
+								},
+								"error": {
+									"type": "string"
+								},
+								"error_code": {
+									"type": "string"
+								},
+								"name": {
+									"type": "string"
+								},
+								"nos": {
+									"type": "string"
+								},
+								"ports": {
+									"items": {
+										"properties": {
+											"description": {
+												"type": "string"
+											},
+											"ifname": {
+												"type": "string"
+											},
+											"macs": {
+												"items": {
+													"properties": {
+														"bmc": {
+															"type": "boolean"
+														},
+														"mac": {
+															"type": "string"
+														},
+														"owner": {
+															"type": "string"
+														},
+														"vlan": {
+															"type": "string"
+														}
+													},
+													"type": "object"
+												},
+												"type": "array"
+											}
+										},
+										"type": "object"
+									},
+									"type": "array"
+								},
+								"warnings": {
+									"items": {
+										"nullable": true,
+										"type": "string"
+									},
+									"nullable": true,
+									"type": "array"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
 					}
 				},
 				"type": "object"
@@ -4759,6 +5086,100 @@
 					}
 				],
 				"summary": "bmc location",
+				"tags": [
+					"v1",
+					"bmc"
+				]
+			}
+		},
+		"/v1/bmc/nics": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcNICs`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList the host network ports each node's BMC reports",
+				"operationId": "GET_/v1/bmc/nics",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcNICList"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/BmcResponse_model.BmcNICList"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "bmc n i cs",
 				"tags": [
 					"v1",
 					"bmc"
@@ -6698,6 +7119,72 @@
 				]
 			}
 		},
+		"/v1/nodes/import": {
+			"post": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeImport`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nAdd a BMC or boot port to each node, creating nodes that do not exist, with addresses taken from ranges. A dry run reports what would change; a commit stores every row or none",
+				"operationId": "POST_/v1/nodes/import",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NodeImportRequest"
+							}
+						}
+					},
+					"description": "Request body for api.NodeImportRequest",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NodeImportResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/NodeImportResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "node import",
+				"tags": [
+					"v1",
+					"nodes"
+				]
+			}
+		},
 		"/v1/nodes/ips/next": {
 			"get": {
 				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeNextAddress`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nSuggest free addresses in a range: the lowest ones no node holds, and the ones after the highest held. Suggestions are pinged, and one that answers is listed but marked",
@@ -7622,6 +8109,100 @@
 				"tags": [
 					"v1",
 					"roles"
+				]
+			}
+		},
+		"/v1/switch/scan": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).SwitchScan`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nRead the MAC table and interface status of switch(es), merged per port, with the node that already holds each MAC",
+				"operationId": "GET_/v1/switch/scan",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Select every node in the database. Required when no nodeset or tags are given",
+						"examples": {
+							"all": {
+								"value": "true"
+							}
+						},
+						"in": "query",
+						"name": "all",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SwitchScanResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/SwitchScanResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "switch scan",
+				"tags": [
+					"v1",
+					"switch"
 				]
 			}
 		},

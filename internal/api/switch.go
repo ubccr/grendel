@@ -2,7 +2,6 @@ package api
 
 import (
 	"errors"
-	"fmt"
 	"slices"
 	"strings"
 
@@ -54,29 +53,34 @@ func (h *Handler) SwitchGetLLDP(c fuego.ContextNoBody) (*model.SwitchLLDPList, e
 		}
 	}
 
-	netSwitch, err := tors.NewNetworkSwitch(nodeList[0])
+	netSwitch, err := tors.New(nodeList[0], tors.ConfigFromViper())
 	if err != nil {
 		return nil, fuego.HTTPError{
 			Err:    err,
+			Type:   tors.ErrorCode(err),
 			Title:  "Error",
 			Detail: err.Error(),
 		}
 	}
 
-	res, err := netSwitch.GetLLDPNeighbors()
+	defer netSwitch.Close()
+	res, err := netSwitch.GetLLDPNeighbors(c.Context())
 	if err != nil {
+		log.Errorf("lldp from %s: %v", nodeList[0].Name, err)
 		return nil, fuego.HTTPError{
 			Err:    err,
+			Type:   tors.CodeUnreachable,
 			Title:  "Error",
-			Detail: "failed to retrieve lldp neighbors",
+			Detail: "failed to retrieve lldp neighbors: " + err.Error(),
 		}
 	}
 
 	filteredList := make(model.LLDPNeighbors)
-	fmt.Println(csf, len(csf))
 	if len(csf) > 0 {
 		for _, port := range csf {
-			filteredList[port] = res[port]
+			if n, ok := res[port]; ok {
+				filteredList[port] = n
+			}
 		}
 	} else {
 		filteredList = res
