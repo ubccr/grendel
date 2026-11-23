@@ -194,6 +194,30 @@ func TestSecureBootKeys(t *testing.T) {
 	assert.Equal(t, "dbDefault", results[0].Data.Keys[0].ID)
 }
 
+// TestSecureBootKeysWithAutoExpand covers a BMC that advertises $expand with bmc.gofish.auto_expand on: a database's keys come back with its collection, where each would otherwise be a request of its own
+func TestSecureBootKeysWithAutoExpand(t *testing.T) {
+	f := secureBootFixture(t, true, "")
+	f.tree["/redfish/v1/"] = strings.Replace(serviceRootDell, `"Vendor": "Dell",`, `"Vendor": "Dell", "ProtocolFeaturesSupported": {"ExpandQuery": {"NoLinks": true}},`, 1)
+	enroll(f, "db", "7", testCert(t, "Grendel Test DB"))
+	for i := range 50 {
+		f.member(sbColl("dbx", "Signatures"), fmt.Sprint(i), map[string]any{"SignatureString": fmt.Sprintf("%064X", i), "SignatureType": "EFI_CERT_SHA256_GUID"})
+	}
+
+	results := testService(func(c *Config) { c.AutoExpand = true }).SecureBoot(context.Background(), sbTarget(t, f), SecureBootRequest{Keys: true})
+	require.True(t, results[0].Success, "message was: %s", results[0].Message)
+
+	keys := results[0].Data.Keys
+	require.Len(t, keys, 4)
+	require.Len(t, keys[2].Certificates, 1)
+	assert.Equal(t, "Grendel Test DB", keys[2].Certificates[0].Subject)
+	require.Len(t, keys[3].Signatures, 50)
+	assert.Equal(t, fmt.Sprintf("%064x", 0), keys[3].Signatures[0].Hash)
+
+	for path := range f.hits {
+		assert.False(t, strings.Contains(path, "/Certificates/") || strings.Contains(path, "/Signatures/"), "%s was fetched on its own", path)
+	}
+}
+
 func TestAddSecureBootCerts(t *testing.T) {
 	f := secureBootFixture(t, true, "")
 	a, b := testCert(t, "a"), testCert(t, "b")

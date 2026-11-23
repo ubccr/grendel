@@ -118,7 +118,7 @@ function RouteComponent() {
 
       <Card>
         <CardContent className="pt-6">
-          <KeysPanel nodes={nodes} results={results} />
+          <KeysPanel nodes={nodes} />
         </CardContent>
       </Card>
     </div>

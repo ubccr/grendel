@@ -139,11 +139,13 @@ func (s *Service) connectSecureBoot(ctx context.Context, t Target) (_ *secureBoo
 	if sb == nil {
 		return nil, errors.New("bmc exposes no secure boot resource")
 	}
-	settings, err := redfishSettings(c, sb.ODataID)
-	if err != nil {
-		return nil, err
+	var raw struct {
+		Settings schemas.Settings `json:"@Redfish.Settings"`
 	}
-	return &secureBootConn{conn: c, sb: sb, settings: settings}, nil
+	if err := json.Unmarshal(sb.RawData, &raw); err != nil {
+		return nil, fmt.Errorf("reading the settings of %s: %w", sb.ODataID, err)
+	}
+	return &secureBootConn{conn: c, sb: sb, settings: raw.Settings}, nil
 }
 
 // staged reports whether changes go to a separate settings object rather than the resource itself

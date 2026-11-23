@@ -12,6 +12,8 @@ const roles: Record<Writable, { name: string; tone: string }> = {
 type Props = {
   // counts is how many keys each database holds
   counts: Record<string, number>;
+  // unread are the databases with no count to show, still being read from the BMC or failed to be
+  unread?: Partial<Record<Writable, "reading" | "failed">>;
   selected: Writable;
   onSelect: (db: Writable) => void;
   // unit is what a count counts, keys on one node or distinct keys across many
@@ -19,10 +21,17 @@ type Props = {
 };
 
 // The databases are drawn in the order authority flows: PK signs changes to KEK, KEK signs changes to db, and dbx sits beside db as the list that overrides it
-export default function TrustChain({ counts, selected, onSelect, unit = "key" }: Props) {
+export default function TrustChain({
+  counts,
+  unread = {},
+  selected,
+  onSelect,
+  unit = "key",
+}: Props) {
   const link = (db: Writable) => {
     const n = counts[db] ?? 0;
-    const empty = n === 0;
+    const state = unread[db];
+    const empty = !state && n === 0;
     const active = selected === db;
     return (
       <button
@@ -41,11 +50,15 @@ export default function TrustChain({ counts, selected, onSelect, unit = "key" }:
         </span>
         <span className="mt-1.5 text-sm">{roles[db].name}</span>
         <span className={cn("text-xs", empty ? "text-yellow-600" : "text-muted-foreground")}>
-          {empty
-            ? db === "PK"
-              ? "None, so nothing is enforced"
-              : "Empty"
-            : `${n} ${unit}${n === 1 ? "" : "s"}`}
+          {state === "reading"
+            ? "Reading…"
+            : state === "failed"
+              ? "Could not be read"
+              : empty
+                ? db === "PK"
+                  ? "None, so nothing is enforced"
+                  : "Empty"
+                : `${n} ${unit}${n === 1 ? "" : "s"}`}
         </span>
       </button>
     );

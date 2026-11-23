@@ -1,5 +1,7 @@
+import type { BmcResponseModelBmcSecureBoot } from "@/client";
 import KeysPanel from "@/components/secureboot/keys-panel";
 import SecureBootState, { look, type Status } from "@/components/secureboot/state";
+import { secureBootKeysOptions } from "@/lib/queries";
 import type { SecureBootResult } from "@/lib/secureboot";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
@@ -53,31 +55,35 @@ describe("secure boot views", () => {
       issuer: "Grendel DB",
       not_after: "2036-01-01T00:00:00Z",
     };
-    const html = render(
-      <KeysPanel
-        nodes="cpn-[01-02]"
-        results={results([
-          {
-            node: "cpn-01",
-            success: true,
-            data: { keys: [{ id: "db", certificates: [cert], signatures: [] }] },
+    const client = new QueryClient();
+    client.setQueryData(secureBootKeysOptions("cpn-[01-02]", "trusted").queryKey, {
+      results: results([
+        {
+          node: "cpn-01",
+          success: true,
+          data: { keys: [{ id: "db", certificates: [cert], signatures: [] }] },
+        },
+        {
+          node: "cpn-02",
+          success: true,
+          data: {
+            keys: [
+              { id: "db", certificates: [], signatures: [] },
+              { id: "PK", certificates: [], signatures: [] },
+            ],
           },
-          {
-            node: "cpn-02",
-            success: true,
-            data: {
-              keys: [
-                { id: "db", certificates: [], signatures: [] },
-                { id: "PK", certificates: [], signatures: [] },
-              ],
-            },
-          },
-        ])}
-      />,
+        },
+      ]),
+    } as BmcResponseModelBmcSecureBoot);
+    const html = renderToStaticMarkup(
+      <QueryClientProvider client={client}>
+        <KeysPanel nodes="cpn-[01-02]" />
+      </QueryClientProvider>,
     );
     expect(html).toContain("Grendel DB");
     expect(html).toContain("On 1 of 2 nodes");
     expect(html).toContain("Missing on cpn-02");
     expect(html).toContain("None, so nothing is enforced");
+    expect(html).toContain("Reading…");
   });
 });

@@ -31,7 +31,7 @@ func init() {
 	viper.SetDefault("bmc.gofish.max_concurrent_requests", 1)
 	// reusing connections keeps one connection open for all of an operation's requests to a BMC, rather than a TCP connection and TLS handshake for each. It lasts as long as the operation, since each one builds its own client
 	viper.SetDefault("bmc.gofish.reuse_connections", true)
-	viper.SetDefault("bmc.gofish.auto_expand", false)
+	viper.SetDefault("bmc.gofish.auto_expand", true)
 	viper.SetDefault("bmc.gofish.client_timeout", time.Second*60)
 	viper.SetDefault("bmc.gofish.dial_timeout", time.Second*5)
 	viper.SetDefault("bmc.gofish.dial_keep_alive_timeout", time.Second*30)

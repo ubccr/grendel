@@ -83,6 +83,10 @@ func (f *fixture) serveCollection(w http.ResponseWriter, r *http.Request, body m
 		case http.MethodGet:
 			refs := []string{}
 			for _, uri := range slices.Sorted(maps.Keys(coll)) {
+				if r.URL.Query().Has("$expand") {
+					refs = append(refs, coll[uri])
+					continue
+				}
 				refs = append(refs, `{"@odata.id": "`+uri+`"}`)
 			}
 			w.Write([]byte(`{"@odata.id": "` + p + `", "Members": [` + strings.Join(refs, ",") + `]}`))

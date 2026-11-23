@@ -32,7 +32,7 @@ function RouteComponent() {
   return (
     <div className="grid gap-6">
       <SecureBootState node={node} status={result.data} />
-      <KeysPanel nodes={node} results={data.results ?? []} />
+      <KeysPanel nodes={node} />
     </div>
   );
 }

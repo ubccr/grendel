@@ -345,8 +345,8 @@ cipher_suites = [17, 3]
 max_concurrent_requests = 1
 reuse_connections = true
 
-# Read a collection and its members in one request ($expand) on BMCs that advertise support, instead of one request per member. Off by default as it is untested against real BMCs
-auto_expand = false
+# Read a collection and its members in one request ($expand) on BMCs that advertise support, instead of one request per member. A BMC that fails the expanded read is asked again without it
+auto_expand = true
 
 # Use basic auth instead of creating a Redfish session. Required for mockup server
 basic_auth = true

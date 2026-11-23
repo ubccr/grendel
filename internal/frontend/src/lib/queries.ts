@@ -38,8 +38,16 @@ export const biosOptions = (nodes: string) =>
 
 // one request reads the state and the keys over a single login to each BMC
 export const secureBootOptions = (nodes: string) =>
+  queryOptions({ ...getV1BmcSecurebootOptions({ query: { nodeset: nodes } }), ...hardware });
+
+// a BMC hands over each key in a request of its own, so the few in PK, KEK and db are read apart from the hundreds of hashes in dbx
+export const secureBootKeySets = { trusted: "PK,KEK,db", revoked: "dbx" } as const;
+
+export const secureBootKeysOptions = (nodes: string, set: keyof typeof secureBootKeySets) =>
   queryOptions({
-    ...getV1BmcSecurebootOptions({ query: { nodeset: nodes, keys: true } }),
+    ...getV1BmcSecurebootOptions({
+      query: { nodeset: nodes, keys: true, databases: secureBootKeySets[set] },
+    }),
     ...hardware,
   });
 
