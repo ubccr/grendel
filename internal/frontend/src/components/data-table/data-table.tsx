@@ -455,7 +455,13 @@ export function DataTable<TData extends RowData>({
       </div>
       <div
         ref={bodyRef}
-        className={cn("rounded-md border", scrollHeight ? "overflow-auto" : "overflow-hidden")}
+        className={cn(
+          "rounded-md border",
+          // Table wraps itself in a container that scrolls sideways, which the header would stick to instead of this one
+          scrollHeight
+            ? "overflow-auto [&>[data-slot=table-container]]:overflow-visible"
+            : "overflow-hidden",
+        )}
         style={scrollHeight ? { maxHeight: scrollHeight } : undefined}
       >
         <Table>

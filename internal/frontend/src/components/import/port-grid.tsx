@@ -395,7 +395,7 @@ export function PortGrid({
   );
 }
 
-function ResetButton({
+export function ResetButton({
   title,
   label,
   onClick,

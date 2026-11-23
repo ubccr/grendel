@@ -2,6 +2,7 @@ import { postV1NodesImport, type NodeImportRequest, type NodeImportResponse } fr
 import { postV1NodesImportMutation } from "@/client/@tanstack/react-query.gen";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import type { ImportRow } from "@/lib/import-rows";
@@ -12,6 +13,8 @@ import { useStoredValue } from "@/hooks/use-stored-value";
 import { useId, useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { rangeKey } from "@/lib/addresses";
+import { cellInput } from "@/components/form-layout";
+import { ResetButton } from "./port-grid";
 import { RangePicker } from "./range-picker";
 import { StepBar } from "./step-bar";
 
@@ -19,6 +22,9 @@ type Result = NonNullable<NodeImportResponse["rows"]>[number];
 type Action = "create" | "add" | "replace" | "unchanged" | "conflict";
 
 const s = (n: number) => (n === 1 ? "" : "s");
+
+// an address typed over the one a row would get is kept by the row's port, so it survives a preview that reorders or renumbers the rows
+const editKey = (r: ImportRow) => `${r.node}|${r.mac}|${r.bmc}`;
 
 const actionText: Record<Action, { label: string; count: (n: number) => string; color?: string }> =
   {
@@ -59,6 +65,10 @@ export function Review({
   const [from, setFrom] = useState<"lowest" | "after_highest">("lowest");
   const [ping, setPing] = useState(true);
   const { mutate, isPending } = useMutation(postV1NodesImportMutation());
+  const [edits, setEdits] = useState<Record<string, string>>({});
+  // the edits the preview on screen was made with; any others haven't been checked by the server yet
+  const [checked, setChecked] = useState("{}");
+  const editsKey = useMemo(() => JSON.stringify(edits), [edits]);
 
   const request = useMemo<NodeImportRequest>(
     () => ({
@@ -75,20 +85,38 @@ export function Review({
   const dry = useQuery({
     queryKey: ["node-import-preview", requestKey],
     queryFn: async () =>
-      (await postV1NodesImport({ body: { ...request, dry_run: true }, throwOnError: true })).data,
+      (
+        await postV1NodesImport({
+          body: {
+            ...request,
+            dry_run: true,
+            rows: rows.map((r) => ({ ...r, ip: edits[editKey(r)]?.trim() || r.ip })),
+          },
+          throwOnError: true,
+        })
+      ).data,
     enabled: false,
     // dropped as soon as the request changes, so returning to an earlier request never shows a preview from before other changes were stored
     gcTime: 0,
   });
   const preview = dry.data;
+  // an address changed since the preview is one the server hasn't checked for conflicts or pinged
+  const edited = !!preview && editsKey !== checked;
 
   const runPreview = async () => {
+    const sent = editsKey;
     const { error } = await dry.refetch();
     if (error) {
       const err = error as { title?: string; detail?: string };
       toast.error(err.title ?? "Preview failed", { description: err.detail });
-    }
+    } else setChecked(sent);
   };
+
+  const setAddress = (key: string, ip: string | undefined) =>
+    setEdits((e) => {
+      const { [key]: _, ...rest } = e;
+      return ip === undefined ? rest : { ...rest, [key]: ip };
+    });
 
   const commit = () => {
     // the previewed addresses are sent back, so the server stores exactly what was shown, and a range filling up in between is a conflict rather than a different address
@@ -155,7 +183,13 @@ export function Review({
             </p>
           )}
           <Summary summary={summary} />
-          <PreviewTable rows={preview.rows ?? []} />
+          <PreviewTable
+            rows={preview.rows ?? []}
+            keys={rows.map(editKey)}
+            edits={edits}
+            onEdit={setAddress}
+            onSubmit={runPreview}
+          />
         </div>
       )}
 
@@ -168,14 +202,16 @@ export function Review({
             ? `Choose a ${bmc ? "BMC" : "boot"} address range to hand out addresses from.`
             : !preview
               ? `${rows.length} ${bmc ? "BMC" : "boot"} port${rows.length === 1 ? "" : "s"} to import. Preview to hand out addresses and check for conflicts.`
-              : blocked
-                ? "Resolve the conflicts before importing. Nothing is stored while any row conflicts."
-                : changes === 0
-                  ? "Every port is already in Grendel as shown."
-                  : "Stored in one step: every row or none."}
+              : edited
+                ? "Preview again to check the addresses you changed."
+                : blocked
+                  ? "Resolve the conflicts before importing. Nothing is stored while any row conflicts."
+                  : changes === 0
+                    ? "Every port is already in Grendel as shown."
+                    : "Stored in one step: every row or none."}
         </p>
         <Button
-          variant={preview ? "outline" : "default"}
+          variant={preview && !edited ? "outline" : "default"}
           disabled={rows.length === 0 || isPending || dryRunning || needsRange}
           onClick={runPreview}
         >
@@ -183,7 +219,11 @@ export function Review({
           {preview ? "Preview again" : "Preview"}
         </Button>
         {preview && (
-          <Button disabled={blocked || changes === 0 || isPending || dryRunning} onClick={commit}>
+          <Button
+            variant={edited ? "outline" : "default"}
+            disabled={edited || blocked || changes === 0 || isPending || dryRunning}
+            onClick={commit}
+          >
             {isPending ? <LoaderCircle className="animate-spin" /> : <Upload />}
             Import {changes} port{changes === 1 ? "" : "s"}
           </Button>
@@ -219,10 +259,23 @@ function Summary({ summary }: { summary: NodeImportResponse["summary"] }) {
   );
 }
 
-function PreviewTable({ rows }: { rows: Result[] }) {
-  const sorted = [...rows].sort(
-    (a, b) => order.indexOf(a.action as Action) - order.indexOf(b.action as Action),
-  );
+function PreviewTable({
+  rows,
+  keys,
+  edits,
+  onEdit,
+  onSubmit,
+}: {
+  rows: Result[];
+  // keys names each row's edit, in the order the rows were sent, which is the order the server answers in
+  keys: string[];
+  edits: Record<string, string>;
+  onEdit: (key: string, ip: string | undefined) => void;
+  onSubmit: () => void;
+}) {
+  const sorted = rows
+    .map((r, i) => ({ r, key: keys[i] ?? "" }))
+    .sort((a, b) => order.indexOf(a.r.action as Action) - order.indexOf(b.r.action as Action));
   return (
     <div className="max-h-[min(60vh,40rem)] overflow-auto rounded-lg border">
       <table className="w-full min-w-[48rem] text-sm">
@@ -236,8 +289,9 @@ function PreviewTable({ rows }: { rows: Result[] }) {
           </tr>
         </thead>
         <tbody>
-          {sorted.map((r) => {
+          {sorted.map(({ r, key }) => {
             const a = actionText[r.action as Action] ?? actionText.unchanged;
+            const typed = edits[key];
             return (
               <tr
                 key={`${r.node}-${r.mac}-${r.bmc}`}
@@ -272,9 +326,33 @@ function PreviewTable({ rows }: { rows: Result[] }) {
                   )}
                   {r.mac}
                 </td>
-                <td className="px-2 py-1.5 font-mono text-xs whitespace-nowrap">
-                  {r.ip ?? "—"}
-                  {r.assigned && (
+                <td className="px-2 py-1 text-xs whitespace-nowrap">
+                  {/* sized in the input's own font to hold the longest address, 255.255.255.255/32, beside the reset button */}
+                  <span className="relative inline-block w-[calc(19ch+2.5rem)] align-middle font-mono text-xs">
+                    <Input
+                      aria-label={`Address for ${r.node}`}
+                      value={typed ?? r.ip ?? ""}
+                      placeholder="From the range"
+                      spellCheck={false}
+                      className={cn(
+                        cellInput,
+                        "h-7 pr-8 text-xs md:text-xs",
+                        typed !== undefined && "bg-sky-500/10",
+                      )}
+                      onChange={(e) => onEdit(key, e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") onSubmit();
+                      }}
+                    />
+                    {typed !== undefined && (
+                      <ResetButton
+                        title="Take the address from the range or the port again"
+                        label={`Reset the address for ${r.node}`}
+                        onClick={() => onEdit(key, undefined)}
+                      />
+                    )}
+                  </span>
+                  {r.assigned && typed === undefined && (
                     <span className="ml-1.5 font-sans text-[11px] text-muted-foreground">new</span>
                   )}
                   {r.answered && (
