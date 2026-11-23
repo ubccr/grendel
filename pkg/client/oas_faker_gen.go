@@ -2589,7 +2589,31 @@ func (s *BmcSecureBootDeleteBody) SetFake() {
 	}
 	{
 		{
+			s.Fingerprints = nil
+			for i := 0; i < 0; i++ {
+				var elem string
+				{
+					elem = "string"
+				}
+				s.Fingerprints = append(s.Fingerprints, elem)
+			}
+		}
+	}
+	{
+		{
 			s.ID.SetFake()
+		}
+	}
+	{
+		{
+			s.Ids = nil
+			for i := 0; i < 0; i++ {
+				var elem string
+				{
+					elem = "string"
+				}
+				s.Ids = append(s.Ids, elem)
+			}
 		}
 	}
 }

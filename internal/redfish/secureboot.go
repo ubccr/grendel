@@ -48,11 +48,11 @@ type AddSecureBootKeyRequest struct {
 	Owner         string
 }
 
-// DeleteSecureBootKeyRequest names a key by Fingerprint, a certificate's SHA-256 or a signature's hash in lower case hex, which is the same on every node, or by ID, which is not
+// DeleteSecureBootKeyRequest names keys by Fingerprints, a certificate's SHA-256 or a signature's hash in lower case hex, which are the same on every node, or by IDs, which are not
 type DeleteSecureBootKeyRequest struct {
-	Database    string
-	Fingerprint string
-	ID          string
+	Database     string
+	Fingerprints []string
+	IDs          []string
 }
 
 // ResetSecureBootKeysRequest resets every database when Database is empty, or only that one. DeletePK only applies to every database
@@ -494,7 +494,7 @@ func (s *Service) deleteSecureBootKeyOne(ctx context.Context, t Target, req Dele
 		return nil, err
 	}
 	for _, c := range certs {
-		if (req.ID != "" && c.ID == req.ID) || (req.Fingerprint != "" && fingerprintOf(c) == req.Fingerprint) {
+		if slices.Contains(req.IDs, c.ID) || slices.Contains(req.Fingerprints, fingerprintOf(c)) {
 			uris, ids = append(uris, c.ODataID), append(ids, c.ID)
 		}
 	}
@@ -504,7 +504,7 @@ func (s *Service) deleteSecureBootKeyOne(ctx context.Context, t Target, req Dele
 		return nil, err
 	}
 	for _, sig := range sigs {
-		if (req.ID != "" && sig.ID == req.ID) || (req.Fingerprint != "" && strings.EqualFold(sig.SignatureString, req.Fingerprint)) {
+		if slices.Contains(req.IDs, sig.ID) || slices.Contains(req.Fingerprints, strings.ToLower(sig.SignatureString)) {
 			uris, ids = append(uris, sig.ODataID), append(ids, sig.ID)
 		}
 	}

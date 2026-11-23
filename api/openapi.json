@@ -2116,12 +2116,26 @@
 						"type": "string"
 					},
 					"fingerprint": {
-						"description": "SHA-256 of a certificate, or the hash of a signature, in hex with or without colons. Mutually exclusive with id",
+						"description": "SHA-256 of a certificate, or the hash of a signature, in hex with or without colons",
 						"type": "string"
 					},
+					"fingerprints": {
+						"description": "More keys to remove, each named as fingerprint is",
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
 					"id": {
-						"description": "Id of the certificate or signature on the bmc. Ids differ between nodes, so this suits a single node. Mutually exclusive with fingerprint",
+						"description": "Id of the certificate or signature on the bmc. Ids differ between nodes, so this suits a single node",
 						"type": "string"
+					},
+					"ids": {
+						"description": "More keys to remove, each named as id is",
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
 					}
 				},
 				"type": "object"

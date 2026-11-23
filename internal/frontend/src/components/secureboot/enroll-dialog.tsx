@@ -141,7 +141,7 @@ export default function EnrollDialog({ nodes, db: initial }: Props) {
         <Plus />
         Enroll key
       </DialogTrigger>
-      <DialogContent className="max-h-dvh overflow-y-auto sm:max-w-xl">
+      <DialogContent className="max-h-[90dvh] gap-6 overflow-y-auto p-6 sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Enroll a key</DialogTitle>
           <DialogDescription>
@@ -149,11 +149,11 @@ export default function EnrollDialog({ nodes, db: initial }: Props) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4">
-          <div className="grid gap-1.5">
+        <div className="grid gap-6">
+          <div className="grid gap-2">
             <Label htmlFor="enroll-db">Database</Label>
             <Select value={db} onValueChange={(v) => setDb(v as Writable)}>
-              <SelectTrigger id="enroll-db" className="w-40">
+              <SelectTrigger id="enroll-db" className="w-full sm:w-56">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -164,17 +164,17 @@ export default function EnrollDialog({ nodes, db: initial }: Props) {
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-muted-foreground">{dbHelp[db]}</p>
+            <p className="text-sm text-muted-foreground">{dbHelp[db]}</p>
           </div>
 
           <Tabs value={kind} onValueChange={(v) => setKind(v as "cert" | "hash")}>
-            <TabsList>
+            <TabsList className="w-full">
               <TabsTrigger value="cert">Certificate</TabsTrigger>
               <TabsTrigger value="hash">Hash</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="cert" className="grid gap-3 pt-2">
-              <div className="grid gap-1.5">
+            <TabsContent value="cert" className="grid gap-5 pt-4">
+              <div className="grid gap-2">
                 <Label htmlFor="enroll-file">Certificate file</Label>
                 <Input
                   id="enroll-file"
@@ -184,12 +184,12 @@ export default function EnrollDialog({ nodes, db: initial }: Props) {
                 />
               </div>
               {!file && (
-                <div className="grid gap-1.5">
+                <div className="grid gap-2">
                   <Label htmlFor="enroll-pem">Or paste PEM</Label>
                   <Textarea
                     id="enroll-pem"
-                    rows={5}
-                    className="font-mono text-xs"
+                    rows={8}
+                    className="font-mono text-xs leading-relaxed"
                     placeholder="-----BEGIN CERTIFICATE-----"
                     value={pasted}
                     onChange={(e) => setPasted(e.target.value)}
@@ -197,11 +197,11 @@ export default function EnrollDialog({ nodes, db: initial }: Props) {
                 </div>
               )}
               {pems.length > 0 && (
-                <ul className="grid gap-2 rounded-lg border bg-muted/30 p-3 text-sm">
+                <ul className="grid gap-3 rounded-lg border bg-muted/30 p-4 text-sm">
                   {pems.map((_, i) => (
-                    <li key={i} className="flex items-start gap-2">
+                    <li key={i} className="flex items-start gap-3">
                       <FileKey className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-                      <div className="min-w-0">
+                      <div className="grid min-w-0 gap-1">
                         <div>
                           Certificate {i + 1}
                           {file && pems.length === 1 ? ` from ${file.name}` : ""}
@@ -218,15 +218,15 @@ export default function EnrollDialog({ nodes, db: initial }: Props) {
               )}
             </TabsContent>
 
-            <TabsContent value="hash" className="grid gap-3 pt-2">
-              <div className="grid gap-1.5">
+            <TabsContent value="hash" className="grid gap-5 pt-4">
+              <div className="grid gap-2">
                 <Label htmlFor="enroll-hash-type">Type</Label>
                 <Select
                   value={hashType}
                   onValueChange={(v) => setHashType(v as SignatureType)}
                   items={signatureTypes.map((t) => ({ value: t, label: hashName(t) }))}
                 >
-                  <SelectTrigger id="enroll-hash-type" className="w-56">
+                  <SelectTrigger id="enroll-hash-type" className="w-full sm:w-56">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -238,11 +238,11 @@ export default function EnrollDialog({ nodes, db: initial }: Props) {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid gap-1.5">
+              <div className="grid gap-2">
                 <Label htmlFor="enroll-hash">Hash</Label>
                 <Input
                   id="enroll-hash"
-                  className="font-mono text-xs"
+                  className="font-mono"
                   placeholder={`${wantHex} hex digits`}
                   aria-invalid={!!hashError}
                   value={hash}
@@ -259,11 +259,11 @@ export default function EnrollDialog({ nodes, db: initial }: Props) {
             </TabsContent>
           </Tabs>
 
-          <div className="grid gap-1.5">
+          <div className="grid gap-2">
             <Label htmlFor="enroll-owner">Owner GUID (optional)</Label>
             <Input
               id="enroll-owner"
-              className="font-mono text-xs"
+              className="font-mono"
               placeholder="Left to the BMC"
               aria-invalid={!!ownerError}
               value={owner}
@@ -272,13 +272,13 @@ export default function EnrollDialog({ nodes, db: initial }: Props) {
             {ownerError && <p className="text-xs text-destructive">{ownerError}</p>}
           </div>
 
-          <div className="text-sm text-muted-foreground">
+          <div className="grid gap-2 border-t pt-5 text-sm text-muted-foreground">
             Enrolls on:
             <NodesetView nodes={nodes} size="sm" />
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="-mx-6 -mb-6 px-6">
           <DialogClose render={<Button variant="secondary" />}>Cancel</DialogClose>
           <Button disabled={!ready || isPending} onClick={submit}>
             {isPending && <LoaderCircle className="animate-spin" />}

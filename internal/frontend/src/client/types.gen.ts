@@ -736,13 +736,21 @@ export type BmcSecureBootDeleteBody = {
      */
     database?: string;
     /**
-     * SHA-256 of a certificate, or the hash of a signature, in hex with or without colons. Mutually exclusive with id
+     * SHA-256 of a certificate, or the hash of a signature, in hex with or without colons
      */
     fingerprint?: string;
     /**
-     * Id of the certificate or signature on the bmc. Ids differ between nodes, so this suits a single node. Mutually exclusive with fingerprint
+     * More keys to remove, each named as fingerprint is
+     */
+    fingerprints?: Array<string>;
+    /**
+     * Id of the certificate or signature on the bmc. Ids differ between nodes, so this suits a single node
      */
     id?: string;
+    /**
+     * More keys to remove, each named as id is
+     */
+    ids?: Array<string>;
 };
 
 /**

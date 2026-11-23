@@ -12796,17 +12796,39 @@ func (s *BmcSecureBootDeleteBody) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.Fingerprints != nil {
+			e.FieldStart("fingerprints")
+			e.ArrStart()
+			for _, elem := range s.Fingerprints {
+				e.Str(elem)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
 		if s.ID.Set {
 			e.FieldStart("id")
 			s.ID.Encode(e)
 		}
 	}
+	{
+		if s.Ids != nil {
+			e.FieldStart("ids")
+			e.ArrStart()
+			for _, elem := range s.Ids {
+				e.Str(elem)
+			}
+			e.ArrEnd()
+		}
+	}
 }
 
-var jsonFieldsNameOfBmcSecureBootDeleteBody = [3]string{
+var jsonFieldsNameOfBmcSecureBootDeleteBody = [5]string{
 	0: "database",
 	1: "fingerprint",
-	2: "id",
+	2: "fingerprints",
+	3: "id",
+	4: "ids",
 }
 
 // Decode decodes BmcSecureBootDeleteBody from json.
@@ -12837,6 +12859,25 @@ func (s *BmcSecureBootDeleteBody) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"fingerprint\"")
 			}
+		case "fingerprints":
+			if err := func() error {
+				s.Fingerprints = make([]string, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem string
+					v, err := d.Str()
+					elem = string(v)
+					if err != nil {
+						return err
+					}
+					s.Fingerprints = append(s.Fingerprints, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"fingerprints\"")
+			}
 		case "id":
 			if err := func() error {
 				s.ID.Reset()
@@ -12846,6 +12887,25 @@ func (s *BmcSecureBootDeleteBody) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"id\"")
+			}
+		case "ids":
+			if err := func() error {
+				s.Ids = make([]string, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem string
+					v, err := d.Str()
+					elem = string(v)
+					if err != nil {
+						return err
+					}
+					s.Ids = append(s.Ids, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ids\"")
 			}
 		default:
 			return d.Skip()

@@ -9,6 +9,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/go-fuego/fuego"
@@ -31,11 +32,13 @@ type BmcSecureBootKeyBody struct {
 	Owner         string   `json:"owner" description:"UEFI signature owner GUID. Empty lets the bmc choose"`
 }
 
-// BmcSecureBootDeleteBody names one key to remove, by a fingerprint that is the same on every node, or an id that is not
+// BmcSecureBootDeleteBody names the keys to remove, by fingerprints that are the same on every node, or ids that are not
 type BmcSecureBootDeleteBody struct {
-	Database    string `json:"database" description:"PK, KEK, db or dbx" example:"db"`
-	Fingerprint string `json:"fingerprint" description:"SHA-256 of a certificate, or the hash of a signature, in hex with or without colons. Mutually exclusive with id"`
-	ID          string `json:"id" description:"Id of the certificate or signature on the bmc. Ids differ between nodes, so this suits a single node. Mutually exclusive with fingerprint"`
+	Database     string   `json:"database" description:"PK, KEK, db or dbx" example:"db"`
+	Fingerprint  string   `json:"fingerprint" description:"SHA-256 of a certificate, or the hash of a signature, in hex with or without colons"`
+	Fingerprints []string `json:"fingerprints" description:"More keys to remove, each named as fingerprint is"`
+	ID           string   `json:"id" description:"Id of the certificate or signature on the bmc. Ids differ between nodes, so this suits a single node"`
+	IDs          []string `json:"ids" description:"More keys to remove, each named as id is"`
 }
 
 type BmcSecureBootResetBody struct {
@@ -219,12 +222,10 @@ func secureBootDelete(body BmcSecureBootDeleteBody) (redfish.DeleteSecureBootKey
 	}
 	req.Database = db
 
-	fp := redfish.NormalizeFingerprint(body.Fingerprint)
-	id := strings.TrimSpace(body.ID)
-	switch {
-	case fp != "" && id != "":
-		return req, "", badRequest(errors.New("both fingerprint and id given"), "give a fingerprint or an id, not both")
-	case fp != "":
+	for _, fp := range append([]string{body.Fingerprint}, body.Fingerprints...) {
+		if fp = redfish.NormalizeFingerprint(fp); fp == "" || slices.Contains(req.Fingerprints, fp) {
+			continue
+		}
 		data, err := hex.DecodeString(fp)
 		if err != nil {
 			return req, "", badRequest(err, "fingerprint must be hex encoded")
@@ -233,13 +234,30 @@ func secureBootDelete(body BmcSecureBootDeleteBody) (redfish.DeleteSecureBootKey
 		if len(data) < 32 {
 			return req, "", badRequest(fmt.Errorf("fingerprint is %d hex digits", len(fp)), "fingerprint must be the whole SHA-256 or hash, at least 64 hex digits")
 		}
-		req.Fingerprint = fp
-		return req, fmt.Sprintf("bmc secureboot delete %s %s", db, fp), nil
-	case id != "":
-		req.ID = id
-		return req, fmt.Sprintf("bmc secureboot delete %s id %s", db, id), nil
+		req.Fingerprints = append(req.Fingerprints, fp)
 	}
-	return req, "", badRequest(errors.New("no key named"), "give the fingerprint or id of the key to remove")
+	for _, id := range append([]string{body.ID}, body.IDs...) {
+		if id = strings.TrimSpace(id); id != "" && !slices.Contains(req.IDs, id) {
+			req.IDs = append(req.IDs, id)
+		}
+	}
+	if len(req.Fingerprints)+len(req.IDs) == 0 {
+		return req, "", badRequest(errors.New("no key named"), "give the fingerprint or id of each key to remove")
+	}
+
+	// the operation is an event's summary, which a long selection would fill with hashes
+	if n := len(req.Fingerprints) + len(req.IDs); n > 3 {
+		return req, fmt.Sprintf("bmc secureboot delete %s %d keys", db, n), nil
+	}
+
+	var named []string
+	if len(req.Fingerprints) > 0 {
+		named = append(named, strings.Join(req.Fingerprints, ","))
+	}
+	if len(req.IDs) > 0 {
+		named = append(named, "id "+strings.Join(req.IDs, ","))
+	}
+	return req, fmt.Sprintf("bmc secureboot delete %s %s", db, strings.Join(named, " ")), nil
 }
 
 var secureBootResetTypes = map[string]schemas.ResetKeysType{

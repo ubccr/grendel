@@ -92,13 +92,24 @@ func TestSecureBootDelete(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if req.Fingerprint != fp {
-		t.Errorf("fingerprint = %s, want it normalized", req.Fingerprint)
+	if len(req.Fingerprints) != 1 || req.Fingerprints[0] != fp {
+		t.Errorf("fingerprints = %v, want the one normalized", req.Fingerprints)
+	}
+
+	other := strings.Repeat("cd", 32)
+	req, operation, err := secureBootDelete(BmcSecureBootDeleteBody{Database: "db", Fingerprints: []string{fp, colons, other}, IDs: []string{"3", " 3 ", "4"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(req.Fingerprints) != 2 || len(req.IDs) != 2 {
+		t.Errorf("got %v and %v, want each key named once", req.Fingerprints, req.IDs)
+	}
+	if want := "bmc secureboot delete db 4 keys"; operation != want {
+		t.Errorf("operation = %q, want %q", operation, want)
 	}
 
 	refused := map[string]BmcSecureBootDeleteBody{
 		"nothing":     {Database: "db"},
-		"both":        {Database: "db", Fingerprint: fp, ID: "3"},
 		"short":       {Database: "db", Fingerprint: fp[:16]},
 		"not hex":     {Database: "db", Fingerprint: strings.Repeat("zz", 32)},
 		"default":     {Database: "KEKDefault", ID: "1"},

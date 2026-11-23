@@ -4988,12 +4988,15 @@ func (s *BmcSecureBootBody) SetEnabled(val bool) {
 type BmcSecureBootDeleteBody struct {
 	// PK, KEK, db or dbx.
 	Database OptString `json:"database"`
-	// SHA-256 of a certificate, or the hash of a signature, in hex with or without colons. Mutually
-	// exclusive with id.
+	// SHA-256 of a certificate, or the hash of a signature, in hex with or without colons.
 	Fingerprint OptString `json:"fingerprint"`
+	// More keys to remove, each named as fingerprint is.
+	Fingerprints []string `json:"fingerprints"`
 	// Id of the certificate or signature on the bmc. Ids differ between nodes, so this suits a single
-	// node. Mutually exclusive with fingerprint.
+	// node.
 	ID OptString `json:"id"`
+	// More keys to remove, each named as id is.
+	Ids []string `json:"ids"`
 }
 
 // GetDatabase returns the value of Database.
@@ -5006,9 +5009,19 @@ func (s *BmcSecureBootDeleteBody) GetFingerprint() OptString {
 	return s.Fingerprint
 }
 
+// GetFingerprints returns the value of Fingerprints.
+func (s *BmcSecureBootDeleteBody) GetFingerprints() []string {
+	return s.Fingerprints
+}
+
 // GetID returns the value of ID.
 func (s *BmcSecureBootDeleteBody) GetID() OptString {
 	return s.ID
+}
+
+// GetIds returns the value of Ids.
+func (s *BmcSecureBootDeleteBody) GetIds() []string {
+	return s.Ids
 }
 
 // SetDatabase sets the value of Database.
@@ -5021,9 +5034,19 @@ func (s *BmcSecureBootDeleteBody) SetFingerprint(val OptString) {
 	s.Fingerprint = val
 }
 
+// SetFingerprints sets the value of Fingerprints.
+func (s *BmcSecureBootDeleteBody) SetFingerprints(val []string) {
+	s.Fingerprints = val
+}
+
 // SetID sets the value of ID.
 func (s *BmcSecureBootDeleteBody) SetID(val OptString) {
 	s.ID = val
+}
+
+// SetIds sets the value of Ids.
+func (s *BmcSecureBootDeleteBody) SetIds(val []string) {
+	s.Ids = val
 }
 
 // BmcSecureBootKeyBody schema.

@@ -606,7 +606,7 @@ func compatSecureBoot(t *testing.T, ctx context.Context) {
 		}
 		t.Log(added.Note)
 
-		removed, err := svc.deleteSecureBootKeyOne(ctx, compatTarget(), DeleteSecureBootKeyRequest{Database: "db", Fingerprint: Fingerprint(cert.Raw)})
+		removed, err := svc.deleteSecureBootKeyOne(ctx, compatTarget(), DeleteSecureBootKeyRequest{Database: "db", Fingerprints: []string{Fingerprint(cert.Raw)}})
 		if err != nil {
 			t.Fatalf("enrolled but cannot remove the certificate, remove it by hand: %s", err)
 		}

@@ -110,7 +110,7 @@ export default function KeysPanel({ nodes }: Props) {
               </span>
             </p>
           )}
-          <KeyList db={db} rows={shown} reached={reached} />
+          <KeyList db={db} rows={shown} reached={reached} reading={current.isFetching} />
         </>
       )}
     </section>

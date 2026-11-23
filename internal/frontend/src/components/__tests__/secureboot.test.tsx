@@ -6,7 +6,14 @@ import type { SecureBootResult } from "@/lib/secureboot";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+// the key table keeps its filters with the router's hooks, and there is no router here
+vi.mock("@tanstack/react-router", async (original) => ({
+  ...(await original<typeof import("@tanstack/react-router")>()),
+  useNavigate: () => () => Promise.resolve(),
+  useSearch: () => ({}),
+}));
 
 // fixtures name only the fields a test is about
 const status = (s: Partial<Status>) => s as Status;
@@ -81,7 +88,7 @@ describe("secure boot views", () => {
       </QueryClientProvider>,
     );
     expect(html).toContain("Grendel DB");
-    expect(html).toContain("On 1 of 2 nodes");
+    expect(html).toContain("1 of 2");
     expect(html).toContain("Missing on cpn-02");
     expect(html).toContain("None, so nothing is enforced");
     expect(html).toContain("Reading…");

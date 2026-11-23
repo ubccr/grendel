@@ -259,7 +259,7 @@ func TestDeleteSecureBootKeyByFingerprint(t *testing.T) {
 	enroll(f2, "db", "9", cert)
 
 	targets := []Target{{Name: "cpn-a01-01", Addr: f1.serve(t).URL}, {Name: "cpn-a01-02", Addr: f2.serve(t).URL}}
-	results := testService(nil).DeleteSecureBootKey(context.Background(), targets, DeleteSecureBootKeyRequest{Database: "db", Fingerprint: cert.Fingerprint})
+	results := testService(nil).DeleteSecureBootKey(context.Background(), targets, DeleteSecureBootKeyRequest{Database: "db", Fingerprints: []string{cert.Fingerprint}})
 	require.True(t, results[0].Success, "message was: %s", results[0].Message)
 	require.True(t, results[1].Success, "message was: %s", results[1].Message)
 	assert.Equal(t, "removed 3 from db", results[0].Message)
@@ -268,10 +268,25 @@ func TestDeleteSecureBootKeyByFingerprint(t *testing.T) {
 	assert.Equal(t, []string{sbColl("db", "Certificates") + "/9"}, deletes(f2))
 }
 
+func TestDeleteSecureBootKeys(t *testing.T) {
+	a, b, kept := testCert(t, "a"), testCert(t, "b"), testCert(t, "kept")
+	f := secureBootFixture(t, true, "")
+	enroll(f, "db", "3", a)
+	enroll(f, "db", "4", b)
+	enroll(f, "db", "5", kept)
+	hash := fmt.Sprintf("%064x", 7)
+	f.member(sbColl("db", "Signatures"), "9", map[string]any{"SignatureString": strings.ToUpper(hash), "SignatureType": "EFI_CERT_SHA256_GUID"})
+
+	results := testService(nil).DeleteSecureBootKey(context.Background(), sbTarget(t, f), DeleteSecureBootKeyRequest{Database: "db", Fingerprints: []string{a.Fingerprint, hash}, IDs: []string{"4"}})
+	require.True(t, results[0].Success, "message was: %s", results[0].Message)
+	assert.Equal(t, "removed 3, 4, 9 from db", results[0].Message)
+	assert.Equal(t, []string{sbColl("db", "Certificates") + "/3", sbColl("db", "Certificates") + "/4", sbColl("db", "Signatures") + "/9"}, deletes(f))
+}
+
 func TestDeleteSecureBootKeyNotEnrolled(t *testing.T) {
 	f := secureBootFixture(t, true, "")
 
-	results := testService(nil).DeleteSecureBootKey(context.Background(), sbTarget(t, f), DeleteSecureBootKeyRequest{Database: "db", ID: "42"})
+	results := testService(nil).DeleteSecureBootKey(context.Background(), sbTarget(t, f), DeleteSecureBootKeyRequest{Database: "db", IDs: []string{"42"}})
 	require.True(t, results[0].Success, "message was: %s", results[0].Message)
 	assert.Equal(t, "not enrolled in db, nothing sent", results[0].Message)
 	assert.Empty(t, deletes(f))
