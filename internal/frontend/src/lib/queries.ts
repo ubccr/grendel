@@ -7,8 +7,10 @@ import {
   getV1BmcSelOptions,
   getV1BmcStatusOptions,
   getV1GrendelEventsOptions,
+  getV1NodesCheckOptions,
   getV1NodesFindOptions,
   getV1NodesProvisionStatusOptions,
+  getV1NodesRenderTemplateOptions,
   getV1SwitchNodesetLldpOptions,
   getV1SwitchScanOptions,
 } from "@/client/@tanstack/react-query.gen";
@@ -29,6 +31,18 @@ export const nodeOptions = (node: string) => getV1NodesFindOptions({ query: { no
 
 export const provisionStatusOptions = (query?: { nodeset?: string; tags?: string }) =>
   getV1NodesProvisionStatusOptions(query && { query });
+
+// both read the templates and boot files from the server's disk, which is what changes between looks, so neither is served from the cache
+export const bootCheckOptions = (nodes: string, arch?: string) =>
+  queryOptions({ ...getV1NodesCheckOptions({ query: { nodeset: nodes, arch } }), staleTime: 0 });
+
+export const renderOptions = (node: string, template: string, arch?: string) =>
+  queryOptions({
+    ...getV1NodesRenderTemplateOptions({ path: { template }, query: { nodeset: node, arch } }),
+    staleTime: 0,
+    // the output holds a working boot token, which is dropped as soon as nothing shows it
+    gcTime: 0,
+  });
 
 export const bmcStatusOptions = (nodes: string) =>
   queryOptions({ ...getV1BmcStatusOptions({ query: { nodeset: nodes } }), ...hardware });

@@ -54,6 +54,9 @@ func (h *Host) HostType() string {
 	return t
 }
 
+// Arches are the arches a PXE boot detects that boot images are built for, which is what asking for every arch means
+var Arches = []string{"x86_64", "aarch64"}
+
 // ArchDebian returns the Debian style name for the host arch or the arch unchanged if it has no alias
 func (h *Host) ArchDebian() string {
 	switch h.Arch {

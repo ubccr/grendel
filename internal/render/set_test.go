@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package provision
+package render
 
 import (
 	"bytes"
@@ -25,16 +25,16 @@ func TestWatchRecoversFromFailedReload(t *testing.T) {
 	viper.Set("provision.templates_dir", dir)
 	t.Cleanup(func() { viper.Set("provision.templates_dir", nil) })
 
-	renderer, err := NewTemplateRenderer()
+	set, err := NewSet()
 	require.NoError(t, err)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
-	require.NoError(t, renderer.Watch(ctx))
+	require.NoError(t, set.Watch(ctx))
 
 	render := func() string {
 		var buf bytes.Buffer
-		if err := renderer.templates.Load().ExecuteTemplate(&buf, "custom.tmpl", nil); err != nil {
+		if err := set.Execute(&buf, "custom.tmpl", nil); err != nil {
 			return err.Error()
 		}
 		return buf.String()

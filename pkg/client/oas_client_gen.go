@@ -252,6 +252,20 @@ type Invoker interface {
 	//
 	// GET /v1/nodes
 	GETV1Nodes(ctx context.Context, params GETV1NodesParams) ([]Host, error)
+	// GETV1NodesCheck invokes GET_/v1/nodes/check operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeCheck`
+	// #### Middlewares:
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Check that each node can be served its boot: the kernel and initrds of its image are readable at
+	// the paths rendered for the node, with their .sig files when the image is verified, and the iPXE
+	// script and every template in the image's provision_templates render. Files are read on the machine
+	// the API runs on. Every node is taken when neither nodeset nor tags is given.
+	//
+	// GET /v1/nodes/check
+	GETV1NodesCheck(ctx context.Context, params GETV1NodesCheckParams) (*NodeCheckResponse, error)
 	// GETV1NodesFind invokes GET_/v1/nodes/find operation.
 	//
 	// #### Controller:
@@ -300,6 +314,20 @@ type Invoker interface {
 	//
 	// GET /v1/nodes/provision-status
 	GETV1NodesProvisionStatus(ctx context.Context, params GETV1NodesProvisionStatusParams) ([]ProvisionStatus, error)
+	// GETV1NodesRenderTemplate invokes GET_/v1/nodes/render/:template operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeRender`
+	// #### Middlewares:
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Render a template for each node as the provision server would send it, without recording a
+	// provision stage. Templates are read from disk on each request, so an edit is seen at once and one
+	// that does not parse is an error. The output holds a working boot token and whatever secrets the
+	// template renders, so the nodes have to be named: a request with neither nodeset nor tags is refused.
+	//
+	// GET /v1/nodes/render/{template}
+	GETV1NodesRenderTemplate(ctx context.Context, params GETV1NodesRenderTemplateParams) (*NodeRenderResponse, error)
 	// GETV1NodesTags invokes GET_/v1/nodes/tags operation.
 	//
 	// #### Controller:
@@ -3633,6 +3661,183 @@ func (c *Client) sendGETV1Nodes(ctx context.Context, params GETV1NodesParams) (r
 	return result, nil
 }
 
+// GETV1NodesCheck invokes GET_/v1/nodes/check operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).NodeCheck`
+// #### Middlewares:
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Check that each node can be served its boot: the kernel and initrds of its image are readable at
+// the paths rendered for the node, with their .sig files when the image is verified, and the iPXE
+// script and every template in the image's provision_templates render. Files are read on the machine
+// the API runs on. Every node is taken when neither nodeset nor tags is given.
+//
+// GET /v1/nodes/check
+func (c *Client) GETV1NodesCheck(ctx context.Context, params GETV1NodesCheckParams) (*NodeCheckResponse, error) {
+	res, err := c.sendGETV1NodesCheck(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGETV1NodesCheck(ctx context.Context, params GETV1NodesCheckParams) (res *NodeCheckResponse, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/nodes/check"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "nodeset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "nodeset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Nodeset.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "tags" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "tags",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Tags.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "arch" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "arch",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Arch.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "server" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "server",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Server.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, GETV1NodesCheckOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, GETV1NodesCheckOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer body.Close()
+
+	result, err := decodeGETV1NodesCheckResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // GETV1NodesFind invokes GET_/v1/nodes/find operation.
 //
 // #### Controller:
@@ -4255,6 +4460,218 @@ func (c *Client) sendGETV1NodesProvisionStatus(ctx context.Context, params GETV1
 	defer body.Close()
 
 	result, err := decodeGETV1NodesProvisionStatusResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// GETV1NodesRenderTemplate invokes GET_/v1/nodes/render/:template operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).NodeRender`
+// #### Middlewares:
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Render a template for each node as the provision server would send it, without recording a
+// provision stage. Templates are read from disk on each request, so an edit is seen at once and one
+// that does not parse is an error. The output holds a working boot token and whatever secrets the
+// template renders, so the nodes have to be named: a request with neither nodeset nor tags is refused.
+//
+// GET /v1/nodes/render/{template}
+func (c *Client) GETV1NodesRenderTemplate(ctx context.Context, params GETV1NodesRenderTemplateParams) (*NodeRenderResponse, error) {
+	res, err := c.sendGETV1NodesRenderTemplate(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGETV1NodesRenderTemplate(ctx context.Context, params GETV1NodesRenderTemplateParams) (res *NodeRenderResponse, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/v1/nodes/render/"
+	{
+		// Encode "template" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "template",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.Template))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "nodeset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "nodeset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Nodeset.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "tags" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "tags",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Tags.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "interface" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "interface",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Interface.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "arch" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "arch",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Arch.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "server" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "server",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Server.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, GETV1NodesRenderTemplateOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, GETV1NodesRenderTemplateOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer body.Close()
+
+	result, err := decodeGETV1NodesRenderTemplateResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

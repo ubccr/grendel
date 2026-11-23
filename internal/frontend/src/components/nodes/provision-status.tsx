@@ -59,13 +59,15 @@ export function ProvisionStateBadge({ state }: { state?: string }) {
         {label}
       </Badge>
     );
+  // tinted like the destructive badge, so the three outcomes read as one set
   if (state === "completed")
-    return <Badge className="bg-emerald-600 whitespace-nowrap hover:bg-emerald-600">{label}</Badge>;
+    return (
+      <Badge className="bg-emerald-600/10 whitespace-nowrap text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400">
+        {label}
+      </Badge>
+    );
   return (
-    <Badge
-      variant="outline"
-      className="border-sky-500/50 whitespace-nowrap text-sky-600 dark:text-sky-400"
-    >
+    <Badge className="bg-sky-600/10 whitespace-nowrap text-sky-700 dark:bg-sky-500/20 dark:text-sky-400">
       {label}
     </Badge>
   );

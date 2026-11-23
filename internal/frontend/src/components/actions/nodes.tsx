@@ -21,6 +21,11 @@ export default function NodesAction({ nodes }: { nodes: string }) {
       <NodesProvisionAction nodes={nodes} />
       <NodesImageAction nodes={nodes} />
       <NodesTagsAction nodes={nodes} />
+      <LinkAction
+        title="Boot Check"
+        description="Check that each node's kernel and initrds are on the server and its templates render, before it boots."
+        link={<Link to="/nodes/bootcheck/$nodes" params={{ nodes }} />}
+      />
       <NodesExportAction nodes={nodes} />
       <NodesDeleteAction nodes={nodes} />
 

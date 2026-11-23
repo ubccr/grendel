@@ -12,6 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/internal/firmware"
 	"github.com/ubccr/grendel/internal/provision"
+	"github.com/ubccr/grendel/internal/render"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -96,7 +97,7 @@ func (s *Server) bootingHandler4(host *model.Host, serverIP net.IP, req, resp *d
 		if err != nil {
 			return fmt.Errorf("iPXE firmware - failed to generated signed Firmware token")
 		}
-		endpoints := provision.NewEndpoints(serverIP.String(), token)
+		endpoints := render.NewEndpoints(serverIP.String(), token)
 		resp.UpdateOption(dhcpv4.OptBootFileName(endpoints.BootFileURL()))
 
 	case firmware.EFI386, firmware.EFI64, firmware.SNPONLYx86_64, firmware.SNPONLYarm64:
@@ -120,7 +121,7 @@ func (s *Server) bootingHandler4(host *model.Host, serverIP net.IP, req, resp *d
 			return fmt.Errorf("Failed to generate signed boot token: %s", err)
 		}
 
-		endpoints := provision.NewEndpoints(serverIP.String(), token)
+		endpoints := render.NewEndpoints(serverIP.String(), token)
 		ipxeUrl := endpoints.IpxeURL()
 		log.Debugf("BootFile iPXE script: %s", ipxeUrl)
 		resp.UpdateOption(dhcpv4.OptBootFileName(ipxeUrl))

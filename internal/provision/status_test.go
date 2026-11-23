@@ -362,33 +362,6 @@ func TestIgnitionBeacon(t *testing.T) {
 	assert.Contains(t, ign.Systemd.Units[0].Contents, "ExecStart=/opt/bin/grendel-beacon watch --complete --timeout ")
 }
 
-func TestBeaconTimeout(t *testing.T) {
-	now := time.Now()
-	token, err := model.NewBootToken("2BH7b1vYyOQgC2pzGJ9lOqSHvLq", "aa:bb:cc:dd:ee:ff")
-	require.NoError(t, err)
-
-	expires, err := model.BootTokenExpiry(token)
-	require.NoError(t, err)
-	assert.WithinDuration(t, now.Add(time.Hour), expires, 2*time.Second)
-
-	// the beacon gives up ten minutes before its token stops being accepted
-	got, err := time.ParseDuration(beaconTimeout(token, now))
-	require.NoError(t, err)
-	assert.InDelta(t, (50 * time.Minute).Seconds(), got.Seconds(), 2)
-
-	// a token near its end keeps half of what is left for the report
-	got, err = time.ParseDuration(beaconTimeout(token, expires.Add(-4*time.Minute)))
-	require.NoError(t, err)
-	assert.Equal(t, 2*time.Minute, got)
-
-	assert.Empty(t, beaconTimeout(token, expires.Add(time.Minute)), "an expired token")
-	assert.Empty(t, beaconTimeout("not a token!", now))
-
-	viper.Set("provision.token_ttl", 0)
-	t.Cleanup(func() { viper.Set("provision.token_ttl", 60*60) })
-	assert.Empty(t, beaconTimeout(token, now), "tokens that never expire leave the beacon its own default")
-}
-
 func TestStatusFacts(t *testing.T) {
 	h := &Handler{DB: newTestDB(t)}
 	host := statusHost(t, h, true)

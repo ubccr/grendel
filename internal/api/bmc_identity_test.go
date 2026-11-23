@@ -12,7 +12,7 @@ import (
 	"github.com/ubccr/grendel/pkg/model"
 )
 
-func render(t *testing.T, text string, host *model.Host) (string, error) {
+func renderIdentityText(t *testing.T, text string, host *model.Host) (string, error) {
 	t.Helper()
 	tmpl, err := parseIdentityTemplate("test", text)
 	require.NoError(t, err)
@@ -35,18 +35,18 @@ func TestRenderIdentity(t *testing.T) {
 		{`n{{ add .Index 1 | printf "%03d" }}`, "n005"},
 	}
 	for _, tc := range cases {
-		got, err := render(t, tc.text, host)
+		got, err := renderIdentityText(t, tc.text, host)
 		require.NoError(t, err, tc.text)
 		assert.Equal(t, tc.want, got, tc.text)
 	}
 
-	_, err := render(t, "{{ index .Parts 5 }}", host)
+	_, err := renderIdentityText(t, "{{ index .Parts 5 }}", host)
 	assert.Error(t, err, "an index past the end of the name fails the node")
 
-	_, err = render(t, "{{ .Tags.row }}", host)
+	_, err = renderIdentityText(t, "{{ .Tags.row }}", host)
 	assert.Error(t, err, "a missing map key fails rather than rendering empty")
 
-	_, err = render(t, `{{ tag "row" }}`, host)
+	_, err = renderIdentityText(t, `{{ tag "row" }}`, host)
 	assert.ErrorContains(t, err, "node has no row= tag")
 }
 

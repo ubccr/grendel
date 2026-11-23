@@ -8471,6 +8471,221 @@ func (s *NodeBootTokenResponseNodesItem) SetToken(val OptString) {
 	s.Token = val
 }
 
+// NodeCheckResponse schema.
+// Ref: #/components/schemas/NodeCheckResponse
+type NodeCheckResponse struct {
+	Nodes []NodeCheckResponseNodesItem `json:"nodes"`
+}
+
+// GetNodes returns the value of Nodes.
+func (s *NodeCheckResponse) GetNodes() []NodeCheckResponseNodesItem {
+	return s.Nodes
+}
+
+// SetNodes sets the value of Nodes.
+func (s *NodeCheckResponse) SetNodes(val []NodeCheckResponseNodesItem) {
+	s.Nodes = val
+}
+
+type NodeCheckResponseNodesItem struct {
+	Arch      OptString                                 `json:"arch"`
+	Error     OptString                                 `json:"error"`
+	Files     []NodeCheckResponseNodesItemFilesItem     `json:"files"`
+	Image     OptString                                 `json:"image"`
+	Name      OptString                                 `json:"name"`
+	Ok        OptBool                                   `json:"ok"`
+	OnRequest []NodeCheckResponseNodesItemOnRequestItem `json:"on_request"`
+	Templates []NodeCheckResponseNodesItemTemplatesItem `json:"templates"`
+}
+
+// GetArch returns the value of Arch.
+func (s *NodeCheckResponseNodesItem) GetArch() OptString {
+	return s.Arch
+}
+
+// GetError returns the value of Error.
+func (s *NodeCheckResponseNodesItem) GetError() OptString {
+	return s.Error
+}
+
+// GetFiles returns the value of Files.
+func (s *NodeCheckResponseNodesItem) GetFiles() []NodeCheckResponseNodesItemFilesItem {
+	return s.Files
+}
+
+// GetImage returns the value of Image.
+func (s *NodeCheckResponseNodesItem) GetImage() OptString {
+	return s.Image
+}
+
+// GetName returns the value of Name.
+func (s *NodeCheckResponseNodesItem) GetName() OptString {
+	return s.Name
+}
+
+// GetOk returns the value of Ok.
+func (s *NodeCheckResponseNodesItem) GetOk() OptBool {
+	return s.Ok
+}
+
+// GetOnRequest returns the value of OnRequest.
+func (s *NodeCheckResponseNodesItem) GetOnRequest() []NodeCheckResponseNodesItemOnRequestItem {
+	return s.OnRequest
+}
+
+// GetTemplates returns the value of Templates.
+func (s *NodeCheckResponseNodesItem) GetTemplates() []NodeCheckResponseNodesItemTemplatesItem {
+	return s.Templates
+}
+
+// SetArch sets the value of Arch.
+func (s *NodeCheckResponseNodesItem) SetArch(val OptString) {
+	s.Arch = val
+}
+
+// SetError sets the value of Error.
+func (s *NodeCheckResponseNodesItem) SetError(val OptString) {
+	s.Error = val
+}
+
+// SetFiles sets the value of Files.
+func (s *NodeCheckResponseNodesItem) SetFiles(val []NodeCheckResponseNodesItemFilesItem) {
+	s.Files = val
+}
+
+// SetImage sets the value of Image.
+func (s *NodeCheckResponseNodesItem) SetImage(val OptString) {
+	s.Image = val
+}
+
+// SetName sets the value of Name.
+func (s *NodeCheckResponseNodesItem) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetOk sets the value of Ok.
+func (s *NodeCheckResponseNodesItem) SetOk(val OptBool) {
+	s.Ok = val
+}
+
+// SetOnRequest sets the value of OnRequest.
+func (s *NodeCheckResponseNodesItem) SetOnRequest(val []NodeCheckResponseNodesItemOnRequestItem) {
+	s.OnRequest = val
+}
+
+// SetTemplates sets the value of Templates.
+func (s *NodeCheckResponseNodesItem) SetTemplates(val []NodeCheckResponseNodesItemTemplatesItem) {
+	s.Templates = val
+}
+
+type NodeCheckResponseNodesItemFilesItem struct {
+	Error OptString `json:"error"`
+	Name  OptString `json:"name"`
+	Path  OptString `json:"path"`
+	Size  OptInt64  `json:"size"`
+}
+
+// GetError returns the value of Error.
+func (s *NodeCheckResponseNodesItemFilesItem) GetError() OptString {
+	return s.Error
+}
+
+// GetName returns the value of Name.
+func (s *NodeCheckResponseNodesItemFilesItem) GetName() OptString {
+	return s.Name
+}
+
+// GetPath returns the value of Path.
+func (s *NodeCheckResponseNodesItemFilesItem) GetPath() OptString {
+	return s.Path
+}
+
+// GetSize returns the value of Size.
+func (s *NodeCheckResponseNodesItemFilesItem) GetSize() OptInt64 {
+	return s.Size
+}
+
+// SetError sets the value of Error.
+func (s *NodeCheckResponseNodesItemFilesItem) SetError(val OptString) {
+	s.Error = val
+}
+
+// SetName sets the value of Name.
+func (s *NodeCheckResponseNodesItemFilesItem) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetPath sets the value of Path.
+func (s *NodeCheckResponseNodesItemFilesItem) SetPath(val OptString) {
+	s.Path = val
+}
+
+// SetSize sets the value of Size.
+func (s *NodeCheckResponseNodesItemFilesItem) SetSize(val OptInt64) {
+	s.Size = val
+}
+
+type NodeCheckResponseNodesItemOnRequestItem struct {
+	Kind     OptString `json:"kind"`
+	Template OptString `json:"template"`
+}
+
+// GetKind returns the value of Kind.
+func (s *NodeCheckResponseNodesItemOnRequestItem) GetKind() OptString {
+	return s.Kind
+}
+
+// GetTemplate returns the value of Template.
+func (s *NodeCheckResponseNodesItemOnRequestItem) GetTemplate() OptString {
+	return s.Template
+}
+
+// SetKind sets the value of Kind.
+func (s *NodeCheckResponseNodesItemOnRequestItem) SetKind(val OptString) {
+	s.Kind = val
+}
+
+// SetTemplate sets the value of Template.
+func (s *NodeCheckResponseNodesItemOnRequestItem) SetTemplate(val OptString) {
+	s.Template = val
+}
+
+type NodeCheckResponseNodesItemTemplatesItem struct {
+	Error    OptString `json:"error"`
+	Kind     OptString `json:"kind"`
+	Template OptString `json:"template"`
+}
+
+// GetError returns the value of Error.
+func (s *NodeCheckResponseNodesItemTemplatesItem) GetError() OptString {
+	return s.Error
+}
+
+// GetKind returns the value of Kind.
+func (s *NodeCheckResponseNodesItemTemplatesItem) GetKind() OptString {
+	return s.Kind
+}
+
+// GetTemplate returns the value of Template.
+func (s *NodeCheckResponseNodesItemTemplatesItem) GetTemplate() OptString {
+	return s.Template
+}
+
+// SetError sets the value of Error.
+func (s *NodeCheckResponseNodesItemTemplatesItem) SetError(val OptString) {
+	s.Error = val
+}
+
+// SetKind sets the value of Kind.
+func (s *NodeCheckResponseNodesItemTemplatesItem) SetKind(val OptString) {
+	s.Kind = val
+}
+
+// SetTemplate sets the value of Template.
+func (s *NodeCheckResponseNodesItemTemplatesItem) SetTemplate(val OptString) {
+	s.Template = val
+}
+
 // NodeImportRequest schema.
 // Ref: #/components/schemas/NodeImportRequest
 type NodeImportRequest struct {
@@ -8949,6 +9164,91 @@ func (s *NodeProvisionRequest) GetProvision() OptBool {
 // SetProvision sets the value of Provision.
 func (s *NodeProvisionRequest) SetProvision(val OptBool) {
 	s.Provision = val
+}
+
+// NodeRenderResponse schema.
+// Ref: #/components/schemas/NodeRenderResponse
+type NodeRenderResponse struct {
+	Nodes []NodeRenderResponseNodesItem `json:"nodes"`
+}
+
+// GetNodes returns the value of Nodes.
+func (s *NodeRenderResponse) GetNodes() []NodeRenderResponseNodesItem {
+	return s.Nodes
+}
+
+// SetNodes sets the value of Nodes.
+func (s *NodeRenderResponse) SetNodes(val []NodeRenderResponseNodesItem) {
+	s.Nodes = val
+}
+
+type NodeRenderResponseNodesItem struct {
+	Arch     OptString `json:"arch"`
+	Content  OptString `json:"content"`
+	Error    OptString `json:"error"`
+	Image    OptString `json:"image"`
+	Name     OptString `json:"name"`
+	Template OptString `json:"template"`
+}
+
+// GetArch returns the value of Arch.
+func (s *NodeRenderResponseNodesItem) GetArch() OptString {
+	return s.Arch
+}
+
+// GetContent returns the value of Content.
+func (s *NodeRenderResponseNodesItem) GetContent() OptString {
+	return s.Content
+}
+
+// GetError returns the value of Error.
+func (s *NodeRenderResponseNodesItem) GetError() OptString {
+	return s.Error
+}
+
+// GetImage returns the value of Image.
+func (s *NodeRenderResponseNodesItem) GetImage() OptString {
+	return s.Image
+}
+
+// GetName returns the value of Name.
+func (s *NodeRenderResponseNodesItem) GetName() OptString {
+	return s.Name
+}
+
+// GetTemplate returns the value of Template.
+func (s *NodeRenderResponseNodesItem) GetTemplate() OptString {
+	return s.Template
+}
+
+// SetArch sets the value of Arch.
+func (s *NodeRenderResponseNodesItem) SetArch(val OptString) {
+	s.Arch = val
+}
+
+// SetContent sets the value of Content.
+func (s *NodeRenderResponseNodesItem) SetContent(val OptString) {
+	s.Content = val
+}
+
+// SetError sets the value of Error.
+func (s *NodeRenderResponseNodesItem) SetError(val OptString) {
+	s.Error = val
+}
+
+// SetImage sets the value of Image.
+func (s *NodeRenderResponseNodesItem) SetImage(val OptString) {
+	s.Image = val
+}
+
+// SetName sets the value of Name.
+func (s *NodeRenderResponseNodesItem) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetTemplate sets the value of Template.
+func (s *NodeRenderResponseNodesItem) SetTemplate(val OptString) {
+	s.Template = val
 }
 
 // NodeTagsRequest schema.

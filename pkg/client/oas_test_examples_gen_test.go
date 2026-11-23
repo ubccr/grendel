@@ -1663,6 +1663,66 @@ func TestNodeBootTokenResponseNodesItem_EncodeDecode(t *testing.T) {
 	var typ2 NodeBootTokenResponseNodesItem
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestNodeCheckResponse_EncodeDecode(t *testing.T) {
+	var typ NodeCheckResponse
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 NodeCheckResponse
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestNodeCheckResponseNodesItem_EncodeDecode(t *testing.T) {
+	var typ NodeCheckResponseNodesItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 NodeCheckResponseNodesItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestNodeCheckResponseNodesItemFilesItem_EncodeDecode(t *testing.T) {
+	var typ NodeCheckResponseNodesItemFilesItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 NodeCheckResponseNodesItemFilesItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestNodeCheckResponseNodesItemOnRequestItem_EncodeDecode(t *testing.T) {
+	var typ NodeCheckResponseNodesItemOnRequestItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 NodeCheckResponseNodesItemOnRequestItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestNodeCheckResponseNodesItemTemplatesItem_EncodeDecode(t *testing.T) {
+	var typ NodeCheckResponseNodesItemTemplatesItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 NodeCheckResponseNodesItemTemplatesItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestNodeImportRequest_EncodeDecode(t *testing.T) {
 	var typ NodeImportRequest
 	typ.SetFake()
@@ -1745,6 +1805,30 @@ func TestNodeProvisionRequest_EncodeDecode(t *testing.T) {
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
 	var typ2 NodeProvisionRequest
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestNodeRenderResponse_EncodeDecode(t *testing.T) {
+	var typ NodeRenderResponse
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 NodeRenderResponse
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestNodeRenderResponseNodesItem_EncodeDecode(t *testing.T) {
+	var typ NodeRenderResponseNodesItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 NodeRenderResponseNodesItem
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestNodeTagsRequest_EncodeDecode(t *testing.T) {

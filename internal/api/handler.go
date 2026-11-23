@@ -47,6 +47,11 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 	selectAll := option.QueryBool("all", "Select every node in the database. Required when no nodeset or tags are given", param.Default(false))
 	filterNames := fuego.GroupOptions(option.Query("names", "Filter by name", param.Example("names", "image1,image2")))
 
+	renderOptions := fuego.GroupOptions(
+		option.Query("arch", "Arch for nodes with no arch set, standing in for the one detected during a PXE boot. With all, such a node is taken once as x86_64 and once as aarch64", param.Example("arch", "x86_64 | aarch64 | all")),
+		option.Query("server", "Address of the provision server to put in URLs. Defaults to the address provision listens on, or the machine's first external address, and provision.hostname replaces either", param.Example("server", "10.17.0.1")),
+	)
+
 	globalOptions := fuego.GroupOptions(
 		option.RequestContentType("application/json"),
 		fuego.OptionRemoveResponse(400),
@@ -133,6 +138,18 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 		option.Path("interface", "interface token will be created for", param.Example("interface", "boot | bmc")),
 		filterNodes,
 		option.Query("arch", "Arch to embed in the token, used in templates when the node has no arch set. Simulates the arch detected during a PXE boot", param.Example("arch", "x86_64")),
+	)
+	fuego.Get(nodes, "/render/{template}", h.NodeRender, about("Render provision templates", "Provisioning"),
+		option.Description("Render a template for each node as the provision server would send it, without recording a provision stage. Templates are read from disk on each request, so an edit is seen at once and one that does not parse is an error. The output holds a working boot token and whatever secrets the template renders, so the nodes have to be named: a request with neither nodeset nor tags is refused"),
+		option.Path("template", "What to render: ipxe, kickstart, user_data, meta_data, butane, ignition (the butane template translated), proxmox, a key of the image's provision_templates, or a template file name", param.Example("template", "ipxe | kickstart | idrac-config.json.tmpl")),
+		filterNodes,
+		option.Query("interface", "Interface the node is taken to boot from", param.Default("boot"), param.Example("interface", "boot | bmc")),
+		renderOptions,
+	)
+	fuego.Get(nodes, "/check", h.NodeCheck, about("Check boot files and templates", "Provisioning"),
+		option.Description("Check that each node can be served its boot: the kernel and initrds of its image are readable at the paths rendered for the node, with their .sig files when the image is verified, and the iPXE script and every template in the image's provision_templates render. Files are read on the machine the API runs on. Every node is taken when neither nodeset nor tags is given"),
+		filterNodes,
+		renderOptions,
 	)
 	fuego.Patch(nodes, "/image", h.NodeBootImage, about("Change a node's boot image", "Nodes"),
 		option.Description("Update nodes boot image by nodeset and/or tags"),

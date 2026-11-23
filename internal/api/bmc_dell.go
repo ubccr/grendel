@@ -178,17 +178,11 @@ func importShare(v *viper.Viper) (configShare, error) {
 		share.port = port
 	}
 
-	switch ip := v.GetString("bmc.config_share_ip"); {
-	case ip != "":
-		share.ip = ip
-	case listen != "" && listen != "0.0.0.0":
-		share.ip = listen
-	default:
-		external, err := util.GetFirstExternalIPFromInterfaces()
-		if err != nil {
+	share.ip = v.GetString("bmc.config_share_ip")
+	if share.ip == "" {
+		if share.ip, err = util.ServerAddress(listen); err != nil {
 			return share, err
 		}
-		share.ip = external.String()
 	}
 
 	return share, nil

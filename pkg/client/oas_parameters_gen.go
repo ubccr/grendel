@@ -187,6 +187,21 @@ type GETV1NodesParams struct {
 	Accept OptString `json:",omitempty,omitzero"`
 }
 
+// GETV1NodesCheckParams is parameters of GET_/v1/nodes/check operation.
+type GETV1NodesCheckParams struct {
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString `json:",omitempty,omitzero"`
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags OptString `json:",omitempty,omitzero"`
+	// Arch for nodes with no arch set, standing in for the one detected during a PXE boot. With all,
+	// such a node is taken once as x86_64 and once as aarch64.
+	Arch OptString `json:",omitempty,omitzero"`
+	// Address of the provision server to put in URLs. Defaults to the address provision listens on, or
+	// the machine's first external address, and provision.hostname replaces either.
+	Server OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
+}
+
 // GETV1NodesFindParams is parameters of GET_/v1/nodes/find operation.
 type GETV1NodesFindParams struct {
 	// Filter by nodeset. Minimum of one query parameter is required.
@@ -232,6 +247,26 @@ type GETV1NodesProvisionStatusParams struct {
 	Nodeset OptString `json:",omitempty,omitzero"`
 	// Filter by tags. Minimum of one query parameter is required.
 	Tags   OptString `json:",omitempty,omitzero"`
+	Accept OptString `json:",omitempty,omitzero"`
+}
+
+// GETV1NodesRenderTemplateParams is parameters of GET_/v1/nodes/render/:template operation.
+type GETV1NodesRenderTemplateParams struct {
+	// What to render: ipxe, kickstart, user_data, meta_data, butane, ignition (the butane template
+	// translated), proxmox, a key of the image's provision_templates, or a template file name.
+	Template string
+	// Filter by nodeset. Minimum of one query parameter is required.
+	Nodeset OptString `json:",omitempty,omitzero"`
+	// Filter by tags. Minimum of one query parameter is required.
+	Tags OptString `json:",omitempty,omitzero"`
+	// Interface the node is taken to boot from.
+	Interface OptString `json:",omitempty,omitzero"`
+	// Arch for nodes with no arch set, standing in for the one detected during a PXE boot. With all,
+	// such a node is taken once as x86_64 and once as aarch64.
+	Arch OptString `json:",omitempty,omitzero"`
+	// Address of the provision server to put in URLs. Defaults to the address provision listens on, or
+	// the machine's first external address, and provision.hostname replaces either.
+	Server OptString `json:",omitempty,omitzero"`
 	Accept OptString `json:",omitempty,omitzero"`
 }
 

@@ -17,6 +17,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
 	"github.com/ubccr/grendel/internal/config"
+	"github.com/ubccr/grendel/internal/render"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/store/sqlstore"
 	"github.com/ubccr/grendel/internal/tests"
@@ -34,13 +35,19 @@ func newTestDB(t *testing.T) store.Store {
 	return db
 }
 
-func newTestEcho(t *testing.T) *echo.Echo {
-	e, err := newEcho()
+func newTestTemplates(t *testing.T) *render.Set {
+	t.Helper()
+
+	templates, err := render.NewSet()
 	if err != nil {
-		assert.Fail(t, err.Error())
+		t.Fatal(err)
 	}
 
-	return e
+	return templates
+}
+
+func newTestEcho(t *testing.T) *echo.Echo {
+	return newEcho(newTestTemplates(t))
 }
 
 func TestStatus(t *testing.T) {
@@ -382,38 +389,6 @@ func TestMetaData(t *testing.T) {
 		assert.Equal(http.StatusOK, rec.Code)
 		assert.Contains(rec.Body.String(), "instance-id")
 		assert.Contains(rec.Body.String(), host.UID.String())
-	}
-}
-
-func TestRenderString(t *testing.T) {
-	assert := assert.New(t)
-
-	host := &model.Host{Name: "cpn-01", Tags: []string{"gpu"}}
-	image := &model.BootImage{Name: "ubuntu", Version: "24.04.1"}
-	data := map[string]any{"host": host, "bootimage": image}
-
-	tests := []struct {
-		text    string
-		want    string
-		wantErr bool
-	}{
-		{text: "/var/lib/grendel/images/vmlinuz", want: "/var/lib/grendel/images/vmlinuz"},
-		{text: "/images/{{ .host.Name }}/vmlinuz", want: "/images/cpn-01/vmlinuz"},
-		{text: `/images/{{ if hasTag .host "gpu" }}gpu{{ else }}cpu{{ end }}/vmlinuz`, want: "/images/gpu/vmlinuz"},
-		{text: "/images/{{ .bootimage.Name }}-{{ .bootimage.Version }}/vmlinuz", want: "/images/ubuntu-24.04.1/vmlinuz"},
-		{text: "/images/{{ .nic.Name }}/vmlinuz", wantErr: true},
-		{text: "/images/{{ .host.Name /vmlinuz", wantErr: true},
-	}
-
-	for _, test := range tests {
-		got, err := RenderString("test", test.text, data)
-		if test.wantErr {
-			assert.Errorf(err, "expected error for %q", test.text)
-			continue
-		}
-		if assert.NoErrorf(err, "unexpected error for %q", test.text) {
-			assert.Equal(test.want, got)
-		}
 	}
 }
 

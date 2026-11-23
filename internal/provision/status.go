@@ -36,25 +36,7 @@ const (
 	maxFactValue    = 1024
 )
 
-// beaconTimeoutMargin is how much of a boot token's life is left once a beacon started with it gives up on the boot, for the time between the config being rendered and the beacon starting, and for its last report to be retried
-const beaconTimeoutMargin = 10 * time.Minute
-
 var errOtherBoot = errors.New("provision already finished in another boot")
-
-// beaconTimeout is how long a beacon given this token should wait for the boot before reporting it failed, as a duration for its --timeout. The report is only taken while the token is valid, so the wait ends before the token does. It is empty when tokens never expire, which leaves the beacon its own default
-func beaconTimeout(token string, now time.Time) string {
-	expires, err := model.BootTokenExpiry(token)
-	if err != nil || expires.IsZero() {
-		return ""
-	}
-
-	left := expires.Sub(now)
-	left -= min(beaconTimeoutMargin, left/2)
-	if left < time.Second {
-		return ""
-	}
-	return left.Round(time.Second).String()
-}
 
 func init() {
 	viper.SetDefault("provision.status_check_source", true)

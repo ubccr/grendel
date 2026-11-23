@@ -41,6 +41,7 @@ import { Route as AccountRolesRoleRouteImport } from './routes/account/roles/$ro
 import { Route as AccountUsersIndexRouteImport } from './routes/account/users/index'
 import { Route as NodesNodeIndexRouteImport } from './routes/nodes/$node/index'
 import { Route as NodesNodeBiosRouteImport } from './routes/nodes/$node/bios'
+import { Route as NodesNodeBootcheckRouteImport } from './routes/nodes/$node/bootcheck'
 import { Route as NodesNodeConsoleRouteImport } from './routes/nodes/$node/console'
 import { Route as NodesNodeLldpRouteImport } from './routes/nodes/$node/lldp'
 import { Route as NodesNodeMacsRouteImport } from './routes/nodes/$node/macs'
@@ -49,6 +50,7 @@ import { Route as NodesNodeProvisionRouteImport } from './routes/nodes/$node/pro
 import { Route as NodesNodeRedfishRouteImport } from './routes/nodes/$node/redfish'
 import { Route as NodesNodeSecurebootRouteImport } from './routes/nodes/$node/secureboot'
 import { Route as NodesBiosNodesRouteImport } from './routes/nodes/bios/$nodes'
+import { Route as NodesBootcheckNodesRouteImport } from './routes/nodes/bootcheck/$nodes'
 import { Route as NodesDellFirmwareNodesRouteImport } from './routes/nodes/dell-firmware/$nodes'
 import { Route as NodesIdentityNodesRouteImport } from './routes/nodes/identity/$nodes'
 import { Route as NodesJobsNodesRouteImport } from './routes/nodes/jobs/$nodes'
@@ -215,6 +217,11 @@ const NodesNodeBiosRoute = NodesNodeBiosRouteImport.update({
   path: '/bios',
   getParentRoute: () => NodesNodeRouteRoute,
 } as any)
+const NodesNodeBootcheckRoute = NodesNodeBootcheckRouteImport.update({
+  id: '/bootcheck',
+  path: '/bootcheck',
+  getParentRoute: () => NodesNodeRouteRoute,
+} as any)
 const NodesNodeConsoleRoute = NodesNodeConsoleRouteImport.update({
   id: '/console',
   path: '/console',
@@ -253,6 +260,11 @@ const NodesNodeSecurebootRoute = NodesNodeSecurebootRouteImport.update({
 const NodesBiosNodesRoute = NodesBiosNodesRouteImport.update({
   id: '/bios/$nodes',
   path: '/bios/$nodes',
+  getParentRoute: () => NodesRouteRoute,
+} as any)
+const NodesBootcheckNodesRoute = NodesBootcheckNodesRouteImport.update({
+  id: '/bootcheck/$nodes',
+  path: '/bootcheck/$nodes',
   getParentRoute: () => NodesRouteRoute,
 } as any)
 const NodesDellFirmwareNodesRoute = NodesDellFirmwareNodesRouteImport.update({
@@ -311,6 +323,7 @@ export interface FileRoutesByFullPath {
   '/account/token': typeof AccountAccountTokenRoute
   '/account/roles/$role': typeof AccountRolesRoleRoute
   '/nodes/$node/bios': typeof NodesNodeBiosRoute
+  '/nodes/$node/bootcheck': typeof NodesNodeBootcheckRoute
   '/nodes/$node/console': typeof NodesNodeConsoleRoute
   '/nodes/$node/lldp': typeof NodesNodeLldpRoute
   '/nodes/$node/macs': typeof NodesNodeMacsRoute
@@ -319,6 +332,7 @@ export interface FileRoutesByFullPath {
   '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
   '/nodes/$node/secureboot': typeof NodesNodeSecurebootRoute
   '/nodes/bios/$nodes': typeof NodesBiosNodesRoute
+  '/nodes/bootcheck/$nodes': typeof NodesBootcheckNodesRoute
   '/nodes/dell-firmware/$nodes': typeof NodesDellFirmwareNodesRoute
   '/nodes/identity/$nodes': typeof NodesIdentityNodesRoute
   '/nodes/jobs/$nodes': typeof NodesJobsNodesRoute
@@ -351,6 +365,7 @@ export interface FileRoutesByTo {
   '/account/token': typeof AccountAccountTokenRoute
   '/account/roles/$role': typeof AccountRolesRoleRoute
   '/nodes/$node/bios': typeof NodesNodeBiosRoute
+  '/nodes/$node/bootcheck': typeof NodesNodeBootcheckRoute
   '/nodes/$node/console': typeof NodesNodeConsoleRoute
   '/nodes/$node/lldp': typeof NodesNodeLldpRoute
   '/nodes/$node/macs': typeof NodesNodeMacsRoute
@@ -359,6 +374,7 @@ export interface FileRoutesByTo {
   '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
   '/nodes/$node/secureboot': typeof NodesNodeSecurebootRoute
   '/nodes/bios/$nodes': typeof NodesBiosNodesRoute
+  '/nodes/bootcheck/$nodes': typeof NodesBootcheckNodesRoute
   '/nodes/dell-firmware/$nodes': typeof NodesDellFirmwareNodesRoute
   '/nodes/identity/$nodes': typeof NodesIdentityNodesRoute
   '/nodes/jobs/$nodes': typeof NodesJobsNodesRoute
@@ -399,6 +415,7 @@ export interface FileRoutesById {
   '/account/_account/token': typeof AccountAccountTokenRoute
   '/account/roles/$role': typeof AccountRolesRoleRoute
   '/nodes/$node/bios': typeof NodesNodeBiosRoute
+  '/nodes/$node/bootcheck': typeof NodesNodeBootcheckRoute
   '/nodes/$node/console': typeof NodesNodeConsoleRoute
   '/nodes/$node/lldp': typeof NodesNodeLldpRoute
   '/nodes/$node/macs': typeof NodesNodeMacsRoute
@@ -407,6 +424,7 @@ export interface FileRoutesById {
   '/nodes/$node/redfish': typeof NodesNodeRedfishRoute
   '/nodes/$node/secureboot': typeof NodesNodeSecurebootRoute
   '/nodes/bios/$nodes': typeof NodesBiosNodesRoute
+  '/nodes/bootcheck/$nodes': typeof NodesBootcheckNodesRoute
   '/nodes/dell-firmware/$nodes': typeof NodesDellFirmwareNodesRoute
   '/nodes/identity/$nodes': typeof NodesIdentityNodesRoute
   '/nodes/jobs/$nodes': typeof NodesJobsNodesRoute
@@ -448,6 +466,7 @@ export interface FileRouteTypes {
     | '/account/token'
     | '/account/roles/$role'
     | '/nodes/$node/bios'
+    | '/nodes/$node/bootcheck'
     | '/nodes/$node/console'
     | '/nodes/$node/lldp'
     | '/nodes/$node/macs'
@@ -456,6 +475,7 @@ export interface FileRouteTypes {
     | '/nodes/$node/redfish'
     | '/nodes/$node/secureboot'
     | '/nodes/bios/$nodes'
+    | '/nodes/bootcheck/$nodes'
     | '/nodes/dell-firmware/$nodes'
     | '/nodes/identity/$nodes'
     | '/nodes/jobs/$nodes'
@@ -488,6 +508,7 @@ export interface FileRouteTypes {
     | '/account/token'
     | '/account/roles/$role'
     | '/nodes/$node/bios'
+    | '/nodes/$node/bootcheck'
     | '/nodes/$node/console'
     | '/nodes/$node/lldp'
     | '/nodes/$node/macs'
@@ -496,6 +517,7 @@ export interface FileRouteTypes {
     | '/nodes/$node/redfish'
     | '/nodes/$node/secureboot'
     | '/nodes/bios/$nodes'
+    | '/nodes/bootcheck/$nodes'
     | '/nodes/dell-firmware/$nodes'
     | '/nodes/identity/$nodes'
     | '/nodes/jobs/$nodes'
@@ -535,6 +557,7 @@ export interface FileRouteTypes {
     | '/account/_account/token'
     | '/account/roles/$role'
     | '/nodes/$node/bios'
+    | '/nodes/$node/bootcheck'
     | '/nodes/$node/console'
     | '/nodes/$node/lldp'
     | '/nodes/$node/macs'
@@ -543,6 +566,7 @@ export interface FileRouteTypes {
     | '/nodes/$node/redfish'
     | '/nodes/$node/secureboot'
     | '/nodes/bios/$nodes'
+    | '/nodes/bootcheck/$nodes'
     | '/nodes/dell-firmware/$nodes'
     | '/nodes/identity/$nodes'
     | '/nodes/jobs/$nodes'
@@ -800,6 +824,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NodesNodeBiosRouteImport
       parentRoute: typeof NodesNodeRouteRoute
     }
+    '/nodes/$node/bootcheck': {
+      id: '/nodes/$node/bootcheck'
+      path: '/bootcheck'
+      fullPath: '/nodes/$node/bootcheck'
+      preLoaderRoute: typeof NodesNodeBootcheckRouteImport
+      parentRoute: typeof NodesNodeRouteRoute
+    }
     '/nodes/$node/console': {
       id: '/nodes/$node/console'
       path: '/console'
@@ -856,6 +887,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NodesBiosNodesRouteImport
       parentRoute: typeof NodesRouteRoute
     }
+    '/nodes/bootcheck/$nodes': {
+      id: '/nodes/bootcheck/$nodes'
+      path: '/bootcheck/$nodes'
+      fullPath: '/nodes/bootcheck/$nodes'
+      preLoaderRoute: typeof NodesBootcheckNodesRouteImport
+      parentRoute: typeof NodesRouteRoute
+    }
     '/nodes/dell-firmware/$nodes': {
       id: '/nodes/dell-firmware/$nodes'
       path: '/dell-firmware/$nodes'
@@ -910,6 +948,7 @@ const ImagesRouteRouteWithChildren = ImagesRouteRoute._addFileChildren(
 
 interface NodesNodeRouteRouteChildren {
   NodesNodeBiosRoute: typeof NodesNodeBiosRoute
+  NodesNodeBootcheckRoute: typeof NodesNodeBootcheckRoute
   NodesNodeConsoleRoute: typeof NodesNodeConsoleRoute
   NodesNodeLldpRoute: typeof NodesNodeLldpRoute
   NodesNodeMacsRoute: typeof NodesNodeMacsRoute
@@ -922,6 +961,7 @@ interface NodesNodeRouteRouteChildren {
 
 const NodesNodeRouteRouteChildren: NodesNodeRouteRouteChildren = {
   NodesNodeBiosRoute: NodesNodeBiosRoute,
+  NodesNodeBootcheckRoute: NodesNodeBootcheckRoute,
   NodesNodeConsoleRoute: NodesNodeConsoleRoute,
   NodesNodeLldpRoute: NodesNodeLldpRoute,
   NodesNodeMacsRoute: NodesNodeMacsRoute,
@@ -940,6 +980,7 @@ interface NodesRouteRouteChildren {
   NodesNodeRouteRoute: typeof NodesNodeRouteRouteWithChildren
   NodesIndexRoute: typeof NodesIndexRoute
   NodesBiosNodesRoute: typeof NodesBiosNodesRoute
+  NodesBootcheckNodesRoute: typeof NodesBootcheckNodesRoute
   NodesDellFirmwareNodesRoute: typeof NodesDellFirmwareNodesRoute
   NodesIdentityNodesRoute: typeof NodesIdentityNodesRoute
   NodesJobsNodesRoute: typeof NodesJobsNodesRoute
@@ -951,6 +992,7 @@ const NodesRouteRouteChildren: NodesRouteRouteChildren = {
   NodesNodeRouteRoute: NodesNodeRouteRouteWithChildren,
   NodesIndexRoute: NodesIndexRoute,
   NodesBiosNodesRoute: NodesBiosNodesRoute,
+  NodesBootcheckNodesRoute: NodesBootcheckNodesRoute,
   NodesDellFirmwareNodesRoute: NodesDellFirmwareNodesRoute,
   NodesIdentityNodesRoute: NodesIdentityNodesRoute,
   NodesJobsNodesRoute: NodesJobsNodesRoute,

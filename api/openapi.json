@@ -3282,6 +3282,87 @@
 				},
 				"type": "object"
 			},
+			"NodeCheckResponse": {
+				"description": "NodeCheckResponse schema",
+				"properties": {
+					"nodes": {
+						"items": {
+							"properties": {
+								"arch": {
+									"type": "string"
+								},
+								"error": {
+									"type": "string"
+								},
+								"files": {
+									"items": {
+										"properties": {
+											"error": {
+												"type": "string"
+											},
+											"name": {
+												"type": "string"
+											},
+											"path": {
+												"type": "string"
+											},
+											"size": {
+												"format": "int64",
+												"type": "integer"
+											}
+										},
+										"type": "object"
+									},
+									"type": "array"
+								},
+								"image": {
+									"type": "string"
+								},
+								"name": {
+									"type": "string"
+								},
+								"ok": {
+									"type": "boolean"
+								},
+								"on_request": {
+									"items": {
+										"properties": {
+											"kind": {
+												"type": "string"
+											},
+											"template": {
+												"type": "string"
+											}
+										},
+										"type": "object"
+									},
+									"type": "array"
+								},
+								"templates": {
+									"items": {
+										"properties": {
+											"error": {
+												"type": "string"
+											},
+											"kind": {
+												"type": "string"
+											},
+											"template": {
+												"type": "string"
+											}
+										},
+										"type": "object"
+									},
+									"type": "array"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
+					}
+				},
+				"type": "object"
+			},
 			"NodeImportRequest": {
 				"description": "NodeImportRequest schema",
 				"properties": {
@@ -3454,6 +3535,38 @@
 				"properties": {
 					"provision": {
 						"type": "boolean"
+					}
+				},
+				"type": "object"
+			},
+			"NodeRenderResponse": {
+				"description": "NodeRenderResponse schema",
+				"properties": {
+					"nodes": {
+						"items": {
+							"properties": {
+								"arch": {
+									"type": "string"
+								},
+								"content": {
+									"type": "string"
+								},
+								"error": {
+									"type": "string"
+								},
+								"image": {
+									"type": "string"
+								},
+								"name": {
+									"type": "string"
+								},
+								"template": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
 					}
 				},
 				"type": "object"
@@ -7239,6 +7352,112 @@
 				]
 			}
 		},
+		"/v1/nodes/check": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeCheck`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nCheck that each node can be served its boot: the kernel and initrds of its image are readable at the paths rendered for the node, with their .sig files when the image is verified, and the iPXE script and every template in the image's provision_templates render. Files are read on the machine the API runs on. Every node is taken when neither nodeset nor tags is given",
+				"operationId": "GET_/v1/nodes/check",
+				"parameters": [
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Arch for nodes with no arch set, standing in for the one detected during a PXE boot. With all, such a node is taken once as x86_64 and once as aarch64",
+						"examples": {
+							"arch": {
+								"value": "x86_64 | aarch64 | all"
+							}
+						},
+						"in": "query",
+						"name": "arch",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Address of the provision server to put in URLs. Defaults to the address provision listens on, or the machine's first external address, and provision.hostname replaces either",
+						"examples": {
+							"server": {
+								"value": "10.17.0.1"
+							}
+						},
+						"in": "query",
+						"name": "server",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NodeCheckResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/NodeCheckResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "Check boot files and templates",
+				"tags": [
+					"Provisioning"
+				]
+			}
+		},
 		"/v1/nodes/find": {
 			"get": {
 				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeFind`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nFind nodes by nodeset and/or tags",
@@ -7859,6 +8078,140 @@
 					}
 				],
 				"summary": "See provision status",
+				"tags": [
+					"Provisioning"
+				]
+			}
+		},
+		"/v1/nodes/render/{template}": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeRender`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nRender a template for each node as the provision server would send it, without recording a provision stage. Templates are read from disk on each request, so an edit is seen at once and one that does not parse is an error. The output holds a working boot token and whatever secrets the template renders, so the nodes have to be named: a request with neither nodeset nor tags is refused",
+				"operationId": "GET_/v1/nodes/render/:template",
+				"parameters": [
+					{
+						"description": "What to render: ipxe, kickstart, user_data, meta_data, butane, ignition (the butane template translated), proxmox, a key of the image's provision_templates, or a template file name",
+						"examples": {
+							"template": {
+								"value": "ipxe | kickstart | idrac-config.json.tmpl"
+							}
+						},
+						"in": "path",
+						"name": "template",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by nodeset. Minimum of one query parameter is required",
+						"examples": {
+							"nodeset": {
+								"value": "cpn-i10-[04-05],cpn-h22-33"
+							}
+						},
+						"in": "query",
+						"name": "nodeset",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Filter by tags. Minimum of one query parameter is required",
+						"examples": {
+							"tags": {
+								"value": "a01,ib,test"
+							}
+						},
+						"in": "query",
+						"name": "tags",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Interface the node is taken to boot from",
+						"examples": {
+							"interface": {
+								"value": "boot | bmc"
+							}
+						},
+						"in": "query",
+						"name": "interface",
+						"schema": {
+							"default": "boot",
+							"type": "string"
+						}
+					},
+					{
+						"description": "Arch for nodes with no arch set, standing in for the one detected during a PXE boot. With all, such a node is taken once as x86_64 and once as aarch64",
+						"examples": {
+							"arch": {
+								"value": "x86_64 | aarch64 | all"
+							}
+						},
+						"in": "query",
+						"name": "arch",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"description": "Address of the provision server to put in URLs. Defaults to the address provision listens on, or the machine's first external address, and provision.hostname replaces either",
+						"examples": {
+							"server": {
+								"value": "10.17.0.1"
+							}
+						},
+						"in": "query",
+						"name": "server",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NodeRenderResponse"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/NodeRenderResponse"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "Render provision templates",
 				"tags": [
 					"Provisioning"
 				]

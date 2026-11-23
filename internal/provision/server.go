@@ -8,6 +8,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"strconv"
@@ -17,6 +18,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/sirupsen/logrus"
 	"github.com/ubccr/grendel/internal/logger"
+	"github.com/ubccr/grendel/internal/render"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/util"
 )
@@ -70,41 +72,43 @@ func NewServer(db store.Store, address string) (*Server, error) {
 
 	s.ListenAddress = ip
 
-	if !ip.To4().Equal(net.IPv4zero) {
-		s.ServerAddress = ip
-		return s, nil
-	}
-
-	ipaddr, err := util.GetFirstExternalIPFromInterfaces()
+	serverAddress, err := util.ServerAddress(ip.String())
 	if err != nil {
 		return nil, err
 	}
 
-	s.ServerAddress = ipaddr
+	s.ServerAddress = net.ParseIP(serverAddress)
 
 	return s, nil
 }
 
-func newEcho() (*echo.Echo, error) {
+func newEcho(templates *render.Set) *echo.Echo {
 	e := echo.New()
 	e.HTTPErrorHandler = HTTPErrorHandler
 	e.HideBanner = true
 	e.Use(middleware.Recover())
 	e.Logger = EchoLogger()
+	e.Renderer = &templateRenderer{set: templates}
 
-	renderer, err := NewTemplateRenderer()
-	if err != nil {
-		return nil, err
+	return e
+}
+
+// templateRenderer serves the template set through echo's c.Render
+type templateRenderer struct {
+	set *render.Set
+}
+
+func (t *templateRenderer) Render(w io.Writer, name string, data any, c echo.Context) error {
+	if viewContext, isMap := data.(map[string]any); isMap {
+		viewContext["reverse"] = c.Echo().Reverse
 	}
 
-	err = renderer.Watch(context.Background())
-	if err != nil {
-		return nil, err
+	ct := c.Response().Header().Get(echo.HeaderContentType)
+	if ct == "" {
+		c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextPlainCharsetUTF8)
 	}
 
-	e.Renderer = renderer
-
-	return e, nil
+	return t.set.Execute(w, name, data)
 }
 
 func HTTPErrorHandler(err error, c echo.Context) {
@@ -135,10 +139,16 @@ func HTTPErrorHandler(err error, c echo.Context) {
 }
 
 func (s *Server) Serve(defaultImageName string) error {
-	e, err := newEcho()
+	templates, err := render.NewSet()
 	if err != nil {
 		return err
 	}
+
+	if err := templates.Watch(context.Background()); err != nil {
+		return err
+	}
+
+	e := newEcho(templates)
 
 	if len(s.RepoDir) > 0 {
 		log.Infof("Using repo dir: %s", s.RepoDir)
@@ -154,6 +164,7 @@ func (s *Server) Serve(defaultImageName string) error {
 		return err
 	}
 
+	h.Templates = templates
 	h.SetupRoutes(e)
 
 	httpServer := &http.Server{

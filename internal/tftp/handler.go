@@ -10,11 +10,10 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/internal/provision"
+	"github.com/ubccr/grendel/internal/render"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -48,28 +47,12 @@ func (s *Server) imageFileHandler(filePath string, rf io.ReaderFrom) error {
 		"extra_vars": viper.GetStringMap("provision.extra_vars"),
 	}
 
-	switch {
-	case fileType == "kernel":
-		kernel, err := provision.RenderString("kernel", bootImage.KernelPath, data)
-		if err != nil {
-			log.Errorf("Failed to render kernel path for image %s: %s", bootImage.Name, err)
-			return err
-		}
-		return s.sendFile(kernel, rf)
-	case strings.HasPrefix(fileType, "initrd-"):
-		i, err := strconv.Atoi(fileType[7:])
-		if err != nil || i < 0 || i >= len(bootImage.InitrdPaths) {
-			return fmt.Errorf("no initrd with ID %d", i)
-		}
-		initrd, err := provision.RenderString(fileType, bootImage.InitrdPaths[i], data)
-		if err != nil {
-			log.Errorf("Failed to render initrd path for image %s: %s", bootImage.Name, err)
-			return err
-		}
-		return s.sendFile(initrd, rf)
+	path, err := render.FilePath(bootImage, fileType, data)
+	if err != nil {
+		log.Errorf("Failed to find %s of image %s: %s", fileType, bootImage.Name, err)
+		return err
 	}
-
-	return fmt.Errorf("File not found: %s", filePath)
+	return s.sendFile(path, rf)
 }
 
 func (s *Server) ReadHandler(token string, rf io.ReaderFrom) error {

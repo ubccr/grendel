@@ -13,7 +13,7 @@ import (
 	"github.com/insomniacslk/dhcp/dhcpv4"
 	"github.com/insomniacslk/dhcp/rfc1035label"
 	"github.com/sirupsen/logrus"
-	"github.com/ubccr/grendel/internal/provision"
+	"github.com/ubccr/grendel/internal/render"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -33,7 +33,7 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 		}).Info("Host tagged with Arista ZTP. Setting bootfile URL and config dhcp options")
 
 		token, _ := model.NewBootToken(host.UID.String(), nic.MAC.String())
-		endpoints := provision.NewEndpoints(serverIP.String(), token)
+		endpoints := render.NewEndpoints(serverIP.String(), token)
 
 		configURL := endpoints.KickstartURL()
 		log.Debugf("Arista provision script URL: %s", configURL)
@@ -51,7 +51,7 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 		}).Info("Host tagged with Dell ZTD. Setting ZTD provision URL dhcp option")
 
 		token, _ := model.NewBootToken(host.UID.String(), nic.MAC.String())
-		endpoints := provision.NewEndpoints(serverIP.String(), token)
+		endpoints := render.NewEndpoints(serverIP.String(), token)
 
 		provisionURL := endpoints.KickstartURL()
 		log.Debugf("Dell ZTD provision-url: %s", provisionURL)
@@ -68,7 +68,7 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 		}).Info("Host tagged with proxmox. Setting automated install answer file url")
 
 		token, _ := model.NewBootToken(host.UID.String(), nic.MAC.String())
-		endpoints := provision.NewEndpoints(serverIP.String(), token)
+		endpoints := render.NewEndpoints(serverIP.String(), token)
 
 		proxmoxURL := endpoints.ProxmoxURL()
 		log.Debugf("Proxmox Answer file url: %s", proxmoxURL)
@@ -85,7 +85,7 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 		}).Info("Host is Mellanox ZTP. Setting bootfile URL and config dhcp options")
 
 		token, _ := model.NewBootToken(host.UID.String(), nic.MAC.String())
-		endpoints := provision.NewEndpoints(serverIP.String(), token)
+		endpoints := render.NewEndpoints(serverIP.String(), token)
 
 		configURL, configFilename := endpoints.KickstartURLParts()
 		repoURL := endpoints.RepoURL() + "/onie/"
@@ -112,7 +112,7 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 		}).Info("Host tagged with Dell ZTP. Setting ZTP provision URL dhcp option")
 
 		token, _ := model.NewBootToken(host.UID.String(), nic.MAC.String())
-		endpoints := provision.NewEndpoints(serverIP.String(), token)
+		endpoints := render.NewEndpoints(serverIP.String(), token)
 
 		provisionURL := endpoints.KickstartURL()
 		log.Debugf("Dell ZTP provision-url: %s", provisionURL)
@@ -125,7 +125,7 @@ func (s *Server) setZTD(host *model.Host, nic *model.NetInterface, serverIP net.
 		// See: https://www.eaton.com/content/dam/eaton/products/backup-power-ups-surge-it-power-distribution/power-management-software-connectivity/eaton-gigabit-network-card/network-m3/resources/eaton-zero-touch-provisioning-with-gigabit-network-interfaces-wp158004en.pdf
 
 		token, _ := model.NewBootToken(host.UID.String(), nic.MAC.String())
-		endpoints := provision.NewEndpoints(serverIP.String(), token)
+		endpoints := render.NewEndpoints(serverIP.String(), token)
 		configURL := endpoints.KickstartURL()
 		resp.UpdateOption(dhcpv4.Option{Code: dhcpv4.OptionVendorSpecificInformation, Value: dhcpv4.String(configURL)})
 

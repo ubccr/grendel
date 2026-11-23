@@ -7,7 +7,6 @@ package provision
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"net"
 	"net/http"
 	"path"
@@ -18,22 +17,21 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/render"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
 	"github.com/ubccr/grendel/pkg/netbox"
 )
 
-var netBoxClient *netbox.Client
-
 type Handler struct {
 	DB               store.Store
 	DefaultImageName string
+	Templates        *render.Set
 }
 
 func init() {
 	viper.SetDefault("provision.enable_prometheus_sd", false)
 	viper.SetDefault("provision.prometheus_sd_refresh_interval", "3600")
-	netBoxClient = netbox.NewClient()
 }
 
 func NewHandler(db store.Store, defaultImageName string) (*Handler, error) {
@@ -158,32 +156,19 @@ func (h *Handler) verifyClaims(c echo.Context) (*model.BootImage, *model.Host, *
 		host.Arch = claims.Arch
 	}
 
-	token := c.Param("token")
-	serverHost := c.Request().Host
-	endpoints := NewEndpoints(serverHost, token)
-
 	log.WithFields(logrus.Fields{
 		"host":    host.Name,
 		"headers": c.Request().Header,
 	}).Debug("HTTP request headers")
 
-	data := map[string]any{
-		"token":      c.Param("token"),
-		"endpoints":  endpoints,
-		"bootimage":  bootImage,
-		"nic":        nic,
-		"host":       host,
-		"headers":    c.Request().Header,
-		"extra_vars": viper.GetStringMap("provision.extra_vars"),
-		"beacon": map[string]any{
-			"enabled":  viper.GetBool("provision.beacon.enabled"),
-			"served":   viper.GetString("provision.beacon.dir") != "",
-			"path":     viper.GetString("provision.beacon.path"),
-			"complete": viper.GetBool("provision.beacon.complete"),
-			"url":      endpoints.BeaconURL(host.ArchDebian()),
-			"timeout":  beaconTimeout(token, time.Now()),
-		},
-	}
+	data := render.Data(render.Request{
+		Host:    host,
+		NIC:     nic,
+		Image:   bootImage,
+		Server:  c.Request().Host,
+		Token:   c.Param("token"),
+		Headers: c.Request().Header,
+	})
 
 	return bootImage, host, nic, data, nil
 }
@@ -194,17 +179,11 @@ func (h *Handler) Ipxe(c echo.Context) error {
 		return err
 	}
 
-	tmplName, ok := bootImage.ProvisionTemplates["ipxe"]
-	if !ok {
-		tmplName = "ipxe.tmpl"
-	}
+	tmplName, _ := render.TemplateFor(bootImage, render.KindIPXE)
 
-	commandLine, err := RenderString("cmdline", bootImage.CommandLine, data)
-	if err != nil {
+	if err := render.AddCommandLine(bootImage, data); err != nil {
 		return err
 	}
-
-	data["commandLine"] = commandLine
 
 	log.Infof("iPXE script requested: script=%s host=%s boot_image=%s", tmplName, host.Name, bootImage.Name)
 	if err := c.Render(http.StatusOK, tmplName, data); err != nil {
@@ -224,46 +203,33 @@ func (h *Handler) File(c echo.Context) error {
 
 	log.Infof("Got request for file %q from host %s %s", fileType, host.Name, c.RealIP())
 
-	switch {
-	case fileType == "kernel" || fileType == "kernel.sig":
-		kernel, err := h.renderImagePath("kernel", bootImage.KernelPath, host, bootImage, data)
-		if err != nil {
-			return err
-		}
-		if fileType == "kernel.sig" {
-			kernel += ".sig"
-		}
-		return c.File(kernel)
-
-	case fileType == "liveimg":
+	if fileType == "liveimg" {
 		return c.File(bootImage.LiveImage)
-
-	case strings.HasPrefix(fileType, "initrd-"):
-		initrdBaseName := strings.TrimSuffix(fileType, ".sig")
-		i, err := strconv.Atoi(initrdBaseName[7:])
-		if err != nil || i < 0 || i >= len(bootImage.InitrdPaths) {
-			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("no initrd with ID %d", i))
-		}
-		initrd, err := h.renderImagePath(initrdBaseName, bootImage.InitrdPaths[i], host, bootImage, data)
-		if err != nil {
-			return err
-		}
-		if strings.HasSuffix(fileType, ".sig") {
-			initrd += ".sig"
-		}
-		return c.File(initrd)
 	}
 
-	return echo.NewHTTPError(http.StatusNotFound, "")
+	// a signature is served from beside the file it signs
+	name, isSig := strings.CutSuffix(fileType, ".sig")
+	filePath, err := h.imagePath(name, host, bootImage, data)
+	if err != nil {
+		return err
+	}
+	if isSig {
+		filePath += ".sig"
+	}
+	return c.File(filePath)
 }
 
-func (h *Handler) renderImagePath(name, filePath string, host *model.Host, bootImage *model.BootImage, data map[string]any) (string, error) {
-	rendered, err := RenderString(name, filePath, data)
+// imagePath is where the boot file the image serves as name is on disk for host
+func (h *Handler) imagePath(name string, host *model.Host, bootImage *model.BootImage, data map[string]any) (string, error) {
+	rendered, err := render.FilePath(bootImage, name, data)
+	if errors.Is(err, render.ErrNoFile) {
+		return "", echo.NewHTTPError(http.StatusNotFound, err.Error())
+	}
 	if err != nil {
 		log.WithFields(logrus.Fields{
 			"host":      host.Name,
 			"bootimage": bootImage.Name,
-			"path":      filePath,
+			"file":      name,
 			"err":       err,
 		}).Error("failed to render boot image path template")
 		return "", echo.NewHTTPError(http.StatusInternalServerError, "failed to render boot image path").SetInternal(err)
@@ -283,10 +249,7 @@ func (h *Handler) Kickstart(c echo.Context) error {
 		return err
 	}
 
-	tmplName, ok := bootImage.ProvisionTemplates["kickstart"]
-	if !ok {
-		tmplName = "kickstart.tmpl"
-	}
+	tmplName, _ := render.TemplateFor(bootImage, render.KindKickstart)
 
 	if err := c.Render(http.StatusOK, tmplName, data); err != nil {
 		return err
@@ -329,10 +292,7 @@ func (h *Handler) UserData(c echo.Context) error {
 		return err
 	}
 
-	tmplName, ok := bootImage.ProvisionTemplates["user_data"]
-	if !ok {
-		tmplName = "user-data.tmpl"
-	}
+	tmplName, _ := render.TemplateFor(bootImage, render.KindUserData)
 
 	log.Infof("Sending cloud-init user-data to host %s", host.Name)
 	c.Response().Header().Set(echo.HeaderContentType, "application/yaml; charset=utf-8")
@@ -351,7 +311,7 @@ func (h *Handler) MetaData(c echo.Context) error {
 
 	log.Infof("Sending cloud-init meta-data to host %s", host.Name)
 	c.Response().Header().Set(echo.HeaderContentType, "application/yaml; charset=utf-8")
-	return c.Render(http.StatusOK, "meta-data.tmpl", data)
+	return c.Render(http.StatusOK, render.MetaDataTemplate, data)
 }
 
 func (h *Handler) VendorData(c echo.Context) error {
@@ -365,14 +325,17 @@ func (h *Handler) Ignition(c echo.Context) error {
 		return err
 	}
 
-	tmplName, ok := bootImage.ProvisionTemplates["butane"]
-	if !ok {
-		tmplName = "butane.tmpl"
-	}
+	tmplName, _ := render.TemplateFor(bootImage, render.KindButane)
 
 	log.Infof("Sending ignition config to host %s", host.Name)
-	renderer := c.Echo().Renderer.(*TemplateRenderer)
-	if err := renderer.RenderIgnition(http.StatusOK, tmplName, data, c); err != nil {
+	ignition, err := h.Templates.Ignition(tmplName, data)
+	if err != nil {
+		if errors.Is(err, render.ErrButane) {
+			return echo.NewHTTPError(http.StatusInternalServerError, "failed to translate butane config").SetInternal(err)
+		}
+		return err
+	}
+	if err := c.HTMLBlob(http.StatusOK, ignition); err != nil {
 		return err
 	}
 	h.recordStage(host, model.ProvisionStateConfig, bootImage)
@@ -421,10 +384,7 @@ func (h *Handler) Proxmox(c echo.Context) error {
 		return err
 	}
 
-	tmplName, ok := bootImage.ProvisionTemplates["proxmox"]
-	if !ok {
-		tmplName = "proxmox.tmpl"
-	}
+	tmplName, _ := render.TemplateFor(bootImage, render.KindProxmox)
 
 	log.Infof("Sending automated install answer file to host %s", host.Name)
 	c.Response().Header().Set(echo.HeaderContentType, "application/yaml; charset=utf-8")
@@ -486,7 +446,7 @@ func (h *Handler) Onie(c echo.Context) error {
 			"headers":    c.Request().Header,
 			"extra_vars": viper.GetStringMap("provision.extra_vars"),
 		}
-		kernel, err := h.renderImagePath("kernel", bootImage.KernelPath, host, bootImage, data)
+		kernel, err := h.imagePath("kernel", host, bootImage, data)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusNotFound, "")
 		}
@@ -502,7 +462,7 @@ func (h *Handler) NetBoxRenderConfig(c echo.Context) error {
 		return err
 	}
 
-	res, err := netBoxClient.NetBoxFetchConfig(node.Name)
+	res, err := render.NetBox.NetBoxFetchConfig(node.Name)
 	if err != nil {
 		if errors.Is(err, netbox.ErrNotFound) {
 			return echo.NewHTTPError(http.StatusNotFound, "")

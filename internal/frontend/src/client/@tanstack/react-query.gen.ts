@@ -3,8 +3,8 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { deleteV1AuthSignout, deleteV1Images, deleteV1Nodes, deleteV1RolesNames, deleteV1UsersUsernames, getV1BmcBios, getV1BmcBiosRegistry, getV1BmcFirmwareUpdates, getV1BmcIdentityDefaults, getV1BmcJobs, getV1BmcNics, getV1BmcSecureboot, getV1BmcSel, getV1BmcStatus, getV1DbDump, getV1GrendelEvents, getV1GrendelEventsId, getV1GrendelVersion, getV1Images, getV1ImagesFind, getV1Nodes, getV1NodesFind, getV1NodesIpsNext, getV1NodesIpsRanges, getV1NodesProvisionStatus, getV1NodesTags, getV1NodesTokenInterface, getV1Roles, getV1SwitchNodesetLldp, getV1SwitchScan, getV1Users, type Options, patchV1AuthReset, patchV1NodesImage, patchV1NodesProvision, patchV1NodesTagsAction, patchV1Roles, patchV1UsersUsernamesEnable, patchV1UsersUsernamesRole, postV1AuthSignin, postV1AuthSignup, postV1AuthToken, postV1BmcAssetTag, postV1BmcBios, postV1BmcBiosDiscard, postV1BmcConfigureAuto, postV1BmcConfigureImport, postV1BmcFirmwareInstall, postV1BmcIndicator, postV1BmcJobsClear, postV1BmcLocation, postV1BmcPower, postV1BmcSecureboot, postV1BmcSecurebootKeys, postV1BmcSecurebootKeysDelete, postV1BmcSecurebootReset, postV1BmcSelClear, postV1DbRestore, postV1Images, postV1Nodes, postV1NodesImport, postV1Roles, postV1Users } from '../sdk.gen';
-import type { DeleteV1AuthSignoutData, DeleteV1AuthSignoutError, DeleteV1AuthSignoutResponse, DeleteV1ImagesData, DeleteV1ImagesError, DeleteV1ImagesResponse, DeleteV1NodesData, DeleteV1NodesError, DeleteV1NodesResponse, DeleteV1RolesNamesData, DeleteV1RolesNamesError, DeleteV1RolesNamesResponse, DeleteV1UsersUsernamesData, DeleteV1UsersUsernamesError, DeleteV1UsersUsernamesResponse, GetV1BmcBiosData, GetV1BmcBiosError, GetV1BmcBiosRegistryData, GetV1BmcBiosRegistryError, GetV1BmcBiosRegistryResponse, GetV1BmcBiosResponse, GetV1BmcFirmwareUpdatesData, GetV1BmcFirmwareUpdatesError, GetV1BmcFirmwareUpdatesResponse, GetV1BmcIdentityDefaultsData, GetV1BmcIdentityDefaultsError, GetV1BmcIdentityDefaultsResponse, GetV1BmcJobsData, GetV1BmcJobsError, GetV1BmcJobsResponse, GetV1BmcNicsData, GetV1BmcNicsError, GetV1BmcNicsResponse, GetV1BmcSecurebootData, GetV1BmcSecurebootError, GetV1BmcSecurebootResponse, GetV1BmcSelData, GetV1BmcSelError, GetV1BmcSelResponse, GetV1BmcStatusData, GetV1BmcStatusError, GetV1BmcStatusResponse, GetV1DbDumpData, GetV1DbDumpError, GetV1DbDumpResponse, GetV1GrendelEventsData, GetV1GrendelEventsError, GetV1GrendelEventsIdData, GetV1GrendelEventsIdError, GetV1GrendelEventsIdResponse, GetV1GrendelEventsResponse, GetV1GrendelVersionData, GetV1GrendelVersionError, GetV1GrendelVersionResponse, GetV1ImagesData, GetV1ImagesError, GetV1ImagesFindData, GetV1ImagesFindError, GetV1ImagesFindResponse, GetV1ImagesResponse, GetV1NodesData, GetV1NodesError, GetV1NodesFindData, GetV1NodesFindError, GetV1NodesFindResponse, GetV1NodesIpsNextData, GetV1NodesIpsNextError, GetV1NodesIpsNextResponse, GetV1NodesIpsRangesData, GetV1NodesIpsRangesError, GetV1NodesIpsRangesResponse, GetV1NodesProvisionStatusData, GetV1NodesProvisionStatusError, GetV1NodesProvisionStatusResponse, GetV1NodesResponse, GetV1NodesTagsData, GetV1NodesTagsError, GetV1NodesTagsResponse, GetV1NodesTokenInterfaceData, GetV1NodesTokenInterfaceError, GetV1NodesTokenInterfaceResponse, GetV1RolesData, GetV1RolesError, GetV1RolesResponse, GetV1SwitchNodesetLldpData, GetV1SwitchNodesetLldpError, GetV1SwitchNodesetLldpResponse, GetV1SwitchScanData, GetV1SwitchScanError, GetV1SwitchScanResponse, GetV1UsersData, GetV1UsersError, GetV1UsersResponse, PatchV1AuthResetData, PatchV1AuthResetError, PatchV1AuthResetResponse, PatchV1NodesImageData, PatchV1NodesImageError, PatchV1NodesImageResponse, PatchV1NodesProvisionData, PatchV1NodesProvisionError, PatchV1NodesProvisionResponse, PatchV1NodesTagsActionData, PatchV1NodesTagsActionError, PatchV1NodesTagsActionResponse, PatchV1RolesData, PatchV1RolesError, PatchV1RolesResponse, PatchV1UsersUsernamesEnableData, PatchV1UsersUsernamesEnableError, PatchV1UsersUsernamesEnableResponse, PatchV1UsersUsernamesRoleData, PatchV1UsersUsernamesRoleError, PatchV1UsersUsernamesRoleResponse, PostV1AuthSigninData, PostV1AuthSigninError, PostV1AuthSigninResponse, PostV1AuthSignupData, PostV1AuthSignupError, PostV1AuthSignupResponse, PostV1AuthTokenData, PostV1AuthTokenError, PostV1AuthTokenResponse, PostV1BmcAssetTagData, PostV1BmcAssetTagError, PostV1BmcAssetTagResponse, PostV1BmcBiosData, PostV1BmcBiosDiscardData, PostV1BmcBiosDiscardError, PostV1BmcBiosDiscardResponse, PostV1BmcBiosError, PostV1BmcBiosResponse, PostV1BmcConfigureAutoData, PostV1BmcConfigureAutoError, PostV1BmcConfigureAutoResponse, PostV1BmcConfigureImportData, PostV1BmcConfigureImportError, PostV1BmcConfigureImportResponse, PostV1BmcFirmwareInstallData, PostV1BmcFirmwareInstallError, PostV1BmcFirmwareInstallResponse, PostV1BmcIndicatorData, PostV1BmcIndicatorError, PostV1BmcIndicatorResponse, PostV1BmcJobsClearData, PostV1BmcJobsClearError, PostV1BmcJobsClearResponse, PostV1BmcLocationData, PostV1BmcLocationError, PostV1BmcLocationResponse, PostV1BmcPowerData, PostV1BmcPowerError, PostV1BmcPowerResponse, PostV1BmcSecurebootData, PostV1BmcSecurebootError, PostV1BmcSecurebootKeysData, PostV1BmcSecurebootKeysDeleteData, PostV1BmcSecurebootKeysDeleteError, PostV1BmcSecurebootKeysDeleteResponse, PostV1BmcSecurebootKeysError, PostV1BmcSecurebootKeysResponse, PostV1BmcSecurebootResetData, PostV1BmcSecurebootResetError, PostV1BmcSecurebootResetResponse, PostV1BmcSecurebootResponse, PostV1BmcSelClearData, PostV1BmcSelClearError, PostV1BmcSelClearResponse, PostV1DbRestoreData, PostV1DbRestoreError, PostV1DbRestoreResponse, PostV1ImagesData, PostV1ImagesError, PostV1ImagesResponse, PostV1NodesData, PostV1NodesError, PostV1NodesImportData, PostV1NodesImportError, PostV1NodesImportResponse, PostV1NodesResponse, PostV1RolesData, PostV1RolesError, PostV1RolesResponse, PostV1UsersData, PostV1UsersError, PostV1UsersResponse } from '../types.gen';
+import { deleteV1AuthSignout, deleteV1Images, deleteV1Nodes, deleteV1RolesNames, deleteV1UsersUsernames, getV1BmcBios, getV1BmcBiosRegistry, getV1BmcFirmwareUpdates, getV1BmcIdentityDefaults, getV1BmcJobs, getV1BmcNics, getV1BmcSecureboot, getV1BmcSel, getV1BmcStatus, getV1DbDump, getV1GrendelEvents, getV1GrendelEventsId, getV1GrendelVersion, getV1Images, getV1ImagesFind, getV1Nodes, getV1NodesCheck, getV1NodesFind, getV1NodesIpsNext, getV1NodesIpsRanges, getV1NodesProvisionStatus, getV1NodesRenderTemplate, getV1NodesTags, getV1NodesTokenInterface, getV1Roles, getV1SwitchNodesetLldp, getV1SwitchScan, getV1Users, type Options, patchV1AuthReset, patchV1NodesImage, patchV1NodesProvision, patchV1NodesTagsAction, patchV1Roles, patchV1UsersUsernamesEnable, patchV1UsersUsernamesRole, postV1AuthSignin, postV1AuthSignup, postV1AuthToken, postV1BmcAssetTag, postV1BmcBios, postV1BmcBiosDiscard, postV1BmcConfigureAuto, postV1BmcConfigureImport, postV1BmcFirmwareInstall, postV1BmcIndicator, postV1BmcJobsClear, postV1BmcLocation, postV1BmcPower, postV1BmcSecureboot, postV1BmcSecurebootKeys, postV1BmcSecurebootKeysDelete, postV1BmcSecurebootReset, postV1BmcSelClear, postV1DbRestore, postV1Images, postV1Nodes, postV1NodesImport, postV1Roles, postV1Users } from '../sdk.gen';
+import type { DeleteV1AuthSignoutData, DeleteV1AuthSignoutError, DeleteV1AuthSignoutResponse, DeleteV1ImagesData, DeleteV1ImagesError, DeleteV1ImagesResponse, DeleteV1NodesData, DeleteV1NodesError, DeleteV1NodesResponse, DeleteV1RolesNamesData, DeleteV1RolesNamesError, DeleteV1RolesNamesResponse, DeleteV1UsersUsernamesData, DeleteV1UsersUsernamesError, DeleteV1UsersUsernamesResponse, GetV1BmcBiosData, GetV1BmcBiosError, GetV1BmcBiosRegistryData, GetV1BmcBiosRegistryError, GetV1BmcBiosRegistryResponse, GetV1BmcBiosResponse, GetV1BmcFirmwareUpdatesData, GetV1BmcFirmwareUpdatesError, GetV1BmcFirmwareUpdatesResponse, GetV1BmcIdentityDefaultsData, GetV1BmcIdentityDefaultsError, GetV1BmcIdentityDefaultsResponse, GetV1BmcJobsData, GetV1BmcJobsError, GetV1BmcJobsResponse, GetV1BmcNicsData, GetV1BmcNicsError, GetV1BmcNicsResponse, GetV1BmcSecurebootData, GetV1BmcSecurebootError, GetV1BmcSecurebootResponse, GetV1BmcSelData, GetV1BmcSelError, GetV1BmcSelResponse, GetV1BmcStatusData, GetV1BmcStatusError, GetV1BmcStatusResponse, GetV1DbDumpData, GetV1DbDumpError, GetV1DbDumpResponse, GetV1GrendelEventsData, GetV1GrendelEventsError, GetV1GrendelEventsIdData, GetV1GrendelEventsIdError, GetV1GrendelEventsIdResponse, GetV1GrendelEventsResponse, GetV1GrendelVersionData, GetV1GrendelVersionError, GetV1GrendelVersionResponse, GetV1ImagesData, GetV1ImagesError, GetV1ImagesFindData, GetV1ImagesFindError, GetV1ImagesFindResponse, GetV1ImagesResponse, GetV1NodesCheckData, GetV1NodesCheckError, GetV1NodesCheckResponse, GetV1NodesData, GetV1NodesError, GetV1NodesFindData, GetV1NodesFindError, GetV1NodesFindResponse, GetV1NodesIpsNextData, GetV1NodesIpsNextError, GetV1NodesIpsNextResponse, GetV1NodesIpsRangesData, GetV1NodesIpsRangesError, GetV1NodesIpsRangesResponse, GetV1NodesProvisionStatusData, GetV1NodesProvisionStatusError, GetV1NodesProvisionStatusResponse, GetV1NodesRenderTemplateData, GetV1NodesRenderTemplateError, GetV1NodesRenderTemplateResponse, GetV1NodesResponse, GetV1NodesTagsData, GetV1NodesTagsError, GetV1NodesTagsResponse, GetV1NodesTokenInterfaceData, GetV1NodesTokenInterfaceError, GetV1NodesTokenInterfaceResponse, GetV1RolesData, GetV1RolesError, GetV1RolesResponse, GetV1SwitchNodesetLldpData, GetV1SwitchNodesetLldpError, GetV1SwitchNodesetLldpResponse, GetV1SwitchScanData, GetV1SwitchScanError, GetV1SwitchScanResponse, GetV1UsersData, GetV1UsersError, GetV1UsersResponse, PatchV1AuthResetData, PatchV1AuthResetError, PatchV1AuthResetResponse, PatchV1NodesImageData, PatchV1NodesImageError, PatchV1NodesImageResponse, PatchV1NodesProvisionData, PatchV1NodesProvisionError, PatchV1NodesProvisionResponse, PatchV1NodesTagsActionData, PatchV1NodesTagsActionError, PatchV1NodesTagsActionResponse, PatchV1RolesData, PatchV1RolesError, PatchV1RolesResponse, PatchV1UsersUsernamesEnableData, PatchV1UsersUsernamesEnableError, PatchV1UsersUsernamesEnableResponse, PatchV1UsersUsernamesRoleData, PatchV1UsersUsernamesRoleError, PatchV1UsersUsernamesRoleResponse, PostV1AuthSigninData, PostV1AuthSigninError, PostV1AuthSigninResponse, PostV1AuthSignupData, PostV1AuthSignupError, PostV1AuthSignupResponse, PostV1AuthTokenData, PostV1AuthTokenError, PostV1AuthTokenResponse, PostV1BmcAssetTagData, PostV1BmcAssetTagError, PostV1BmcAssetTagResponse, PostV1BmcBiosData, PostV1BmcBiosDiscardData, PostV1BmcBiosDiscardError, PostV1BmcBiosDiscardResponse, PostV1BmcBiosError, PostV1BmcBiosResponse, PostV1BmcConfigureAutoData, PostV1BmcConfigureAutoError, PostV1BmcConfigureAutoResponse, PostV1BmcConfigureImportData, PostV1BmcConfigureImportError, PostV1BmcConfigureImportResponse, PostV1BmcFirmwareInstallData, PostV1BmcFirmwareInstallError, PostV1BmcFirmwareInstallResponse, PostV1BmcIndicatorData, PostV1BmcIndicatorError, PostV1BmcIndicatorResponse, PostV1BmcJobsClearData, PostV1BmcJobsClearError, PostV1BmcJobsClearResponse, PostV1BmcLocationData, PostV1BmcLocationError, PostV1BmcLocationResponse, PostV1BmcPowerData, PostV1BmcPowerError, PostV1BmcPowerResponse, PostV1BmcSecurebootData, PostV1BmcSecurebootError, PostV1BmcSecurebootKeysData, PostV1BmcSecurebootKeysDeleteData, PostV1BmcSecurebootKeysDeleteError, PostV1BmcSecurebootKeysDeleteResponse, PostV1BmcSecurebootKeysError, PostV1BmcSecurebootKeysResponse, PostV1BmcSecurebootResetData, PostV1BmcSecurebootResetError, PostV1BmcSecurebootResetResponse, PostV1BmcSecurebootResponse, PostV1BmcSelClearData, PostV1BmcSelClearError, PostV1BmcSelClearResponse, PostV1DbRestoreData, PostV1DbRestoreError, PostV1DbRestoreResponse, PostV1ImagesData, PostV1ImagesError, PostV1ImagesResponse, PostV1NodesData, PostV1NodesError, PostV1NodesImportData, PostV1NodesImportError, PostV1NodesImportResponse, PostV1NodesResponse, PostV1RolesData, PostV1RolesError, PostV1RolesResponse, PostV1UsersData, PostV1UsersError, PostV1UsersResponse } from '../types.gen';
 
 /**
  * Change own password
@@ -1303,6 +1303,36 @@ export const postV1NodesMutation = (options?: Partial<Options<PostV1NodesData>>)
     return mutationOptions;
 };
 
+export const getV1NodesCheckQueryKey = (options?: Options<GetV1NodesCheckData>) => createQueryKey('getV1NodesCheck', options);
+
+/**
+ * Check boot files and templates
+ *
+ * #### Controller:
+ *
+ * `github.com/ubccr/grendel/internal/api.(*Handler).NodeCheck`
+ *
+ * #### Middlewares:
+ *
+ * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+ *
+ * ---
+ *
+ * Check that each node can be served its boot: the kernel and initrds of its image are readable at the paths rendered for the node, with their .sig files when the image is verified, and the iPXE script and every template in the image's provision_templates render. Files are read on the machine the API runs on. Every node is taken when neither nodeset nor tags is given
+ */
+export const getV1NodesCheckOptions = (options?: Options<GetV1NodesCheckData>) => queryOptions<GetV1NodesCheckResponse, GetV1NodesCheckError, GetV1NodesCheckResponse, ReturnType<typeof getV1NodesCheckQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getV1NodesCheck({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getV1NodesCheckQueryKey(options)
+});
+
 export const getV1NodesFindQueryKey = (options?: Options<GetV1NodesFindData>) => createQueryKey('getV1NodesFind', options);
 
 /**
@@ -1508,6 +1538,36 @@ export const getV1NodesProvisionStatusOptions = (options?: Options<GetV1NodesPro
         return data;
     },
     queryKey: getV1NodesProvisionStatusQueryKey(options)
+});
+
+export const getV1NodesRenderTemplateQueryKey = (options: Options<GetV1NodesRenderTemplateData>) => createQueryKey('getV1NodesRenderTemplate', options);
+
+/**
+ * Render provision templates
+ *
+ * #### Controller:
+ *
+ * `github.com/ubccr/grendel/internal/api.(*Handler).NodeRender`
+ *
+ * #### Middlewares:
+ *
+ * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+ *
+ * ---
+ *
+ * Render a template for each node as the provision server would send it, without recording a provision stage. Templates are read from disk on each request, so an edit is seen at once and one that does not parse is an error. The output holds a working boot token and whatever secrets the template renders, so the nodes have to be named: a request with neither nodeset nor tags is refused
+ */
+export const getV1NodesRenderTemplateOptions = (options: Options<GetV1NodesRenderTemplateData>) => queryOptions<GetV1NodesRenderTemplateResponse, GetV1NodesRenderTemplateError, GetV1NodesRenderTemplateResponse, ReturnType<typeof getV1NodesRenderTemplateQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getV1NodesRenderTemplate({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getV1NodesRenderTemplateQueryKey(options)
 });
 
 export const getV1NodesTagsQueryKey = (options?: Options<GetV1NodesTagsData>) => createQueryKey('getV1NodesTags', options);

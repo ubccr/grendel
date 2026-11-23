@@ -13,6 +13,19 @@ import (
 	"github.com/insomniacslk/dhcp/interfaces"
 )
 
+// ServerAddress is the address other machines reach a server listening on host at: host itself, or this machine's first external address when host is empty or every interface
+func ServerAddress(host string) (string, error) {
+	if ip := net.ParseIP(host); host != "" && (ip == nil || !ip.IsUnspecified()) {
+		return host, nil
+	}
+
+	ip, err := GetFirstExternalIPFromInterfaces()
+	if err != nil {
+		return "", err
+	}
+	return ip.String(), nil
+}
+
 func GetFirstExternalIPFromInterfaces() (net.IP, error) {
 	intfs, err := interfaces.GetNonLoopbackInterfaces()
 	if err != nil {

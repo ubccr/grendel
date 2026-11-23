@@ -33,6 +33,7 @@ const serverTabs = [
   { to: "/nodes/$node/bios", label: "BIOS" },
   { to: "/nodes/$node/secureboot", label: "Secure boot" },
   { to: "/nodes/$node/provision", label: "Provision" },
+  { to: "/nodes/$node/bootcheck", label: "Boot check" },
   { to: "/nodes/$node/console", label: "Console" },
 ] as const;
 

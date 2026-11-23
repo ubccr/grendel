@@ -369,15 +369,24 @@ func (h *Handler) filterByNodesetAndTags(f1, f2 string) (*nodeset.NodeSet, error
 	return nodeset.NewNodeSet(strings.Join(combined, ","))
 }
 
+// selectedNodeSet is the nodes a request's nodeset and tags pick together, or nil when it gives neither, which a route that reads takes to mean every node
+func (h *Handler) selectedNodeSet(c fuego.ContextNoBody) (*nodeset.NodeSet, error) {
+	if c.QueryParam("nodeset") == "" && c.QueryParam("tags") == "" {
+		return nil, nil
+	}
+
+	ns, err := h.filterByNodesetAndTags(c.QueryParam("nodeset"), c.QueryParam("tags"))
+	if err != nil {
+		return nil, badRequest(err, "failed to filter nodes")
+	}
+	return ns, nil
+}
+
 // NodeProvisionStatus returns the latest provision status of the selected nodes, or of every node when none are selected. Nodes that have never network booted since the status was added have no entry
 func (h *Handler) NodeProvisionStatus(c fuego.ContextNoBody) (model.ProvisionStatusList, error) {
-	var ns *nodeset.NodeSet
-	if c.QueryParam("nodeset") != "" || c.QueryParam("tags") != "" {
-		var err error
-		ns, err = h.filterByNodesetAndTags(c.QueryParam("nodeset"), c.QueryParam("tags"))
-		if err != nil {
-			return nil, badRequest(err, "failed to filter nodes")
-		}
+	ns, err := h.selectedNodeSet(c)
+	if err != nil {
+		return nil, err
 	}
 
 	list, err := h.DB.ProvisionStatuses(ns)

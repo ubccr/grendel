@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { highlightJson } from "@/lib/highlighter";
+import { useHighlighted } from "@/lib/highlighter";
 import { cn } from "@/lib/utils";
 import { type QueryKey, useQuery, type UseQueryOptions } from "@tanstack/react-query";
 import { Download, FileJson } from "lucide-react";
@@ -33,9 +33,6 @@ type Props<T extends Named, E, K extends QueryKey> = {
   noun: "node" | "image";
   options: UseQueryOptions<T[], E, T[], K>;
 };
-
-// MAX_HIGHLIGHT is the most JSON that gets colored, so a very large export shows as plain text rather than stalling the page
-const MAX_HIGHLIGHT = 512 * 1024;
 
 // withoutIds drops the database ids from nodes, their interfaces and bonds, and images. The store upserts on id, so an import carrying them would overwrite whatever records hold those ids in another Grendel
 export function withoutIds<T>(records: T[]): T[] {
@@ -79,17 +76,7 @@ export function ExportJson<T extends Named, E, K extends QueryKey>({
     () => (data ? JSON.stringify(ids ? data : withoutIds(data), null, 2) : ""),
     [data, ids],
   );
-  const large = code.length > MAX_HIGHLIGHT;
-  // keyed on what the JSON was made from rather than the JSON, which is too long to hash on every render
-  const highlighted = useQuery({
-    queryKey: ["highlighted-json", options.queryKey, dataUpdatedAt, ids],
-    queryFn: () => highlightJson(code),
-    enabled: !!code && !large,
-    staleTime: Infinity,
-    gcTime: 0,
-  });
-  // plain lines stand in until the colored ones are ready, and for JSON too large to color
-  const lines = useMemo(() => highlighted.data ?? code.split("\n"), [highlighted.data, code]);
+  const lines = useHighlighted(code, "json", [options.queryKey, dataUpdatedAt, ids]);
   const size = useMemo(() => new Blob([code]).size, [code]);
   const count = data?.length ?? 0;
   const plural = count === 1 ? noun : `${noun}s`;

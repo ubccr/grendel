@@ -51,7 +51,8 @@ func requestIgnitionFor(t *testing.T, tmplName string) (*Handler, *model.Host, *
 	t.Cleanup(func() { config.DefaultDNS = origDNS })
 	config.DefaultDNS = []net.IP{net.ParseIP("10.0.0.2")}
 
-	h := &Handler{DB: newTestDB(t)}
+	templates := newTestTemplates(t)
+	h := &Handler{DB: newTestDB(t), Templates: templates}
 
 	image := &model.BootImage{Name: "flatcar", KernelPath: "/vmlinuz"}
 	if tmplName != "" {
@@ -70,7 +71,7 @@ func requestIgnitionFor(t *testing.T, tmplName string) (*Handler, *model.Host, *
 	token, err := model.NewBootToken(host.UID.String(), host.Interfaces[0].MAC.String())
 	require.NoError(t, err)
 
-	e := newTestEcho(t)
+	e := newEcho(templates)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(httptest.NewRequest(http.MethodGet, "/", nil), rec)
 	c.SetPath("/boot/:token/pxe-config.ign")

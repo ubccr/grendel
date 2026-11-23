@@ -4264,6 +4264,144 @@ func (s *NodeBootTokenResponseNodesItem) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *NodeCheckResponse) SetFake() {
+	{
+		{
+			s.Nodes = nil
+			for i := 0; i < 0; i++ {
+				var elem NodeCheckResponseNodesItem
+				{
+					elem.SetFake()
+				}
+				s.Nodes = append(s.Nodes, elem)
+			}
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *NodeCheckResponseNodesItem) SetFake() {
+	{
+		{
+			s.Arch.SetFake()
+		}
+	}
+	{
+		{
+			s.Error.SetFake()
+		}
+	}
+	{
+		{
+			s.Files = nil
+			for i := 0; i < 0; i++ {
+				var elem NodeCheckResponseNodesItemFilesItem
+				{
+					elem.SetFake()
+				}
+				s.Files = append(s.Files, elem)
+			}
+		}
+	}
+	{
+		{
+			s.Image.SetFake()
+		}
+	}
+	{
+		{
+			s.Name.SetFake()
+		}
+	}
+	{
+		{
+			s.Ok.SetFake()
+		}
+	}
+	{
+		{
+			s.OnRequest = nil
+			for i := 0; i < 0; i++ {
+				var elem NodeCheckResponseNodesItemOnRequestItem
+				{
+					elem.SetFake()
+				}
+				s.OnRequest = append(s.OnRequest, elem)
+			}
+		}
+	}
+	{
+		{
+			s.Templates = nil
+			for i := 0; i < 0; i++ {
+				var elem NodeCheckResponseNodesItemTemplatesItem
+				{
+					elem.SetFake()
+				}
+				s.Templates = append(s.Templates, elem)
+			}
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *NodeCheckResponseNodesItemFilesItem) SetFake() {
+	{
+		{
+			s.Error.SetFake()
+		}
+	}
+	{
+		{
+			s.Name.SetFake()
+		}
+	}
+	{
+		{
+			s.Path.SetFake()
+		}
+	}
+	{
+		{
+			s.Size.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *NodeCheckResponseNodesItemOnRequestItem) SetFake() {
+	{
+		{
+			s.Kind.SetFake()
+		}
+	}
+	{
+		{
+			s.Template.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *NodeCheckResponseNodesItemTemplatesItem) SetFake() {
+	{
+		{
+			s.Error.SetFake()
+		}
+	}
+	{
+		{
+			s.Kind.SetFake()
+		}
+	}
+	{
+		{
+			s.Template.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
 func (s *NodeImportRequest) SetFake() {
 	{
 		{
@@ -4506,6 +4644,56 @@ func (s *NodeProvisionRequest) SetFake() {
 	{
 		{
 			s.Provision.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *NodeRenderResponse) SetFake() {
+	{
+		{
+			s.Nodes = nil
+			for i := 0; i < 0; i++ {
+				var elem NodeRenderResponseNodesItem
+				{
+					elem.SetFake()
+				}
+				s.Nodes = append(s.Nodes, elem)
+			}
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *NodeRenderResponseNodesItem) SetFake() {
+	{
+		{
+			s.Arch.SetFake()
+		}
+	}
+	{
+		{
+			s.Content.SetFake()
+		}
+	}
+	{
+		{
+			s.Error.SetFake()
+		}
+	}
+	{
+		{
+			s.Image.SetFake()
+		}
+	}
+	{
+		{
+			s.Name.SetFake()
+		}
+	}
+	{
+		{
+			s.Template.SetFake()
 		}
 	}
 }
