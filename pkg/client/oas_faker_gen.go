@@ -5102,6 +5102,16 @@ func (s *SwitchScanResponseSwitchesItem) SetFake() {
 	}
 	{
 		{
+			s.LldpError.SetFake()
+		}
+	}
+	{
+		{
+			s.MACTableError.SetFake()
+		}
+	}
+	{
+		{
 			s.Name.SetFake()
 		}
 	}
@@ -5169,7 +5179,17 @@ func (s *SwitchScanResponseSwitchesItemPortsItemMacsItem) SetFake() {
 	}
 	{
 		{
+			s.Neighbor.SetFake()
+		}
+	}
+	{
+		{
 			s.Owner.SetFake()
+		}
+	}
+	{
+		{
+			s.Source.SetFake()
 		}
 	}
 	{

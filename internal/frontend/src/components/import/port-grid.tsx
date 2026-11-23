@@ -442,13 +442,7 @@ function Macs({
 }) {
   // the VLAN only tells the MACs on a port apart when they differ, so it is left off otherwise to keep the choices on one line
   const sameVlan = new Set(row.macs.map((m) => m.vlan)).size === 1;
-  const hint = row.macTyped
-    ? "typed"
-    : row.mac?.owner
-      ? `on ${row.mac.owner}${row.mac.bmc ? " BMC" : ""}`
-      : row.macs.length === 1 && row.mac?.vlan
-        ? `VLAN ${row.mac.vlan}`
-        : undefined;
+  const hint = row.macTyped ? "typed" : row.mac && macNote(row.mac, true);
 
   return (
     <div className="grid gap-1">
@@ -470,8 +464,8 @@ function Macs({
         />
         {row.macOverridden && (
           <ResetButton
-            title="Use the MAC the switch learned"
-            label={`Use the learned MAC for ${row.sw} ${row.ifname}`}
+            title="Use the MAC the switch reported"
+            label={`Use the MAC the switch reported for ${row.sw} ${row.ifname}`}
             onClick={() => onSet(undefined)}
           />
         )}
@@ -479,7 +473,7 @@ function Macs({
       {row.macs.length > 1 ? (
         // a toggle group gives arrow key focus and one pressed item at a time; pressing the picked MAC again clears the pick
         <ToggleGroup
-          aria-label={`Learned MACs on ${row.ifname}`}
+          aria-label={`MACs on ${row.ifname}`}
           variant="outline"
           size="sm"
           spacing={1}
@@ -505,15 +499,19 @@ function Macs({
   );
 }
 
+// macNote says what is known about a MAC: the node that has it, or else the name its LLDP neighbor advertises and where the switch has it
+function macNote(mac: Row["macs"][number], vlan: boolean) {
+  if (mac.owner) return `on ${mac.owner}${mac.bmc ? " BMC" : ""}`;
+  const where = mac.source === "lldp" ? "LLDP only" : vlan && mac.vlan ? `VLAN ${mac.vlan}` : "";
+  return [mac.neighbor, where].filter(Boolean).join(", ") || undefined;
+}
+
 function MacText({ mac, vlan = true }: { mac: Row["macs"][number]; vlan?: boolean }) {
+  const note = macNote(mac, vlan);
   return (
     <span className="grid leading-tight">
       <span className="font-mono text-xs">{mac.mac}</span>
-      {(mac.owner || (vlan && mac.vlan)) && (
-        <span className="text-[11px] text-muted-foreground">
-          {mac.owner ? `on ${mac.owner}${mac.bmc ? " BMC" : ""}` : `VLAN ${mac.vlan}`}
-        </span>
-      )}
+      {note && <span className="text-[11px] text-muted-foreground">{note}</span>}
     </span>
   );
 }

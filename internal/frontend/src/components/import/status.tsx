@@ -23,7 +23,7 @@ export const statusLook: Record<Status, Look> = {
   pick: { label: "Pick a MAC", icon: <MousePointerClick />, color: "var(--node-amber)" },
   conflict: { label: "Conflict", icon: <CircleX />, color: "var(--destructive)" },
   invalid: { label: "Needs fixing", icon: <CircleAlert />, color: "var(--destructive)" },
-  empty: { label: "No MAC learned", icon: <CircleDashed /> },
+  empty: { label: "No MAC seen", icon: <CircleDashed /> },
   unnamed: { label: "Needs a name", icon: <PencilLine /> },
   badmac: { label: "Fix the MAC", icon: <CircleAlert />, color: "var(--destructive)" },
   excluded: { label: "Left out", icon: <CircleMinus /> },

@@ -255,7 +255,7 @@ func TestGNMIFreeTextKeepsItsColons(t *testing.T) {
 	n := parseLLDP(leaves(
 		jsonUpdate(t, "/lldp/interfaces/interface[name=Ethernet7]/neighbors/neighbor[id=1]/state", `{"openconfig-lldp:system-name":"cpn-a01-07:idrac","openconfig-lldp:port-id-type":"openconfig-lldp-types:MAC_ADDRESS"}`),
 	))["Ethernet7"]
-	if n == nil || n.SystemName != "cpn-a01-07:idrac" || n.PortIdType != "MAC_ADDRESS" {
+	if len(n) != 1 || n[0].SystemName != "cpn-a01-07:idrac" || n[0].PortIdType != "MAC_ADDRESS" {
 		t.Errorf("neighbor = %+v, want the system name whole and only the identityref stripped", n)
 	}
 }
@@ -294,10 +294,10 @@ func TestGNMILLDP(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	up := n["Ethernet49/1"]
-	if up == nil {
+	if len(n["Ethernet49/1"]) != 1 {
 		t.Fatalf("no neighbor on Ethernet49/1: %v", n)
 	}
+	up := n["Ethernet49/1"][0]
 	if up.ChassisIdType != "MAC_ADDRESS" || up.PortIdType != "INTERFACE_NAME" || up.SystemName != "spine-01.cluster" {
 		t.Errorf("module prefixes not stripped or fields missing: %+v", up)
 	}
@@ -305,11 +305,15 @@ func TestGNMILLDP(t *testing.T) {
 		t.Errorf("chassis id = %q, want it normalised to colon form", up.ChassisId)
 	}
 
-	n, err = startFake(t, sonicFake(t), NOSSonic).GetLLDPNeighbors(context.Background())
+	sonic := sonicFake(t)
+	n, err = startFake(t, sonic, NOSSonic).GetLLDPNeighbors(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
-	if e0 := n["Ethernet0"]; e0 == nil || e0.SystemName != "cpn-a01-01" || e0.PortIdType != "MAC_ADDRESS" {
+	if sonic.lastReq.GetType() != gpb.GetRequest_ALL {
+		t.Errorf("type = %v, want ALL: SONiC rejects a STATE request for LLDP", sonic.lastReq.GetType())
+	}
+	if e0 := n["Ethernet0"]; len(e0) != 1 || e0[0].SystemName != "cpn-a01-01" || e0[0].PortIdType != "MAC_ADDRESS" {
 		t.Errorf("Ethernet0 = %+v", e0)
 	}
 }

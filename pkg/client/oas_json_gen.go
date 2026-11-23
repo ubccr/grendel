@@ -24603,6 +24603,18 @@ func (s *SwitchScanResponseSwitchesItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.LldpError.Set {
+			e.FieldStart("lldp_error")
+			s.LldpError.Encode(e)
+		}
+	}
+	{
+		if s.MACTableError.Set {
+			e.FieldStart("mac_table_error")
+			s.MACTableError.Encode(e)
+		}
+	}
+	{
 		if s.Name.Set {
 			e.FieldStart("name")
 			s.Name.Encode(e)
@@ -24632,14 +24644,16 @@ func (s *SwitchScanResponseSwitchesItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfSwitchScanResponseSwitchesItem = [7]string{
+var jsonFieldsNameOfSwitchScanResponseSwitchesItem = [9]string{
 	0: "address",
 	1: "error",
 	2: "error_code",
-	3: "name",
-	4: "nos",
-	5: "ports",
-	6: "warnings",
+	3: "lldp_error",
+	4: "mac_table_error",
+	5: "name",
+	6: "nos",
+	7: "ports",
+	8: "warnings",
 }
 
 // Decode decodes SwitchScanResponseSwitchesItem from json.
@@ -24679,6 +24693,26 @@ func (s *SwitchScanResponseSwitchesItem) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"error_code\"")
+			}
+		case "lldp_error":
+			if err := func() error {
+				s.LldpError.Reset()
+				if err := s.LldpError.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"lldp_error\"")
+			}
+		case "mac_table_error":
+			if err := func() error {
+				s.MACTableError.Reset()
+				if err := s.MACTableError.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"mac_table_error\"")
 			}
 		case "name":
 			if err := func() error {
@@ -24881,9 +24915,21 @@ func (s *SwitchScanResponseSwitchesItemPortsItemMacsItem) encodeFields(e *jx.Enc
 		}
 	}
 	{
+		if s.Neighbor.Set {
+			e.FieldStart("neighbor")
+			s.Neighbor.Encode(e)
+		}
+	}
+	{
 		if s.Owner.Set {
 			e.FieldStart("owner")
 			s.Owner.Encode(e)
+		}
+	}
+	{
+		if s.Source.Set {
+			e.FieldStart("source")
+			s.Source.Encode(e)
 		}
 	}
 	{
@@ -24894,11 +24940,13 @@ func (s *SwitchScanResponseSwitchesItemPortsItemMacsItem) encodeFields(e *jx.Enc
 	}
 }
 
-var jsonFieldsNameOfSwitchScanResponseSwitchesItemPortsItemMacsItem = [4]string{
+var jsonFieldsNameOfSwitchScanResponseSwitchesItemPortsItemMacsItem = [6]string{
 	0: "bmc",
 	1: "mac",
-	2: "owner",
-	3: "vlan",
+	2: "neighbor",
+	3: "owner",
+	4: "source",
+	5: "vlan",
 }
 
 // Decode decodes SwitchScanResponseSwitchesItemPortsItemMacsItem from json.
@@ -24929,6 +24977,16 @@ func (s *SwitchScanResponseSwitchesItemPortsItemMacsItem) Decode(d *jx.Decoder) 
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"mac\"")
 			}
+		case "neighbor":
+			if err := func() error {
+				s.Neighbor.Reset()
+				if err := s.Neighbor.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"neighbor\"")
+			}
 		case "owner":
 			if err := func() error {
 				s.Owner.Reset()
@@ -24938,6 +24996,16 @@ func (s *SwitchScanResponseSwitchesItemPortsItemMacsItem) Decode(d *jx.Decoder) 
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"owner\"")
+			}
+		case "source":
+			if err := func() error {
+				s.Source.Reset()
+				if err := s.Source.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"source\"")
 			}
 		case "vlan":
 			if err := func() error {

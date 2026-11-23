@@ -47,7 +47,9 @@ const kindOf = (e: Entry): NeighborKind => (e.owner ? "node" : "other");
 function entriesOf(sw: ScanSwitch | undefined): Entry[] {
   const out: Entry[] = [];
   for (const port of sw?.ports ?? [])
-    for (const m of port.macs ?? [])
+    for (const m of port.macs ?? []) {
+      // the scan also lists MACs only an LLDP neighbor advertised, which aren't in the MAC table
+      if (m.source === "lldp") continue;
       out.push({
         id: `${port.ifname}|${m.vlan}|${m.mac}`,
         port_name: port.ifname ?? "",
@@ -56,6 +58,7 @@ function entriesOf(sw: ScanSwitch | undefined): Entry[] {
         vlan: m.vlan ?? "",
         owner: m.owner || undefined,
       });
+    }
   return out;
 }
 
@@ -112,13 +115,14 @@ function RouteComponent() {
   const entries = useMemo(() => entriesOf(sw), [sw]);
 
   if (isPending) return <Pending />;
-  if (problem || sw?.error)
+  const unread = sw?.error ?? sw?.mac_table_error;
+  if (problem || unread)
     return (
       <SwitchProblem
         what="the MAC table"
-        code={problem?.type ?? sw?.error_code}
+        code={problem?.type ?? sw?.error_code ?? "unreachable"}
         title={problem?.title}
-        detail={problem?.detail ?? sw?.error}
+        detail={problem?.detail ?? unread}
         address={host?.interfaces?.[0]?.ip?.split("/")[0]}
       />
     );

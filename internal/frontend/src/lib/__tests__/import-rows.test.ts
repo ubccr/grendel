@@ -165,7 +165,7 @@ describe("buildRows", () => {
     expect(bad[0].problem).toMatch(/isn't a MAC address/);
     const cleared = rows([a01], {}, { "swe-a01:Ethernet1": { mac: "" } });
     expect(cleared[0].status).toBe("pick");
-    expect(cleared[0].problem).toMatch(/reset to use the one the switch learned/);
+    expect(cleared[0].problem).toMatch(/reset to use the one the switch reported/);
   });
 
   it("fills pasted MACs down", () => {

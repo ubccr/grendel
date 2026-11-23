@@ -105,13 +105,13 @@ func (g *GNMI) Close() error {
 	return err
 }
 
-func (g *GNMI) get(ctx context.Context, path *gpb.Path) ([]leaf, error) {
+func (g *GNMI) get(ctx context.Context, kind gpb.GetRequest_DataType, path *gpb.Path) ([]leaf, error) {
 	conn, err := g.client()
 	if err != nil {
 		return nil, err
 	}
 
-	req := &gpb.GetRequest{Type: gpb.GetRequest_STATE, Encoding: gpb.Encoding_JSON_IETF, Path: []*gpb.Path{path}}
+	req := &gpb.GetRequest{Type: kind, Encoding: gpb.Encoding_JSON_IETF, Path: []*gpb.Path{path}}
 	if g.cfg.Target != "" {
 		req.Prefix = &gpb.Path{Target: g.cfg.Target}
 	}
@@ -187,7 +187,7 @@ next:
 
 // GetInterfaceDescriptions asks for the whole state container rather than its description leaf, since an interface with no description has no such leaf and would be missing from the answer
 func (g *GNMI) GetInterfaceDescriptions(ctx context.Context) (map[string]string, error) {
-	leaves, err := g.get(ctx, elems("interfaces", "interface", "state"))
+	leaves, err := g.get(ctx, gpb.GetRequest_STATE, elems("interfaces", "interface", "state"))
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +209,7 @@ func parseInterfaces(leaves []leaf) map[string]string {
 func (g *GNMI) GetMACTable(ctx context.Context) (model.MACTable, error) {
 	path := elems("network-instances", "network-instance", "fdb", "mac-table", "entries")
 	path.Elem[1].Key = map[string]string{"name": g.cfg.NetworkInstance}
-	leaves, err := g.get(ctx, path)
+	leaves, err := g.get(ctx, gpb.GetRequest_STATE, path)
 	if err != nil {
 		return nil, err
 	}
@@ -240,7 +240,8 @@ func parseFDB(leaves []leaf) model.MACTable {
 }
 
 func (g *GNMI) GetLLDPNeighbors(ctx context.Context) (model.LLDPNeighbors, error) {
-	leaves, err := g.get(ctx, elems("lldp", "interfaces", "interface", "neighbors", "neighbor", "state"))
+	// asked for with no data type: SONiC fails a STATE request on its LLDP tree with "Query Parameter processing unsuccessful", and the path names the state container anyway
+	leaves, err := g.get(ctx, gpb.GetRequest_ALL, elems("lldp", "interfaces", "interface", "neighbors", "neighbor", "state"))
 	if err != nil {
 		return nil, err
 	}
@@ -261,7 +262,7 @@ func parseLLDP(leaves []leaf) model.LLDPNeighbors {
 				chassis = mac.String()
 			}
 		}
-		out[port] = &model.LLDP{
+		out[port] = append(out[port], &model.LLDP{
 			PortName:          port,
 			ChassisIdType:     chassisType,
 			ChassisId:         chassis,
@@ -271,7 +272,7 @@ func parseLLDP(leaves []leaf) model.LLDPNeighbors {
 			PortDescription:   r.fields["state/port-description"],
 			PortId:            r.fields["state/port-id"],
 			PortIdType:        r.ident("state/port-id-type"),
-		}
+		})
 	}
 	return out
 }

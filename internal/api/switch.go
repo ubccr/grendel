@@ -88,8 +88,11 @@ func (h *Handler) SwitchGetLLDP(c fuego.ContextNoBody) (*model.SwitchLLDPList, e
 
 	resSlice := make(model.SwitchLLDPList, 0)
 
+	// the list shows one neighbor per port, the first the switch reported
 	for _, v := range filteredList {
-		resSlice = append(resSlice, *v)
+		if len(v) > 0 {
+			resSlice = append(resSlice, *v[0])
+		}
 	}
 
 	slices.SortFunc(resSlice, func(a, b model.LLDP) int {

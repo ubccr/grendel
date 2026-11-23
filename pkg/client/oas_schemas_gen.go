@@ -12469,13 +12469,15 @@ func (s *SwitchScanResponse) SetSwitches(val []SwitchScanResponseSwitchesItem) {
 }
 
 type SwitchScanResponseSwitchesItem struct {
-	Address   OptString                                 `json:"address"`
-	Error     OptString                                 `json:"error"`
-	ErrorCode OptString                                 `json:"error_code"`
-	Name      OptString                                 `json:"name"`
-	Nos       OptString                                 `json:"nos"`
-	Ports     []SwitchScanResponseSwitchesItemPortsItem `json:"ports"`
-	Warnings  OptNilStringArray                         `json:"warnings"`
+	Address       OptString                                 `json:"address"`
+	Error         OptString                                 `json:"error"`
+	ErrorCode     OptString                                 `json:"error_code"`
+	LldpError     OptString                                 `json:"lldp_error"`
+	MACTableError OptString                                 `json:"mac_table_error"`
+	Name          OptString                                 `json:"name"`
+	Nos           OptString                                 `json:"nos"`
+	Ports         []SwitchScanResponseSwitchesItemPortsItem `json:"ports"`
+	Warnings      OptNilStringArray                         `json:"warnings"`
 }
 
 // GetAddress returns the value of Address.
@@ -12491,6 +12493,16 @@ func (s *SwitchScanResponseSwitchesItem) GetError() OptString {
 // GetErrorCode returns the value of ErrorCode.
 func (s *SwitchScanResponseSwitchesItem) GetErrorCode() OptString {
 	return s.ErrorCode
+}
+
+// GetLldpError returns the value of LldpError.
+func (s *SwitchScanResponseSwitchesItem) GetLldpError() OptString {
+	return s.LldpError
+}
+
+// GetMACTableError returns the value of MACTableError.
+func (s *SwitchScanResponseSwitchesItem) GetMACTableError() OptString {
+	return s.MACTableError
 }
 
 // GetName returns the value of Name.
@@ -12526,6 +12538,16 @@ func (s *SwitchScanResponseSwitchesItem) SetError(val OptString) {
 // SetErrorCode sets the value of ErrorCode.
 func (s *SwitchScanResponseSwitchesItem) SetErrorCode(val OptString) {
 	s.ErrorCode = val
+}
+
+// SetLldpError sets the value of LldpError.
+func (s *SwitchScanResponseSwitchesItem) SetLldpError(val OptString) {
+	s.LldpError = val
+}
+
+// SetMACTableError sets the value of MACTableError.
+func (s *SwitchScanResponseSwitchesItem) SetMACTableError(val OptString) {
+	s.MACTableError = val
 }
 
 // SetName sets the value of Name.
@@ -12585,10 +12607,12 @@ func (s *SwitchScanResponseSwitchesItemPortsItem) SetMacs(val []SwitchScanRespon
 }
 
 type SwitchScanResponseSwitchesItemPortsItemMacsItem struct {
-	Bmc   OptBool   `json:"bmc"`
-	MAC   OptString `json:"mac"`
-	Owner OptString `json:"owner"`
-	Vlan  OptString `json:"vlan"`
+	Bmc      OptBool   `json:"bmc"`
+	MAC      OptString `json:"mac"`
+	Neighbor OptString `json:"neighbor"`
+	Owner    OptString `json:"owner"`
+	Source   OptString `json:"source"`
+	Vlan     OptString `json:"vlan"`
 }
 
 // GetBmc returns the value of Bmc.
@@ -12601,9 +12625,19 @@ func (s *SwitchScanResponseSwitchesItemPortsItemMacsItem) GetMAC() OptString {
 	return s.MAC
 }
 
+// GetNeighbor returns the value of Neighbor.
+func (s *SwitchScanResponseSwitchesItemPortsItemMacsItem) GetNeighbor() OptString {
+	return s.Neighbor
+}
+
 // GetOwner returns the value of Owner.
 func (s *SwitchScanResponseSwitchesItemPortsItemMacsItem) GetOwner() OptString {
 	return s.Owner
+}
+
+// GetSource returns the value of Source.
+func (s *SwitchScanResponseSwitchesItemPortsItemMacsItem) GetSource() OptString {
+	return s.Source
 }
 
 // GetVlan returns the value of Vlan.
@@ -12621,9 +12655,19 @@ func (s *SwitchScanResponseSwitchesItemPortsItemMacsItem) SetMAC(val OptString) 
 	s.MAC = val
 }
 
+// SetNeighbor sets the value of Neighbor.
+func (s *SwitchScanResponseSwitchesItemPortsItemMacsItem) SetNeighbor(val OptString) {
+	s.Neighbor = val
+}
+
 // SetOwner sets the value of Owner.
 func (s *SwitchScanResponseSwitchesItemPortsItemMacsItem) SetOwner(val OptString) {
 	s.Owner = val
+}
+
+// SetSource sets the value of Source.
+func (s *SwitchScanResponseSwitchesItemPortsItemMacsItem) SetSource(val OptString) {
+	s.Source = val
 }
 
 // SetVlan sets the value of Vlan.

@@ -413,7 +413,7 @@ func parseSNMPLLDP(w map[string][]gosnmp.SnmpPDU) model.LLDPNeighbors {
 		mgmt[remKey{idx[1], idx[2]}] = fmt.Sprintf("%d.%d.%d.%d", idx[5], idx[6], idx[7], idx[8])
 	}
 
-	// a port can have several neighbors, such as a shared-LOM host and its BMC, but the result holds one per port: the lowest remote index, so every call picks the same one
+	// sorted so a port's neighbors come in the same order on every call
 	keys := slices.SortedFunc(maps.Keys(rows), func(a, b remKey) int {
 		return cmp.Or(cmp.Compare(a.local, b.local), cmp.Compare(a.index, b.index))
 	})
@@ -435,10 +435,7 @@ func parseSNMPLLDP(w map[string][]gosnmp.SnmpPDU) model.LLDPNeighbors {
 		}
 
 		name := portName(k.local)
-		if _, seen := out[name]; seen {
-			continue
-		}
-		out[name] = &model.LLDP{
+		out[name] = append(out[name], &model.LLDP{
 			PortName:          name,
 			ChassisIdType:     chassisType,
 			ChassisId:         chassis,
@@ -448,7 +445,7 @@ func parseSNMPLLDP(w map[string][]gosnmp.SnmpPDU) model.LLDPNeighbors {
 			SystemName:        string(pduBytes(cols[9])),
 			SystemDescription: string(pduBytes(cols[10])),
 			ManagementAddress: mgmt[k],
-		}
+		})
 	}
 	return out
 }

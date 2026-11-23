@@ -3607,6 +3607,12 @@
 								"error_code": {
 									"type": "string"
 								},
+								"lldp_error": {
+									"type": "string"
+								},
+								"mac_table_error": {
+									"type": "string"
+								},
 								"name": {
 									"type": "string"
 								},
@@ -3631,7 +3637,13 @@
 														"mac": {
 															"type": "string"
 														},
+														"neighbor": {
+															"type": "string"
+														},
 														"owner": {
+															"type": "string"
+														},
+														"source": {
 															"type": "string"
 														},
 														"vlan": {

@@ -155,20 +155,20 @@ func TestSNMPLLDP(t *testing.T) {
 	}
 
 	n := parseSNMPLLDP(w)
-	bmc := n["ethernet1/1/1"]
-	if bmc == nil || bmc.ChassisIdType != "MAC_ADDRESS" || bmc.ChassisId != "d0:8e:79:00:00:01" || bmc.PortId != "d0:8e:79:00:00:01" || bmc.SystemName != "idrac-ABC1234" {
-		t.Errorf("ethernet1/1/1 = %+v", bmc)
-	}
-	up := n["ethernet1/1/54"]
-	if up == nil {
+	if len(n["ethernet1/1/1"]) != 1 || len(n["ethernet1/1/54"]) != 1 {
 		t.Fatalf("a local port number that is not an ifIndex should be named from lldpLocPortDesc: %v", n)
 	}
+	bmc := n["ethernet1/1/1"][0]
+	if bmc.ChassisIdType != "MAC_ADDRESS" || bmc.ChassisId != "d0:8e:79:00:00:01" || bmc.PortId != "d0:8e:79:00:00:01" || bmc.SystemName != "idrac-ABC1234" {
+		t.Errorf("ethernet1/1/1 = %+v", bmc)
+	}
+	up := n["ethernet1/1/54"][0]
 	if up.PortIdType != "INTERFACE_NAME" || up.PortId != "Ethernet1/1" || up.ManagementAddress != "10.0.0.254" {
 		t.Errorf("ethernet1/1/54 = %+v", up)
 	}
 }
 
-func TestSNMPLLDPPicksTheSameNeighborEveryTime(t *testing.T) {
+func TestSNMPLLDPKeepsEveryNeighborInOrder(t *testing.T) {
 	rem := func(col, local, idx int) string {
 		return fmt.Sprintf("%s.%d.0.%d.%d", oidLldpRemTable, col, local, idx)
 	}
@@ -180,8 +180,8 @@ func TestSNMPLLDPPicksTheSameNeighborEveryTime(t *testing.T) {
 		},
 	}
 	for range 50 {
-		if n := parseSNMPLLDP(w)["ethernet1/1/1"]; n == nil || n.SystemName != "cpn-a01-01" {
-			t.Fatalf("neighbor = %+v, want the one with the lowest remote index", n)
+		if n := parseSNMPLLDP(w)["ethernet1/1/1"]; len(n) != 2 || n[0].SystemName != "cpn-a01-01" || n[1].SystemName != "idrac-ABC1234" {
+			t.Fatalf("neighbors = %+v, want both, lowest remote index first", n)
 		}
 	}
 }

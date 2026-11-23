@@ -265,7 +265,7 @@ function Scanning({ count }: { count: number }) {
     <div className="grid gap-3" aria-busy>
       <p className="flex items-center gap-2 text-sm text-muted-foreground">
         <LoaderCircle className="size-4 animate-spin" />
-        Reading MAC tables from {count} switch{count === 1 ? "" : "es"}…
+        Reading MAC tables and LLDP neighbors from {count} switch{count === 1 ? "" : "es"}…
       </p>
       {Array.from({ length: Math.min(count, 4) }, (_, i) => (
         <Skeleton key={i} className="h-24 w-full" />

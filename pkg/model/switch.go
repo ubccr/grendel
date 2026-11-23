@@ -29,6 +29,7 @@ type LLDP struct {
 
 type MACTable []*MACTableEntry
 
-type LLDPNeighbors map[string]*LLDP
+// LLDPNeighbors holds every neighbor of each port. A port has more than one when devices share it, as a shared-LOM host and its BMC do
+type LLDPNeighbors map[string][]*LLDP
 
 type SwitchLLDPList []LLDP

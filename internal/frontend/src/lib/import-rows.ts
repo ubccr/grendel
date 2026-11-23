@@ -249,7 +249,7 @@ function status(row: Row, templateProblem?: string): [Status, string?] {
     return [
       "pick",
       row.macs.length === 1
-        ? "Type a MAC, or reset to use the one the switch learned."
+        ? "Type a MAC, or reset to use the one the switch reported."
         : `${row.macs.length} MACs on this port. Pick the BMC's.`,
     ];
   if (templateProblem) return ["invalid", templateProblem];

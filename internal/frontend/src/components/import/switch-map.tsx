@@ -68,7 +68,7 @@ export function SwitchDetail({
   if (sw.error)
     return (
       <SwitchProblem
-        what="the MAC table"
+        what="the MAC table or LLDP neighbors"
         code={sw.error_code}
         detail={sw.error}
         address={sw.address}
@@ -111,14 +111,24 @@ export function SwitchDetail({
           The faceplate can't be drawn for these port names. Every port is still in the list below.
         </p>
       )}
+      {(sw.mac_table_error || sw.lldp_error) && (
+        <p className="flex items-start gap-1.5 text-xs text-amber-700 dark:text-amber-300">
+          <TriangleAlert className="mt-px size-3.5 shrink-0" />
+          <span>
+            {sw.mac_table_error
+              ? `Couldn't read the MAC table, so only MACs from LLDP neighbors are listed: ${sw.mac_table_error}`
+              : `Couldn't read the LLDP neighbors, so only MACs from the MAC table are listed: ${sw.lldp_error}`}
+          </span>
+        </p>
+      )}
       {(sw.warnings?.length ?? 0) > 0 && (
         <ul className="grid gap-1 text-xs text-amber-700 dark:text-amber-300">
           {sw.warnings!.map((w) => (
             <li key={w} className="flex items-start gap-1.5">
               <TriangleAlert className="mt-px size-3.5 shrink-0" />
               <span>
-                Couldn't read {w}. Ports that have learned no MAC are missing from the list, so{" "}
-                {"{n}"} doesn't count them.
+                Couldn't read {w}. Ports with no MAC are missing from the list, so {"{n}"} doesn't
+                count them.
               </span>
             </li>
           ))}

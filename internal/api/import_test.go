@@ -394,7 +394,9 @@ func TestPlanWithPingNeverAssignsUnpinged(t *testing.T) {
 type fakeSwitch struct {
 	macs      model.MACTable
 	status    map[string]string
+	lldp      model.LLDPNeighbors
 	macErr    error
+	lldpErr   error
 	statusErr error
 }
 
@@ -403,7 +405,9 @@ func (fakeSwitch) Close() error                                          { retur
 func (f fakeSwitch) GetInterfaceDescriptions(context.Context) (map[string]string, error) {
 	return f.status, f.statusErr
 }
-func (fakeSwitch) GetLLDPNeighbors(context.Context) (model.LLDPNeighbors, error) { return nil, nil }
+func (f fakeSwitch) GetLLDPNeighbors(context.Context) (model.LLDPNeighbors, error) {
+	return f.lldp, f.lldpErr
+}
 
 func mac(s string) net.HardwareAddr { hw, _ := net.ParseMAC(s); return hw }
 
@@ -460,9 +464,54 @@ func TestScanSwitchErrors(t *testing.T) {
 	assert.Equal(t, []string{"interface status: timeout"}, res.Warnings)
 
 	newSwitch = func(*model.Host, tors.Config) (tors.NetworkSwitch, error) {
-		return fakeSwitch{macErr: errors.New("connection refused")}, nil
+		return fakeSwitch{macErr: errors.New("connection refused"), lldpErr: errors.New("connection refused")}, nil
 	}
 	res = scanSwitch(context.Background(), &model.Host{Name: "swe-a01"}, tors.Config{}, nil)
 	assert.Equal(t, "failed to read the MAC table: connection refused", res.Error)
 	assert.Equal(t, tors.CodeUnreachable, res.ErrorCode)
+
+	bmc := model.LLDPNeighbors{"Ethernet1": {{PortIdType: "MAC_ADDRESS", PortId: "d0:8e:79:00:00:01"}}}
+	newSwitch = func(*model.Host, tors.Config) (tors.NetworkSwitch, error) {
+		return fakeSwitch{macErr: errors.New("timeout"), lldp: bmc}, nil
+	}
+	res = scanSwitch(context.Background(), &model.Host{Name: "swe-a01"}, tors.Config{}, nil)
+	assert.Empty(t, res.Error, "LLDP alone is enough to scan")
+	assert.Equal(t, "timeout", res.MACTableError)
+	require.Len(t, res.Ports, 1)
+
+	newSwitch = func(*model.Host, tors.Config) (tors.NetworkSwitch, error) {
+		return fakeSwitch{macs: model.MACTable{{Ifname: "Ethernet1", MAC: mac("d0:8e:79:00:00:01")}}, lldpErr: errors.New("timeout")}, nil
+	}
+	res = scanSwitch(context.Background(), &model.Host{Name: "swe-a01"}, tors.Config{}, nil)
+	assert.Empty(t, res.Error)
+	assert.Equal(t, "timeout", res.LLDPError)
+}
+
+func TestScanPortsMergesLLDP(t *testing.T) {
+	macs := model.MACTable{
+		{Ifname: "Ethernet1", VLAN: "3001", MAC: mac("d0:8e:79:00:00:01")},
+		{Ifname: "Ethernet3", VLAN: "3001", MAC: mac("b8:ca:3a:00:00:03")},
+	}
+	neighbors := model.LLDPNeighbors{
+		"Ethernet1": {{PortIdType: "MAC_ADDRESS", PortId: "d0:8e:79:00:00:01", SystemName: "idrac-1"}},
+		"Ethernet2": {{PortIdType: "MAC_ADDRESS", PortId: "d08e.7900.0002", ChassisIdType: "MAC_ADDRESS", ChassisId: "aa:aa:aa:00:00:02", SystemName: "idrac-2"}},
+		"Ethernet3": {
+			{PortIdType: "INTERFACE_NAME", PortId: "eno1", ChassisIdType: "MAC_ADDRESS", ChassisId: "b8:ca:3a:00:00:03", SystemName: "cpn-03"},
+			{PortIdType: "MAC_ADDRESS", PortId: "d0:8e:79:00:00:03", SystemName: "idrac-3"},
+		},
+		"Ethernet4":     {{PortIdType: "INTERFACE_NAME", PortId: "Ethernet1/1", ChassisIdType: "LOCAL", ChassisId: "spine"}},
+		"Management1":   {{PortIdType: "MAC_ADDRESS", PortId: "aa:aa:aa:00:00:09"}},
+		"Port-Channel1": nil,
+	}
+	owners := map[string]macOwner{"d0:8e:79:00:00:02": {node: "cpn-02", bmc: true}}
+
+	ports := scanPorts(macs, neighbors, nil, owners)
+	require.Len(t, ports, 3, "a neighbor with no MAC adds no port, nor does one off the front panel")
+
+	assert.Equal(t, []SwitchScanMAC{{MAC: "d0:8e:79:00:00:01", VLAN: "3001", Source: scanSourceBoth, Neighbor: "idrac-1"}}, ports[0].MACs)
+	assert.Equal(t, []SwitchScanMAC{{MAC: "d0:8e:79:00:00:02", Source: scanSourceLLDP, Neighbor: "idrac-2", Owner: "cpn-02", BMC: true}}, ports[1].MACs, "the port ID is taken over the chassis ID")
+	assert.Equal(t, []SwitchScanMAC{
+		{MAC: "b8:ca:3a:00:00:03", VLAN: "3001", Source: scanSourceBoth, Neighbor: "cpn-03"},
+		{MAC: "d0:8e:79:00:00:03", Source: scanSourceLLDP, Neighbor: "idrac-3"},
+	}, ports[2].MACs, "both neighbors of a shared port are kept")
 }

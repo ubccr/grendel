@@ -25,6 +25,13 @@ func (p panickingSwitch) GetMACTable(ctx context.Context) (model.MACTable, error
 	return p.fakeSwitch.GetMACTable(ctx)
 }
 
+func (p panickingSwitch) GetLLDPNeighbors(context.Context) (model.LLDPNeighbors, error) {
+	if p.inMACs {
+		panic("bad lldp table")
+	}
+	return nil, nil
+}
+
 func (p panickingSwitch) GetInterfaceDescriptions(ctx context.Context) (map[string]string, error) {
 	if p.inDescriptions {
 		panic("bad interface table")
