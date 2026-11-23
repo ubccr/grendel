@@ -15,8 +15,7 @@ import (
 )
 
 var (
-	listFilter  []string
-	listOptions *shared.TableOptions
+	listTable   *shared.TableFlags
 	listColumns = []shared.Column{
 		{Name: "Name"},
 		{Name: "Provision"},
@@ -45,16 +44,16 @@ var (
 				return apiclient.NewApiError(err)
 			}
 
-			t := shared.NewTable(listColumns, listFilter).Options(*listOptions).Empty("-")
+			t := listTable.Table()
 
 			for _, node := range res {
 				ips := make([]string, 0, len(node.Interfaces))
 				fqdns := make([]string, 0, len(node.Interfaces))
 				macs := make([]string, 0, len(node.Interfaces))
 				for _, iface := range node.Interfaces {
-					ips = append(ips, iface.Value.IP.Value)
-					fqdns = append(fqdns, iface.Value.Fqdn.Value)
-					macs = append(macs, iface.Value.MAC.Value)
+					ips = append(ips, iface.IP.Value)
+					fqdns = append(fqdns, iface.Fqdn.Value)
+					macs = append(macs, iface.MAC.Value)
 				}
 
 				t.AppendRow(
@@ -78,10 +77,7 @@ var (
 )
 
 func init() {
-	listOptions = shared.RegisterTableFlags(listCmd)
-	listCmd.Flags().StringSliceVar(&listFilter, "filter", []string{"IP", "FQDN", "MAC"}, "filter table columns by name")
-
-	listCmd.RegisterFlagCompletionFunc("filter", shared.ColumnCompletion(listColumns))
+	listTable = shared.RegisterTableFlags(listCmd, listColumns, "IP", "FQDN", "MAC")
 
 	nodeCmd.AddCommand(listCmd)
 }

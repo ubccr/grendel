@@ -21,7 +21,7 @@ import (
 // protocolICMP is the IANA protocol number of ICMP, which icmp.ParseMessage takes
 const protocolICMP = 1
 
-// Ping sends an echo request to each address and reports the ones that answered. An address is asked again, tries times in all, until it answers, with wait between tries. When no request can be sent at all, as when a firewall refuses them, it fails rather than report that nothing answered. Echo goes out on an unprivileged ICMP socket where net.ipv4.ping_group_range allows one, otherwise on a raw socket, which needs CAP_NET_RAW
+// Ping sends an echo request to each address, up to tries times with wait between them, and reports the ones that answered. It fails when no request can be sent at all, as when a firewall refuses them, rather than report that nothing answered. It uses an unprivileged ICMP socket where net.ipv4.ping_group_range allows one, otherwise a raw socket, which needs CAP_NET_RAW
 func Ping(ctx context.Context, addrs []netip.Addr, tries int, wait time.Duration) (map[netip.Addr]bool, error) {
 	answered := make(map[netip.Addr]bool, len(addrs))
 	if len(addrs) == 0 {

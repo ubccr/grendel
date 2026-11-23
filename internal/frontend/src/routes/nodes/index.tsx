@@ -1,4 +1,5 @@
-import { getV1Nodes, getV1NodesProvisionStatus, Host } from "@/client";
+import { Host } from "@/client";
+import { getV1NodesOptions } from "@/client/@tanstack/react-query.gen";
 import { NodeLink } from "@/components/nodes/node-link";
 import ActionsSheet from "@/components/actions-sheet";
 import NodeActions from "@/components/actions/nodes";
@@ -9,29 +10,28 @@ import { ProvisionStatusBadge, statusesByNode } from "@/components/nodes/provisi
 import TagsList from "@/components/tags";
 import { Card, CardContent } from "@/components/ui/card";
 import { matchesTags } from "@/lib/tags";
-import AuthRedirect from "@/lib/auth";
-import { stateLabels } from "@/lib/provision";
+import { provisionState } from "@/lib/provision";
+import { provisionStatusOptions } from "@/lib/queries";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import type { DataTableColumnDef } from "@/components/data-table/features";
 import { useMemo } from "react";
 
 export const Route = createFileRoute("/nodes/")({
   component: TableComponent,
-  beforeLoad: AuthRedirect,
-  // the statuses load with the nodes so the table's refresh reloads both. A failure there only leaves the status column empty
-  loader: async () => {
-    const [nodes, statuses] = await Promise.all([getV1Nodes(), getV1NodesProvisionStatus()]);
-    return { ...nodes, statuses: statuses.data ?? [] };
+  // the statuses are asked for with the nodes but not waited on, so a failure there only leaves the status column empty
+  loader: ({ context: { queryClient } }) => {
+    void queryClient.prefetchQuery(provisionStatusOptions());
+    return queryClient.ensureQueryData(getV1NodesOptions());
   },
 });
 
 function TableComponent() {
-  const { data, statuses } = Route.useLoaderData();
-  const { isFetching } = Route.useMatch();
+  const { data, isFetching } = useSuspenseQuery(getV1NodesOptions());
+  const { data: statuses } = useQuery(provisionStatusOptions());
 
-  const statusByNode = useMemo(() => statusesByNode(statuses), [statuses]);
+  const statusByNode = useMemo(() => statusesByNode(statuses ?? []), [statuses]);
 
-  // columns are memoized, so the table keeps the same column definitions across renders. They change only when the provision statuses do
   const columns = useMemo<DataTableColumnDef<Host, any>[]>(
     () => [
       {
@@ -63,9 +63,7 @@ function TableComponent() {
         // a whole state matches only that state, so pxe does not also list the nodes at ipxe; anything else typed matches part of a state
         filterFn: (row, columnId, filterValue: string) => {
           const state = row.getValue<string>(columnId);
-          return Object.keys(stateLabels).includes(filterValue)
-            ? state === filterValue
-            : state.includes(filterValue);
+          return provisionState(filterValue) ? state === filterValue : state.includes(filterValue);
         },
       },
       {
@@ -161,7 +159,7 @@ function TableComponent() {
             interfaces_fqdn: false,
             interfaces_mac: false,
           }}
-          progress={isFetching !== false}
+          progress={isFetching}
         />
       </CardContent>
     </Card>

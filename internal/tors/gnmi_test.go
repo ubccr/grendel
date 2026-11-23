@@ -6,11 +6,14 @@ package tors
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"sort"
+	"strings"
 	"testing"
 
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
+	"github.com/ubccr/grendel/pkg/model"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
@@ -54,6 +57,54 @@ func startFake(t *testing.T, f *fakeGNMI, nos string) *GNMI {
 	return g
 }
 
+// splitPath splits on '/' outside of brackets, since key values such as Ethernet49/1 contain slashes.
+func splitPath(p string) []string {
+	var parts []string
+	depth, start := 0, 0
+	for i, r := range p {
+		switch r {
+		case '[':
+			depth++
+		case ']':
+			depth--
+		case '/':
+			if depth == 0 {
+				parts = append(parts, p[start:i])
+				start = i + 1
+			}
+		}
+	}
+	return append(parts, p[start:])
+}
+
+// parsePath turns an xpath like /a/b[name=x]/c into a gNMI path, so the fixtures can be written the way a switch's paths read. Key values cannot contain ']' or '['.
+func parsePath(p string) (*gpb.Path, error) {
+	path := &gpb.Path{}
+	for _, part := range splitPath(strings.Trim(p, "/")) {
+		if part == "" {
+			continue
+		}
+		name, rest, _ := strings.Cut(part, "[")
+		elem := &gpb.PathElem{Name: name}
+		if rest != "" {
+			elem.Key = map[string]string{}
+			for _, kv := range strings.Split("["+rest, "[") {
+				if kv == "" {
+					continue
+				}
+				kv = strings.TrimSuffix(kv, "]")
+				k, v, ok := strings.Cut(kv, "=")
+				if !ok {
+					return nil, fmt.Errorf("invalid key %q in path %s", kv, p)
+				}
+				elem.Key[k] = v
+			}
+		}
+		path.Elem = append(path.Elem, elem)
+	}
+	return path, nil
+}
+
 func mustPath(t *testing.T, p string) *gpb.Path {
 	t.Helper()
 	gp, err := parsePath(p)
@@ -61,6 +112,14 @@ func mustPath(t *testing.T, p string) *gpb.Path {
 		t.Fatal(err)
 	}
 	return gp
+}
+
+func byIfname(table model.MACTable) map[string][]*model.MACTableEntry {
+	out := map[string][]*model.MACTableEntry{}
+	for _, entry := range table {
+		out[entry.Ifname] = append(out[entry.Ifname], entry)
+	}
+	return out
 }
 
 func jsonUpdate(t *testing.T, path, js string) *gpb.Update {
@@ -122,7 +181,7 @@ func macsOn(t *testing.T, g *GNMI) map[string][]string {
 		t.Fatal(err)
 	}
 	out := map[string][]string{}
-	for ifname, entries := range table.ByIfname() {
+	for ifname, entries := range byIfname(table) {
 		for _, e := range entries {
 			out[ifname] = append(out[ifname], e.MAC.String()+"@"+e.VLAN)
 		}
@@ -164,16 +223,69 @@ func TestGNMISonicMACTableFromLeaves(t *testing.T) {
 }
 
 func TestGNMIInterfaces(t *testing.T) {
-	table, err := startFake(t, aristaFake(t), NOSArista).GetInterfaceStatus(context.Background())
+	got, err := startFake(t, aristaFake(t), NOSArista).GetInterfaceDescriptions(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
-	e1 := table["Ethernet1"]
-	if e1 == nil || e1.LineProtocolStatus != "up" || e1.MTU != 9214 || e1.Description != "cpn-a01-01 bmc" {
-		t.Errorf("Ethernet1 = %+v", e1)
+	if got["Ethernet1"] != "cpn-a01-01 bmc" {
+		t.Errorf("Ethernet1 = %q", got["Ethernet1"])
 	}
-	if e2 := table["Ethernet2"]; e2 == nil || e2.LineProtocolStatus != "down" {
-		t.Errorf("Ethernet2 = %+v", e2)
+	if d, ok := got["Ethernet2"]; !ok || d != "" {
+		t.Errorf("an interface with no description must still be listed: %v", got)
+	}
+}
+
+func TestGNMIFreeTextKeepsItsColons(t *testing.T) {
+	leaves := func(updates ...*gpb.Update) []leaf {
+		out, err := leavesFromNotifications([]*gpb.Notification{{Update: updates}})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return out
+	}
+
+	descriptions := parseInterfaces(leaves(
+		jsonUpdate(t, "/interfaces/interface[name=Ethernet7]/state", `{"openconfig-interfaces:description":"cpn-a01-07:eth0"}`),
+		strUpdate(t, "/interfaces/interface[name=Ethernet8]/state/description", "cpn-a01-08:eth0"),
+	))
+	if descriptions["Ethernet7"] != "cpn-a01-07:eth0" || descriptions["Ethernet8"] != "cpn-a01-08:eth0" {
+		t.Errorf("descriptions = %v, want them as the switch sent them", descriptions)
+	}
+
+	n := parseLLDP(leaves(
+		jsonUpdate(t, "/lldp/interfaces/interface[name=Ethernet7]/neighbors/neighbor[id=1]/state", `{"openconfig-lldp:system-name":"cpn-a01-07:idrac","openconfig-lldp:port-id-type":"openconfig-lldp-types:MAC_ADDRESS"}`),
+	))["Ethernet7"]
+	if n == nil || n.SystemName != "cpn-a01-07:idrac" || n.PortIdType != "MAC_ADDRESS" {
+		t.Errorf("neighbor = %+v, want the system name whole and only the identityref stripped", n)
+	}
+}
+
+func TestGNMIRequestPaths(t *testing.T) {
+	f := aristaFake(t)
+	g := startFake(t, f, NOSArista)
+	g.cfg.NetworkInstance = "Vlan3001"
+	g.GetMACTable(context.Background())
+	if got := pathString(f.lastReq.GetPath()[0].GetElem()); got != "/network-instances/network-instance[name=Vlan3001]/fdb/mac-table/entries" {
+		t.Errorf("mac table path = %s", got)
+	}
+}
+
+func TestDecodeValueScalars(t *testing.T) {
+	for want, v := range map[string]*gpb.TypedValue{
+		"1.5":   {Value: &gpb.TypedValue_DoubleVal{DoubleVal: 1.5}},
+		"-3":    {Value: &gpb.TypedValue_IntVal{IntVal: -3}},
+		"true":  {Value: &gpb.TypedValue_BoolVal{BoolVal: true}},
+		"ascii": {Value: &gpb.TypedValue_AsciiVal{AsciiVal: "ascii"}},
+		"3001":  {Value: &gpb.TypedValue_JsonIetfVal{JsonIetfVal: []byte(`3001`)}},
+		"":      {Value: &gpb.TypedValue_AnyVal{}},
+	} {
+		got, _, err := decodeValue(v)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if s := (leaf{value: got}).str(); s != want {
+			t.Errorf("decodeValue(%v) reads as %q, want %q", v, s, want)
+		}
 	}
 }
 
@@ -224,10 +336,8 @@ func TestStripModule(t *testing.T) {
 	for in, want := range map[string]string{
 		"openconfig-lldp-types:MAC_ADDRESS": "MAC_ADDRESS",
 		"openconfig-interfaces:mtu":         "mtu",
-		"d0:8e:79:00:00:01":                 "d0:8e:79:00:00:01",
-		"Ethernet1/1":                       "Ethernet1/1",
-		"10.0.0.1":                          "10.0.0.1",
-		"fe80::1":                           "fe80::1",
+		"MAC_ADDRESS":                       "MAC_ADDRESS",
+		"mac-table":                         "mac-table",
 	} {
 		if got := stripModule(in); got != want {
 			t.Errorf("stripModule(%q) = %q, want %q", in, got, want)

@@ -23,7 +23,7 @@ type AddressRange struct {
 	Nodes OptInt `json:"nodes"`
 	// How many of the nodes' ports have an address in the range.
 	Ports OptInt `json:"ports"`
-	// The prefix length most of the range's ports carry.
+	// The prefix length to give a port in the range, the one a search of the range reports.
 	PrefixLen OptInt    `json:"prefix_len"`
 	Range     OptString `json:"range"`
 }
@@ -324,7 +324,7 @@ type BmcClearJobsBody struct {
 	// Clear every job in the queue. Mutually exclusive with ids.
 	All OptBool `json:"all"`
 	// Clear only these job ids.
-	Ids OptNilNilStringArray `json:"ids"`
+	Ids OptNilStringArray `json:"ids"`
 }
 
 // GetAll returns the value of All.
@@ -333,7 +333,7 @@ func (s *BmcClearJobsBody) GetAll() OptBool {
 }
 
 // GetIds returns the value of Ids.
-func (s *BmcClearJobsBody) GetIds() OptNilNilStringArray {
+func (s *BmcClearJobsBody) GetIds() OptNilStringArray {
 	return s.Ids
 }
 
@@ -343,7 +343,7 @@ func (s *BmcClearJobsBody) SetAll(val OptBool) {
 }
 
 // SetIds sets the value of Ids.
-func (s *BmcClearJobsBody) SetIds(val OptNilNilStringArray) {
+func (s *BmcClearJobsBody) SetIds(val OptNilStringArray) {
 	s.Ids = val
 }
 
@@ -652,7 +652,7 @@ type BmcPowerBody struct {
 	//  UefiShell, UefiTarget, SDCard, UefiHttp, RemoteDrive, UefiBootNext, Recovery.
 	BootOverride OptString `json:"boot_override"`
 	// What to power, 'host' or 'bmc'. Defaults to host. A bmc target is always a graceful restart and
-	// ignores the other fields.
+	// takes no action or boot_override.
 	Target OptString `json:"target"`
 }
 
@@ -689,47 +689,47 @@ func (s *BmcPowerBody) SetTarget(val OptString) {
 // BmcResponse_model.BmcAck schema.
 // Ref: #/components/schemas/BmcResponse_model.BmcAck
 type BmcResponseModelBmcAck struct {
-	Results OptNilNilBmcResponseModelBmcAckResultsItemArray `json:"results"`
-	RunID   OptString                                       `json:"run_id"`
-	Summary OptBmcResponseModelBmcAckSummary                `json:"summary"`
+	Results []BmcResponseModelBmcAckResultsItem `json:"results"`
+	RunID   string                              `json:"run_id"`
+	Summary BmcResponseModelBmcAckSummary       `json:"summary"`
 }
 
 // GetResults returns the value of Results.
-func (s *BmcResponseModelBmcAck) GetResults() OptNilNilBmcResponseModelBmcAckResultsItemArray {
+func (s *BmcResponseModelBmcAck) GetResults() []BmcResponseModelBmcAckResultsItem {
 	return s.Results
 }
 
 // GetRunID returns the value of RunID.
-func (s *BmcResponseModelBmcAck) GetRunID() OptString {
+func (s *BmcResponseModelBmcAck) GetRunID() string {
 	return s.RunID
 }
 
 // GetSummary returns the value of Summary.
-func (s *BmcResponseModelBmcAck) GetSummary() OptBmcResponseModelBmcAckSummary {
+func (s *BmcResponseModelBmcAck) GetSummary() BmcResponseModelBmcAckSummary {
 	return s.Summary
 }
 
 // SetResults sets the value of Results.
-func (s *BmcResponseModelBmcAck) SetResults(val OptNilNilBmcResponseModelBmcAckResultsItemArray) {
+func (s *BmcResponseModelBmcAck) SetResults(val []BmcResponseModelBmcAckResultsItem) {
 	s.Results = val
 }
 
 // SetRunID sets the value of RunID.
-func (s *BmcResponseModelBmcAck) SetRunID(val OptString) {
+func (s *BmcResponseModelBmcAck) SetRunID(val string) {
 	s.RunID = val
 }
 
 // SetSummary sets the value of Summary.
-func (s *BmcResponseModelBmcAck) SetSummary(val OptBmcResponseModelBmcAckSummary) {
+func (s *BmcResponseModelBmcAck) SetSummary(val BmcResponseModelBmcAckSummary) {
 	s.Summary = val
 }
 
 type BmcResponseModelBmcAckResultsItem struct {
-	Data       jx.Raw    `json:"data"`
-	DurationMs OptInt64  `json:"duration_ms"`
-	Message    OptString `json:"message"`
-	Node       OptString `json:"node"`
-	Success    OptBool   `json:"success"`
+	Data       jx.Raw `json:"data"`
+	DurationMs int64  `json:"duration_ms"`
+	Message    string `json:"message"`
+	Node       string `json:"node"`
+	Success    bool   `json:"success"`
 }
 
 // GetData returns the value of Data.
@@ -738,22 +738,22 @@ func (s *BmcResponseModelBmcAckResultsItem) GetData() jx.Raw {
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcAckResultsItem) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcAckResultsItem) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetMessage returns the value of Message.
-func (s *BmcResponseModelBmcAckResultsItem) GetMessage() OptString {
+func (s *BmcResponseModelBmcAckResultsItem) GetMessage() string {
 	return s.Message
 }
 
 // GetNode returns the value of Node.
-func (s *BmcResponseModelBmcAckResultsItem) GetNode() OptString {
+func (s *BmcResponseModelBmcAckResultsItem) GetNode() string {
 	return s.Node
 }
 
 // GetSuccess returns the value of Success.
-func (s *BmcResponseModelBmcAckResultsItem) GetSuccess() OptBool {
+func (s *BmcResponseModelBmcAckResultsItem) GetSuccess() bool {
 	return s.Success
 }
 
@@ -763,127 +763,127 @@ func (s *BmcResponseModelBmcAckResultsItem) SetData(val jx.Raw) {
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcAckResultsItem) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcAckResultsItem) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetMessage sets the value of Message.
-func (s *BmcResponseModelBmcAckResultsItem) SetMessage(val OptString) {
+func (s *BmcResponseModelBmcAckResultsItem) SetMessage(val string) {
 	s.Message = val
 }
 
 // SetNode sets the value of Node.
-func (s *BmcResponseModelBmcAckResultsItem) SetNode(val OptString) {
+func (s *BmcResponseModelBmcAckResultsItem) SetNode(val string) {
 	s.Node = val
 }
 
 // SetSuccess sets the value of Success.
-func (s *BmcResponseModelBmcAckResultsItem) SetSuccess(val OptBool) {
+func (s *BmcResponseModelBmcAckResultsItem) SetSuccess(val bool) {
 	s.Success = val
 }
 
 type BmcResponseModelBmcAckSummary struct {
-	DurationMs  OptInt64  `json:"duration_ms"`
-	Failed      OptInt    `json:"failed"`
-	FailedNodes OptString `json:"failed_nodes"`
-	Succeeded   OptInt    `json:"succeeded"`
-	Total       OptInt    `json:"total"`
+	DurationMs  int64  `json:"duration_ms"`
+	Failed      int    `json:"failed"`
+	FailedNodes string `json:"failed_nodes"`
+	Succeeded   int    `json:"succeeded"`
+	Total       int    `json:"total"`
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcAckSummary) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcAckSummary) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetFailed returns the value of Failed.
-func (s *BmcResponseModelBmcAckSummary) GetFailed() OptInt {
+func (s *BmcResponseModelBmcAckSummary) GetFailed() int {
 	return s.Failed
 }
 
 // GetFailedNodes returns the value of FailedNodes.
-func (s *BmcResponseModelBmcAckSummary) GetFailedNodes() OptString {
+func (s *BmcResponseModelBmcAckSummary) GetFailedNodes() string {
 	return s.FailedNodes
 }
 
 // GetSucceeded returns the value of Succeeded.
-func (s *BmcResponseModelBmcAckSummary) GetSucceeded() OptInt {
+func (s *BmcResponseModelBmcAckSummary) GetSucceeded() int {
 	return s.Succeeded
 }
 
 // GetTotal returns the value of Total.
-func (s *BmcResponseModelBmcAckSummary) GetTotal() OptInt {
+func (s *BmcResponseModelBmcAckSummary) GetTotal() int {
 	return s.Total
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcAckSummary) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcAckSummary) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetFailed sets the value of Failed.
-func (s *BmcResponseModelBmcAckSummary) SetFailed(val OptInt) {
+func (s *BmcResponseModelBmcAckSummary) SetFailed(val int) {
 	s.Failed = val
 }
 
 // SetFailedNodes sets the value of FailedNodes.
-func (s *BmcResponseModelBmcAckSummary) SetFailedNodes(val OptString) {
+func (s *BmcResponseModelBmcAckSummary) SetFailedNodes(val string) {
 	s.FailedNodes = val
 }
 
 // SetSucceeded sets the value of Succeeded.
-func (s *BmcResponseModelBmcAckSummary) SetSucceeded(val OptInt) {
+func (s *BmcResponseModelBmcAckSummary) SetSucceeded(val int) {
 	s.Succeeded = val
 }
 
 // SetTotal sets the value of Total.
-func (s *BmcResponseModelBmcAckSummary) SetTotal(val OptInt) {
+func (s *BmcResponseModelBmcAckSummary) SetTotal(val int) {
 	s.Total = val
 }
 
 // BmcResponse_model.BmcAssetTagResult schema.
 // Ref: #/components/schemas/BmcResponse_model.BmcAssetTagResult
 type BmcResponseModelBmcAssetTagResult struct {
-	Results OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray `json:"results"`
-	RunID   OptString                                                  `json:"run_id"`
-	Summary OptBmcResponseModelBmcAssetTagResultSummary                `json:"summary"`
+	Results []BmcResponseModelBmcAssetTagResultResultsItem `json:"results"`
+	RunID   string                                         `json:"run_id"`
+	Summary BmcResponseModelBmcAssetTagResultSummary       `json:"summary"`
 }
 
 // GetResults returns the value of Results.
-func (s *BmcResponseModelBmcAssetTagResult) GetResults() OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray {
+func (s *BmcResponseModelBmcAssetTagResult) GetResults() []BmcResponseModelBmcAssetTagResultResultsItem {
 	return s.Results
 }
 
 // GetRunID returns the value of RunID.
-func (s *BmcResponseModelBmcAssetTagResult) GetRunID() OptString {
+func (s *BmcResponseModelBmcAssetTagResult) GetRunID() string {
 	return s.RunID
 }
 
 // GetSummary returns the value of Summary.
-func (s *BmcResponseModelBmcAssetTagResult) GetSummary() OptBmcResponseModelBmcAssetTagResultSummary {
+func (s *BmcResponseModelBmcAssetTagResult) GetSummary() BmcResponseModelBmcAssetTagResultSummary {
 	return s.Summary
 }
 
 // SetResults sets the value of Results.
-func (s *BmcResponseModelBmcAssetTagResult) SetResults(val OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) {
+func (s *BmcResponseModelBmcAssetTagResult) SetResults(val []BmcResponseModelBmcAssetTagResultResultsItem) {
 	s.Results = val
 }
 
 // SetRunID sets the value of RunID.
-func (s *BmcResponseModelBmcAssetTagResult) SetRunID(val OptString) {
+func (s *BmcResponseModelBmcAssetTagResult) SetRunID(val string) {
 	s.RunID = val
 }
 
 // SetSummary sets the value of Summary.
-func (s *BmcResponseModelBmcAssetTagResult) SetSummary(val OptBmcResponseModelBmcAssetTagResultSummary) {
+func (s *BmcResponseModelBmcAssetTagResult) SetSummary(val BmcResponseModelBmcAssetTagResultSummary) {
 	s.Summary = val
 }
 
 type BmcResponseModelBmcAssetTagResultResultsItem struct {
 	Data       OptNilBmcResponseModelBmcAssetTagResultResultsItemData `json:"data"`
-	DurationMs OptInt64                                               `json:"duration_ms"`
-	Message    OptString                                              `json:"message"`
-	Node       OptString                                              `json:"node"`
-	Success    OptBool                                                `json:"success"`
+	DurationMs int64                                                  `json:"duration_ms"`
+	Message    string                                                 `json:"message"`
+	Node       string                                                 `json:"node"`
+	Success    bool                                                   `json:"success"`
 }
 
 // GetData returns the value of Data.
@@ -892,22 +892,22 @@ func (s *BmcResponseModelBmcAssetTagResultResultsItem) GetData() OptNilBmcRespon
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcAssetTagResultResultsItem) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcAssetTagResultResultsItem) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetMessage returns the value of Message.
-func (s *BmcResponseModelBmcAssetTagResultResultsItem) GetMessage() OptString {
+func (s *BmcResponseModelBmcAssetTagResultResultsItem) GetMessage() string {
 	return s.Message
 }
 
 // GetNode returns the value of Node.
-func (s *BmcResponseModelBmcAssetTagResultResultsItem) GetNode() OptString {
+func (s *BmcResponseModelBmcAssetTagResultResultsItem) GetNode() string {
 	return s.Node
 }
 
 // GetSuccess returns the value of Success.
-func (s *BmcResponseModelBmcAssetTagResultResultsItem) GetSuccess() OptBool {
+func (s *BmcResponseModelBmcAssetTagResultResultsItem) GetSuccess() bool {
 	return s.Success
 }
 
@@ -917,212 +917,212 @@ func (s *BmcResponseModelBmcAssetTagResultResultsItem) SetData(val OptNilBmcResp
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcAssetTagResultResultsItem) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcAssetTagResultResultsItem) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetMessage sets the value of Message.
-func (s *BmcResponseModelBmcAssetTagResultResultsItem) SetMessage(val OptString) {
+func (s *BmcResponseModelBmcAssetTagResultResultsItem) SetMessage(val string) {
 	s.Message = val
 }
 
 // SetNode sets the value of Node.
-func (s *BmcResponseModelBmcAssetTagResultResultsItem) SetNode(val OptString) {
+func (s *BmcResponseModelBmcAssetTagResultResultsItem) SetNode(val string) {
 	s.Node = val
 }
 
 // SetSuccess sets the value of Success.
-func (s *BmcResponseModelBmcAssetTagResultResultsItem) SetSuccess(val OptBool) {
+func (s *BmcResponseModelBmcAssetTagResultResultsItem) SetSuccess(val bool) {
 	s.Success = val
 }
 
 type BmcResponseModelBmcAssetTagResultResultsItemData struct {
-	Changed OptBool   `json:"changed"`
-	Current OptString `json:"current"`
-	Desired OptString `json:"desired"`
-	Serial  OptString `json:"serial"`
+	Changed bool   `json:"changed"`
+	Current string `json:"current"`
+	Desired string `json:"desired"`
+	Serial  string `json:"serial"`
 }
 
 // GetChanged returns the value of Changed.
-func (s *BmcResponseModelBmcAssetTagResultResultsItemData) GetChanged() OptBool {
+func (s *BmcResponseModelBmcAssetTagResultResultsItemData) GetChanged() bool {
 	return s.Changed
 }
 
 // GetCurrent returns the value of Current.
-func (s *BmcResponseModelBmcAssetTagResultResultsItemData) GetCurrent() OptString {
+func (s *BmcResponseModelBmcAssetTagResultResultsItemData) GetCurrent() string {
 	return s.Current
 }
 
 // GetDesired returns the value of Desired.
-func (s *BmcResponseModelBmcAssetTagResultResultsItemData) GetDesired() OptString {
+func (s *BmcResponseModelBmcAssetTagResultResultsItemData) GetDesired() string {
 	return s.Desired
 }
 
 // GetSerial returns the value of Serial.
-func (s *BmcResponseModelBmcAssetTagResultResultsItemData) GetSerial() OptString {
+func (s *BmcResponseModelBmcAssetTagResultResultsItemData) GetSerial() string {
 	return s.Serial
 }
 
 // SetChanged sets the value of Changed.
-func (s *BmcResponseModelBmcAssetTagResultResultsItemData) SetChanged(val OptBool) {
+func (s *BmcResponseModelBmcAssetTagResultResultsItemData) SetChanged(val bool) {
 	s.Changed = val
 }
 
 // SetCurrent sets the value of Current.
-func (s *BmcResponseModelBmcAssetTagResultResultsItemData) SetCurrent(val OptString) {
+func (s *BmcResponseModelBmcAssetTagResultResultsItemData) SetCurrent(val string) {
 	s.Current = val
 }
 
 // SetDesired sets the value of Desired.
-func (s *BmcResponseModelBmcAssetTagResultResultsItemData) SetDesired(val OptString) {
+func (s *BmcResponseModelBmcAssetTagResultResultsItemData) SetDesired(val string) {
 	s.Desired = val
 }
 
 // SetSerial sets the value of Serial.
-func (s *BmcResponseModelBmcAssetTagResultResultsItemData) SetSerial(val OptString) {
+func (s *BmcResponseModelBmcAssetTagResultResultsItemData) SetSerial(val string) {
 	s.Serial = val
 }
 
 type BmcResponseModelBmcAssetTagResultSummary struct {
-	DurationMs  OptInt64  `json:"duration_ms"`
-	Failed      OptInt    `json:"failed"`
-	FailedNodes OptString `json:"failed_nodes"`
-	Succeeded   OptInt    `json:"succeeded"`
-	Total       OptInt    `json:"total"`
+	DurationMs  int64  `json:"duration_ms"`
+	Failed      int    `json:"failed"`
+	FailedNodes string `json:"failed_nodes"`
+	Succeeded   int    `json:"succeeded"`
+	Total       int    `json:"total"`
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcAssetTagResultSummary) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcAssetTagResultSummary) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetFailed returns the value of Failed.
-func (s *BmcResponseModelBmcAssetTagResultSummary) GetFailed() OptInt {
+func (s *BmcResponseModelBmcAssetTagResultSummary) GetFailed() int {
 	return s.Failed
 }
 
 // GetFailedNodes returns the value of FailedNodes.
-func (s *BmcResponseModelBmcAssetTagResultSummary) GetFailedNodes() OptString {
+func (s *BmcResponseModelBmcAssetTagResultSummary) GetFailedNodes() string {
 	return s.FailedNodes
 }
 
 // GetSucceeded returns the value of Succeeded.
-func (s *BmcResponseModelBmcAssetTagResultSummary) GetSucceeded() OptInt {
+func (s *BmcResponseModelBmcAssetTagResultSummary) GetSucceeded() int {
 	return s.Succeeded
 }
 
 // GetTotal returns the value of Total.
-func (s *BmcResponseModelBmcAssetTagResultSummary) GetTotal() OptInt {
+func (s *BmcResponseModelBmcAssetTagResultSummary) GetTotal() int {
 	return s.Total
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcAssetTagResultSummary) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcAssetTagResultSummary) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetFailed sets the value of Failed.
-func (s *BmcResponseModelBmcAssetTagResultSummary) SetFailed(val OptInt) {
+func (s *BmcResponseModelBmcAssetTagResultSummary) SetFailed(val int) {
 	s.Failed = val
 }
 
 // SetFailedNodes sets the value of FailedNodes.
-func (s *BmcResponseModelBmcAssetTagResultSummary) SetFailedNodes(val OptString) {
+func (s *BmcResponseModelBmcAssetTagResultSummary) SetFailedNodes(val string) {
 	s.FailedNodes = val
 }
 
 // SetSucceeded sets the value of Succeeded.
-func (s *BmcResponseModelBmcAssetTagResultSummary) SetSucceeded(val OptInt) {
+func (s *BmcResponseModelBmcAssetTagResultSummary) SetSucceeded(val int) {
 	s.Succeeded = val
 }
 
 // SetTotal sets the value of Total.
-func (s *BmcResponseModelBmcAssetTagResultSummary) SetTotal(val OptInt) {
+func (s *BmcResponseModelBmcAssetTagResultSummary) SetTotal(val int) {
 	s.Total = val
 }
 
 // BmcResponse_model.BmcBios schema.
 // Ref: #/components/schemas/BmcResponse_model.BmcBios
 type BmcResponseModelBmcBios struct {
-	Results OptNilNilBmcResponseModelBmcBiosResultsItemArray `json:"results"`
-	RunID   OptString                                        `json:"run_id"`
-	Summary OptBmcResponseModelBmcBiosSummary                `json:"summary"`
+	Results []BmcResponseModelBmcBiosResultsItem `json:"results"`
+	RunID   string                               `json:"run_id"`
+	Summary BmcResponseModelBmcBiosSummary       `json:"summary"`
 }
 
 // GetResults returns the value of Results.
-func (s *BmcResponseModelBmcBios) GetResults() OptNilNilBmcResponseModelBmcBiosResultsItemArray {
+func (s *BmcResponseModelBmcBios) GetResults() []BmcResponseModelBmcBiosResultsItem {
 	return s.Results
 }
 
 // GetRunID returns the value of RunID.
-func (s *BmcResponseModelBmcBios) GetRunID() OptString {
+func (s *BmcResponseModelBmcBios) GetRunID() string {
 	return s.RunID
 }
 
 // GetSummary returns the value of Summary.
-func (s *BmcResponseModelBmcBios) GetSummary() OptBmcResponseModelBmcBiosSummary {
+func (s *BmcResponseModelBmcBios) GetSummary() BmcResponseModelBmcBiosSummary {
 	return s.Summary
 }
 
 // SetResults sets the value of Results.
-func (s *BmcResponseModelBmcBios) SetResults(val OptNilNilBmcResponseModelBmcBiosResultsItemArray) {
+func (s *BmcResponseModelBmcBios) SetResults(val []BmcResponseModelBmcBiosResultsItem) {
 	s.Results = val
 }
 
 // SetRunID sets the value of RunID.
-func (s *BmcResponseModelBmcBios) SetRunID(val OptString) {
+func (s *BmcResponseModelBmcBios) SetRunID(val string) {
 	s.RunID = val
 }
 
 // SetSummary sets the value of Summary.
-func (s *BmcResponseModelBmcBios) SetSummary(val OptBmcResponseModelBmcBiosSummary) {
+func (s *BmcResponseModelBmcBios) SetSummary(val BmcResponseModelBmcBiosSummary) {
 	s.Summary = val
 }
 
 // BmcResponse_model.BmcBiosRegistry schema.
 // Ref: #/components/schemas/BmcResponse_model.BmcBiosRegistry
 type BmcResponseModelBmcBiosRegistry struct {
-	Results OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray `json:"results"`
-	RunID   OptString                                                `json:"run_id"`
-	Summary OptBmcResponseModelBmcBiosRegistrySummary                `json:"summary"`
+	Results []BmcResponseModelBmcBiosRegistryResultsItem `json:"results"`
+	RunID   string                                       `json:"run_id"`
+	Summary BmcResponseModelBmcBiosRegistrySummary       `json:"summary"`
 }
 
 // GetResults returns the value of Results.
-func (s *BmcResponseModelBmcBiosRegistry) GetResults() OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray {
+func (s *BmcResponseModelBmcBiosRegistry) GetResults() []BmcResponseModelBmcBiosRegistryResultsItem {
 	return s.Results
 }
 
 // GetRunID returns the value of RunID.
-func (s *BmcResponseModelBmcBiosRegistry) GetRunID() OptString {
+func (s *BmcResponseModelBmcBiosRegistry) GetRunID() string {
 	return s.RunID
 }
 
 // GetSummary returns the value of Summary.
-func (s *BmcResponseModelBmcBiosRegistry) GetSummary() OptBmcResponseModelBmcBiosRegistrySummary {
+func (s *BmcResponseModelBmcBiosRegistry) GetSummary() BmcResponseModelBmcBiosRegistrySummary {
 	return s.Summary
 }
 
 // SetResults sets the value of Results.
-func (s *BmcResponseModelBmcBiosRegistry) SetResults(val OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) {
+func (s *BmcResponseModelBmcBiosRegistry) SetResults(val []BmcResponseModelBmcBiosRegistryResultsItem) {
 	s.Results = val
 }
 
 // SetRunID sets the value of RunID.
-func (s *BmcResponseModelBmcBiosRegistry) SetRunID(val OptString) {
+func (s *BmcResponseModelBmcBiosRegistry) SetRunID(val string) {
 	s.RunID = val
 }
 
 // SetSummary sets the value of Summary.
-func (s *BmcResponseModelBmcBiosRegistry) SetSummary(val OptBmcResponseModelBmcBiosRegistrySummary) {
+func (s *BmcResponseModelBmcBiosRegistry) SetSummary(val BmcResponseModelBmcBiosRegistrySummary) {
 	s.Summary = val
 }
 
 type BmcResponseModelBmcBiosRegistryResultsItem struct {
 	Data       OptNilBmcResponseModelBmcBiosRegistryResultsItemData `json:"data"`
-	DurationMs OptInt64                                             `json:"duration_ms"`
-	Message    OptString                                            `json:"message"`
-	Node       OptString                                            `json:"node"`
-	Success    OptBool                                              `json:"success"`
+	DurationMs int64                                                `json:"duration_ms"`
+	Message    string                                               `json:"message"`
+	Node       string                                               `json:"node"`
+	Success    bool                                                 `json:"success"`
 }
 
 // GetData returns the value of Data.
@@ -1131,22 +1131,22 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItem) GetData() OptNilBmcResponse
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcBiosRegistryResultsItem) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetMessage returns the value of Message.
-func (s *BmcResponseModelBmcBiosRegistryResultsItem) GetMessage() OptString {
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) GetMessage() string {
 	return s.Message
 }
 
 // GetNode returns the value of Node.
-func (s *BmcResponseModelBmcBiosRegistryResultsItem) GetNode() OptString {
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) GetNode() string {
 	return s.Node
 }
 
 // GetSuccess returns the value of Success.
-func (s *BmcResponseModelBmcBiosRegistryResultsItem) GetSuccess() OptBool {
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) GetSuccess() bool {
 	return s.Success
 }
 
@@ -1156,31 +1156,31 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItem) SetData(val OptNilBmcRespon
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcBiosRegistryResultsItem) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetMessage sets the value of Message.
-func (s *BmcResponseModelBmcBiosRegistryResultsItem) SetMessage(val OptString) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) SetMessage(val string) {
 	s.Message = val
 }
 
 // SetNode sets the value of Node.
-func (s *BmcResponseModelBmcBiosRegistryResultsItem) SetNode(val OptString) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) SetNode(val string) {
 	s.Node = val
 }
 
 // SetSuccess sets the value of Success.
-func (s *BmcResponseModelBmcBiosRegistryResultsItem) SetSuccess(val OptBool) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItem) SetSuccess(val bool) {
 	s.Success = val
 }
 
 type BmcResponseModelBmcBiosRegistryResultsItemData struct {
 	Attributes []BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem `json:"attributes"`
-	Available  OptBool                                                        `json:"available"`
-	Language   OptString                                                      `json:"language"`
-	Registry   OptString                                                      `json:"registry"`
-	Version    OptString                                                      `json:"version"`
+	Available  bool                                                           `json:"available"`
+	Language   string                                                         `json:"language"`
+	Registry   string                                                         `json:"registry"`
+	Version    string                                                         `json:"version"`
 }
 
 // GetAttributes returns the value of Attributes.
@@ -1189,22 +1189,22 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemData) GetAttributes() []BmcRe
 }
 
 // GetAvailable returns the value of Available.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemData) GetAvailable() OptBool {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) GetAvailable() bool {
 	return s.Available
 }
 
 // GetLanguage returns the value of Language.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemData) GetLanguage() OptString {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) GetLanguage() string {
 	return s.Language
 }
 
 // GetRegistry returns the value of Registry.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemData) GetRegistry() OptString {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) GetRegistry() string {
 	return s.Registry
 }
 
 // GetVersion returns the value of Version.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemData) GetVersion() OptString {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) GetVersion() string {
 	return s.Version
 }
 
@@ -1214,46 +1214,46 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemData) SetAttributes(val []Bmc
 }
 
 // SetAvailable sets the value of Available.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemData) SetAvailable(val OptBool) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) SetAvailable(val bool) {
 	s.Available = val
 }
 
 // SetLanguage sets the value of Language.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemData) SetLanguage(val OptString) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) SetLanguage(val string) {
 	s.Language = val
 }
 
 // SetRegistry sets the value of Registry.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemData) SetRegistry(val OptString) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) SetRegistry(val string) {
 	s.Registry = val
 }
 
 // SetVersion sets the value of Version.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemData) SetVersion(val OptString) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemData) SetVersion(val string) {
 	s.Version = val
 }
 
 type BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem struct {
 	DefaultValue  jx.Raw                                                                   `json:"default_value"`
-	DisplayName   OptString                                                                `json:"display_name"`
-	DisplayOrder  OptInt                                                                   `json:"display_order"`
-	GrayOut       OptBool                                                                  `json:"gray_out"`
-	HelpText      OptString                                                                `json:"help_text"`
-	Hidden        OptBool                                                                  `json:"hidden"`
-	Immutable     OptBool                                                                  `json:"immutable"`
+	DisplayName   string                                                                   `json:"display_name"`
+	DisplayOrder  int                                                                      `json:"display_order"`
+	GrayOut       bool                                                                     `json:"gray_out"`
+	HelpText      string                                                                   `json:"help_text"`
+	Hidden        bool                                                                     `json:"hidden"`
+	Immutable     bool                                                                     `json:"immutable"`
 	LowerBound    OptNilInt64                                                              `json:"lower_bound"`
 	MaxLength     OptNilInt                                                                `json:"max_length"`
-	MenuPath      OptString                                                                `json:"menu_path"`
+	MenuPath      string                                                                   `json:"menu_path"`
 	MinLength     OptNilInt                                                                `json:"min_length"`
-	Name          OptString                                                                `json:"name"`
-	ReadOnly      OptBool                                                                  `json:"read_only"`
-	ResetRequired OptBool                                                                  `json:"reset_required"`
-	SystemUnique  OptBool                                                                  `json:"system_unique"`
-	Type          OptString                                                                `json:"type"`
+	Name          string                                                                   `json:"name"`
+	ReadOnly      bool                                                                     `json:"read_only"`
+	ResetRequired bool                                                                     `json:"reset_required"`
+	SystemUnique  bool                                                                     `json:"system_unique"`
+	Type          string                                                                   `json:"type"`
 	UpperBound    OptNilInt64                                                              `json:"upper_bound"`
 	Values        []BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem `json:"values"`
-	WarningText   OptString                                                                `json:"warning_text"`
-	WriteOnly     OptBool                                                                  `json:"write_only"`
+	WarningText   string                                                                   `json:"warning_text"`
+	WriteOnly     bool                                                                     `json:"write_only"`
 }
 
 // GetDefaultValue returns the value of DefaultValue.
@@ -1262,32 +1262,32 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetDefaul
 }
 
 // GetDisplayName returns the value of DisplayName.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetDisplayName() OptString {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetDisplayName() string {
 	return s.DisplayName
 }
 
 // GetDisplayOrder returns the value of DisplayOrder.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetDisplayOrder() OptInt {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetDisplayOrder() int {
 	return s.DisplayOrder
 }
 
 // GetGrayOut returns the value of GrayOut.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetGrayOut() OptBool {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetGrayOut() bool {
 	return s.GrayOut
 }
 
 // GetHelpText returns the value of HelpText.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetHelpText() OptString {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetHelpText() string {
 	return s.HelpText
 }
 
 // GetHidden returns the value of Hidden.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetHidden() OptBool {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetHidden() bool {
 	return s.Hidden
 }
 
 // GetImmutable returns the value of Immutable.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetImmutable() OptBool {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetImmutable() bool {
 	return s.Immutable
 }
 
@@ -1302,7 +1302,7 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetMaxLen
 }
 
 // GetMenuPath returns the value of MenuPath.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetMenuPath() OptString {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetMenuPath() string {
 	return s.MenuPath
 }
 
@@ -1312,27 +1312,27 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetMinLen
 }
 
 // GetName returns the value of Name.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetName() OptString {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetName() string {
 	return s.Name
 }
 
 // GetReadOnly returns the value of ReadOnly.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetReadOnly() OptBool {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetReadOnly() bool {
 	return s.ReadOnly
 }
 
 // GetResetRequired returns the value of ResetRequired.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetResetRequired() OptBool {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetResetRequired() bool {
 	return s.ResetRequired
 }
 
 // GetSystemUnique returns the value of SystemUnique.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetSystemUnique() OptBool {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetSystemUnique() bool {
 	return s.SystemUnique
 }
 
 // GetType returns the value of Type.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetType() OptString {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetType() string {
 	return s.Type
 }
 
@@ -1347,12 +1347,12 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetValues
 }
 
 // GetWarningText returns the value of WarningText.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetWarningText() OptString {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetWarningText() string {
 	return s.WarningText
 }
 
 // GetWriteOnly returns the value of WriteOnly.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetWriteOnly() OptBool {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) GetWriteOnly() bool {
 	return s.WriteOnly
 }
 
@@ -1362,32 +1362,32 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetDefaul
 }
 
 // SetDisplayName sets the value of DisplayName.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetDisplayName(val OptString) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetDisplayName(val string) {
 	s.DisplayName = val
 }
 
 // SetDisplayOrder sets the value of DisplayOrder.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetDisplayOrder(val OptInt) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetDisplayOrder(val int) {
 	s.DisplayOrder = val
 }
 
 // SetGrayOut sets the value of GrayOut.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetGrayOut(val OptBool) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetGrayOut(val bool) {
 	s.GrayOut = val
 }
 
 // SetHelpText sets the value of HelpText.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetHelpText(val OptString) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetHelpText(val string) {
 	s.HelpText = val
 }
 
 // SetHidden sets the value of Hidden.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetHidden(val OptBool) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetHidden(val bool) {
 	s.Hidden = val
 }
 
 // SetImmutable sets the value of Immutable.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetImmutable(val OptBool) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetImmutable(val bool) {
 	s.Immutable = val
 }
 
@@ -1402,7 +1402,7 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetMaxLen
 }
 
 // SetMenuPath sets the value of MenuPath.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetMenuPath(val OptString) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetMenuPath(val string) {
 	s.MenuPath = val
 }
 
@@ -1412,27 +1412,27 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetMinLen
 }
 
 // SetName sets the value of Name.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetName(val OptString) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetName(val string) {
 	s.Name = val
 }
 
 // SetReadOnly sets the value of ReadOnly.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetReadOnly(val OptBool) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetReadOnly(val bool) {
 	s.ReadOnly = val
 }
 
 // SetResetRequired sets the value of ResetRequired.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetResetRequired(val OptBool) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetResetRequired(val bool) {
 	s.ResetRequired = val
 }
 
 // SetSystemUnique sets the value of SystemUnique.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetSystemUnique(val OptBool) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetSystemUnique(val bool) {
 	s.SystemUnique = val
 }
 
 // SetType sets the value of Type.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetType(val OptString) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetType(val string) {
 	s.Type = val
 }
 
@@ -1447,104 +1447,104 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetValues
 }
 
 // SetWarningText sets the value of WarningText.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetWarningText(val OptString) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetWarningText(val string) {
 	s.WarningText = val
 }
 
 // SetWriteOnly sets the value of WriteOnly.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetWriteOnly(val OptBool) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetWriteOnly(val bool) {
 	s.WriteOnly = val
 }
 
 type BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem struct {
-	DisplayName OptString `json:"display_name"`
-	Name        OptString `json:"name"`
+	DisplayName string `json:"display_name"`
+	Name        string `json:"name"`
 }
 
 // GetDisplayName returns the value of DisplayName.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem) GetDisplayName() OptString {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem) GetDisplayName() string {
 	return s.DisplayName
 }
 
 // GetName returns the value of Name.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem) GetName() OptString {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem) GetName() string {
 	return s.Name
 }
 
 // SetDisplayName sets the value of DisplayName.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem) SetDisplayName(val OptString) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem) SetDisplayName(val string) {
 	s.DisplayName = val
 }
 
 // SetName sets the value of Name.
-func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem) SetName(val OptString) {
+func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem) SetName(val string) {
 	s.Name = val
 }
 
 type BmcResponseModelBmcBiosRegistrySummary struct {
-	DurationMs  OptInt64  `json:"duration_ms"`
-	Failed      OptInt    `json:"failed"`
-	FailedNodes OptString `json:"failed_nodes"`
-	Succeeded   OptInt    `json:"succeeded"`
-	Total       OptInt    `json:"total"`
+	DurationMs  int64  `json:"duration_ms"`
+	Failed      int    `json:"failed"`
+	FailedNodes string `json:"failed_nodes"`
+	Succeeded   int    `json:"succeeded"`
+	Total       int    `json:"total"`
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcBiosRegistrySummary) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcBiosRegistrySummary) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetFailed returns the value of Failed.
-func (s *BmcResponseModelBmcBiosRegistrySummary) GetFailed() OptInt {
+func (s *BmcResponseModelBmcBiosRegistrySummary) GetFailed() int {
 	return s.Failed
 }
 
 // GetFailedNodes returns the value of FailedNodes.
-func (s *BmcResponseModelBmcBiosRegistrySummary) GetFailedNodes() OptString {
+func (s *BmcResponseModelBmcBiosRegistrySummary) GetFailedNodes() string {
 	return s.FailedNodes
 }
 
 // GetSucceeded returns the value of Succeeded.
-func (s *BmcResponseModelBmcBiosRegistrySummary) GetSucceeded() OptInt {
+func (s *BmcResponseModelBmcBiosRegistrySummary) GetSucceeded() int {
 	return s.Succeeded
 }
 
 // GetTotal returns the value of Total.
-func (s *BmcResponseModelBmcBiosRegistrySummary) GetTotal() OptInt {
+func (s *BmcResponseModelBmcBiosRegistrySummary) GetTotal() int {
 	return s.Total
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcBiosRegistrySummary) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcBiosRegistrySummary) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetFailed sets the value of Failed.
-func (s *BmcResponseModelBmcBiosRegistrySummary) SetFailed(val OptInt) {
+func (s *BmcResponseModelBmcBiosRegistrySummary) SetFailed(val int) {
 	s.Failed = val
 }
 
 // SetFailedNodes sets the value of FailedNodes.
-func (s *BmcResponseModelBmcBiosRegistrySummary) SetFailedNodes(val OptString) {
+func (s *BmcResponseModelBmcBiosRegistrySummary) SetFailedNodes(val string) {
 	s.FailedNodes = val
 }
 
 // SetSucceeded sets the value of Succeeded.
-func (s *BmcResponseModelBmcBiosRegistrySummary) SetSucceeded(val OptInt) {
+func (s *BmcResponseModelBmcBiosRegistrySummary) SetSucceeded(val int) {
 	s.Succeeded = val
 }
 
 // SetTotal sets the value of Total.
-func (s *BmcResponseModelBmcBiosRegistrySummary) SetTotal(val OptInt) {
+func (s *BmcResponseModelBmcBiosRegistrySummary) SetTotal(val int) {
 	s.Total = val
 }
 
 type BmcResponseModelBmcBiosResultsItem struct {
 	Data       OptNilBmcResponseModelBmcBiosResultsItemData `json:"data"`
-	DurationMs OptInt64                                     `json:"duration_ms"`
-	Message    OptString                                    `json:"message"`
-	Node       OptString                                    `json:"node"`
-	Success    OptBool                                      `json:"success"`
+	DurationMs int64                                        `json:"duration_ms"`
+	Message    string                                       `json:"message"`
+	Node       string                                       `json:"node"`
+	Success    bool                                         `json:"success"`
 }
 
 // GetData returns the value of Data.
@@ -1553,22 +1553,22 @@ func (s *BmcResponseModelBmcBiosResultsItem) GetData() OptNilBmcResponseModelBmc
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcBiosResultsItem) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcBiosResultsItem) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetMessage returns the value of Message.
-func (s *BmcResponseModelBmcBiosResultsItem) GetMessage() OptString {
+func (s *BmcResponseModelBmcBiosResultsItem) GetMessage() string {
 	return s.Message
 }
 
 // GetNode returns the value of Node.
-func (s *BmcResponseModelBmcBiosResultsItem) GetNode() OptString {
+func (s *BmcResponseModelBmcBiosResultsItem) GetNode() string {
 	return s.Node
 }
 
 // GetSuccess returns the value of Success.
-func (s *BmcResponseModelBmcBiosResultsItem) GetSuccess() OptBool {
+func (s *BmcResponseModelBmcBiosResultsItem) GetSuccess() bool {
 	return s.Success
 }
 
@@ -1578,33 +1578,33 @@ func (s *BmcResponseModelBmcBiosResultsItem) SetData(val OptNilBmcResponseModelB
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcBiosResultsItem) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcBiosResultsItem) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetMessage sets the value of Message.
-func (s *BmcResponseModelBmcBiosResultsItem) SetMessage(val OptString) {
+func (s *BmcResponseModelBmcBiosResultsItem) SetMessage(val string) {
 	s.Message = val
 }
 
 // SetNode sets the value of Node.
-func (s *BmcResponseModelBmcBiosResultsItem) SetNode(val OptString) {
+func (s *BmcResponseModelBmcBiosResultsItem) SetNode(val string) {
 	s.Node = val
 }
 
 // SetSuccess sets the value of Success.
-func (s *BmcResponseModelBmcBiosResultsItem) SetSuccess(val OptBool) {
+func (s *BmcResponseModelBmcBiosResultsItem) SetSuccess(val bool) {
 	s.Success = val
 }
 
 type BmcResponseModelBmcBiosResultsItemData struct {
 	ApplyTimes        []string                                            `json:"apply_times"`
-	AttributeRegistry OptString                                           `json:"attribute_registry"`
+	AttributeRegistry string                                              `json:"attribute_registry"`
 	Attributes        OptBmcResponseModelBmcBiosResultsItemDataAttributes `json:"attributes"`
-	BiosVersion       OptString                                           `json:"bios_version"`
-	Model             OptString                                           `json:"model"`
+	BiosVersion       string                                              `json:"bios_version"`
+	Model             string                                              `json:"model"`
 	Pending           OptBmcResponseModelBmcBiosResultsItemDataPending    `json:"pending"`
-	ResetPending      OptBool                                             `json:"reset_pending"`
+	ResetPending      bool                                                `json:"reset_pending"`
 }
 
 // GetApplyTimes returns the value of ApplyTimes.
@@ -1613,7 +1613,7 @@ func (s *BmcResponseModelBmcBiosResultsItemData) GetApplyTimes() []string {
 }
 
 // GetAttributeRegistry returns the value of AttributeRegistry.
-func (s *BmcResponseModelBmcBiosResultsItemData) GetAttributeRegistry() OptString {
+func (s *BmcResponseModelBmcBiosResultsItemData) GetAttributeRegistry() string {
 	return s.AttributeRegistry
 }
 
@@ -1623,12 +1623,12 @@ func (s *BmcResponseModelBmcBiosResultsItemData) GetAttributes() OptBmcResponseM
 }
 
 // GetBiosVersion returns the value of BiosVersion.
-func (s *BmcResponseModelBmcBiosResultsItemData) GetBiosVersion() OptString {
+func (s *BmcResponseModelBmcBiosResultsItemData) GetBiosVersion() string {
 	return s.BiosVersion
 }
 
 // GetModel returns the value of Model.
-func (s *BmcResponseModelBmcBiosResultsItemData) GetModel() OptString {
+func (s *BmcResponseModelBmcBiosResultsItemData) GetModel() string {
 	return s.Model
 }
 
@@ -1638,7 +1638,7 @@ func (s *BmcResponseModelBmcBiosResultsItemData) GetPending() OptBmcResponseMode
 }
 
 // GetResetPending returns the value of ResetPending.
-func (s *BmcResponseModelBmcBiosResultsItemData) GetResetPending() OptBool {
+func (s *BmcResponseModelBmcBiosResultsItemData) GetResetPending() bool {
 	return s.ResetPending
 }
 
@@ -1648,7 +1648,7 @@ func (s *BmcResponseModelBmcBiosResultsItemData) SetApplyTimes(val []string) {
 }
 
 // SetAttributeRegistry sets the value of AttributeRegistry.
-func (s *BmcResponseModelBmcBiosResultsItemData) SetAttributeRegistry(val OptString) {
+func (s *BmcResponseModelBmcBiosResultsItemData) SetAttributeRegistry(val string) {
 	s.AttributeRegistry = val
 }
 
@@ -1658,12 +1658,12 @@ func (s *BmcResponseModelBmcBiosResultsItemData) SetAttributes(val OptBmcRespons
 }
 
 // SetBiosVersion sets the value of BiosVersion.
-func (s *BmcResponseModelBmcBiosResultsItemData) SetBiosVersion(val OptString) {
+func (s *BmcResponseModelBmcBiosResultsItemData) SetBiosVersion(val string) {
 	s.BiosVersion = val
 }
 
 // SetModel sets the value of Model.
-func (s *BmcResponseModelBmcBiosResultsItemData) SetModel(val OptString) {
+func (s *BmcResponseModelBmcBiosResultsItemData) SetModel(val string) {
 	s.Model = val
 }
 
@@ -1673,7 +1673,7 @@ func (s *BmcResponseModelBmcBiosResultsItemData) SetPending(val OptBmcResponseMo
 }
 
 // SetResetPending sets the value of ResetPending.
-func (s *BmcResponseModelBmcBiosResultsItemData) SetResetPending(val OptBool) {
+func (s *BmcResponseModelBmcBiosResultsItemData) SetResetPending(val bool) {
 	s.ResetPending = val
 }
 
@@ -1700,107 +1700,107 @@ func (s *BmcResponseModelBmcBiosResultsItemDataPending) init() BmcResponseModelB
 }
 
 type BmcResponseModelBmcBiosSummary struct {
-	DurationMs  OptInt64  `json:"duration_ms"`
-	Failed      OptInt    `json:"failed"`
-	FailedNodes OptString `json:"failed_nodes"`
-	Succeeded   OptInt    `json:"succeeded"`
-	Total       OptInt    `json:"total"`
+	DurationMs  int64  `json:"duration_ms"`
+	Failed      int    `json:"failed"`
+	FailedNodes string `json:"failed_nodes"`
+	Succeeded   int    `json:"succeeded"`
+	Total       int    `json:"total"`
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcBiosSummary) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcBiosSummary) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetFailed returns the value of Failed.
-func (s *BmcResponseModelBmcBiosSummary) GetFailed() OptInt {
+func (s *BmcResponseModelBmcBiosSummary) GetFailed() int {
 	return s.Failed
 }
 
 // GetFailedNodes returns the value of FailedNodes.
-func (s *BmcResponseModelBmcBiosSummary) GetFailedNodes() OptString {
+func (s *BmcResponseModelBmcBiosSummary) GetFailedNodes() string {
 	return s.FailedNodes
 }
 
 // GetSucceeded returns the value of Succeeded.
-func (s *BmcResponseModelBmcBiosSummary) GetSucceeded() OptInt {
+func (s *BmcResponseModelBmcBiosSummary) GetSucceeded() int {
 	return s.Succeeded
 }
 
 // GetTotal returns the value of Total.
-func (s *BmcResponseModelBmcBiosSummary) GetTotal() OptInt {
+func (s *BmcResponseModelBmcBiosSummary) GetTotal() int {
 	return s.Total
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcBiosSummary) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcBiosSummary) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetFailed sets the value of Failed.
-func (s *BmcResponseModelBmcBiosSummary) SetFailed(val OptInt) {
+func (s *BmcResponseModelBmcBiosSummary) SetFailed(val int) {
 	s.Failed = val
 }
 
 // SetFailedNodes sets the value of FailedNodes.
-func (s *BmcResponseModelBmcBiosSummary) SetFailedNodes(val OptString) {
+func (s *BmcResponseModelBmcBiosSummary) SetFailedNodes(val string) {
 	s.FailedNodes = val
 }
 
 // SetSucceeded sets the value of Succeeded.
-func (s *BmcResponseModelBmcBiosSummary) SetSucceeded(val OptInt) {
+func (s *BmcResponseModelBmcBiosSummary) SetSucceeded(val int) {
 	s.Succeeded = val
 }
 
 // SetTotal sets the value of Total.
-func (s *BmcResponseModelBmcBiosSummary) SetTotal(val OptInt) {
+func (s *BmcResponseModelBmcBiosSummary) SetTotal(val int) {
 	s.Total = val
 }
 
 // BmcResponse_model.BmcFirmwareUpdates schema.
 // Ref: #/components/schemas/BmcResponse_model.BmcFirmwareUpdates
 type BmcResponseModelBmcFirmwareUpdates struct {
-	Results OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray `json:"results"`
-	RunID   OptString                                                   `json:"run_id"`
-	Summary OptBmcResponseModelBmcFirmwareUpdatesSummary                `json:"summary"`
+	Results []BmcResponseModelBmcFirmwareUpdatesResultsItem `json:"results"`
+	RunID   string                                          `json:"run_id"`
+	Summary BmcResponseModelBmcFirmwareUpdatesSummary       `json:"summary"`
 }
 
 // GetResults returns the value of Results.
-func (s *BmcResponseModelBmcFirmwareUpdates) GetResults() OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray {
+func (s *BmcResponseModelBmcFirmwareUpdates) GetResults() []BmcResponseModelBmcFirmwareUpdatesResultsItem {
 	return s.Results
 }
 
 // GetRunID returns the value of RunID.
-func (s *BmcResponseModelBmcFirmwareUpdates) GetRunID() OptString {
+func (s *BmcResponseModelBmcFirmwareUpdates) GetRunID() string {
 	return s.RunID
 }
 
 // GetSummary returns the value of Summary.
-func (s *BmcResponseModelBmcFirmwareUpdates) GetSummary() OptBmcResponseModelBmcFirmwareUpdatesSummary {
+func (s *BmcResponseModelBmcFirmwareUpdates) GetSummary() BmcResponseModelBmcFirmwareUpdatesSummary {
 	return s.Summary
 }
 
 // SetResults sets the value of Results.
-func (s *BmcResponseModelBmcFirmwareUpdates) SetResults(val OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) {
+func (s *BmcResponseModelBmcFirmwareUpdates) SetResults(val []BmcResponseModelBmcFirmwareUpdatesResultsItem) {
 	s.Results = val
 }
 
 // SetRunID sets the value of RunID.
-func (s *BmcResponseModelBmcFirmwareUpdates) SetRunID(val OptString) {
+func (s *BmcResponseModelBmcFirmwareUpdates) SetRunID(val string) {
 	s.RunID = val
 }
 
 // SetSummary sets the value of Summary.
-func (s *BmcResponseModelBmcFirmwareUpdates) SetSummary(val OptBmcResponseModelBmcFirmwareUpdatesSummary) {
+func (s *BmcResponseModelBmcFirmwareUpdates) SetSummary(val BmcResponseModelBmcFirmwareUpdatesSummary) {
 	s.Summary = val
 }
 
 type BmcResponseModelBmcFirmwareUpdatesResultsItem struct {
 	Data       OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemData `json:"data"`
-	DurationMs OptInt64                                                `json:"duration_ms"`
-	Message    OptString                                               `json:"message"`
-	Node       OptString                                               `json:"node"`
-	Success    OptBool                                                 `json:"success"`
+	DurationMs int64                                                   `json:"duration_ms"`
+	Message    string                                                  `json:"message"`
+	Node       string                                                  `json:"node"`
+	Success    bool                                                    `json:"success"`
 }
 
 // GetData returns the value of Data.
@@ -1809,22 +1809,22 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) GetData() OptNilBmcRespo
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetMessage returns the value of Message.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) GetMessage() OptString {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) GetMessage() string {
 	return s.Message
 }
 
 // GetNode returns the value of Node.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) GetNode() OptString {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) GetNode() string {
 	return s.Node
 }
 
 // GetSuccess returns the value of Success.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) GetSuccess() OptBool {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) GetSuccess() bool {
 	return s.Success
 }
 
@@ -1834,243 +1834,243 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) SetData(val OptNilBmcRes
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetMessage sets the value of Message.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) SetMessage(val OptString) {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) SetMessage(val string) {
 	s.Message = val
 }
 
 // SetNode sets the value of Node.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) SetNode(val OptString) {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) SetNode(val string) {
 	s.Node = val
 }
 
 // SetSuccess sets the value of Success.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) SetSuccess(val OptBool) {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) SetSuccess(val bool) {
 	s.Success = val
 }
 
 type BmcResponseModelBmcFirmwareUpdatesResultsItemData struct {
-	RebootType OptString                                                                  `json:"reboot_type"`
-	Updates    OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray `json:"updates"`
+	RebootType string                                                                  `json:"reboot_type"`
+	Updates    OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray `json:"updates"`
 }
 
 // GetRebootType returns the value of RebootType.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) GetRebootType() OptString {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) GetRebootType() string {
 	return s.RebootType
 }
 
 // GetUpdates returns the value of Updates.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) GetUpdates() OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) GetUpdates() OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray {
 	return s.Updates
 }
 
 // SetRebootType sets the value of RebootType.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) SetRebootType(val OptString) {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) SetRebootType(val string) {
 	s.RebootType = val
 }
 
 // SetUpdates sets the value of Updates.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) SetUpdates(val OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) SetUpdates(val OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) {
 	s.Updates = val
 }
 
 type BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem struct {
-	ComponentType    OptString `json:"component_type"`
-	Criticality      OptString `json:"criticality"`
-	DisplayName      OptString `json:"display_name"`
-	InstalledVersion OptString `json:"installed_version"`
-	Name             OptString `json:"name"`
-	PackagePath      OptString `json:"package_path"`
-	PackageVersion   OptString `json:"package_version"`
-	RebootType       OptString `json:"reboot_type"`
+	ComponentType    string `json:"component_type"`
+	Criticality      string `json:"criticality"`
+	DisplayName      string `json:"display_name"`
+	InstalledVersion string `json:"installed_version"`
+	Name             string `json:"name"`
+	PackagePath      string `json:"package_path"`
+	PackageVersion   string `json:"package_version"`
+	RebootType       string `json:"reboot_type"`
 }
 
 // GetComponentType returns the value of ComponentType.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) GetComponentType() OptString {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) GetComponentType() string {
 	return s.ComponentType
 }
 
 // GetCriticality returns the value of Criticality.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) GetCriticality() OptString {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) GetCriticality() string {
 	return s.Criticality
 }
 
 // GetDisplayName returns the value of DisplayName.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) GetDisplayName() OptString {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) GetDisplayName() string {
 	return s.DisplayName
 }
 
 // GetInstalledVersion returns the value of InstalledVersion.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) GetInstalledVersion() OptString {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) GetInstalledVersion() string {
 	return s.InstalledVersion
 }
 
 // GetName returns the value of Name.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) GetName() OptString {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) GetName() string {
 	return s.Name
 }
 
 // GetPackagePath returns the value of PackagePath.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) GetPackagePath() OptString {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) GetPackagePath() string {
 	return s.PackagePath
 }
 
 // GetPackageVersion returns the value of PackageVersion.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) GetPackageVersion() OptString {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) GetPackageVersion() string {
 	return s.PackageVersion
 }
 
 // GetRebootType returns the value of RebootType.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) GetRebootType() OptString {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) GetRebootType() string {
 	return s.RebootType
 }
 
 // SetComponentType sets the value of ComponentType.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetComponentType(val OptString) {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetComponentType(val string) {
 	s.ComponentType = val
 }
 
 // SetCriticality sets the value of Criticality.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetCriticality(val OptString) {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetCriticality(val string) {
 	s.Criticality = val
 }
 
 // SetDisplayName sets the value of DisplayName.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetDisplayName(val OptString) {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetDisplayName(val string) {
 	s.DisplayName = val
 }
 
 // SetInstalledVersion sets the value of InstalledVersion.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetInstalledVersion(val OptString) {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetInstalledVersion(val string) {
 	s.InstalledVersion = val
 }
 
 // SetName sets the value of Name.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetName(val OptString) {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetName(val string) {
 	s.Name = val
 }
 
 // SetPackagePath sets the value of PackagePath.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetPackagePath(val OptString) {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetPackagePath(val string) {
 	s.PackagePath = val
 }
 
 // SetPackageVersion sets the value of PackageVersion.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetPackageVersion(val OptString) {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetPackageVersion(val string) {
 	s.PackageVersion = val
 }
 
 // SetRebootType sets the value of RebootType.
-func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetRebootType(val OptString) {
+func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetRebootType(val string) {
 	s.RebootType = val
 }
 
 type BmcResponseModelBmcFirmwareUpdatesSummary struct {
-	DurationMs  OptInt64  `json:"duration_ms"`
-	Failed      OptInt    `json:"failed"`
-	FailedNodes OptString `json:"failed_nodes"`
-	Succeeded   OptInt    `json:"succeeded"`
-	Total       OptInt    `json:"total"`
+	DurationMs  int64  `json:"duration_ms"`
+	Failed      int    `json:"failed"`
+	FailedNodes string `json:"failed_nodes"`
+	Succeeded   int    `json:"succeeded"`
+	Total       int    `json:"total"`
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcFirmwareUpdatesSummary) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcFirmwareUpdatesSummary) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetFailed returns the value of Failed.
-func (s *BmcResponseModelBmcFirmwareUpdatesSummary) GetFailed() OptInt {
+func (s *BmcResponseModelBmcFirmwareUpdatesSummary) GetFailed() int {
 	return s.Failed
 }
 
 // GetFailedNodes returns the value of FailedNodes.
-func (s *BmcResponseModelBmcFirmwareUpdatesSummary) GetFailedNodes() OptString {
+func (s *BmcResponseModelBmcFirmwareUpdatesSummary) GetFailedNodes() string {
 	return s.FailedNodes
 }
 
 // GetSucceeded returns the value of Succeeded.
-func (s *BmcResponseModelBmcFirmwareUpdatesSummary) GetSucceeded() OptInt {
+func (s *BmcResponseModelBmcFirmwareUpdatesSummary) GetSucceeded() int {
 	return s.Succeeded
 }
 
 // GetTotal returns the value of Total.
-func (s *BmcResponseModelBmcFirmwareUpdatesSummary) GetTotal() OptInt {
+func (s *BmcResponseModelBmcFirmwareUpdatesSummary) GetTotal() int {
 	return s.Total
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcFirmwareUpdatesSummary) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcFirmwareUpdatesSummary) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetFailed sets the value of Failed.
-func (s *BmcResponseModelBmcFirmwareUpdatesSummary) SetFailed(val OptInt) {
+func (s *BmcResponseModelBmcFirmwareUpdatesSummary) SetFailed(val int) {
 	s.Failed = val
 }
 
 // SetFailedNodes sets the value of FailedNodes.
-func (s *BmcResponseModelBmcFirmwareUpdatesSummary) SetFailedNodes(val OptString) {
+func (s *BmcResponseModelBmcFirmwareUpdatesSummary) SetFailedNodes(val string) {
 	s.FailedNodes = val
 }
 
 // SetSucceeded sets the value of Succeeded.
-func (s *BmcResponseModelBmcFirmwareUpdatesSummary) SetSucceeded(val OptInt) {
+func (s *BmcResponseModelBmcFirmwareUpdatesSummary) SetSucceeded(val int) {
 	s.Succeeded = val
 }
 
 // SetTotal sets the value of Total.
-func (s *BmcResponseModelBmcFirmwareUpdatesSummary) SetTotal(val OptInt) {
+func (s *BmcResponseModelBmcFirmwareUpdatesSummary) SetTotal(val int) {
 	s.Total = val
 }
 
 // BmcResponse_model.BmcJobList schema.
 // Ref: #/components/schemas/BmcResponse_model.BmcJobList
 type BmcResponseModelBmcJobList struct {
-	Results OptNilNilBmcResponseModelBmcJobListResultsItemArray `json:"results"`
-	RunID   OptString                                           `json:"run_id"`
-	Summary OptBmcResponseModelBmcJobListSummary                `json:"summary"`
+	Results []BmcResponseModelBmcJobListResultsItem `json:"results"`
+	RunID   string                                  `json:"run_id"`
+	Summary BmcResponseModelBmcJobListSummary       `json:"summary"`
 }
 
 // GetResults returns the value of Results.
-func (s *BmcResponseModelBmcJobList) GetResults() OptNilNilBmcResponseModelBmcJobListResultsItemArray {
+func (s *BmcResponseModelBmcJobList) GetResults() []BmcResponseModelBmcJobListResultsItem {
 	return s.Results
 }
 
 // GetRunID returns the value of RunID.
-func (s *BmcResponseModelBmcJobList) GetRunID() OptString {
+func (s *BmcResponseModelBmcJobList) GetRunID() string {
 	return s.RunID
 }
 
 // GetSummary returns the value of Summary.
-func (s *BmcResponseModelBmcJobList) GetSummary() OptBmcResponseModelBmcJobListSummary {
+func (s *BmcResponseModelBmcJobList) GetSummary() BmcResponseModelBmcJobListSummary {
 	return s.Summary
 }
 
 // SetResults sets the value of Results.
-func (s *BmcResponseModelBmcJobList) SetResults(val OptNilNilBmcResponseModelBmcJobListResultsItemArray) {
+func (s *BmcResponseModelBmcJobList) SetResults(val []BmcResponseModelBmcJobListResultsItem) {
 	s.Results = val
 }
 
 // SetRunID sets the value of RunID.
-func (s *BmcResponseModelBmcJobList) SetRunID(val OptString) {
+func (s *BmcResponseModelBmcJobList) SetRunID(val string) {
 	s.RunID = val
 }
 
 // SetSummary sets the value of Summary.
-func (s *BmcResponseModelBmcJobList) SetSummary(val OptBmcResponseModelBmcJobListSummary) {
+func (s *BmcResponseModelBmcJobList) SetSummary(val BmcResponseModelBmcJobListSummary) {
 	s.Summary = val
 }
 
 type BmcResponseModelBmcJobListResultsItem struct {
 	Data       OptNilBmcResponseModelBmcJobListResultsItemData `json:"data"`
-	DurationMs OptInt64                                        `json:"duration_ms"`
-	Message    OptString                                       `json:"message"`
-	Node       OptString                                       `json:"node"`
-	Success    OptBool                                         `json:"success"`
+	DurationMs int64                                           `json:"duration_ms"`
+	Message    string                                          `json:"message"`
+	Node       string                                          `json:"node"`
+	Success    bool                                            `json:"success"`
 }
 
 // GetData returns the value of Data.
@@ -2079,22 +2079,22 @@ func (s *BmcResponseModelBmcJobListResultsItem) GetData() OptNilBmcResponseModel
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcJobListResultsItem) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcJobListResultsItem) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetMessage returns the value of Message.
-func (s *BmcResponseModelBmcJobListResultsItem) GetMessage() OptString {
+func (s *BmcResponseModelBmcJobListResultsItem) GetMessage() string {
 	return s.Message
 }
 
 // GetNode returns the value of Node.
-func (s *BmcResponseModelBmcJobListResultsItem) GetNode() OptString {
+func (s *BmcResponseModelBmcJobListResultsItem) GetNode() string {
 	return s.Node
 }
 
 // GetSuccess returns the value of Success.
-func (s *BmcResponseModelBmcJobListResultsItem) GetSuccess() OptBool {
+func (s *BmcResponseModelBmcJobListResultsItem) GetSuccess() bool {
 	return s.Success
 }
 
@@ -2104,243 +2104,243 @@ func (s *BmcResponseModelBmcJobListResultsItem) SetData(val OptNilBmcResponseMod
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcJobListResultsItem) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcJobListResultsItem) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetMessage sets the value of Message.
-func (s *BmcResponseModelBmcJobListResultsItem) SetMessage(val OptString) {
+func (s *BmcResponseModelBmcJobListResultsItem) SetMessage(val string) {
 	s.Message = val
 }
 
 // SetNode sets the value of Node.
-func (s *BmcResponseModelBmcJobListResultsItem) SetNode(val OptString) {
+func (s *BmcResponseModelBmcJobListResultsItem) SetNode(val string) {
 	s.Node = val
 }
 
 // SetSuccess sets the value of Success.
-func (s *BmcResponseModelBmcJobListResultsItem) SetSuccess(val OptBool) {
+func (s *BmcResponseModelBmcJobListResultsItem) SetSuccess(val bool) {
 	s.Success = val
 }
 
 type BmcResponseModelBmcJobListResultsItemData struct {
-	Jobs OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray `json:"jobs"`
+	Jobs OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray `json:"jobs"`
 }
 
 // GetJobs returns the value of Jobs.
-func (s *BmcResponseModelBmcJobListResultsItemData) GetJobs() OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray {
+func (s *BmcResponseModelBmcJobListResultsItemData) GetJobs() OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray {
 	return s.Jobs
 }
 
 // SetJobs sets the value of Jobs.
-func (s *BmcResponseModelBmcJobListResultsItemData) SetJobs(val OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) {
+func (s *BmcResponseModelBmcJobListResultsItemData) SetJobs(val OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) {
 	s.Jobs = val
 }
 
 type BmcResponseModelBmcJobListResultsItemDataJobsItem struct {
-	EndTime         OptString `json:"end_time"`
-	ID              OptString `json:"id"`
-	Message         OptString `json:"message"`
-	Name            OptString `json:"name"`
-	PercentComplete OptInt    `json:"percent_complete"`
-	StartTime       OptString `json:"start_time"`
-	State           OptString `json:"state"`
-	Status          OptString `json:"status"`
-	Type            OptString `json:"type"`
+	EndTime         string `json:"end_time"`
+	ID              string `json:"id"`
+	Message         string `json:"message"`
+	Name            string `json:"name"`
+	PercentComplete int    `json:"percent_complete"`
+	StartTime       string `json:"start_time"`
+	State           string `json:"state"`
+	Status          string `json:"status"`
+	Type            string `json:"type"`
 }
 
 // GetEndTime returns the value of EndTime.
-func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) GetEndTime() OptString {
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) GetEndTime() string {
 	return s.EndTime
 }
 
 // GetID returns the value of ID.
-func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) GetID() OptString {
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) GetID() string {
 	return s.ID
 }
 
 // GetMessage returns the value of Message.
-func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) GetMessage() OptString {
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) GetMessage() string {
 	return s.Message
 }
 
 // GetName returns the value of Name.
-func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) GetName() OptString {
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) GetName() string {
 	return s.Name
 }
 
 // GetPercentComplete returns the value of PercentComplete.
-func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) GetPercentComplete() OptInt {
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) GetPercentComplete() int {
 	return s.PercentComplete
 }
 
 // GetStartTime returns the value of StartTime.
-func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) GetStartTime() OptString {
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) GetStartTime() string {
 	return s.StartTime
 }
 
 // GetState returns the value of State.
-func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) GetState() OptString {
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) GetState() string {
 	return s.State
 }
 
 // GetStatus returns the value of Status.
-func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) GetStatus() OptString {
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) GetStatus() string {
 	return s.Status
 }
 
 // GetType returns the value of Type.
-func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) GetType() OptString {
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) GetType() string {
 	return s.Type
 }
 
 // SetEndTime sets the value of EndTime.
-func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetEndTime(val OptString) {
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetEndTime(val string) {
 	s.EndTime = val
 }
 
 // SetID sets the value of ID.
-func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetID(val OptString) {
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetID(val string) {
 	s.ID = val
 }
 
 // SetMessage sets the value of Message.
-func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetMessage(val OptString) {
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetMessage(val string) {
 	s.Message = val
 }
 
 // SetName sets the value of Name.
-func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetName(val OptString) {
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetName(val string) {
 	s.Name = val
 }
 
 // SetPercentComplete sets the value of PercentComplete.
-func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetPercentComplete(val OptInt) {
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetPercentComplete(val int) {
 	s.PercentComplete = val
 }
 
 // SetStartTime sets the value of StartTime.
-func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetStartTime(val OptString) {
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetStartTime(val string) {
 	s.StartTime = val
 }
 
 // SetState sets the value of State.
-func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetState(val OptString) {
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetState(val string) {
 	s.State = val
 }
 
 // SetStatus sets the value of Status.
-func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetStatus(val OptString) {
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetStatus(val string) {
 	s.Status = val
 }
 
 // SetType sets the value of Type.
-func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetType(val OptString) {
+func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetType(val string) {
 	s.Type = val
 }
 
 type BmcResponseModelBmcJobListSummary struct {
-	DurationMs  OptInt64  `json:"duration_ms"`
-	Failed      OptInt    `json:"failed"`
-	FailedNodes OptString `json:"failed_nodes"`
-	Succeeded   OptInt    `json:"succeeded"`
-	Total       OptInt    `json:"total"`
+	DurationMs  int64  `json:"duration_ms"`
+	Failed      int    `json:"failed"`
+	FailedNodes string `json:"failed_nodes"`
+	Succeeded   int    `json:"succeeded"`
+	Total       int    `json:"total"`
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcJobListSummary) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcJobListSummary) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetFailed returns the value of Failed.
-func (s *BmcResponseModelBmcJobListSummary) GetFailed() OptInt {
+func (s *BmcResponseModelBmcJobListSummary) GetFailed() int {
 	return s.Failed
 }
 
 // GetFailedNodes returns the value of FailedNodes.
-func (s *BmcResponseModelBmcJobListSummary) GetFailedNodes() OptString {
+func (s *BmcResponseModelBmcJobListSummary) GetFailedNodes() string {
 	return s.FailedNodes
 }
 
 // GetSucceeded returns the value of Succeeded.
-func (s *BmcResponseModelBmcJobListSummary) GetSucceeded() OptInt {
+func (s *BmcResponseModelBmcJobListSummary) GetSucceeded() int {
 	return s.Succeeded
 }
 
 // GetTotal returns the value of Total.
-func (s *BmcResponseModelBmcJobListSummary) GetTotal() OptInt {
+func (s *BmcResponseModelBmcJobListSummary) GetTotal() int {
 	return s.Total
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcJobListSummary) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcJobListSummary) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetFailed sets the value of Failed.
-func (s *BmcResponseModelBmcJobListSummary) SetFailed(val OptInt) {
+func (s *BmcResponseModelBmcJobListSummary) SetFailed(val int) {
 	s.Failed = val
 }
 
 // SetFailedNodes sets the value of FailedNodes.
-func (s *BmcResponseModelBmcJobListSummary) SetFailedNodes(val OptString) {
+func (s *BmcResponseModelBmcJobListSummary) SetFailedNodes(val string) {
 	s.FailedNodes = val
 }
 
 // SetSucceeded sets the value of Succeeded.
-func (s *BmcResponseModelBmcJobListSummary) SetSucceeded(val OptInt) {
+func (s *BmcResponseModelBmcJobListSummary) SetSucceeded(val int) {
 	s.Succeeded = val
 }
 
 // SetTotal sets the value of Total.
-func (s *BmcResponseModelBmcJobListSummary) SetTotal(val OptInt) {
+func (s *BmcResponseModelBmcJobListSummary) SetTotal(val int) {
 	s.Total = val
 }
 
 // BmcResponse_model.BmcLocationResult schema.
 // Ref: #/components/schemas/BmcResponse_model.BmcLocationResult
 type BmcResponseModelBmcLocationResult struct {
-	Results OptNilNilBmcResponseModelBmcLocationResultResultsItemArray `json:"results"`
-	RunID   OptString                                                  `json:"run_id"`
-	Summary OptBmcResponseModelBmcLocationResultSummary                `json:"summary"`
+	Results []BmcResponseModelBmcLocationResultResultsItem `json:"results"`
+	RunID   string                                         `json:"run_id"`
+	Summary BmcResponseModelBmcLocationResultSummary       `json:"summary"`
 }
 
 // GetResults returns the value of Results.
-func (s *BmcResponseModelBmcLocationResult) GetResults() OptNilNilBmcResponseModelBmcLocationResultResultsItemArray {
+func (s *BmcResponseModelBmcLocationResult) GetResults() []BmcResponseModelBmcLocationResultResultsItem {
 	return s.Results
 }
 
 // GetRunID returns the value of RunID.
-func (s *BmcResponseModelBmcLocationResult) GetRunID() OptString {
+func (s *BmcResponseModelBmcLocationResult) GetRunID() string {
 	return s.RunID
 }
 
 // GetSummary returns the value of Summary.
-func (s *BmcResponseModelBmcLocationResult) GetSummary() OptBmcResponseModelBmcLocationResultSummary {
+func (s *BmcResponseModelBmcLocationResult) GetSummary() BmcResponseModelBmcLocationResultSummary {
 	return s.Summary
 }
 
 // SetResults sets the value of Results.
-func (s *BmcResponseModelBmcLocationResult) SetResults(val OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) {
+func (s *BmcResponseModelBmcLocationResult) SetResults(val []BmcResponseModelBmcLocationResultResultsItem) {
 	s.Results = val
 }
 
 // SetRunID sets the value of RunID.
-func (s *BmcResponseModelBmcLocationResult) SetRunID(val OptString) {
+func (s *BmcResponseModelBmcLocationResult) SetRunID(val string) {
 	s.RunID = val
 }
 
 // SetSummary sets the value of Summary.
-func (s *BmcResponseModelBmcLocationResult) SetSummary(val OptBmcResponseModelBmcLocationResultSummary) {
+func (s *BmcResponseModelBmcLocationResult) SetSummary(val BmcResponseModelBmcLocationResultSummary) {
 	s.Summary = val
 }
 
 type BmcResponseModelBmcLocationResultResultsItem struct {
 	Data       OptNilBmcResponseModelBmcLocationResultResultsItemData `json:"data"`
-	DurationMs OptInt64                                               `json:"duration_ms"`
-	Message    OptString                                              `json:"message"`
-	Node       OptString                                              `json:"node"`
-	Success    OptBool                                                `json:"success"`
+	DurationMs int64                                                  `json:"duration_ms"`
+	Message    string                                                 `json:"message"`
+	Node       string                                                 `json:"node"`
+	Success    bool                                                   `json:"success"`
 }
 
 // GetData returns the value of Data.
@@ -2349,22 +2349,22 @@ func (s *BmcResponseModelBmcLocationResultResultsItem) GetData() OptNilBmcRespon
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcLocationResultResultsItem) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcLocationResultResultsItem) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetMessage returns the value of Message.
-func (s *BmcResponseModelBmcLocationResultResultsItem) GetMessage() OptString {
+func (s *BmcResponseModelBmcLocationResultResultsItem) GetMessage() string {
 	return s.Message
 }
 
 // GetNode returns the value of Node.
-func (s *BmcResponseModelBmcLocationResultResultsItem) GetNode() OptString {
+func (s *BmcResponseModelBmcLocationResultResultsItem) GetNode() string {
 	return s.Node
 }
 
 // GetSuccess returns the value of Success.
-func (s *BmcResponseModelBmcLocationResultResultsItem) GetSuccess() OptBool {
+func (s *BmcResponseModelBmcLocationResultResultsItem) GetSuccess() bool {
 	return s.Success
 }
 
@@ -2374,76 +2374,76 @@ func (s *BmcResponseModelBmcLocationResultResultsItem) SetData(val OptNilBmcResp
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcLocationResultResultsItem) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcLocationResultResultsItem) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetMessage sets the value of Message.
-func (s *BmcResponseModelBmcLocationResultResultsItem) SetMessage(val OptString) {
+func (s *BmcResponseModelBmcLocationResultResultsItem) SetMessage(val string) {
 	s.Message = val
 }
 
 // SetNode sets the value of Node.
-func (s *BmcResponseModelBmcLocationResultResultsItem) SetNode(val OptString) {
+func (s *BmcResponseModelBmcLocationResultResultsItem) SetNode(val string) {
 	s.Node = val
 }
 
 // SetSuccess sets the value of Success.
-func (s *BmcResponseModelBmcLocationResultResultsItem) SetSuccess(val OptBool) {
+func (s *BmcResponseModelBmcLocationResultResultsItem) SetSuccess(val bool) {
 	s.Success = val
 }
 
 type BmcResponseModelBmcLocationResultResultsItemData struct {
-	Changed OptBool                                                    `json:"changed"`
-	Current OptBmcResponseModelBmcLocationResultResultsItemDataCurrent `json:"current"`
-	Desired OptBmcResponseModelBmcLocationResultResultsItemDataDesired `json:"desired"`
+	Changed bool                                                    `json:"changed"`
+	Current BmcResponseModelBmcLocationResultResultsItemDataCurrent `json:"current"`
+	Desired BmcResponseModelBmcLocationResultResultsItemDataDesired `json:"desired"`
 }
 
 // GetChanged returns the value of Changed.
-func (s *BmcResponseModelBmcLocationResultResultsItemData) GetChanged() OptBool {
+func (s *BmcResponseModelBmcLocationResultResultsItemData) GetChanged() bool {
 	return s.Changed
 }
 
 // GetCurrent returns the value of Current.
-func (s *BmcResponseModelBmcLocationResultResultsItemData) GetCurrent() OptBmcResponseModelBmcLocationResultResultsItemDataCurrent {
+func (s *BmcResponseModelBmcLocationResultResultsItemData) GetCurrent() BmcResponseModelBmcLocationResultResultsItemDataCurrent {
 	return s.Current
 }
 
 // GetDesired returns the value of Desired.
-func (s *BmcResponseModelBmcLocationResultResultsItemData) GetDesired() OptBmcResponseModelBmcLocationResultResultsItemDataDesired {
+func (s *BmcResponseModelBmcLocationResultResultsItemData) GetDesired() BmcResponseModelBmcLocationResultResultsItemDataDesired {
 	return s.Desired
 }
 
 // SetChanged sets the value of Changed.
-func (s *BmcResponseModelBmcLocationResultResultsItemData) SetChanged(val OptBool) {
+func (s *BmcResponseModelBmcLocationResultResultsItemData) SetChanged(val bool) {
 	s.Changed = val
 }
 
 // SetCurrent sets the value of Current.
-func (s *BmcResponseModelBmcLocationResultResultsItemData) SetCurrent(val OptBmcResponseModelBmcLocationResultResultsItemDataCurrent) {
+func (s *BmcResponseModelBmcLocationResultResultsItemData) SetCurrent(val BmcResponseModelBmcLocationResultResultsItemDataCurrent) {
 	s.Current = val
 }
 
 // SetDesired sets the value of Desired.
-func (s *BmcResponseModelBmcLocationResultResultsItemData) SetDesired(val OptBmcResponseModelBmcLocationResultResultsItemDataDesired) {
+func (s *BmcResponseModelBmcLocationResultResultsItemData) SetDesired(val BmcResponseModelBmcLocationResultResultsItemDataDesired) {
 	s.Desired = val
 }
 
 type BmcResponseModelBmcLocationResultResultsItemDataCurrent struct {
-	Datacenter OptString `json:"datacenter"`
-	Rack       OptString `json:"rack"`
+	Datacenter string    `json:"datacenter"`
+	Rack       string    `json:"rack"`
 	RackUnit   OptNilInt `json:"rack_unit"`
-	Room       OptString `json:"room"`
-	Row        OptString `json:"row"`
+	Room       string    `json:"room"`
+	Row        string    `json:"row"`
 }
 
 // GetDatacenter returns the value of Datacenter.
-func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) GetDatacenter() OptString {
+func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) GetDatacenter() string {
 	return s.Datacenter
 }
 
 // GetRack returns the value of Rack.
-func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) GetRack() OptString {
+func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) GetRack() string {
 	return s.Rack
 }
 
@@ -2453,22 +2453,22 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) GetRackUnit() 
 }
 
 // GetRoom returns the value of Room.
-func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) GetRoom() OptString {
+func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) GetRoom() string {
 	return s.Room
 }
 
 // GetRow returns the value of Row.
-func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) GetRow() OptString {
+func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) GetRow() string {
 	return s.Row
 }
 
 // SetDatacenter sets the value of Datacenter.
-func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) SetDatacenter(val OptString) {
+func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) SetDatacenter(val string) {
 	s.Datacenter = val
 }
 
 // SetRack sets the value of Rack.
-func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) SetRack(val OptString) {
+func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) SetRack(val string) {
 	s.Rack = val
 }
 
@@ -2478,30 +2478,30 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) SetRackUnit(va
 }
 
 // SetRoom sets the value of Room.
-func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) SetRoom(val OptString) {
+func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) SetRoom(val string) {
 	s.Room = val
 }
 
 // SetRow sets the value of Row.
-func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) SetRow(val OptString) {
+func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) SetRow(val string) {
 	s.Row = val
 }
 
 type BmcResponseModelBmcLocationResultResultsItemDataDesired struct {
-	Datacenter OptString `json:"datacenter"`
-	Rack       OptString `json:"rack"`
+	Datacenter string    `json:"datacenter"`
+	Rack       string    `json:"rack"`
 	RackUnit   OptNilInt `json:"rack_unit"`
-	Room       OptString `json:"room"`
-	Row        OptString `json:"row"`
+	Room       string    `json:"room"`
+	Row        string    `json:"row"`
 }
 
 // GetDatacenter returns the value of Datacenter.
-func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) GetDatacenter() OptString {
+func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) GetDatacenter() string {
 	return s.Datacenter
 }
 
 // GetRack returns the value of Rack.
-func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) GetRack() OptString {
+func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) GetRack() string {
 	return s.Rack
 }
 
@@ -2511,22 +2511,22 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) GetRackUnit() 
 }
 
 // GetRoom returns the value of Room.
-func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) GetRoom() OptString {
+func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) GetRoom() string {
 	return s.Room
 }
 
 // GetRow returns the value of Row.
-func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) GetRow() OptString {
+func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) GetRow() string {
 	return s.Row
 }
 
 // SetDatacenter sets the value of Datacenter.
-func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) SetDatacenter(val OptString) {
+func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) SetDatacenter(val string) {
 	s.Datacenter = val
 }
 
 // SetRack sets the value of Rack.
-func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) SetRack(val OptString) {
+func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) SetRack(val string) {
 	s.Rack = val
 }
 
@@ -2536,117 +2536,117 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) SetRackUnit(va
 }
 
 // SetRoom sets the value of Room.
-func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) SetRoom(val OptString) {
+func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) SetRoom(val string) {
 	s.Room = val
 }
 
 // SetRow sets the value of Row.
-func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) SetRow(val OptString) {
+func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) SetRow(val string) {
 	s.Row = val
 }
 
 type BmcResponseModelBmcLocationResultSummary struct {
-	DurationMs  OptInt64  `json:"duration_ms"`
-	Failed      OptInt    `json:"failed"`
-	FailedNodes OptString `json:"failed_nodes"`
-	Succeeded   OptInt    `json:"succeeded"`
-	Total       OptInt    `json:"total"`
+	DurationMs  int64  `json:"duration_ms"`
+	Failed      int    `json:"failed"`
+	FailedNodes string `json:"failed_nodes"`
+	Succeeded   int    `json:"succeeded"`
+	Total       int    `json:"total"`
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcLocationResultSummary) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcLocationResultSummary) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetFailed returns the value of Failed.
-func (s *BmcResponseModelBmcLocationResultSummary) GetFailed() OptInt {
+func (s *BmcResponseModelBmcLocationResultSummary) GetFailed() int {
 	return s.Failed
 }
 
 // GetFailedNodes returns the value of FailedNodes.
-func (s *BmcResponseModelBmcLocationResultSummary) GetFailedNodes() OptString {
+func (s *BmcResponseModelBmcLocationResultSummary) GetFailedNodes() string {
 	return s.FailedNodes
 }
 
 // GetSucceeded returns the value of Succeeded.
-func (s *BmcResponseModelBmcLocationResultSummary) GetSucceeded() OptInt {
+func (s *BmcResponseModelBmcLocationResultSummary) GetSucceeded() int {
 	return s.Succeeded
 }
 
 // GetTotal returns the value of Total.
-func (s *BmcResponseModelBmcLocationResultSummary) GetTotal() OptInt {
+func (s *BmcResponseModelBmcLocationResultSummary) GetTotal() int {
 	return s.Total
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcLocationResultSummary) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcLocationResultSummary) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetFailed sets the value of Failed.
-func (s *BmcResponseModelBmcLocationResultSummary) SetFailed(val OptInt) {
+func (s *BmcResponseModelBmcLocationResultSummary) SetFailed(val int) {
 	s.Failed = val
 }
 
 // SetFailedNodes sets the value of FailedNodes.
-func (s *BmcResponseModelBmcLocationResultSummary) SetFailedNodes(val OptString) {
+func (s *BmcResponseModelBmcLocationResultSummary) SetFailedNodes(val string) {
 	s.FailedNodes = val
 }
 
 // SetSucceeded sets the value of Succeeded.
-func (s *BmcResponseModelBmcLocationResultSummary) SetSucceeded(val OptInt) {
+func (s *BmcResponseModelBmcLocationResultSummary) SetSucceeded(val int) {
 	s.Succeeded = val
 }
 
 // SetTotal sets the value of Total.
-func (s *BmcResponseModelBmcLocationResultSummary) SetTotal(val OptInt) {
+func (s *BmcResponseModelBmcLocationResultSummary) SetTotal(val int) {
 	s.Total = val
 }
 
 // BmcResponse_model.BmcNICList schema.
 // Ref: #/components/schemas/BmcResponse_model.BmcNICList
 type BmcResponseModelBmcNICList struct {
-	Results OptNilNilBmcResponseModelBmcNICListResultsItemArray `json:"results"`
-	RunID   OptString                                           `json:"run_id"`
-	Summary OptBmcResponseModelBmcNICListSummary                `json:"summary"`
+	Results []BmcResponseModelBmcNICListResultsItem `json:"results"`
+	RunID   string                                  `json:"run_id"`
+	Summary BmcResponseModelBmcNICListSummary       `json:"summary"`
 }
 
 // GetResults returns the value of Results.
-func (s *BmcResponseModelBmcNICList) GetResults() OptNilNilBmcResponseModelBmcNICListResultsItemArray {
+func (s *BmcResponseModelBmcNICList) GetResults() []BmcResponseModelBmcNICListResultsItem {
 	return s.Results
 }
 
 // GetRunID returns the value of RunID.
-func (s *BmcResponseModelBmcNICList) GetRunID() OptString {
+func (s *BmcResponseModelBmcNICList) GetRunID() string {
 	return s.RunID
 }
 
 // GetSummary returns the value of Summary.
-func (s *BmcResponseModelBmcNICList) GetSummary() OptBmcResponseModelBmcNICListSummary {
+func (s *BmcResponseModelBmcNICList) GetSummary() BmcResponseModelBmcNICListSummary {
 	return s.Summary
 }
 
 // SetResults sets the value of Results.
-func (s *BmcResponseModelBmcNICList) SetResults(val OptNilNilBmcResponseModelBmcNICListResultsItemArray) {
+func (s *BmcResponseModelBmcNICList) SetResults(val []BmcResponseModelBmcNICListResultsItem) {
 	s.Results = val
 }
 
 // SetRunID sets the value of RunID.
-func (s *BmcResponseModelBmcNICList) SetRunID(val OptString) {
+func (s *BmcResponseModelBmcNICList) SetRunID(val string) {
 	s.RunID = val
 }
 
 // SetSummary sets the value of Summary.
-func (s *BmcResponseModelBmcNICList) SetSummary(val OptBmcResponseModelBmcNICListSummary) {
+func (s *BmcResponseModelBmcNICList) SetSummary(val BmcResponseModelBmcNICListSummary) {
 	s.Summary = val
 }
 
 type BmcResponseModelBmcNICListResultsItem struct {
 	Data       OptNilBmcResponseModelBmcNICListResultsItemData `json:"data"`
-	DurationMs OptInt64                                        `json:"duration_ms"`
-	Message    OptString                                       `json:"message"`
-	Node       OptString                                       `json:"node"`
-	Success    OptBool                                         `json:"success"`
+	DurationMs int64                                           `json:"duration_ms"`
+	Message    string                                          `json:"message"`
+	Node       string                                          `json:"node"`
+	Success    bool                                            `json:"success"`
 }
 
 // GetData returns the value of Data.
@@ -2655,22 +2655,22 @@ func (s *BmcResponseModelBmcNICListResultsItem) GetData() OptNilBmcResponseModel
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcNICListResultsItem) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcNICListResultsItem) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetMessage returns the value of Message.
-func (s *BmcResponseModelBmcNICListResultsItem) GetMessage() OptString {
+func (s *BmcResponseModelBmcNICListResultsItem) GetMessage() string {
 	return s.Message
 }
 
 // GetNode returns the value of Node.
-func (s *BmcResponseModelBmcNICListResultsItem) GetNode() OptString {
+func (s *BmcResponseModelBmcNICListResultsItem) GetNode() string {
 	return s.Node
 }
 
 // GetSuccess returns the value of Success.
-func (s *BmcResponseModelBmcNICListResultsItem) GetSuccess() OptBool {
+func (s *BmcResponseModelBmcNICListResultsItem) GetSuccess() bool {
 	return s.Success
 }
 
@@ -2680,210 +2680,210 @@ func (s *BmcResponseModelBmcNICListResultsItem) SetData(val OptNilBmcResponseMod
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcNICListResultsItem) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcNICListResultsItem) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetMessage sets the value of Message.
-func (s *BmcResponseModelBmcNICListResultsItem) SetMessage(val OptString) {
+func (s *BmcResponseModelBmcNICListResultsItem) SetMessage(val string) {
 	s.Message = val
 }
 
 // SetNode sets the value of Node.
-func (s *BmcResponseModelBmcNICListResultsItem) SetNode(val OptString) {
+func (s *BmcResponseModelBmcNICListResultsItem) SetNode(val string) {
 	s.Node = val
 }
 
 // SetSuccess sets the value of Success.
-func (s *BmcResponseModelBmcNICListResultsItem) SetSuccess(val OptBool) {
+func (s *BmcResponseModelBmcNICListResultsItem) SetSuccess(val bool) {
 	s.Success = val
 }
 
 type BmcResponseModelBmcNICListResultsItemData struct {
-	Nics OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray `json:"nics"`
+	Nics OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray `json:"nics"`
 }
 
 // GetNics returns the value of Nics.
-func (s *BmcResponseModelBmcNICListResultsItemData) GetNics() OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray {
+func (s *BmcResponseModelBmcNICListResultsItemData) GetNics() OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray {
 	return s.Nics
 }
 
 // SetNics sets the value of Nics.
-func (s *BmcResponseModelBmcNICListResultsItemData) SetNics(val OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) {
+func (s *BmcResponseModelBmcNICListResultsItemData) SetNics(val OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) {
 	s.Nics = val
 }
 
 type BmcResponseModelBmcNICListResultsItemDataNicsItem struct {
-	Enabled   OptBool   `json:"enabled"`
-	ID        OptString `json:"id"`
-	Link      OptString `json:"link"`
-	MAC       OptString `json:"mac"`
-	Name      OptString `json:"name"`
-	SpeedMbps OptInt    `json:"speed_mbps"`
+	Enabled   bool   `json:"enabled"`
+	ID        string `json:"id"`
+	Link      string `json:"link"`
+	MAC       string `json:"mac"`
+	Name      string `json:"name"`
+	SpeedMbps int    `json:"speed_mbps"`
 }
 
 // GetEnabled returns the value of Enabled.
-func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) GetEnabled() OptBool {
+func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) GetEnabled() bool {
 	return s.Enabled
 }
 
 // GetID returns the value of ID.
-func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) GetID() OptString {
+func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) GetID() string {
 	return s.ID
 }
 
 // GetLink returns the value of Link.
-func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) GetLink() OptString {
+func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) GetLink() string {
 	return s.Link
 }
 
 // GetMAC returns the value of MAC.
-func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) GetMAC() OptString {
+func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) GetMAC() string {
 	return s.MAC
 }
 
 // GetName returns the value of Name.
-func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) GetName() OptString {
+func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) GetName() string {
 	return s.Name
 }
 
 // GetSpeedMbps returns the value of SpeedMbps.
-func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) GetSpeedMbps() OptInt {
+func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) GetSpeedMbps() int {
 	return s.SpeedMbps
 }
 
 // SetEnabled sets the value of Enabled.
-func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) SetEnabled(val OptBool) {
+func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) SetEnabled(val bool) {
 	s.Enabled = val
 }
 
 // SetID sets the value of ID.
-func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) SetID(val OptString) {
+func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) SetID(val string) {
 	s.ID = val
 }
 
 // SetLink sets the value of Link.
-func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) SetLink(val OptString) {
+func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) SetLink(val string) {
 	s.Link = val
 }
 
 // SetMAC sets the value of MAC.
-func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) SetMAC(val OptString) {
+func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) SetMAC(val string) {
 	s.MAC = val
 }
 
 // SetName sets the value of Name.
-func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) SetName(val OptString) {
+func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) SetName(val string) {
 	s.Name = val
 }
 
 // SetSpeedMbps sets the value of SpeedMbps.
-func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) SetSpeedMbps(val OptInt) {
+func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) SetSpeedMbps(val int) {
 	s.SpeedMbps = val
 }
 
 type BmcResponseModelBmcNICListSummary struct {
-	DurationMs  OptInt64  `json:"duration_ms"`
-	Failed      OptInt    `json:"failed"`
-	FailedNodes OptString `json:"failed_nodes"`
-	Succeeded   OptInt    `json:"succeeded"`
-	Total       OptInt    `json:"total"`
+	DurationMs  int64  `json:"duration_ms"`
+	Failed      int    `json:"failed"`
+	FailedNodes string `json:"failed_nodes"`
+	Succeeded   int    `json:"succeeded"`
+	Total       int    `json:"total"`
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcNICListSummary) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcNICListSummary) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetFailed returns the value of Failed.
-func (s *BmcResponseModelBmcNICListSummary) GetFailed() OptInt {
+func (s *BmcResponseModelBmcNICListSummary) GetFailed() int {
 	return s.Failed
 }
 
 // GetFailedNodes returns the value of FailedNodes.
-func (s *BmcResponseModelBmcNICListSummary) GetFailedNodes() OptString {
+func (s *BmcResponseModelBmcNICListSummary) GetFailedNodes() string {
 	return s.FailedNodes
 }
 
 // GetSucceeded returns the value of Succeeded.
-func (s *BmcResponseModelBmcNICListSummary) GetSucceeded() OptInt {
+func (s *BmcResponseModelBmcNICListSummary) GetSucceeded() int {
 	return s.Succeeded
 }
 
 // GetTotal returns the value of Total.
-func (s *BmcResponseModelBmcNICListSummary) GetTotal() OptInt {
+func (s *BmcResponseModelBmcNICListSummary) GetTotal() int {
 	return s.Total
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcNICListSummary) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcNICListSummary) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetFailed sets the value of Failed.
-func (s *BmcResponseModelBmcNICListSummary) SetFailed(val OptInt) {
+func (s *BmcResponseModelBmcNICListSummary) SetFailed(val int) {
 	s.Failed = val
 }
 
 // SetFailedNodes sets the value of FailedNodes.
-func (s *BmcResponseModelBmcNICListSummary) SetFailedNodes(val OptString) {
+func (s *BmcResponseModelBmcNICListSummary) SetFailedNodes(val string) {
 	s.FailedNodes = val
 }
 
 // SetSucceeded sets the value of Succeeded.
-func (s *BmcResponseModelBmcNICListSummary) SetSucceeded(val OptInt) {
+func (s *BmcResponseModelBmcNICListSummary) SetSucceeded(val int) {
 	s.Succeeded = val
 }
 
 // SetTotal sets the value of Total.
-func (s *BmcResponseModelBmcNICListSummary) SetTotal(val OptInt) {
+func (s *BmcResponseModelBmcNICListSummary) SetTotal(val int) {
 	s.Total = val
 }
 
 // BmcResponse_model.BmcSELLog schema.
 // Ref: #/components/schemas/BmcResponse_model.BmcSELLog
 type BmcResponseModelBmcSELLog struct {
-	Results OptNilNilBmcResponseModelBmcSELLogResultsItemArray `json:"results"`
-	RunID   OptString                                          `json:"run_id"`
-	Summary OptBmcResponseModelBmcSELLogSummary                `json:"summary"`
+	Results []BmcResponseModelBmcSELLogResultsItem `json:"results"`
+	RunID   string                                 `json:"run_id"`
+	Summary BmcResponseModelBmcSELLogSummary       `json:"summary"`
 }
 
 // GetResults returns the value of Results.
-func (s *BmcResponseModelBmcSELLog) GetResults() OptNilNilBmcResponseModelBmcSELLogResultsItemArray {
+func (s *BmcResponseModelBmcSELLog) GetResults() []BmcResponseModelBmcSELLogResultsItem {
 	return s.Results
 }
 
 // GetRunID returns the value of RunID.
-func (s *BmcResponseModelBmcSELLog) GetRunID() OptString {
+func (s *BmcResponseModelBmcSELLog) GetRunID() string {
 	return s.RunID
 }
 
 // GetSummary returns the value of Summary.
-func (s *BmcResponseModelBmcSELLog) GetSummary() OptBmcResponseModelBmcSELLogSummary {
+func (s *BmcResponseModelBmcSELLog) GetSummary() BmcResponseModelBmcSELLogSummary {
 	return s.Summary
 }
 
 // SetResults sets the value of Results.
-func (s *BmcResponseModelBmcSELLog) SetResults(val OptNilNilBmcResponseModelBmcSELLogResultsItemArray) {
+func (s *BmcResponseModelBmcSELLog) SetResults(val []BmcResponseModelBmcSELLogResultsItem) {
 	s.Results = val
 }
 
 // SetRunID sets the value of RunID.
-func (s *BmcResponseModelBmcSELLog) SetRunID(val OptString) {
+func (s *BmcResponseModelBmcSELLog) SetRunID(val string) {
 	s.RunID = val
 }
 
 // SetSummary sets the value of Summary.
-func (s *BmcResponseModelBmcSELLog) SetSummary(val OptBmcResponseModelBmcSELLogSummary) {
+func (s *BmcResponseModelBmcSELLog) SetSummary(val BmcResponseModelBmcSELLogSummary) {
 	s.Summary = val
 }
 
 type BmcResponseModelBmcSELLogResultsItem struct {
 	Data       OptNilBmcResponseModelBmcSELLogResultsItemData `json:"data"`
-	DurationMs OptInt64                                       `json:"duration_ms"`
-	Message    OptString                                      `json:"message"`
-	Node       OptString                                      `json:"node"`
-	Success    OptBool                                        `json:"success"`
+	DurationMs int64                                          `json:"duration_ms"`
+	Message    string                                         `json:"message"`
+	Node       string                                         `json:"node"`
+	Success    bool                                           `json:"success"`
 }
 
 // GetData returns the value of Data.
@@ -2892,22 +2892,22 @@ func (s *BmcResponseModelBmcSELLogResultsItem) GetData() OptNilBmcResponseModelB
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcSELLogResultsItem) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcSELLogResultsItem) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetMessage returns the value of Message.
-func (s *BmcResponseModelBmcSELLogResultsItem) GetMessage() OptString {
+func (s *BmcResponseModelBmcSELLogResultsItem) GetMessage() string {
 	return s.Message
 }
 
 // GetNode returns the value of Node.
-func (s *BmcResponseModelBmcSELLogResultsItem) GetNode() OptString {
+func (s *BmcResponseModelBmcSELLogResultsItem) GetNode() string {
 	return s.Node
 }
 
 // GetSuccess returns the value of Success.
-func (s *BmcResponseModelBmcSELLogResultsItem) GetSuccess() OptBool {
+func (s *BmcResponseModelBmcSELLogResultsItem) GetSuccess() bool {
 	return s.Success
 }
 
@@ -2917,232 +2917,232 @@ func (s *BmcResponseModelBmcSELLogResultsItem) SetData(val OptNilBmcResponseMode
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcSELLogResultsItem) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcSELLogResultsItem) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetMessage sets the value of Message.
-func (s *BmcResponseModelBmcSELLogResultsItem) SetMessage(val OptString) {
+func (s *BmcResponseModelBmcSELLogResultsItem) SetMessage(val string) {
 	s.Message = val
 }
 
 // SetNode sets the value of Node.
-func (s *BmcResponseModelBmcSELLogResultsItem) SetNode(val OptString) {
+func (s *BmcResponseModelBmcSELLogResultsItem) SetNode(val string) {
 	s.Node = val
 }
 
 // SetSuccess sets the value of Success.
-func (s *BmcResponseModelBmcSELLogResultsItem) SetSuccess(val OptBool) {
+func (s *BmcResponseModelBmcSELLogResultsItem) SetSuccess(val bool) {
 	s.Success = val
 }
 
 type BmcResponseModelBmcSELLogResultsItemData struct {
-	Entries OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray `json:"entries"`
+	Entries OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray `json:"entries"`
 }
 
 // GetEntries returns the value of Entries.
-func (s *BmcResponseModelBmcSELLogResultsItemData) GetEntries() OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray {
+func (s *BmcResponseModelBmcSELLogResultsItemData) GetEntries() OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray {
 	return s.Entries
 }
 
 // SetEntries sets the value of Entries.
-func (s *BmcResponseModelBmcSELLogResultsItemData) SetEntries(val OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) {
+func (s *BmcResponseModelBmcSELLogResultsItemData) SetEntries(val OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) {
 	s.Entries = val
 }
 
 type BmcResponseModelBmcSELLogResultsItemDataEntriesItem struct {
-	Created    OptString `json:"created"`
-	EntryType  OptString `json:"entry_type"`
-	ID         OptString `json:"id"`
-	Message    OptString `json:"message"`
-	MessageID  OptString `json:"message_id"`
-	Resolution OptString `json:"resolution"`
-	SensorType OptString `json:"sensor_type"`
-	Severity   OptString `json:"severity"`
+	Created    string `json:"created"`
+	EntryType  string `json:"entry_type"`
+	ID         string `json:"id"`
+	Message    string `json:"message"`
+	MessageID  string `json:"message_id"`
+	Resolution string `json:"resolution"`
+	SensorType string `json:"sensor_type"`
+	Severity   string `json:"severity"`
 }
 
 // GetCreated returns the value of Created.
-func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) GetCreated() OptString {
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) GetCreated() string {
 	return s.Created
 }
 
 // GetEntryType returns the value of EntryType.
-func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) GetEntryType() OptString {
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) GetEntryType() string {
 	return s.EntryType
 }
 
 // GetID returns the value of ID.
-func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) GetID() OptString {
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) GetID() string {
 	return s.ID
 }
 
 // GetMessage returns the value of Message.
-func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) GetMessage() OptString {
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) GetMessage() string {
 	return s.Message
 }
 
 // GetMessageID returns the value of MessageID.
-func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) GetMessageID() OptString {
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) GetMessageID() string {
 	return s.MessageID
 }
 
 // GetResolution returns the value of Resolution.
-func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) GetResolution() OptString {
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) GetResolution() string {
 	return s.Resolution
 }
 
 // GetSensorType returns the value of SensorType.
-func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) GetSensorType() OptString {
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) GetSensorType() string {
 	return s.SensorType
 }
 
 // GetSeverity returns the value of Severity.
-func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) GetSeverity() OptString {
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) GetSeverity() string {
 	return s.Severity
 }
 
 // SetCreated sets the value of Created.
-func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetCreated(val OptString) {
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetCreated(val string) {
 	s.Created = val
 }
 
 // SetEntryType sets the value of EntryType.
-func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetEntryType(val OptString) {
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetEntryType(val string) {
 	s.EntryType = val
 }
 
 // SetID sets the value of ID.
-func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetID(val OptString) {
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetID(val string) {
 	s.ID = val
 }
 
 // SetMessage sets the value of Message.
-func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetMessage(val OptString) {
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetMessage(val string) {
 	s.Message = val
 }
 
 // SetMessageID sets the value of MessageID.
-func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetMessageID(val OptString) {
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetMessageID(val string) {
 	s.MessageID = val
 }
 
 // SetResolution sets the value of Resolution.
-func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetResolution(val OptString) {
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetResolution(val string) {
 	s.Resolution = val
 }
 
 // SetSensorType sets the value of SensorType.
-func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetSensorType(val OptString) {
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetSensorType(val string) {
 	s.SensorType = val
 }
 
 // SetSeverity sets the value of Severity.
-func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetSeverity(val OptString) {
+func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetSeverity(val string) {
 	s.Severity = val
 }
 
 type BmcResponseModelBmcSELLogSummary struct {
-	DurationMs  OptInt64  `json:"duration_ms"`
-	Failed      OptInt    `json:"failed"`
-	FailedNodes OptString `json:"failed_nodes"`
-	Succeeded   OptInt    `json:"succeeded"`
-	Total       OptInt    `json:"total"`
+	DurationMs  int64  `json:"duration_ms"`
+	Failed      int    `json:"failed"`
+	FailedNodes string `json:"failed_nodes"`
+	Succeeded   int    `json:"succeeded"`
+	Total       int    `json:"total"`
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcSELLogSummary) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcSELLogSummary) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetFailed returns the value of Failed.
-func (s *BmcResponseModelBmcSELLogSummary) GetFailed() OptInt {
+func (s *BmcResponseModelBmcSELLogSummary) GetFailed() int {
 	return s.Failed
 }
 
 // GetFailedNodes returns the value of FailedNodes.
-func (s *BmcResponseModelBmcSELLogSummary) GetFailedNodes() OptString {
+func (s *BmcResponseModelBmcSELLogSummary) GetFailedNodes() string {
 	return s.FailedNodes
 }
 
 // GetSucceeded returns the value of Succeeded.
-func (s *BmcResponseModelBmcSELLogSummary) GetSucceeded() OptInt {
+func (s *BmcResponseModelBmcSELLogSummary) GetSucceeded() int {
 	return s.Succeeded
 }
 
 // GetTotal returns the value of Total.
-func (s *BmcResponseModelBmcSELLogSummary) GetTotal() OptInt {
+func (s *BmcResponseModelBmcSELLogSummary) GetTotal() int {
 	return s.Total
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcSELLogSummary) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcSELLogSummary) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetFailed sets the value of Failed.
-func (s *BmcResponseModelBmcSELLogSummary) SetFailed(val OptInt) {
+func (s *BmcResponseModelBmcSELLogSummary) SetFailed(val int) {
 	s.Failed = val
 }
 
 // SetFailedNodes sets the value of FailedNodes.
-func (s *BmcResponseModelBmcSELLogSummary) SetFailedNodes(val OptString) {
+func (s *BmcResponseModelBmcSELLogSummary) SetFailedNodes(val string) {
 	s.FailedNodes = val
 }
 
 // SetSucceeded sets the value of Succeeded.
-func (s *BmcResponseModelBmcSELLogSummary) SetSucceeded(val OptInt) {
+func (s *BmcResponseModelBmcSELLogSummary) SetSucceeded(val int) {
 	s.Succeeded = val
 }
 
 // SetTotal sets the value of Total.
-func (s *BmcResponseModelBmcSELLogSummary) SetTotal(val OptInt) {
+func (s *BmcResponseModelBmcSELLogSummary) SetTotal(val int) {
 	s.Total = val
 }
 
 // BmcResponse_model.BmcSecureBoot schema.
 // Ref: #/components/schemas/BmcResponse_model.BmcSecureBoot
 type BmcResponseModelBmcSecureBoot struct {
-	Results OptNilNilBmcResponseModelBmcSecureBootResultsItemArray `json:"results"`
-	RunID   OptString                                              `json:"run_id"`
-	Summary OptBmcResponseModelBmcSecureBootSummary                `json:"summary"`
+	Results []BmcResponseModelBmcSecureBootResultsItem `json:"results"`
+	RunID   string                                     `json:"run_id"`
+	Summary BmcResponseModelBmcSecureBootSummary       `json:"summary"`
 }
 
 // GetResults returns the value of Results.
-func (s *BmcResponseModelBmcSecureBoot) GetResults() OptNilNilBmcResponseModelBmcSecureBootResultsItemArray {
+func (s *BmcResponseModelBmcSecureBoot) GetResults() []BmcResponseModelBmcSecureBootResultsItem {
 	return s.Results
 }
 
 // GetRunID returns the value of RunID.
-func (s *BmcResponseModelBmcSecureBoot) GetRunID() OptString {
+func (s *BmcResponseModelBmcSecureBoot) GetRunID() string {
 	return s.RunID
 }
 
 // GetSummary returns the value of Summary.
-func (s *BmcResponseModelBmcSecureBoot) GetSummary() OptBmcResponseModelBmcSecureBootSummary {
+func (s *BmcResponseModelBmcSecureBoot) GetSummary() BmcResponseModelBmcSecureBootSummary {
 	return s.Summary
 }
 
 // SetResults sets the value of Results.
-func (s *BmcResponseModelBmcSecureBoot) SetResults(val OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) {
+func (s *BmcResponseModelBmcSecureBoot) SetResults(val []BmcResponseModelBmcSecureBootResultsItem) {
 	s.Results = val
 }
 
 // SetRunID sets the value of RunID.
-func (s *BmcResponseModelBmcSecureBoot) SetRunID(val OptString) {
+func (s *BmcResponseModelBmcSecureBoot) SetRunID(val string) {
 	s.RunID = val
 }
 
 // SetSummary sets the value of Summary.
-func (s *BmcResponseModelBmcSecureBoot) SetSummary(val OptBmcResponseModelBmcSecureBootSummary) {
+func (s *BmcResponseModelBmcSecureBoot) SetSummary(val BmcResponseModelBmcSecureBootSummary) {
 	s.Summary = val
 }
 
 type BmcResponseModelBmcSecureBootResultsItem struct {
 	Data       OptNilBmcResponseModelBmcSecureBootResultsItemData `json:"data"`
-	DurationMs OptInt64                                           `json:"duration_ms"`
-	Message    OptString                                          `json:"message"`
-	Node       OptString                                          `json:"node"`
-	Success    OptBool                                            `json:"success"`
+	DurationMs int64                                              `json:"duration_ms"`
+	Message    string                                             `json:"message"`
+	Node       string                                             `json:"node"`
+	Success    bool                                               `json:"success"`
 }
 
 // GetData returns the value of Data.
@@ -3151,22 +3151,22 @@ func (s *BmcResponseModelBmcSecureBootResultsItem) GetData() OptNilBmcResponseMo
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcSecureBootResultsItem) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcSecureBootResultsItem) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetMessage returns the value of Message.
-func (s *BmcResponseModelBmcSecureBootResultsItem) GetMessage() OptString {
+func (s *BmcResponseModelBmcSecureBootResultsItem) GetMessage() string {
 	return s.Message
 }
 
 // GetNode returns the value of Node.
-func (s *BmcResponseModelBmcSecureBootResultsItem) GetNode() OptString {
+func (s *BmcResponseModelBmcSecureBootResultsItem) GetNode() string {
 	return s.Node
 }
 
 // GetSuccess returns the value of Success.
-func (s *BmcResponseModelBmcSecureBootResultsItem) GetSuccess() OptBool {
+func (s *BmcResponseModelBmcSecureBootResultsItem) GetSuccess() bool {
 	return s.Success
 }
 
@@ -3176,36 +3176,36 @@ func (s *BmcResponseModelBmcSecureBootResultsItem) SetData(val OptNilBmcResponse
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcSecureBootResultsItem) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcSecureBootResultsItem) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetMessage sets the value of Message.
-func (s *BmcResponseModelBmcSecureBootResultsItem) SetMessage(val OptString) {
+func (s *BmcResponseModelBmcSecureBootResultsItem) SetMessage(val string) {
 	s.Message = val
 }
 
 // SetNode sets the value of Node.
-func (s *BmcResponseModelBmcSecureBootResultsItem) SetNode(val OptString) {
+func (s *BmcResponseModelBmcSecureBootResultsItem) SetNode(val string) {
 	s.Node = val
 }
 
 // SetSuccess sets the value of Success.
-func (s *BmcResponseModelBmcSecureBootResultsItem) SetSuccess(val OptBool) {
+func (s *BmcResponseModelBmcSecureBootResultsItem) SetSuccess(val bool) {
 	s.Success = val
 }
 
 type BmcResponseModelBmcSecureBootResultsItemData struct {
-	CurrentBoot    OptString                                              `json:"current_boot"`
+	CurrentBoot    string                                                 `json:"current_boot"`
 	Databases      []string                                               `json:"databases"`
-	Enabled        OptBool                                                `json:"enabled"`
+	Enabled        bool                                                   `json:"enabled"`
 	Keys           []BmcResponseModelBmcSecureBootResultsItemDataKeysItem `json:"keys"`
-	Mode           OptString                                              `json:"mode"`
+	Mode           string                                                 `json:"mode"`
 	PendingEnabled OptNilBool                                             `json:"pending_enabled"`
 }
 
 // GetCurrentBoot returns the value of CurrentBoot.
-func (s *BmcResponseModelBmcSecureBootResultsItemData) GetCurrentBoot() OptString {
+func (s *BmcResponseModelBmcSecureBootResultsItemData) GetCurrentBoot() string {
 	return s.CurrentBoot
 }
 
@@ -3215,7 +3215,7 @@ func (s *BmcResponseModelBmcSecureBootResultsItemData) GetDatabases() []string {
 }
 
 // GetEnabled returns the value of Enabled.
-func (s *BmcResponseModelBmcSecureBootResultsItemData) GetEnabled() OptBool {
+func (s *BmcResponseModelBmcSecureBootResultsItemData) GetEnabled() bool {
 	return s.Enabled
 }
 
@@ -3225,7 +3225,7 @@ func (s *BmcResponseModelBmcSecureBootResultsItemData) GetKeys() []BmcResponseMo
 }
 
 // GetMode returns the value of Mode.
-func (s *BmcResponseModelBmcSecureBootResultsItemData) GetMode() OptString {
+func (s *BmcResponseModelBmcSecureBootResultsItemData) GetMode() string {
 	return s.Mode
 }
 
@@ -3235,7 +3235,7 @@ func (s *BmcResponseModelBmcSecureBootResultsItemData) GetPendingEnabled() OptNi
 }
 
 // SetCurrentBoot sets the value of CurrentBoot.
-func (s *BmcResponseModelBmcSecureBootResultsItemData) SetCurrentBoot(val OptString) {
+func (s *BmcResponseModelBmcSecureBootResultsItemData) SetCurrentBoot(val string) {
 	s.CurrentBoot = val
 }
 
@@ -3245,7 +3245,7 @@ func (s *BmcResponseModelBmcSecureBootResultsItemData) SetDatabases(val []string
 }
 
 // SetEnabled sets the value of Enabled.
-func (s *BmcResponseModelBmcSecureBootResultsItemData) SetEnabled(val OptBool) {
+func (s *BmcResponseModelBmcSecureBootResultsItemData) SetEnabled(val bool) {
 	s.Enabled = val
 }
 
@@ -3255,7 +3255,7 @@ func (s *BmcResponseModelBmcSecureBootResultsItemData) SetKeys(val []BmcResponse
 }
 
 // SetMode sets the value of Mode.
-func (s *BmcResponseModelBmcSecureBootResultsItemData) SetMode(val OptString) {
+func (s *BmcResponseModelBmcSecureBootResultsItemData) SetMode(val string) {
 	s.Mode = val
 }
 
@@ -3266,7 +3266,7 @@ func (s *BmcResponseModelBmcSecureBootResultsItemData) SetPendingEnabled(val Opt
 
 type BmcResponseModelBmcSecureBootResultsItemDataKeysItem struct {
 	Certificates []BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem `json:"certificates"`
-	ID           OptString                                                              `json:"id"`
+	ID           string                                                                 `json:"id"`
 	Signatures   []BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem   `json:"signatures"`
 }
 
@@ -3276,7 +3276,7 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) GetCertificates()
 }
 
 // GetID returns the value of ID.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) GetID() OptString {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) GetID() string {
 	return s.ID
 }
 
@@ -3291,7 +3291,7 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) SetCertificates(v
 }
 
 // SetID sets the value of ID.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) SetID(val OptString) {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) SetID(val string) {
 	s.ID = val
 }
 
@@ -3301,234 +3301,234 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) SetSignatures(val
 }
 
 type BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem struct {
-	Fingerprint OptString `json:"fingerprint"`
-	ID          OptString `json:"id"`
-	Issuer      OptString `json:"issuer"`
-	NotAfter    OptString `json:"not_after"`
-	NotBefore   OptString `json:"not_before"`
-	Owner       OptString `json:"owner"`
-	Subject     OptString `json:"subject"`
+	Fingerprint string `json:"fingerprint"`
+	ID          string `json:"id"`
+	Issuer      string `json:"issuer"`
+	NotAfter    string `json:"not_after"`
+	NotBefore   string `json:"not_before"`
+	Owner       string `json:"owner"`
+	Subject     string `json:"subject"`
 }
 
 // GetFingerprint returns the value of Fingerprint.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetFingerprint() OptString {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetFingerprint() string {
 	return s.Fingerprint
 }
 
 // GetID returns the value of ID.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetID() OptString {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetID() string {
 	return s.ID
 }
 
 // GetIssuer returns the value of Issuer.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetIssuer() OptString {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetIssuer() string {
 	return s.Issuer
 }
 
 // GetNotAfter returns the value of NotAfter.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetNotAfter() OptString {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetNotAfter() string {
 	return s.NotAfter
 }
 
 // GetNotBefore returns the value of NotBefore.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetNotBefore() OptString {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetNotBefore() string {
 	return s.NotBefore
 }
 
 // GetOwner returns the value of Owner.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetOwner() OptString {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetOwner() string {
 	return s.Owner
 }
 
 // GetSubject returns the value of Subject.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetSubject() OptString {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) GetSubject() string {
 	return s.Subject
 }
 
 // SetFingerprint sets the value of Fingerprint.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetFingerprint(val OptString) {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetFingerprint(val string) {
 	s.Fingerprint = val
 }
 
 // SetID sets the value of ID.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetID(val OptString) {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetID(val string) {
 	s.ID = val
 }
 
 // SetIssuer sets the value of Issuer.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetIssuer(val OptString) {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetIssuer(val string) {
 	s.Issuer = val
 }
 
 // SetNotAfter sets the value of NotAfter.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetNotAfter(val OptString) {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetNotAfter(val string) {
 	s.NotAfter = val
 }
 
 // SetNotBefore sets the value of NotBefore.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetNotBefore(val OptString) {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetNotBefore(val string) {
 	s.NotBefore = val
 }
 
 // SetOwner sets the value of Owner.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetOwner(val OptString) {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetOwner(val string) {
 	s.Owner = val
 }
 
 // SetSubject sets the value of Subject.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetSubject(val OptString) {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetSubject(val string) {
 	s.Subject = val
 }
 
 type BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem struct {
-	Hash  OptString `json:"hash"`
-	ID    OptString `json:"id"`
-	Owner OptString `json:"owner"`
-	Type  OptString `json:"type"`
+	Hash  string `json:"hash"`
+	ID    string `json:"id"`
+	Owner string `json:"owner"`
+	Type  string `json:"type"`
 }
 
 // GetHash returns the value of Hash.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) GetHash() OptString {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) GetHash() string {
 	return s.Hash
 }
 
 // GetID returns the value of ID.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) GetID() OptString {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) GetID() string {
 	return s.ID
 }
 
 // GetOwner returns the value of Owner.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) GetOwner() OptString {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) GetOwner() string {
 	return s.Owner
 }
 
 // GetType returns the value of Type.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) GetType() OptString {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) GetType() string {
 	return s.Type
 }
 
 // SetHash sets the value of Hash.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) SetHash(val OptString) {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) SetHash(val string) {
 	s.Hash = val
 }
 
 // SetID sets the value of ID.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) SetID(val OptString) {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) SetID(val string) {
 	s.ID = val
 }
 
 // SetOwner sets the value of Owner.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) SetOwner(val OptString) {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) SetOwner(val string) {
 	s.Owner = val
 }
 
 // SetType sets the value of Type.
-func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) SetType(val OptString) {
+func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) SetType(val string) {
 	s.Type = val
 }
 
 type BmcResponseModelBmcSecureBootSummary struct {
-	DurationMs  OptInt64  `json:"duration_ms"`
-	Failed      OptInt    `json:"failed"`
-	FailedNodes OptString `json:"failed_nodes"`
-	Succeeded   OptInt    `json:"succeeded"`
-	Total       OptInt    `json:"total"`
+	DurationMs  int64  `json:"duration_ms"`
+	Failed      int    `json:"failed"`
+	FailedNodes string `json:"failed_nodes"`
+	Succeeded   int    `json:"succeeded"`
+	Total       int    `json:"total"`
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelBmcSecureBootSummary) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelBmcSecureBootSummary) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetFailed returns the value of Failed.
-func (s *BmcResponseModelBmcSecureBootSummary) GetFailed() OptInt {
+func (s *BmcResponseModelBmcSecureBootSummary) GetFailed() int {
 	return s.Failed
 }
 
 // GetFailedNodes returns the value of FailedNodes.
-func (s *BmcResponseModelBmcSecureBootSummary) GetFailedNodes() OptString {
+func (s *BmcResponseModelBmcSecureBootSummary) GetFailedNodes() string {
 	return s.FailedNodes
 }
 
 // GetSucceeded returns the value of Succeeded.
-func (s *BmcResponseModelBmcSecureBootSummary) GetSucceeded() OptInt {
+func (s *BmcResponseModelBmcSecureBootSummary) GetSucceeded() int {
 	return s.Succeeded
 }
 
 // GetTotal returns the value of Total.
-func (s *BmcResponseModelBmcSecureBootSummary) GetTotal() OptInt {
+func (s *BmcResponseModelBmcSecureBootSummary) GetTotal() int {
 	return s.Total
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelBmcSecureBootSummary) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelBmcSecureBootSummary) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetFailed sets the value of Failed.
-func (s *BmcResponseModelBmcSecureBootSummary) SetFailed(val OptInt) {
+func (s *BmcResponseModelBmcSecureBootSummary) SetFailed(val int) {
 	s.Failed = val
 }
 
 // SetFailedNodes sets the value of FailedNodes.
-func (s *BmcResponseModelBmcSecureBootSummary) SetFailedNodes(val OptString) {
+func (s *BmcResponseModelBmcSecureBootSummary) SetFailedNodes(val string) {
 	s.FailedNodes = val
 }
 
 // SetSucceeded sets the value of Succeeded.
-func (s *BmcResponseModelBmcSecureBootSummary) SetSucceeded(val OptInt) {
+func (s *BmcResponseModelBmcSecureBootSummary) SetSucceeded(val int) {
 	s.Succeeded = val
 }
 
 // SetTotal sets the value of Total.
-func (s *BmcResponseModelBmcSecureBootSummary) SetTotal(val OptInt) {
+func (s *BmcResponseModelBmcSecureBootSummary) SetTotal(val int) {
 	s.Total = val
 }
 
 // BmcResponse_model.RedfishSystem schema.
 // Ref: #/components/schemas/BmcResponse_model.RedfishSystem
 type BmcResponseModelRedfishSystem struct {
-	Results OptNilNilBmcResponseModelRedfishSystemResultsItemArray `json:"results"`
-	RunID   OptString                                              `json:"run_id"`
-	Summary OptBmcResponseModelRedfishSystemSummary                `json:"summary"`
+	Results []BmcResponseModelRedfishSystemResultsItem `json:"results"`
+	RunID   string                                     `json:"run_id"`
+	Summary BmcResponseModelRedfishSystemSummary       `json:"summary"`
 }
 
 // GetResults returns the value of Results.
-func (s *BmcResponseModelRedfishSystem) GetResults() OptNilNilBmcResponseModelRedfishSystemResultsItemArray {
+func (s *BmcResponseModelRedfishSystem) GetResults() []BmcResponseModelRedfishSystemResultsItem {
 	return s.Results
 }
 
 // GetRunID returns the value of RunID.
-func (s *BmcResponseModelRedfishSystem) GetRunID() OptString {
+func (s *BmcResponseModelRedfishSystem) GetRunID() string {
 	return s.RunID
 }
 
 // GetSummary returns the value of Summary.
-func (s *BmcResponseModelRedfishSystem) GetSummary() OptBmcResponseModelRedfishSystemSummary {
+func (s *BmcResponseModelRedfishSystem) GetSummary() BmcResponseModelRedfishSystemSummary {
 	return s.Summary
 }
 
 // SetResults sets the value of Results.
-func (s *BmcResponseModelRedfishSystem) SetResults(val OptNilNilBmcResponseModelRedfishSystemResultsItemArray) {
+func (s *BmcResponseModelRedfishSystem) SetResults(val []BmcResponseModelRedfishSystemResultsItem) {
 	s.Results = val
 }
 
 // SetRunID sets the value of RunID.
-func (s *BmcResponseModelRedfishSystem) SetRunID(val OptString) {
+func (s *BmcResponseModelRedfishSystem) SetRunID(val string) {
 	s.RunID = val
 }
 
 // SetSummary sets the value of Summary.
-func (s *BmcResponseModelRedfishSystem) SetSummary(val OptBmcResponseModelRedfishSystemSummary) {
+func (s *BmcResponseModelRedfishSystem) SetSummary(val BmcResponseModelRedfishSystemSummary) {
 	s.Summary = val
 }
 
 type BmcResponseModelRedfishSystemResultsItem struct {
 	Data       OptNilBmcResponseModelRedfishSystemResultsItemData `json:"data"`
-	DurationMs OptInt64                                           `json:"duration_ms"`
-	Message    OptString                                          `json:"message"`
-	Node       OptString                                          `json:"node"`
-	Success    OptBool                                            `json:"success"`
+	DurationMs int64                                              `json:"duration_ms"`
+	Message    string                                             `json:"message"`
+	Node       string                                             `json:"node"`
+	Success    bool                                               `json:"success"`
 }
 
 // GetData returns the value of Data.
@@ -3537,22 +3537,22 @@ func (s *BmcResponseModelRedfishSystemResultsItem) GetData() OptNilBmcResponseMo
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelRedfishSystemResultsItem) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelRedfishSystemResultsItem) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetMessage returns the value of Message.
-func (s *BmcResponseModelRedfishSystemResultsItem) GetMessage() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItem) GetMessage() string {
 	return s.Message
 }
 
 // GetNode returns the value of Node.
-func (s *BmcResponseModelRedfishSystemResultsItem) GetNode() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItem) GetNode() string {
 	return s.Node
 }
 
 // GetSuccess returns the value of Success.
-func (s *BmcResponseModelRedfishSystemResultsItem) GetSuccess() OptBool {
+func (s *BmcResponseModelRedfishSystemResultsItem) GetSuccess() bool {
 	return s.Success
 }
 
@@ -3562,104 +3562,104 @@ func (s *BmcResponseModelRedfishSystemResultsItem) SetData(val OptNilBmcResponse
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelRedfishSystemResultsItem) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelRedfishSystemResultsItem) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetMessage sets the value of Message.
-func (s *BmcResponseModelRedfishSystemResultsItem) SetMessage(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItem) SetMessage(val string) {
 	s.Message = val
 }
 
 // SetNode sets the value of Node.
-func (s *BmcResponseModelRedfishSystemResultsItem) SetNode(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItem) SetNode(val string) {
 	s.Node = val
 }
 
 // SetSuccess sets the value of Success.
-func (s *BmcResponseModelRedfishSystemResultsItem) SetSuccess(val OptBool) {
+func (s *BmcResponseModelRedfishSystemResultsItem) SetSuccess(val bool) {
 	s.Success = val
 }
 
 type BmcResponseModelRedfishSystemResultsItemData struct {
-	AssetTag            OptString                                                  `json:"asset_tag"`
-	BiosVersion         OptString                                                  `json:"bios_version"`
-	BootMode            OptString                                                  `json:"boot_mode"`
-	BootNext            OptString                                                  `json:"boot_next"`
-	BootOrder           OptNilNilStringArray                                       `json:"boot_order"`
-	BootOverrideEnabled OptString                                                  `json:"boot_override_enabled"`
-	BootOverrideTarget  OptString                                                  `json:"boot_override_target"`
-	BootProgress        OptString                                                  `json:"boot_progress"`
-	BootProgressTime    OptString                                                  `json:"boot_progress_time"`
-	Health              OptString                                                  `json:"health"`
-	HostName            OptString                                                  `json:"host_name"`
+	AssetTag            string                                                     `json:"asset_tag"`
+	BiosVersion         string                                                     `json:"bios_version"`
+	BootMode            string                                                     `json:"boot_mode"`
+	BootNext            string                                                     `json:"boot_next"`
+	BootOrder           OptNilStringArray                                          `json:"boot_order"`
+	BootOverrideEnabled string                                                     `json:"boot_override_enabled"`
+	BootOverrideTarget  string                                                     `json:"boot_override_target"`
+	BootProgress        string                                                     `json:"boot_progress"`
+	BootProgressTime    string                                                     `json:"boot_progress_time"`
+	Health              string                                                     `json:"health"`
+	HostName            string                                                     `json:"host_name"`
 	Location            OptNilBmcResponseModelRedfishSystemResultsItemDataLocation `json:"location"`
-	LocationIndicator   OptString                                                  `json:"location_indicator"`
-	Manufacturer        OptString                                                  `json:"manufacturer"`
-	Model               OptString                                                  `json:"model"`
-	Name                OptString                                                  `json:"name"`
+	LocationIndicator   string                                                     `json:"location_indicator"`
+	Manufacturer        string                                                     `json:"manufacturer"`
+	Model               string                                                     `json:"model"`
+	Name                string                                                     `json:"name"`
 	OemDell             OptNilBmcResponseModelRedfishSystemResultsItemDataOemDell  `json:"oem_dell"`
-	PowerStatus         OptString                                                  `json:"power_status"`
-	ProcessorCores      OptInt                                                     `json:"processor_cores"`
-	ProcessorCount      OptInt                                                     `json:"processor_count"`
-	ProcessorModel      OptString                                                  `json:"processor_model"`
-	ProcessorSockets    OptInt                                                     `json:"processor_sockets"`
-	SerialNumber        OptString                                                  `json:"serial_number"`
-	TotalMemory         OptFloat32                                                 `json:"total_memory"`
+	PowerStatus         string                                                     `json:"power_status"`
+	ProcessorCores      int                                                        `json:"processor_cores"`
+	ProcessorCount      int                                                        `json:"processor_count"`
+	ProcessorModel      string                                                     `json:"processor_model"`
+	ProcessorSockets    int                                                        `json:"processor_sockets"`
+	SerialNumber        string                                                     `json:"serial_number"`
+	TotalMemory         float32                                                    `json:"total_memory"`
 }
 
 // GetAssetTag returns the value of AssetTag.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetAssetTag() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetAssetTag() string {
 	return s.AssetTag
 }
 
 // GetBiosVersion returns the value of BiosVersion.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetBiosVersion() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetBiosVersion() string {
 	return s.BiosVersion
 }
 
 // GetBootMode returns the value of BootMode.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetBootMode() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetBootMode() string {
 	return s.BootMode
 }
 
 // GetBootNext returns the value of BootNext.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetBootNext() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetBootNext() string {
 	return s.BootNext
 }
 
 // GetBootOrder returns the value of BootOrder.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetBootOrder() OptNilNilStringArray {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetBootOrder() OptNilStringArray {
 	return s.BootOrder
 }
 
 // GetBootOverrideEnabled returns the value of BootOverrideEnabled.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetBootOverrideEnabled() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetBootOverrideEnabled() string {
 	return s.BootOverrideEnabled
 }
 
 // GetBootOverrideTarget returns the value of BootOverrideTarget.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetBootOverrideTarget() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetBootOverrideTarget() string {
 	return s.BootOverrideTarget
 }
 
 // GetBootProgress returns the value of BootProgress.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetBootProgress() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetBootProgress() string {
 	return s.BootProgress
 }
 
 // GetBootProgressTime returns the value of BootProgressTime.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetBootProgressTime() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetBootProgressTime() string {
 	return s.BootProgressTime
 }
 
 // GetHealth returns the value of Health.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetHealth() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetHealth() string {
 	return s.Health
 }
 
 // GetHostName returns the value of HostName.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetHostName() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetHostName() string {
 	return s.HostName
 }
 
@@ -3669,22 +3669,22 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) GetLocation() OptNilBmcRe
 }
 
 // GetLocationIndicator returns the value of LocationIndicator.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetLocationIndicator() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetLocationIndicator() string {
 	return s.LocationIndicator
 }
 
 // GetManufacturer returns the value of Manufacturer.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetManufacturer() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetManufacturer() string {
 	return s.Manufacturer
 }
 
 // GetModel returns the value of Model.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetModel() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetModel() string {
 	return s.Model
 }
 
 // GetName returns the value of Name.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetName() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetName() string {
 	return s.Name
 }
 
@@ -3694,92 +3694,92 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) GetOemDell() OptNilBmcRes
 }
 
 // GetPowerStatus returns the value of PowerStatus.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetPowerStatus() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetPowerStatus() string {
 	return s.PowerStatus
 }
 
 // GetProcessorCores returns the value of ProcessorCores.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetProcessorCores() OptInt {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetProcessorCores() int {
 	return s.ProcessorCores
 }
 
 // GetProcessorCount returns the value of ProcessorCount.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetProcessorCount() OptInt {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetProcessorCount() int {
 	return s.ProcessorCount
 }
 
 // GetProcessorModel returns the value of ProcessorModel.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetProcessorModel() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetProcessorModel() string {
 	return s.ProcessorModel
 }
 
 // GetProcessorSockets returns the value of ProcessorSockets.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetProcessorSockets() OptInt {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetProcessorSockets() int {
 	return s.ProcessorSockets
 }
 
 // GetSerialNumber returns the value of SerialNumber.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetSerialNumber() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetSerialNumber() string {
 	return s.SerialNumber
 }
 
 // GetTotalMemory returns the value of TotalMemory.
-func (s *BmcResponseModelRedfishSystemResultsItemData) GetTotalMemory() OptFloat32 {
+func (s *BmcResponseModelRedfishSystemResultsItemData) GetTotalMemory() float32 {
 	return s.TotalMemory
 }
 
 // SetAssetTag sets the value of AssetTag.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetAssetTag(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetAssetTag(val string) {
 	s.AssetTag = val
 }
 
 // SetBiosVersion sets the value of BiosVersion.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetBiosVersion(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetBiosVersion(val string) {
 	s.BiosVersion = val
 }
 
 // SetBootMode sets the value of BootMode.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetBootMode(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetBootMode(val string) {
 	s.BootMode = val
 }
 
 // SetBootNext sets the value of BootNext.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetBootNext(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetBootNext(val string) {
 	s.BootNext = val
 }
 
 // SetBootOrder sets the value of BootOrder.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetBootOrder(val OptNilNilStringArray) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetBootOrder(val OptNilStringArray) {
 	s.BootOrder = val
 }
 
 // SetBootOverrideEnabled sets the value of BootOverrideEnabled.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetBootOverrideEnabled(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetBootOverrideEnabled(val string) {
 	s.BootOverrideEnabled = val
 }
 
 // SetBootOverrideTarget sets the value of BootOverrideTarget.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetBootOverrideTarget(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetBootOverrideTarget(val string) {
 	s.BootOverrideTarget = val
 }
 
 // SetBootProgress sets the value of BootProgress.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetBootProgress(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetBootProgress(val string) {
 	s.BootProgress = val
 }
 
 // SetBootProgressTime sets the value of BootProgressTime.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetBootProgressTime(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetBootProgressTime(val string) {
 	s.BootProgressTime = val
 }
 
 // SetHealth sets the value of Health.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetHealth(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetHealth(val string) {
 	s.Health = val
 }
 
 // SetHostName sets the value of HostName.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetHostName(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetHostName(val string) {
 	s.HostName = val
 }
 
@@ -3789,22 +3789,22 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) SetLocation(val OptNilBmc
 }
 
 // SetLocationIndicator sets the value of LocationIndicator.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetLocationIndicator(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetLocationIndicator(val string) {
 	s.LocationIndicator = val
 }
 
 // SetManufacturer sets the value of Manufacturer.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetManufacturer(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetManufacturer(val string) {
 	s.Manufacturer = val
 }
 
 // SetModel sets the value of Model.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetModel(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetModel(val string) {
 	s.Model = val
 }
 
 // SetName sets the value of Name.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetName(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetName(val string) {
 	s.Name = val
 }
 
@@ -3814,55 +3814,55 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) SetOemDell(val OptNilBmcR
 }
 
 // SetPowerStatus sets the value of PowerStatus.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetPowerStatus(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetPowerStatus(val string) {
 	s.PowerStatus = val
 }
 
 // SetProcessorCores sets the value of ProcessorCores.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetProcessorCores(val OptInt) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetProcessorCores(val int) {
 	s.ProcessorCores = val
 }
 
 // SetProcessorCount sets the value of ProcessorCount.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetProcessorCount(val OptInt) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetProcessorCount(val int) {
 	s.ProcessorCount = val
 }
 
 // SetProcessorModel sets the value of ProcessorModel.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetProcessorModel(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetProcessorModel(val string) {
 	s.ProcessorModel = val
 }
 
 // SetProcessorSockets sets the value of ProcessorSockets.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetProcessorSockets(val OptInt) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetProcessorSockets(val int) {
 	s.ProcessorSockets = val
 }
 
 // SetSerialNumber sets the value of SerialNumber.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetSerialNumber(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetSerialNumber(val string) {
 	s.SerialNumber = val
 }
 
 // SetTotalMemory sets the value of TotalMemory.
-func (s *BmcResponseModelRedfishSystemResultsItemData) SetTotalMemory(val OptFloat32) {
+func (s *BmcResponseModelRedfishSystemResultsItemData) SetTotalMemory(val float32) {
 	s.TotalMemory = val
 }
 
 type BmcResponseModelRedfishSystemResultsItemDataLocation struct {
-	Datacenter OptString `json:"datacenter"`
-	Rack       OptString `json:"rack"`
+	Datacenter string    `json:"datacenter"`
+	Rack       string    `json:"rack"`
 	RackUnit   OptNilInt `json:"rack_unit"`
-	Room       OptString `json:"room"`
-	Row        OptString `json:"row"`
+	Room       string    `json:"room"`
+	Row        string    `json:"row"`
 }
 
 // GetDatacenter returns the value of Datacenter.
-func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) GetDatacenter() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) GetDatacenter() string {
 	return s.Datacenter
 }
 
 // GetRack returns the value of Rack.
-func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) GetRack() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) GetRack() string {
 	return s.Rack
 }
 
@@ -3872,22 +3872,22 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) GetRackUnit() Opt
 }
 
 // GetRoom returns the value of Room.
-func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) GetRoom() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) GetRoom() string {
 	return s.Room
 }
 
 // GetRow returns the value of Row.
-func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) GetRow() OptString {
+func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) GetRow() string {
 	return s.Row
 }
 
 // SetDatacenter sets the value of Datacenter.
-func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) SetDatacenter(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) SetDatacenter(val string) {
 	s.Datacenter = val
 }
 
 // SetRack sets the value of Rack.
-func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) SetRack(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) SetRack(val string) {
 	s.Rack = val
 }
 
@@ -3897,12 +3897,12 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) SetRackUnit(val O
 }
 
 // SetRoom sets the value of Room.
-func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) SetRoom(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) SetRoom(val string) {
 	s.Room = val
 }
 
 // SetRow sets the value of Row.
-func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) SetRow(val OptString) {
+func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) SetRow(val string) {
 	s.Row = val
 }
 
@@ -4537,17 +4537,17 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataOemDell) SetSmbiosGUID(val 
 }
 
 type BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem struct {
-	Message                  OptString                                                                                                      `json:"Message"`
-	MessageArgs              OptNilNilStringArray                                                                                           `json:"MessageArgs"`
-	MessageId                OptString                                                                                                      `json:"MessageId"`
-	MessageSeverity          OptString                                                                                                      `json:"MessageSeverity"`
-	Oem                      jx.Raw                                                                                                         `json:"Oem"`
-	RelatedProperties        OptNilNilStringArray                                                                                           `json:"RelatedProperties"`
-	Resolution               OptString                                                                                                      `json:"Resolution"`
-	ResolutionSteps          OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray `json:"ResolutionSteps"`
-	Severity                 OptString                                                                                                      `json:"Severity"`
-	UserAuthenticationSource OptString                                                                                                      `json:"UserAuthenticationSource"`
-	Username                 OptString                                                                                                      `json:"Username"`
+	Message                  OptString                                                                                                   `json:"Message"`
+	MessageArgs              OptNilStringArray                                                                                           `json:"MessageArgs"`
+	MessageId                OptString                                                                                                   `json:"MessageId"`
+	MessageSeverity          OptString                                                                                                   `json:"MessageSeverity"`
+	Oem                      jx.Raw                                                                                                      `json:"Oem"`
+	RelatedProperties        OptNilStringArray                                                                                           `json:"RelatedProperties"`
+	Resolution               OptString                                                                                                   `json:"Resolution"`
+	ResolutionSteps          OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray `json:"ResolutionSteps"`
+	Severity                 OptString                                                                                                   `json:"Severity"`
+	UserAuthenticationSource OptString                                                                                                   `json:"UserAuthenticationSource"`
+	Username                 OptString                                                                                                   `json:"Username"`
 }
 
 // GetMessage returns the value of Message.
@@ -4556,7 +4556,7 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedIn
 }
 
 // GetMessageArgs returns the value of MessageArgs.
-func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem) GetMessageArgs() OptNilNilStringArray {
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem) GetMessageArgs() OptNilStringArray {
 	return s.MessageArgs
 }
 
@@ -4576,7 +4576,7 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedIn
 }
 
 // GetRelatedProperties returns the value of RelatedProperties.
-func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem) GetRelatedProperties() OptNilNilStringArray {
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem) GetRelatedProperties() OptNilStringArray {
 	return s.RelatedProperties
 }
 
@@ -4586,7 +4586,7 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedIn
 }
 
 // GetResolutionSteps returns the value of ResolutionSteps.
-func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem) GetResolutionSteps() OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray {
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem) GetResolutionSteps() OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray {
 	return s.ResolutionSteps
 }
 
@@ -4611,7 +4611,7 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedIn
 }
 
 // SetMessageArgs sets the value of MessageArgs.
-func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem) SetMessageArgs(val OptNilNilStringArray) {
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem) SetMessageArgs(val OptNilStringArray) {
 	s.MessageArgs = val
 }
 
@@ -4631,7 +4631,7 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedIn
 }
 
 // SetRelatedProperties sets the value of RelatedProperties.
-func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem) SetRelatedProperties(val OptNilNilStringArray) {
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem) SetRelatedProperties(val OptNilStringArray) {
 	s.RelatedProperties = val
 }
 
@@ -4641,7 +4641,7 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedIn
 }
 
 // SetResolutionSteps sets the value of ResolutionSteps.
-func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem) SetResolutionSteps(val OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) {
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItem) SetResolutionSteps(val OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) {
 	s.ResolutionSteps = val
 }
 
@@ -4661,18 +4661,18 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedIn
 }
 
 type BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem struct {
-	ActionParameters     OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray `json:"ActionParameters"`
-	ActionURI            OptString                                                                                                                          `json:"ActionURI"`
-	Oem                  jx.Raw                                                                                                                             `json:"Oem"`
-	Priority             OptNilInt                                                                                                                          `json:"Priority"`
-	ResolutionType       OptString                                                                                                                          `json:"ResolutionType"`
-	RetryCount           OptNilInt                                                                                                                          `json:"RetryCount"`
-	RetryIntervalSeconds OptNilInt                                                                                                                          `json:"RetryIntervalSeconds"`
-	TargetComponentURI   OptString                                                                                                                          `json:"TargetComponentURI"`
+	ActionParameters     OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray `json:"ActionParameters"`
+	ActionURI            OptString                                                                                                                       `json:"ActionURI"`
+	Oem                  jx.Raw                                                                                                                          `json:"Oem"`
+	Priority             OptNilInt                                                                                                                       `json:"Priority"`
+	ResolutionType       OptString                                                                                                                       `json:"ResolutionType"`
+	RetryCount           OptNilInt                                                                                                                       `json:"RetryCount"`
+	RetryIntervalSeconds OptNilInt                                                                                                                       `json:"RetryIntervalSeconds"`
+	TargetComponentURI   OptString                                                                                                                       `json:"TargetComponentURI"`
 }
 
 // GetActionParameters returns the value of ActionParameters.
-func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) GetActionParameters() OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray {
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) GetActionParameters() OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray {
 	return s.ActionParameters
 }
 
@@ -4712,7 +4712,7 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedIn
 }
 
 // SetActionParameters sets the value of ActionParameters.
-func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetActionParameters(val OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) {
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetActionParameters(val OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) {
 	s.ActionParameters = val
 }
 
@@ -4752,24 +4752,24 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedIn
 }
 
 type BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem struct {
-	AllowableNumbers           OptNilNilStringArray `json:"AllowableNumbers"`
-	AllowablePattern           OptString            `json:"AllowablePattern"`
-	AllowableValueDescriptions OptNilNilStringArray `json:"AllowableValueDescriptions"`
-	AllowableValues            OptNilNilStringArray `json:"AllowableValues"`
-	ArraySizeMaximum           OptNilInt            `json:"ArraySizeMaximum"`
-	ArraySizeMinimum           OptNilInt            `json:"ArraySizeMinimum"`
-	DataType                   OptString            `json:"DataType"`
-	DefaultValue               OptString            `json:"DefaultValue"`
-	MaximumValue               OptNilFloat64        `json:"MaximumValue"`
-	MinimumValue               OptNilFloat64        `json:"MinimumValue"`
-	Name                       OptString            `json:"Name"`
-	NoDefaultValue             OptBool              `json:"NoDefaultValue"`
-	ObjectDataType             OptString            `json:"ObjectDataType"`
-	Required                   OptBool              `json:"Required"`
+	AllowableNumbers           OptNilStringArray `json:"AllowableNumbers"`
+	AllowablePattern           OptString         `json:"AllowablePattern"`
+	AllowableValueDescriptions OptNilStringArray `json:"AllowableValueDescriptions"`
+	AllowableValues            OptNilStringArray `json:"AllowableValues"`
+	ArraySizeMaximum           OptNilInt         `json:"ArraySizeMaximum"`
+	ArraySizeMinimum           OptNilInt         `json:"ArraySizeMinimum"`
+	DataType                   OptString         `json:"DataType"`
+	DefaultValue               OptString         `json:"DefaultValue"`
+	MaximumValue               OptNilFloat64     `json:"MaximumValue"`
+	MinimumValue               OptNilFloat64     `json:"MinimumValue"`
+	Name                       OptString         `json:"Name"`
+	NoDefaultValue             OptBool           `json:"NoDefaultValue"`
+	ObjectDataType             OptString         `json:"ObjectDataType"`
+	Required                   OptBool           `json:"Required"`
 }
 
 // GetAllowableNumbers returns the value of AllowableNumbers.
-func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableNumbers() OptNilNilStringArray {
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableNumbers() OptNilStringArray {
 	return s.AllowableNumbers
 }
 
@@ -4779,12 +4779,12 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedIn
 }
 
 // GetAllowableValueDescriptions returns the value of AllowableValueDescriptions.
-func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValueDescriptions() OptNilNilStringArray {
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValueDescriptions() OptNilStringArray {
 	return s.AllowableValueDescriptions
 }
 
 // GetAllowableValues returns the value of AllowableValues.
-func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValues() OptNilNilStringArray {
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) GetAllowableValues() OptNilStringArray {
 	return s.AllowableValues
 }
 
@@ -4839,7 +4839,7 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedIn
 }
 
 // SetAllowableNumbers sets the value of AllowableNumbers.
-func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableNumbers(val OptNilNilStringArray) {
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableNumbers(val OptNilStringArray) {
 	s.AllowableNumbers = val
 }
 
@@ -4849,12 +4849,12 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedIn
 }
 
 // SetAllowableValueDescriptions sets the value of AllowableValueDescriptions.
-func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValueDescriptions(val OptNilNilStringArray) {
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValueDescriptions(val OptNilStringArray) {
 	s.AllowableValueDescriptions = val
 }
 
 // SetAllowableValues sets the value of AllowableValues.
-func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValues(val OptNilNilStringArray) {
+func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetAllowableValues(val OptNilStringArray) {
 	s.AllowableValues = val
 }
 
@@ -4909,60 +4909,60 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedIn
 }
 
 type BmcResponseModelRedfishSystemSummary struct {
-	DurationMs  OptInt64  `json:"duration_ms"`
-	Failed      OptInt    `json:"failed"`
-	FailedNodes OptString `json:"failed_nodes"`
-	Succeeded   OptInt    `json:"succeeded"`
-	Total       OptInt    `json:"total"`
+	DurationMs  int64  `json:"duration_ms"`
+	Failed      int    `json:"failed"`
+	FailedNodes string `json:"failed_nodes"`
+	Succeeded   int    `json:"succeeded"`
+	Total       int    `json:"total"`
 }
 
 // GetDurationMs returns the value of DurationMs.
-func (s *BmcResponseModelRedfishSystemSummary) GetDurationMs() OptInt64 {
+func (s *BmcResponseModelRedfishSystemSummary) GetDurationMs() int64 {
 	return s.DurationMs
 }
 
 // GetFailed returns the value of Failed.
-func (s *BmcResponseModelRedfishSystemSummary) GetFailed() OptInt {
+func (s *BmcResponseModelRedfishSystemSummary) GetFailed() int {
 	return s.Failed
 }
 
 // GetFailedNodes returns the value of FailedNodes.
-func (s *BmcResponseModelRedfishSystemSummary) GetFailedNodes() OptString {
+func (s *BmcResponseModelRedfishSystemSummary) GetFailedNodes() string {
 	return s.FailedNodes
 }
 
 // GetSucceeded returns the value of Succeeded.
-func (s *BmcResponseModelRedfishSystemSummary) GetSucceeded() OptInt {
+func (s *BmcResponseModelRedfishSystemSummary) GetSucceeded() int {
 	return s.Succeeded
 }
 
 // GetTotal returns the value of Total.
-func (s *BmcResponseModelRedfishSystemSummary) GetTotal() OptInt {
+func (s *BmcResponseModelRedfishSystemSummary) GetTotal() int {
 	return s.Total
 }
 
 // SetDurationMs sets the value of DurationMs.
-func (s *BmcResponseModelRedfishSystemSummary) SetDurationMs(val OptInt64) {
+func (s *BmcResponseModelRedfishSystemSummary) SetDurationMs(val int64) {
 	s.DurationMs = val
 }
 
 // SetFailed sets the value of Failed.
-func (s *BmcResponseModelRedfishSystemSummary) SetFailed(val OptInt) {
+func (s *BmcResponseModelRedfishSystemSummary) SetFailed(val int) {
 	s.Failed = val
 }
 
 // SetFailedNodes sets the value of FailedNodes.
-func (s *BmcResponseModelRedfishSystemSummary) SetFailedNodes(val OptString) {
+func (s *BmcResponseModelRedfishSystemSummary) SetFailedNodes(val string) {
 	s.FailedNodes = val
 }
 
 // SetSucceeded sets the value of Succeeded.
-func (s *BmcResponseModelRedfishSystemSummary) SetSucceeded(val OptInt) {
+func (s *BmcResponseModelRedfishSystemSummary) SetSucceeded(val int) {
 	s.Succeeded = val
 }
 
 // SetTotal sets the value of Total.
-func (s *BmcResponseModelRedfishSystemSummary) SetTotal(val OptInt) {
+func (s *BmcResponseModelRedfishSystemSummary) SetTotal(val int) {
 	s.Total = val
 }
 
@@ -5392,16 +5392,16 @@ func (s *BootImage) SetVersion(val OptString) {
 // BootImageAddRequest schema.
 // Ref: #/components/schemas/BootImageAddRequest
 type BootImageAddRequest struct {
-	BootImages []NilBootImageAddRequestBootImagesItem `json:"boot_images"`
+	BootImages []BootImageAddRequestBootImagesItem `json:"boot_images"`
 }
 
 // GetBootImages returns the value of BootImages.
-func (s *BootImageAddRequest) GetBootImages() []NilBootImageAddRequestBootImagesItem {
+func (s *BootImageAddRequest) GetBootImages() []BootImageAddRequestBootImagesItem {
 	return s.BootImages
 }
 
 // SetBootImages sets the value of BootImages.
-func (s *BootImageAddRequest) SetBootImages(val []NilBootImageAddRequestBootImagesItem) {
+func (s *BootImageAddRequest) SetBootImages(val []BootImageAddRequestBootImagesItem) {
 	s.BootImages = val
 }
 
@@ -5409,9 +5409,9 @@ type BootImageAddRequestBootImagesItem struct {
 	Cmdline            OptString                                                 `json:"cmdline"`
 	ID                 OptNilInt64                                               `json:"id"`
 	Initrd             []string                                                  `json:"initrd"`
-	Kernel             OptString                                                 `json:"kernel"`
+	Kernel             string                                                    `json:"kernel"`
 	Liveimg            OptString                                                 `json:"liveimg"`
-	Name               OptString                                                 `json:"name"`
+	Name               string                                                    `json:"name"`
 	ProvisionTemplates OptNilBootImageAddRequestBootImagesItemProvisionTemplates `json:"provision_templates"`
 	UID                OptNilString                                              `json:"uid"`
 	Verify             OptBool                                                   `json:"verify"`
@@ -5434,7 +5434,7 @@ func (s *BootImageAddRequestBootImagesItem) GetInitrd() []string {
 }
 
 // GetKernel returns the value of Kernel.
-func (s *BootImageAddRequestBootImagesItem) GetKernel() OptString {
+func (s *BootImageAddRequestBootImagesItem) GetKernel() string {
 	return s.Kernel
 }
 
@@ -5444,7 +5444,7 @@ func (s *BootImageAddRequestBootImagesItem) GetLiveimg() OptString {
 }
 
 // GetName returns the value of Name.
-func (s *BootImageAddRequestBootImagesItem) GetName() OptString {
+func (s *BootImageAddRequestBootImagesItem) GetName() string {
 	return s.Name
 }
 
@@ -5484,7 +5484,7 @@ func (s *BootImageAddRequestBootImagesItem) SetInitrd(val []string) {
 }
 
 // SetKernel sets the value of Kernel.
-func (s *BootImageAddRequestBootImagesItem) SetKernel(val OptString) {
+func (s *BootImageAddRequestBootImagesItem) SetKernel(val string) {
 	s.Kernel = val
 }
 
@@ -5494,7 +5494,7 @@ func (s *BootImageAddRequestBootImagesItem) SetLiveimg(val OptString) {
 }
 
 // SetName sets the value of Name.
-func (s *BootImageAddRequestBootImagesItem) SetName(val OptString) {
+func (s *BootImageAddRequestBootImagesItem) SetName(val string) {
 	s.Name = val
 }
 
@@ -5568,19 +5568,19 @@ func (s *CookieAuth) SetRoles(val []string) {
 // DataDump schema.
 // Ref: #/components/schemas/DataDump
 type DataDump struct {
-	Hosts  []NilDataDumpHostsItem  `json:"Hosts"`
-	Images []NilDataDumpImagesItem `json:"Images"`
-	Roles  []DataDumpRolesItem     `json:"Roles"`
-	Users  []DataDumpUsersItem     `json:"Users"`
+	Hosts  []DataDumpHostsItem  `json:"Hosts"`
+	Images []DataDumpImagesItem `json:"Images"`
+	Roles  []DataDumpRolesItem  `json:"Roles"`
+	Users  []DataDumpUsersItem  `json:"Users"`
 }
 
 // GetHosts returns the value of Hosts.
-func (s *DataDump) GetHosts() []NilDataDumpHostsItem {
+func (s *DataDump) GetHosts() []DataDumpHostsItem {
 	return s.Hosts
 }
 
 // GetImages returns the value of Images.
-func (s *DataDump) GetImages() []NilDataDumpImagesItem {
+func (s *DataDump) GetImages() []DataDumpImagesItem {
 	return s.Images
 }
 
@@ -5595,12 +5595,12 @@ func (s *DataDump) GetUsers() []DataDumpUsersItem {
 }
 
 // SetHosts sets the value of Hosts.
-func (s *DataDump) SetHosts(val []NilDataDumpHostsItem) {
+func (s *DataDump) SetHosts(val []DataDumpHostsItem) {
 	s.Hosts = val
 }
 
 // SetImages sets the value of Images.
-func (s *DataDump) SetImages(val []NilDataDumpImagesItem) {
+func (s *DataDump) SetImages(val []DataDumpImagesItem) {
 	s.Images = val
 }
 
@@ -5615,16 +5615,16 @@ func (s *DataDump) SetUsers(val []DataDumpUsersItem) {
 }
 
 type DataDumpHostsItem struct {
-	Arch       OptString                            `json:"arch"`
-	Bonds      []NilDataDumpHostsItemBondsItem      `json:"bonds"`
-	BootImage  OptString                            `json:"boot_image"`
-	Firmware   OptString                            `json:"firmware"`
-	ID         OptNilInt64                          `json:"id"`
-	Interfaces []NilDataDumpHostsItemInterfacesItem `json:"interfaces"`
-	Name       OptString                            `json:"name"`
-	Provision  OptBool                              `json:"provision"`
-	Tags       OptNilStringArray                    `json:"tags"`
-	UID        OptNilString                         `json:"uid"`
+	Arch       OptString                         `json:"arch"`
+	Bonds      []DataDumpHostsItemBondsItem      `json:"bonds"`
+	BootImage  OptString                         `json:"boot_image"`
+	Firmware   OptString                         `json:"firmware"`
+	ID         OptNilInt64                       `json:"id"`
+	Interfaces []DataDumpHostsItemInterfacesItem `json:"interfaces"`
+	Name       OptString                         `json:"name"`
+	Provision  OptBool                           `json:"provision"`
+	Tags       OptNilStringArray                 `json:"tags"`
+	UID        OptNilString                      `json:"uid"`
 }
 
 // GetArch returns the value of Arch.
@@ -5633,7 +5633,7 @@ func (s *DataDumpHostsItem) GetArch() OptString {
 }
 
 // GetBonds returns the value of Bonds.
-func (s *DataDumpHostsItem) GetBonds() []NilDataDumpHostsItemBondsItem {
+func (s *DataDumpHostsItem) GetBonds() []DataDumpHostsItemBondsItem {
 	return s.Bonds
 }
 
@@ -5653,7 +5653,7 @@ func (s *DataDumpHostsItem) GetID() OptNilInt64 {
 }
 
 // GetInterfaces returns the value of Interfaces.
-func (s *DataDumpHostsItem) GetInterfaces() []NilDataDumpHostsItemInterfacesItem {
+func (s *DataDumpHostsItem) GetInterfaces() []DataDumpHostsItemInterfacesItem {
 	return s.Interfaces
 }
 
@@ -5683,7 +5683,7 @@ func (s *DataDumpHostsItem) SetArch(val OptString) {
 }
 
 // SetBonds sets the value of Bonds.
-func (s *DataDumpHostsItem) SetBonds(val []NilDataDumpHostsItemBondsItem) {
+func (s *DataDumpHostsItem) SetBonds(val []DataDumpHostsItemBondsItem) {
 	s.Bonds = val
 }
 
@@ -5703,7 +5703,7 @@ func (s *DataDumpHostsItem) SetID(val OptNilInt64) {
 }
 
 // SetInterfaces sets the value of Interfaces.
-func (s *DataDumpHostsItem) SetInterfaces(val []NilDataDumpHostsItemInterfacesItem) {
+func (s *DataDumpHostsItem) SetInterfaces(val []DataDumpHostsItemInterfacesItem) {
 	s.Interfaces = val
 }
 
@@ -5924,9 +5924,9 @@ type DataDumpImagesItem struct {
 	Cmdline            OptString                                  `json:"cmdline"`
 	ID                 OptNilInt64                                `json:"id"`
 	Initrd             []string                                   `json:"initrd"`
-	Kernel             OptString                                  `json:"kernel"`
+	Kernel             string                                     `json:"kernel"`
 	Liveimg            OptString                                  `json:"liveimg"`
-	Name               OptString                                  `json:"name"`
+	Name               string                                     `json:"name"`
 	ProvisionTemplates OptNilDataDumpImagesItemProvisionTemplates `json:"provision_templates"`
 	UID                OptNilString                               `json:"uid"`
 	Verify             OptBool                                    `json:"verify"`
@@ -5949,7 +5949,7 @@ func (s *DataDumpImagesItem) GetInitrd() []string {
 }
 
 // GetKernel returns the value of Kernel.
-func (s *DataDumpImagesItem) GetKernel() OptString {
+func (s *DataDumpImagesItem) GetKernel() string {
 	return s.Kernel
 }
 
@@ -5959,7 +5959,7 @@ func (s *DataDumpImagesItem) GetLiveimg() OptString {
 }
 
 // GetName returns the value of Name.
-func (s *DataDumpImagesItem) GetName() OptString {
+func (s *DataDumpImagesItem) GetName() string {
 	return s.Name
 }
 
@@ -5999,7 +5999,7 @@ func (s *DataDumpImagesItem) SetInitrd(val []string) {
 }
 
 // SetKernel sets the value of Kernel.
-func (s *DataDumpImagesItem) SetKernel(val OptString) {
+func (s *DataDumpImagesItem) SetKernel(val string) {
 	s.Kernel = val
 }
 
@@ -6009,7 +6009,7 @@ func (s *DataDumpImagesItem) SetLiveimg(val OptString) {
 }
 
 // SetName sets the value of Name.
-func (s *DataDumpImagesItem) SetName(val OptString) {
+func (s *DataDumpImagesItem) SetName(val string) {
 	s.Name = val
 }
 
@@ -6081,8 +6081,21 @@ func (s *DataDumpRolesItem) SetUnassignedPermissionList(val []DataDumpRolesItemU
 }
 
 type DataDumpRolesItemPermissionListItem struct {
-	Method OptString `json:"method"`
-	Path   OptString `json:"path"`
+	Group   OptString                                  `json:"group"`
+	Kind    OptDataDumpRolesItemPermissionListItemKind `json:"kind"`
+	Method  OptString                                  `json:"method"`
+	Path    OptString                                  `json:"path"`
+	Summary OptString                                  `json:"summary"`
+}
+
+// GetGroup returns the value of Group.
+func (s *DataDumpRolesItemPermissionListItem) GetGroup() OptString {
+	return s.Group
+}
+
+// GetKind returns the value of Kind.
+func (s *DataDumpRolesItemPermissionListItem) GetKind() OptDataDumpRolesItemPermissionListItemKind {
+	return s.Kind
 }
 
 // GetMethod returns the value of Method.
@@ -6095,6 +6108,21 @@ func (s *DataDumpRolesItemPermissionListItem) GetPath() OptString {
 	return s.Path
 }
 
+// GetSummary returns the value of Summary.
+func (s *DataDumpRolesItemPermissionListItem) GetSummary() OptString {
+	return s.Summary
+}
+
+// SetGroup sets the value of Group.
+func (s *DataDumpRolesItemPermissionListItem) SetGroup(val OptString) {
+	s.Group = val
+}
+
+// SetKind sets the value of Kind.
+func (s *DataDumpRolesItemPermissionListItem) SetKind(val OptDataDumpRolesItemPermissionListItemKind) {
+	s.Kind = val
+}
+
 // SetMethod sets the value of Method.
 func (s *DataDumpRolesItemPermissionListItem) SetMethod(val OptString) {
 	s.Method = val
@@ -6105,9 +6133,75 @@ func (s *DataDumpRolesItemPermissionListItem) SetPath(val OptString) {
 	s.Path = val
 }
 
+// SetSummary sets the value of Summary.
+func (s *DataDumpRolesItemPermissionListItem) SetSummary(val OptString) {
+	s.Summary = val
+}
+
+type DataDumpRolesItemPermissionListItemKind string
+
+const (
+	DataDumpRolesItemPermissionListItemKindView   DataDumpRolesItemPermissionListItemKind = "view"
+	DataDumpRolesItemPermissionListItemKindChange DataDumpRolesItemPermissionListItemKind = "change"
+	DataDumpRolesItemPermissionListItemKindDelete DataDumpRolesItemPermissionListItemKind = "delete"
+)
+
+// AllValues returns all DataDumpRolesItemPermissionListItemKind values.
+func (DataDumpRolesItemPermissionListItemKind) AllValues() []DataDumpRolesItemPermissionListItemKind {
+	return []DataDumpRolesItemPermissionListItemKind{
+		DataDumpRolesItemPermissionListItemKindView,
+		DataDumpRolesItemPermissionListItemKindChange,
+		DataDumpRolesItemPermissionListItemKindDelete,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s DataDumpRolesItemPermissionListItemKind) MarshalText() ([]byte, error) {
+	switch s {
+	case DataDumpRolesItemPermissionListItemKindView:
+		return []byte(s), nil
+	case DataDumpRolesItemPermissionListItemKindChange:
+		return []byte(s), nil
+	case DataDumpRolesItemPermissionListItemKindDelete:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *DataDumpRolesItemPermissionListItemKind) UnmarshalText(data []byte) error {
+	switch DataDumpRolesItemPermissionListItemKind(data) {
+	case DataDumpRolesItemPermissionListItemKindView:
+		*s = DataDumpRolesItemPermissionListItemKindView
+		return nil
+	case DataDumpRolesItemPermissionListItemKindChange:
+		*s = DataDumpRolesItemPermissionListItemKindChange
+		return nil
+	case DataDumpRolesItemPermissionListItemKindDelete:
+		*s = DataDumpRolesItemPermissionListItemKindDelete
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 type DataDumpRolesItemUnassignedPermissionListItem struct {
-	Method OptString `json:"method"`
-	Path   OptString `json:"path"`
+	Group   OptString                                            `json:"group"`
+	Kind    OptDataDumpRolesItemUnassignedPermissionListItemKind `json:"kind"`
+	Method  OptString                                            `json:"method"`
+	Path    OptString                                            `json:"path"`
+	Summary OptString                                            `json:"summary"`
+}
+
+// GetGroup returns the value of Group.
+func (s *DataDumpRolesItemUnassignedPermissionListItem) GetGroup() OptString {
+	return s.Group
+}
+
+// GetKind returns the value of Kind.
+func (s *DataDumpRolesItemUnassignedPermissionListItem) GetKind() OptDataDumpRolesItemUnassignedPermissionListItemKind {
+	return s.Kind
 }
 
 // GetMethod returns the value of Method.
@@ -6120,6 +6214,21 @@ func (s *DataDumpRolesItemUnassignedPermissionListItem) GetPath() OptString {
 	return s.Path
 }
 
+// GetSummary returns the value of Summary.
+func (s *DataDumpRolesItemUnassignedPermissionListItem) GetSummary() OptString {
+	return s.Summary
+}
+
+// SetGroup sets the value of Group.
+func (s *DataDumpRolesItemUnassignedPermissionListItem) SetGroup(val OptString) {
+	s.Group = val
+}
+
+// SetKind sets the value of Kind.
+func (s *DataDumpRolesItemUnassignedPermissionListItem) SetKind(val OptDataDumpRolesItemUnassignedPermissionListItemKind) {
+	s.Kind = val
+}
+
 // SetMethod sets the value of Method.
 func (s *DataDumpRolesItemUnassignedPermissionListItem) SetMethod(val OptString) {
 	s.Method = val
@@ -6128,6 +6237,59 @@ func (s *DataDumpRolesItemUnassignedPermissionListItem) SetMethod(val OptString)
 // SetPath sets the value of Path.
 func (s *DataDumpRolesItemUnassignedPermissionListItem) SetPath(val OptString) {
 	s.Path = val
+}
+
+// SetSummary sets the value of Summary.
+func (s *DataDumpRolesItemUnassignedPermissionListItem) SetSummary(val OptString) {
+	s.Summary = val
+}
+
+type DataDumpRolesItemUnassignedPermissionListItemKind string
+
+const (
+	DataDumpRolesItemUnassignedPermissionListItemKindView   DataDumpRolesItemUnassignedPermissionListItemKind = "view"
+	DataDumpRolesItemUnassignedPermissionListItemKindChange DataDumpRolesItemUnassignedPermissionListItemKind = "change"
+	DataDumpRolesItemUnassignedPermissionListItemKindDelete DataDumpRolesItemUnassignedPermissionListItemKind = "delete"
+)
+
+// AllValues returns all DataDumpRolesItemUnassignedPermissionListItemKind values.
+func (DataDumpRolesItemUnassignedPermissionListItemKind) AllValues() []DataDumpRolesItemUnassignedPermissionListItemKind {
+	return []DataDumpRolesItemUnassignedPermissionListItemKind{
+		DataDumpRolesItemUnassignedPermissionListItemKindView,
+		DataDumpRolesItemUnassignedPermissionListItemKindChange,
+		DataDumpRolesItemUnassignedPermissionListItemKindDelete,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s DataDumpRolesItemUnassignedPermissionListItemKind) MarshalText() ([]byte, error) {
+	switch s {
+	case DataDumpRolesItemUnassignedPermissionListItemKindView:
+		return []byte(s), nil
+	case DataDumpRolesItemUnassignedPermissionListItemKindChange:
+		return []byte(s), nil
+	case DataDumpRolesItemUnassignedPermissionListItemKindDelete:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *DataDumpRolesItemUnassignedPermissionListItemKind) UnmarshalText(data []byte) error {
+	switch DataDumpRolesItemUnassignedPermissionListItemKind(data) {
+	case DataDumpRolesItemUnassignedPermissionListItemKindView:
+		*s = DataDumpRolesItemUnassignedPermissionListItemKindView
+		return nil
+	case DataDumpRolesItemUnassignedPermissionListItemKindChange:
+		*s = DataDumpRolesItemUnassignedPermissionListItemKindChange
+		return nil
+	case DataDumpRolesItemUnassignedPermissionListItemKindDelete:
+		*s = DataDumpRolesItemUnassignedPermissionListItemKindDelete
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 type DataDumpUsersItem struct {
@@ -6516,12 +6678,12 @@ func (s *EventKind) UnmarshalText(data []byte) error {
 }
 
 type EventNodesItem struct {
-	Message   OptString              `json:"message"`
-	Node      OptString              `json:"node"`
-	Ref       OptString              `json:"ref"`
-	Stage     OptString              `json:"stage"`
-	State     OptEventNodesItemState `json:"state"`
-	UpdatedAt OptDateTime            `json:"updated_at"`
+	Message   OptString           `json:"message"`
+	Node      string              `json:"node"`
+	Ref       OptString           `json:"ref"`
+	Stage     OptString           `json:"stage"`
+	State     EventNodesItemState `json:"state"`
+	UpdatedAt time.Time           `json:"updated_at"`
 }
 
 // GetMessage returns the value of Message.
@@ -6530,7 +6692,7 @@ func (s *EventNodesItem) GetMessage() OptString {
 }
 
 // GetNode returns the value of Node.
-func (s *EventNodesItem) GetNode() OptString {
+func (s *EventNodesItem) GetNode() string {
 	return s.Node
 }
 
@@ -6545,12 +6707,12 @@ func (s *EventNodesItem) GetStage() OptString {
 }
 
 // GetState returns the value of State.
-func (s *EventNodesItem) GetState() OptEventNodesItemState {
+func (s *EventNodesItem) GetState() EventNodesItemState {
 	return s.State
 }
 
 // GetUpdatedAt returns the value of UpdatedAt.
-func (s *EventNodesItem) GetUpdatedAt() OptDateTime {
+func (s *EventNodesItem) GetUpdatedAt() time.Time {
 	return s.UpdatedAt
 }
 
@@ -6560,7 +6722,7 @@ func (s *EventNodesItem) SetMessage(val OptString) {
 }
 
 // SetNode sets the value of Node.
-func (s *EventNodesItem) SetNode(val OptString) {
+func (s *EventNodesItem) SetNode(val string) {
 	s.Node = val
 }
 
@@ -6575,12 +6737,12 @@ func (s *EventNodesItem) SetStage(val OptString) {
 }
 
 // SetState sets the value of State.
-func (s *EventNodesItem) SetState(val OptEventNodesItemState) {
+func (s *EventNodesItem) SetState(val EventNodesItemState) {
 	s.State = val
 }
 
 // SetUpdatedAt sets the value of UpdatedAt.
-func (s *EventNodesItem) SetUpdatedAt(val OptDateTime) {
+func (s *EventNodesItem) SetUpdatedAt(val time.Time) {
 	s.UpdatedAt = val
 }
 
@@ -6844,8 +7006,21 @@ func (s *GetRolesResponseRolesItem) SetUnassignedPermissionList(val []GetRolesRe
 }
 
 type GetRolesResponseRolesItemPermissionListItem struct {
-	Method OptString `json:"method"`
-	Path   OptString `json:"path"`
+	Group   OptString                                          `json:"group"`
+	Kind    OptGetRolesResponseRolesItemPermissionListItemKind `json:"kind"`
+	Method  OptString                                          `json:"method"`
+	Path    OptString                                          `json:"path"`
+	Summary OptString                                          `json:"summary"`
+}
+
+// GetGroup returns the value of Group.
+func (s *GetRolesResponseRolesItemPermissionListItem) GetGroup() OptString {
+	return s.Group
+}
+
+// GetKind returns the value of Kind.
+func (s *GetRolesResponseRolesItemPermissionListItem) GetKind() OptGetRolesResponseRolesItemPermissionListItemKind {
+	return s.Kind
 }
 
 // GetMethod returns the value of Method.
@@ -6858,6 +7033,21 @@ func (s *GetRolesResponseRolesItemPermissionListItem) GetPath() OptString {
 	return s.Path
 }
 
+// GetSummary returns the value of Summary.
+func (s *GetRolesResponseRolesItemPermissionListItem) GetSummary() OptString {
+	return s.Summary
+}
+
+// SetGroup sets the value of Group.
+func (s *GetRolesResponseRolesItemPermissionListItem) SetGroup(val OptString) {
+	s.Group = val
+}
+
+// SetKind sets the value of Kind.
+func (s *GetRolesResponseRolesItemPermissionListItem) SetKind(val OptGetRolesResponseRolesItemPermissionListItemKind) {
+	s.Kind = val
+}
+
 // SetMethod sets the value of Method.
 func (s *GetRolesResponseRolesItemPermissionListItem) SetMethod(val OptString) {
 	s.Method = val
@@ -6868,9 +7058,75 @@ func (s *GetRolesResponseRolesItemPermissionListItem) SetPath(val OptString) {
 	s.Path = val
 }
 
+// SetSummary sets the value of Summary.
+func (s *GetRolesResponseRolesItemPermissionListItem) SetSummary(val OptString) {
+	s.Summary = val
+}
+
+type GetRolesResponseRolesItemPermissionListItemKind string
+
+const (
+	GetRolesResponseRolesItemPermissionListItemKindView   GetRolesResponseRolesItemPermissionListItemKind = "view"
+	GetRolesResponseRolesItemPermissionListItemKindChange GetRolesResponseRolesItemPermissionListItemKind = "change"
+	GetRolesResponseRolesItemPermissionListItemKindDelete GetRolesResponseRolesItemPermissionListItemKind = "delete"
+)
+
+// AllValues returns all GetRolesResponseRolesItemPermissionListItemKind values.
+func (GetRolesResponseRolesItemPermissionListItemKind) AllValues() []GetRolesResponseRolesItemPermissionListItemKind {
+	return []GetRolesResponseRolesItemPermissionListItemKind{
+		GetRolesResponseRolesItemPermissionListItemKindView,
+		GetRolesResponseRolesItemPermissionListItemKindChange,
+		GetRolesResponseRolesItemPermissionListItemKindDelete,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetRolesResponseRolesItemPermissionListItemKind) MarshalText() ([]byte, error) {
+	switch s {
+	case GetRolesResponseRolesItemPermissionListItemKindView:
+		return []byte(s), nil
+	case GetRolesResponseRolesItemPermissionListItemKindChange:
+		return []byte(s), nil
+	case GetRolesResponseRolesItemPermissionListItemKindDelete:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetRolesResponseRolesItemPermissionListItemKind) UnmarshalText(data []byte) error {
+	switch GetRolesResponseRolesItemPermissionListItemKind(data) {
+	case GetRolesResponseRolesItemPermissionListItemKindView:
+		*s = GetRolesResponseRolesItemPermissionListItemKindView
+		return nil
+	case GetRolesResponseRolesItemPermissionListItemKindChange:
+		*s = GetRolesResponseRolesItemPermissionListItemKindChange
+		return nil
+	case GetRolesResponseRolesItemPermissionListItemKindDelete:
+		*s = GetRolesResponseRolesItemPermissionListItemKindDelete
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 type GetRolesResponseRolesItemUnassignedPermissionListItem struct {
-	Method OptString `json:"method"`
-	Path   OptString `json:"path"`
+	Group   OptString                                                    `json:"group"`
+	Kind    OptGetRolesResponseRolesItemUnassignedPermissionListItemKind `json:"kind"`
+	Method  OptString                                                    `json:"method"`
+	Path    OptString                                                    `json:"path"`
+	Summary OptString                                                    `json:"summary"`
+}
+
+// GetGroup returns the value of Group.
+func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) GetGroup() OptString {
+	return s.Group
+}
+
+// GetKind returns the value of Kind.
+func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) GetKind() OptGetRolesResponseRolesItemUnassignedPermissionListItemKind {
+	return s.Kind
 }
 
 // GetMethod returns the value of Method.
@@ -6883,6 +7139,21 @@ func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) GetPath() OptStr
 	return s.Path
 }
 
+// GetSummary returns the value of Summary.
+func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) GetSummary() OptString {
+	return s.Summary
+}
+
+// SetGroup sets the value of Group.
+func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) SetGroup(val OptString) {
+	s.Group = val
+}
+
+// SetKind sets the value of Kind.
+func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) SetKind(val OptGetRolesResponseRolesItemUnassignedPermissionListItemKind) {
+	s.Kind = val
+}
+
 // SetMethod sets the value of Method.
 func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) SetMethod(val OptString) {
 	s.Method = val
@@ -6891,6 +7162,59 @@ func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) SetMethod(val Op
 // SetPath sets the value of Path.
 func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) SetPath(val OptString) {
 	s.Path = val
+}
+
+// SetSummary sets the value of Summary.
+func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) SetSummary(val OptString) {
+	s.Summary = val
+}
+
+type GetRolesResponseRolesItemUnassignedPermissionListItemKind string
+
+const (
+	GetRolesResponseRolesItemUnassignedPermissionListItemKindView   GetRolesResponseRolesItemUnassignedPermissionListItemKind = "view"
+	GetRolesResponseRolesItemUnassignedPermissionListItemKindChange GetRolesResponseRolesItemUnassignedPermissionListItemKind = "change"
+	GetRolesResponseRolesItemUnassignedPermissionListItemKindDelete GetRolesResponseRolesItemUnassignedPermissionListItemKind = "delete"
+)
+
+// AllValues returns all GetRolesResponseRolesItemUnassignedPermissionListItemKind values.
+func (GetRolesResponseRolesItemUnassignedPermissionListItemKind) AllValues() []GetRolesResponseRolesItemUnassignedPermissionListItemKind {
+	return []GetRolesResponseRolesItemUnassignedPermissionListItemKind{
+		GetRolesResponseRolesItemUnassignedPermissionListItemKindView,
+		GetRolesResponseRolesItemUnassignedPermissionListItemKindChange,
+		GetRolesResponseRolesItemUnassignedPermissionListItemKindDelete,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetRolesResponseRolesItemUnassignedPermissionListItemKind) MarshalText() ([]byte, error) {
+	switch s {
+	case GetRolesResponseRolesItemUnassignedPermissionListItemKindView:
+		return []byte(s), nil
+	case GetRolesResponseRolesItemUnassignedPermissionListItemKindChange:
+		return []byte(s), nil
+	case GetRolesResponseRolesItemUnassignedPermissionListItemKindDelete:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetRolesResponseRolesItemUnassignedPermissionListItemKind) UnmarshalText(data []byte) error {
+	switch GetRolesResponseRolesItemUnassignedPermissionListItemKind(data) {
+	case GetRolesResponseRolesItemUnassignedPermissionListItemKindView:
+		*s = GetRolesResponseRolesItemUnassignedPermissionListItemKindView
+		return nil
+	case GetRolesResponseRolesItemUnassignedPermissionListItemKindChange:
+		*s = GetRolesResponseRolesItemUnassignedPermissionListItemKindChange
+		return nil
+	case GetRolesResponseRolesItemUnassignedPermissionListItemKindDelete:
+		*s = GetRolesResponseRolesItemUnassignedPermissionListItemKindDelete
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 // HTTPError schema.
@@ -7069,16 +7393,16 @@ func (s *HeaderAuth) SetRoles(val []string) {
 // Host schema.
 // Ref: #/components/schemas/Host
 type Host struct {
-	Arch       OptString               `json:"arch"`
-	Bonds      []NilHostBondsItem      `json:"bonds"`
-	BootImage  OptString               `json:"boot_image"`
-	Firmware   OptString               `json:"firmware"`
-	ID         OptNilInt64             `json:"id"`
-	Interfaces []NilHostInterfacesItem `json:"interfaces"`
-	Name       OptString               `json:"name"`
-	Provision  OptBool                 `json:"provision"`
-	Tags       OptNilStringArray       `json:"tags"`
-	UID        OptNilString            `json:"uid"`
+	Arch       OptString            `json:"arch"`
+	Bonds      []HostBondsItem      `json:"bonds"`
+	BootImage  OptString            `json:"boot_image"`
+	Firmware   OptString            `json:"firmware"`
+	ID         OptNilInt64          `json:"id"`
+	Interfaces []HostInterfacesItem `json:"interfaces"`
+	Name       OptString            `json:"name"`
+	Provision  OptBool              `json:"provision"`
+	Tags       OptNilStringArray    `json:"tags"`
+	UID        OptNilString         `json:"uid"`
 }
 
 // GetArch returns the value of Arch.
@@ -7087,7 +7411,7 @@ func (s *Host) GetArch() OptString {
 }
 
 // GetBonds returns the value of Bonds.
-func (s *Host) GetBonds() []NilHostBondsItem {
+func (s *Host) GetBonds() []HostBondsItem {
 	return s.Bonds
 }
 
@@ -7107,7 +7431,7 @@ func (s *Host) GetID() OptNilInt64 {
 }
 
 // GetInterfaces returns the value of Interfaces.
-func (s *Host) GetInterfaces() []NilHostInterfacesItem {
+func (s *Host) GetInterfaces() []HostInterfacesItem {
 	return s.Interfaces
 }
 
@@ -7137,7 +7461,7 @@ func (s *Host) SetArch(val OptString) {
 }
 
 // SetBonds sets the value of Bonds.
-func (s *Host) SetBonds(val []NilHostBondsItem) {
+func (s *Host) SetBonds(val []HostBondsItem) {
 	s.Bonds = val
 }
 
@@ -7157,7 +7481,7 @@ func (s *Host) SetID(val OptNilInt64) {
 }
 
 // SetInterfaces sets the value of Interfaces.
-func (s *Host) SetInterfaces(val []NilHostInterfacesItem) {
+func (s *Host) SetInterfaces(val []HostInterfacesItem) {
 	s.Interfaces = val
 }
 
@@ -7494,11 +7818,11 @@ type NextAddressResponse struct {
 	// The prefix length to give a port with one of the suggested addresses.
 	PrefixLen OptInt    `json:"prefix_len"`
 	Range     OptString `json:"range"`
-	// Addresses in the range never suggested: the subnet's network and broadcast addresses, and in a
-	// subnet larger than a /24, ones ending in .0 or .255.
+	// Addresses in the range never suggested: the subnet's network and broadcast addresses, the gateway
+	// DHCP hands its nodes, and in a subnet larger than a /24, ones ending in .0 or .255.
 	Reserved []string `json:"reserved"`
-	// The subnet the range lies in, taken from the prefix length of the nodes in and around it, or the
-	// range itself when there are none.
+	// The subnet the range lies in: the one in dhcp.subnets holding it, or else taken from the prefix
+	// length of the nodes in and around it, or the range itself when there are none.
 	Subnet OptString `json:"subnet"`
 	// Addresses in the range a node's port holds, lowest first.
 	Used []NextAddressResponseUsedItem `json:"used"`
@@ -7700,1225 +8024,6 @@ func (s *NextAddressResponseUsedItem) SetNode(val OptString) {
 	s.Node = val
 }
 
-// NewNilBmcResponseModelBmcAckResultsItem returns new NilBmcResponseModelBmcAckResultsItem with value set to v.
-func NewNilBmcResponseModelBmcAckResultsItem(v BmcResponseModelBmcAckResultsItem) NilBmcResponseModelBmcAckResultsItem {
-	return NilBmcResponseModelBmcAckResultsItem{
-		Value: v,
-	}
-}
-
-// NilBmcResponseModelBmcAckResultsItem is nullable BmcResponseModelBmcAckResultsItem.
-type NilBmcResponseModelBmcAckResultsItem struct {
-	Value BmcResponseModelBmcAckResultsItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilBmcResponseModelBmcAckResultsItem) SetTo(v BmcResponseModelBmcAckResultsItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilBmcResponseModelBmcAckResultsItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilBmcResponseModelBmcAckResultsItem) SetToNull() {
-	o.Null = true
-	var v BmcResponseModelBmcAckResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilBmcResponseModelBmcAckResultsItem) Get() (v BmcResponseModelBmcAckResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilBmcResponseModelBmcAckResultsItem) Or(d BmcResponseModelBmcAckResultsItem) BmcResponseModelBmcAckResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilBmcResponseModelBmcAssetTagResultResultsItem returns new NilBmcResponseModelBmcAssetTagResultResultsItem with value set to v.
-func NewNilBmcResponseModelBmcAssetTagResultResultsItem(v BmcResponseModelBmcAssetTagResultResultsItem) NilBmcResponseModelBmcAssetTagResultResultsItem {
-	return NilBmcResponseModelBmcAssetTagResultResultsItem{
-		Value: v,
-	}
-}
-
-// NilBmcResponseModelBmcAssetTagResultResultsItem is nullable BmcResponseModelBmcAssetTagResultResultsItem.
-type NilBmcResponseModelBmcAssetTagResultResultsItem struct {
-	Value BmcResponseModelBmcAssetTagResultResultsItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilBmcResponseModelBmcAssetTagResultResultsItem) SetTo(v BmcResponseModelBmcAssetTagResultResultsItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilBmcResponseModelBmcAssetTagResultResultsItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilBmcResponseModelBmcAssetTagResultResultsItem) SetToNull() {
-	o.Null = true
-	var v BmcResponseModelBmcAssetTagResultResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilBmcResponseModelBmcAssetTagResultResultsItem) Get() (v BmcResponseModelBmcAssetTagResultResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilBmcResponseModelBmcAssetTagResultResultsItem) Or(d BmcResponseModelBmcAssetTagResultResultsItem) BmcResponseModelBmcAssetTagResultResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilBmcResponseModelBmcBiosRegistryResultsItem returns new NilBmcResponseModelBmcBiosRegistryResultsItem with value set to v.
-func NewNilBmcResponseModelBmcBiosRegistryResultsItem(v BmcResponseModelBmcBiosRegistryResultsItem) NilBmcResponseModelBmcBiosRegistryResultsItem {
-	return NilBmcResponseModelBmcBiosRegistryResultsItem{
-		Value: v,
-	}
-}
-
-// NilBmcResponseModelBmcBiosRegistryResultsItem is nullable BmcResponseModelBmcBiosRegistryResultsItem.
-type NilBmcResponseModelBmcBiosRegistryResultsItem struct {
-	Value BmcResponseModelBmcBiosRegistryResultsItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilBmcResponseModelBmcBiosRegistryResultsItem) SetTo(v BmcResponseModelBmcBiosRegistryResultsItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilBmcResponseModelBmcBiosRegistryResultsItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilBmcResponseModelBmcBiosRegistryResultsItem) SetToNull() {
-	o.Null = true
-	var v BmcResponseModelBmcBiosRegistryResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilBmcResponseModelBmcBiosRegistryResultsItem) Get() (v BmcResponseModelBmcBiosRegistryResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilBmcResponseModelBmcBiosRegistryResultsItem) Or(d BmcResponseModelBmcBiosRegistryResultsItem) BmcResponseModelBmcBiosRegistryResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilBmcResponseModelBmcBiosResultsItem returns new NilBmcResponseModelBmcBiosResultsItem with value set to v.
-func NewNilBmcResponseModelBmcBiosResultsItem(v BmcResponseModelBmcBiosResultsItem) NilBmcResponseModelBmcBiosResultsItem {
-	return NilBmcResponseModelBmcBiosResultsItem{
-		Value: v,
-	}
-}
-
-// NilBmcResponseModelBmcBiosResultsItem is nullable BmcResponseModelBmcBiosResultsItem.
-type NilBmcResponseModelBmcBiosResultsItem struct {
-	Value BmcResponseModelBmcBiosResultsItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilBmcResponseModelBmcBiosResultsItem) SetTo(v BmcResponseModelBmcBiosResultsItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilBmcResponseModelBmcBiosResultsItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilBmcResponseModelBmcBiosResultsItem) SetToNull() {
-	o.Null = true
-	var v BmcResponseModelBmcBiosResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilBmcResponseModelBmcBiosResultsItem) Get() (v BmcResponseModelBmcBiosResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilBmcResponseModelBmcBiosResultsItem) Or(d BmcResponseModelBmcBiosResultsItem) BmcResponseModelBmcBiosResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilBmcResponseModelBmcFirmwareUpdatesResultsItem returns new NilBmcResponseModelBmcFirmwareUpdatesResultsItem with value set to v.
-func NewNilBmcResponseModelBmcFirmwareUpdatesResultsItem(v BmcResponseModelBmcFirmwareUpdatesResultsItem) NilBmcResponseModelBmcFirmwareUpdatesResultsItem {
-	return NilBmcResponseModelBmcFirmwareUpdatesResultsItem{
-		Value: v,
-	}
-}
-
-// NilBmcResponseModelBmcFirmwareUpdatesResultsItem is nullable BmcResponseModelBmcFirmwareUpdatesResultsItem.
-type NilBmcResponseModelBmcFirmwareUpdatesResultsItem struct {
-	Value BmcResponseModelBmcFirmwareUpdatesResultsItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilBmcResponseModelBmcFirmwareUpdatesResultsItem) SetTo(v BmcResponseModelBmcFirmwareUpdatesResultsItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilBmcResponseModelBmcFirmwareUpdatesResultsItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilBmcResponseModelBmcFirmwareUpdatesResultsItem) SetToNull() {
-	o.Null = true
-	var v BmcResponseModelBmcFirmwareUpdatesResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilBmcResponseModelBmcFirmwareUpdatesResultsItem) Get() (v BmcResponseModelBmcFirmwareUpdatesResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilBmcResponseModelBmcFirmwareUpdatesResultsItem) Or(d BmcResponseModelBmcFirmwareUpdatesResultsItem) BmcResponseModelBmcFirmwareUpdatesResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem returns new NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem with value set to v.
-func NewNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem(v BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem {
-	return NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem{
-		Value: v,
-	}
-}
-
-// NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem is nullable BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem.
-type NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem struct {
-	Value BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetTo(v BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetToNull() {
-	o.Null = true
-	var v BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) Get() (v BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) Or(d BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilBmcResponseModelBmcJobListResultsItem returns new NilBmcResponseModelBmcJobListResultsItem with value set to v.
-func NewNilBmcResponseModelBmcJobListResultsItem(v BmcResponseModelBmcJobListResultsItem) NilBmcResponseModelBmcJobListResultsItem {
-	return NilBmcResponseModelBmcJobListResultsItem{
-		Value: v,
-	}
-}
-
-// NilBmcResponseModelBmcJobListResultsItem is nullable BmcResponseModelBmcJobListResultsItem.
-type NilBmcResponseModelBmcJobListResultsItem struct {
-	Value BmcResponseModelBmcJobListResultsItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilBmcResponseModelBmcJobListResultsItem) SetTo(v BmcResponseModelBmcJobListResultsItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilBmcResponseModelBmcJobListResultsItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilBmcResponseModelBmcJobListResultsItem) SetToNull() {
-	o.Null = true
-	var v BmcResponseModelBmcJobListResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilBmcResponseModelBmcJobListResultsItem) Get() (v BmcResponseModelBmcJobListResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilBmcResponseModelBmcJobListResultsItem) Or(d BmcResponseModelBmcJobListResultsItem) BmcResponseModelBmcJobListResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilBmcResponseModelBmcJobListResultsItemDataJobsItem returns new NilBmcResponseModelBmcJobListResultsItemDataJobsItem with value set to v.
-func NewNilBmcResponseModelBmcJobListResultsItemDataJobsItem(v BmcResponseModelBmcJobListResultsItemDataJobsItem) NilBmcResponseModelBmcJobListResultsItemDataJobsItem {
-	return NilBmcResponseModelBmcJobListResultsItemDataJobsItem{
-		Value: v,
-	}
-}
-
-// NilBmcResponseModelBmcJobListResultsItemDataJobsItem is nullable BmcResponseModelBmcJobListResultsItemDataJobsItem.
-type NilBmcResponseModelBmcJobListResultsItemDataJobsItem struct {
-	Value BmcResponseModelBmcJobListResultsItemDataJobsItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilBmcResponseModelBmcJobListResultsItemDataJobsItem) SetTo(v BmcResponseModelBmcJobListResultsItemDataJobsItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilBmcResponseModelBmcJobListResultsItemDataJobsItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilBmcResponseModelBmcJobListResultsItemDataJobsItem) SetToNull() {
-	o.Null = true
-	var v BmcResponseModelBmcJobListResultsItemDataJobsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilBmcResponseModelBmcJobListResultsItemDataJobsItem) Get() (v BmcResponseModelBmcJobListResultsItemDataJobsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilBmcResponseModelBmcJobListResultsItemDataJobsItem) Or(d BmcResponseModelBmcJobListResultsItemDataJobsItem) BmcResponseModelBmcJobListResultsItemDataJobsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilBmcResponseModelBmcLocationResultResultsItem returns new NilBmcResponseModelBmcLocationResultResultsItem with value set to v.
-func NewNilBmcResponseModelBmcLocationResultResultsItem(v BmcResponseModelBmcLocationResultResultsItem) NilBmcResponseModelBmcLocationResultResultsItem {
-	return NilBmcResponseModelBmcLocationResultResultsItem{
-		Value: v,
-	}
-}
-
-// NilBmcResponseModelBmcLocationResultResultsItem is nullable BmcResponseModelBmcLocationResultResultsItem.
-type NilBmcResponseModelBmcLocationResultResultsItem struct {
-	Value BmcResponseModelBmcLocationResultResultsItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilBmcResponseModelBmcLocationResultResultsItem) SetTo(v BmcResponseModelBmcLocationResultResultsItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilBmcResponseModelBmcLocationResultResultsItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilBmcResponseModelBmcLocationResultResultsItem) SetToNull() {
-	o.Null = true
-	var v BmcResponseModelBmcLocationResultResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilBmcResponseModelBmcLocationResultResultsItem) Get() (v BmcResponseModelBmcLocationResultResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilBmcResponseModelBmcLocationResultResultsItem) Or(d BmcResponseModelBmcLocationResultResultsItem) BmcResponseModelBmcLocationResultResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilBmcResponseModelBmcNICListResultsItem returns new NilBmcResponseModelBmcNICListResultsItem with value set to v.
-func NewNilBmcResponseModelBmcNICListResultsItem(v BmcResponseModelBmcNICListResultsItem) NilBmcResponseModelBmcNICListResultsItem {
-	return NilBmcResponseModelBmcNICListResultsItem{
-		Value: v,
-	}
-}
-
-// NilBmcResponseModelBmcNICListResultsItem is nullable BmcResponseModelBmcNICListResultsItem.
-type NilBmcResponseModelBmcNICListResultsItem struct {
-	Value BmcResponseModelBmcNICListResultsItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilBmcResponseModelBmcNICListResultsItem) SetTo(v BmcResponseModelBmcNICListResultsItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilBmcResponseModelBmcNICListResultsItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilBmcResponseModelBmcNICListResultsItem) SetToNull() {
-	o.Null = true
-	var v BmcResponseModelBmcNICListResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilBmcResponseModelBmcNICListResultsItem) Get() (v BmcResponseModelBmcNICListResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilBmcResponseModelBmcNICListResultsItem) Or(d BmcResponseModelBmcNICListResultsItem) BmcResponseModelBmcNICListResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilBmcResponseModelBmcNICListResultsItemDataNicsItem returns new NilBmcResponseModelBmcNICListResultsItemDataNicsItem with value set to v.
-func NewNilBmcResponseModelBmcNICListResultsItemDataNicsItem(v BmcResponseModelBmcNICListResultsItemDataNicsItem) NilBmcResponseModelBmcNICListResultsItemDataNicsItem {
-	return NilBmcResponseModelBmcNICListResultsItemDataNicsItem{
-		Value: v,
-	}
-}
-
-// NilBmcResponseModelBmcNICListResultsItemDataNicsItem is nullable BmcResponseModelBmcNICListResultsItemDataNicsItem.
-type NilBmcResponseModelBmcNICListResultsItemDataNicsItem struct {
-	Value BmcResponseModelBmcNICListResultsItemDataNicsItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilBmcResponseModelBmcNICListResultsItemDataNicsItem) SetTo(v BmcResponseModelBmcNICListResultsItemDataNicsItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilBmcResponseModelBmcNICListResultsItemDataNicsItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilBmcResponseModelBmcNICListResultsItemDataNicsItem) SetToNull() {
-	o.Null = true
-	var v BmcResponseModelBmcNICListResultsItemDataNicsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilBmcResponseModelBmcNICListResultsItemDataNicsItem) Get() (v BmcResponseModelBmcNICListResultsItemDataNicsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilBmcResponseModelBmcNICListResultsItemDataNicsItem) Or(d BmcResponseModelBmcNICListResultsItemDataNicsItem) BmcResponseModelBmcNICListResultsItemDataNicsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilBmcResponseModelBmcSELLogResultsItem returns new NilBmcResponseModelBmcSELLogResultsItem with value set to v.
-func NewNilBmcResponseModelBmcSELLogResultsItem(v BmcResponseModelBmcSELLogResultsItem) NilBmcResponseModelBmcSELLogResultsItem {
-	return NilBmcResponseModelBmcSELLogResultsItem{
-		Value: v,
-	}
-}
-
-// NilBmcResponseModelBmcSELLogResultsItem is nullable BmcResponseModelBmcSELLogResultsItem.
-type NilBmcResponseModelBmcSELLogResultsItem struct {
-	Value BmcResponseModelBmcSELLogResultsItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilBmcResponseModelBmcSELLogResultsItem) SetTo(v BmcResponseModelBmcSELLogResultsItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilBmcResponseModelBmcSELLogResultsItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilBmcResponseModelBmcSELLogResultsItem) SetToNull() {
-	o.Null = true
-	var v BmcResponseModelBmcSELLogResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilBmcResponseModelBmcSELLogResultsItem) Get() (v BmcResponseModelBmcSELLogResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilBmcResponseModelBmcSELLogResultsItem) Or(d BmcResponseModelBmcSELLogResultsItem) BmcResponseModelBmcSELLogResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilBmcResponseModelBmcSELLogResultsItemDataEntriesItem returns new NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem with value set to v.
-func NewNilBmcResponseModelBmcSELLogResultsItemDataEntriesItem(v BmcResponseModelBmcSELLogResultsItemDataEntriesItem) NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem {
-	return NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem{
-		Value: v,
-	}
-}
-
-// NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem is nullable BmcResponseModelBmcSELLogResultsItemDataEntriesItem.
-type NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem struct {
-	Value BmcResponseModelBmcSELLogResultsItemDataEntriesItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetTo(v BmcResponseModelBmcSELLogResultsItemDataEntriesItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetToNull() {
-	o.Null = true
-	var v BmcResponseModelBmcSELLogResultsItemDataEntriesItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) Get() (v BmcResponseModelBmcSELLogResultsItemDataEntriesItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) Or(d BmcResponseModelBmcSELLogResultsItemDataEntriesItem) BmcResponseModelBmcSELLogResultsItemDataEntriesItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilBmcResponseModelBmcSecureBootResultsItem returns new NilBmcResponseModelBmcSecureBootResultsItem with value set to v.
-func NewNilBmcResponseModelBmcSecureBootResultsItem(v BmcResponseModelBmcSecureBootResultsItem) NilBmcResponseModelBmcSecureBootResultsItem {
-	return NilBmcResponseModelBmcSecureBootResultsItem{
-		Value: v,
-	}
-}
-
-// NilBmcResponseModelBmcSecureBootResultsItem is nullable BmcResponseModelBmcSecureBootResultsItem.
-type NilBmcResponseModelBmcSecureBootResultsItem struct {
-	Value BmcResponseModelBmcSecureBootResultsItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilBmcResponseModelBmcSecureBootResultsItem) SetTo(v BmcResponseModelBmcSecureBootResultsItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilBmcResponseModelBmcSecureBootResultsItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilBmcResponseModelBmcSecureBootResultsItem) SetToNull() {
-	o.Null = true
-	var v BmcResponseModelBmcSecureBootResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilBmcResponseModelBmcSecureBootResultsItem) Get() (v BmcResponseModelBmcSecureBootResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilBmcResponseModelBmcSecureBootResultsItem) Or(d BmcResponseModelBmcSecureBootResultsItem) BmcResponseModelBmcSecureBootResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilBmcResponseModelRedfishSystemResultsItem returns new NilBmcResponseModelRedfishSystemResultsItem with value set to v.
-func NewNilBmcResponseModelRedfishSystemResultsItem(v BmcResponseModelRedfishSystemResultsItem) NilBmcResponseModelRedfishSystemResultsItem {
-	return NilBmcResponseModelRedfishSystemResultsItem{
-		Value: v,
-	}
-}
-
-// NilBmcResponseModelRedfishSystemResultsItem is nullable BmcResponseModelRedfishSystemResultsItem.
-type NilBmcResponseModelRedfishSystemResultsItem struct {
-	Value BmcResponseModelRedfishSystemResultsItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilBmcResponseModelRedfishSystemResultsItem) SetTo(v BmcResponseModelRedfishSystemResultsItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilBmcResponseModelRedfishSystemResultsItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilBmcResponseModelRedfishSystemResultsItem) SetToNull() {
-	o.Null = true
-	var v BmcResponseModelRedfishSystemResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilBmcResponseModelRedfishSystemResultsItem) Get() (v BmcResponseModelRedfishSystemResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilBmcResponseModelRedfishSystemResultsItem) Or(d BmcResponseModelRedfishSystemResultsItem) BmcResponseModelRedfishSystemResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem returns new NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem with value set to v.
-func NewNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem(v BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem {
-	return NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem{
-		Value: v,
-	}
-}
-
-// NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem is nullable BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem.
-type NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem struct {
-	Value BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetTo(v BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) IsNull() bool {
-	return o.Null
-}
-
-// SetToNull sets value to null.
-func (o *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetToNull() {
-	o.Null = true
-	var v BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) Get() (v BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) Or(d BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem returns new NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem with value set to v.
-func NewNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem(v BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
-	return NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem{
-		Value: v,
-	}
-}
-
-// NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem is nullable BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem.
-type NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem struct {
-	Value BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetTo(v BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) IsNull() bool {
-	return o.Null
-}
-
-// SetToNull sets value to null.
-func (o *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetToNull() {
-	o.Null = true
-	var v BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Get() (v BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Or(d BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilBootImageAddRequestBootImagesItem returns new NilBootImageAddRequestBootImagesItem with value set to v.
-func NewNilBootImageAddRequestBootImagesItem(v BootImageAddRequestBootImagesItem) NilBootImageAddRequestBootImagesItem {
-	return NilBootImageAddRequestBootImagesItem{
-		Value: v,
-	}
-}
-
-// NilBootImageAddRequestBootImagesItem is nullable BootImageAddRequestBootImagesItem.
-type NilBootImageAddRequestBootImagesItem struct {
-	Value BootImageAddRequestBootImagesItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilBootImageAddRequestBootImagesItem) SetTo(v BootImageAddRequestBootImagesItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilBootImageAddRequestBootImagesItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilBootImageAddRequestBootImagesItem) SetToNull() {
-	o.Null = true
-	var v BootImageAddRequestBootImagesItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilBootImageAddRequestBootImagesItem) Get() (v BootImageAddRequestBootImagesItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilBootImageAddRequestBootImagesItem) Or(d BootImageAddRequestBootImagesItem) BootImageAddRequestBootImagesItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilDataDumpHostsItem returns new NilDataDumpHostsItem with value set to v.
-func NewNilDataDumpHostsItem(v DataDumpHostsItem) NilDataDumpHostsItem {
-	return NilDataDumpHostsItem{
-		Value: v,
-	}
-}
-
-// NilDataDumpHostsItem is nullable DataDumpHostsItem.
-type NilDataDumpHostsItem struct {
-	Value DataDumpHostsItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilDataDumpHostsItem) SetTo(v DataDumpHostsItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilDataDumpHostsItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilDataDumpHostsItem) SetToNull() {
-	o.Null = true
-	var v DataDumpHostsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilDataDumpHostsItem) Get() (v DataDumpHostsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilDataDumpHostsItem) Or(d DataDumpHostsItem) DataDumpHostsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilDataDumpHostsItemBondsItem returns new NilDataDumpHostsItemBondsItem with value set to v.
-func NewNilDataDumpHostsItemBondsItem(v DataDumpHostsItemBondsItem) NilDataDumpHostsItemBondsItem {
-	return NilDataDumpHostsItemBondsItem{
-		Value: v,
-	}
-}
-
-// NilDataDumpHostsItemBondsItem is nullable DataDumpHostsItemBondsItem.
-type NilDataDumpHostsItemBondsItem struct {
-	Value DataDumpHostsItemBondsItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilDataDumpHostsItemBondsItem) SetTo(v DataDumpHostsItemBondsItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilDataDumpHostsItemBondsItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilDataDumpHostsItemBondsItem) SetToNull() {
-	o.Null = true
-	var v DataDumpHostsItemBondsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilDataDumpHostsItemBondsItem) Get() (v DataDumpHostsItemBondsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilDataDumpHostsItemBondsItem) Or(d DataDumpHostsItemBondsItem) DataDumpHostsItemBondsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilDataDumpHostsItemInterfacesItem returns new NilDataDumpHostsItemInterfacesItem with value set to v.
-func NewNilDataDumpHostsItemInterfacesItem(v DataDumpHostsItemInterfacesItem) NilDataDumpHostsItemInterfacesItem {
-	return NilDataDumpHostsItemInterfacesItem{
-		Value: v,
-	}
-}
-
-// NilDataDumpHostsItemInterfacesItem is nullable DataDumpHostsItemInterfacesItem.
-type NilDataDumpHostsItemInterfacesItem struct {
-	Value DataDumpHostsItemInterfacesItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilDataDumpHostsItemInterfacesItem) SetTo(v DataDumpHostsItemInterfacesItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilDataDumpHostsItemInterfacesItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilDataDumpHostsItemInterfacesItem) SetToNull() {
-	o.Null = true
-	var v DataDumpHostsItemInterfacesItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilDataDumpHostsItemInterfacesItem) Get() (v DataDumpHostsItemInterfacesItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilDataDumpHostsItemInterfacesItem) Or(d DataDumpHostsItemInterfacesItem) DataDumpHostsItemInterfacesItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilDataDumpImagesItem returns new NilDataDumpImagesItem with value set to v.
-func NewNilDataDumpImagesItem(v DataDumpImagesItem) NilDataDumpImagesItem {
-	return NilDataDumpImagesItem{
-		Value: v,
-	}
-}
-
-// NilDataDumpImagesItem is nullable DataDumpImagesItem.
-type NilDataDumpImagesItem struct {
-	Value DataDumpImagesItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilDataDumpImagesItem) SetTo(v DataDumpImagesItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilDataDumpImagesItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilDataDumpImagesItem) SetToNull() {
-	o.Null = true
-	var v DataDumpImagesItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilDataDumpImagesItem) Get() (v DataDumpImagesItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilDataDumpImagesItem) Or(d DataDumpImagesItem) DataDumpImagesItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilHostBondsItem returns new NilHostBondsItem with value set to v.
-func NewNilHostBondsItem(v HostBondsItem) NilHostBondsItem {
-	return NilHostBondsItem{
-		Value: v,
-	}
-}
-
-// NilHostBondsItem is nullable HostBondsItem.
-type NilHostBondsItem struct {
-	Value HostBondsItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilHostBondsItem) SetTo(v HostBondsItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilHostBondsItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilHostBondsItem) SetToNull() {
-	o.Null = true
-	var v HostBondsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilHostBondsItem) Get() (v HostBondsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilHostBondsItem) Or(d HostBondsItem) HostBondsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilHostInterfacesItem returns new NilHostInterfacesItem with value set to v.
-func NewNilHostInterfacesItem(v HostInterfacesItem) NilHostInterfacesItem {
-	return NilHostInterfacesItem{
-		Value: v,
-	}
-}
-
-// NilHostInterfacesItem is nullable HostInterfacesItem.
-type NilHostInterfacesItem struct {
-	Value HostInterfacesItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilHostInterfacesItem) SetTo(v HostInterfacesItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilHostInterfacesItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilHostInterfacesItem) SetToNull() {
-	o.Null = true
-	var v HostInterfacesItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilHostInterfacesItem) Get() (v HostInterfacesItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilHostInterfacesItem) Or(d HostInterfacesItem) HostInterfacesItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilNodeAddRequestNodeListItem returns new NilNodeAddRequestNodeListItem with value set to v.
-func NewNilNodeAddRequestNodeListItem(v NodeAddRequestNodeListItem) NilNodeAddRequestNodeListItem {
-	return NilNodeAddRequestNodeListItem{
-		Value: v,
-	}
-}
-
-// NilNodeAddRequestNodeListItem is nullable NodeAddRequestNodeListItem.
-type NilNodeAddRequestNodeListItem struct {
-	Value NodeAddRequestNodeListItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilNodeAddRequestNodeListItem) SetTo(v NodeAddRequestNodeListItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilNodeAddRequestNodeListItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilNodeAddRequestNodeListItem) SetToNull() {
-	o.Null = true
-	var v NodeAddRequestNodeListItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilNodeAddRequestNodeListItem) Get() (v NodeAddRequestNodeListItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilNodeAddRequestNodeListItem) Or(d NodeAddRequestNodeListItem) NodeAddRequestNodeListItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilNodeAddRequestNodeListItemBondsItem returns new NilNodeAddRequestNodeListItemBondsItem with value set to v.
-func NewNilNodeAddRequestNodeListItemBondsItem(v NodeAddRequestNodeListItemBondsItem) NilNodeAddRequestNodeListItemBondsItem {
-	return NilNodeAddRequestNodeListItemBondsItem{
-		Value: v,
-	}
-}
-
-// NilNodeAddRequestNodeListItemBondsItem is nullable NodeAddRequestNodeListItemBondsItem.
-type NilNodeAddRequestNodeListItemBondsItem struct {
-	Value NodeAddRequestNodeListItemBondsItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilNodeAddRequestNodeListItemBondsItem) SetTo(v NodeAddRequestNodeListItemBondsItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilNodeAddRequestNodeListItemBondsItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilNodeAddRequestNodeListItemBondsItem) SetToNull() {
-	o.Null = true
-	var v NodeAddRequestNodeListItemBondsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilNodeAddRequestNodeListItemBondsItem) Get() (v NodeAddRequestNodeListItemBondsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilNodeAddRequestNodeListItemBondsItem) Or(d NodeAddRequestNodeListItemBondsItem) NodeAddRequestNodeListItemBondsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewNilNodeAddRequestNodeListItemInterfacesItem returns new NilNodeAddRequestNodeListItemInterfacesItem with value set to v.
-func NewNilNodeAddRequestNodeListItemInterfacesItem(v NodeAddRequestNodeListItemInterfacesItem) NilNodeAddRequestNodeListItemInterfacesItem {
-	return NilNodeAddRequestNodeListItemInterfacesItem{
-		Value: v,
-	}
-}
-
-// NilNodeAddRequestNodeListItemInterfacesItem is nullable NodeAddRequestNodeListItemInterfacesItem.
-type NilNodeAddRequestNodeListItemInterfacesItem struct {
-	Value NodeAddRequestNodeListItemInterfacesItem
-	Null  bool
-}
-
-// SetTo sets value to v.
-func (o *NilNodeAddRequestNodeListItemInterfacesItem) SetTo(v NodeAddRequestNodeListItemInterfacesItem) {
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o NilNodeAddRequestNodeListItemInterfacesItem) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *NilNodeAddRequestNodeListItemInterfacesItem) SetToNull() {
-	o.Null = true
-	var v NodeAddRequestNodeListItemInterfacesItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o NilNodeAddRequestNodeListItemInterfacesItem) Get() (v NodeAddRequestNodeListItemInterfacesItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o NilNodeAddRequestNodeListItemInterfacesItem) Or(d NodeAddRequestNodeListItemInterfacesItem) NodeAddRequestNodeListItemInterfacesItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewNilString returns new NilString with value set to v.
 func NewNilString(v string) NilString {
 	return NilString{
@@ -8967,30 +8072,30 @@ func (o NilString) Or(d string) string {
 // NodeAddRequest schema.
 // Ref: #/components/schemas/NodeAddRequest
 type NodeAddRequest struct {
-	NodeList []NilNodeAddRequestNodeListItem `json:"node_list"`
+	NodeList []NodeAddRequestNodeListItem `json:"node_list"`
 }
 
 // GetNodeList returns the value of NodeList.
-func (s *NodeAddRequest) GetNodeList() []NilNodeAddRequestNodeListItem {
+func (s *NodeAddRequest) GetNodeList() []NodeAddRequestNodeListItem {
 	return s.NodeList
 }
 
 // SetNodeList sets the value of NodeList.
-func (s *NodeAddRequest) SetNodeList(val []NilNodeAddRequestNodeListItem) {
+func (s *NodeAddRequest) SetNodeList(val []NodeAddRequestNodeListItem) {
 	s.NodeList = val
 }
 
 type NodeAddRequestNodeListItem struct {
-	Arch       OptString                                     `json:"arch"`
-	Bonds      []NilNodeAddRequestNodeListItemBondsItem      `json:"bonds"`
-	BootImage  OptString                                     `json:"boot_image"`
-	Firmware   OptString                                     `json:"firmware"`
-	ID         OptNilInt64                                   `json:"id"`
-	Interfaces []NilNodeAddRequestNodeListItemInterfacesItem `json:"interfaces"`
-	Name       OptString                                     `json:"name"`
-	Provision  OptBool                                       `json:"provision"`
-	Tags       OptNilStringArray                             `json:"tags"`
-	UID        OptNilString                                  `json:"uid"`
+	Arch       OptString                                  `json:"arch"`
+	Bonds      []NodeAddRequestNodeListItemBondsItem      `json:"bonds"`
+	BootImage  OptString                                  `json:"boot_image"`
+	Firmware   OptString                                  `json:"firmware"`
+	ID         OptNilInt64                                `json:"id"`
+	Interfaces []NodeAddRequestNodeListItemInterfacesItem `json:"interfaces"`
+	Name       OptString                                  `json:"name"`
+	Provision  OptBool                                    `json:"provision"`
+	Tags       OptNilStringArray                          `json:"tags"`
+	UID        OptNilString                               `json:"uid"`
 }
 
 // GetArch returns the value of Arch.
@@ -8999,7 +8104,7 @@ func (s *NodeAddRequestNodeListItem) GetArch() OptString {
 }
 
 // GetBonds returns the value of Bonds.
-func (s *NodeAddRequestNodeListItem) GetBonds() []NilNodeAddRequestNodeListItemBondsItem {
+func (s *NodeAddRequestNodeListItem) GetBonds() []NodeAddRequestNodeListItemBondsItem {
 	return s.Bonds
 }
 
@@ -9019,7 +8124,7 @@ func (s *NodeAddRequestNodeListItem) GetID() OptNilInt64 {
 }
 
 // GetInterfaces returns the value of Interfaces.
-func (s *NodeAddRequestNodeListItem) GetInterfaces() []NilNodeAddRequestNodeListItemInterfacesItem {
+func (s *NodeAddRequestNodeListItem) GetInterfaces() []NodeAddRequestNodeListItemInterfacesItem {
 	return s.Interfaces
 }
 
@@ -9049,7 +8154,7 @@ func (s *NodeAddRequestNodeListItem) SetArch(val OptString) {
 }
 
 // SetBonds sets the value of Bonds.
-func (s *NodeAddRequestNodeListItem) SetBonds(val []NilNodeAddRequestNodeListItemBondsItem) {
+func (s *NodeAddRequestNodeListItem) SetBonds(val []NodeAddRequestNodeListItemBondsItem) {
 	s.Bonds = val
 }
 
@@ -9069,7 +8174,7 @@ func (s *NodeAddRequestNodeListItem) SetID(val OptNilInt64) {
 }
 
 // SetInterfaces sets the value of Interfaces.
-func (s *NodeAddRequestNodeListItem) SetInterfaces(val []NilNodeAddRequestNodeListItemInterfacesItem) {
+func (s *NodeAddRequestNodeListItem) SetInterfaces(val []NodeAddRequestNodeListItemInterfacesItem) {
 	s.Interfaces = val
 }
 
@@ -9431,15 +8536,15 @@ func (s *NodeImportRequestRanges) SetBoot(val OptNilString) {
 }
 
 type NodeImportRequestRowsItem struct {
-	Bmc    OptBool              `json:"bmc"`
-	Fqdn   OptString            `json:"fqdn"`
-	Ifname OptString            `json:"ifname"`
-	IP     OptString            `json:"ip"`
-	MAC    OptString            `json:"mac"`
-	Mtu    OptInt               `json:"mtu"`
-	Node   OptString            `json:"node"`
-	Tags   OptNilNilStringArray `json:"tags"`
-	Vlan   OptString            `json:"vlan"`
+	Bmc    OptBool           `json:"bmc"`
+	Fqdn   OptString         `json:"fqdn"`
+	Ifname OptString         `json:"ifname"`
+	IP     OptString         `json:"ip"`
+	MAC    OptString         `json:"mac"`
+	Mtu    OptInt            `json:"mtu"`
+	Node   OptString         `json:"node"`
+	Tags   OptNilStringArray `json:"tags"`
+	Vlan   OptString         `json:"vlan"`
 }
 
 // GetBmc returns the value of Bmc.
@@ -9478,7 +8583,7 @@ func (s *NodeImportRequestRowsItem) GetNode() OptString {
 }
 
 // GetTags returns the value of Tags.
-func (s *NodeImportRequestRowsItem) GetTags() OptNilNilStringArray {
+func (s *NodeImportRequestRowsItem) GetTags() OptNilStringArray {
 	return s.Tags
 }
 
@@ -9523,7 +8628,7 @@ func (s *NodeImportRequestRowsItem) SetNode(val OptString) {
 }
 
 // SetTags sets the value of Tags.
-func (s *NodeImportRequestRowsItem) SetTags(val OptNilNilStringArray) {
+func (s *NodeImportRequestRowsItem) SetTags(val OptNilStringArray) {
 	s.Tags = val
 }
 
@@ -9593,20 +8698,20 @@ func (s *NodeImportResponse) SetSummary(val OptNodeImportResponseSummary) {
 }
 
 type NodeImportResponseRowsItem struct {
-	Action   OptString            `json:"action"`
-	Answered OptBool              `json:"answered"`
-	Assigned OptBool              `json:"assigned"`
-	Bmc      OptBool              `json:"bmc"`
-	Fqdn     OptString            `json:"fqdn"`
-	Ifname   OptString            `json:"ifname"`
-	IP       OptString            `json:"ip"`
-	MAC      OptString            `json:"mac"`
-	Mtu      OptInt               `json:"mtu"`
-	Node     OptString            `json:"node"`
-	Reason   OptString            `json:"reason"`
-	Replaces OptString            `json:"replaces"`
-	Tags     OptNilNilStringArray `json:"tags"`
-	Vlan     OptString            `json:"vlan"`
+	Action   OptString         `json:"action"`
+	Answered OptBool           `json:"answered"`
+	Assigned OptBool           `json:"assigned"`
+	Bmc      OptBool           `json:"bmc"`
+	Fqdn     OptString         `json:"fqdn"`
+	Ifname   OptString         `json:"ifname"`
+	IP       OptString         `json:"ip"`
+	MAC      OptString         `json:"mac"`
+	Mtu      OptInt            `json:"mtu"`
+	Node     OptString         `json:"node"`
+	Reason   OptString         `json:"reason"`
+	Replaces OptString         `json:"replaces"`
+	Tags     OptNilStringArray `json:"tags"`
+	Vlan     OptString         `json:"vlan"`
 }
 
 // GetAction returns the value of Action.
@@ -9670,7 +8775,7 @@ func (s *NodeImportResponseRowsItem) GetReplaces() OptString {
 }
 
 // GetTags returns the value of Tags.
-func (s *NodeImportResponseRowsItem) GetTags() OptNilNilStringArray {
+func (s *NodeImportResponseRowsItem) GetTags() OptNilStringArray {
 	return s.Tags
 }
 
@@ -9740,7 +8845,7 @@ func (s *NodeImportResponseRowsItem) SetReplaces(val OptString) {
 }
 
 // SetTags sets the value of Tags.
-func (s *NodeImportResponseRowsItem) SetTags(val OptNilNilStringArray) {
+func (s *NodeImportResponseRowsItem) SetTags(val OptNilStringArray) {
 	s.Tags = val
 }
 
@@ -9840,144 +8945,6 @@ func (s *NodeTagsRequest) SetTags(val OptString) {
 	s.Tags = val
 }
 
-// NewOptBmcResponseModelBmcAckSummary returns new OptBmcResponseModelBmcAckSummary with value set to v.
-func NewOptBmcResponseModelBmcAckSummary(v BmcResponseModelBmcAckSummary) OptBmcResponseModelBmcAckSummary {
-	return OptBmcResponseModelBmcAckSummary{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptBmcResponseModelBmcAckSummary is optional BmcResponseModelBmcAckSummary.
-type OptBmcResponseModelBmcAckSummary struct {
-	Value BmcResponseModelBmcAckSummary
-	Set   bool
-}
-
-// IsSet returns true if OptBmcResponseModelBmcAckSummary was set.
-func (o OptBmcResponseModelBmcAckSummary) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptBmcResponseModelBmcAckSummary) Reset() {
-	var v BmcResponseModelBmcAckSummary
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptBmcResponseModelBmcAckSummary) SetTo(v BmcResponseModelBmcAckSummary) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptBmcResponseModelBmcAckSummary) Get() (v BmcResponseModelBmcAckSummary, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptBmcResponseModelBmcAckSummary) Or(d BmcResponseModelBmcAckSummary) BmcResponseModelBmcAckSummary {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptBmcResponseModelBmcAssetTagResultSummary returns new OptBmcResponseModelBmcAssetTagResultSummary with value set to v.
-func NewOptBmcResponseModelBmcAssetTagResultSummary(v BmcResponseModelBmcAssetTagResultSummary) OptBmcResponseModelBmcAssetTagResultSummary {
-	return OptBmcResponseModelBmcAssetTagResultSummary{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptBmcResponseModelBmcAssetTagResultSummary is optional BmcResponseModelBmcAssetTagResultSummary.
-type OptBmcResponseModelBmcAssetTagResultSummary struct {
-	Value BmcResponseModelBmcAssetTagResultSummary
-	Set   bool
-}
-
-// IsSet returns true if OptBmcResponseModelBmcAssetTagResultSummary was set.
-func (o OptBmcResponseModelBmcAssetTagResultSummary) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptBmcResponseModelBmcAssetTagResultSummary) Reset() {
-	var v BmcResponseModelBmcAssetTagResultSummary
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptBmcResponseModelBmcAssetTagResultSummary) SetTo(v BmcResponseModelBmcAssetTagResultSummary) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptBmcResponseModelBmcAssetTagResultSummary) Get() (v BmcResponseModelBmcAssetTagResultSummary, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptBmcResponseModelBmcAssetTagResultSummary) Or(d BmcResponseModelBmcAssetTagResultSummary) BmcResponseModelBmcAssetTagResultSummary {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptBmcResponseModelBmcBiosRegistrySummary returns new OptBmcResponseModelBmcBiosRegistrySummary with value set to v.
-func NewOptBmcResponseModelBmcBiosRegistrySummary(v BmcResponseModelBmcBiosRegistrySummary) OptBmcResponseModelBmcBiosRegistrySummary {
-	return OptBmcResponseModelBmcBiosRegistrySummary{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptBmcResponseModelBmcBiosRegistrySummary is optional BmcResponseModelBmcBiosRegistrySummary.
-type OptBmcResponseModelBmcBiosRegistrySummary struct {
-	Value BmcResponseModelBmcBiosRegistrySummary
-	Set   bool
-}
-
-// IsSet returns true if OptBmcResponseModelBmcBiosRegistrySummary was set.
-func (o OptBmcResponseModelBmcBiosRegistrySummary) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptBmcResponseModelBmcBiosRegistrySummary) Reset() {
-	var v BmcResponseModelBmcBiosRegistrySummary
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptBmcResponseModelBmcBiosRegistrySummary) SetTo(v BmcResponseModelBmcBiosRegistrySummary) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptBmcResponseModelBmcBiosRegistrySummary) Get() (v BmcResponseModelBmcBiosRegistrySummary, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptBmcResponseModelBmcBiosRegistrySummary) Or(d BmcResponseModelBmcBiosRegistrySummary) BmcResponseModelBmcBiosRegistrySummary {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptBmcResponseModelBmcBiosResultsItemDataAttributes returns new OptBmcResponseModelBmcBiosResultsItemDataAttributes with value set to v.
 func NewOptBmcResponseModelBmcBiosResultsItemDataAttributes(v BmcResponseModelBmcBiosResultsItemDataAttributes) OptBmcResponseModelBmcBiosResultsItemDataAttributes {
 	return OptBmcResponseModelBmcBiosResultsItemDataAttributes{
@@ -10064,466 +9031,6 @@ func (o OptBmcResponseModelBmcBiosResultsItemDataPending) Get() (v BmcResponseMo
 
 // Or returns value if set, or given parameter if does not.
 func (o OptBmcResponseModelBmcBiosResultsItemDataPending) Or(d BmcResponseModelBmcBiosResultsItemDataPending) BmcResponseModelBmcBiosResultsItemDataPending {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptBmcResponseModelBmcBiosSummary returns new OptBmcResponseModelBmcBiosSummary with value set to v.
-func NewOptBmcResponseModelBmcBiosSummary(v BmcResponseModelBmcBiosSummary) OptBmcResponseModelBmcBiosSummary {
-	return OptBmcResponseModelBmcBiosSummary{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptBmcResponseModelBmcBiosSummary is optional BmcResponseModelBmcBiosSummary.
-type OptBmcResponseModelBmcBiosSummary struct {
-	Value BmcResponseModelBmcBiosSummary
-	Set   bool
-}
-
-// IsSet returns true if OptBmcResponseModelBmcBiosSummary was set.
-func (o OptBmcResponseModelBmcBiosSummary) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptBmcResponseModelBmcBiosSummary) Reset() {
-	var v BmcResponseModelBmcBiosSummary
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptBmcResponseModelBmcBiosSummary) SetTo(v BmcResponseModelBmcBiosSummary) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptBmcResponseModelBmcBiosSummary) Get() (v BmcResponseModelBmcBiosSummary, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptBmcResponseModelBmcBiosSummary) Or(d BmcResponseModelBmcBiosSummary) BmcResponseModelBmcBiosSummary {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptBmcResponseModelBmcFirmwareUpdatesSummary returns new OptBmcResponseModelBmcFirmwareUpdatesSummary with value set to v.
-func NewOptBmcResponseModelBmcFirmwareUpdatesSummary(v BmcResponseModelBmcFirmwareUpdatesSummary) OptBmcResponseModelBmcFirmwareUpdatesSummary {
-	return OptBmcResponseModelBmcFirmwareUpdatesSummary{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptBmcResponseModelBmcFirmwareUpdatesSummary is optional BmcResponseModelBmcFirmwareUpdatesSummary.
-type OptBmcResponseModelBmcFirmwareUpdatesSummary struct {
-	Value BmcResponseModelBmcFirmwareUpdatesSummary
-	Set   bool
-}
-
-// IsSet returns true if OptBmcResponseModelBmcFirmwareUpdatesSummary was set.
-func (o OptBmcResponseModelBmcFirmwareUpdatesSummary) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptBmcResponseModelBmcFirmwareUpdatesSummary) Reset() {
-	var v BmcResponseModelBmcFirmwareUpdatesSummary
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptBmcResponseModelBmcFirmwareUpdatesSummary) SetTo(v BmcResponseModelBmcFirmwareUpdatesSummary) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptBmcResponseModelBmcFirmwareUpdatesSummary) Get() (v BmcResponseModelBmcFirmwareUpdatesSummary, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptBmcResponseModelBmcFirmwareUpdatesSummary) Or(d BmcResponseModelBmcFirmwareUpdatesSummary) BmcResponseModelBmcFirmwareUpdatesSummary {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptBmcResponseModelBmcJobListSummary returns new OptBmcResponseModelBmcJobListSummary with value set to v.
-func NewOptBmcResponseModelBmcJobListSummary(v BmcResponseModelBmcJobListSummary) OptBmcResponseModelBmcJobListSummary {
-	return OptBmcResponseModelBmcJobListSummary{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptBmcResponseModelBmcJobListSummary is optional BmcResponseModelBmcJobListSummary.
-type OptBmcResponseModelBmcJobListSummary struct {
-	Value BmcResponseModelBmcJobListSummary
-	Set   bool
-}
-
-// IsSet returns true if OptBmcResponseModelBmcJobListSummary was set.
-func (o OptBmcResponseModelBmcJobListSummary) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptBmcResponseModelBmcJobListSummary) Reset() {
-	var v BmcResponseModelBmcJobListSummary
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptBmcResponseModelBmcJobListSummary) SetTo(v BmcResponseModelBmcJobListSummary) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptBmcResponseModelBmcJobListSummary) Get() (v BmcResponseModelBmcJobListSummary, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptBmcResponseModelBmcJobListSummary) Or(d BmcResponseModelBmcJobListSummary) BmcResponseModelBmcJobListSummary {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptBmcResponseModelBmcLocationResultResultsItemDataCurrent returns new OptBmcResponseModelBmcLocationResultResultsItemDataCurrent with value set to v.
-func NewOptBmcResponseModelBmcLocationResultResultsItemDataCurrent(v BmcResponseModelBmcLocationResultResultsItemDataCurrent) OptBmcResponseModelBmcLocationResultResultsItemDataCurrent {
-	return OptBmcResponseModelBmcLocationResultResultsItemDataCurrent{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptBmcResponseModelBmcLocationResultResultsItemDataCurrent is optional BmcResponseModelBmcLocationResultResultsItemDataCurrent.
-type OptBmcResponseModelBmcLocationResultResultsItemDataCurrent struct {
-	Value BmcResponseModelBmcLocationResultResultsItemDataCurrent
-	Set   bool
-}
-
-// IsSet returns true if OptBmcResponseModelBmcLocationResultResultsItemDataCurrent was set.
-func (o OptBmcResponseModelBmcLocationResultResultsItemDataCurrent) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptBmcResponseModelBmcLocationResultResultsItemDataCurrent) Reset() {
-	var v BmcResponseModelBmcLocationResultResultsItemDataCurrent
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptBmcResponseModelBmcLocationResultResultsItemDataCurrent) SetTo(v BmcResponseModelBmcLocationResultResultsItemDataCurrent) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptBmcResponseModelBmcLocationResultResultsItemDataCurrent) Get() (v BmcResponseModelBmcLocationResultResultsItemDataCurrent, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptBmcResponseModelBmcLocationResultResultsItemDataCurrent) Or(d BmcResponseModelBmcLocationResultResultsItemDataCurrent) BmcResponseModelBmcLocationResultResultsItemDataCurrent {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptBmcResponseModelBmcLocationResultResultsItemDataDesired returns new OptBmcResponseModelBmcLocationResultResultsItemDataDesired with value set to v.
-func NewOptBmcResponseModelBmcLocationResultResultsItemDataDesired(v BmcResponseModelBmcLocationResultResultsItemDataDesired) OptBmcResponseModelBmcLocationResultResultsItemDataDesired {
-	return OptBmcResponseModelBmcLocationResultResultsItemDataDesired{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptBmcResponseModelBmcLocationResultResultsItemDataDesired is optional BmcResponseModelBmcLocationResultResultsItemDataDesired.
-type OptBmcResponseModelBmcLocationResultResultsItemDataDesired struct {
-	Value BmcResponseModelBmcLocationResultResultsItemDataDesired
-	Set   bool
-}
-
-// IsSet returns true if OptBmcResponseModelBmcLocationResultResultsItemDataDesired was set.
-func (o OptBmcResponseModelBmcLocationResultResultsItemDataDesired) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptBmcResponseModelBmcLocationResultResultsItemDataDesired) Reset() {
-	var v BmcResponseModelBmcLocationResultResultsItemDataDesired
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptBmcResponseModelBmcLocationResultResultsItemDataDesired) SetTo(v BmcResponseModelBmcLocationResultResultsItemDataDesired) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptBmcResponseModelBmcLocationResultResultsItemDataDesired) Get() (v BmcResponseModelBmcLocationResultResultsItemDataDesired, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptBmcResponseModelBmcLocationResultResultsItemDataDesired) Or(d BmcResponseModelBmcLocationResultResultsItemDataDesired) BmcResponseModelBmcLocationResultResultsItemDataDesired {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptBmcResponseModelBmcLocationResultSummary returns new OptBmcResponseModelBmcLocationResultSummary with value set to v.
-func NewOptBmcResponseModelBmcLocationResultSummary(v BmcResponseModelBmcLocationResultSummary) OptBmcResponseModelBmcLocationResultSummary {
-	return OptBmcResponseModelBmcLocationResultSummary{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptBmcResponseModelBmcLocationResultSummary is optional BmcResponseModelBmcLocationResultSummary.
-type OptBmcResponseModelBmcLocationResultSummary struct {
-	Value BmcResponseModelBmcLocationResultSummary
-	Set   bool
-}
-
-// IsSet returns true if OptBmcResponseModelBmcLocationResultSummary was set.
-func (o OptBmcResponseModelBmcLocationResultSummary) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptBmcResponseModelBmcLocationResultSummary) Reset() {
-	var v BmcResponseModelBmcLocationResultSummary
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptBmcResponseModelBmcLocationResultSummary) SetTo(v BmcResponseModelBmcLocationResultSummary) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptBmcResponseModelBmcLocationResultSummary) Get() (v BmcResponseModelBmcLocationResultSummary, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptBmcResponseModelBmcLocationResultSummary) Or(d BmcResponseModelBmcLocationResultSummary) BmcResponseModelBmcLocationResultSummary {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptBmcResponseModelBmcNICListSummary returns new OptBmcResponseModelBmcNICListSummary with value set to v.
-func NewOptBmcResponseModelBmcNICListSummary(v BmcResponseModelBmcNICListSummary) OptBmcResponseModelBmcNICListSummary {
-	return OptBmcResponseModelBmcNICListSummary{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptBmcResponseModelBmcNICListSummary is optional BmcResponseModelBmcNICListSummary.
-type OptBmcResponseModelBmcNICListSummary struct {
-	Value BmcResponseModelBmcNICListSummary
-	Set   bool
-}
-
-// IsSet returns true if OptBmcResponseModelBmcNICListSummary was set.
-func (o OptBmcResponseModelBmcNICListSummary) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptBmcResponseModelBmcNICListSummary) Reset() {
-	var v BmcResponseModelBmcNICListSummary
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptBmcResponseModelBmcNICListSummary) SetTo(v BmcResponseModelBmcNICListSummary) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptBmcResponseModelBmcNICListSummary) Get() (v BmcResponseModelBmcNICListSummary, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptBmcResponseModelBmcNICListSummary) Or(d BmcResponseModelBmcNICListSummary) BmcResponseModelBmcNICListSummary {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptBmcResponseModelBmcSELLogSummary returns new OptBmcResponseModelBmcSELLogSummary with value set to v.
-func NewOptBmcResponseModelBmcSELLogSummary(v BmcResponseModelBmcSELLogSummary) OptBmcResponseModelBmcSELLogSummary {
-	return OptBmcResponseModelBmcSELLogSummary{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptBmcResponseModelBmcSELLogSummary is optional BmcResponseModelBmcSELLogSummary.
-type OptBmcResponseModelBmcSELLogSummary struct {
-	Value BmcResponseModelBmcSELLogSummary
-	Set   bool
-}
-
-// IsSet returns true if OptBmcResponseModelBmcSELLogSummary was set.
-func (o OptBmcResponseModelBmcSELLogSummary) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptBmcResponseModelBmcSELLogSummary) Reset() {
-	var v BmcResponseModelBmcSELLogSummary
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptBmcResponseModelBmcSELLogSummary) SetTo(v BmcResponseModelBmcSELLogSummary) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptBmcResponseModelBmcSELLogSummary) Get() (v BmcResponseModelBmcSELLogSummary, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptBmcResponseModelBmcSELLogSummary) Or(d BmcResponseModelBmcSELLogSummary) BmcResponseModelBmcSELLogSummary {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptBmcResponseModelBmcSecureBootSummary returns new OptBmcResponseModelBmcSecureBootSummary with value set to v.
-func NewOptBmcResponseModelBmcSecureBootSummary(v BmcResponseModelBmcSecureBootSummary) OptBmcResponseModelBmcSecureBootSummary {
-	return OptBmcResponseModelBmcSecureBootSummary{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptBmcResponseModelBmcSecureBootSummary is optional BmcResponseModelBmcSecureBootSummary.
-type OptBmcResponseModelBmcSecureBootSummary struct {
-	Value BmcResponseModelBmcSecureBootSummary
-	Set   bool
-}
-
-// IsSet returns true if OptBmcResponseModelBmcSecureBootSummary was set.
-func (o OptBmcResponseModelBmcSecureBootSummary) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptBmcResponseModelBmcSecureBootSummary) Reset() {
-	var v BmcResponseModelBmcSecureBootSummary
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptBmcResponseModelBmcSecureBootSummary) SetTo(v BmcResponseModelBmcSecureBootSummary) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptBmcResponseModelBmcSecureBootSummary) Get() (v BmcResponseModelBmcSecureBootSummary, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptBmcResponseModelBmcSecureBootSummary) Or(d BmcResponseModelBmcSecureBootSummary) BmcResponseModelBmcSecureBootSummary {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptBmcResponseModelRedfishSystemSummary returns new OptBmcResponseModelRedfishSystemSummary with value set to v.
-func NewOptBmcResponseModelRedfishSystemSummary(v BmcResponseModelRedfishSystemSummary) OptBmcResponseModelRedfishSystemSummary {
-	return OptBmcResponseModelRedfishSystemSummary{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptBmcResponseModelRedfishSystemSummary is optional BmcResponseModelRedfishSystemSummary.
-type OptBmcResponseModelRedfishSystemSummary struct {
-	Value BmcResponseModelRedfishSystemSummary
-	Set   bool
-}
-
-// IsSet returns true if OptBmcResponseModelRedfishSystemSummary was set.
-func (o OptBmcResponseModelRedfishSystemSummary) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptBmcResponseModelRedfishSystemSummary) Reset() {
-	var v BmcResponseModelRedfishSystemSummary
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptBmcResponseModelRedfishSystemSummary) SetTo(v BmcResponseModelRedfishSystemSummary) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptBmcResponseModelRedfishSystemSummary) Get() (v BmcResponseModelRedfishSystemSummary, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptBmcResponseModelRedfishSystemSummary) Or(d BmcResponseModelRedfishSystemSummary) BmcResponseModelRedfishSystemSummary {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -10714,6 +9221,98 @@ func (o OptBool) Or(d bool) bool {
 	return d
 }
 
+// NewOptDataDumpRolesItemPermissionListItemKind returns new OptDataDumpRolesItemPermissionListItemKind with value set to v.
+func NewOptDataDumpRolesItemPermissionListItemKind(v DataDumpRolesItemPermissionListItemKind) OptDataDumpRolesItemPermissionListItemKind {
+	return OptDataDumpRolesItemPermissionListItemKind{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptDataDumpRolesItemPermissionListItemKind is optional DataDumpRolesItemPermissionListItemKind.
+type OptDataDumpRolesItemPermissionListItemKind struct {
+	Value DataDumpRolesItemPermissionListItemKind
+	Set   bool
+}
+
+// IsSet returns true if OptDataDumpRolesItemPermissionListItemKind was set.
+func (o OptDataDumpRolesItemPermissionListItemKind) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptDataDumpRolesItemPermissionListItemKind) Reset() {
+	var v DataDumpRolesItemPermissionListItemKind
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptDataDumpRolesItemPermissionListItemKind) SetTo(v DataDumpRolesItemPermissionListItemKind) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptDataDumpRolesItemPermissionListItemKind) Get() (v DataDumpRolesItemPermissionListItemKind, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptDataDumpRolesItemPermissionListItemKind) Or(d DataDumpRolesItemPermissionListItemKind) DataDumpRolesItemPermissionListItemKind {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptDataDumpRolesItemUnassignedPermissionListItemKind returns new OptDataDumpRolesItemUnassignedPermissionListItemKind with value set to v.
+func NewOptDataDumpRolesItemUnassignedPermissionListItemKind(v DataDumpRolesItemUnassignedPermissionListItemKind) OptDataDumpRolesItemUnassignedPermissionListItemKind {
+	return OptDataDumpRolesItemUnassignedPermissionListItemKind{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptDataDumpRolesItemUnassignedPermissionListItemKind is optional DataDumpRolesItemUnassignedPermissionListItemKind.
+type OptDataDumpRolesItemUnassignedPermissionListItemKind struct {
+	Value DataDumpRolesItemUnassignedPermissionListItemKind
+	Set   bool
+}
+
+// IsSet returns true if OptDataDumpRolesItemUnassignedPermissionListItemKind was set.
+func (o OptDataDumpRolesItemUnassignedPermissionListItemKind) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptDataDumpRolesItemUnassignedPermissionListItemKind) Reset() {
+	var v DataDumpRolesItemUnassignedPermissionListItemKind
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptDataDumpRolesItemUnassignedPermissionListItemKind) SetTo(v DataDumpRolesItemUnassignedPermissionListItemKind) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptDataDumpRolesItemUnassignedPermissionListItemKind) Get() (v DataDumpRolesItemUnassignedPermissionListItemKind, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptDataDumpRolesItemUnassignedPermissionListItemKind) Or(d DataDumpRolesItemUnassignedPermissionListItemKind) DataDumpRolesItemUnassignedPermissionListItemKind {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptDateTime returns new OptDateTime with value set to v.
 func NewOptDateTime(v time.Time) OptDateTime {
 	return OptDateTime{
@@ -10760,38 +9359,38 @@ func (o OptDateTime) Or(d time.Time) time.Time {
 	return d
 }
 
-// NewOptEventNodesItemState returns new OptEventNodesItemState with value set to v.
-func NewOptEventNodesItemState(v EventNodesItemState) OptEventNodesItemState {
-	return OptEventNodesItemState{
+// NewOptGetRolesResponseRolesItemPermissionListItemKind returns new OptGetRolesResponseRolesItemPermissionListItemKind with value set to v.
+func NewOptGetRolesResponseRolesItemPermissionListItemKind(v GetRolesResponseRolesItemPermissionListItemKind) OptGetRolesResponseRolesItemPermissionListItemKind {
+	return OptGetRolesResponseRolesItemPermissionListItemKind{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptEventNodesItemState is optional EventNodesItemState.
-type OptEventNodesItemState struct {
-	Value EventNodesItemState
+// OptGetRolesResponseRolesItemPermissionListItemKind is optional GetRolesResponseRolesItemPermissionListItemKind.
+type OptGetRolesResponseRolesItemPermissionListItemKind struct {
+	Value GetRolesResponseRolesItemPermissionListItemKind
 	Set   bool
 }
 
-// IsSet returns true if OptEventNodesItemState was set.
-func (o OptEventNodesItemState) IsSet() bool { return o.Set }
+// IsSet returns true if OptGetRolesResponseRolesItemPermissionListItemKind was set.
+func (o OptGetRolesResponseRolesItemPermissionListItemKind) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptEventNodesItemState) Reset() {
-	var v EventNodesItemState
+func (o *OptGetRolesResponseRolesItemPermissionListItemKind) Reset() {
+	var v GetRolesResponseRolesItemPermissionListItemKind
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptEventNodesItemState) SetTo(v EventNodesItemState) {
+func (o *OptGetRolesResponseRolesItemPermissionListItemKind) SetTo(v GetRolesResponseRolesItemPermissionListItemKind) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptEventNodesItemState) Get() (v EventNodesItemState, ok bool) {
+func (o OptGetRolesResponseRolesItemPermissionListItemKind) Get() (v GetRolesResponseRolesItemPermissionListItemKind, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -10799,45 +9398,45 @@ func (o OptEventNodesItemState) Get() (v EventNodesItemState, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptEventNodesItemState) Or(d EventNodesItemState) EventNodesItemState {
+func (o OptGetRolesResponseRolesItemPermissionListItemKind) Or(d GetRolesResponseRolesItemPermissionListItemKind) GetRolesResponseRolesItemPermissionListItemKind {
 	if v, ok := o.Get(); ok {
 		return v
 	}
 	return d
 }
 
-// NewOptFloat32 returns new OptFloat32 with value set to v.
-func NewOptFloat32(v float32) OptFloat32 {
-	return OptFloat32{
+// NewOptGetRolesResponseRolesItemUnassignedPermissionListItemKind returns new OptGetRolesResponseRolesItemUnassignedPermissionListItemKind with value set to v.
+func NewOptGetRolesResponseRolesItemUnassignedPermissionListItemKind(v GetRolesResponseRolesItemUnassignedPermissionListItemKind) OptGetRolesResponseRolesItemUnassignedPermissionListItemKind {
+	return OptGetRolesResponseRolesItemUnassignedPermissionListItemKind{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptFloat32 is optional float32.
-type OptFloat32 struct {
-	Value float32
+// OptGetRolesResponseRolesItemUnassignedPermissionListItemKind is optional GetRolesResponseRolesItemUnassignedPermissionListItemKind.
+type OptGetRolesResponseRolesItemUnassignedPermissionListItemKind struct {
+	Value GetRolesResponseRolesItemUnassignedPermissionListItemKind
 	Set   bool
 }
 
-// IsSet returns true if OptFloat32 was set.
-func (o OptFloat32) IsSet() bool { return o.Set }
+// IsSet returns true if OptGetRolesResponseRolesItemUnassignedPermissionListItemKind was set.
+func (o OptGetRolesResponseRolesItemUnassignedPermissionListItemKind) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptFloat32) Reset() {
-	var v float32
+func (o *OptGetRolesResponseRolesItemUnassignedPermissionListItemKind) Reset() {
+	var v GetRolesResponseRolesItemUnassignedPermissionListItemKind
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptFloat32) SetTo(v float32) {
+func (o *OptGetRolesResponseRolesItemUnassignedPermissionListItemKind) SetTo(v GetRolesResponseRolesItemUnassignedPermissionListItemKind) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptFloat32) Get() (v float32, ok bool) {
+func (o OptGetRolesResponseRolesItemUnassignedPermissionListItemKind) Get() (v GetRolesResponseRolesItemUnassignedPermissionListItemKind, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -10845,7 +9444,7 @@ func (o OptFloat32) Get() (v float32, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptFloat32) Or(d float32) float32 {
+func (o OptGetRolesResponseRolesItemUnassignedPermissionListItemKind) Or(d GetRolesResponseRolesItemUnassignedPermissionListItemKind) GetRolesResponseRolesItemUnassignedPermissionListItemKind {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -11305,6 +9904,73 @@ func (o OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemData) Or(d BmcRespons
 	return d
 }
 
+// NewOptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray returns new OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray with value set to v.
+func NewOptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray(v []BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray {
+	return OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray is optional nullable []BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem.
+type OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray struct {
+	Value []BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray was set.
+func (o OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) IsSet() bool {
+	return o.Set
+}
+
+// Reset unsets value.
+func (o *OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) Reset() {
+	var v []BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) SetTo(v []BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) IsNull() bool {
+	return o.Null
+}
+
+// SetToNull sets value to null.
+func (o *OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) Get() (v []BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) Or(d []BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) []BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilBmcResponseModelBmcJobListResultsItemData returns new OptNilBmcResponseModelBmcJobListResultsItemData with value set to v.
 func NewOptNilBmcResponseModelBmcJobListResultsItemData(v BmcResponseModelBmcJobListResultsItemData) OptNilBmcResponseModelBmcJobListResultsItemData {
 	return OptNilBmcResponseModelBmcJobListResultsItemData{
@@ -11362,6 +10028,69 @@ func (o OptNilBmcResponseModelBmcJobListResultsItemData) Get() (v BmcResponseMod
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilBmcResponseModelBmcJobListResultsItemData) Or(d BmcResponseModelBmcJobListResultsItemData) BmcResponseModelBmcJobListResultsItemData {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray returns new OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray with value set to v.
+func NewOptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray(v []BmcResponseModelBmcJobListResultsItemDataJobsItem) OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray {
+	return OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray is optional nullable []BmcResponseModelBmcJobListResultsItemDataJobsItem.
+type OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray struct {
+	Value []BmcResponseModelBmcJobListResultsItemDataJobsItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray was set.
+func (o OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) Reset() {
+	var v []BmcResponseModelBmcJobListResultsItemDataJobsItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) SetTo(v []BmcResponseModelBmcJobListResultsItemDataJobsItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []BmcResponseModelBmcJobListResultsItemDataJobsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) Get() (v []BmcResponseModelBmcJobListResultsItemDataJobsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) Or(d []BmcResponseModelBmcJobListResultsItemDataJobsItem) []BmcResponseModelBmcJobListResultsItemDataJobsItem {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -11494,6 +10223,69 @@ func (o OptNilBmcResponseModelBmcNICListResultsItemData) Or(d BmcResponseModelBm
 	return d
 }
 
+// NewOptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray returns new OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray with value set to v.
+func NewOptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray(v []BmcResponseModelBmcNICListResultsItemDataNicsItem) OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray {
+	return OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray is optional nullable []BmcResponseModelBmcNICListResultsItemDataNicsItem.
+type OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray struct {
+	Value []BmcResponseModelBmcNICListResultsItemDataNicsItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray was set.
+func (o OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) Reset() {
+	var v []BmcResponseModelBmcNICListResultsItemDataNicsItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) SetTo(v []BmcResponseModelBmcNICListResultsItemDataNicsItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []BmcResponseModelBmcNICListResultsItemDataNicsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) Get() (v []BmcResponseModelBmcNICListResultsItemDataNicsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) Or(d []BmcResponseModelBmcNICListResultsItemDataNicsItem) []BmcResponseModelBmcNICListResultsItemDataNicsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilBmcResponseModelBmcSELLogResultsItemData returns new OptNilBmcResponseModelBmcSELLogResultsItemData with value set to v.
 func NewOptNilBmcResponseModelBmcSELLogResultsItemData(v BmcResponseModelBmcSELLogResultsItemData) OptNilBmcResponseModelBmcSELLogResultsItemData {
 	return OptNilBmcResponseModelBmcSELLogResultsItemData{
@@ -11551,6 +10343,69 @@ func (o OptNilBmcResponseModelBmcSELLogResultsItemData) Get() (v BmcResponseMode
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilBmcResponseModelBmcSELLogResultsItemData) Or(d BmcResponseModelBmcSELLogResultsItemData) BmcResponseModelBmcSELLogResultsItemData {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray returns new OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray with value set to v.
+func NewOptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray(v []BmcResponseModelBmcSELLogResultsItemDataEntriesItem) OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray {
+	return OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray is optional nullable []BmcResponseModelBmcSELLogResultsItemDataEntriesItem.
+type OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray struct {
+	Value []BmcResponseModelBmcSELLogResultsItemDataEntriesItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray was set.
+func (o OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) Reset() {
+	var v []BmcResponseModelBmcSELLogResultsItemDataEntriesItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) SetTo(v []BmcResponseModelBmcSELLogResultsItemDataEntriesItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []BmcResponseModelBmcSELLogResultsItemDataEntriesItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) Get() (v []BmcResponseModelBmcSELLogResultsItemDataEntriesItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) Or(d []BmcResponseModelBmcSELLogResultsItemDataEntriesItem) []BmcResponseModelBmcSELLogResultsItemDataEntriesItem {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -11803,6 +10658,140 @@ func (o OptNilBmcResponseModelRedfishSystemResultsItemDataOemDell) Get() (v BmcR
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilBmcResponseModelRedfishSystemResultsItemDataOemDell) Or(d BmcResponseModelRedfishSystemResultsItemDataOemDell) BmcResponseModelRedfishSystemResultsItemDataOemDell {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray returns new OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray with value set to v.
+func NewOptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray(v []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray {
+	return OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray is optional nullable []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem.
+type OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray struct {
+	Value []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray was set.
+func (o OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) IsSet() bool {
+	return o.Set
+}
+
+// Reset unsets value.
+func (o *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Reset() {
+	var v []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetTo(v []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) IsNull() bool {
+	return o.Null
+}
+
+// SetToNull sets value to null.
+func (o *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Get() (v []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Or(d []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray returns new OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray with value set to v.
+func NewOptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray(v []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray {
+	return OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray is optional nullable []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem.
+type OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray struct {
+	Value []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray was set.
+func (o OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) IsSet() bool {
+	return o.Set
+}
+
+// Reset unsets value.
+func (o *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Reset() {
+	var v []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) SetTo(v []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) IsNull() bool {
+	return o.Null
+}
+
+// SetToNull sets value to null.
+func (o *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Get() (v []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Or(d []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -12565,1154 +11554,6 @@ func (o OptNilInt64) Or(d int64) int64 {
 	return d
 }
 
-// NewOptNilNilBmcResponseModelBmcAckResultsItemArray returns new OptNilNilBmcResponseModelBmcAckResultsItemArray with value set to v.
-func NewOptNilNilBmcResponseModelBmcAckResultsItemArray(v []NilBmcResponseModelBmcAckResultsItem) OptNilNilBmcResponseModelBmcAckResultsItemArray {
-	return OptNilNilBmcResponseModelBmcAckResultsItemArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilBmcResponseModelBmcAckResultsItemArray is optional nullable []NilBmcResponseModelBmcAckResultsItem.
-type OptNilNilBmcResponseModelBmcAckResultsItemArray struct {
-	Value []NilBmcResponseModelBmcAckResultsItem
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilBmcResponseModelBmcAckResultsItemArray was set.
-func (o OptNilNilBmcResponseModelBmcAckResultsItemArray) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilNilBmcResponseModelBmcAckResultsItemArray) Reset() {
-	var v []NilBmcResponseModelBmcAckResultsItem
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilBmcResponseModelBmcAckResultsItemArray) SetTo(v []NilBmcResponseModelBmcAckResultsItem) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilNilBmcResponseModelBmcAckResultsItemArray) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilNilBmcResponseModelBmcAckResultsItemArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilBmcResponseModelBmcAckResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilBmcResponseModelBmcAckResultsItemArray) Get() (v []NilBmcResponseModelBmcAckResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilBmcResponseModelBmcAckResultsItemArray) Or(d []NilBmcResponseModelBmcAckResultsItem) []NilBmcResponseModelBmcAckResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray returns new OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray with value set to v.
-func NewOptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray(v []NilBmcResponseModelBmcAssetTagResultResultsItem) OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray {
-	return OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray is optional nullable []NilBmcResponseModelBmcAssetTagResultResultsItem.
-type OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray struct {
-	Value []NilBmcResponseModelBmcAssetTagResultResultsItem
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray was set.
-func (o OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) Reset() {
-	var v []NilBmcResponseModelBmcAssetTagResultResultsItem
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) SetTo(v []NilBmcResponseModelBmcAssetTagResultResultsItem) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilBmcResponseModelBmcAssetTagResultResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) Get() (v []NilBmcResponseModelBmcAssetTagResultResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) Or(d []NilBmcResponseModelBmcAssetTagResultResultsItem) []NilBmcResponseModelBmcAssetTagResultResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray returns new OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray with value set to v.
-func NewOptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray(v []NilBmcResponseModelBmcBiosRegistryResultsItem) OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray {
-	return OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray is optional nullable []NilBmcResponseModelBmcBiosRegistryResultsItem.
-type OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray struct {
-	Value []NilBmcResponseModelBmcBiosRegistryResultsItem
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray was set.
-func (o OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) Reset() {
-	var v []NilBmcResponseModelBmcBiosRegistryResultsItem
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) SetTo(v []NilBmcResponseModelBmcBiosRegistryResultsItem) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilBmcResponseModelBmcBiosRegistryResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) Get() (v []NilBmcResponseModelBmcBiosRegistryResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) Or(d []NilBmcResponseModelBmcBiosRegistryResultsItem) []NilBmcResponseModelBmcBiosRegistryResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilNilBmcResponseModelBmcBiosResultsItemArray returns new OptNilNilBmcResponseModelBmcBiosResultsItemArray with value set to v.
-func NewOptNilNilBmcResponseModelBmcBiosResultsItemArray(v []NilBmcResponseModelBmcBiosResultsItem) OptNilNilBmcResponseModelBmcBiosResultsItemArray {
-	return OptNilNilBmcResponseModelBmcBiosResultsItemArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilBmcResponseModelBmcBiosResultsItemArray is optional nullable []NilBmcResponseModelBmcBiosResultsItem.
-type OptNilNilBmcResponseModelBmcBiosResultsItemArray struct {
-	Value []NilBmcResponseModelBmcBiosResultsItem
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilBmcResponseModelBmcBiosResultsItemArray was set.
-func (o OptNilNilBmcResponseModelBmcBiosResultsItemArray) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilNilBmcResponseModelBmcBiosResultsItemArray) Reset() {
-	var v []NilBmcResponseModelBmcBiosResultsItem
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilBmcResponseModelBmcBiosResultsItemArray) SetTo(v []NilBmcResponseModelBmcBiosResultsItem) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilNilBmcResponseModelBmcBiosResultsItemArray) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilNilBmcResponseModelBmcBiosResultsItemArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilBmcResponseModelBmcBiosResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilBmcResponseModelBmcBiosResultsItemArray) Get() (v []NilBmcResponseModelBmcBiosResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilBmcResponseModelBmcBiosResultsItemArray) Or(d []NilBmcResponseModelBmcBiosResultsItem) []NilBmcResponseModelBmcBiosResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray returns new OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray with value set to v.
-func NewOptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray(v []NilBmcResponseModelBmcFirmwareUpdatesResultsItem) OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray {
-	return OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray is optional nullable []NilBmcResponseModelBmcFirmwareUpdatesResultsItem.
-type OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray struct {
-	Value []NilBmcResponseModelBmcFirmwareUpdatesResultsItem
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray was set.
-func (o OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) Reset() {
-	var v []NilBmcResponseModelBmcFirmwareUpdatesResultsItem
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) SetTo(v []NilBmcResponseModelBmcFirmwareUpdatesResultsItem) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilBmcResponseModelBmcFirmwareUpdatesResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) Get() (v []NilBmcResponseModelBmcFirmwareUpdatesResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) Or(d []NilBmcResponseModelBmcFirmwareUpdatesResultsItem) []NilBmcResponseModelBmcFirmwareUpdatesResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray returns new OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray with value set to v.
-func NewOptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray(v []NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray {
-	return OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray is optional nullable []NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem.
-type OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray struct {
-	Value []NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray was set.
-func (o OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) IsSet() bool {
-	return o.Set
-}
-
-// Reset unsets value.
-func (o *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) Reset() {
-	var v []NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) SetTo(v []NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) IsNull() bool {
-	return o.Null
-}
-
-// SetToNull sets value to null.
-func (o *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) Get() (v []NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) Or(d []NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) []NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilNilBmcResponseModelBmcJobListResultsItemArray returns new OptNilNilBmcResponseModelBmcJobListResultsItemArray with value set to v.
-func NewOptNilNilBmcResponseModelBmcJobListResultsItemArray(v []NilBmcResponseModelBmcJobListResultsItem) OptNilNilBmcResponseModelBmcJobListResultsItemArray {
-	return OptNilNilBmcResponseModelBmcJobListResultsItemArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilBmcResponseModelBmcJobListResultsItemArray is optional nullable []NilBmcResponseModelBmcJobListResultsItem.
-type OptNilNilBmcResponseModelBmcJobListResultsItemArray struct {
-	Value []NilBmcResponseModelBmcJobListResultsItem
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilBmcResponseModelBmcJobListResultsItemArray was set.
-func (o OptNilNilBmcResponseModelBmcJobListResultsItemArray) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilNilBmcResponseModelBmcJobListResultsItemArray) Reset() {
-	var v []NilBmcResponseModelBmcJobListResultsItem
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilBmcResponseModelBmcJobListResultsItemArray) SetTo(v []NilBmcResponseModelBmcJobListResultsItem) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilNilBmcResponseModelBmcJobListResultsItemArray) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilNilBmcResponseModelBmcJobListResultsItemArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilBmcResponseModelBmcJobListResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilBmcResponseModelBmcJobListResultsItemArray) Get() (v []NilBmcResponseModelBmcJobListResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilBmcResponseModelBmcJobListResultsItemArray) Or(d []NilBmcResponseModelBmcJobListResultsItem) []NilBmcResponseModelBmcJobListResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray returns new OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray with value set to v.
-func NewOptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray(v []NilBmcResponseModelBmcJobListResultsItemDataJobsItem) OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray {
-	return OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray is optional nullable []NilBmcResponseModelBmcJobListResultsItemDataJobsItem.
-type OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray struct {
-	Value []NilBmcResponseModelBmcJobListResultsItemDataJobsItem
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray was set.
-func (o OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) Reset() {
-	var v []NilBmcResponseModelBmcJobListResultsItemDataJobsItem
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) SetTo(v []NilBmcResponseModelBmcJobListResultsItemDataJobsItem) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilBmcResponseModelBmcJobListResultsItemDataJobsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) Get() (v []NilBmcResponseModelBmcJobListResultsItemDataJobsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) Or(d []NilBmcResponseModelBmcJobListResultsItemDataJobsItem) []NilBmcResponseModelBmcJobListResultsItemDataJobsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilNilBmcResponseModelBmcLocationResultResultsItemArray returns new OptNilNilBmcResponseModelBmcLocationResultResultsItemArray with value set to v.
-func NewOptNilNilBmcResponseModelBmcLocationResultResultsItemArray(v []NilBmcResponseModelBmcLocationResultResultsItem) OptNilNilBmcResponseModelBmcLocationResultResultsItemArray {
-	return OptNilNilBmcResponseModelBmcLocationResultResultsItemArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilBmcResponseModelBmcLocationResultResultsItemArray is optional nullable []NilBmcResponseModelBmcLocationResultResultsItem.
-type OptNilNilBmcResponseModelBmcLocationResultResultsItemArray struct {
-	Value []NilBmcResponseModelBmcLocationResultResultsItem
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilBmcResponseModelBmcLocationResultResultsItemArray was set.
-func (o OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) Reset() {
-	var v []NilBmcResponseModelBmcLocationResultResultsItem
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) SetTo(v []NilBmcResponseModelBmcLocationResultResultsItem) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilBmcResponseModelBmcLocationResultResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) Get() (v []NilBmcResponseModelBmcLocationResultResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) Or(d []NilBmcResponseModelBmcLocationResultResultsItem) []NilBmcResponseModelBmcLocationResultResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilNilBmcResponseModelBmcNICListResultsItemArray returns new OptNilNilBmcResponseModelBmcNICListResultsItemArray with value set to v.
-func NewOptNilNilBmcResponseModelBmcNICListResultsItemArray(v []NilBmcResponseModelBmcNICListResultsItem) OptNilNilBmcResponseModelBmcNICListResultsItemArray {
-	return OptNilNilBmcResponseModelBmcNICListResultsItemArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilBmcResponseModelBmcNICListResultsItemArray is optional nullable []NilBmcResponseModelBmcNICListResultsItem.
-type OptNilNilBmcResponseModelBmcNICListResultsItemArray struct {
-	Value []NilBmcResponseModelBmcNICListResultsItem
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilBmcResponseModelBmcNICListResultsItemArray was set.
-func (o OptNilNilBmcResponseModelBmcNICListResultsItemArray) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilNilBmcResponseModelBmcNICListResultsItemArray) Reset() {
-	var v []NilBmcResponseModelBmcNICListResultsItem
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilBmcResponseModelBmcNICListResultsItemArray) SetTo(v []NilBmcResponseModelBmcNICListResultsItem) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilNilBmcResponseModelBmcNICListResultsItemArray) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilNilBmcResponseModelBmcNICListResultsItemArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilBmcResponseModelBmcNICListResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilBmcResponseModelBmcNICListResultsItemArray) Get() (v []NilBmcResponseModelBmcNICListResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilBmcResponseModelBmcNICListResultsItemArray) Or(d []NilBmcResponseModelBmcNICListResultsItem) []NilBmcResponseModelBmcNICListResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray returns new OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray with value set to v.
-func NewOptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray(v []NilBmcResponseModelBmcNICListResultsItemDataNicsItem) OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray {
-	return OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray is optional nullable []NilBmcResponseModelBmcNICListResultsItemDataNicsItem.
-type OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray struct {
-	Value []NilBmcResponseModelBmcNICListResultsItemDataNicsItem
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray was set.
-func (o OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) Reset() {
-	var v []NilBmcResponseModelBmcNICListResultsItemDataNicsItem
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) SetTo(v []NilBmcResponseModelBmcNICListResultsItemDataNicsItem) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilBmcResponseModelBmcNICListResultsItemDataNicsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) Get() (v []NilBmcResponseModelBmcNICListResultsItemDataNicsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) Or(d []NilBmcResponseModelBmcNICListResultsItemDataNicsItem) []NilBmcResponseModelBmcNICListResultsItemDataNicsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilNilBmcResponseModelBmcSELLogResultsItemArray returns new OptNilNilBmcResponseModelBmcSELLogResultsItemArray with value set to v.
-func NewOptNilNilBmcResponseModelBmcSELLogResultsItemArray(v []NilBmcResponseModelBmcSELLogResultsItem) OptNilNilBmcResponseModelBmcSELLogResultsItemArray {
-	return OptNilNilBmcResponseModelBmcSELLogResultsItemArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilBmcResponseModelBmcSELLogResultsItemArray is optional nullable []NilBmcResponseModelBmcSELLogResultsItem.
-type OptNilNilBmcResponseModelBmcSELLogResultsItemArray struct {
-	Value []NilBmcResponseModelBmcSELLogResultsItem
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilBmcResponseModelBmcSELLogResultsItemArray was set.
-func (o OptNilNilBmcResponseModelBmcSELLogResultsItemArray) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilNilBmcResponseModelBmcSELLogResultsItemArray) Reset() {
-	var v []NilBmcResponseModelBmcSELLogResultsItem
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilBmcResponseModelBmcSELLogResultsItemArray) SetTo(v []NilBmcResponseModelBmcSELLogResultsItem) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilNilBmcResponseModelBmcSELLogResultsItemArray) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilNilBmcResponseModelBmcSELLogResultsItemArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilBmcResponseModelBmcSELLogResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilBmcResponseModelBmcSELLogResultsItemArray) Get() (v []NilBmcResponseModelBmcSELLogResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilBmcResponseModelBmcSELLogResultsItemArray) Or(d []NilBmcResponseModelBmcSELLogResultsItem) []NilBmcResponseModelBmcSELLogResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray returns new OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray with value set to v.
-func NewOptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray(v []NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray {
-	return OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray is optional nullable []NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem.
-type OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray struct {
-	Value []NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray was set.
-func (o OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) Reset() {
-	var v []NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) SetTo(v []NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) IsNull() bool {
-	return o.Null
-}
-
-// SetToNull sets value to null.
-func (o *OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) Get() (v []NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) Or(d []NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) []NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilNilBmcResponseModelBmcSecureBootResultsItemArray returns new OptNilNilBmcResponseModelBmcSecureBootResultsItemArray with value set to v.
-func NewOptNilNilBmcResponseModelBmcSecureBootResultsItemArray(v []NilBmcResponseModelBmcSecureBootResultsItem) OptNilNilBmcResponseModelBmcSecureBootResultsItemArray {
-	return OptNilNilBmcResponseModelBmcSecureBootResultsItemArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilBmcResponseModelBmcSecureBootResultsItemArray is optional nullable []NilBmcResponseModelBmcSecureBootResultsItem.
-type OptNilNilBmcResponseModelBmcSecureBootResultsItemArray struct {
-	Value []NilBmcResponseModelBmcSecureBootResultsItem
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilBmcResponseModelBmcSecureBootResultsItemArray was set.
-func (o OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) Reset() {
-	var v []NilBmcResponseModelBmcSecureBootResultsItem
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) SetTo(v []NilBmcResponseModelBmcSecureBootResultsItem) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilBmcResponseModelBmcSecureBootResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) Get() (v []NilBmcResponseModelBmcSecureBootResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) Or(d []NilBmcResponseModelBmcSecureBootResultsItem) []NilBmcResponseModelBmcSecureBootResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilNilBmcResponseModelRedfishSystemResultsItemArray returns new OptNilNilBmcResponseModelRedfishSystemResultsItemArray with value set to v.
-func NewOptNilNilBmcResponseModelRedfishSystemResultsItemArray(v []NilBmcResponseModelRedfishSystemResultsItem) OptNilNilBmcResponseModelRedfishSystemResultsItemArray {
-	return OptNilNilBmcResponseModelRedfishSystemResultsItemArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilBmcResponseModelRedfishSystemResultsItemArray is optional nullable []NilBmcResponseModelRedfishSystemResultsItem.
-type OptNilNilBmcResponseModelRedfishSystemResultsItemArray struct {
-	Value []NilBmcResponseModelRedfishSystemResultsItem
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilBmcResponseModelRedfishSystemResultsItemArray was set.
-func (o OptNilNilBmcResponseModelRedfishSystemResultsItemArray) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemArray) Reset() {
-	var v []NilBmcResponseModelRedfishSystemResultsItem
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemArray) SetTo(v []NilBmcResponseModelRedfishSystemResultsItem) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilNilBmcResponseModelRedfishSystemResultsItemArray) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilBmcResponseModelRedfishSystemResultsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilBmcResponseModelRedfishSystemResultsItemArray) Get() (v []NilBmcResponseModelRedfishSystemResultsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilBmcResponseModelRedfishSystemResultsItemArray) Or(d []NilBmcResponseModelRedfishSystemResultsItem) []NilBmcResponseModelRedfishSystemResultsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray returns new OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray with value set to v.
-func NewOptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray(v []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray {
-	return OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray is optional nullable []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem.
-type OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray struct {
-	Value []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray was set.
-func (o OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) IsSet() bool {
-	return o.Set
-}
-
-// Reset unsets value.
-func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Reset() {
-	var v []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetTo(v []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) IsNull() bool {
-	return o.Null
-}
-
-// SetToNull sets value to null.
-func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Get() (v []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Or(d []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray returns new OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray with value set to v.
-func NewOptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray(v []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray {
-	return OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray is optional nullable []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem.
-type OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray struct {
-	Value []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray was set.
-func (o OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) IsSet() bool {
-	return o.Set
-}
-
-// Reset unsets value.
-func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Reset() {
-	var v []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) SetTo(v []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) IsNull() bool {
-	return o.Null
-}
-
-// SetToNull sets value to null.
-func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Get() (v []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Or(d []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptNilNilStringArray returns new OptNilNilStringArray with value set to v.
-func NewOptNilNilStringArray(v []NilString) OptNilNilStringArray {
-	return OptNilNilStringArray{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptNilNilStringArray is optional nullable []NilString.
-type OptNilNilStringArray struct {
-	Value []NilString
-	Set   bool
-	Null  bool
-}
-
-// IsSet returns true if OptNilNilStringArray was set.
-func (o OptNilNilStringArray) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptNilNilStringArray) Reset() {
-	var v []NilString
-	o.Value = v
-	o.Set = false
-	o.Null = false
-}
-
-// SetTo sets value to v.
-func (o *OptNilNilStringArray) SetTo(v []NilString) {
-	o.Set = true
-	o.Null = false
-	o.Value = v
-}
-
-// IsNull returns true if value is Null.
-func (o OptNilNilStringArray) IsNull() bool { return o.Null }
-
-// SetToNull sets value to null.
-func (o *OptNilNilStringArray) SetToNull() {
-	o.Set = true
-	o.Null = true
-	var v []NilString
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptNilNilStringArray) Get() (v []NilString, ok bool) {
-	if o.Null {
-		return v, false
-	}
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptNilNilStringArray) Or(d []NilString) []NilString {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptNilProvisionStatusFacts returns new OptNilProvisionStatusFacts with value set to v.
 func NewOptNilProvisionStatusFacts(v ProvisionStatusFacts) OptNilProvisionStatusFacts {
 	return OptNilProvisionStatusFacts{
@@ -14120,6 +11961,52 @@ func (o OptNodeImportResponseSummary) Or(d NodeImportResponseSummary) NodeImport
 	return d
 }
 
+// NewOptPatchRolesRequestPermissionListItemKind returns new OptPatchRolesRequestPermissionListItemKind with value set to v.
+func NewOptPatchRolesRequestPermissionListItemKind(v PatchRolesRequestPermissionListItemKind) OptPatchRolesRequestPermissionListItemKind {
+	return OptPatchRolesRequestPermissionListItemKind{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptPatchRolesRequestPermissionListItemKind is optional PatchRolesRequestPermissionListItemKind.
+type OptPatchRolesRequestPermissionListItemKind struct {
+	Value PatchRolesRequestPermissionListItemKind
+	Set   bool
+}
+
+// IsSet returns true if OptPatchRolesRequestPermissionListItemKind was set.
+func (o OptPatchRolesRequestPermissionListItemKind) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptPatchRolesRequestPermissionListItemKind) Reset() {
+	var v PatchRolesRequestPermissionListItemKind
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptPatchRolesRequestPermissionListItemKind) SetTo(v PatchRolesRequestPermissionListItemKind) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptPatchRolesRequestPermissionListItemKind) Get() (v PatchRolesRequestPermissionListItemKind, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptPatchRolesRequestPermissionListItemKind) Or(d PatchRolesRequestPermissionListItemKind) PatchRolesRequestPermissionListItemKind {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
 	return OptString{
@@ -14194,8 +12081,21 @@ func (s *PatchRolesRequest) SetRole(val OptString) {
 }
 
 type PatchRolesRequestPermissionListItem struct {
-	Method OptString `json:"method"`
-	Path   OptString `json:"path"`
+	Group   OptString                                  `json:"group"`
+	Kind    OptPatchRolesRequestPermissionListItemKind `json:"kind"`
+	Method  OptString                                  `json:"method"`
+	Path    OptString                                  `json:"path"`
+	Summary OptString                                  `json:"summary"`
+}
+
+// GetGroup returns the value of Group.
+func (s *PatchRolesRequestPermissionListItem) GetGroup() OptString {
+	return s.Group
+}
+
+// GetKind returns the value of Kind.
+func (s *PatchRolesRequestPermissionListItem) GetKind() OptPatchRolesRequestPermissionListItemKind {
+	return s.Kind
 }
 
 // GetMethod returns the value of Method.
@@ -14208,6 +12108,21 @@ func (s *PatchRolesRequestPermissionListItem) GetPath() OptString {
 	return s.Path
 }
 
+// GetSummary returns the value of Summary.
+func (s *PatchRolesRequestPermissionListItem) GetSummary() OptString {
+	return s.Summary
+}
+
+// SetGroup sets the value of Group.
+func (s *PatchRolesRequestPermissionListItem) SetGroup(val OptString) {
+	s.Group = val
+}
+
+// SetKind sets the value of Kind.
+func (s *PatchRolesRequestPermissionListItem) SetKind(val OptPatchRolesRequestPermissionListItemKind) {
+	s.Kind = val
+}
+
 // SetMethod sets the value of Method.
 func (s *PatchRolesRequestPermissionListItem) SetMethod(val OptString) {
 	s.Method = val
@@ -14216,6 +12131,59 @@ func (s *PatchRolesRequestPermissionListItem) SetMethod(val OptString) {
 // SetPath sets the value of Path.
 func (s *PatchRolesRequestPermissionListItem) SetPath(val OptString) {
 	s.Path = val
+}
+
+// SetSummary sets the value of Summary.
+func (s *PatchRolesRequestPermissionListItem) SetSummary(val OptString) {
+	s.Summary = val
+}
+
+type PatchRolesRequestPermissionListItemKind string
+
+const (
+	PatchRolesRequestPermissionListItemKindView   PatchRolesRequestPermissionListItemKind = "view"
+	PatchRolesRequestPermissionListItemKindChange PatchRolesRequestPermissionListItemKind = "change"
+	PatchRolesRequestPermissionListItemKindDelete PatchRolesRequestPermissionListItemKind = "delete"
+)
+
+// AllValues returns all PatchRolesRequestPermissionListItemKind values.
+func (PatchRolesRequestPermissionListItemKind) AllValues() []PatchRolesRequestPermissionListItemKind {
+	return []PatchRolesRequestPermissionListItemKind{
+		PatchRolesRequestPermissionListItemKindView,
+		PatchRolesRequestPermissionListItemKindChange,
+		PatchRolesRequestPermissionListItemKindDelete,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s PatchRolesRequestPermissionListItemKind) MarshalText() ([]byte, error) {
+	switch s {
+	case PatchRolesRequestPermissionListItemKindView:
+		return []byte(s), nil
+	case PatchRolesRequestPermissionListItemKindChange:
+		return []byte(s), nil
+	case PatchRolesRequestPermissionListItemKindDelete:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *PatchRolesRequestPermissionListItemKind) UnmarshalText(data []byte) error {
+	switch PatchRolesRequestPermissionListItemKind(data) {
+	case PatchRolesRequestPermissionListItemKindView:
+		*s = PatchRolesRequestPermissionListItemKindView
+		return nil
+	case PatchRolesRequestPermissionListItemKindChange:
+		*s = PatchRolesRequestPermissionListItemKindChange
+		return nil
+	case PatchRolesRequestPermissionListItemKindDelete:
+		*s = PatchRolesRequestPermissionListItemKindDelete
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 // PostRolesRequest schema.
@@ -14507,7 +12475,7 @@ type SwitchScanResponseSwitchesItem struct {
 	Name      OptString                                 `json:"name"`
 	Nos       OptString                                 `json:"nos"`
 	Ports     []SwitchScanResponseSwitchesItemPortsItem `json:"ports"`
-	Warnings  OptNilNilStringArray                      `json:"warnings"`
+	Warnings  OptNilStringArray                         `json:"warnings"`
 }
 
 // GetAddress returns the value of Address.
@@ -14541,7 +12509,7 @@ func (s *SwitchScanResponseSwitchesItem) GetPorts() []SwitchScanResponseSwitches
 }
 
 // GetWarnings returns the value of Warnings.
-func (s *SwitchScanResponseSwitchesItem) GetWarnings() OptNilNilStringArray {
+func (s *SwitchScanResponseSwitchesItem) GetWarnings() OptNilStringArray {
 	return s.Warnings
 }
 
@@ -14576,7 +12544,7 @@ func (s *SwitchScanResponseSwitchesItem) SetPorts(val []SwitchScanResponseSwitch
 }
 
 // SetWarnings sets the value of Warnings.
-func (s *SwitchScanResponseSwitchesItem) SetWarnings(val OptNilNilStringArray) {
+func (s *SwitchScanResponseSwitchesItem) SetWarnings(val OptNilStringArray) {
 	s.Warnings = val
 }
 
@@ -14862,7 +12830,12 @@ func (s *UserStoreResponse) SetUsername(val OptString) {
 // Version schema.
 // Ref: #/components/schemas/Version
 type Version struct {
-	Version OptString `json:"Version"`
+	Version    OptString    `json:"Version"`
+	Commit     OptNilString `json:"commit"`
+	CommitTime OptNilString `json:"commit_time"`
+	GoVersion  OptNilString `json:"go_version"`
+	Modified   OptNilBool   `json:"modified"`
+	Schema     OptNilInt    `json:"schema"`
 }
 
 // GetVersion returns the value of Version.
@@ -14870,7 +12843,57 @@ func (s *Version) GetVersion() OptString {
 	return s.Version
 }
 
+// GetCommit returns the value of Commit.
+func (s *Version) GetCommit() OptNilString {
+	return s.Commit
+}
+
+// GetCommitTime returns the value of CommitTime.
+func (s *Version) GetCommitTime() OptNilString {
+	return s.CommitTime
+}
+
+// GetGoVersion returns the value of GoVersion.
+func (s *Version) GetGoVersion() OptNilString {
+	return s.GoVersion
+}
+
+// GetModified returns the value of Modified.
+func (s *Version) GetModified() OptNilBool {
+	return s.Modified
+}
+
+// GetSchema returns the value of Schema.
+func (s *Version) GetSchema() OptNilInt {
+	return s.Schema
+}
+
 // SetVersion sets the value of Version.
 func (s *Version) SetVersion(val OptString) {
 	s.Version = val
+}
+
+// SetCommit sets the value of Commit.
+func (s *Version) SetCommit(val OptNilString) {
+	s.Commit = val
+}
+
+// SetCommitTime sets the value of CommitTime.
+func (s *Version) SetCommitTime(val OptNilString) {
+	s.CommitTime = val
+}
+
+// SetGoVersion sets the value of GoVersion.
+func (s *Version) SetGoVersion(val OptNilString) {
+	s.GoVersion = val
+}
+
+// SetModified sets the value of Modified.
+func (s *Version) SetModified(val OptNilBool) {
+	s.Modified = val
+}
+
+// SetSchema sets the value of Schema.
+func (s *Version) SetSchema(val OptNilInt) {
+	s.Schema = val
 }

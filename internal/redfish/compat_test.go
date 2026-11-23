@@ -6,11 +6,9 @@ package redfish
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -22,9 +20,7 @@ import (
 	"github.com/stmcginnis/gofish/schemas"
 )
 
-// TestCompat answers one question about one machine: does Grendel's BMC layer work here, and if not, which specific assumption fails. Every heuristic in this package was written against a Dell iDRAC, so pointing it at anything else is the only way to find out what it assumed. See docs/pages/advanced/bmc-compatibility.md for how to capture a mockup off a bmc and serve it
-//
-// The report is the test output, and it turns on one distinction. A skip means the hardware does not have the thing at all, which is correct behaviour. A failure means the hardware has it and Grendel gets it wrong. Nothing here fails because a bmc is missing a feature
+// TestCompat runs the BMC layer against one machine, see docs/pages/advanced/bmc-compatibility.md. A skip means the hardware does not have the feature, and a failure means it has it and Grendel gets it wrong
 var (
 	compatEndpoint       = flag.String("redfish.endpoint", "", "Redfish base url to run the compatibility suite against. Empty skips the suite")
 	compatUser           = flag.String("redfish.user", "compat", "bmc username. Any non empty value works against a mockup server, which authenticates nothing")
@@ -106,9 +102,7 @@ func compatConnect(t *testing.T, ctx context.Context, basicAuth bool) *conn {
 	return c
 }
 
-// compatAuth reports which login modes this service accepts. Neither result is a failure on its own, the point is to record what the operator has to put in grendel.toml
-//
-// This is the one check that sends anything other than a GET without -redfish.destructive: testing session login means creating a session and then deleting it, which is what every ordinary Grendel run does anyway. Nothing here changes the machine's state
+// compatAuth reports which login modes the service accepts, for the operator to set in grendel.toml, and neither result is a failure. Testing session login creates and deletes a session, the one request here that is not a GET without -redfish.destructive
 func compatAuth(t *testing.T, ctx context.Context) {
 	session := compatTry(ctx, false)
 	basic := compatTry(ctx, true)
@@ -137,7 +131,7 @@ func compatOutcome(err error) string {
 	return "rejected: " + err.Error()
 }
 
-// compatStatus checks every field bmc status puts in a column. An empty one is not a cosmetic problem: the operator sees a blank cell and has no way to tell a bmc that does not report the value from a bmc Grendel reads the wrong field on
+// compatStatus checks every field bmc status puts in a column, since a blank cell cannot tell a bmc that does not report the value from one Grendel reads the wrong field on
 func compatStatus(t *testing.T, ctx context.Context) {
 	if systems, err := compatConnect(t, ctx, *compatBasicAuth).service.Systems(); err == nil && len(systems) == 0 {
 		t.Skip("service exposes no computer systems")
@@ -192,7 +186,7 @@ func compatStatus(t *testing.T, ctx context.Context) {
 	})
 }
 
-// compatPower asks the service what it supports rather than making it do anything. That is where nearly all of the signal is, and it is the only way this can be safe to run against a live bmc
+// compatPower only asks the service what it supports, which keeps it safe to run against a live bmc
 func compatPower(t *testing.T, ctx context.Context) {
 	c := compatConnect(t, ctx, *compatBasicAuth)
 
@@ -290,26 +284,6 @@ func compatJobs(t *testing.T, ctx context.Context) {
 	}
 	t.Logf("job service: %s", js.ODataID)
 
-	// clearing named ids does not use the collection link the service advertises, clearJobsOne builds {JobService}/Jobs/{id} by hand. On a service that puts its jobs anywhere else, every such clear is a DELETE to a 404
-	t.Run("delete_uri", func(t *testing.T) {
-		var doc struct {
-			Jobs struct {
-				ODataID string `json:"@odata.id"`
-			} `json:"Jobs"`
-		}
-		if err := compatGetJSON(c, js.ODataID, &doc); err != nil {
-			t.Fatalf("cannot re-read the job service: %s", err)
-		}
-		if doc.Jobs.ODataID == "" {
-			t.Skip("job service advertises no Jobs collection link")
-		}
-
-		want := js.ODataID + "/Jobs"
-		if doc.Jobs.ODataID != want {
-			t.Errorf("clearJobsOne builds %s/{id} but this service keeps its jobs at %s, so clearing a named job would DELETE a uri that does not exist", want, doc.Jobs.ODataID)
-		}
-	})
-
 	jobs, err := js.Jobs()
 	if err != nil {
 		t.Fatalf("cannot list jobs: %s", err)
@@ -330,8 +304,9 @@ func compatJobs(t *testing.T, ctx context.Context) {
 				t.Errorf("job %s has no JobState", job.ID)
 			}
 
-			if want := strings.TrimRight(js.ODataID, "/") + "/Jobs/" + url.PathEscape(job.ID); job.ODataID != want {
-				t.Errorf("clearJobsOne would DELETE %s but job %s lives at %s", want, job.ID, job.ODataID)
+			// a job named by id is deleted under the collection, so one that lives elsewhere can only be cleared with all
+			if want := jobsCollection(js) + "/" + url.PathEscape(job.ID); job.ODataID != want {
+				t.Errorf("clearing job %s by id would DELETE %s but it lives at %s", job.ID, want, job.ODataID)
 			}
 		}
 	})
@@ -359,7 +334,7 @@ func compatSEL(t *testing.T, ctx context.Context) {
 	}
 
 	if len(matched) == 0 {
-		t.Skip("no log service on any manager or system looks like a system event log. If this bmc has one, its id belongs in knownSystemLogIDs")
+		t.Skip("no log service on any manager or system is typed SEL, and no manager log is one by its id. If this bmc has a system event log, selLogServices needs a rule for it")
 	}
 	if len(matched) > 1 {
 		// selOne concatenates every match, so bmc sel list here is not only the system event log
@@ -714,21 +689,6 @@ func compatAbsent(err error) bool {
 		return true
 	}
 	return false
-}
-
-func compatGetJSON(c *conn, uri string, into any) error {
-	resp, err := c.client.Get(uri)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	return json.Unmarshal(body, into)
 }
 
 // compatMissing returns the members of want that supported does not contain

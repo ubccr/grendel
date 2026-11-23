@@ -5,9 +5,6 @@
 package bmc
 
 import (
-	"strconv"
-	"strings"
-
 	"github.com/jedib0t/go-pretty/v6/text"
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd/grendel/apiclient"
@@ -16,9 +13,8 @@ import (
 )
 
 var (
-	selListFilter  []string
 	selListLimit   int
-	selListOptions *shared.TableOptions
+	selListTable   *shared.TableFlags
 	selListColumns = []shared.Column{
 		{Name: "Node"},
 		{Name: "State"},
@@ -36,55 +32,47 @@ var (
 		Short:   "List the system event log on the BMC",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			nodeset, all := selector(args[0])
-			params := client.GETV1BmcSelParams{
-				Nodeset: nodeset,
-				All:     all,
-				Tags:    client.NewOptString(strings.Join(tags, ",")),
-				Limit:   client.NewOptString(strconv.Itoa(selListLimit)),
-			}
+			sel := selected(args[0])
+			params := client.GETV1BmcSelParams{Nodeset: sel.Nodeset, Tags: sel.Tags, All: sel.All, Limit: client.NewOptInt(selListLimit)}
 
 			res, err := apiclient.API.GETV1BmcSel(command.Context(), params)
 			if err != nil {
 				return apiclient.NewApiError(err)
 			}
 
-			t := shared.NewTable(selListColumns, selListFilter).Options(*selListOptions).Empty("-")
-			for _, r := range res.Results.Value {
-				result := r.Value
-				state := colorState(result.Success.Value)
+			t := selListTable.Table()
+			for _, result := range res.Results {
+				state := colorState(result.Success)
 
 				// a node that was reached with an empty log still gets a row, which is how an empty log is told apart from a bmc that never answered
 				entries := result.Data.Value.Entries.Value
 				if len(entries) == 0 {
-					t.AppendRow(result.Node.Value, state, "", "", "", result.Message.Value, "", "", "")
+					t.AppendRow(result.Node, state, "", "", "", result.Message, "", "", "")
 					continue
 				}
 
-				for _, e := range entries {
-					entry := e.Value
+				for _, entry := range entries {
 					t.AppendRow(
-						result.Node.Value,
+						result.Node,
 						state,
-						entry.ID.Value,
-						entry.Created.Value,
-						colorSeverity(entry.Severity.Value),
-						entry.Message.Value,
-						entry.MessageID.Value,
-						entry.SensorType.Value,
-						entry.Resolution.Value,
+						entry.ID,
+						entry.Created,
+						colorSeverity(entry.Severity),
+						entry.Message,
+						entry.MessageID,
+						entry.SensorType,
+						entry.Resolution,
 					)
 				}
 			}
 			t.Print()
 
-			s := res.Summary.Value
-			return summaryLine(s.Total.Value, s.Succeeded.Value, s.Failed.Value, s.FailedNodes.Value, s.DurationMs.Value)
+			return summaryLine(summary(res.Summary))
 		},
 	}
 )
 
-// colorSeverity picks out the entries worth reading first, which is the point of looking at a log that runs to thousands of lines
+// colorSeverity picks out the entries worth reading first in a log that runs to thousands of lines
 func colorSeverity(severity string) string {
 	switch severity {
 	case "OK":
@@ -99,11 +87,8 @@ func colorSeverity(severity string) string {
 }
 
 func init() {
-	selListOptions = shared.RegisterTableFlags(selListCmd)
-	selListCmd.Flags().StringSliceVar(&selListFilter, "filter", []string{"Message ID", "Sensor", "Resolution"}, "filter table columns by name")
+	selListTable = shared.RegisterTableFlags(selListCmd, selListColumns, "Message ID", "Sensor", "Resolution")
 	selListCmd.Flags().IntVar(&selListLimit, "limit", 50, "show only this many entries per node, the ones the BMC lists first, which is the newest on most BMCs. 0 reads the whole log and sorts it newest first")
-
-	selListCmd.RegisterFlagCompletionFunc("filter", shared.ColumnCompletion(selListColumns))
 
 	selCmd.AddCommand(selListCmd)
 }

@@ -1,4 +1,4 @@
-import { BmcResponseModelBmcSelLog, getV1BmcSel } from "@/client";
+import { BmcResponseModelBmcSelLog } from "@/client";
 import ActionsSheet from "@/components/actions-sheet";
 import NodesSelAction from "@/components/actions/nodes/sel";
 import { DataTable, DataTableActions } from "@/components/data-table/data-table";
@@ -22,8 +22,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import AuthRedirect from "@/lib/auth";
+import { selOptions } from "@/lib/queries";
 import { severityVariant } from "@/lib/utils";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { z } from "zod";
@@ -35,7 +36,6 @@ type Entry = NodeTreeRow<SelEntry>;
 
 const limits = ["25", "50", "100", "0"] as const;
 
-// columns are defined once, outside the component, so the table keeps the same column definitions across renders
 const columns: DataTableColumnDef<Entry, any>[] = [
   ...nodeColumns<SelEntry>(),
   {
@@ -76,23 +76,25 @@ const columns: DataTableColumnDef<Entry, any>[] = [
 export const Route = createFileRoute("/nodes/sel/$nodes")({
   staticData: { crumb: ["SEL", { param: "nodes" }] },
   component: RouteComponent,
-  beforeLoad: AuthRedirect,
   validateSearch: z.object({
     limit: z.enum(limits).default("50").catch("50"),
   }),
+  // BMCs are only logged into once the page is opened, not when its link is hovered
+  preload: false,
   loaderDeps: ({ search: { limit } }) => ({ limit }),
-  loader: async ({ params: { nodes }, deps: { limit } }) =>
-    getV1BmcSel({ query: { nodeset: nodes, limit } }),
+  loader: ({ context: { queryClient }, params: { nodes }, deps: { limit } }) =>
+    queryClient.ensureQueryData(selOptions(nodes, Number(limit))),
 });
 
 function RouteComponent() {
-  const { data } = Route.useLoaderData();
-  const { isFetching } = Route.useMatch();
   const { limit } = Route.useSearch();
+  const { data, isFetching } = useSuspenseQuery(selOptions(Route.useParams().nodes, Number(limit)));
+  // the match is fetching while another limit is being read, which the log on show is not
+  const loading = Route.useMatch({ select: (m) => m.isFetching !== false });
   const navigate = useNavigate({ from: Route.fullPath });
 
   const entries = useMemo(
-    () => nodeTree<SelEntry>((data?.results ?? []).map((r) => ({ ...r, items: r.data?.entries }))),
+    () => nodeTree<SelEntry>((data.results ?? []).map((r) => ({ ...r, items: r.data?.entries }))),
     [data],
   );
 
@@ -156,7 +158,7 @@ function RouteComponent() {
             getRowTone={nodeRowTone}
             initialVisibility={{ message_id: false }}
             data={entries}
-            progress={isFetching !== false}
+            progress={isFetching || loading}
           />
         </CardContent>
       </Card>

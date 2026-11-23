@@ -13,7 +13,6 @@ const fields: Field[] = [
 
 const example = { name: "cpn-a01-07", sw: "swe-a01", port: 7 };
 
-// BootSettingsPanel holds the settings every interface is stored with: its FQDN template and its interface
 export function BootSettingsPanel({
   settings,
   fqdn,

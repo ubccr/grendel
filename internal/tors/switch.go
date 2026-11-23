@@ -50,7 +50,8 @@ func ErrorCode(err error) string {
 
 // NetworkSwitch reuses one connection across its calls, so a caller makes all of them on one value and then closes it
 type NetworkSwitch interface {
-	GetInterfaceStatus(ctx context.Context) (model.InterfaceTable, error)
+	// GetInterfaceDescriptions returns every interface by name, with an empty description for those that have none
+	GetInterfaceDescriptions(ctx context.Context) (map[string]string, error)
 	GetMACTable(ctx context.Context) (model.MACTable, error)
 	GetLLDPNeighbors(ctx context.Context) (model.LLDPNeighbors, error)
 	Close() error
@@ -75,7 +76,13 @@ func New(host *model.Host, cfg Config) (NetworkSwitch, error) {
 		return nil, ErrNoInterfaces
 	}
 
-	return NewFromAddr(host.Interfaces[0].AddrString(), nos, cfg)
+	addr := host.Interfaces[0].AddrString()
+	// an empty address would be dialed as ":port", which is this host
+	if addr == "" {
+		return nil, fmt.Errorf("%w with an address: its first interface has no IP", ErrNoInterfaces)
+	}
+
+	return NewFromAddr(addr, nos, cfg)
 }
 
 func NewFromAddr(addr, nos string, cfg Config) (NetworkSwitch, error) {

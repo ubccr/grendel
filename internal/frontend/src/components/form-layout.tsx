@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { revalidateLogic } from "@tanstack/react-form";
 import { LoaderCircle } from "lucide-react";
 import { useId, type ReactNode } from "react";
 
-// cellInput styles an input in a dense table of rows, like a node's ports or an image's initrds: a faint filled box until it is hovered or focused, so empty cells are still visible without the table becoming a wall of outlines
+// A faint filled box until hovered or focused, so empty cells in a dense table stay visible without a wall of outlines
 export const cellInput =
   "h-8 border-transparent bg-muted/60 px-2 font-mono shadow-none hover:border-input focus-visible:border-input focus-visible:bg-transparent max-lg:border-input aria-invalid:border-destructive";
 
@@ -12,23 +13,13 @@ export const cellInput =
 export const invalidInput =
   "aria-invalid:border-destructive aria-invalid:focus-visible:ring-destructive";
 
-// required checks that a field isn't empty or blank, refusing it with message
 export function required(message: string) {
   return ({ value }: { value: unknown }) =>
     typeof value === "string" && value.trim() !== "" ? undefined : message;
 }
 
-type Check<T> = (props: { value: T }) => string | undefined;
-type FieldProps<T> = { value: T; fieldApi: { form: { state: { submissionAttempts: number } } } };
-
-// validateOnSave runs check when the form is saved, and again on every change once a save has been refused, so a field is only marked once the person has tried to save and is cleared as soon as they fix it. A row that was just added isn't marked while it is still being filled in
-export function validateOnSave<T>(check: Check<T>) {
-  return {
-    onSubmit: check,
-    onChange: ({ value, fieldApi }: FieldProps<T>) =>
-      fieldApi.form.state.submissionAttempts > 0 ? check({ value }) : undefined,
-  };
-}
+// validateOnSave is a form's validationLogic: its onDynamic checks run when the form is saved, and again on every change once a save has been refused, so a field is only marked once the person has tried to save and is cleared as soon as they fix it. A row that was just added isn't marked until it is typed in
+export const validateOnSave = revalidateLogic();
 
 // FieldErrors shows why a field failed validation, the first reason being enough to fix it
 export function FieldErrors({ errors }: { errors: unknown[] }) {
@@ -37,7 +28,6 @@ export function FieldErrors({ errors }: { errors: unknown[] }) {
   return <p className="text-xs text-destructive">{first as string}</p>;
 }
 
-// Section is a titled part of an edit form, with an optional action such as an add button at its end
 export function Section({
   title,
   description,
@@ -63,7 +53,6 @@ export function Section({
   );
 }
 
-// Field labels one input, handing it the id the label points at
 export function Field({
   label,
   className,
@@ -82,7 +71,7 @@ export function Field({
   );
 }
 
-// SaveBar sits at the bottom of an edit form while it has unsaved changes, or always when the form adds something new. noun names what is saved, as in "Add node". invalid says a save was refused because fields failed validation
+// noun names what is saved, as in "Add node", and invalid says a save was refused because fields failed validation
 export function SaveBar({
   noun,
   adding,

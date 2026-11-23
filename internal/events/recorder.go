@@ -8,9 +8,6 @@ package events
 import (
 	"context"
 	"errors"
-	"maps"
-	"slices"
-	"sync"
 	"time"
 
 	"github.com/segmentio/ksuid"
@@ -28,11 +25,7 @@ const (
 	bmcStalledAfter       = time.Hour
 )
 
-const (
-	// FlushInterval is how often the reports of nodes provisioning are written. They are held in memory until then, so a whole cluster booting at once costs one write a second rather than one per report
-	FlushInterval = time.Second
-	tidyInterval  = time.Minute
-)
+const tidyInterval = time.Minute
 
 func init() {
 	viper.SetDefault("events.retention", "2160h")
@@ -48,7 +41,6 @@ func New(db store.Store) *Recorder {
 	return &Recorder{DB: db}
 }
 
-// start fills in what every new event has
 func start(event *model.Event, now time.Time) {
 	id, err := ksuid.NewRandomWithTime(now)
 	if err != nil {
@@ -72,7 +64,7 @@ func (r *Recorder) Record(event model.Event) *model.Event {
 	return &event
 }
 
-// Open writes an event that is still running, with its Nodes, to be updated with SetNodes and ended by Settle once it is over for them all
+// Open writes an event that is still running, with its Nodes, to be updated with SetNodes, which ends it once it is over for them all
 func (r *Recorder) Open(event model.Event) *model.Event {
 	now := time.Now().UTC()
 	start(&event, now)
@@ -88,7 +80,7 @@ func (r *Recorder) Open(event model.Event) *model.Event {
 	return &event
 }
 
-// SetNodes writes how the event is going on the given nodes, leaving its other nodes as they were. It works on an event that has ended too, for a node that reports late
+// SetNodes writes how the event is going on the given nodes, leaving its other nodes as they were, and settles the event as Settle does. It works on an event that has ended too, for a node that reports late
 func (r *Recorder) SetNodes(event *model.Event, nodes ...model.EventNode) {
 	now := time.Now().UTC()
 	for i := range nodes {
@@ -101,7 +93,7 @@ func (r *Recorder) SetNodes(event *model.Event, nodes ...model.EventNode) {
 	}
 }
 
-// Settle ends a running event once it is over for every one of its nodes, and brings the severity of one already ended up to date with a node that reported late
+// Settle ends a running event once it is over for every one of its nodes, and brings the severity of one already ended up to date with a node that reported late. SetNodes does this itself, so it is only needed after nodes changed some other way, as when they are marked stalled
 func (r *Recorder) Settle(event *model.Event) {
 	if err := r.DB.SettleEvent(event.ID, time.Now().UTC()); err != nil {
 		log.Warnf("failed to settle event %q: %s", event.Summary, err)
@@ -114,56 +106,11 @@ func (r *Recorder) store(event *model.Event) {
 	}
 }
 
-// provisionQueue holds the latest report of each node provisioning until the next flush writes them all at once
-type provisionQueue struct {
-	mu    sync.Mutex
-	nodes map[string]model.EventNode
-}
-
-// queues are the provision queues by store, so each store's reports are written to it and tests with a store each stay apart
-var queues sync.Map
-
-func queueFor(db store.Store) *provisionQueue {
-	q, _ := queues.LoadOrStore(db, &provisionQueue{nodes: map[string]model.EventNode{}})
-	return q.(*provisionQueue)
-}
-
-// TrackProvision records how a node's provision is going, which joins it to the provisioning under way. It is called on a node's boot path, so it only notes the report in memory; Flush writes it with every other report since the last, within FlushInterval while Run is running. A later report from the same node replaces one not yet written
-func TrackProvision(db store.Store, node model.EventNode) {
-	if node.UpdatedAt.IsZero() {
-		node.UpdatedAt = time.Now().UTC()
-	}
-	q := queueFor(db)
-	q.mu.Lock()
-	q.nodes[node.Node] = node
-	q.mu.Unlock()
-}
-
-// Flush writes the provision reports noted since the last flush, in one transaction. Reports it fails to write are kept for the next flush, unless a newer report from the same node has come in meanwhile
-func (r *Recorder) Flush() {
-	q := queueFor(r.DB)
-	q.mu.Lock()
-	if len(q.nodes) == 0 {
-		q.mu.Unlock()
-		return
-	}
-	nodes := q.nodes
-	q.nodes = make(map[string]model.EventNode, len(nodes))
-	q.mu.Unlock()
-
-	now := time.Now().UTC()
+// Provisioning is the event nodes network booting are tracked in, as it is when the first of them opens it
+func Provisioning(now time.Time) *model.Event {
 	open := model.Event{Kind: model.EventKindProvision, Action: "provision", Summary: "Provisioning", State: model.EventStateRunning, Severity: model.SeverityInfo}
 	start(&open, now)
-	if err := r.DB.TrackEventNodes(&open, slices.Collect(maps.Values(nodes)), now); err != nil {
-		log.Warnf("failed to write the reports of %d provisioning nodes, retrying: %s", len(nodes), err)
-		q.mu.Lock()
-		for name, n := range nodes {
-			if _, newer := q.nodes[name]; !newer {
-				q.nodes[name] = n
-			}
-		}
-		q.mu.Unlock()
-	}
+	return &open
 }
 
 // Tidy marks the nodes of running events that went quiet as stalled, ends the events that leaves with nothing running, and deletes the events older than events.retention. It only changes what is out of date, so more than one service can run it
@@ -202,10 +149,22 @@ func (r *Recorder) Tidy(now time.Time) {
 	}
 }
 
-// Run writes the provision reports every FlushInterval and tidies the events every minute, until the context ends, when it writes what reports are left
+// warnBadDuration flags a setting viper would read as zero or as nanoseconds, since a retention of "60d" silently keeps events forever
+func warnBadDuration(key string) {
+	v := viper.GetString(key)
+	if v == "" || v == "0" {
+		return
+	}
+	if _, err := time.ParseDuration(v); err != nil {
+		log.Warnf("%s is %q, which is not a duration such as \"2160h\"", key, v)
+	}
+}
+
+// Run tidies the events every minute until the context ends
 func (r *Recorder) Run(ctx context.Context) error {
-	flush := time.NewTicker(FlushInterval)
-	defer flush.Stop()
+	warnBadDuration("events.retention")
+	warnBadDuration("bmc.firmware_timeout")
+
 	tidy := time.NewTicker(tidyInterval)
 	defer tidy.Stop()
 
@@ -213,13 +172,10 @@ func (r *Recorder) Run(ctx context.Context) error {
 	for {
 		select {
 		case <-ctx.Done():
-			r.Flush()
 			if errors.Is(ctx.Err(), context.Canceled) {
 				return nil
 			}
 			return ctx.Err()
-		case <-flush.C:
-			r.Flush()
 		case <-tidy.C:
 			r.Tidy(time.Now().UTC())
 		}

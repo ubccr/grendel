@@ -5,9 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { BmcResponse, toastBmcResponse } from "@/lib/bmc";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
-import { toast } from "sonner";
 
 // byJobs groups nodes that have the same jobs selected, since one clear request removes the same ids from every node it names
 function byJobs(list: { [node: string]: string[] }) {
@@ -27,8 +25,11 @@ type clearProps = { list?: { [key: string]: string[] }; allNodes?: string };
 
 // JobsClearDialog clears the selected jobs in list, or with allNodes the whole queue on those nodes
 export function JobsClearDialog({ list = {}, allNodes }: clearProps) {
-  const router = useRouter();
-  const { mutateAsync, isPending } = useMutation(postV1BmcJobsClearMutation());
+  // the requests are one action to the person, so their outcomes are added up and toasted once, here
+  const { mutateAsync, isPending } = useMutation({
+    ...postV1BmcJobsClearMutation(),
+    meta: { bmc: true },
+  });
   const hasSelection = Object.values(list).some((ids) => ids.length > 0);
 
   const clear = async () => {
@@ -54,12 +55,9 @@ export function JobsClearDialog({ list = {}, allNodes }: clearProps) {
         if (res.summary?.failed_nodes) failedNodes.push(res.summary.failed_nodes);
         results.push(...(res.results ?? []));
       }
-    } catch (e) {
-      const err = e as { title?: string; detail?: string };
-      toast.error(err.title ?? "Failed to clear jobs", { description: err.detail });
+    } catch {
+      // the failed request has been toasted, and the jobs it and the ones before it cleared are fetched again
       return;
-    } finally {
-      router.invalidate();
     }
 
     toastBmcResponse("Clear jobs", {

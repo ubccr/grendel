@@ -17,18 +17,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useRefresh } from "@/lib/queries";
 import { cn } from "@/lib/utils";
-import { Link, useNavigate, useRouter, useSearch } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { ChevronRight, ChevronsDownUp, ChevronsUpDown, Plus, RefreshCw } from "lucide-react";
-import React, {
-  createContext,
-  JSX,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-} from "react";
+import React, { JSX, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
@@ -40,7 +33,6 @@ import {
   type DataTableInstance,
   type DataTableRow,
 } from "./features";
-import { DataTableFilterContext } from "./header";
 import { DataTablePagination } from "./pagination";
 import { DataTableViewOptions } from "./view-options";
 
@@ -72,9 +64,7 @@ interface DataTableProps<TData extends RowData> {
   getRowId?: (row: TData, index: number) => string;
   // meta is handed to TanStack as the table's meta, so cells can read state that changes often, like the values of inputs in them, without the column definitions changing and remounting every cell
   meta?: object;
-  // getRowProps adds attributes to a row's <tr>, such as hover handlers
   getRowProps?: (row: DataTableRow<TData>) => React.HTMLAttributes<HTMLTableRowElement>;
-  // paginate false shows every row on one page, with no page controls
   paginate?: boolean;
   // scrollHeight caps the table's height, scrolling its body under a header that stays in view
   scrollHeight?: string;
@@ -86,10 +76,8 @@ interface DataTableProps<TData extends RowData> {
   reveal?: { id: string; at: number };
   // selection makes the table selectable with the selection held by the parent, as row ids. It is kept through filtering and through rows not yet loaded, so a table used to pick rows can build its pick up across several filters
   selection?: { ids: string[]; onChange: (ids: string[]) => void };
-  // canSelect decides which rows get a checkbox. In a tree only rows without sub rows are selected, and a group's box ticks the rows under it
+  // canSelect decides which rows get a checkbox. In a tree only the rows under a group are selected, and a group's box ticks the ones under it
   canSelect?: (row: TData) => boolean;
-  // bulkSelect is which rows the select all and group boxes tick, for rows that can be ticked one at a time but shouldn't be swept up with the rest
-  bulkSelect?: (row: TData) => boolean;
 }
 
 export type DataTableActions<TData extends RowData> = ({
@@ -146,10 +134,9 @@ export function DataTable<TData extends RowData>({
   reveal,
   selection,
   canSelect,
-  bulkSelect,
 }: DataTableProps<TData>) {
   const navigate = useNavigate();
-  const router = useRouter();
+  const refreshPage = useRefresh();
   const search = useSearch({ strict: false }) as Record<string, unknown>;
 
   const hasDetail = renderSubComponent !== undefined;
@@ -169,6 +156,39 @@ export function DataTable<TData extends RowData>({
     [search, allColumns, syncFilters],
   );
 
+  const [columnFilters, setColumnFilters] = useState(urlFilters);
+  // the filters as of the last change, which two changes in one event both build on before either is rendered
+  const filtersRef = useRef(columnFilters);
+  // navigations this table started and that have not landed yet
+  const ownChanges = useRef(0);
+  const controlled = selection !== undefined;
+
+  // every change to the filters, from a header, the clear button or a reveal, comes through here: the url follows, and the selection is cleared, since it could otherwise hold rows the filters now hide
+  const setFilters = (
+    updater: ColumnFiltersState | ((old: ColumnFiltersState) => ColumnFiltersState),
+  ) => {
+    const previous = filtersRef.current;
+    const next = typeof updater === "function" ? updater(previous) : updater;
+    if (next === previous) return;
+    filtersRef.current = next;
+    setColumnFilters(next);
+    if (!controlled) tableRef.current?.resetRowSelection();
+    if (!syncFilters) return;
+    ownChanges.current++;
+    void navigate({
+      to: ".",
+      search: (prev) => ({
+        ...Object.fromEntries(
+          Object.entries(prev as Record<string, unknown>).filter(
+            ([k]) => !previous.some((f) => f.id === k),
+          ),
+        ),
+        ...Object.fromEntries(next.map((f) => [f.id, f.value])),
+      }),
+      replace: true,
+    }).finally(() => ownChanges.current--);
+  };
+
   const selectedIds = selection?.ids;
   const rowSelection = useMemo(
     () =>
@@ -181,8 +201,9 @@ export function DataTable<TData extends RowData>({
 
   const table = useTable({
     features,
+    state: { columnFilters, ...(rowSelection && { rowSelection }) },
+    onColumnFiltersChange: setFilters,
     ...(rowSelection && {
-      state: { rowSelection },
       onRowSelectionChange: (u: unknown) => {
         const next = (typeof u === "function" ? u(rowSelection) : u) as Record<string, true>;
         onSelection?.(Object.keys(next).filter((id) => next[id]));
@@ -194,7 +215,7 @@ export function DataTable<TData extends RowData>({
     getSubRows: tree?.getSubRows,
     getRowCanExpand,
     enableRowSelection: (row) =>
-      (tree === undefined || row.subRows.length === 0) && (canSelect?.(row.original) ?? true),
+      (tree === undefined || row.depth > 0) && (canSelect?.(row.original) ?? true),
     meta: meta as never,
     // a filter on a group's rows keeps every group holding a match, rather than judging the group row itself
     filterFromLeafRows: tree !== undefined,
@@ -202,90 +223,60 @@ export function DataTable<TData extends RowData>({
     paginateExpandedRows: false,
     // keep groups open while filtering, so a filter on a job column shows the matching jobs rather than closing the nodes holding them
     autoResetExpanded: false,
+    // manual pagination hands every row back unsliced, which is all a table without pages needs
+    manualPagination: !paginate,
     initialState: {
       sorting: initialSorting ?? [],
       columnVisibility: initialVisibility ?? {},
-      // filters start from the url
+      // the first render already filters by what the url holds, rather than drawing every row before the state above is taken up
       columnFilters: urlFilters,
       // groups start open, since the rows under a node are what the page is for. Tables with detail panels start closed, as each panel can be large
       expanded: tree ? true : {},
-      pagination: { pageIndex: 0, pageSize: paginate ? 20 : Number.MAX_SAFE_INTEGER },
+      pagination: { pageIndex: 0, pageSize: 20 },
     },
   });
 
-  // when the data changes, drop the selection of rows that are gone, such as nodes just deleted. Selected ids stay in the selection state after their rows go, where they would still count towards "some rows selected" and leave the select all box partly checked with nothing visibly selected
-  const controlled = selection !== undefined;
+  // useTable returns a new object on every render, so effects read the table through this ref rather than depending on it and running each time; a layout effect runs before the effects below, so they always see the current one
+  const tableRef = useRef<typeof table>(undefined);
+  useLayoutEffect(() => {
+    tableRef.current = table;
+  });
+
+  // when the data changes, drop the selection of rows that are gone, such as nodes just deleted. A selected id outlives its row, so a row coming back under the same id would otherwise come back ticked
   useEffect(() => {
     if (controlled) return;
-    table.setRowSelection((prev) => {
-      const rows = table.getCoreRowModel().rowsById;
+    tableRef.current?.setRowSelection((prev) => {
+      const rows = tableRef.current!.getCoreRowModel().rowsById;
       const kept = Object.keys(prev).filter((id) => id in rows);
       return kept.length === Object.keys(prev).length
         ? prev
         : Object.fromEntries(kept.map((id) => [id, prev[id]]));
     });
-  }, [data, table, controlled]);
+  }, [data, controlled]);
 
-  // the url can also change under the table, as when a link elsewhere on the page leads back to it with other filters, and the table then takes its filters from it. The table's own changes are left alone: it already holds them, and the url trails behind while typing, so taking it then would put back an earlier value
-  const ownChanges = useRef(0);
+  // the url can also change under the table, as when a link elsewhere on the page leads back to it with other filters, and the table then takes its filters from it. While a navigation of its own is in flight it doesn't: it already holds those filters, and the url trails behind while typing, so taking it then would put back an earlier value
   const urlKey = JSON.stringify(urlFilters);
   const seenUrlKey = useRef(urlKey);
   useEffect(() => {
     if (urlKey === seenUrlKey.current) return;
     seenUrlKey.current = urlKey;
     if (ownChanges.current > 0) return;
-    if (!controlled) table.resetRowSelection();
-    table.setColumnFilters(JSON.parse(urlKey) as ColumnFiltersState);
-  }, [urlKey, table, controlled]);
-  const own = (navigated: Promise<void>) => {
-    ownChanges.current++;
-    void navigated.finally(() => ownChanges.current--);
-  };
-
-  // every filter change goes through here, so the filter lands in the url and the selection is cleared, since it could otherwise hold rows the filter now hides
-  const setFilter = (id: string, value: unknown) => {
-    if (syncFilters)
-      own(navigate({ to: ".", search: (prev) => ({ ...prev, [id]: value }), replace: true }));
-    if (!controlled) table.resetRowSelection();
-    table.getColumn(id)?.setFilterValue(value);
-  };
-
-  const filters = table.state.columnFilters;
-  const clearFilters = () => {
-    if (syncFilters)
-      own(
-        navigate({
-          to: ".",
-          search: (prev) =>
-            Object.fromEntries(
-              Object.entries(prev as Record<string, unknown>).filter(
-                ([k]) => !filters.some((f) => f.id === k),
-              ),
-            ),
-          replace: true,
-        }),
-      );
-    if (!controlled) table.resetRowSelection();
-    table.resetColumnFilters(true);
-  };
+    if (!controlled) tableRef.current?.resetRowSelection();
+    filtersRef.current = JSON.parse(urlKey) as ColumnFiltersState;
+    setColumnFilters(filtersRef.current);
+  }, [urlKey, controlled]);
 
   const bodyRef = useRef<HTMLDivElement>(null);
   const revealId = reveal?.id;
   const revealAt = reveal?.at;
   // keyed on the id and time rather than the object, so a parent that builds a new reveal object each render doesn't scroll back to the row on every render
-  // the table is read through a ref, as the instance can change between renders and would otherwise re-run the reveal; a layout effect runs before the effect below, so it always sees the current one
-  const tableRef = useRef(table);
-  useLayoutEffect(() => {
-    tableRef.current = table;
-  });
   useEffect(() => {
-    if (revealId === undefined) return;
+    const table = tableRef.current;
+    if (revealId === undefined || !table) return;
     // a row the filters hide can't be shown, so they are cleared first
-    if (!tableRef.current.getFilteredRowModel().flatRows.some((r) => r.id === revealId))
-      tableRef.current.resetColumnFilters(true);
-    const row = tableRef.current.getCoreRowModel().rowsById[revealId] as
-      | DataTableRow<TData>
-      | undefined;
+    if (!table.getFilteredRowModel().flatRows.some((r) => r.id === revealId))
+      table.resetColumnFilters(true);
+    const row = table.getCoreRowModel().rowsById[revealId] as DataTableRow<TData> | undefined;
     for (let parent = row?.getParentRow(); parent; parent = parent.getParentRow())
       if (!parent.getIsExpanded()) parent.toggleExpanded(true);
     // the opened group draws on the next frame, so the row is looked for after it
@@ -453,8 +444,8 @@ export function DataTable<TData extends RowData>({
               <span className="sr-only sm:not-sr-only">Add</span>
             </Button>
           )}
-          {/* use passed refresh func (tanstack query) or fallback to route cache invalidation*/}
-          <Button variant="secondary" onClick={refresh ?? (() => router.invalidate())}>
+          {/* without a refresh of its own, a table fetches again everything its page shows */}
+          <Button variant="secondary" onClick={refresh ?? (() => void refreshPage())}>
             <RefreshCw className={cn(progress && "motion-safe:animate-spin")} />
             <span className="sr-only sm:not-sr-only">Refresh</span>
           </Button>
@@ -462,107 +453,119 @@ export function DataTable<TData extends RowData>({
           {!!Actions && <Actions table={table} />}
         </div>
       </div>
-      <BulkSelectContext.Provider value={bulkSelect as BulkSelect}>
-        <DataTableFilterContext.Provider value={setFilter}>
-          <div
-            ref={bodyRef}
-            className={cn("rounded-md border", scrollHeight ? "overflow-auto" : "overflow-hidden")}
-            style={scrollHeight ? { maxHeight: scrollHeight } : undefined}
+      <div
+        ref={bodyRef}
+        className={cn("rounded-md border", scrollHeight ? "overflow-auto" : "overflow-hidden")}
+        style={scrollHeight ? { maxHeight: scrollHeight } : undefined}
+      >
+        <Table>
+          <TableHeader
+            className={cn(
+              scrollHeight && "sticky top-0 z-10 bg-background shadow-[0_1px_0_var(--border)]",
+            )}
           >
-            <Table>
-              <TableHeader
-                className={cn(
-                  scrollHeight && "sticky top-0 z-10 bg-background shadow-[0_1px_0_var(--border)]",
-                )}
-              >
-                {tree ? (
-                  <>
-                    {/* the leading cells span both rows, so select all sits once beside both bands */}
-                    {/* each header row takes the colour of the rows it heads: plain for the group rows, tinted for the rows under them */}
-                    <TableRow className="border-b-border/50 hover:bg-transparent">
-                      {lead.map((c) => headCell(c.id, { rowSpan: 2, className: "border-b" }))}
-                      {groupCols.map((c, ci) =>
-                        headCell(c.id, {
-                          colSpan: stretch(ci, groupCols.length),
-                          className: ci === 0 ? "pl-6" : undefined,
-                        }),
-                      )}
-                    </TableRow>
-                    {/* the row band's header hangs off the group band's with the same elbow its rows use, so it reads as the header for the rows under each group */}
-                    <TableRow className="bg-muted/30 hover:bg-muted/30">
-                      {itemCols.map((c, ci) =>
-                        headCell(c.id, {
-                          colSpan: stretch(ci, itemCols.length),
-                          className: ci === 0 ? "relative pl-9" : undefined,
-                          guide: ci === 0,
-                        }),
-                      )}
-                    </TableRow>
-                  </>
-                ) : (
-                  <TableRow className="bg-muted/40 hover:bg-muted/40">
-                    {leaf.map((c) => headCell(c.id))}
-                  </TableRow>
-                )}
-                {/* the loading bar's row takes no height and no border, the header's [&_tr]:border-b outranks a plain border-0, and the bar overlays the top edge of the body, so the header keeps a single bottom border whether or not anything is loading */}
-                <TableRow className="border-0! hover:bg-transparent">
-                  <TableCell className="relative h-0 p-0" colSpan={width}>
-                    {progress && (
-                      <Progress
-                        value={null}
-                        className="absolute inset-x-0 top-0 z-10 *:data-[slot=progress-track]:h-0.5 *:data-[slot=progress-track]:rounded-none"
-                      />
-                    )}
-                  </TableCell>
+            {tree ? (
+              <>
+                {/* the leading cells span both rows, so select all sits once beside both bands */}
+                {/* each header row takes the colour of the rows it heads: plain for the group rows, tinted for the rows under them */}
+                <TableRow className="border-b-border/50 hover:bg-transparent">
+                  {lead.map((c) => headCell(c.id, { rowSpan: 2, className: "border-b" }))}
+                  {groupCols.map((c, ci) =>
+                    headCell(c.id, {
+                      colSpan: stretch(ci, groupCols.length),
+                      className: ci === 0 ? "pl-6" : undefined,
+                    }),
+                  )}
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rows.length ? (
-                  rows.map(renderRow)
-                ) : (
-                  <TableRow className="hover:bg-transparent">
-                    <TableCell colSpan={width} className="h-28 text-center">
-                      {filters.length > 0 ? (
-                        <div className="grid justify-items-center gap-2">
-                          <span className="text-muted-foreground">
-                            No rows match these filters.
-                          </span>
-                          <Button variant="secondary" size="sm" onClick={clearFilters}>
-                            Clear filters
-                          </Button>
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground">Nothing to show.</span>
-                      )}
-                    </TableCell>
-                  </TableRow>
+                {/* the row band's header hangs off the group band's with the same elbow its rows use, so it reads as the header for the rows under each group */}
+                <TableRow className="bg-muted/30 hover:bg-muted/30">
+                  {itemCols.map((c, ci) =>
+                    headCell(c.id, {
+                      colSpan: stretch(ci, itemCols.length),
+                      className: ci === 0 ? "relative pl-9" : undefined,
+                      guide: ci === 0,
+                    }),
+                  )}
+                </TableRow>
+              </>
+            ) : (
+              <TableRow className="bg-muted/40 hover:bg-muted/40">
+                {leaf.map((c) => headCell(c.id))}
+              </TableRow>
+            )}
+            {/* the loading bar's row takes no height and no border, the header's [&_tr]:border-b outranks a plain border-0, and the bar overlays the top edge of the body, so the header keeps a single bottom border whether or not anything is loading */}
+            <TableRow className="border-0! hover:bg-transparent">
+              <TableCell className="relative h-0 p-0" colSpan={width}>
+                {progress && (
+                  <Progress
+                    value={null}
+                    className="absolute inset-x-0 top-0 z-10 *:data-[slot=progress-track]:h-0.5 *:data-[slot=progress-track]:rounded-none"
+                  />
                 )}
-              </TableBody>
-            </Table>
-          </div>
-        </DataTableFilterContext.Provider>
-      </BulkSelectContext.Provider>
+              </TableCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {rows.length ? (
+              rows.map(renderRow)
+            ) : (
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={width} className="h-28 text-center">
+                  {columnFilters.length > 0 ? (
+                    <div className="grid justify-items-center gap-2">
+                      <span className="text-muted-foreground">No rows match these filters.</span>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => table.resetColumnFilters(true)}
+                      >
+                        Clear filters
+                      </Button>
+                    </div>
+                  ) : (
+                    <span className="text-muted-foreground">Nothing to show.</span>
+                  )}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
       {paginate && <DataTablePagination table={table} tree={tree !== undefined} />}
     </div>
   );
 }
 
-type BulkSelect = ((row: unknown) => boolean) | undefined;
-
-const BulkSelectContext = createContext<BulkSelect>(undefined);
-
-// selectColumn is the checkbox column a selectable table gets
 const selectColumn: DisplayColumnDef<DataTableFeatures, any> = {
   id: SELECT_COLUMN,
   enableHiding: false,
   enableSorting: false,
   enableColumnFilter: false,
-  header: ({ table }) => (
-    <BulkBox label="Select all" rows={table.getFilteredRowModel().flatRows} table={table} />
-  ),
-  cell: ({ row, table }) =>
+  header: ({ table }) => {
+    const any = table.getFilteredRowModel().flatRows.some((r) => r.getCanSelect());
+    const all = any && table.getIsAllRowsSelected();
+    return (
+      <Checkbox
+        aria-label="Select all"
+        checked={all}
+        // only the rows the filters show count, since a selection held by the parent keeps the ones they hide
+        indeterminate={!all && table.getFilteredSelectedRowModel().flatRows.length > 0}
+        disabled={!any}
+        onClick={() => table.toggleAllRowsSelected(!all)}
+      />
+    );
+  },
+  cell: ({ row }) =>
     row.subRows.length > 0 ? (
-      <BulkBox label="Select group" rows={row.getLeafRows()} table={table} group />
+      // a group with nothing selectable under it shows no box
+      row.getLeafRows().some((r) => r.getCanSelect()) && (
+        <Checkbox
+          aria-label="Select group"
+          checked={row.getIsAllSubRowsSelected()}
+          indeterminate={row.getIsSomeSelected()}
+          onClick={() => row.toggleSelected(!row.getIsAllSubRowsSelected())}
+        />
+      )
     ) : row.getCanSelect() ? (
       <Checkbox
         aria-label="Select row"
@@ -580,46 +583,6 @@ const selectColumn: DisplayColumnDef<DataTableFeatures, any> = {
     ) : null,
 };
 
-// BulkBox is the box over many rows: the header's over every row shown, a group's over its rows. It shows whether all, some or none of them are selected, and ticks the ones bulkSelect allows, or clears them all
-function BulkBox<TData extends RowData>({
-  label,
-  rows,
-  table,
-  group,
-}: {
-  label: string;
-  rows: DataTableRow<TData>[];
-  table: DataTableInstance<TData>;
-  // a group with nothing selectable under it shows no box, where the header's stays, disabled
-  group?: boolean;
-}) {
-  const bulk = useContext(BulkSelectContext);
-  const leaves = rows.filter((r) => r.subRows.length === 0 && r.getCanSelect());
-  const eligible = bulk ? leaves.filter((r) => bulk(r.original)) : leaves;
-  const all = eligible.length > 0 && eligible.every((r) => r.getIsSelected());
-  const some = leaves.some((r) => r.getIsSelected());
-  if (group && leaves.length === 0) return null;
-  return (
-    <Checkbox
-      aria-label={label}
-      checked={all}
-      indeterminate={some && !all}
-      disabled={eligible.length === 0}
-      onClick={() =>
-        table.setRowSelection((prev) => {
-          const next = { ...prev };
-          for (const r of all ? leaves : eligible) {
-            if (all) delete next[r.id];
-            else next[r.id] = true;
-          }
-          return next;
-        })
-      }
-    />
-  );
-}
-
-// expandColumn is the disclosure column a table with detail panels gets
 const expandColumn: DisplayColumnDef<DataTableFeatures, any> = {
   id: EXPAND_COLUMN,
   enableHiding: false,
@@ -629,7 +592,7 @@ const expandColumn: DisplayColumnDef<DataTableFeatures, any> = {
   cell: ({ row }) => (row.getCanExpand() ? <Disclosure row={row} /> : null),
 };
 
-// GroupLabel is the group row's lead cell: the disclosure, the group's own value and, at the cell's end, how many rows the group holds. An empty group's 0 is drawn faintly, so nodes with nothing to show recede, and the counts line up down the column whatever the length of the name
+// An empty group's 0 is drawn faintly so nodes with nothing to show recede, and the count sits at the cell's end so counts line up down the column
 function GroupLabel<TData extends RowData>({
   cell,
 }: {
@@ -654,7 +617,7 @@ function GroupLabel<TData extends RowData>({
   );
 }
 
-// Disclosure is the chevron that opens a row. It is a real button so the row can be opened from the keyboard, and it turns rather than swapping icons so the change reads as the same control moving
+// A real button so the row can be opened from the keyboard. It turns rather than swapping icons, so the change reads as one control moving
 function Disclosure<TData extends RowData>({ row }: { row: DataTableRow<TData> }) {
   const open = row.getIsExpanded();
   return (
@@ -679,7 +642,6 @@ function Disclosure<TData extends RowData>({ row }: { row: DataTableRow<TData> }
   );
 }
 
-// TreeGuide is the line a group's rows hang from, centred under the group row's chevron, with an elbow on the last row
 function TreeGuide({ last }: { last: boolean }) {
   return (
     <span aria-hidden className="pointer-events-none absolute inset-0">

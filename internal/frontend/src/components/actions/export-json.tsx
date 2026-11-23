@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { useHighlightedCode } from "@/hooks/use-highlighted-code";
+import { highlightJson } from "@/lib/highlighter";
 import { cn } from "@/lib/utils";
 import { type QueryKey, useQuery, type UseQueryOptions } from "@tanstack/react-query";
 import { Download, FileJson } from "lucide-react";
@@ -37,7 +37,7 @@ type Props<T extends Named, E, K extends QueryKey> = {
 // MAX_HIGHLIGHT is the most JSON that gets colored, so a very large export shows as plain text rather than stalling the page
 const MAX_HIGHLIGHT = 512 * 1024;
 
-// withoutIds drops the database ids from nodes, their interfaces and bonds, and images. The store upserts on id, so an import that carries them overwrites whatever records have those ids, in another Grendel a different node entirely. Without them the uids are generated fresh
+// withoutIds drops the database ids from nodes, their interfaces and bonds, and images. The store upserts on id, so an import carrying them would overwrite whatever records hold those ids in another Grendel
 export function withoutIds<T>(records: T[]): T[] {
   return records.map((record) => {
     const { id: _id, uid: _uid, ...rest } = record as Record<string, unknown>;
@@ -59,7 +59,7 @@ function formatSize(bytes: number) {
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
 
-// ExportJson shows records as the JSON the CLI's import command reads, to copy or save as a file. It only fetches while open, so the records are current each time
+// The records are only fetched while the dialog is open, so they are current each time
 export function ExportJson<T extends Named, E, K extends QueryKey>({
   trigger,
   noun,
@@ -69,7 +69,10 @@ export function ExportJson<T extends Named, E, K extends QueryKey>({
   const [ids, setIds] = useState(false);
   const idsSwitch = useId();
   // the client throws the server's error body rather than an Error, so its detail says what went wrong
-  const { data, isPending, isError, error } = useQuery({ ...options, enabled: open });
+  const { data, dataUpdatedAt, isPending, isError, error } = useQuery({
+    ...options,
+    enabled: open,
+  });
   const reason = (error as { detail?: string } | null)?.detail;
 
   const code = useMemo(
@@ -77,8 +80,16 @@ export function ExportJson<T extends Named, E, K extends QueryKey>({
     [data, ids],
   );
   const large = code.length > MAX_HIGHLIGHT;
-  const highlighted = useHighlightedCode(large ? "" : code, "json");
-  const lines = useMemo(() => (large ? code.split("\n") : highlighted), [large, code, highlighted]);
+  // keyed on what the JSON was made from rather than the JSON, which is too long to hash on every render
+  const highlighted = useQuery({
+    queryKey: ["highlighted-json", options.queryKey, dataUpdatedAt, ids],
+    queryFn: () => highlightJson(code),
+    enabled: !!code && !large,
+    staleTime: Infinity,
+    gcTime: 0,
+  });
+  // plain lines stand in until the colored ones are ready, and for JSON too large to color
+  const lines = useMemo(() => highlighted.data ?? code.split("\n"), [highlighted.data, code]);
   const size = useMemo(() => new Blob([code]).size, [code]);
   const count = data?.length ?? 0;
   const plural = count === 1 ? noun : `${noun}s`;

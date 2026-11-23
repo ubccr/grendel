@@ -15,11 +15,10 @@ const headings: Record<Writable, string> = {
 type Props = {
   nodes: string;
   results: SecureBootResult[];
-  onChanged: () => void;
 };
 
-// KeysPanel is the chain of databases and the keys of the one picked, for one node or many. With many nodes a key is one row however many nodes hold it
-export default function KeysPanel({ nodes, results, onChanged }: Props) {
+// With many nodes a key is one row however many nodes hold it
+export default function KeysPanel({ nodes, results }: Props) {
   const [db, setDb] = useState<Writable>("db");
   const rows = coverage(results);
   const reached = results.filter((r) => r.success).map((r) => r.node ?? "");
@@ -48,12 +47,12 @@ export default function KeysPanel({ nodes, results, onChanged }: Props) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <ResetDialog nodes={nodes} onDone={onChanged} />
-          <EnrollDialog nodes={nodes} db={db} onDone={onChanged} />
+          <ResetDialog nodes={nodes} />
+          <EnrollDialog nodes={nodes} db={db} />
         </div>
       </div>
 
-      <KeyList db={db} rows={shown} reached={reached} onChanged={onChanged} />
+      <KeyList db={db} rows={shown} reached={reached} />
     </section>
   );
 }

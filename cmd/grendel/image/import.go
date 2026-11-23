@@ -22,7 +22,7 @@ var (
 		Long:  `import images`,
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			var images []client.NilBootImageAddRequestBootImagesItem
+			var images []client.BootImageAddRequestBootImagesItem
 			for _, name := range args {
 				file, err := os.Open(name)
 				if err != nil {
@@ -32,7 +32,7 @@ var (
 
 				shared.Log.Infof("Processing file: %s", name)
 
-				var image []client.NilBootImageAddRequestBootImagesItem
+				var image []client.BootImageAddRequestBootImagesItem
 				if err := json.NewDecoder(file).Decode(&image); err != nil {
 					return err
 				}

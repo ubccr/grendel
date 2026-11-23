@@ -181,6 +181,7 @@ func (h *Handler) verifyClaims(c echo.Context) (*model.BootImage, *model.Host, *
 			"path":     viper.GetString("provision.beacon.path"),
 			"complete": viper.GetBool("provision.beacon.complete"),
 			"url":      endpoints.BeaconURL(host.ArchDebian()),
+			"timeout":  beaconTimeout(token, time.Now()),
 		},
 	}
 
@@ -206,8 +207,11 @@ func (h *Handler) Ipxe(c echo.Context) error {
 	data["commandLine"] = commandLine
 
 	log.Infof("iPXE script requested: script=%s host=%s boot_image=%s", tmplName, host.Name, bootImage.Name)
+	if err := c.Render(http.StatusOK, tmplName, data); err != nil {
+		return err
+	}
 	h.recordStage(host, model.ProvisionStateIPXE, bootImage)
-	return c.Render(http.StatusOK, tmplName, data)
+	return nil
 }
 
 func (h *Handler) File(c echo.Context) error {
@@ -284,8 +288,11 @@ func (h *Handler) Kickstart(c echo.Context) error {
 		tmplName = "kickstart.tmpl"
 	}
 
+	if err := c.Render(http.StatusOK, tmplName, data); err != nil {
+		return err
+	}
 	h.recordStage(host, model.ProvisionStateConfig, bootImage)
-	return c.Render(http.StatusOK, tmplName, data)
+	return nil
 }
 
 // Complete marks the node's provision completed and turns provisioning off. With ?unprovision=false it only records the status, for nodes that network boot every time
@@ -328,9 +335,12 @@ func (h *Handler) UserData(c echo.Context) error {
 	}
 
 	log.Infof("Sending cloud-init user-data to host %s", host.Name)
-	h.recordStage(host, model.ProvisionStateConfig, bootImage)
 	c.Response().Header().Set(echo.HeaderContentType, "application/yaml; charset=utf-8")
-	return c.Render(http.StatusOK, tmplName, data)
+	if err := c.Render(http.StatusOK, tmplName, data); err != nil {
+		return err
+	}
+	h.recordStage(host, model.ProvisionStateConfig, bootImage)
+	return nil
 }
 
 func (h *Handler) MetaData(c echo.Context) error {
@@ -361,9 +371,12 @@ func (h *Handler) Ignition(c echo.Context) error {
 	}
 
 	log.Infof("Sending ignition config to host %s", host.Name)
-	h.recordStage(host, model.ProvisionStateConfig, bootImage)
 	renderer := c.Echo().Renderer.(*TemplateRenderer)
-	return renderer.RenderIgnition(http.StatusOK, tmplName, data, c)
+	if err := renderer.RenderIgnition(http.StatusOK, tmplName, data, c); err != nil {
+		return err
+	}
+	h.recordStage(host, model.ProvisionStateConfig, bootImage)
+	return nil
 }
 
 func (h *Handler) ProvisionTemplate(c echo.Context) error {

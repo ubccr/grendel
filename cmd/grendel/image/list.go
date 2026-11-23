@@ -16,8 +16,7 @@ import (
 )
 
 var (
-	listFilter  []string
-	listOptions *shared.TableOptions
+	listTable   *shared.TableFlags
 	listColumns = []shared.Column{
 		{Name: "Name"},
 		{Name: "Version"},
@@ -42,7 +41,7 @@ var (
 				return apiclient.NewApiError(err)
 			}
 
-			t := shared.NewTable(listColumns, listFilter).Options(*listOptions).Empty("-")
+			t := listTable.Table()
 
 			for _, image := range images {
 				var sb strings.Builder
@@ -65,10 +64,7 @@ var (
 )
 
 func init() {
-	listOptions = shared.RegisterTableFlags(listCmd)
-	listCmd.Flags().StringSliceVar(&listFilter, "filter", []string{"Command Line"}, "filter table columns by name")
-
-	listCmd.RegisterFlagCompletionFunc("filter", shared.ColumnCompletion(listColumns))
+	listTable = shared.RegisterTableFlags(listCmd, listColumns, "Command Line")
 
 	imageCmd.AddCommand(listCmd)
 }

@@ -5,10 +5,13 @@
 package storetest
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
+	"github.com/segmentio/ksuid"
 	"github.com/ubccr/grendel/internal/store"
+	"github.com/ubccr/grendel/internal/tests"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -40,7 +43,7 @@ func (s *StoreTestSuite) TestEvents() {
 
 	audit := testEvent("a1", model.EventKindAudit, model.EventStateDone, now)
 	audit.Subject = "cpn-[01-02]"
-	audit.Detail = map[string]string{"run": "r1"}
+	audit.Detail = model.EventDetail{"run": "r1"}
 	s.Require().NoError(s.db.StoreEvent(audit))
 
 	run := testEvent("b2", model.EventKindBmc, model.EventStateRunning, now.Add(time.Minute))
@@ -75,7 +78,7 @@ func (s *StoreTestSuite) TestEvents() {
 	s.Assert().Equal(loaded.Nodes, withNodes[0].Nodes, "unless asked")
 	s.Assert().Equal(loaded.Counts, withNodes[0].Counts)
 	s.Assert().Equal("cpn-[01-02]", list[1].Subject)
-	s.Assert().Equal(map[string]string{"run": "r1"}, list[1].Detail)
+	s.Assert().Equal(model.EventDetail{"run": "r1"}, list[1].Detail)
 	s.Assert().Zero(list[1].Counts)
 
 	for name, c := range map[string]struct {
@@ -134,13 +137,38 @@ func (s *StoreTestSuite) TestEvents() {
 	s.Require().NoError(err)
 	s.Require().Len(list, 2)
 	s.Assert().Equal([]string{"b2", "00"}, []string{list[0].ID, list[1].ID})
+
+	// reading back from an event that is not there is an error, not the end of the list
+	_, err = s.db.Events(model.EventFilter{Before: "a1"})
+	s.Assert().ErrorIs(err, store.ErrNotFound)
 }
 
-func (s *StoreTestSuite) TestTrackEventNodes() {
+func (s *StoreTestSuite) TestUpdateProvisionStatus() {
 	defer s.db.Close()
 	now := time.Date(2026, 11, 16, 12, 0, 0, 0, time.UTC)
-	node := func(name string, state model.EventNodeState) model.EventNode {
-		return model.EventNode{Node: name, State: state, UpdatedAt: now}
+
+	hosts := make([]*model.Host, 8)
+	for i := range hosts {
+		hosts[i] = tests.HostFactory.MustCreate().(*model.Host)
+		hosts[i].Name = fmt.Sprintf("n%d", i)
+		s.Require().NoError(s.db.StoreHost(hosts[i]))
+	}
+	// report moves a host to a state and writes its row of the provisioning, which is opened under the given id when none is running
+	report := func(id string, host *model.Host, state model.ProvisionState, at time.Time) error {
+		open := testEvent(id, model.EventKindProvision, model.EventStateRunning, at)
+		return s.db.UpdateProvisionStatus(host.UID.String(), open, func(status *model.ProvisionStatus) (*model.EventNode, error) {
+			status.State = state
+			status.StartedAt = now
+			status.UpdatedAt = at
+			row := &model.EventNode{Node: host.Name, State: model.EventNodeRunning, Stage: string(state), UpdatedAt: at}
+			switch state {
+			case model.ProvisionStateCompleted:
+				row.State = model.EventNodeSucceeded
+			case model.ProvisionStateFailed:
+				row.State = model.EventNodeFailed
+			}
+			return row, nil
+		})
 	}
 	provisions := func() model.EventList {
 		list, err := s.db.Events(model.EventFilter{Kind: model.EventKindProvision})
@@ -148,48 +176,74 @@ func (s *StoreTestSuite) TestTrackEventNodes() {
 		return list
 	}
 
-	// flushes from several services at once all land in the one event
-	errs := make(chan error, 8)
-	for i := range 8 {
-		go func() {
-			open := testEvent(fmt.Sprintf("p%d", i), model.EventKindProvision, model.EventStateRunning, now)
-			errs <- s.db.TrackEventNodes(open, model.EventNodeList{node(fmt.Sprintf("n%d", i), model.EventNodeRunning)}, now)
-		}()
+	_, err := s.db.LoadProvisionStatus(hosts[0].UID.String())
+	s.Assert().ErrorIs(err, store.ErrNotFound)
+
+	// nodes reporting at once all land in the one event
+	errs := make(chan error, len(hosts))
+	for i, host := range hosts {
+		go func() { errs <- report(fmt.Sprintf("p%d", i), host, model.ProvisionStatePXE, now) }()
 	}
-	for range 8 {
+	for range hosts {
 		s.Require().NoError(<-errs)
 	}
 	list := provisions()
 	s.Require().Len(list, 1)
 	first := list[0].ID
 	s.Assert().Equal(model.EventCounts{Total: 8, Running: 8}, list[0].Counts)
+	s.Assert().Equal(map[string]int{"pxe": 8}, list[0].Stages)
+	status, err := s.db.LoadProvisionStatus(hosts[0].UID.String())
+	s.Require().NoError(err)
+	s.Assert().Equal(model.ProvisionStatePXE, status.State)
+
+	// update is given what is stored, and an error from it leaves that and the event as they were
+	refused := errors.New("refused")
+	err = s.db.UpdateProvisionStatus(hosts[0].UID.String(), testEvent("p8", model.EventKindProvision, model.EventStateRunning, now), func(status *model.ProvisionStatus) (*model.EventNode, error) {
+		s.Assert().Equal(model.ProvisionStatePXE, status.State)
+		status.State = model.ProvisionStateFailed
+		return &model.EventNode{Node: hosts[0].Name, State: model.EventNodeFailed, UpdatedAt: now}, refused
+	})
+	s.Assert().ErrorIs(err, refused)
+	status, err = s.db.LoadProvisionStatus(hosts[0].UID.String())
+	s.Require().NoError(err)
+	s.Assert().Equal(model.ProvisionStatePXE, status.State)
+	s.Assert().Equal(model.EventCounts{Total: 8, Running: 8}, provisions()[0].Counts)
+
+	// a status changed with no node to track leaves the events alone
+	err = s.db.UpdateProvisionStatus(hosts[0].UID.String(), testEvent("p8", model.EventKindProvision, model.EventStateRunning, now), func(status *model.ProvisionStatus) (*model.EventNode, error) {
+		status.Message = "noted"
+		return nil, nil
+	})
+	s.Require().NoError(err)
+	status, err = s.db.LoadProvisionStatus(hosts[0].UID.String())
+	s.Require().NoError(err)
+	s.Assert().Equal("noted", status.Message)
+	s.Assert().Equal(model.EventCounts{Total: 8, Running: 8}, provisions()[0].Counts)
 
 	// a running event of another kind is not joined
 	s.Require().NoError(s.db.StoreEvent(testEvent("f1", model.EventKindFirmware, model.EventStateRunning, now)))
-	s.Require().NoError(s.db.TrackEventNodes(testEvent("p9", model.EventKindProvision, model.EventStateRunning, now), model.EventNodeList{node("n0", model.EventNodeSucceeded)}, now))
+	s.Require().NoError(report("p9", hosts[0], model.ProvisionStateCompleted, now))
 	s.Assert().Len(provisions(), 1)
 
 	// the event ends in the same write as its last node finishing
-	var done model.EventNodeList
-	for i := range 8 {
-		done = append(done, node(fmt.Sprintf("n%d", i), model.EventNodeSucceeded))
+	ended := now.Add(time.Minute)
+	for _, host := range hosts[1:7] {
+		s.Require().NoError(report("p9", host, model.ProvisionStateCompleted, ended))
 	}
-	done[7].State = model.EventNodeFailed
-	s.Require().NoError(s.db.TrackEventNodes(testEvent("p9", model.EventKindProvision, model.EventStateRunning, now), done, now.Add(time.Minute)))
+	s.Assert().Equal(model.EventStateRunning, provisions()[0].State)
+	s.Require().NoError(report("p9", hosts[7], model.ProvisionStateFailed, ended))
 	loaded, err := s.db.LoadEvent(first)
 	s.Require().NoError(err)
 	s.Assert().Equal(model.EventStateDone, loaded.State)
 	s.Assert().Equal(model.SeverityWarning, loaded.Severity)
 	s.Require().NotNil(loaded.EndedAt)
-	s.Assert().True(loaded.EndedAt.Equal(now.Add(time.Minute)))
-	// a finished event is listed with the counts stored when it was settled
-	list = provisions()
-	s.Assert().Equal(model.EventCounts{Total: 8, Succeeded: 7, Failed: 1}, list[0].Counts)
+	s.Assert().True(loaded.EndedAt.Equal(ended))
+	s.Assert().Equal(model.EventCounts{Total: 8, Succeeded: 7, Failed: 1}, provisions()[0].Counts)
 
 	// after that a node starting opens a new event, while one finishing late finishes in the event it was in
 	later := now.Add(2 * time.Minute)
-	s.Require().NoError(s.db.TrackEventNodes(testEvent("p10", model.EventKindProvision, model.EventStateRunning, later),
-		model.EventNodeList{node("n1", model.EventNodeRunning), node("n7", model.EventNodeSucceeded)}, later))
+	s.Require().NoError(report("p10", hosts[1], model.ProvisionStatePXE, later))
+	s.Require().NoError(report("p11", hosts[7], model.ProvisionStateCompleted, later))
 	list = provisions()
 	s.Require().Len(list, 2)
 	s.Assert().Equal("p10", list[0].ID)
@@ -198,5 +252,6 @@ func (s *StoreTestSuite) TestTrackEventNodes() {
 	s.Assert().Equal(model.SeveritySuccess, list[1].Severity)
 	s.Assert().Equal(model.EventCounts{Total: 8, Succeeded: 8}, list[1].Counts, "and the late node is in them")
 
+	s.Assert().ErrorIs(report("p12", &model.Host{Name: "gone", UID: ksuid.New()}, model.ProvisionStatePXE, later), store.ErrNotFound)
 	s.Assert().ErrorIs(s.db.SettleEvent("missing", now), store.ErrNotFound)
 }

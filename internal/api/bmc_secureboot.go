@@ -18,12 +18,11 @@ import (
 	"github.com/ubccr/grendel/pkg/model"
 )
 
-// BmcSecureBootBody turns secure boot on or off. Enabled is a pointer so a body that leaves it out is refused, rather than read as false and turning secure boot off
+// Enabled is a pointer so a body that leaves it out is refused, rather than read as false and turning secure boot off
 type BmcSecureBootBody struct {
 	Enabled *bool `json:"enabled" validate:"required" oai3:"notnull" description:"Whether secure boot is in effect from the next boot"`
 }
 
-// BmcSecureBootKeyBody is the keys to enroll, either certificates or one signature
 type BmcSecureBootKeyBody struct {
 	Database      string   `json:"database" description:"PK, KEK, db or dbx" example:"db"`
 	Certificates  []string `json:"certificates" description:"PEM encoded X.509 certificates, one per entry, enrolled in order. Mutually exclusive with signature"`
@@ -39,13 +38,11 @@ type BmcSecureBootDeleteBody struct {
 	ID          string `json:"id" description:"Id of the certificate or signature on the bmc. Ids differ between nodes, so this suits a single node. Mutually exclusive with fingerprint"`
 }
 
-// BmcSecureBootResetBody resets the secure boot databases
 type BmcSecureBootResetBody struct {
 	Database string `json:"database" description:"Reset only this database, PK, KEK, db or dbx. Empty resets every database"`
 	Type     string `json:"type" enum:"to-default,delete-all,delete-pk" description:"to-default restores the factory keys, delete-all removes every key, which leaves the system in setup mode, and delete-pk removes only the platform key. delete-pk applies to every database, not one"`
 }
 
-// BmcSecureBoot reads the secure boot state of node(s), and with keys the contents of their databases, over one connection to each bmc
 func (h *Handler) BmcSecureBoot(c fuego.ContextNoBody) (model.BmcResponse[model.BmcSecureBoot], error) {
 	var req redfish.SecureBootRequest
 	for _, name := range strings.Split(c.QueryParam("databases"), ",") {
@@ -54,11 +51,11 @@ func (h *Handler) BmcSecureBoot(c fuego.ContextNoBody) (model.BmcResponse[model.
 		}
 	}
 	var err error
-	if req.Keys, err = queryBool(c, "keys"); err != nil {
-		return model.BmcResponse[model.BmcSecureBoot]{}, err
+	if req.Keys, err = c.QueryParamBoolErr("keys"); err != nil {
+		return model.BmcResponse[model.BmcSecureBoot]{}, badRequest(err, "keys must be true or false")
 	}
-	if req.Defaults, err = queryBool(c, "defaults"); err != nil {
-		return model.BmcResponse[model.BmcSecureBoot]{}, err
+	if req.Defaults, err = c.QueryParamBoolErr("defaults"); err != nil {
+		return model.BmcResponse[model.BmcSecureBoot]{}, badRequest(err, "defaults must be true or false")
 	}
 
 	return runBmc(h, c, "bmc secureboot", nil,
@@ -69,23 +66,10 @@ func (h *Handler) BmcSecureBoot(c fuego.ContextNoBody) (model.BmcResponse[model.
 	)
 }
 
-// queryBool reads an optional boolean query parameter, false when it is absent
-func queryBool(c fuego.ContextNoBody, name string) (bool, error) {
-	if c.QueryParam(name) == "" {
-		return false, nil
-	}
-	v, err := c.QueryParamBoolErr(name)
-	if err != nil {
-		return false, badRequest(err, name+" must be true or false")
-	}
-	return v, nil
-}
-
-// BmcSetSecureBoot turns secure boot on or off on node(s), from their next boot
 func (h *Handler) BmcSetSecureBoot(c fuego.ContextWithBody[BmcSecureBootBody]) (model.BmcResponse[model.BmcAck], error) {
 	body, err := c.Body()
 	if err != nil {
-		return model.BmcResponse[model.BmcAck]{}, badRequest(err, "enabled must be true or false")
+		return model.BmcResponse[model.BmcAck]{}, err
 	}
 	enable := *body.Enabled
 
@@ -93,16 +77,15 @@ func (h *Handler) BmcSetSecureBoot(c fuego.ContextWithBody[BmcSecureBootBody]) (
 	if enable {
 		operation = "bmc secureboot enable"
 	}
-	return runAck(h, c, operation, func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
+	return runAck(h, c, "bmc.secureboot.set", operation, func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
 		return h.Redfish.SetSecureBoot(ctx, t, enable)
 	})
 }
 
-// BmcAddSecureBootKey enrolls certificates or a signature in a secure boot database on node(s)
 func (h *Handler) BmcAddSecureBootKey(c fuego.ContextWithBody[BmcSecureBootKeyBody]) (model.BmcResponse[model.BmcAck], error) {
 	body, err := c.Body()
 	if err != nil {
-		return model.BmcResponse[model.BmcAck]{}, badRequest(err, "failed to parse the secure boot key")
+		return model.BmcResponse[model.BmcAck]{}, err
 	}
 
 	req, operation, err := secureBootKey(body)
@@ -110,16 +93,15 @@ func (h *Handler) BmcAddSecureBootKey(c fuego.ContextWithBody[BmcSecureBootKeyBo
 		return model.BmcResponse[model.BmcAck]{}, err
 	}
 
-	return runAck(h, c, operation, func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
+	return runAck(h, c, "bmc.secureboot.keys.add", operation, func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
 		return h.Redfish.AddSecureBootKey(ctx, t, req)
 	})
 }
 
-// BmcDeleteSecureBootKey removes a certificate or signature from a secure boot database on node(s)
 func (h *Handler) BmcDeleteSecureBootKey(c fuego.ContextWithBody[BmcSecureBootDeleteBody]) (model.BmcResponse[model.BmcAck], error) {
 	body, err := c.Body()
 	if err != nil {
-		return model.BmcResponse[model.BmcAck]{}, badRequest(err, "failed to parse the secure boot key")
+		return model.BmcResponse[model.BmcAck]{}, err
 	}
 
 	req, operation, err := secureBootDelete(body)
@@ -127,16 +109,15 @@ func (h *Handler) BmcDeleteSecureBootKey(c fuego.ContextWithBody[BmcSecureBootDe
 		return model.BmcResponse[model.BmcAck]{}, err
 	}
 
-	return runAck(h, c, operation, func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
+	return runAck(h, c, "bmc.secureboot.keys.delete", operation, func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
 		return h.Redfish.DeleteSecureBootKey(ctx, t, req)
 	})
 }
 
-// BmcResetSecureBootKeys resets or empties the secure boot databases of node(s)
 func (h *Handler) BmcResetSecureBootKeys(c fuego.ContextWithBody[BmcSecureBootResetBody]) (model.BmcResponse[model.BmcAck], error) {
 	body, err := c.Body()
 	if err != nil {
-		return model.BmcResponse[model.BmcAck]{}, badRequest(err, "failed to parse the secure boot reset")
+		return model.BmcResponse[model.BmcAck]{}, err
 	}
 
 	req, operation, err := secureBootReset(body)
@@ -144,7 +125,7 @@ func (h *Handler) BmcResetSecureBootKeys(c fuego.ContextWithBody[BmcSecureBootRe
 		return model.BmcResponse[model.BmcAck]{}, err
 	}
 
-	return runAck(h, c, operation, func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
+	return runAck(h, c, "bmc.secureboot.reset", operation, func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
 		return h.Redfish.ResetSecureBootKeys(ctx, t, req)
 	})
 }

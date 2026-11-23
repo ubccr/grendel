@@ -5,7 +5,6 @@ import { LatestEvent } from "./latest-event";
 import { Separator } from "./ui/separator";
 import { SidebarTrigger } from "./ui/sidebar";
 
-// Header is a small island at the top left of the page, beside the sidebar, holding the sidebar toggle and where you are. It is only as wide as the breadcrumb and grows or shrinks with it as you move around; the theme and account live in the sidebar footer. The latest event sits in a second island across from it
 export default function Header() {
   const crumbs = useCrumbs();
   return (
@@ -17,7 +16,7 @@ export default function Header() {
           transition={islandSpring}
           style={{ borderRadius: 14 }}
           data-slot="app-header"
-          // the island sits on its own layer above the page, so its shadow always falls on the card below it. Without it the card paints over the shadow at rest, and the layout animation's transform, which lifts the island above the card while it runs, made the shadow flash on and off with every navigation
+          // the island sits on its own layer above the page, so its shadow always falls on the card below it. Without the layer the card paints over the shadow at rest and the layout animation's transform lifts it back above, so the shadow flashes on every navigation
           className="relative z-10 flex h-10 max-w-full min-w-0 items-center bg-sidebar px-1 text-sidebar-foreground shadow-float ring-1 ring-sidebar-border"
         >
           {/* children of a layout animation are kept unstretched by giving them a layout of their own */}

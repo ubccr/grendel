@@ -29,7 +29,6 @@ const fields: Field[] = [
 
 const example = { port: 7, sw: "swe-a01", name: "cpn-a01-07", ifname: "Ethernet7" };
 
-// Naming holds the templates every port is named by and the settings of the BMC interface
 export function Naming({
   settings,
   compiled,
@@ -48,6 +47,7 @@ export function Naming({
     ? named[0].name + (named.length > 1 ? ` to ${named[named.length - 1].name}` : "")
     : undefined;
   const fqdnSample = rows.find((r) => r.include && r.fqdn)?.fqdn;
+  const badTag = compiled.tags.find((t) => t.error);
 
   const summary = [
     { label: "Name", value: settings.name },
@@ -88,6 +88,11 @@ export function Naming({
                 value={settings.tags}
                 onValueChange={(v) => set("tags", v)}
               />
+              {badTag && (
+                <p className="text-xs text-destructive">
+                  <span className="font-mono">{badTag.source}</span> {badTag.error!.message}
+                </p>
+              )}
             </div>
             <Plain
               label="Count {n} from"
@@ -140,7 +145,6 @@ export function Naming({
   );
 }
 
-// SettingsPanel is a collapsible box of an import's settings. Collapsed, it lists the ones set in its header
 export function SettingsPanel({
   title,
   storageKey,
@@ -183,7 +187,6 @@ export function SettingsPanel({
   );
 }
 
-// Group is one set of related settings under a heading that names it for screen readers
 export function Group({
   title,
   className,
@@ -325,7 +328,6 @@ function NameLegend({ rows, start }: { rows: Row[]; start: number }) {
   );
 }
 
-// Legend lists the fields a template can use, each with its value for one port, so a field's effect is read off rather than worked out
 export function Legend({
   fields,
   vars,

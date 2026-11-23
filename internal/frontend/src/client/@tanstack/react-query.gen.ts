@@ -7,7 +7,7 @@ import { deleteV1AuthSignout, deleteV1Images, deleteV1Nodes, deleteV1RolesNames,
 import type { DeleteV1AuthSignoutData, DeleteV1AuthSignoutError, DeleteV1AuthSignoutResponse, DeleteV1ImagesData, DeleteV1ImagesError, DeleteV1ImagesResponse, DeleteV1NodesData, DeleteV1NodesError, DeleteV1NodesResponse, DeleteV1RolesNamesData, DeleteV1RolesNamesError, DeleteV1RolesNamesResponse, DeleteV1UsersUsernamesData, DeleteV1UsersUsernamesError, DeleteV1UsersUsernamesResponse, GetV1BmcBiosData, GetV1BmcBiosError, GetV1BmcBiosRegistryData, GetV1BmcBiosRegistryError, GetV1BmcBiosRegistryResponse, GetV1BmcBiosResponse, GetV1BmcFirmwareUpdatesData, GetV1BmcFirmwareUpdatesError, GetV1BmcFirmwareUpdatesResponse, GetV1BmcIdentityDefaultsData, GetV1BmcIdentityDefaultsError, GetV1BmcIdentityDefaultsResponse, GetV1BmcJobsData, GetV1BmcJobsError, GetV1BmcJobsResponse, GetV1BmcNicsData, GetV1BmcNicsError, GetV1BmcNicsResponse, GetV1BmcSecurebootData, GetV1BmcSecurebootError, GetV1BmcSecurebootResponse, GetV1BmcSelData, GetV1BmcSelError, GetV1BmcSelResponse, GetV1BmcStatusData, GetV1BmcStatusError, GetV1BmcStatusResponse, GetV1DbDumpData, GetV1DbDumpError, GetV1DbDumpResponse, GetV1GrendelEventsData, GetV1GrendelEventsError, GetV1GrendelEventsIdData, GetV1GrendelEventsIdError, GetV1GrendelEventsIdResponse, GetV1GrendelEventsResponse, GetV1GrendelVersionData, GetV1GrendelVersionError, GetV1GrendelVersionResponse, GetV1ImagesData, GetV1ImagesError, GetV1ImagesFindData, GetV1ImagesFindError, GetV1ImagesFindResponse, GetV1ImagesResponse, GetV1NodesData, GetV1NodesError, GetV1NodesFindData, GetV1NodesFindError, GetV1NodesFindResponse, GetV1NodesIpsNextData, GetV1NodesIpsNextError, GetV1NodesIpsNextResponse, GetV1NodesIpsRangesData, GetV1NodesIpsRangesError, GetV1NodesIpsRangesResponse, GetV1NodesProvisionStatusData, GetV1NodesProvisionStatusError, GetV1NodesProvisionStatusResponse, GetV1NodesResponse, GetV1NodesTagsData, GetV1NodesTagsError, GetV1NodesTagsResponse, GetV1NodesTokenInterfaceData, GetV1NodesTokenInterfaceError, GetV1NodesTokenInterfaceResponse, GetV1RolesData, GetV1RolesError, GetV1RolesResponse, GetV1SwitchNodesetLldpData, GetV1SwitchNodesetLldpError, GetV1SwitchNodesetLldpResponse, GetV1SwitchScanData, GetV1SwitchScanError, GetV1SwitchScanResponse, GetV1UsersData, GetV1UsersError, GetV1UsersResponse, PatchV1AuthResetData, PatchV1AuthResetError, PatchV1AuthResetResponse, PatchV1NodesImageData, PatchV1NodesImageError, PatchV1NodesImageResponse, PatchV1NodesProvisionData, PatchV1NodesProvisionError, PatchV1NodesProvisionResponse, PatchV1NodesTagsActionData, PatchV1NodesTagsActionError, PatchV1NodesTagsActionResponse, PatchV1RolesData, PatchV1RolesError, PatchV1RolesResponse, PatchV1UsersUsernamesEnableData, PatchV1UsersUsernamesEnableError, PatchV1UsersUsernamesEnableResponse, PatchV1UsersUsernamesRoleData, PatchV1UsersUsernamesRoleError, PatchV1UsersUsernamesRoleResponse, PostV1AuthSigninData, PostV1AuthSigninError, PostV1AuthSigninResponse, PostV1AuthSignupData, PostV1AuthSignupError, PostV1AuthSignupResponse, PostV1AuthTokenData, PostV1AuthTokenError, PostV1AuthTokenResponse, PostV1BmcAssetTagData, PostV1BmcAssetTagError, PostV1BmcAssetTagResponse, PostV1BmcBiosData, PostV1BmcBiosDiscardData, PostV1BmcBiosDiscardError, PostV1BmcBiosDiscardResponse, PostV1BmcBiosError, PostV1BmcBiosResponse, PostV1BmcConfigureAutoData, PostV1BmcConfigureAutoError, PostV1BmcConfigureAutoResponse, PostV1BmcConfigureImportData, PostV1BmcConfigureImportError, PostV1BmcConfigureImportResponse, PostV1BmcFirmwareInstallData, PostV1BmcFirmwareInstallError, PostV1BmcFirmwareInstallResponse, PostV1BmcIndicatorData, PostV1BmcIndicatorError, PostV1BmcIndicatorResponse, PostV1BmcJobsClearData, PostV1BmcJobsClearError, PostV1BmcJobsClearResponse, PostV1BmcLocationData, PostV1BmcLocationError, PostV1BmcLocationResponse, PostV1BmcPowerData, PostV1BmcPowerError, PostV1BmcPowerResponse, PostV1BmcSecurebootData, PostV1BmcSecurebootError, PostV1BmcSecurebootKeysData, PostV1BmcSecurebootKeysDeleteData, PostV1BmcSecurebootKeysDeleteError, PostV1BmcSecurebootKeysDeleteResponse, PostV1BmcSecurebootKeysError, PostV1BmcSecurebootKeysResponse, PostV1BmcSecurebootResetData, PostV1BmcSecurebootResetError, PostV1BmcSecurebootResetResponse, PostV1BmcSecurebootResponse, PostV1BmcSelClearData, PostV1BmcSelClearError, PostV1BmcSelClearResponse, PostV1DbRestoreData, PostV1DbRestoreError, PostV1DbRestoreResponse, PostV1ImagesData, PostV1ImagesError, PostV1ImagesResponse, PostV1NodesData, PostV1NodesError, PostV1NodesImportData, PostV1NodesImportError, PostV1NodesImportResponse, PostV1NodesResponse, PostV1RolesData, PostV1RolesError, PostV1RolesResponse, PostV1UsersData, PostV1UsersError, PostV1UsersResponse } from '../types.gen';
 
 /**
- * auth reset
+ * Change own password
  *
  * #### Controller:
  *
@@ -15,7 +15,6 @@ import type { DeleteV1AuthSignoutData, DeleteV1AuthSignoutError, DeleteV1AuthSig
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -37,15 +36,11 @@ export const patchV1AuthResetMutation = (options?: Partial<Options<PatchV1AuthRe
 };
 
 /**
- * auth signin
+ * Sign in
  *
  * #### Controller:
  *
  * `github.com/ubccr/grendel/internal/api.(*Handler).AuthSignin`
- *
- * #### Middlewares:
- *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  *
  * ---
  *
@@ -66,15 +61,11 @@ export const postV1AuthSigninMutation = (options?: Partial<Options<PostV1AuthSig
 };
 
 /**
- * auth signout
+ * Sign out
  *
  * #### Controller:
  *
  * `github.com/ubccr/grendel/internal/api.(*Handler).AuthSignout`
- *
- * #### Middlewares:
- *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  *
  * ---
  *
@@ -95,15 +86,11 @@ export const deleteV1AuthSignoutMutation = (options?: Partial<Options<DeleteV1Au
 };
 
 /**
- * auth signup
+ * Sign up
  *
  * #### Controller:
  *
  * `github.com/ubccr/grendel/internal/api.(*Handler).AuthSignup`
- *
- * #### Middlewares:
- *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  *
  * ---
  *
@@ -124,7 +111,7 @@ export const postV1AuthSignupMutation = (options?: Partial<Options<PostV1AuthSig
 };
 
 /**
- * auth token
+ * Create API tokens
  *
  * #### Controller:
  *
@@ -132,7 +119,6 @@ export const postV1AuthSignupMutation = (options?: Partial<Options<PostV1AuthSig
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -154,7 +140,7 @@ export const postV1AuthTokenMutation = (options?: Partial<Options<PostV1AuthToke
 };
 
 /**
- * bmc asset tag
+ * Set asset tags
  *
  * #### Controller:
  *
@@ -162,7 +148,6 @@ export const postV1AuthTokenMutation = (options?: Partial<Options<PostV1AuthToke
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -219,7 +204,7 @@ const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions
 export const getV1BmcBiosQueryKey = (options?: Options<GetV1BmcBiosData>) => createQueryKey('getV1BmcBios', options);
 
 /**
- * bmc bios
+ * Read BIOS attributes
  *
  * #### Controller:
  *
@@ -227,7 +212,6 @@ export const getV1BmcBiosQueryKey = (options?: Options<GetV1BmcBiosData>) => cre
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -248,7 +232,7 @@ export const getV1BmcBiosOptions = (options?: Options<GetV1BmcBiosData>) => quer
 });
 
 /**
- * bmc set bios
+ * Stage BIOS changes
  *
  * #### Controller:
  *
@@ -256,7 +240,6 @@ export const getV1BmcBiosOptions = (options?: Options<GetV1BmcBiosData>) => quer
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -278,7 +261,7 @@ export const postV1BmcBiosMutation = (options?: Partial<Options<PostV1BmcBiosDat
 };
 
 /**
- * bmc discard bios
+ * Discard staged BIOS changes
  *
  * #### Controller:
  *
@@ -286,7 +269,6 @@ export const postV1BmcBiosMutation = (options?: Partial<Options<PostV1BmcBiosDat
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -310,7 +292,7 @@ export const postV1BmcBiosDiscardMutation = (options?: Partial<Options<PostV1Bmc
 export const getV1BmcBiosRegistryQueryKey = (options?: Options<GetV1BmcBiosRegistryData>) => createQueryKey('getV1BmcBiosRegistry', options);
 
 /**
- * bmc bios registry
+ * Read the BIOS attribute registry
  *
  * #### Controller:
  *
@@ -318,7 +300,6 @@ export const getV1BmcBiosRegistryQueryKey = (options?: Options<GetV1BmcBiosRegis
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -339,7 +320,7 @@ export const getV1BmcBiosRegistryOptions = (options?: Options<GetV1BmcBiosRegist
 });
 
 /**
- * bmc auto configure
+ * Set iDRAC auto configure
  *
  * #### Controller:
  *
@@ -347,7 +328,6 @@ export const getV1BmcBiosRegistryOptions = (options?: Options<GetV1BmcBiosRegist
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -369,7 +349,7 @@ export const postV1BmcConfigureAutoMutation = (options?: Partial<Options<PostV1B
 };
 
 /**
- * bmc import config
+ * Import an iDRAC config
  *
  * #### Controller:
  *
@@ -377,7 +357,6 @@ export const postV1BmcConfigureAutoMutation = (options?: Partial<Options<PostV1B
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -399,7 +378,7 @@ export const postV1BmcConfigureImportMutation = (options?: Partial<Options<PostV
 };
 
 /**
- * bmc install firmware
+ * Check and install firmware
  *
  * #### Controller:
  *
@@ -407,7 +386,6 @@ export const postV1BmcConfigureImportMutation = (options?: Partial<Options<PostV
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -431,7 +409,7 @@ export const postV1BmcFirmwareInstallMutation = (options?: Partial<Options<PostV
 export const getV1BmcFirmwareUpdatesQueryKey = (options?: Options<GetV1BmcFirmwareUpdatesData>) => createQueryKey('getV1BmcFirmwareUpdates', options);
 
 /**
- * bmc firmware updates
+ * List available firmware updates
  *
  * #### Controller:
  *
@@ -439,7 +417,6 @@ export const getV1BmcFirmwareUpdatesQueryKey = (options?: Options<GetV1BmcFirmwa
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -462,7 +439,7 @@ export const getV1BmcFirmwareUpdatesOptions = (options?: Options<GetV1BmcFirmwar
 export const getV1BmcIdentityDefaultsQueryKey = (options?: Options<GetV1BmcIdentityDefaultsData>) => createQueryKey('getV1BmcIdentityDefaults', options);
 
 /**
- * bmc identity defaults
+ * See asset tag and location defaults
  *
  * #### Controller:
  *
@@ -470,7 +447,6 @@ export const getV1BmcIdentityDefaultsQueryKey = (options?: Options<GetV1BmcIdent
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -491,7 +467,7 @@ export const getV1BmcIdentityDefaultsOptions = (options?: Options<GetV1BmcIdenti
 });
 
 /**
- * bmc indicator
+ * Turn the locate light on or off
  *
  * #### Controller:
  *
@@ -499,7 +475,6 @@ export const getV1BmcIdentityDefaultsOptions = (options?: Options<GetV1BmcIdenti
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -523,7 +498,7 @@ export const postV1BmcIndicatorMutation = (options?: Partial<Options<PostV1BmcIn
 export const getV1BmcJobsQueryKey = (options?: Options<GetV1BmcJobsData>) => createQueryKey('getV1BmcJobs', options);
 
 /**
- * bmc jobs
+ * See the job queue
  *
  * #### Controller:
  *
@@ -531,7 +506,6 @@ export const getV1BmcJobsQueryKey = (options?: Options<GetV1BmcJobsData>) => cre
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -552,7 +526,7 @@ export const getV1BmcJobsOptions = (options?: Options<GetV1BmcJobsData>) => quer
 });
 
 /**
- * bmc clear jobs
+ * Clear jobs
  *
  * #### Controller:
  *
@@ -560,7 +534,6 @@ export const getV1BmcJobsOptions = (options?: Options<GetV1BmcJobsData>) => quer
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -582,7 +555,7 @@ export const postV1BmcJobsClearMutation = (options?: Partial<Options<PostV1BmcJo
 };
 
 /**
- * bmc location
+ * Set rack locations
  *
  * #### Controller:
  *
@@ -590,7 +563,6 @@ export const postV1BmcJobsClearMutation = (options?: Partial<Options<PostV1BmcJo
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -614,7 +586,7 @@ export const postV1BmcLocationMutation = (options?: Partial<Options<PostV1BmcLoc
 export const getV1BmcNicsQueryKey = (options?: Options<GetV1BmcNicsData>) => createQueryKey('getV1BmcNics', options);
 
 /**
- * bmc n i cs
+ * List network ports
  *
  * #### Controller:
  *
@@ -622,7 +594,6 @@ export const getV1BmcNicsQueryKey = (options?: Options<GetV1BmcNicsData>) => cre
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -643,7 +614,7 @@ export const getV1BmcNicsOptions = (options?: Options<GetV1BmcNicsData>) => quer
 });
 
 /**
- * bmc power
+ * Power nodes and restart BMCs
  *
  * #### Controller:
  *
@@ -651,7 +622,6 @@ export const getV1BmcNicsOptions = (options?: Options<GetV1BmcNicsData>) => quer
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -675,7 +645,7 @@ export const postV1BmcPowerMutation = (options?: Partial<Options<PostV1BmcPowerD
 export const getV1BmcSecurebootQueryKey = (options?: Options<GetV1BmcSecurebootData>) => createQueryKey('getV1BmcSecureboot', options);
 
 /**
- * bmc secure boot
+ * See secure boot state and keys
  *
  * #### Controller:
  *
@@ -683,7 +653,6 @@ export const getV1BmcSecurebootQueryKey = (options?: Options<GetV1BmcSecurebootD
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -704,7 +673,7 @@ export const getV1BmcSecurebootOptions = (options?: Options<GetV1BmcSecurebootDa
 });
 
 /**
- * bmc set secure boot
+ * Turn secure boot on or off
  *
  * #### Controller:
  *
@@ -712,7 +681,6 @@ export const getV1BmcSecurebootOptions = (options?: Options<GetV1BmcSecurebootDa
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -734,7 +702,7 @@ export const postV1BmcSecurebootMutation = (options?: Partial<Options<PostV1BmcS
 };
 
 /**
- * bmc add secure boot key
+ * Enroll secure boot keys
  *
  * #### Controller:
  *
@@ -742,7 +710,6 @@ export const postV1BmcSecurebootMutation = (options?: Partial<Options<PostV1BmcS
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -764,7 +731,7 @@ export const postV1BmcSecurebootKeysMutation = (options?: Partial<Options<PostV1
 };
 
 /**
- * bmc delete secure boot key
+ * Delete secure boot keys
  *
  * #### Controller:
  *
@@ -772,7 +739,6 @@ export const postV1BmcSecurebootKeysMutation = (options?: Partial<Options<PostV1
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -794,7 +760,7 @@ export const postV1BmcSecurebootKeysDeleteMutation = (options?: Partial<Options<
 };
 
 /**
- * bmc reset secure boot keys
+ * Reset secure boot keys
  *
  * #### Controller:
  *
@@ -802,7 +768,6 @@ export const postV1BmcSecurebootKeysDeleteMutation = (options?: Partial<Options<
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -826,7 +791,7 @@ export const postV1BmcSecurebootResetMutation = (options?: Partial<Options<PostV
 export const getV1BmcSelQueryKey = (options?: Options<GetV1BmcSelData>) => createQueryKey('getV1BmcSel', options);
 
 /**
- * bmc s e l
+ * Read the system event log
  *
  * #### Controller:
  *
@@ -834,7 +799,6 @@ export const getV1BmcSelQueryKey = (options?: Options<GetV1BmcSelData>) => creat
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -855,7 +819,7 @@ export const getV1BmcSelOptions = (options?: Options<GetV1BmcSelData>) => queryO
 });
 
 /**
- * bmc clear s e l
+ * Clear the system event log
  *
  * #### Controller:
  *
@@ -863,7 +827,6 @@ export const getV1BmcSelOptions = (options?: Options<GetV1BmcSelData>) => queryO
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -887,7 +850,7 @@ export const postV1BmcSelClearMutation = (options?: Partial<Options<PostV1BmcSel
 export const getV1BmcStatusQueryKey = (options?: Options<GetV1BmcStatusData>) => createQueryKey('getV1BmcStatus', options);
 
 /**
- * bmc status
+ * See system status
  *
  * #### Controller:
  *
@@ -895,7 +858,6 @@ export const getV1BmcStatusQueryKey = (options?: Options<GetV1BmcStatusData>) =>
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -918,7 +880,7 @@ export const getV1BmcStatusOptions = (options?: Options<GetV1BmcStatusData>) => 
 export const getV1DbDumpQueryKey = (options?: Options<GetV1DbDumpData>) => createQueryKey('getV1DbDump', options);
 
 /**
- * dump
+ * Download a database backup
  *
  * #### Controller:
  *
@@ -926,7 +888,6 @@ export const getV1DbDumpQueryKey = (options?: Options<GetV1DbDumpData>) => creat
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -947,7 +908,7 @@ export const getV1DbDumpOptions = (options?: Options<GetV1DbDumpData>) => queryO
 });
 
 /**
- * restore
+ * Restore a database backup
  *
  * #### Controller:
  *
@@ -955,7 +916,6 @@ export const getV1DbDumpOptions = (options?: Options<GetV1DbDumpData>) => queryO
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -979,7 +939,7 @@ export const postV1DbRestoreMutation = (options?: Partial<Options<PostV1DbRestor
 export const getV1GrendelEventsQueryKey = (options?: Options<GetV1GrendelEventsData>) => createQueryKey('getV1GrendelEvents', options);
 
 /**
- * get events
+ * Follow events
  *
  * #### Controller:
  *
@@ -987,7 +947,6 @@ export const getV1GrendelEventsQueryKey = (options?: Options<GetV1GrendelEventsD
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1039,7 +998,7 @@ const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'hea
 export const getV1GrendelEventsInfiniteQueryKey = (options?: Options<GetV1GrendelEventsData>): QueryKey<Options<GetV1GrendelEventsData>> => createQueryKey('getV1GrendelEvents', options, true);
 
 /**
- * get events
+ * Follow events
  *
  * #### Controller:
  *
@@ -1047,7 +1006,6 @@ export const getV1GrendelEventsInfiniteQueryKey = (options?: Options<GetV1Grende
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1082,7 +1040,7 @@ export const getV1GrendelEventsInfiniteOptions = (options?: Options<GetV1Grendel
 export const getV1GrendelEventsIdQueryKey = (options: Options<GetV1GrendelEventsIdData>) => createQueryKey('getV1GrendelEventsId', options);
 
 /**
- * get event
+ * See how an event went on each node
  *
  * #### Controller:
  *
@@ -1090,7 +1048,6 @@ export const getV1GrendelEventsIdQueryKey = (options: Options<GetV1GrendelEvents
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1113,7 +1070,7 @@ export const getV1GrendelEventsIdOptions = (options: Options<GetV1GrendelEventsI
 export const getV1GrendelVersionQueryKey = (options?: Options<GetV1GrendelVersionData>) => createQueryKey('getV1GrendelVersion', options);
 
 /**
- * get version
+ * See the server version
  *
  * #### Controller:
  *
@@ -1121,7 +1078,6 @@ export const getV1GrendelVersionQueryKey = (options?: Options<GetV1GrendelVersio
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1142,7 +1098,7 @@ export const getV1GrendelVersionOptions = (options?: Options<GetV1GrendelVersion
 });
 
 /**
- * boot image delete
+ * Delete images
  *
  * #### Controller:
  *
@@ -1150,7 +1106,6 @@ export const getV1GrendelVersionOptions = (options?: Options<GetV1GrendelVersion
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1174,7 +1129,7 @@ export const deleteV1ImagesMutation = (options?: Partial<Options<DeleteV1ImagesD
 export const getV1ImagesQueryKey = (options?: Options<GetV1ImagesData>) => createQueryKey('getV1Images', options);
 
 /**
- * boot image list
+ * List images
  *
  * #### Controller:
  *
@@ -1182,7 +1137,6 @@ export const getV1ImagesQueryKey = (options?: Options<GetV1ImagesData>) => creat
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1203,7 +1157,7 @@ export const getV1ImagesOptions = (options?: Options<GetV1ImagesData>) => queryO
 });
 
 /**
- * boot image add
+ * Add and edit images
  *
  * #### Controller:
  *
@@ -1211,7 +1165,6 @@ export const getV1ImagesOptions = (options?: Options<GetV1ImagesData>) => queryO
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1235,7 +1188,7 @@ export const postV1ImagesMutation = (options?: Partial<Options<PostV1ImagesData>
 export const getV1ImagesFindQueryKey = (options?: Options<GetV1ImagesFindData>) => createQueryKey('getV1ImagesFind', options);
 
 /**
- * boot image find
+ * Find images
  *
  * #### Controller:
  *
@@ -1243,7 +1196,6 @@ export const getV1ImagesFindQueryKey = (options?: Options<GetV1ImagesFindData>) 
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1264,7 +1216,7 @@ export const getV1ImagesFindOptions = (options?: Options<GetV1ImagesFindData>) =
 });
 
 /**
- * node delete
+ * Delete nodes
  *
  * #### Controller:
  *
@@ -1272,7 +1224,6 @@ export const getV1ImagesFindOptions = (options?: Options<GetV1ImagesFindData>) =
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1296,7 +1247,7 @@ export const deleteV1NodesMutation = (options?: Partial<Options<DeleteV1NodesDat
 export const getV1NodesQueryKey = (options?: Options<GetV1NodesData>) => createQueryKey('getV1Nodes', options);
 
 /**
- * node list
+ * List nodes
  *
  * #### Controller:
  *
@@ -1304,7 +1255,6 @@ export const getV1NodesQueryKey = (options?: Options<GetV1NodesData>) => createQ
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1325,7 +1275,7 @@ export const getV1NodesOptions = (options?: Options<GetV1NodesData>) => queryOpt
 });
 
 /**
- * node add
+ * Add and edit nodes
  *
  * #### Controller:
  *
@@ -1333,7 +1283,6 @@ export const getV1NodesOptions = (options?: Options<GetV1NodesData>) => queryOpt
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1357,7 +1306,7 @@ export const postV1NodesMutation = (options?: Partial<Options<PostV1NodesData>>)
 export const getV1NodesFindQueryKey = (options?: Options<GetV1NodesFindData>) => createQueryKey('getV1NodesFind', options);
 
 /**
- * node find
+ * Find nodes
  *
  * #### Controller:
  *
@@ -1365,7 +1314,6 @@ export const getV1NodesFindQueryKey = (options?: Options<GetV1NodesFindData>) =>
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1386,7 +1334,7 @@ export const getV1NodesFindOptions = (options?: Options<GetV1NodesFindData>) => 
 });
 
 /**
- * node boot image
+ * Change a node's boot image
  *
  * #### Controller:
  *
@@ -1394,7 +1342,6 @@ export const getV1NodesFindOptions = (options?: Options<GetV1NodesFindData>) => 
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1416,7 +1363,7 @@ export const patchV1NodesImageMutation = (options?: Partial<Options<PatchV1Nodes
 };
 
 /**
- * node import
+ * Import nodes from switches and BMCs
  *
  * #### Controller:
  *
@@ -1424,7 +1371,6 @@ export const patchV1NodesImageMutation = (options?: Partial<Options<PatchV1Nodes
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1448,7 +1394,7 @@ export const postV1NodesImportMutation = (options?: Partial<Options<PostV1NodesI
 export const getV1NodesIpsNextQueryKey = (options: Options<GetV1NodesIpsNextData>) => createQueryKey('getV1NodesIpsNext', options);
 
 /**
- * node next address
+ * Find free addresses
  *
  * #### Controller:
  *
@@ -1456,7 +1402,6 @@ export const getV1NodesIpsNextQueryKey = (options: Options<GetV1NodesIpsNextData
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1479,7 +1424,7 @@ export const getV1NodesIpsNextOptions = (options: Options<GetV1NodesIpsNextData>
 export const getV1NodesIpsRangesQueryKey = (options?: Options<GetV1NodesIpsRangesData>) => createQueryKey('getV1NodesIpsRanges', options);
 
 /**
- * node address ranges
+ * List address ranges in use
  *
  * #### Controller:
  *
@@ -1487,7 +1432,6 @@ export const getV1NodesIpsRangesQueryKey = (options?: Options<GetV1NodesIpsRange
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1508,7 +1452,7 @@ export const getV1NodesIpsRangesOptions = (options?: Options<GetV1NodesIpsRanges
 });
 
 /**
- * node provision
+ * Turn provisioning on or off
  *
  * #### Controller:
  *
@@ -1516,7 +1460,6 @@ export const getV1NodesIpsRangesOptions = (options?: Options<GetV1NodesIpsRanges
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1540,7 +1483,7 @@ export const patchV1NodesProvisionMutation = (options?: Partial<Options<PatchV1N
 export const getV1NodesProvisionStatusQueryKey = (options?: Options<GetV1NodesProvisionStatusData>) => createQueryKey('getV1NodesProvisionStatus', options);
 
 /**
- * node provision status
+ * See provision status
  *
  * #### Controller:
  *
@@ -1548,7 +1491,6 @@ export const getV1NodesProvisionStatusQueryKey = (options?: Options<GetV1NodesPr
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1571,7 +1513,7 @@ export const getV1NodesProvisionStatusOptions = (options?: Options<GetV1NodesPro
 export const getV1NodesTagsQueryKey = (options?: Options<GetV1NodesTagsData>) => createQueryKey('getV1NodesTags', options);
 
 /**
- * node tag list
+ * List tags
  *
  * #### Controller:
  *
@@ -1579,7 +1521,6 @@ export const getV1NodesTagsQueryKey = (options?: Options<GetV1NodesTagsData>) =>
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1600,7 +1541,7 @@ export const getV1NodesTagsOptions = (options?: Options<GetV1NodesTagsData>) => 
 });
 
 /**
- * node tags
+ * Add and remove tags
  *
  * #### Controller:
  *
@@ -1608,7 +1549,6 @@ export const getV1NodesTagsOptions = (options?: Options<GetV1NodesTagsData>) => 
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1632,7 +1572,7 @@ export const patchV1NodesTagsActionMutation = (options?: Partial<Options<PatchV1
 export const getV1NodesTokenInterfaceQueryKey = (options: Options<GetV1NodesTokenInterfaceData>) => createQueryKey('getV1NodesTokenInterface', options);
 
 /**
- * node boot token
+ * Create boot tokens
  *
  * #### Controller:
  *
@@ -1640,7 +1580,6 @@ export const getV1NodesTokenInterfaceQueryKey = (options: Options<GetV1NodesToke
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1663,7 +1602,7 @@ export const getV1NodesTokenInterfaceOptions = (options: Options<GetV1NodesToken
 export const getV1RolesQueryKey = (options?: Options<GetV1RolesData>) => createQueryKey('getV1Roles', options);
 
 /**
- * get roles
+ * List roles and permissions
  *
  * #### Controller:
  *
@@ -1671,7 +1610,6 @@ export const getV1RolesQueryKey = (options?: Options<GetV1RolesData>) => createQ
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1692,7 +1630,7 @@ export const getV1RolesOptions = (options?: Options<GetV1RolesData>) => queryOpt
 });
 
 /**
- * patch roles
+ * Edit a role's permissions
  *
  * #### Controller:
  *
@@ -1700,7 +1638,6 @@ export const getV1RolesOptions = (options?: Options<GetV1RolesData>) => queryOpt
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1722,7 +1659,7 @@ export const patchV1RolesMutation = (options?: Partial<Options<PatchV1RolesData>
 };
 
 /**
- * post roles
+ * Add roles
  *
  * #### Controller:
  *
@@ -1730,7 +1667,6 @@ export const patchV1RolesMutation = (options?: Partial<Options<PatchV1RolesData>
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1752,7 +1688,7 @@ export const postV1RolesMutation = (options?: Partial<Options<PostV1RolesData>>)
 };
 
 /**
- * delete roles
+ * Delete roles
  *
  * #### Controller:
  *
@@ -1760,7 +1696,6 @@ export const postV1RolesMutation = (options?: Partial<Options<PostV1RolesData>>)
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1784,7 +1719,7 @@ export const deleteV1RolesNamesMutation = (options?: Partial<Options<DeleteV1Rol
 export const getV1SwitchScanQueryKey = (options?: Options<GetV1SwitchScanData>) => createQueryKey('getV1SwitchScan', options);
 
 /**
- * switch scan
+ * Scan switch ports and MAC tables
  *
  * #### Controller:
  *
@@ -1792,7 +1727,6 @@ export const getV1SwitchScanQueryKey = (options?: Options<GetV1SwitchScanData>) 
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1815,7 +1749,7 @@ export const getV1SwitchScanOptions = (options?: Options<GetV1SwitchScanData>) =
 export const getV1SwitchNodesetLldpQueryKey = (options: Options<GetV1SwitchNodesetLldpData>) => createQueryKey('getV1SwitchNodesetLldp', options);
 
 /**
- * switch get l l d p
+ * Read LLDP neighbours
  *
  * #### Controller:
  *
@@ -1823,7 +1757,6 @@ export const getV1SwitchNodesetLldpQueryKey = (options: Options<GetV1SwitchNodes
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1846,7 +1779,7 @@ export const getV1SwitchNodesetLldpOptions = (options: Options<GetV1SwitchNodese
 export const getV1UsersQueryKey = (options?: Options<GetV1UsersData>) => createQueryKey('getV1Users', options);
 
 /**
- * user list
+ * List users
  *
  * #### Controller:
  *
@@ -1854,7 +1787,6 @@ export const getV1UsersQueryKey = (options?: Options<GetV1UsersData>) => createQ
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1875,7 +1807,7 @@ export const getV1UsersOptions = (options?: Options<GetV1UsersData>) => queryOpt
 });
 
 /**
- * user store
+ * Add users
  *
  * #### Controller:
  *
@@ -1883,7 +1815,6 @@ export const getV1UsersOptions = (options?: Options<GetV1UsersData>) => queryOpt
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1905,7 +1836,7 @@ export const postV1UsersMutation = (options?: Partial<Options<PostV1UsersData>>)
 };
 
 /**
- * user delete
+ * Delete users
  *
  * #### Controller:
  *
@@ -1913,7 +1844,6 @@ export const postV1UsersMutation = (options?: Partial<Options<PostV1UsersData>>)
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1935,7 +1865,7 @@ export const deleteV1UsersUsernamesMutation = (options?: Partial<Options<DeleteV
 };
 
 /**
- * user enable
+ * Enable and disable users
  *
  * #### Controller:
  *
@@ -1943,7 +1873,6 @@ export const deleteV1UsersUsernamesMutation = (options?: Partial<Options<DeleteV
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1965,7 +1894,7 @@ export const patchV1UsersUsernamesEnableMutation = (options?: Partial<Options<Pa
 };
 
 /**
- * user role
+ * Change a user's role
  *
  * #### Controller:
  *
@@ -1973,7 +1902,6 @@ export const patchV1UsersUsernamesEnableMutation = (options?: Partial<Options<Pa
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---

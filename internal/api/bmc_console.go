@@ -30,8 +30,6 @@ const (
 const ConsoleAttached = "attached"
 
 // BmcConsole upgrades to a websocket carrying a node's serial console over IPMI SOL. Binary messages are console bytes in both directions, a text message says the console is attached, and the close frame says why the console ended
-//
-// It is registered on the mux directly rather than through fuego, whose logging middleware wraps the response writer in a type that cannot be hijacked
 func (h *Handler) BmcConsole(w http.ResponseWriter, r *http.Request) {
 	node := r.URL.Query().Get("node")
 	if node == "" {

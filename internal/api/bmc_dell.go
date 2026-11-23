@@ -21,13 +21,11 @@ import (
 	"github.com/ubccr/grendel/pkg/model"
 )
 
-// BmcImportConfigBody names the config template every node's iDRAC imports
 type BmcImportConfigBody struct {
 	File         string `json:"file" description:"BMC config template to import, by its name in the provision templates. Each iDRAC downloads it from Grendel's provision server" example:"idrac-config.json"`
 	ShutdownType string `json:"shutdown_type" description:"NoReboot queues the import until the node next reboots. Graceful and Forced reboot the node to apply it. Defaults to NoReboot" example:"NoReboot"`
 }
 
-// BmcInstallFirmwareBody points every node's iDRAC at an update catalog
 type BmcInstallFirmwareBody struct {
 	ApplyUpdate       bool   `json:"apply_update" description:"false only compares the installed firmware against the catalog, which firmware/updates then lists. true queues every available update as a job"`
 	IPAddress         string `json:"ip_address" description:"Domain name or IP address of the share holding the catalog" example:"downloads.dell.com"`
@@ -39,18 +37,16 @@ type BmcInstallFirmwareBody struct {
 	ClearJobs         bool   `json:"clear_jobs" description:"Clear every job in the queue first. Requires apply_update"`
 }
 
-// BmcAutoConfigure sets iDRAC(s) to auto configure once on their next boot
 func (h *Handler) BmcAutoConfigure(c fuego.ContextNoBody) (model.BmcResponse[model.BmcAck], error) {
-	return runAck(h, c, "bmc configure auto", func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
+	return runAck(h, c, "bmc.configure.auto", "bmc configure auto", func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
 		return h.Redfish.AutoConfigure(ctx, t)
 	})
 }
 
-// BmcImportConfig has iDRAC(s) download and import a config template from the provision server
 func (h *Handler) BmcImportConfig(c fuego.ContextWithBody[BmcImportConfigBody]) (model.BmcResponse[model.BmcAck], error) {
 	body, err := c.Body()
 	if err != nil {
-		return model.BmcResponse[model.BmcAck]{}, badRequest(err, "failed to parse the import request")
+		return model.BmcResponse[model.BmcAck]{}, err
 	}
 
 	shutdown, err := shutdownType(body.ShutdownType)
@@ -67,7 +63,7 @@ func (h *Handler) BmcImportConfig(c fuego.ContextWithBody[BmcImportConfigBody]) 
 		return model.BmcResponse[model.BmcAck]{}, fuego.HTTPError{Err: err, Title: "Error", Detail: "failed to work out the address bmcs fetch the config from"}
 	}
 
-	hosts, err := h.bmcSelect(c)
+	nodes, err := h.bmcNodes(c)
 	if err != nil {
 		return model.BmcResponse[model.BmcAck]{}, err
 	}
@@ -85,15 +81,17 @@ func (h *Handler) BmcImportConfig(c fuego.ContextWithBody[BmcImportConfigBody]) 
 			},
 		},
 		PortNumber: share.port,
-		ShareNames: shareNames(hosts),
+		ShareNames: shareNames(nodes.hosts),
 	}
 
-	return runAck(h, c, fmt.Sprintf("bmc configure import %s, shutdown %s", body.File, shutdown), func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
-		return h.Redfish.ImportConfig(ctx, t, req)
-	})
+	return runBmcOn(h, c, nodes, fmt.Sprintf("bmc configure import %s, shutdown %s", body.File, shutdown), trackBmc[redfish.Ack](true, "bmc.configure.import"),
+		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
+			return h.Redfish.ImportConfig(ctx, t, req)
+		},
+		func(*redfish.Ack) *model.BmcAck { return nil },
+	)
 }
 
-// BmcFirmwareUpdates lists the firmware updates iDRAC(s) found in their last catalog comparison
 func (h *Handler) BmcFirmwareUpdates(c fuego.ContextNoBody) (model.BmcResponse[model.BmcFirmwareUpdates], error) {
 	return runBmc(h, c, "bmc firmware updates", nil,
 		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.FirmwareUpdates] {
@@ -103,11 +101,10 @@ func (h *Handler) BmcFirmwareUpdates(c fuego.ContextNoBody) (model.BmcResponse[m
 	)
 }
 
-// BmcInstallFirmware has iDRAC(s) compare their firmware against a catalog, and queue the updates when asked to
 func (h *Handler) BmcInstallFirmware(c fuego.ContextWithBody[BmcInstallFirmwareBody]) (model.BmcResponse[model.BmcAck], error) {
 	body, err := c.Body()
 	if err != nil {
-		return model.BmcResponse[model.BmcAck]{}, badRequest(err, "failed to parse the firmware request")
+		return model.BmcResponse[model.BmcAck]{}, err
 	}
 
 	req, err := installFirmwareRequest(body)
@@ -197,19 +194,11 @@ func importShare(v *viper.Viper) (configShare, error) {
 	return share, nil
 }
 
-// shareNames gives every node the provision path its iDRAC downloads the config from, which carries a boot token for that node. A node whose token cannot be made is left out, and fails on its own
+// shareNames gives every node the provision path its iDRAC downloads the config from, which carries a boot token for that node. A node whose token cannot be made is left out, and fails on its own. Every host must have an interface marked bmc
 func shareNames(hosts model.HostList) map[string]string {
 	names := make(map[string]string, len(hosts))
 	for _, host := range hosts {
-		if host == nil {
-			continue
-		}
-		nic := host.InterfaceBMC()
-		if nic == nil {
-			continue
-		}
-
-		token, err := model.NewBootToken(host.UID.String(), nic.MAC.String())
+		token, err := model.NewBootToken(host.UID.String(), host.InterfaceBMC().MAC.String())
 		if err != nil {
 			log.Warnf("failed to create a boot token for %s: %s", host.Name, err)
 			continue

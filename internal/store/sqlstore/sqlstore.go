@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"net"
 	"net/netip"
+	"slices"
 	"strings"
 
 	null "github.com/guregu/null/v5"
@@ -95,7 +96,6 @@ func New(filename string) (*SqlStore, error) {
 	return &SqlStore{rw: rw, ro: ro, q: db.New()}, nil
 }
 
-// StoreUser creates a new user and returns its role; it never touches an existing account, and returns store.ErrDuplicateEntry when the username is taken
 func (s *SqlStore) StoreUser(username, password string) (string, error) {
 	ctx := context.Background()
 
@@ -134,7 +134,6 @@ func (s *SqlStore) StoreUser(username, password string) (string, error) {
 	return role.String(), nil
 }
 
-// UpdateUserPassword replaces the password of an existing user, returning store.ErrNotFound when there is no such user
 func (s *SqlStore) UpdateUserPassword(username, password string) error {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), 8)
 	if err != nil {
@@ -155,7 +154,6 @@ func (s *SqlStore) UpdateUserPassword(username, password string) error {
 	return nil
 }
 
-// VerifyUser checks a username and password, giving the user's role when they match. An unknown user and a wrong password are both reported as not authenticated rather than as errors, so an error means the check itself failed
 func (s *SqlStore) VerifyUser(username, password string) (bool, string, error) {
 	ctx := context.Background()
 
@@ -618,7 +616,7 @@ func (s *SqlStore) ProvisionHosts(ns *nodeset.NodeSet, provision bool) error {
 	})
 }
 
-// TagCounts returns every tag on a host, with how many hosts have it. A tag no host has any more is left out
+// A tag no host has any more is left out
 func (s *SqlStore) TagCounts() (model.TagCountList, error) {
 	rows, err := s.q.TagCounts(context.Background(), s.ro)
 	if err != nil {
@@ -944,7 +942,21 @@ func (s *SqlStore) GetRolesByRoute(method, path string) (*[]string, error) {
 		return nil, err
 	}
 
+	// the admin role may call every route, whether or not a migration granted it
+	if admin := model.RoleAdmin.String(); !slices.Contains(roles, admin) {
+		roles = append(roles, admin)
+	}
+
 	return &roles, nil
+}
+
+// adminHoldsAll reports the admin role as holding every permission, as GetRolesByRoute enforces
+func adminHoldsAll(role *model.RoleView) {
+	if role.Name != model.RoleAdmin.String() {
+		return
+	}
+	role.PermissionList = append(role.PermissionList, role.UnassignedPermissionList...)
+	role.UnassignedPermissionList = model.PermissionList{}
 }
 
 func (s *SqlStore) GetRoles() (model.RoleViewList, error) {
@@ -952,6 +964,10 @@ func (s *SqlStore) GetRoles() (model.RoleViewList, error) {
 	res, err := s.q.RoleFetchView(ctx, s.ro)
 	if err != nil {
 		return nil, err
+	}
+
+	for i := range res {
+		adminHoldsAll(&res[i])
 	}
 
 	return res, nil
@@ -963,6 +979,8 @@ func (s *SqlStore) GetRolesByName(name string) (*model.RoleView, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	adminHoldsAll(&res)
 
 	return &res, nil
 }

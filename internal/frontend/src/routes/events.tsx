@@ -1,7 +1,4 @@
-import {
-  getV1GrendelEventsIdOptions,
-  getV1GrendelEventsOptions,
-} from "@/client/@tanstack/react-query.gen";
+import { getV1GrendelEventsIdOptions } from "@/client/@tanstack/react-query.gen";
 import { NodeLink } from "@/components/nodes/node-link";
 import { DataTable, type RowTone } from "@/components/data-table/data-table";
 import type { DataTableColumnDef, DataTableRow } from "@/components/data-table/features";
@@ -19,7 +16,8 @@ import {
 } from "@/components/ui/table";
 import { RunRing } from "@/components/run-ring";
 import AuthRedirect from "@/lib/auth";
-import { eventRows, isRunning, nodeNote, nodeSeverity, type EventRow } from "@/lib/events";
+import { eventRows, nodeNote, nodeSeverity, type EventRow } from "@/lib/events";
+import { EVENTS_SHOWN, eventsOptions } from "@/lib/queries";
 import { relativeTime, severityOf, severityVariant, type Severity } from "@/lib/utils";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
@@ -32,11 +30,6 @@ export const Route = createFileRoute("/events")({
   beforeLoad: AuthRedirect,
 });
 
-// how often the list is fetched while an event is running and while none is
-const LIVE_POLL_MS = 5_000;
-const POLL_MS = 30_000;
-
-// columns are defined once, outside the component, so the table keeps the same column definitions across renders
 const columns: DataTableColumnDef<EventRow, any>[] = [
   {
     accessorKey: "message",
@@ -56,7 +49,6 @@ const columns: DataTableColumnDef<EventRow, any>[] = [
     filterFn: (row, _, value: string) =>
       row.original.result.toLowerCase().includes(String(value).toLowerCase()),
     header: ({ column }) => <DataTableColumnHeader column={column} title="Result" />,
-    // the ring shows the share of nodes that succeeded and the count gives it exactly
     cell: ({ row }) => {
       const { succeeded, failed, going, stalled, total } = row.original;
       if (total === 0) return null;
@@ -140,10 +132,8 @@ function rowTone(row: DataTableRow<EventRow>) {
 const hasNodes = (row: DataTableRow<EventRow>) => row.original.total > 0;
 
 function RouteComponent() {
-  const { data, isFetching, refetch } = useQuery({
-    ...getV1GrendelEventsOptions(),
-    refetchInterval: (q) => (q.state.data?.some(isRunning) ? LIVE_POLL_MS : POLL_MS),
-  });
+  // the header, which is on every page, keeps this list up to date
+  const { data, isFetching, refetch } = useQuery(eventsOptions());
   const rows = useMemo(() => eventRows(data ?? []), [data]);
 
   return (
@@ -161,12 +151,17 @@ function RouteComponent() {
           progress={isFetching}
           refresh={() => void refetch()}
         />
+        {rows.length >= EVENTS_SHOWN && (
+          <p className="px-2 pt-2 text-xs text-muted-foreground">
+            These are the latest {EVENTS_SHOWN} events. Older ones are kept but not listed here.
+          </p>
+        )}
       </CardContent>
     </Card>
   );
 }
 
-// EventNodes is how an opened event went on each of its nodes. They are fetched only while it is open, and again whenever the list shows the event changed, as every write to its nodes says when it was updated, so a running event's panel keeps up with no polling of its own and a finished one is fetched once
+// EventNodes fetches an opened event's nodes only while it is open, and again whenever the list shows the event was updated, so a running event's panel keeps up with no polling of its own
 function EventNodes({ event }: { event: EventRow }) {
   const options = getV1GrendelEventsIdOptions({ path: { id: event.id } });
   const { data, error, isPending } = useQuery({

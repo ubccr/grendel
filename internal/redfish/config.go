@@ -31,6 +31,7 @@ func init() {
 	viper.SetDefault("bmc.gofish.max_concurrent_requests", 1)
 	// reusing connections keeps one connection open for all of an operation's requests to a BMC, rather than a TCP connection and TLS handshake for each. It lasts as long as the operation, since each one builds its own client
 	viper.SetDefault("bmc.gofish.reuse_connections", true)
+	viper.SetDefault("bmc.gofish.auto_expand", false)
 	viper.SetDefault("bmc.gofish.client_timeout", time.Second*60)
 	viper.SetDefault("bmc.gofish.dial_timeout", time.Second*5)
 	viper.SetDefault("bmc.gofish.dial_keep_alive_timeout", time.Second*30)
@@ -41,7 +42,6 @@ func init() {
 	viper.SetDefault("bmc.ipmi.cipher_suites", []int{17, 3})
 }
 
-// BMC username and password
 type Credential struct {
 	User     string `mapstructure:"user"`
 	Password string `mapstructure:"password"`
@@ -65,6 +65,7 @@ type Config struct {
 	IdleConnTimeout       time.Duration
 	MaxConcurrentRequests int64
 	ReuseConnections      bool
+	AutoExpand            bool
 
 	IPMIPort         int
 	IPMICipherSuites []int
@@ -89,6 +90,7 @@ func ConfigFromViper() Config {
 
 		MaxConcurrentRequests: viper.GetInt64("bmc.gofish.max_concurrent_requests"),
 		ReuseConnections:      viper.GetBool("bmc.gofish.reuse_connections"),
+		AutoExpand:            viper.GetBool("bmc.gofish.auto_expand"),
 
 		IPMIPort:         viper.GetInt("bmc.ipmi.port"),
 		IPMICipherSuites: viper.GetIntSlice("bmc.ipmi.cipher_suites"),

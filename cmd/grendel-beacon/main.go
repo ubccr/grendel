@@ -10,13 +10,13 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"sort"
 	"strings"
 	"syscall"
 	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/internal/beacon"
+	"github.com/ubccr/grendel/internal/beacon/wire"
 	"github.com/ubccr/grendel/internal/version"
 )
 
@@ -24,7 +24,7 @@ var (
 	statusURL string
 	insecure  bool
 	complete  bool
-	factsDir  string
+	extra     []string
 )
 
 func main() {
@@ -38,10 +38,9 @@ func main() {
 	root.PersistentFlags().StringVar(&statusURL, "url", os.Getenv("GRENDEL_STATUS_URL"), "status URL of this node, {{ $.endpoints.StatusURL }} in a provision template (env GRENDEL_STATUS_URL)")
 	root.PersistentFlags().BoolVar(&insecure, "insecure", os.Getenv("GRENDEL_INSECURE") == "true", "skip TLS certificate verification (env GRENDEL_INSECURE=true)")
 	root.PersistentFlags().BoolVar(&complete, "complete", false, "on a clean finish also turn provisioning off for this node, as the complete endpoint does")
+	root.PersistentFlags().StringArrayVar(&extra, "fact", nil, "a fact to report, key=value, repeatable. Keys are lowercase with dots, such as site.raid_layout")
 
-	root.PersistentFlags().StringVar(&factsDir, "facts-dir", beacon.DefaultFactsDir, "drop-in directory of site facts: executables printing key=value lines, or plain files of them, each prefixed with its file name")
-
-	root.AddCommand(watchCmd(), reportCmd(), factsCmd())
+	root.AddCommand(watchCmd(), reportCmd())
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	err := root.ExecuteContext(ctx)
@@ -59,6 +58,22 @@ func client() (*beacon.Client, error) {
 	return beacon.NewClient(statusURL, insecure), nil
 }
 
+// facts are the ones given with --fact, on top of the built in ones when those are wanted
+func facts(builtIn bool) (map[string]string, error) {
+	out := map[string]string{}
+	if builtIn {
+		out = beacon.Collect(beacon.DefaultFacts)
+	}
+	for _, f := range extra {
+		k, v, ok := strings.Cut(f, "=")
+		if !ok || !wire.ValidFactKey(k) {
+			return nil, fmt.Errorf("--fact %q is not key=value with a lowercase key such as site.raid_layout", f)
+		}
+		out[k] = v
+	}
+	return out, nil
+}
+
 func watchCmd() *cobra.Command {
 	opts := beacon.WatchOptions{Heartbeat: time.Minute, FinalRetry: 5 * time.Minute}
 
@@ -73,6 +88,11 @@ func watchCmd() *cobra.Command {
 				return err
 			}
 
+			opts.Facts, err = facts(true)
+			if err != nil {
+				return err
+			}
+
 			sys, err := beacon.Systemd(command.Context())
 			if err != nil {
 				return fmt.Errorf("failed to connect to systemd: %w", err)
@@ -81,9 +101,6 @@ func watchCmd() *cobra.Command {
 
 			opts.Complete = complete
 			opts.BootID = beacon.BootID()
-			opts.Facts = func(ctx context.Context) map[string]string {
-				return beacon.Collect(ctx, factSource(), sys)
-			}
 
 			err = beacon.Watch(command.Context(), sys, c, opts)
 			switch {
@@ -97,52 +114,12 @@ func watchCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().DurationVar(&opts.Interval, "interval", 10*time.Second, "how often to check systemd")
-	cmd.Flags().DurationVar(&opts.Timeout, "timeout", time.Hour, "report the boot as failed when it hasn't finished by then")
+	cmd.Flags().DurationVar(&opts.Timeout, "timeout", beacon.DefaultTimeout, "report the boot as failed when it hasn't finished by then. Grendel only takes the report while the node's boot token is valid, provision.token_ttl (1h by default) from its network boot, so this has to run out before that")
 	return cmd
 }
 
-func factSource() beacon.FactSource {
-	src := beacon.DefaultFacts
-	src.DropIns = factsDir
-	return src
-}
-
-// systemdIfAvailable is for commands that can do without systemd, such as a report from an installer that may not run it
-func systemdIfAvailable(ctx context.Context) beacon.System {
-	sys, err := beacon.Systemd(ctx)
-	if err != nil {
-		return nil
-	}
-	return sys
-}
-
-func factsCmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   "facts",
-		Short: "Print the facts a report would carry, to check a drop-in",
-		Args:  cobra.NoArgs,
-		RunE: func(command *cobra.Command, args []string) error {
-			sys := systemdIfAvailable(command.Context())
-			if sys != nil {
-				defer sys.Close()
-			}
-			facts := beacon.Collect(command.Context(), factSource(), sys)
-			keys := make([]string, 0, len(facts))
-			for k := range facts {
-				keys = append(keys, k)
-			}
-			sort.Strings(keys)
-			for _, k := range keys {
-				fmt.Printf("%s=%s\n", k, facts[k])
-			}
-			return nil
-		},
-	}
-}
-
 func reportCmd() *cobra.Command {
-	var r beacon.Report
-	var extra []string
+	var r wire.Report
 	var collect bool
 
 	cmd := &cobra.Command{
@@ -151,9 +128,9 @@ func reportCmd() *cobra.Command {
 		Args:  cobra.NoArgs,
 		RunE: func(command *cobra.Command, args []string) error {
 			switch r.State {
-			case beacon.StateBooting, beacon.StateFailed, beacon.StateCompleted:
+			case wire.StateBooting, wire.StateFailed, wire.StateCompleted:
 			default:
-				return fmt.Errorf("--state must be one of %s, %s, %s", beacon.StateBooting, beacon.StateFailed, beacon.StateCompleted)
+				return fmt.Errorf("--state must be one of %s, %s, %s", wire.StateBooting, wire.StateFailed, wire.StateCompleted)
 			}
 
 			c, err := client()
@@ -161,21 +138,10 @@ func reportCmd() *cobra.Command {
 				return err
 			}
 
-			// built in and drop-in facts only on request, since an installer's %post would report the installer's os-release rather than the installed OS's
-			r.Facts = map[string]string{}
-			if collect {
-				sys := systemdIfAvailable(command.Context())
-				if sys != nil {
-					defer sys.Close()
-				}
-				r.Facts = beacon.Collect(command.Context(), factSource(), sys)
-			}
-			for _, f := range extra {
-				k, v, ok := strings.Cut(f, "=")
-				if !ok || k == "" {
-					return fmt.Errorf("--fact %q is not key=value", f)
-				}
-				r.Facts[k] = v
+			// the built in facts only on request, since an installer's %post would report the installer's os-release rather than the installed OS's
+			r.Facts, err = facts(collect)
+			if err != nil {
+				return err
 			}
 
 			// no boot id, since a report from an installer's %post comes from a different boot than the installed OS, whose watch has to be able to report after it
@@ -185,7 +151,6 @@ func reportCmd() *cobra.Command {
 	}
 	cmd.Flags().StringVar(&r.State, "state", "", "booting, failed or completed")
 	cmd.Flags().StringVar(&r.Message, "message", "", "shown with the status in grendel")
-	cmd.Flags().StringArrayVar(&extra, "fact", nil, "a fact to report, key=value, repeatable. Keys are lowercase with dots, such as site.raid_layout")
-	cmd.Flags().BoolVar(&collect, "collect", false, "also report the built in facts (os-release, kernel, boot timings) and the drop-ins")
+	cmd.Flags().BoolVar(&collect, "collect", false, "also report the built in facts (os-release and the kernel release)")
 	return cmd
 }

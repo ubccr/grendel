@@ -10,11 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toastBmcResponse } from "@/lib/bmc";
 import { useMutation } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 
 const powerOptions = {
   ForceRestart: "Power Cycle",
@@ -36,7 +34,10 @@ const bootOptions = {
 export default function NodesOsPowerAction({ nodes }: { nodes: string }) {
   const [powerOption, setPowerOption] = useState("");
   const [bootOption, setBootOption] = useState("None");
-  const { mutate, isPending } = useMutation(postV1BmcPowerMutation());
+  const { mutate, isPending } = useMutation({
+    ...postV1BmcPowerMutation(),
+    meta: { bmc: `Power ${powerOption}` },
+  });
 
   return (
     <ActionCard
@@ -51,20 +52,14 @@ export default function NodesOsPowerAction({ nodes }: { nodes: string }) {
             </Button>
           }
           onConfirm={() =>
-            mutate(
-              {
-                query: { nodeset: nodes },
-                body: {
-                  target: "host",
-                  action: powerOption,
-                  boot_override: bootOption === "None" ? "" : bootOption,
-                },
+            mutate({
+              query: { nodeset: nodes },
+              body: {
+                target: "host",
+                action: powerOption,
+                boot_override: bootOption === "None" ? "" : bootOption,
               },
-              {
-                onSuccess: (data) => toastBmcResponse(`Power ${powerOption}`, data),
-                onError: (e) => toast.error(e.title, { description: e.detail }),
-              },
-            )
+            })
           }
         >
           Power: {powerOptions[powerOption as keyof typeof powerOptions]}, boot:{" "}

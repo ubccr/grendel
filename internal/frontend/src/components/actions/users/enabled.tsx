@@ -1,6 +1,6 @@
 import { patchV1UsersUsernamesEnableMutation } from "@/client/@tanstack/react-query.gen";
+import ActionCard from "@/components/actions/action-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -13,53 +13,47 @@ import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+const states = { true: "Enabled", false: "Disabled" };
+
 export default function UsersEnabledAction({ users }: { users: string }) {
-  const [userEnabled, setUserEnabled] = useState("");
+  const [enabled, setEnabled] = useState<keyof typeof states>();
   const { mutate, isPending } = useMutation(patchV1UsersUsernamesEnableMutation());
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Change Enabled flag</CardTitle>
-      </CardHeader>
-      <CardContent className="grid grid-cols-1 gap-2">
-        <Select
-          onValueChange={(v: string | null) => setUserEnabled(v ?? "")}
-          items={{ true: "True", false: "False" }}
-        >
-          <SelectTrigger className="w-45">
-            <SelectValue placeholder="Enabled" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="true">True</SelectItem>
-            <SelectItem value="false">False</SelectItem>
-          </SelectContent>
-        </Select>
-      </CardContent>
-      <CardFooter>
+    <ActionCard
+      title="Account access"
+      description="A disabled account keeps its role and password, but can't sign in."
+      footer={
         <Button
+          disabled={isPending || enabled === undefined}
           onClick={() =>
             mutate(
-              {
-                path: { usernames: users },
-                body: { enabled: userEnabled === "true" },
-              },
-              {
-                onSuccess: (data) => {
-                  toast.success(data?.title, {
-                    description: data?.detail,
-                  });
-                },
-                onError: (e) =>
-                  toast.error(e.title, {
-                    description: e.detail,
-                  }),
-              },
+              { path: { usernames: users }, body: { enabled: enabled === "true" } },
+              { onSuccess: (data) => toast.success(data?.title, { description: data?.detail }) },
             )
           }
         >
-          {isPending ? <LoaderCircle className="animate-spin" /> : <span>Submit</span>}
+          {isPending && <LoaderCircle className="animate-spin" />}
+          Apply
         </Button>
-      </CardFooter>
-    </Card>
+      }
+    >
+      <Select
+        value={enabled ?? null}
+        onValueChange={(v) => setEnabled(v ?? undefined)}
+        items={states}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Enable or disable" />
+        </SelectTrigger>
+        <SelectContent>
+          {Object.entries(states).map(([value, label]) => (
+            <SelectItem key={value} value={value}>
+              {label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </ActionCard>
   );
 }

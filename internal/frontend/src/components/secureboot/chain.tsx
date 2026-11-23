@@ -18,7 +18,7 @@ type Props = {
   unit?: string;
 };
 
-// TrustChain draws the secure boot databases in the order authority flows, PK signing changes to KEK and KEK signing changes to db, with dbx beside db as the list that overrides it. Each link is a button that picks which database the list below shows
+// The databases are drawn in the order authority flows: PK signs changes to KEK, KEK signs changes to db, and dbx sits beside db as the list that overrides it
 export default function TrustChain({ counts, selected, onSelect, unit = "key" }: Props) {
   const link = (db: Writable) => {
     const n = counts[db] ?? 0;

@@ -15,13 +15,12 @@ const CELL = 14;
 const BASE_ALPHA = 0.75;
 const GLOW_ALPHA = 0.85;
 const LIFE = 17; // seconds a lit cell takes from orange back to the field colour
-// cards float over the field, so cells under them never light up; anything else can opt in with data-node-field-avoid
 // a full field is drawn at full strength; a quiet one, behind pages where the work is, has a fainter grid and fewer, dimmer groups
 const QUIET = { grid: 0.3, glow: 0.25, spawn: 2 };
 const EASE = 0.5; // seconds the field takes to move between full and quiet
 // the colours change over seconds, so 30 frames a second looks the same as 60 for half the work
 const FRAME_MS = 1000 / 30;
-// the cards, sidebar and header are re-measured this often, which keeps up with scrolling and the sidebar sliding without reading layout every frame
+// while the page scrolls or the sidebar slides, the sidebar and header are re-measured this often, which keeps up with them without reading layout every frame
 const MEASURE_MS = 250;
 
 // routes opt in to the full field through their static data
@@ -31,7 +30,8 @@ declare module "@tanstack/react-router" {
   }
 }
 
-const AVOID = '[data-slot="card"], [data-node-field-avoid]';
+// cards float over the field, so a group that came up under one would never be seen
+const AVOID = '[data-slot="card"]';
 
 type Rect = DOMRect;
 type Glow = { x: number; y: number; t0: number };
@@ -100,8 +100,8 @@ function cell(ctx: CanvasRenderingContext2D, x: number, y: number, color: string
   ctx.globalAlpha = 1;
 }
 
-// NodeField is a page background: a faint grid of node cells behind the page, in which small groups of nodes now and then come up together, orange then blue then green, and settle back. It runs under the sidebar and header, and fades out toward every edge, at the top and left underneath those bars. Cells under cards, the sidebar and the header never light up. It is drawn full behind the pages that ask for it and quiet behind the rest, easing between the two. Reduced motion gets a still field with a few lit groups
-export function NodeField({ full }: Props) {
+// Cells under cards, the sidebar and the header never light up. Reduced motion gets a still field with a few lit groups
+export function NodeBackdrop({ full }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fullRef = useRef(full);
   const redrawRef = useRef<() => void>(() => {});
@@ -124,8 +124,12 @@ export function NodeField({ full }: Props) {
     let dpr = 1;
     let fadeLeft = 0;
     let fadeTop = 0;
-    let avoid: Rect[] = [];
+    let chrome: Rect[] = [];
     let glows: Glow[] = [];
+    // gone are the cells that went dark since the last frame, which still show their last colour
+    let gone: Glow[] = [];
+    // whole is set when every cell is out of date, as after a resize, rather than only the lit ones
+    let whole = true;
     let next = 0.5;
     let frame = 0;
     // strength runs from 0, quiet, to 1, full
@@ -133,7 +137,7 @@ export function NodeField({ full }: Props) {
     let last = performance.now();
     const began = last;
     const lerp = (quiet: number) => quiet + (1 - quiet) * strength;
-    // the static grid is drawn once into its own canvas and copied each frame, so only the lit cells are redrawn
+    // the static grid is drawn once into its own canvas and copied from it, so only the lit cells are ever drawn again
     const base = document.createElement("canvas");
     const baseCtx = base.getContext("2d");
     let baseKey = "";
@@ -145,28 +149,39 @@ export function NodeField({ full }: Props) {
       (1 - smooth(0.62, 1, x / w)) *
       (1 - smooth(0.55, 1, y / h));
 
-    const measure = () => {
-      const side = document.querySelector('[data-slot="sidebar-inner"]')?.getBoundingClientRect();
-      const header = document.querySelector('[data-slot="app-header"]')?.getBoundingClientRect();
-      avoid = [...document.querySelectorAll(AVOID)].map((el) => el.getBoundingClientRect());
-      if (side) avoid.push(side);
-      if (header) avoid.push(header);
-      avoid = avoid.filter((r) => r.width > 0 && r.height > 0);
-      fadeLeft = side && side.width > 0 ? Math.round(side.right) : 0;
-      fadeTop = header && header.height > 0 ? Math.round(header.bottom) : 0;
-    };
+    // the sidebar is replaced by another element when the window crosses the phone width, so it is looked up on each measure and watched anew when it has changed
+    let sidebar: Element | null = null;
+    let chromeMoved = true;
+    const sidebarSize = new ResizeObserver(() => {
+      chromeMoved = true;
+    });
 
-    const under = (x: number, y: number) =>
-      avoid.some(
-        (r) => x + CELL > r.left - 6 && x < r.right + 6 && y + CELL > r.top - 6 && y < r.bottom + 6,
-      );
+    const measure = () => {
+      const side = document.querySelector('[data-slot="sidebar-inner"]');
+      if (side !== sidebar) {
+        sidebarSize.disconnect();
+        if (side) sidebarSize.observe(side);
+        sidebar = side;
+      }
+      const sideRect = side?.getBoundingClientRect();
+      const header = document.querySelector('[data-slot="app-header"]')?.getBoundingClientRect();
+      chrome = [sideRect, header].filter(
+        (r) => r !== undefined && r.width > 0 && r.height > 0,
+      ) as Rect[];
+      const left = sideRect && sideRect.width > 0 ? Math.round(sideRect.right) : 0;
+      const top = header && header.height > 0 ? Math.round(header.bottom) : 0;
+      if (left !== fadeLeft || top !== fadeTop) whole = true;
+      fadeLeft = left;
+      fadeTop = top;
+      chromeMoved = false;
+    };
 
     const drawBase = () => {
       const key = `${w}x${h}@${dpr}:${fadeLeft}:${fadeTop}:${P.off}`;
       if (key === baseKey || !baseCtx) return;
       baseKey = key;
-      base.width = Math.round(w * dpr);
-      base.height = Math.round(h * dpr);
+      base.width = canvas.width;
+      base.height = canvas.height;
       baseCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
       baseCtx.clearRect(0, 0, w, h);
       for (let y = 4; y < h; y += PITCH) {
@@ -181,12 +196,22 @@ export function NodeField({ full }: Props) {
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      whole = true;
     };
 
     // a group starts from a random open cell, and 4 to 12 of its neighbours follow, nearest first with some jitter and each a little later than the one before
     const spawn = (t: number) => {
       // a group must land clear of whatever is on the page now
       measure();
+      const avoid = [...document.querySelectorAll(AVOID)]
+        .map((el) => el.getBoundingClientRect())
+        .filter((r) => r.width > 0 && r.height > 0)
+        .concat(chrome);
+      const under = (x: number, y: number) =>
+        avoid.some(
+          (r) =>
+            x + CELL > r.left - 6 && x < r.right + 6 && y + CELL > r.top - 6 && y < r.bottom + 6,
+        );
       const cols = Math.floor((w - 4) / PITCH) + 1;
       const rows = Math.floor((h - 4) / PITCH) + 1;
       for (let attempt = 0; attempt < 30; attempt++) {
@@ -219,23 +244,37 @@ export function NodeField({ full }: Props) {
       }
     };
 
+    // render brings the canvas up to time t. Between frames only the lit cells change, so unless the whole canvas is out of date, just those, and the ones that have gone dark, are put back to the grid and drawn again
     const render = (t: number) => {
       drawBase();
-      ctx.clearRect(0, 0, w, h);
+      const lit = glows.filter((g) => t >= g.t0);
+      // the grid is copied in device pixels, so a cell put back on its own lands exactly where the full copy drew it
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.globalAlpha = lerp(QUIET.grid);
-      ctx.drawImage(base, 0, 0, w, h);
+      if (whole) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(base, 0, 0);
+      } else {
+        const size = Math.ceil((CELL + 2) * dpr);
+        for (const g of [...gone, ...lit]) {
+          const x = Math.max(0, Math.floor((g.x - 1) * dpr));
+          const y = Math.max(0, Math.floor((g.y - 1) * dpr));
+          ctx.clearRect(x, y, size, size);
+          ctx.drawImage(base, x, y, size, size, x, y, size, size);
+        }
+      }
       ctx.globalAlpha = 1;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const glowAlpha = GLOW_ALPHA * lerp(QUIET.glow);
-      for (const g of glows) {
-        const s = t - g.t0;
-        if (s < 0) continue;
-        const [color, a] = glow(s, P);
+      for (const g of lit) {
+        const [color, a] = glow(t - g.t0, P);
         cell(ctx, g.x, g.y, color, glowAlpha * a * edge(g.x, g.y));
       }
+      whole = false;
+      gone = [];
     };
 
     const drawStill = () => {
-      measure();
       glows = [];
       for (let i = 0; i < 3; i++) spawn(0);
       // freeze the groups at green, blue and orange
@@ -245,6 +284,7 @@ export function NodeField({ full }: Props) {
         if (g.t0 === 0) group++;
         return { ...g, t0: -stages[Math.max(0, group) % stages.length] };
       });
+      whole = true;
       render(0);
     };
 
@@ -259,6 +299,7 @@ export function NodeField({ full }: Props) {
     // the theme switch toggles a class on the root element
     const themeObserver = new MutationObserver(() => {
       P = readPalette(root);
+      whole = true;
       if (still) {
         measure();
         render(0);
@@ -266,39 +307,54 @@ export function NodeField({ full }: Props) {
     });
     themeObserver.observe(root, { attributes: true, attributeFilter: ["class"] });
 
+    // the header scrolls with the page, and the top fade follows it
+    const onScroll = () => {
+      chromeMoved = true;
+    };
+
     if (still) {
       redrawRef.current = () => {
         strength = fullRef.current ? 1 : 0;
         measure();
+        whole = true;
         render(0);
       };
       drawStill();
     } else {
+      document.addEventListener("scroll", onScroll, { capture: true, passive: true });
       let measured = 0;
       const loop = (now: number) => {
         frame = requestAnimationFrame(loop);
         if (now - last < FRAME_MS) return;
-        if (now - measured > MEASURE_MS) {
+        if (chromeMoved && now - measured > MEASURE_MS) {
           measure();
           measured = now;
         }
         const t = (now - began) / 1000;
         const step = Math.min(0.1, (now - last) / 1000) / EASE;
         last = now;
-        strength = fullRef.current ? Math.min(1, strength + step) : Math.max(0, strength - step);
+        const target = fullRef.current ? 1 : 0;
+        if (strength !== target) {
+          strength = target ? Math.min(1, strength + step) : Math.max(0, strength - step);
+          whole = true;
+        }
         if (t > next) {
           spawn(t);
           next = t + (3.8 + Math.random() * 2.6) * lerp(QUIET.spawn);
         }
+        gone.push(...glows.filter((g) => t - g.t0 >= LIFE));
         glows = glows.filter((g) => t - g.t0 < LIFE);
-        render(t);
+        // a frame with nothing lit and nothing out of date is the one already on the canvas
+        if (whole || gone.length > 0 || glows.some((g) => t >= g.t0)) render(t);
       };
       frame = requestAnimationFrame(loop);
     }
 
     return () => {
       window.removeEventListener("resize", onResize);
+      document.removeEventListener("scroll", onScroll, { capture: true });
       themeObserver.disconnect();
+      sidebarSize.disconnect();
       cancelAnimationFrame(frame);
     };
   }, []);
@@ -306,7 +362,7 @@ export function NodeField({ full }: Props) {
   return (
     <canvas
       ref={canvasRef}
-      data-slot="node-field"
+      data-slot="node-backdrop"
       aria-hidden
       className="pointer-events-none fixed inset-0 -z-10 size-full"
     />

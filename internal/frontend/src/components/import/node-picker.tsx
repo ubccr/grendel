@@ -61,7 +61,7 @@ const columns: DataTableColumnDef<Host, any>[] = [
   },
 ];
 
-// NodePicker is every node but the switches, in a table to pick the ones to read interfaces for. children is the step's bar, drawn under the table
+// children is the step's bar, drawn under the table
 export function NodePicker({
   selected,
   onChange,

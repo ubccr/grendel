@@ -1,11 +1,7 @@
-import { useNavigate, useRouter } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 import { Host } from "@/client";
-import {
-  getV1ImagesOptions,
-  getV1NodesTagsQueryKey,
-  postV1NodesMutation,
-} from "@/client/@tanstack/react-query.gen";
+import { getV1ImagesOptions, postV1NodesMutation } from "@/client/@tanstack/react-query.gen";
 import {
   cellInput,
   Field,
@@ -13,6 +9,7 @@ import {
   invalidInput,
   SaveBar,
   Section,
+  validateOnSave,
 } from "@/components/form-layout";
 import { AddressInput } from "@/components/nodes/address-finder";
 import { TagCombobox } from "@/components/tag-combobox";
@@ -30,9 +27,9 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { useForm, useStore } from "@tanstack/react-form";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronRight, ExternalLink, Plus, X } from "lucide-react";
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { toast } from "sonner";
 
 type Nic = NonNullable<Host["interfaces"]>[number];
@@ -52,7 +49,7 @@ const archs = ["x86_64", "aarch64", "i386"];
 // unset stands in for an empty value, since a select item can't have an empty value
 const unset = "__unset__";
 
-// OptionSelect picks one of options or leaves the value empty, shown as unsetLabel. A saved value that isn't one of the options is still listed, so opening the form never changes it
+// A saved value that isn't one of the options is still listed, so opening the form never changes it
 function OptionSelect({
   id,
   value,
@@ -119,7 +116,7 @@ export function emptyPort(nic?: Nic) {
   return !portIdentity.some((k) => String(nic?.[k] ?? "").trim());
 }
 
-// checkNode refuses a node with no name or with an empty port. The name's reason goes on its field; an empty port is a form error, and its row marks itself from its own values so it clears as soon as any of its fields is filled in
+// The name's reason goes on its field. An empty port is a form error, and its row marks itself from its own values so it clears as soon as any of its fields is filled in
 export function checkNode({ value }: { value?: Host }) {
   const name = value?.name?.trim() ? undefined : "Enter a name.";
   const ports = value?.interfaces?.some(emptyPort)
@@ -129,7 +126,6 @@ export function checkNode({ value }: { value?: Host }) {
   return { form: ports, fields: name ? { name } : {} };
 }
 
-// sameItems says whether two lists hold the same items in the same order
 function sameItems<T>(a: T[], b: T[]) {
   return a.length === b.length && a.every((x, i) => x === b[i]);
 }
@@ -140,39 +136,31 @@ function role(bmc: boolean[], i: number) {
   return bmc.indexOf(false) === i ? "boot" : undefined;
 }
 
-export default function NodeForm({ data, reset }: { data?: Host; reset?: boolean }) {
+export default function NodeForm({ data }: { data?: Host }) {
   const { mutateAsync, isPending } = useMutation(postV1NodesMutation());
   const images = useQuery(getV1ImagesOptions());
-  const router = useRouter();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const adding = data == undefined;
 
   const form = useForm({
     defaultValues: data,
-    // checked on save, then on every change once a save was refused, so a port isn't marked while it is still being filled in
-    validators: {
-      onSubmit: checkNode,
-      onChange: ({ value, formApi }) =>
-        formApi.state.submissionAttempts > 0 ? checkNode({ value }) : undefined,
-    },
+    validationLogic: validateOnSave,
+    validators: { onDynamic: checkNode },
     onSubmit: async ({ value }) => {
       if (value == undefined) return;
+      // a refused save is toasted like any failed change, so the rejection is dropped here rather than left unhandled
       await mutateAsync(
         { body: { node_list: [value] } },
         {
           onSuccess: (res) => {
             toast.success(res?.title, { description: res?.detail });
             if (!adding) form.reset(value);
-            // a renamed node is only found under its new name, so the page moves there rather than reloading the old one
+            // a renamed node is only found under its new name, so the page moves there
             if (!adding && value.name && value.name !== data?.name)
               navigate({ to: "/nodes/$node/node", params: { node: value.name } });
-            else router.invalidate();
-            queryClient.invalidateQueries({ queryKey: getV1NodesTagsQueryKey() });
           },
-          onError: (e) => toast.error(e.title, { description: e.detail }),
         },
-      );
+      ).catch(() => undefined);
     },
   });
 
@@ -190,10 +178,6 @@ export default function NodeForm({ data, reset }: { data?: Host; reset?: boolean
     (st) => (st.values?.interfaces ?? []).map((n) => emptyPort(n)),
     sameItems,
   );
-
-  useEffect(() => {
-    form.reset();
-  }, [reset]);
 
   return (
     <form

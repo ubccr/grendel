@@ -1,5 +1,5 @@
 import type { Event } from "@/client";
-import { stateLabels } from "@/lib/provision";
+import { runningStates, stateLabel } from "@/lib/provision";
 import { severityOf, type Severity } from "@/lib/utils";
 
 // Tally is an event's nodes by how it went on them. going are the nodes it is not over for, whether it has got to them yet or not
@@ -29,6 +29,12 @@ export function isRunning(e?: Pick<Event, "state">) {
 // eventTime is when an event counts as having happened: when it ended, or when it started while it is running
 export function eventTime(e: Pick<Event, "ended_at" | "started_at">) {
   return e.ended_at ?? e.started_at;
+}
+
+// newestFirst orders events by when each counts as having happened, so one that ran for a while moves to the top when it ends. The API lists them by when they started
+export function newestFirst<T extends Pick<Event, "ended_at" | "started_at">>(events: T[]): T[] {
+  const at = (e: T) => Date.parse(eventTime(e)) || 0;
+  return [...events].sort((a, b) => at(b) - at(a));
 }
 
 const nodes = (n: number) => `${n} ${n === 1 ? "node" : "nodes"}`;
@@ -72,7 +78,7 @@ const stageColors = [
 ];
 
 // the stages of a provision, the furthest along first
-const provisionStages = ["booting", "config", "ipxe", "pxe"];
+const provisionStages: string[] = runningStates.map((s) => s.state).reverse();
 
 // eventParts are an event's nodes by how far they got, the furthest first, so drawn in order they read as progress filling from the left: done, failed, each stage still running, not started, stalled. Parts with no nodes are left out
 export function eventParts(e: Pick<Event, "kind" | "counts" | "stages">): EventPart[] {
@@ -85,7 +91,7 @@ export function eventParts(e: Pick<Event, "kind" | "counts" | "stages">): EventP
   return [
     {
       key: "succeeded",
-      label: provision ? stateLabels.completed : "succeeded",
+      label: provision ? stateLabel("completed") : "succeeded",
       count: c.succeeded,
       color: "bg-(--node-ready)",
       state: provision ? "completed" : undefined,
@@ -99,7 +105,7 @@ export function eventParts(e: Pick<Event, "kind" | "counts" | "stages">): EventP
     },
     ...names.map((s, i) => ({
       key: `stage:${s}`,
-      label: provision ? (stateLabels[s] ?? s) : s,
+      label: provision ? stateLabel(s) : s,
       count: stages[s],
       color: stageColors[Math.min(i, stageColors.length - 1)],
       state: provision ? s : undefined,
@@ -115,7 +121,6 @@ export function eventParts(e: Pick<Event, "kind" | "counts" | "stages">): EventP
   ].filter((p) => p.count > 0);
 }
 
-// EventRow is a row of the events table. An event's nodes are fetched when its row is opened, so the list stays small however many nodes events had
 export type EventRow = Tally & {
   id: string;
   time: string;
@@ -130,7 +135,6 @@ export type EventRow = Tally & {
   run: string;
 };
 
-// eventRows turns the api's events, newest first, into the events table's rows
 export function eventRows(events: Event[]): EventRow[] {
   return events.map((e) => ({
     id: e.id,
@@ -155,7 +159,6 @@ export function nodeNote(n: EventNode) {
   return [n.stage, n.message].filter(Boolean).join(": ");
 }
 
-// nodeSeverity reads how an event went on a node as a severity, for the badge that shows it
 export function nodeSeverity(state?: string): Severity | undefined {
   switch (state) {
     case "succeeded":

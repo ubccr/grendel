@@ -1,4 +1,5 @@
-import { getV1Users, User } from "@/client";
+import { User } from "@/client";
+import { getV1UsersOptions } from "@/client/@tanstack/react-query.gen";
 import ActionsSheet from "@/components/actions-sheet";
 import UsersDeleteAction from "@/components/actions/users/delete";
 import UsersEnabledAction from "@/components/actions/users/enabled";
@@ -8,6 +9,7 @@ import { DataTableColumnHeader } from "@/components/data-table/header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import AuthRedirect from "@/lib/auth";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import type { DataTableColumnDef } from "@/components/data-table/features";
 
@@ -15,10 +17,9 @@ export const Route = createFileRoute("/account/users/")({
   staticData: { crumb: "Users" },
   component: RouteComponent,
   beforeLoad: AuthRedirect,
-  loader: () => getV1Users(),
+  loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(getV1UsersOptions()),
 });
 
-// columns are defined once, outside the component, so the table keeps the same column definitions across renders
 const columns: DataTableColumnDef<User, any>[] = [
   {
     accessorKey: "username",
@@ -68,8 +69,7 @@ const columns: DataTableColumnDef<User, any>[] = [
 ];
 
 function RouteComponent() {
-  const { isFetching } = Route.useMatch();
-  const { data } = Route.useLoaderData();
+  const { data, isFetching } = useSuspenseQuery(getV1UsersOptions());
 
   const actions: DataTableActions<User> = ({ table }) => {
     const checked = table
@@ -93,9 +93,9 @@ function RouteComponent() {
           selectable
           getRowId={(user, i) => user.username ?? String(i)}
           columns={columns}
-          data={data ?? []}
+          data={data}
           Actions={actions}
-          progress={isFetching !== false}
+          progress={isFetching}
         />
       </CardContent>
     </Card>

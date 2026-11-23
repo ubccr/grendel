@@ -18,9 +18,8 @@ import (
 )
 
 var (
-	biosDescribeFilter  []string
 	biosDescribeSearch  string
-	biosDescribeOptions *shared.TableOptions
+	biosDescribeTable   *shared.TableFlags
 	biosDescribeColumns = []shared.Column{
 		{Name: "Attribute"},
 		{Name: "Name"},
@@ -42,44 +41,44 @@ var (
 				Tags:    client.NewOptString(strings.Join(tags, ",")),
 			}
 
+			// the route answers for exactly one node, and refuses a nodeset that names more
 			res, err := apiclient.API.GETV1BmcBiosRegistry(command.Context(), params)
 			if err != nil {
 				return apiclient.NewApiError(err)
 			}
-			if len(res.Results.Value) == 0 {
+			if len(res.Results) == 0 {
 				return errors.New("no result returned")
 			}
 
-			result := res.Results.Value[0].Value
-			if !result.Success.Value {
-				return fmt.Errorf("%s: %s", result.Node.Value, result.Message.Value)
+			result := res.Results[0]
+			if !result.Success {
+				return fmt.Errorf("%s: %s", result.Node, result.Message)
 			}
 			reg := result.Data.Value
-			if !reg.Available.Value {
-				return fmt.Errorf("%s publishes no attribute registry it serves itself, 'bmc bios get' still lists the attributes by name", result.Node.Value)
+			if !reg.Available {
+				return fmt.Errorf("%s publishes no attribute registry it serves itself, 'bmc bios get' still lists the attributes by name", result.Node)
 			}
 
 			search := strings.ToLower(biosDescribeSearch)
-			t := shared.NewTable(biosDescribeColumns, biosDescribeFilter).Options(*biosDescribeOptions).Empty("-")
-			for _, a := range reg.Attributes {
-				attr := a
-				name := attr.Name.Value
+			t := biosDescribeTable.Table()
+			for _, attr := range reg.Attributes {
+				name := attr.Name
 				if len(args) > 1 && !slices.Contains(args[1:], name) {
 					continue
 				}
-				if search != "" && !strings.Contains(strings.ToLower(name+" "+attr.DisplayName.Value+" "+attr.HelpText.Value), search) {
+				if search != "" && !strings.Contains(strings.ToLower(name+" "+attr.DisplayName+" "+attr.HelpText), search) {
 					continue
 				}
 
 				t.AppendRow(
 					name,
-					attr.DisplayName.Value,
-					strings.TrimPrefix(attr.MenuPath.Value, "./"),
-					attr.Type.Value,
+					attr.DisplayName,
+					strings.TrimPrefix(attr.MenuPath, "./"),
+					attr.Type,
 					allowedValues(attr),
 					rawValue(attr.DefaultValue),
 					attributeFlags(attr),
-					attr.HelpText.Value,
+					attr.HelpText,
 				)
 			}
 			t.Print()
@@ -92,19 +91,20 @@ func allowedValues(attr client.BmcResponseModelBmcBiosRegistryResultsItemDataAtt
 	if len(attr.Values) > 0 {
 		names := make([]string, 0, len(attr.Values))
 		for _, v := range attr.Values {
-			names = append(names, v.Name.Value)
+			names = append(names, v.Name)
 		}
 		return strings.Join(names, "\n")
 	}
 
-	lower, upper := attr.LowerBound, attr.UpperBound
-	if lower.Set && !lower.Null || upper.Set && !upper.Null {
-		return fmt.Sprintf("%s..%s", optBound(lower.Value, lower.Set && !lower.Null), optBound(upper.Value, upper.Set && !upper.Null))
+	lower, hasLower := attr.LowerBound.Get()
+	upper, hasUpper := attr.UpperBound.Get()
+	if hasLower || hasUpper {
+		return fmt.Sprintf("%s..%s", optBound(lower, hasLower), optBound(upper, hasUpper))
 	}
 
-	minLen, maxLen := attr.MinLength, attr.MaxLength
-	if maxLen.Set && !maxLen.Null {
-		return fmt.Sprintf("%s to %d characters", optBound(int64(minLen.Value), minLen.Set && !minLen.Null), maxLen.Value)
+	if maxLen, ok := attr.MaxLength.Get(); ok {
+		minLen, hasMin := attr.MinLength.Get()
+		return fmt.Sprintf("%s to %d characters", optBound(int64(minLen), hasMin), maxLen)
 	}
 	return ""
 }
@@ -122,13 +122,13 @@ func attributeFlags(attr client.BmcResponseModelBmcBiosRegistryResultsItemDataAt
 		on   bool
 		name string
 	}{
-		{attr.ReadOnly.Value, "read-only"},
-		{attr.Immutable.Value, "immutable"},
-		{attr.GrayOut.Value, "grayed out"},
-		{attr.Hidden.Value, "hidden"},
-		{attr.WriteOnly.Value, "write-only"},
-		{attr.ResetRequired.Value, "needs reboot"},
-		{attr.SystemUnique.Value, "per system"},
+		{attr.ReadOnly, "read-only"},
+		{attr.Immutable, "immutable"},
+		{attr.GrayOut, "grayed out"},
+		{attr.Hidden, "hidden"},
+		{attr.WriteOnly, "write-only"},
+		{attr.ResetRequired, "needs reboot"},
+		{attr.SystemUnique, "per system"},
 	} {
 		if f.on {
 			flags = append(flags, f.name)
@@ -138,10 +138,8 @@ func attributeFlags(attr client.BmcResponseModelBmcBiosRegistryResultsItemDataAt
 }
 
 func init() {
-	biosDescribeOptions = shared.RegisterTableFlags(biosDescribeCmd)
-	biosDescribeCmd.Flags().StringSliceVar(&biosDescribeFilter, "filter", []string{"Help"}, "filter table columns by name")
+	biosDescribeTable = shared.RegisterTableFlags(biosDescribeCmd, biosDescribeColumns, "Help")
 	biosDescribeCmd.Flags().StringVar(&biosDescribeSearch, "search", "", "show only attributes whose name, display name or help mentions this text")
-	biosDescribeCmd.RegisterFlagCompletionFunc("filter", shared.ColumnCompletion(biosDescribeColumns))
 
 	biosCmd.AddCommand(biosDescribeCmd)
 }

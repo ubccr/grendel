@@ -1,14 +1,11 @@
 import type { Host } from "@/client";
-import {
-  getV1NodesFindOptions,
-  getV1NodesProvisionStatusOptions,
-  getV1NodesQueryKey,
-} from "@/client/@tanstack/react-query.gen";
+import { getV1NodesQueryKey } from "@/client/@tanstack/react-query.gen";
 import { Unset } from "@/components/detail-header";
 import { bmcNic, bootNic, LastProvision, ProvisionLight } from "@/components/nodes/plate";
 import { Badge } from "@/components/ui/badge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { nodeOptions, provisionStatusOptions } from "@/lib/queries";
 import { cn } from "@/lib/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, type LinkProps } from "@tanstack/react-router";
@@ -16,10 +13,8 @@ import type { ReactNode } from "react";
 
 const TAGS_SHOWN = 8;
 
-// NodeTab is a page of the node view a link can open on
 type NodeTab = Extract<LinkProps["to"], `/nodes/$node/${string}`>;
 
-// NodeLink is a link to a node that shows a summary of it on hover or focus, so a node named in a table can be told apart without leaving the page
 export function NodeLink({
   node,
   to = "/nodes/$node/node",
@@ -61,12 +56,11 @@ export function NodeLink({
   );
 }
 
-// NodeSummary is a node at a glance, laid out like the asset tag on a server's front: what it is and whether it provisions, then how to reach it, then its tags
 export function NodeSummary({ node }: { node: string }) {
   const queryClient = useQueryClient();
   const { data, isPending, isError } = useQuery({
-    ...getV1NodesFindOptions({ query: { nodeset: node } }),
-    staleTime: 30_000,
+    // the same read as the node's own page, which the link asks for ahead of a click, so the two are one request
+    ...nodeOptions(node),
     // a page that already loaded every node shows the summary at once, and the lookup only refreshes it
     placeholderData: () => {
       const h = queryClient
@@ -78,8 +72,7 @@ export function NodeSummary({ node }: { node: string }) {
   const host = data?.[0];
   const isSwitch = !!host?.tags?.includes("switch");
   const { data: statuses } = useQuery({
-    ...getV1NodesProvisionStatusOptions({ query: { nodeset: node } }),
-    staleTime: 30_000,
+    ...provisionStatusOptions({ nodeset: node }),
     enabled: !!host && !isSwitch,
   });
   const status = statuses?.[0];

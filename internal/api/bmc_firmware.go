@@ -19,7 +19,6 @@ import (
 )
 
 const (
-	// firmwareStageQueued is a node whose update was just queued
 	firmwareStageQueued = "queued"
 	// firmwareStageVerifying is a node whose jobs all read as finished, which is checked once more before it counts, since an iDRAC adds a job per component a little after the first
 	firmwareStageVerifying = "verifying"
@@ -71,9 +70,7 @@ func (h *Handler) trackFirmware(ctx context.Context) {
 	}
 }
 
-// checkFirmware reads the job queues of the nodes firmware events still follow: the running nodes of running events, and the stalled nodes of events queued within firmwareFollowFor, whose BMC may have come back
-//
-// A running node is written every time its BMC answers, changed or not, so the time it was last written is when its BMC last answered, and Tidy stalls it once that is longer ago than bmc.firmware_timeout. A BMC that does not answer is most likely restarting to apply the update, and its node is left as it is
+// checkFirmware reads the job queues of the nodes firmware events still follow: the running nodes of running events, and the stalled nodes of events queued within firmwareFollowFor. A running node is written every time its BMC answers, changed or not, so Tidy can stall it once its BMC has been quiet for bmc.firmware_timeout. A BMC that does not answer is most likely restarting to apply the update, so its node is left as it is
 func (h *Handler) checkFirmware(ctx context.Context, now time.Time, read jobReader) {
 	recent, err := h.DB.Events(model.EventFilter{Kind: model.EventKindFirmware, Limit: model.MaxEventLimit, Nodes: true})
 	if err != nil {
@@ -140,7 +137,7 @@ func (h *Handler) checkFirmware(ctx context.Context, now time.Time, read jobRead
 	}
 }
 
-// firmwareProgress works out where a node's update has got to from its job queue, and whether that differs from its row. The jobs of the update are the one the row's ref names and every job queued after it. A node that is stalled stays stalled until its update has an outcome. waitsForReboot is an update the install was asked not to reboot for, whose node is done with once all that is left of it waits for the next reboot
+// firmwareProgress works out where a node's update has got to from its job queue, and whether that differs from its row. The update's jobs are the one the row's ref names and every job queued after it. A stalled node stays stalled until its update has an outcome, and with waitsForReboot a node is done once all that is left of its update waits for the next reboot
 func firmwareProgress(row model.EventNode, jobs []*schemas.Job, waitsForReboot bool) (model.EventNode, bool) {
 	first := row.Ref
 	next := row

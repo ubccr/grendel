@@ -1,8 +1,6 @@
 import { patchV1NodesProvisionMutation } from "@/client/@tanstack/react-query.gen";
 import { useMutation } from "@tanstack/react-query";
 import { LoaderCircle, Zap, ZapOff } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 import { Button } from "../ui/button";
 
 type Props = {
@@ -11,8 +9,9 @@ type Props = {
 };
 
 export default function ProvisionIcon({ provision, name }: Props) {
-  const { mutate, isPending } = useMutation(patchV1NodesProvisionMutation());
-  const [localProvision, setLocalProvision] = useState(provision);
+  const { mutate, isPending, variables } = useMutation(patchV1NodesProvisionMutation());
+  // what was asked for stands in while the change is stored and the nodes are read again
+  const on = isPending ? variables.body.provision : provision;
 
   return (
     <>
@@ -24,26 +23,9 @@ export default function ProvisionIcon({ provision, name }: Props) {
           variant="secondary"
           type="button"
           className={isPending ? "animate-pulse" : ""}
-          onClick={() => {
-            mutate(
-              { query: { nodeset: name }, body: { provision: !localProvision } },
-              {
-                onSuccess: () => {
-                  setLocalProvision(!localProvision);
-                },
-                onError: (e) =>
-                  toast.error(e.title, {
-                    description: e.detail,
-                  }),
-              },
-            );
-          }}
+          onClick={() => mutate({ query: { nodeset: name }, body: { provision: !on } })}
         >
-          {localProvision ? (
-            <Zap className="text-green-600" />
-          ) : (
-            <ZapOff className="text-red-600" />
-          )}
+          {on ? <Zap className="text-green-600" /> : <ZapOff className="text-red-600" />}
         </Button>
       )}
     </>

@@ -132,6 +132,34 @@ func TestSELSendsTop(t *testing.T) {
 	assert.Equal(t, []string{"11", "10"}, got, "the first two members the BMC listed, newest first")
 }
 
+// TestSELWithAutoExpand covers a BMC that advertises $expand with bmc.gofish.auto_expand on: the limited read leaves $top off, since gofish would append ?$expand after it, and the limit is applied after sorting
+func TestSELWithAutoExpand(t *testing.T) {
+	const entriesPath = "/redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Sel/Entries"
+
+	f := selFixture(scrambledSEL)
+	f.tree["/redfish/v1/"] = strings.Replace(serviceRootDell, `"Vendor": "Dell",`, `"Vendor": "Dell", "ProtocolFeaturesSupported": {"ExpandQuery": {"NoLinks": true}},`, 1)
+	var queries []string
+	f.handler = func(w http.ResponseWriter, r *http.Request) bool {
+		if r.URL.Path == entriesPath {
+			queries = append(queries, r.URL.RawQuery)
+		}
+		return false
+	}
+	srv := f.serve(t)
+
+	results := testService(func(c *Config) { c.AutoExpand = true }).SEL(context.Background(),
+		[]Target{{Name: "cpn-a01-01", Addr: srv.URL}}, SELRequest{Limit: 2})
+
+	require.True(t, results[0].Success, "message was: %s", results[0].Message)
+	assert.Equal(t, []string{"$expand=."}, queries)
+
+	got := make([]string, 0, 2)
+	for _, e := range results[0].Data.Entries {
+		got = append(got, e.ID)
+	}
+	assert.Equal(t, []string{"13", "12"}, got)
+}
+
 func TestSELUnlimitedReturnsEverything(t *testing.T) {
 	srv := selFixture(scrambledSEL).serve(t)
 

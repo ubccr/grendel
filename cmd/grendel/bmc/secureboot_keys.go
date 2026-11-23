@@ -16,10 +16,9 @@ import (
 )
 
 var (
-	secureBootKeysFilter   []string
 	secureBootKeysDefaults bool
 	secureBootKeysFull     bool
-	secureBootKeysOptions  *shared.TableOptions
+	secureBootKeysTable    *shared.TableFlags
 	secureBootKeysColumns  = []shared.Column{
 		{Name: "Node"},
 		{Name: "State"},
@@ -39,13 +38,8 @@ var (
 		Long:  "List the certificates and hashes in the secure boot databases. A certificate's fingerprint is its SHA-256, which is the same on every node, so it is what 'bmc secureboot delete' takes. A hash's fingerprint is the hash itself",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			nodeset, all := selector(args[0])
-			params := client.GETV1BmcSecurebootParams{
-				Keys:    client.NewOptBool(true),
-				Nodeset: nodeset,
-				All:     all,
-				Tags:    client.NewOptString(strings.Join(tags, ",")),
-			}
+			sel := selected(args[0])
+			params := client.GETV1BmcSecurebootParams{Keys: client.NewOptBool(true), Nodeset: sel.Nodeset, Tags: sel.Tags, All: sel.All}
 			if len(args) > 1 {
 				params.Databases = client.NewOptString(strings.Join(args[1:], ","))
 			}
@@ -59,33 +53,36 @@ var (
 			}
 
 			now := time.Now()
-			t := shared.NewTable(secureBootKeysColumns, secureBootKeysFilter).Options(*secureBootKeysOptions).Empty("-")
-			for _, r := range res.Results.Value {
-				result := r.Value
-				node, state := result.Node.Value, colorState(result.Success.Value)
+			t := secureBootKeysTable.Table()
+			var failed failures
+			for _, result := range res.Results {
+				node, state := result.Node, colorState(result.Success)
+				if !result.Success {
+					failed.add(node, result.Message)
+				}
 
 				rows := 0
 				for _, db := range result.Data.Value.Keys {
 					for _, c := range db.Certificates {
-						t.AppendRow(node, state, db.ID.Value, c.ID.Value, "cert", c.Subject.Value, c.Issuer.Value,
-							expires(c.NotAfter.Value, now), shortFingerprint(c.Fingerprint.Value, secureBootKeysFull), c.Owner.Value, result.Message.Value)
+						t.AppendRow(node, state, db.ID, c.ID, "cert", c.Subject, c.Issuer,
+							expires(c.NotAfter, now), shortFingerprint(c.Fingerprint, secureBootKeysFull), c.Owner, result.Message)
 						rows++
 					}
 					for _, s := range db.Signatures {
-						t.AppendRow(node, state, db.ID.Value, s.ID.Value, hashKind(s.Type.Value), "", "", "",
-							shortFingerprint(s.Hash.Value, secureBootKeysFull), s.Owner.Value, result.Message.Value)
+						t.AppendRow(node, state, db.ID, s.ID, hashKind(s.Type), "", "", "",
+							shortFingerprint(s.Hash, secureBootKeysFull), s.Owner, result.Message)
 						rows++
 					}
 				}
-				// a node with no keys, or one that failed, still gets a row saying so
+				// a node with no keys, or one that failed, still gets a row, so every node of the run is in the table
 				if rows == 0 {
-					t.AppendRow(node, state, "", "", "", "", "", "", "", "", result.Message.Value)
+					t.AppendRow(node, state, "", "", "", "", "", "", "", "", result.Message)
 				}
 			}
 			t.Print()
+			failed.print()
 
-			s := res.Summary.Value
-			return summaryLine(s.Total.Value, s.Succeeded.Value, s.Failed.Value, s.FailedNodes.Value, s.DurationMs.Value)
+			return summaryLine(summary(res.Summary))
 		},
 	}
 )
@@ -121,11 +118,9 @@ func hashKind(typ string) string {
 }
 
 func init() {
-	secureBootKeysOptions = shared.RegisterTableFlags(secureBootKeysCmd)
-	secureBootKeysCmd.Flags().StringSliceVar(&secureBootKeysFilter, "filter", []string{"ID", "Owner", "Message"}, "filter table columns by name")
+	secureBootKeysTable = shared.RegisterTableFlags(secureBootKeysCmd, secureBootKeysColumns, "ID", "Owner", "Message")
 	secureBootKeysCmd.Flags().BoolVar(&secureBootKeysDefaults, "defaults", false, "also list the factory default databases, such as dbDefault")
 	secureBootKeysCmd.Flags().BoolVar(&secureBootKeysFull, "full", false, "show whole fingerprints instead of the first 16 digits")
-	secureBootKeysCmd.RegisterFlagCompletionFunc("filter", shared.ColumnCompletion(secureBootKeysColumns))
 	secureBootKeysCmd.ValidArgsFunction = func(_ *cobra.Command, args []string, _ string) ([]string, cobra.ShellCompDirective) {
 		if len(args) == 0 {
 			return nil, cobra.ShellCompDirectiveNoFileComp

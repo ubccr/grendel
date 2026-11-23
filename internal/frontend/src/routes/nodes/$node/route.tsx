@@ -1,18 +1,12 @@
-import { getV1NodesFind } from "@/client";
 import ActionsSheet from "@/components/actions-sheet";
 import NodeActions from "@/components/actions/nodes";
 import { DetailHeader, DetailTabs } from "@/components/detail-header";
 import { NodeFacts } from "@/components/nodes/plate";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import AuthRedirect from "@/lib/auth";
-import {
-  createFileRoute,
-  notFound,
-  Outlet,
-  retainSearchParams,
-  useRouter,
-} from "@tanstack/react-router";
+import { nodeOptions, useRefresh } from "@/lib/queries";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, notFound, Outlet, retainSearchParams } from "@tanstack/react-router";
 import { RefreshCw } from "lucide-react";
 import { z } from "zod";
 
@@ -24,14 +18,12 @@ export const Route = createFileRoute("/nodes/$node")({
     from: z.string().optional(),
   }),
   search: { middlewares: [retainSearchParams(["from"])] },
-  beforeLoad: AuthRedirect,
-  loader: async ({ params: { node } }) => {
-    const res = await getV1NodesFind({ query: { nodeset: node } });
-    if (res.data && res.data.length != 1)
+  loader: async ({ context: { queryClient }, params: { node } }) => {
+    const hosts = await queryClient.ensureQueryData(nodeOptions(node));
+    if (hosts.length != 1)
       throw notFound({
-        data: { message: `Query '${node}' matched ${res.data.length} node(s)` },
+        data: { message: `Query '${node}' matched ${hosts.length} node(s)` },
       });
-    else return res;
   },
 });
 
@@ -51,10 +43,10 @@ const switchTabs = [
 ] as const;
 
 function RouteComponent() {
-  const router = useRouter();
+  const refresh = useRefresh();
   const nodeName = Route.useParams().node;
-  const { data } = Route.useLoaderData();
-  const host = data?.[0];
+  const { data } = useSuspenseQuery(nodeOptions(nodeName));
+  const host = data[0];
   const tabs = host?.tags?.includes("switch") ? switchTabs : serverTabs;
 
   return (
@@ -68,7 +60,7 @@ function RouteComponent() {
               <ActionsSheet type="node" checked={nodeName} length={1}>
                 <NodeActions nodes={nodeName} />
               </ActionsSheet>
-              <Button variant="secondary" type="button" onClick={() => router.invalidate()}>
+              <Button variant="secondary" type="button" onClick={() => void refresh()}>
                 <RefreshCw />
                 <span className="sr-only md:not-sr-only">Refresh</span>
               </Button>

@@ -1,25 +1,12 @@
+// SPDX-FileCopyrightText: (C) 2019 Grendel Authors
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 package model
 
 import (
-	"encoding/json"
 	"net"
 )
-
-type InterfaceStatus struct {
-	Name               string           `json:"name"`
-	LineProtocolStatus string           `json:"line_protocol_status"`
-	InterfaceStatus    string           `json:"interface_status"`
-	PhysicalAddress    net.HardwareAddr `json:"physical_address"`
-	Description        string           `json:"description"`
-	Hardware           string           `json:"hardware"`
-	// Bandwidth is in Mb/s.
-	Bandwidth           int    `json:"bandwidth"`
-	MTU                 int    `json:"mtu"`
-	InterfaceMembership string `json:"interface_membership"`
-	// Duplex              string           // `json:"duplex"`
-	// AutoNegotiate       string           // `json:"auto_negotiate"`
-	// Lanes               string           // `json:"lanes"`
-}
 
 type MACTableEntry struct {
 	Ifname string           `json:"ifname"`
@@ -40,34 +27,8 @@ type LLDP struct {
 	PortIdType        string `json:"port_id_type"`
 }
 
-type InterfaceTable map[string]*InterfaceStatus
-
 type MACTable []*MACTableEntry
 
 type LLDPNeighbors map[string]*LLDP
 
 type SwitchLLDPList []LLDP
-
-func (mt MACTable) ByIfname() map[string][]*MACTableEntry {
-	out := make(map[string][]*MACTableEntry)
-	for _, entry := range mt {
-		out[entry.Ifname] = append(out[entry.Ifname], entry)
-	}
-	return out
-}
-
-func (m *MACTableEntry) MarshalJSON() ([]byte, error) {
-	type Alias MACTableEntry
-	return json.Marshal(&struct {
-		MAC string `json:"mac"`
-		*Alias
-	}{
-		MAC:   m.MAC.String(),
-		Alias: (*Alias)(m),
-	})
-}
-
-func (mt MACTable) String() string {
-	data, _ := json.MarshalIndent(mt, "", "    ")
-	return string(data)
-}

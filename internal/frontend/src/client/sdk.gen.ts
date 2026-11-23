@@ -19,7 +19,7 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 /**
- * auth reset
+ * Change own password
  *
  * #### Controller:
  *
@@ -27,7 +27,6 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -53,15 +52,11 @@ export const patchV1AuthReset = <ThrowOnError extends boolean = false>(options: 
 });
 
 /**
- * auth signin
+ * Sign in
  *
  * #### Controller:
  *
  * `github.com/ubccr/grendel/internal/api.(*Handler).AuthSignin`
- *
- * #### Middlewares:
- *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  *
  * ---
  *
@@ -86,15 +81,11 @@ export const postV1AuthSignin = <ThrowOnError extends boolean = false>(options: 
 });
 
 /**
- * auth signout
+ * Sign out
  *
  * #### Controller:
  *
  * `github.com/ubccr/grendel/internal/api.(*Handler).AuthSignout`
- *
- * #### Middlewares:
- *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  *
  * ---
  *
@@ -115,15 +106,11 @@ export const deleteV1AuthSignout = <ThrowOnError extends boolean = false>(option
 });
 
 /**
- * auth signup
+ * Sign up
  *
  * #### Controller:
  *
  * `github.com/ubccr/grendel/internal/api.(*Handler).AuthSignup`
- *
- * #### Middlewares:
- *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  *
  * ---
  *
@@ -148,7 +135,7 @@ export const postV1AuthSignup = <ThrowOnError extends boolean = false>(options: 
 });
 
 /**
- * auth token
+ * Create API tokens
  *
  * #### Controller:
  *
@@ -156,7 +143,6 @@ export const postV1AuthSignup = <ThrowOnError extends boolean = false>(options: 
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -182,7 +168,7 @@ export const postV1AuthToken = <ThrowOnError extends boolean = false>(options: O
 });
 
 /**
- * bmc asset tag
+ * Set asset tags
  *
  * #### Controller:
  *
@@ -190,7 +176,6 @@ export const postV1AuthToken = <ThrowOnError extends boolean = false>(options: O
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -216,7 +201,7 @@ export const postV1BmcAssetTag = <ThrowOnError extends boolean = false>(options:
 });
 
 /**
- * bmc bios
+ * Read BIOS attributes
  *
  * #### Controller:
  *
@@ -224,7 +209,6 @@ export const postV1BmcAssetTag = <ThrowOnError extends boolean = false>(options:
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -246,7 +230,7 @@ export const getV1BmcBios = <ThrowOnError extends boolean = false>(options?: Opt
 });
 
 /**
- * bmc set bios
+ * Stage BIOS changes
  *
  * #### Controller:
  *
@@ -254,7 +238,6 @@ export const getV1BmcBios = <ThrowOnError extends boolean = false>(options?: Opt
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -280,7 +263,7 @@ export const postV1BmcBios = <ThrowOnError extends boolean = false>(options: Opt
 });
 
 /**
- * bmc discard bios
+ * Discard staged BIOS changes
  *
  * #### Controller:
  *
@@ -288,7 +271,6 @@ export const postV1BmcBios = <ThrowOnError extends boolean = false>(options: Opt
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -310,7 +292,7 @@ export const postV1BmcBiosDiscard = <ThrowOnError extends boolean = false>(optio
 });
 
 /**
- * bmc bios registry
+ * Read the BIOS attribute registry
  *
  * #### Controller:
  *
@@ -318,7 +300,6 @@ export const postV1BmcBiosDiscard = <ThrowOnError extends boolean = false>(optio
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -340,7 +321,7 @@ export const getV1BmcBiosRegistry = <ThrowOnError extends boolean = false>(optio
 });
 
 /**
- * bmc auto configure
+ * Set iDRAC auto configure
  *
  * #### Controller:
  *
@@ -348,7 +329,6 @@ export const getV1BmcBiosRegistry = <ThrowOnError extends boolean = false>(optio
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -370,7 +350,7 @@ export const postV1BmcConfigureAuto = <ThrowOnError extends boolean = false>(opt
 });
 
 /**
- * bmc import config
+ * Import an iDRAC config
  *
  * #### Controller:
  *
@@ -378,7 +358,6 @@ export const postV1BmcConfigureAuto = <ThrowOnError extends boolean = false>(opt
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -404,7 +383,7 @@ export const postV1BmcConfigureImport = <ThrowOnError extends boolean = false>(o
 });
 
 /**
- * bmc install firmware
+ * Check and install firmware
  *
  * #### Controller:
  *
@@ -412,7 +391,6 @@ export const postV1BmcConfigureImport = <ThrowOnError extends boolean = false>(o
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -438,7 +416,7 @@ export const postV1BmcFirmwareInstall = <ThrowOnError extends boolean = false>(o
 });
 
 /**
- * bmc firmware updates
+ * List available firmware updates
  *
  * #### Controller:
  *
@@ -446,7 +424,6 @@ export const postV1BmcFirmwareInstall = <ThrowOnError extends boolean = false>(o
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -468,7 +445,7 @@ export const getV1BmcFirmwareUpdates = <ThrowOnError extends boolean = false>(op
 });
 
 /**
- * bmc identity defaults
+ * See asset tag and location defaults
  *
  * #### Controller:
  *
@@ -476,7 +453,6 @@ export const getV1BmcFirmwareUpdates = <ThrowOnError extends boolean = false>(op
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -498,7 +474,7 @@ export const getV1BmcIdentityDefaults = <ThrowOnError extends boolean = false>(o
 });
 
 /**
- * bmc indicator
+ * Turn the locate light on or off
  *
  * #### Controller:
  *
@@ -506,7 +482,6 @@ export const getV1BmcIdentityDefaults = <ThrowOnError extends boolean = false>(o
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -532,7 +507,7 @@ export const postV1BmcIndicator = <ThrowOnError extends boolean = false>(options
 });
 
 /**
- * bmc jobs
+ * See the job queue
  *
  * #### Controller:
  *
@@ -540,7 +515,6 @@ export const postV1BmcIndicator = <ThrowOnError extends boolean = false>(options
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -562,7 +536,7 @@ export const getV1BmcJobs = <ThrowOnError extends boolean = false>(options?: Opt
 });
 
 /**
- * bmc clear jobs
+ * Clear jobs
  *
  * #### Controller:
  *
@@ -570,7 +544,6 @@ export const getV1BmcJobs = <ThrowOnError extends boolean = false>(options?: Opt
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -596,7 +569,7 @@ export const postV1BmcJobsClear = <ThrowOnError extends boolean = false>(options
 });
 
 /**
- * bmc location
+ * Set rack locations
  *
  * #### Controller:
  *
@@ -604,7 +577,6 @@ export const postV1BmcJobsClear = <ThrowOnError extends boolean = false>(options
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -630,7 +602,7 @@ export const postV1BmcLocation = <ThrowOnError extends boolean = false>(options:
 });
 
 /**
- * bmc n i cs
+ * List network ports
  *
  * #### Controller:
  *
@@ -638,7 +610,6 @@ export const postV1BmcLocation = <ThrowOnError extends boolean = false>(options:
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -660,7 +631,7 @@ export const getV1BmcNics = <ThrowOnError extends boolean = false>(options?: Opt
 });
 
 /**
- * bmc power
+ * Power nodes and restart BMCs
  *
  * #### Controller:
  *
@@ -668,7 +639,6 @@ export const getV1BmcNics = <ThrowOnError extends boolean = false>(options?: Opt
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -694,7 +664,7 @@ export const postV1BmcPower = <ThrowOnError extends boolean = false>(options: Op
 });
 
 /**
- * bmc secure boot
+ * See secure boot state and keys
  *
  * #### Controller:
  *
@@ -702,7 +672,6 @@ export const postV1BmcPower = <ThrowOnError extends boolean = false>(options: Op
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -724,7 +693,7 @@ export const getV1BmcSecureboot = <ThrowOnError extends boolean = false>(options
 });
 
 /**
- * bmc set secure boot
+ * Turn secure boot on or off
  *
  * #### Controller:
  *
@@ -732,7 +701,6 @@ export const getV1BmcSecureboot = <ThrowOnError extends boolean = false>(options
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -758,7 +726,7 @@ export const postV1BmcSecureboot = <ThrowOnError extends boolean = false>(option
 });
 
 /**
- * bmc add secure boot key
+ * Enroll secure boot keys
  *
  * #### Controller:
  *
@@ -766,7 +734,6 @@ export const postV1BmcSecureboot = <ThrowOnError extends boolean = false>(option
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -792,7 +759,7 @@ export const postV1BmcSecurebootKeys = <ThrowOnError extends boolean = false>(op
 });
 
 /**
- * bmc delete secure boot key
+ * Delete secure boot keys
  *
  * #### Controller:
  *
@@ -800,7 +767,6 @@ export const postV1BmcSecurebootKeys = <ThrowOnError extends boolean = false>(op
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -826,7 +792,7 @@ export const postV1BmcSecurebootKeysDelete = <ThrowOnError extends boolean = fal
 });
 
 /**
- * bmc reset secure boot keys
+ * Reset secure boot keys
  *
  * #### Controller:
  *
@@ -834,7 +800,6 @@ export const postV1BmcSecurebootKeysDelete = <ThrowOnError extends boolean = fal
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -860,7 +825,7 @@ export const postV1BmcSecurebootReset = <ThrowOnError extends boolean = false>(o
 });
 
 /**
- * bmc s e l
+ * Read the system event log
  *
  * #### Controller:
  *
@@ -868,7 +833,6 @@ export const postV1BmcSecurebootReset = <ThrowOnError extends boolean = false>(o
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -890,7 +854,7 @@ export const getV1BmcSel = <ThrowOnError extends boolean = false>(options?: Opti
 });
 
 /**
- * bmc clear s e l
+ * Clear the system event log
  *
  * #### Controller:
  *
@@ -898,7 +862,6 @@ export const getV1BmcSel = <ThrowOnError extends boolean = false>(options?: Opti
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -920,7 +883,7 @@ export const postV1BmcSelClear = <ThrowOnError extends boolean = false>(options?
 });
 
 /**
- * bmc status
+ * See system status
  *
  * #### Controller:
  *
@@ -928,7 +891,6 @@ export const postV1BmcSelClear = <ThrowOnError extends boolean = false>(options?
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -950,7 +912,7 @@ export const getV1BmcStatus = <ThrowOnError extends boolean = false>(options?: O
 });
 
 /**
- * dump
+ * Download a database backup
  *
  * #### Controller:
  *
@@ -958,7 +920,6 @@ export const getV1BmcStatus = <ThrowOnError extends boolean = false>(options?: O
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -980,7 +941,7 @@ export const getV1DbDump = <ThrowOnError extends boolean = false>(options?: Opti
 });
 
 /**
- * restore
+ * Restore a database backup
  *
  * #### Controller:
  *
@@ -988,7 +949,6 @@ export const getV1DbDump = <ThrowOnError extends boolean = false>(options?: Opti
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1014,7 +974,7 @@ export const postV1DbRestore = <ThrowOnError extends boolean = false>(options: O
 });
 
 /**
- * get events
+ * Follow events
  *
  * #### Controller:
  *
@@ -1022,7 +982,6 @@ export const postV1DbRestore = <ThrowOnError extends boolean = false>(options: O
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1044,7 +1003,7 @@ export const getV1GrendelEvents = <ThrowOnError extends boolean = false>(options
 });
 
 /**
- * get event
+ * See how an event went on each node
  *
  * #### Controller:
  *
@@ -1052,7 +1011,6 @@ export const getV1GrendelEvents = <ThrowOnError extends boolean = false>(options
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1074,7 +1032,7 @@ export const getV1GrendelEventsId = <ThrowOnError extends boolean = false>(optio
 });
 
 /**
- * get version
+ * See the server version
  *
  * #### Controller:
  *
@@ -1082,7 +1040,6 @@ export const getV1GrendelEventsId = <ThrowOnError extends boolean = false>(optio
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1104,7 +1061,7 @@ export const getV1GrendelVersion = <ThrowOnError extends boolean = false>(option
 });
 
 /**
- * boot image delete
+ * Delete images
  *
  * #### Controller:
  *
@@ -1112,7 +1069,6 @@ export const getV1GrendelVersion = <ThrowOnError extends boolean = false>(option
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1134,7 +1090,7 @@ export const deleteV1Images = <ThrowOnError extends boolean = false>(options?: O
 });
 
 /**
- * boot image list
+ * List images
  *
  * #### Controller:
  *
@@ -1142,7 +1098,6 @@ export const deleteV1Images = <ThrowOnError extends boolean = false>(options?: O
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1164,7 +1119,7 @@ export const getV1Images = <ThrowOnError extends boolean = false>(options?: Opti
 });
 
 /**
- * boot image add
+ * Add and edit images
  *
  * #### Controller:
  *
@@ -1172,7 +1127,6 @@ export const getV1Images = <ThrowOnError extends boolean = false>(options?: Opti
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1198,7 +1152,7 @@ export const postV1Images = <ThrowOnError extends boolean = false>(options: Opti
 });
 
 /**
- * boot image find
+ * Find images
  *
  * #### Controller:
  *
@@ -1206,7 +1160,6 @@ export const postV1Images = <ThrowOnError extends boolean = false>(options: Opti
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1228,7 +1181,7 @@ export const getV1ImagesFind = <ThrowOnError extends boolean = false>(options?: 
 });
 
 /**
- * node delete
+ * Delete nodes
  *
  * #### Controller:
  *
@@ -1236,7 +1189,6 @@ export const getV1ImagesFind = <ThrowOnError extends boolean = false>(options?: 
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1258,7 +1210,7 @@ export const deleteV1Nodes = <ThrowOnError extends boolean = false>(options?: Op
 });
 
 /**
- * node list
+ * List nodes
  *
  * #### Controller:
  *
@@ -1266,7 +1218,6 @@ export const deleteV1Nodes = <ThrowOnError extends boolean = false>(options?: Op
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1288,7 +1239,7 @@ export const getV1Nodes = <ThrowOnError extends boolean = false>(options?: Optio
 });
 
 /**
- * node add
+ * Add and edit nodes
  *
  * #### Controller:
  *
@@ -1296,7 +1247,6 @@ export const getV1Nodes = <ThrowOnError extends boolean = false>(options?: Optio
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1322,7 +1272,7 @@ export const postV1Nodes = <ThrowOnError extends boolean = false>(options: Optio
 });
 
 /**
- * node find
+ * Find nodes
  *
  * #### Controller:
  *
@@ -1330,7 +1280,6 @@ export const postV1Nodes = <ThrowOnError extends boolean = false>(options: Optio
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1352,7 +1301,7 @@ export const getV1NodesFind = <ThrowOnError extends boolean = false>(options?: O
 });
 
 /**
- * node boot image
+ * Change a node's boot image
  *
  * #### Controller:
  *
@@ -1360,7 +1309,6 @@ export const getV1NodesFind = <ThrowOnError extends boolean = false>(options?: O
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1386,7 +1334,7 @@ export const patchV1NodesImage = <ThrowOnError extends boolean = false>(options:
 });
 
 /**
- * node import
+ * Import nodes from switches and BMCs
  *
  * #### Controller:
  *
@@ -1394,7 +1342,6 @@ export const patchV1NodesImage = <ThrowOnError extends boolean = false>(options:
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1420,7 +1367,7 @@ export const postV1NodesImport = <ThrowOnError extends boolean = false>(options:
 });
 
 /**
- * node next address
+ * Find free addresses
  *
  * #### Controller:
  *
@@ -1428,7 +1375,6 @@ export const postV1NodesImport = <ThrowOnError extends boolean = false>(options:
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1450,7 +1396,7 @@ export const getV1NodesIpsNext = <ThrowOnError extends boolean = false>(options:
 });
 
 /**
- * node address ranges
+ * List address ranges in use
  *
  * #### Controller:
  *
@@ -1458,7 +1404,6 @@ export const getV1NodesIpsNext = <ThrowOnError extends boolean = false>(options:
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1480,7 +1425,7 @@ export const getV1NodesIpsRanges = <ThrowOnError extends boolean = false>(option
 });
 
 /**
- * node provision
+ * Turn provisioning on or off
  *
  * #### Controller:
  *
@@ -1488,7 +1433,6 @@ export const getV1NodesIpsRanges = <ThrowOnError extends boolean = false>(option
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1514,7 +1458,7 @@ export const patchV1NodesProvision = <ThrowOnError extends boolean = false>(opti
 });
 
 /**
- * node provision status
+ * See provision status
  *
  * #### Controller:
  *
@@ -1522,7 +1466,6 @@ export const patchV1NodesProvision = <ThrowOnError extends boolean = false>(opti
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1544,7 +1487,7 @@ export const getV1NodesProvisionStatus = <ThrowOnError extends boolean = false>(
 });
 
 /**
- * node tag list
+ * List tags
  *
  * #### Controller:
  *
@@ -1552,7 +1495,6 @@ export const getV1NodesProvisionStatus = <ThrowOnError extends boolean = false>(
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1574,7 +1516,7 @@ export const getV1NodesTags = <ThrowOnError extends boolean = false>(options?: O
 });
 
 /**
- * node tags
+ * Add and remove tags
  *
  * #### Controller:
  *
@@ -1582,7 +1524,6 @@ export const getV1NodesTags = <ThrowOnError extends boolean = false>(options?: O
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1608,7 +1549,7 @@ export const patchV1NodesTagsAction = <ThrowOnError extends boolean = false>(opt
 });
 
 /**
- * node boot token
+ * Create boot tokens
  *
  * #### Controller:
  *
@@ -1616,7 +1557,6 @@ export const patchV1NodesTagsAction = <ThrowOnError extends boolean = false>(opt
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1638,7 +1578,7 @@ export const getV1NodesTokenInterface = <ThrowOnError extends boolean = false>(o
 });
 
 /**
- * get roles
+ * List roles and permissions
  *
  * #### Controller:
  *
@@ -1646,7 +1586,6 @@ export const getV1NodesTokenInterface = <ThrowOnError extends boolean = false>(o
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1668,7 +1607,7 @@ export const getV1Roles = <ThrowOnError extends boolean = false>(options?: Optio
 });
 
 /**
- * patch roles
+ * Edit a role's permissions
  *
  * #### Controller:
  *
@@ -1676,7 +1615,6 @@ export const getV1Roles = <ThrowOnError extends boolean = false>(options?: Optio
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1702,7 +1640,7 @@ export const patchV1Roles = <ThrowOnError extends boolean = false>(options: Opti
 });
 
 /**
- * post roles
+ * Add roles
  *
  * #### Controller:
  *
@@ -1710,7 +1648,6 @@ export const patchV1Roles = <ThrowOnError extends boolean = false>(options: Opti
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1736,7 +1673,7 @@ export const postV1Roles = <ThrowOnError extends boolean = false>(options: Optio
 });
 
 /**
- * delete roles
+ * Delete roles
  *
  * #### Controller:
  *
@@ -1744,7 +1681,6 @@ export const postV1Roles = <ThrowOnError extends boolean = false>(options: Optio
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1766,7 +1702,7 @@ export const deleteV1RolesNames = <ThrowOnError extends boolean = false>(options
 });
 
 /**
- * switch scan
+ * Scan switch ports and MAC tables
  *
  * #### Controller:
  *
@@ -1774,7 +1710,6 @@ export const deleteV1RolesNames = <ThrowOnError extends boolean = false>(options
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1796,7 +1731,7 @@ export const getV1SwitchScan = <ThrowOnError extends boolean = false>(options?: 
 });
 
 /**
- * switch get l l d p
+ * Read LLDP neighbours
  *
  * #### Controller:
  *
@@ -1804,7 +1739,6 @@ export const getV1SwitchScan = <ThrowOnError extends boolean = false>(options?: 
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1826,7 +1760,7 @@ export const getV1SwitchNodesetLldp = <ThrowOnError extends boolean = false>(opt
 });
 
 /**
- * user list
+ * List users
  *
  * #### Controller:
  *
@@ -1834,7 +1768,6 @@ export const getV1SwitchNodesetLldp = <ThrowOnError extends boolean = false>(opt
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1856,7 +1789,7 @@ export const getV1Users = <ThrowOnError extends boolean = false>(options?: Optio
 });
 
 /**
- * user store
+ * Add users
  *
  * #### Controller:
  *
@@ -1864,7 +1797,6 @@ export const getV1Users = <ThrowOnError extends boolean = false>(options?: Optio
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1890,7 +1822,7 @@ export const postV1Users = <ThrowOnError extends boolean = false>(options: Optio
 });
 
 /**
- * user delete
+ * Delete users
  *
  * #### Controller:
  *
@@ -1898,7 +1830,6 @@ export const postV1Users = <ThrowOnError extends boolean = false>(options: Optio
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1920,7 +1851,7 @@ export const deleteV1UsersUsernames = <ThrowOnError extends boolean = false>(opt
 });
 
 /**
- * user enable
+ * Enable and disable users
  *
  * #### Controller:
  *
@@ -1928,7 +1859,6 @@ export const deleteV1UsersUsernames = <ThrowOnError extends boolean = false>(opt
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---
@@ -1954,7 +1884,7 @@ export const patchV1UsersUsernamesEnable = <ThrowOnError extends boolean = false
 });
 
 /**
- * user role
+ * Change a user's role
  *
  * #### Controller:
  *
@@ -1962,7 +1892,6 @@ export const patchV1UsersUsernamesEnable = <ThrowOnError extends boolean = false
  *
  * #### Middlewares:
  *
- * - `github.com/go-fuego/fuego.defaultLogger.middleware`
  * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
  *
  * ---

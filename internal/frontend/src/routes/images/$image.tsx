@@ -1,5 +1,5 @@
-import { BootImage, getV1ImagesFind } from "@/client";
-import { getV1NodesOptions } from "@/client/@tanstack/react-query.gen";
+import { BootImage } from "@/client";
+import { getV1ImagesFindOptions, getV1NodesOptions } from "@/client/@tanstack/react-query.gen";
 import ActionsSheet from "@/components/actions-sheet";
 import ImagesDeleteAction from "@/components/actions/images/delete";
 import ImagesExportAction from "@/components/actions/images/export";
@@ -7,25 +7,25 @@ import { DetailHeader, Fact, Unset } from "@/components/detail-header";
 import ImageForm from "@/components/images/form";
 import { ErrorPanel } from "@/components/error-panel";
 import { Card, CardContent } from "@/components/ui/card";
-import AuthRedirect from "@/lib/auth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ImageOff } from "lucide-react";
 
 export const Route = createFileRoute("/images/$image")({
   staticData: { crumb: { param: "image" } },
   component: RouteComponent,
-  beforeLoad: AuthRedirect,
-  loader: ({ params: { image } }) => getV1ImagesFind({ query: { names: image } }),
+  loader: ({ context: { queryClient }, params: { image } }) =>
+    queryClient.ensureQueryData(imageOptions(image)),
 });
+
+const imageOptions = (image: string) => getV1ImagesFindOptions({ query: { names: image } });
 
 function plural(n: number, one: string) {
   return `${n} ${one}${n === 1 ? "" : "s"}`;
 }
 
-// ImageFacts are what an image boots and how widely it is used, at a glance
 function ImageFacts({ image }: { image: BootImage }) {
-  const { data: nodes } = useQuery({ ...getV1NodesOptions(), staleTime: 60_000 });
+  const { data: nodes } = useQuery(getV1NodesOptions());
   const assigned = nodes?.filter((n) => n.boot_image === image.name).length;
   const initrds = image.initrd?.length ?? 0;
   const templates = Object.keys(image.provision_templates ?? {}).length;
@@ -58,9 +58,9 @@ function ImageFacts({ image }: { image: BootImage }) {
 }
 
 function RouteComponent() {
-  const { data } = Route.useLoaderData();
   const imageName = Route.useParams().image;
-  const image = data?.length === 1 ? data[0] : undefined;
+  const { data } = useSuspenseQuery(imageOptions(imageName));
+  const image = data.length === 1 ? data[0] : undefined;
 
   if (!image)
     return (

@@ -15,8 +15,6 @@ import (
 
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
-	"github.com/ubccr/grendel/cmd/shared"
-	"github.com/ubccr/grendel/pkg/client"
 	"golang.org/x/term"
 )
 
@@ -25,13 +23,6 @@ var (
 		Use:   "secureboot",
 		Short: "UEFI secure boot commands",
 		Long:  "Show and change UEFI secure boot, and manage the keys in its PK, KEK, db and dbx databases. Changes take effect at the node's next boot",
-	}
-
-	// secureBootAckColumns is the table every secure boot change prints
-	secureBootAckColumns = []shared.Column{
-		{Name: "Node"},
-		{Name: "State"},
-		{Name: "Message"},
 	}
 
 	secureBootWritable = []string{"PK", "KEK", "db", "dbx"}
@@ -49,19 +40,6 @@ func completeDatabases(pos int, names []string) func(*cobra.Command, []string, s
 		}
 		return nil, cobra.ShellCompDirectiveDefault
 	}
-}
-
-// printAcks prints the result of a secure boot change and returns the error that sets the exit code
-func printAcks(res *client.BmcResponseModelBmcAck, filter []string, options *shared.TableOptions) error {
-	t := shared.NewTable(secureBootAckColumns, filter).Options(*options).Empty("-")
-	for _, r := range res.Results.Value {
-		result := r.Value
-		t.AppendRow(result.Node.Value, colorState(result.Success.Value), result.Message.Value)
-	}
-	t.Print()
-
-	s := res.Summary.Value
-	return summaryLine(s.Total.Value, s.Succeeded.Value, s.Failed.Value, s.FailedNodes.Value, s.DurationMs.Value)
 }
 
 // errNoTerminal makes a script that forgot --yes fail, rather than exit 0 having changed nothing

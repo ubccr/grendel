@@ -93,18 +93,3 @@ func TestIdentityDataOfFailedNode(t *testing.T) {
 	assert.Nil(t, assetTagData(nil))
 	assert.Nil(t, locationData(nil))
 }
-
-func TestIdentityHostsOrder(t *testing.T) {
-	bmc := []*model.NetInterface{{BMC: true}}
-	hosts := model.HostList{
-		{Name: "cpn-f01-10", Interfaces: bmc},
-		{Name: "cpn-f01-9", Interfaces: bmc},
-		{Name: "cpn-f01-1"},
-		{Name: "cpn-f01-2", Interfaces: bmc},
-	}
-	var names []string
-	for _, h := range identityHosts(hosts) {
-		names = append(names, h.Name)
-	}
-	assert.Equal(t, []string{"cpn-f01-2", "cpn-f01-9", "cpn-f01-10"}, names, "natural order, skipping the host with no bmc")
-}

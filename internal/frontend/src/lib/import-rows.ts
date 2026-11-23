@@ -13,7 +13,6 @@ export type Settings = {
   ifname: string;
   // the BMC port's MTU; empty leaves Grendel's default
   mtu: string;
-  // the BMC port's VLAN
   portVlan: string;
   // each tag is a template, like rack=a{sw.1}
   tags: string[];
@@ -201,7 +200,7 @@ export function buildRows(
 
         const rendered = renderTemplate(c.name, vars);
         row.name = o.name ?? rendered.value;
-        if (o.name === undefined && rendered.error) row.problem = rendered.error;
+        let templateProblem = o.name === undefined ? rendered.error : undefined;
 
         if (o.mac === undefined) {
           row.mac = macs.length === 1 ? macs[0] : autoPick(macs);
@@ -214,12 +213,22 @@ export function buildRows(
         }
         row.macText = o.mac ?? row.mac?.mac ?? "";
 
-        if (row.name) {
+        if (row.name && !templateProblem) {
           const withName = { ...vars, name: row.name };
-          row.fqdn = c.fqdn.parts.length ? renderTemplate(c.fqdn, withName).value : "";
-          row.tags = c.tags.map((t) => renderTemplate(t, withName).value).filter(Boolean);
+          const filled = [c.fqdn, ...c.tags].map((t) => renderTemplate(t, withName));
+          const failed = filled.findIndex((f) => f.error);
+          // a template that stops at a field it can't fill has only rendered its start, which would be stored as the whole FQDN or tag
+          if (failed >= 0)
+            templateProblem = `${failed === 0 ? "FQDN" : `Tag ${c.tags[failed - 1].source}`}: ${filled[failed].error}`;
+          else {
+            row.fqdn = filled[0].value;
+            row.tags = filled
+              .slice(1)
+              .map((f) => f.value)
+              .filter(Boolean);
+          }
         }
-        row.status = status(row);
+        [row.status, row.problem] = status(row, templateProblem);
       } else {
         if (o.name !== undefined) row.name = o.name;
         row.macText = o.mac ?? (macs.length === 1 ? (macs[0].mac ?? "") : "");
@@ -232,33 +241,26 @@ export function buildRows(
   return rows;
 }
 
-function status(row: Row): Status {
-  if (row.macProblem) {
-    row.problem = row.macProblem;
-    return "badmac";
-  }
-  if (!row.mac && row.macs.length === 0) return "empty";
-  if (!row.mac) {
-    row.problem ??=
+// status is what a row will become and, when that needs explaining, why. The MAC is settled before the templates are judged, so a port still waiting for its MAC says so rather than showing a template's error
+function status(row: Row, templateProblem?: string): [Status, string?] {
+  if (row.macProblem) return ["badmac", row.macProblem];
+  if (!row.mac && row.macs.length === 0) return ["empty"];
+  if (!row.mac)
+    return [
+      "pick",
       row.macs.length === 1
         ? "Type a MAC, or reset to use the one the switch learned."
-        : `${row.macs.length} MACs on this port. Pick the BMC's.`;
-    return "pick";
-  }
-  if (row.problem) return "invalid";
+        : `${row.macs.length} MACs on this port. Pick the BMC's.`,
+    ];
+  if (templateProblem) return ["invalid", templateProblem];
   // a port with no name and no template yet is waiting on the operator, not wrong
-  if (!row.name && !row.nameOverridden) return "unnamed";
+  if (!row.name && !row.nameOverridden) return ["unnamed"];
   const bad = nameProblem(row.name);
-  if (bad) {
-    row.problem = bad;
-    return "invalid";
-  }
-  if (row.mac.owner && row.mac.owner !== row.name) {
-    row.problem = `This MAC belongs to ${row.mac.owner}.`;
-    return "conflict";
-  }
-  if (row.mac.owner === row.name && row.mac.bmc) return "existing";
-  return "ready";
+  if (bad) return ["invalid", bad];
+  if (row.mac.owner && row.mac.owner !== row.name)
+    return ["conflict", `This MAC belongs to ${row.mac.owner}.`];
+  if (row.mac.owner === row.name && row.mac.bmc) return ["existing"];
+  return ["ready"];
 }
 
 function markDuplicates(rows: Row[]) {
@@ -336,7 +338,7 @@ export function pickByOui(rows: Row[], oui: string, overrides: Overrides): Overr
   return next;
 }
 
-// fillNames returns the overrides that put pasted values, names by default or MACs, on the rows from start down, one line each, skipping rows that aren't included
+// fillNames returns the overrides that put pasted values, names by default or MACs, on the rows from start down, one line each, skipping rows that aren't included. rows are the ones the table shows, so a filter keeps a paste off the rows it hides
 export function fillNames(
   rows: Row[],
   startKey: string,

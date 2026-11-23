@@ -22,15 +22,15 @@ var (
 		Short: "add node",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			newNode := []client.NilNodeAddRequestNodeListItem{
-				client.NewNilNodeAddRequestNodeListItem(client.NodeAddRequestNodeListItem{
+			newNode := []client.NodeAddRequestNodeListItem{
+				{
 					Name:      client.NewOptString(args[0]),
 					Firmware:  client.NewOptString(newFirmware),
 					Arch:      client.NewOptString(newArch),
 					Provision: client.NewOptBool(newProvision),
 					Tags:      client.NewOptNilStringArray(newTags),
 					BootImage: client.NewOptString(newBootImage),
-				}),
+				},
 			}
 
 			storeReq := &client.NodeAddRequest{

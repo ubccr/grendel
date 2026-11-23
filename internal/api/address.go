@@ -15,6 +15,8 @@ import (
 	"time"
 
 	"github.com/go-fuego/fuego"
+	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/config"
 	"github.com/ubccr/grendel/internal/ping"
 	"github.com/ubccr/grendel/pkg/model"
 	"go4.org/netipx"
@@ -37,7 +39,6 @@ const (
 // pingAddrs is ping.Ping, swapped out in tests
 var pingAddrs = ping.Ping
 
-// AddressUse is an IP address held by one of a node's ports
 type AddressUse struct {
 	Addr netip.Addr `json:"ip" oai3:"typeStr"`
 	// Bits is the prefix length the port was given with its address
@@ -57,7 +58,6 @@ func hostPorts(host *model.Host) []*model.NetInterface {
 	})
 }
 
-// addressUses is the address of every port of hosts that has one
 func addressUses(hosts model.HostList) []AddressUse {
 	var uses []AddressUse
 	for _, host := range hosts {
@@ -75,12 +75,12 @@ type NextAddress struct {
 
 type NextAddressResponse struct {
 	Range        string        `json:"range" example:"10.17.25.0/24"`
-	Subnet       string        `json:"subnet" description:"the subnet the range lies in, taken from the prefix length of the nodes in and around it, or the range itself when there are none" example:"10.17.0.0/18"`
+	Subnet       string        `json:"subnet" description:"the subnet the range lies in: the one in dhcp.subnets holding it, or else taken from the prefix length of the nodes in and around it, or the range itself when there are none" example:"10.17.0.0/18"`
 	PrefixLen    int           `json:"prefix_len" description:"the prefix length to give a port with one of the suggested addresses" example:"18"`
 	Free         int           `json:"free" description:"how many addresses in the range no node holds, that aren't excluded or reserved"`
 	Used         []AddressUse  `json:"used" description:"addresses in the range a node's port holds, lowest first"`
 	Highest      string        `json:"highest,omitempty" description:"the highest address in the range a node holds or that is excluded, which after_highest starts from"`
-	Reserved     []string      `json:"reserved" description:"addresses in the range never suggested: the subnet's network and broadcast addresses, and in a subnet larger than a /24, ones ending in .0 or .255"`
+	Reserved     []string      `json:"reserved" description:"addresses in the range never suggested: the subnet's network and broadcast addresses, the gateway DHCP hands its nodes, and in a subnet larger than a /24, ones ending in .0 or .255"`
 	Lowest       []NextAddress `json:"lowest" description:"the lowest free addresses in the range"`
 	AfterHighest []NextAddress `json:"after_highest" description:"the free addresses after the highest one in use"`
 	Pinged       bool          `json:"pinged"`
@@ -116,7 +116,7 @@ func parseRange(s string) (netip.Prefix, error) {
 	return r, nil
 }
 
-// NodeNextAddress suggests free addresses in a range: the lowest ones no node holds, and the ones after the highest held, or only one of those lists when from names it. Each suggestion is pinged unless ping is false, and one that answers is still listed, marked, so the caller can see what it skipped
+// NodeNextAddress suggests free addresses in a range: the lowest ones no node holds, and the ones after the highest held, or only the list from names. An address that answers a ping is still listed, marked, so the caller can see what was skipped
 func (h *Handler) NodeNextAddress(c fuego.ContextNoBody) (*NextAddressResponse, error) {
 	cidr := c.QueryParam("cidr")
 	r, err := parseRange(cidr)
@@ -139,7 +139,10 @@ func (h *Handler) NodeNextAddress(c fuego.ContextNoBody) (*NextAddressResponse, 
 		most = maxNextCount
 	}
 	count, err := c.QueryParamIntErr("count")
-	if err != nil || count < 1 || count > most {
+	if err == nil && (count < 1 || count > most) {
+		err = fmt.Errorf("not from 1 to %d", most)
+	}
+	if err != nil {
 		return nil, badRequest(fmt.Errorf("bad count %q: %w", c.QueryParam("count"), err), fmt.Sprintf("count must be a number from 1 to %d, or to %d without pinging", maxNextCount, maxNextCountUnpinged))
 	}
 
@@ -152,7 +155,6 @@ func (h *Handler) NodeNextAddress(c fuego.ContextNoBody) (*NextAddressResponse, 
 	p := planRange(r, addressUses(hosts), parseExclude(c.QueryParam("exclude")))
 	res := p.response()
 
-	// a list not asked for stays empty, and isn't pinged
 	n := count
 	if doPing {
 		n += pingSpare
@@ -187,32 +189,85 @@ func (h *Handler) NodeNextAddress(c fuego.ContextNoBody) (*NextAddressResponse, 
 	return res, nil
 }
 
-// rangePlan is what a range holds: who uses each address, and the subnet its addresses belong to
 type rangePlan struct {
-	r        netip.Prefix
-	bits     int
-	used     map[netip.Addr]AddressUse
+	r    netip.Prefix
+	bits int
+	used map[netip.Addr]AddressUse
+	// excluded is the map planRange was given, so it can hold addresses outside the range, and a caller sharing it between ranges sees what each adds
 	excluded map[netip.Addr]bool
+	gateways gateways
 }
 
-func planRange(r netip.Prefix, uses []AddressUse, exclude []netip.Addr) rangePlan {
-	p := rangePlan{r: r, used: map[netip.Addr]AddressUse{}, excluded: map[netip.Addr]bool{}}
+func planRange(r netip.Prefix, uses []AddressUse, exclude map[netip.Addr]bool) rangePlan {
+	p := rangePlan{r: r, used: map[netip.Addr]AddressUse{}, excluded: exclude, gateways: configuredGateways()}
+	if p.excluded == nil {
+		p.excluded = map[netip.Addr]bool{}
+	}
 	for _, u := range uses {
 		if r.Contains(u.Addr) {
 			p.used[u.Addr] = u
-		}
-	}
-	for _, a := range exclude {
-		if r.Contains(a) {
-			p.excluded[a] = true
 		}
 	}
 	p.bits = subnetBits(r, uses)
 	return p
 }
 
-// subnetBits is the prefix length of the subnet a range lies in, taken from the nodes that know it. The nodes in the range know it best, so the most common prefix length among them counts first, as long as it holds the whole range. A range is often one rack's share of a larger subnet, like a /24 of a /18, so an empty one takes the most common among nodes nearby whose subnet holds it. Failing both it is the most common among the nodes in the range, as when the range spans several small subnets, and with no nodes at all the range is taken as the subnet
+// gateways is what decides the router DHCP hands a node, the same settings NetInterface.Gateway reads for a stored port
+type gateways struct {
+	// subnets are the dhcp.subnets entries, each a gateway address with its subnet's prefix length
+	subnets []netip.Prefix
+	// octet4 is dhcp.router_octet4, or -1 when it isn't set
+	octet4 int
+	static netip.Addr
+}
+
+func configuredGateways() gateways {
+	g := gateways{octet4: -1, static: config.DefaultGateway}
+	for _, s := range config.Subnets {
+		g.subnets = append(g.subnets, s.Gateway)
+	}
+	if viper.IsSet("dhcp.router_octet4") {
+		g.octet4 = viper.GetInt("dhcp.router_octet4")
+	}
+	return g
+}
+
+// has is true when a is a configured subnet's gateway, or the router a port with that address and prefix length would be handed. An address inside a configured subnet has no other router, as dhcp.router_octet4 and dhcp.gateway only apply outside them
+func (g gateways) has(a netip.Addr, bits int) bool {
+	configured := false
+	for _, s := range g.subnets {
+		if s.Addr() == a {
+			return true
+		}
+		configured = configured || s.Contains(a)
+	}
+	if configured {
+		return false
+	}
+	if g.octet4 >= 0 {
+		last := netipx.PrefixLastIP(netip.PrefixFrom(a, bits)).As4()
+		last[3] = uint8(g.octet4)
+		return netip.AddrFrom4(last) == a
+	}
+	return g.static == a
+}
+
+// configuredBits is the prefix length of the smallest dhcp.subnets entry that holds the whole range
+func configuredBits(r netip.Prefix) (int, bool) {
+	best := -1
+	for _, s := range config.Subnets {
+		if s.Gateway.Bits() <= r.Bits() && s.Gateway.Contains(r.Addr()) {
+			best = max(best, s.Gateway.Bits())
+		}
+	}
+	return best, best >= 0
+}
+
+// subnetBits is the prefix length of the subnet a range lies in: that of a dhcp.subnets entry holding the range, else the most common among the nodes in the range if it holds the whole range. An empty range, often one rack's /24 of a larger subnet, takes the most common among nearby nodes whose subnet holds it. Failing those it is the most common among the range's nodes, or the range itself when it has none
 func subnetBits(r netip.Prefix, uses []AddressUse) int {
+	if b, ok := configuredBits(r); ok {
+		return b
+	}
 	in := map[int]int{}
 	around := map[int]int{}
 	small := map[int]int{}
@@ -249,8 +304,11 @@ func mostCommon(counts map[int]int) (int, bool) {
 	return best, most > 0
 }
 
-// reserved is true for an address no port should be given: a subnet's network and broadcast address, and in a subnet larger than a /24 any address ending in .0 or .255, which are valid there but look like network and broadcast addresses to people and to some devices. A /31 or /32 has none
+// reserved is true for an address no port should be given: the subnet's gateway, its network and broadcast address, and in a subnet larger than a /24 any address ending in .0 or .255, which are valid there but look like network and broadcast addresses to some devices. A /31 or /32 has no network or broadcast address
 func (p rangePlan) reserved(a netip.Addr) bool {
+	if p.gateways.has(a, p.bits) {
+		return true
+	}
 	if p.bits > 30 {
 		return false
 	}
@@ -267,19 +325,20 @@ func (p rangePlan) free(a netip.Addr) bool {
 	return !used && !p.excluded[a] && !p.reserved(a)
 }
 
-// lowest is the first n free addresses in the range
 func (p rangePlan) lowest(n int) []netip.Addr {
 	return p.freeFrom(p.r.Addr(), n)
 }
 
-// highest is the highest address taken, by a node or by being excluded, or the zero Addr with none taken
+// highest is the highest address in the range taken, by a node or by being excluded, or the zero Addr with none taken
 func (p rangePlan) highest() netip.Addr {
 	var top netip.Addr
-	for a := range maps.Keys(p.used) {
+	for a := range p.used {
 		top = maxAddr(top, a)
 	}
-	for a := range maps.Keys(p.excluded) {
-		top = maxAddr(top, a)
+	for a := range p.excluded {
+		if p.r.Contains(a) {
+			top = maxAddr(top, a)
+		}
 	}
 	return top
 }
@@ -373,12 +432,12 @@ func union(a, b []netip.Addr) []netip.Addr {
 }
 
 // parseExclude reads a comma separated list of addresses, each with or without a prefix length, as the IP field of a port holds them. What doesn't parse is ignored
-func parseExclude(s string) []netip.Addr {
-	var out []netip.Addr
+func parseExclude(s string) map[netip.Addr]bool {
+	out := map[netip.Addr]bool{}
 	for _, f := range strings.Split(s, ",") {
 		addr, _, _ := strings.Cut(strings.TrimSpace(f), "/")
 		if a, err := netip.ParseAddr(addr); err == nil {
-			out = append(out, a)
+			out[a] = true
 		}
 	}
 	return out

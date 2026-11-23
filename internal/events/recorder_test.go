@@ -61,13 +61,11 @@ func TestTrackedEvent(t *testing.T) {
 	assert.Equal(t, 2, got.Counts.Pending)
 	assert.False(t, got.Nodes[0].UpdatedAt.IsZero(), "a node written without a time gets now")
 
-	// settling leaves it open while any node is not finished
+	// writing nodes settles the event, which stays open while any node is not finished
 	r.SetNodes(e, model.EventNode{Node: "n1", State: model.EventNodeSucceeded})
-	r.Settle(e)
 	assert.Equal(t, model.EventStateRunning, load(e).State)
 
 	r.SetNodes(e, model.EventNode{Node: "n2", State: model.EventNodeStalled})
-	r.Settle(e)
 	got = load(e)
 	assert.Equal(t, model.EventStateDone, got.State)
 	assert.Equal(t, model.SeverityWarning, got.Severity, "one node never finished")
@@ -76,69 +74,10 @@ func TestTrackedEvent(t *testing.T) {
 
 	// a node reporting after the event ended changes how it went, and not when it ended
 	r.SetNodes(e, model.EventNode{Node: "n2", State: model.EventNodeSucceeded})
-	r.Settle(e)
 	got = load(e)
 	assert.Equal(t, model.SeveritySuccess, got.Severity)
 	assert.Equal(t, model.EventStateDone, got.State)
 	assert.True(t, got.EndedAt.Equal(ended))
-}
-
-func TestTrackProvision(t *testing.T) {
-	r := newRecorder(t)
-	provisions := func() model.EventList {
-		t.Helper()
-		list, err := r.DB.Events(model.EventFilter{Kind: model.EventKindProvision, Nodes: true})
-		require.NoError(t, err)
-		return list
-	}
-	report := func(node string, state model.EventNodeState, stage string) {
-		TrackProvision(r.DB, model.EventNode{Node: node, State: state, Stage: stage})
-	}
-
-	// a report is only noted until the flush writes it
-	report("n1", model.EventNodeRunning, "pxe")
-	assert.Empty(t, provisions())
-
-	// the latest report from a node is the one written
-	report("n1", model.EventNodeRunning, "ipxe")
-	report("n2", model.EventNodeRunning, "pxe")
-	r.Flush()
-	list := provisions()
-	require.Len(t, list, 1)
-	assert.Equal(t, model.EventStateRunning, list[0].State)
-	assert.Equal(t, model.EventActorSystem, list[0].Actor)
-	assert.Equal(t, model.EventCounts{Total: 2, Running: 2}, list[0].Counts)
-	assert.Equal(t, "ipxe", list[0].Nodes[0].Stage)
-
-	// nodes reporting in a later flush join the same event, and it ends with the last of them
-	report("n1", model.EventNodeSucceeded, "completed")
-	report("n3", model.EventNodeRunning, "pxe")
-	r.Flush()
-	report("n2", model.EventNodeFailed, "failed")
-	report("n3", model.EventNodeSucceeded, "completed")
-	r.Flush()
-	list = provisions()
-	require.Len(t, list, 1)
-	first := list[0]
-	assert.Equal(t, model.EventStateDone, first.State)
-	assert.Equal(t, model.SeverityWarning, first.Severity)
-	assert.Equal(t, model.EventCounts{Total: 3, Succeeded: 2, Failed: 1}, first.Counts)
-
-	// a node starting again after that is a new provisioning, and one that finishes late finishes in the event it was in
-	report("n1", model.EventNodeRunning, "pxe")
-	report("n2", model.EventNodeSucceeded, "completed")
-	r.Flush()
-	list = provisions()
-	require.Len(t, list, 2)
-	assert.Equal(t, model.EventStateRunning, list[0].State)
-	assert.Equal(t, model.EventCounts{Total: 1, Running: 1}, list[0].Counts)
-	assert.Equal(t, first.ID, list[1].ID)
-	assert.Equal(t, model.SeveritySuccess, list[1].Severity, "the late node changes how the first went")
-	assert.Equal(t, model.EventCounts{Total: 3, Succeeded: 3}, list[1].Counts)
-
-	// with nothing noted a flush writes nothing
-	r.Flush()
-	assert.Len(t, provisions(), 2)
 }
 
 func TestTidy(t *testing.T) {

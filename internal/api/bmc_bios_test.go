@@ -67,7 +67,7 @@ func TestGeneratedClientDecodesBios(t *testing.T) {
 	if err := bios.Decode(jx.DecodeBytes(body)); err != nil {
 		t.Fatalf("decoding the attributes %s: %v", body, err)
 	}
-	if got := string(bios.Results.Value[0].Value.Data.Value.Attributes.Value["Port"]); got != "3" {
+	if got := string(bios.Results[0].Data.Value.Attributes.Value["Port"]); got != "3" {
 		t.Errorf("Port = %s", got)
 	}
 }

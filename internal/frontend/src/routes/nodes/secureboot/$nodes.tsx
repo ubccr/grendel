@@ -1,29 +1,30 @@
-import { getV1BmcSecureboot } from "@/client";
 import { NodeLink } from "@/components/nodes/node-link";
 import KeysPanel from "@/components/secureboot/keys-panel";
 import { look, type Tone } from "@/components/secureboot/state";
 import SecureBootToggle from "@/components/secureboot/toggle";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import AuthRedirect from "@/lib/auth";
 import { fold } from "@/lib/nodeset";
+import { secureBootOptions } from "@/lib/queries";
 import type { SecureBootResult } from "@/lib/secureboot";
 import { cn } from "@/lib/utils";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { ServerOff, type LucideIcon } from "lucide-react";
 
 export const Route = createFileRoute("/nodes/secureboot/$nodes")({
   staticData: { crumb: ["Secure boot", { param: "nodes" }] },
   component: RouteComponent,
-  beforeLoad: AuthRedirect,
-  // one request reads the state and the keys over a single login to each BMC
-  loader: ({ params: { nodes } }) => getV1BmcSecureboot({ query: { nodeset: nodes, keys: true } }),
+  // BMCs are only logged into once the page is opened, not when its link is hovered
+  preload: false,
+  loader: ({ context: { queryClient }, params: { nodes } }) =>
+    queryClient.ensureQueryData(secureBootOptions(nodes)),
 });
 
 type Group = { title: string; icon: LucideIcon; tone: Tone; nodes: string[]; reason?: string };
 
 const unreachable: Tone = { text: "text-red-600", border: "border-red-400/60" };
 
-// groups sorts the nodes by what secure boot does on them, so the ones that differ from the rest are listed apart rather than found by scanning a table. Nodes that could not be read are grouped by the reason, so each reason is shown
+// groups sorts the nodes by what secure boot does on them, so the ones that differ from the rest are listed apart. Nodes that could not be read are grouped by the reason
 function groups(results: SecureBootResult[]) {
   const out = new Map<string, Group>();
   const add = (key: string, node: string, group: Omit<Group, "nodes">) => {
@@ -52,11 +53,9 @@ function groups(results: SecureBootResult[]) {
 }
 
 function RouteComponent() {
-  const router = useRouter();
   const { nodes } = Route.useParams();
-  const { data } = Route.useLoaderData();
-  const results = data?.results ?? [];
-  const refresh = () => router.invalidate();
+  const { data } = useSuspenseQuery(secureBootOptions(nodes));
+  const results = data.results ?? [];
   const byState = groups(results);
   const total = results.length;
   // failures are split by reason, but count as one state
@@ -69,14 +68,14 @@ function RouteComponent() {
           <div className="space-y-1.5">
             <CardTitle>Secure boot</CardTitle>
             <CardDescription>
-              {states === 1 && byState.length === 1
+              {states === 1
                 ? `All ${total} nodes: ${byState[0].title.charAt(0).toLowerCase()}${byState[0].title.slice(1)}.`
                 : `The ${total} nodes are in ${states} different states.`}
             </CardDescription>
           </div>
           <div className="flex flex-wrap gap-2">
-            <SecureBootToggle nodes={nodes} enable={false} variant="secondary" onDone={refresh} />
-            <SecureBootToggle nodes={nodes} enable onDone={refresh} />
+            <SecureBootToggle nodes={nodes} enable={false} variant="secondary" />
+            <SecureBootToggle nodes={nodes} enable />
           </div>
         </CardHeader>
         <CardContent>
@@ -119,7 +118,7 @@ function RouteComponent() {
 
       <Card>
         <CardContent className="pt-6">
-          <KeysPanel nodes={nodes} results={results} onChanged={refresh} />
+          <KeysPanel nodes={nodes} results={results} />
         </CardContent>
       </Card>
     </div>

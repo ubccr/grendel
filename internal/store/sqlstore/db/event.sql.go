@@ -7,13 +7,14 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"strings"
 	"time"
+
+	"github.com/ubccr/grendel/pkg/model"
 )
 
 const eventFetch = `-- name: EventFetch :one
-select id, kind, "action", summary, subject, actor, state, severity, started_at, updated_at, ended_at, detail, counts from event where id = ?1
+select id, kind, "action", summary, subject, actor, state, severity, started_at, updated_at, ended_at, detail from event where id = ?1
 `
 
 func (q *Queries) EventFetch(ctx context.Context, db DBTX, id string) (Event, error) {
@@ -32,13 +33,12 @@ func (q *Queries) EventFetch(ctx context.Context, db DBTX, id string) (Event, er
 		&i.UpdatedAt,
 		&i.EndedAt,
 		&i.Detail,
-		&i.Counts,
 	)
 	return i, err
 }
 
 const eventList = `-- name: EventList :many
-select id, kind, "action", summary, subject, actor, state, severity, started_at, updated_at, ended_at, detail, counts from event
+select id, kind, "action", summary, subject, actor, state, severity, started_at, updated_at, ended_at, detail from event
 where (cast(?1 as text) = '' or state = cast(?1 as text))
   and (cast(?2 as text) = '' or kind = cast(?2 as text))
   and (cast(?3 as text) = '' or (started_at, id) < (select b.started_at, b.id from event b where b.id = cast(?3 as text)))
@@ -81,7 +81,6 @@ func (q *Queries) EventList(ctx context.Context, db DBTX, arg EventListParams) (
 			&i.UpdatedAt,
 			&i.EndedAt,
 			&i.Detail,
-			&i.Counts,
 		); err != nil {
 			return nil, err
 		}
@@ -104,10 +103,10 @@ group by event_id, state, stage
 `
 
 type EventNodeCountsRow struct {
-	EventID string `json:"event_id"`
-	State   string `json:"state"`
-	Stage   string `json:"stage"`
-	Nodes   int64  `json:"nodes"`
+	EventID string               `json:"event_id"`
+	State   model.EventNodeState `json:"state"`
+	Stage   string               `json:"stage"`
+	Nodes   int64                `json:"nodes"`
 }
 
 func (q *Queries) EventNodeCounts(ctx context.Context, db DBTX, ids []string) ([]EventNodeCountsRow, error) {
@@ -148,6 +147,41 @@ func (q *Queries) EventNodeCounts(ctx context.Context, db DBTX, ids []string) ([
 	return items, nil
 }
 
+const eventNodeLatest = `-- name: EventNodeLatest :one
+select e.id
+from event_node n
+join event e on e.id = n.event_id
+where e.kind = ?1 and n.node = ?2
+order by e.started_at desc, e.id desc
+limit 1
+`
+
+type EventNodeLatestParams struct {
+	Kind model.EventKind `json:"kind"`
+	Node string          `json:"node"`
+}
+
+func (q *Queries) EventNodeLatest(ctx context.Context, db DBTX, arg EventNodeLatestParams) (string, error) {
+	row := db.QueryRowContext(ctx, eventNodeLatest, arg.Kind, arg.Node)
+	var id string
+	err := row.Scan(&id)
+	return id, err
+}
+
+const eventNodeOpen = `-- name: EventNodeOpen :one
+select exists (
+  select 1 from event_node
+  where event_id = ?1 and state in ('pending', 'running')
+)
+`
+
+func (q *Queries) EventNodeOpen(ctx context.Context, db DBTX, eventID string) (bool, error) {
+	row := db.QueryRowContext(ctx, eventNodeOpen, eventID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const eventNodeUpsert = `-- name: EventNodeUpsert :exec
 insert into event_node (event_id, node, state, stage, message, ref, updated_at)
 values (?1, ?2, ?3, ?4, ?5, ?6, ?7)
@@ -161,13 +195,13 @@ do update set
 `
 
 type EventNodeUpsertParams struct {
-	EventID   string    `json:"event_id"`
-	Node      string    `json:"node"`
-	State     string    `json:"state"`
-	Stage     string    `json:"stage"`
-	Message   string    `json:"message"`
-	Ref       string    `json:"ref"`
-	UpdatedAt time.Time `json:"updated_at"`
+	EventID   string               `json:"event_id"`
+	Node      string               `json:"node"`
+	State     model.EventNodeState `json:"state"`
+	Stage     string               `json:"stage"`
+	Message   string               `json:"message"`
+	Ref       string               `json:"ref"`
+	UpdatedAt time.Time            `json:"updated_at"`
 }
 
 func (q *Queries) EventNodeUpsert(ctx context.Context, db DBTX, arg EventNodeUpsertParams) error {
@@ -263,59 +297,6 @@ func (q *Queries) EventNodesIn(ctx context.Context, db DBTX, ids []string) ([]Ev
 	return items, nil
 }
 
-const eventNodesLatest = `-- name: EventNodesLatest :many
-select n.node, e.id
-from event_node n
-join event e on e.id = n.event_id
-where e.kind = ?1 and n.node in (/*SLICE:nodes*/?)
-order by e.started_at desc, e.id desc
-`
-
-type EventNodesLatestParams struct {
-	Kind  string   `json:"kind"`
-	Nodes []string `json:"nodes"`
-}
-
-type EventNodesLatestRow struct {
-	Node string `json:"node"`
-	ID   string `json:"id"`
-}
-
-// the events of a kind each of the given nodes is in, newest first, for finding the one a node last joined
-func (q *Queries) EventNodesLatest(ctx context.Context, db DBTX, arg EventNodesLatestParams) ([]EventNodesLatestRow, error) {
-	query := eventNodesLatest
-	var queryParams []interface{}
-	queryParams = append(queryParams, arg.Kind)
-	if len(arg.Nodes) > 0 {
-		for _, v := range arg.Nodes {
-			queryParams = append(queryParams, v)
-		}
-		query = strings.Replace(query, "/*SLICE:nodes*/?", strings.Repeat(",?", len(arg.Nodes))[1:], 1)
-	} else {
-		query = strings.Replace(query, "/*SLICE:nodes*/?", "NULL", 1)
-	}
-	rows, err := db.QueryContext(ctx, query, queryParams...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []EventNodesLatestRow
-	for rows.Next() {
-		var i EventNodesLatestRow
-		if err := rows.Scan(&i.Node, &i.ID); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const eventNodesStall = `-- name: EventNodesStall :execrows
 update event_node
 set state = 'stalled'
@@ -325,8 +306,8 @@ where event_node.state in ('pending', 'running')
 `
 
 type EventNodesStallParams struct {
-	Before time.Time `json:"before"`
-	Kind   string    `json:"kind"`
+	Before time.Time       `json:"before"`
+	Kind   model.EventKind `json:"kind"`
 }
 
 func (q *Queries) EventNodesStall(ctx context.Context, db DBTX, arg EventNodesStallParams) (int64, error) {
@@ -335,34 +316,6 @@ func (q *Queries) EventNodesStall(ctx context.Context, db DBTX, arg EventNodesSt
 		return 0, err
 	}
 	return result.RowsAffected()
-}
-
-const eventOpen = `-- name: EventOpen :one
-select id, kind, "action", summary, subject, actor, state, severity, started_at, updated_at, ended_at, detail, counts from event
-where kind = ?1 and state = 'running'
-order by started_at desc, id desc
-limit 1
-`
-
-func (q *Queries) EventOpen(ctx context.Context, db DBTX, kind string) (Event, error) {
-	row := db.QueryRowContext(ctx, eventOpen, kind)
-	var i Event
-	err := row.Scan(
-		&i.ID,
-		&i.Kind,
-		&i.Action,
-		&i.Summary,
-		&i.Subject,
-		&i.Actor,
-		&i.State,
-		&i.Severity,
-		&i.StartedAt,
-		&i.UpdatedAt,
-		&i.EndedAt,
-		&i.Detail,
-		&i.Counts,
-	)
-	return i, err
 }
 
 const eventPrune = `-- name: EventPrune :execrows
@@ -394,6 +347,30 @@ func (q *Queries) EventTouch(ctx context.Context, db DBTX, arg EventTouchParams)
 	return result.RowsAffected()
 }
 
+const eventTouchOpen = `-- name: EventTouchOpen :one
+update event set updated_at = ?1
+where id = (
+  select o.id from event o
+  where o.kind = ?2 and o.state = 'running'
+  order by o.started_at desc, o.id desc
+  limit 1
+)
+returning id
+`
+
+type EventTouchOpenParams struct {
+	UpdatedAt time.Time       `json:"updated_at"`
+	Kind      model.EventKind `json:"kind"`
+}
+
+// says the newest running event of a kind was updated, and returns its id
+func (q *Queries) EventTouchOpen(ctx context.Context, db DBTX, arg EventTouchOpenParams) (string, error) {
+	row := db.QueryRowContext(ctx, eventTouchOpen, arg.UpdatedAt, arg.Kind)
+	var id string
+	err := row.Scan(&id)
+	return id, err
+}
+
 const eventUpsert = `-- name: EventUpsert :exec
 /*
  * SPDX-FileCopyrightText: (C) 2019 Grendel Authors
@@ -401,8 +378,8 @@ const eventUpsert = `-- name: EventUpsert :exec
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-insert into event (id, kind, action, summary, subject, actor, state, severity, started_at, updated_at, ended_at, detail, counts)
-values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)
+insert into event (id, kind, action, summary, subject, actor, state, severity, started_at, updated_at, ended_at, detail)
+values (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)
 on conflict (id)
 do update set
   summary = excluded.summary,
@@ -411,24 +388,22 @@ do update set
   severity = excluded.severity,
   updated_at = excluded.updated_at,
   ended_at = excluded.ended_at,
-  detail = excluded.detail,
-  counts = excluded.counts
+  detail = excluded.detail
 `
 
 type EventUpsertParams struct {
-	ID        string       `json:"id"`
-	Kind      string       `json:"kind"`
-	Action    string       `json:"action"`
-	Summary   string       `json:"summary"`
-	Subject   string       `json:"subject"`
-	Actor     string       `json:"actor"`
-	State     string       `json:"state"`
-	Severity  string       `json:"severity"`
-	StartedAt time.Time    `json:"started_at"`
-	UpdatedAt time.Time    `json:"updated_at"`
-	EndedAt   sql.NullTime `json:"ended_at"`
-	Detail    string       `json:"detail"`
-	Counts    string       `json:"counts"`
+	ID        string            `json:"id"`
+	Kind      model.EventKind   `json:"kind"`
+	Action    string            `json:"action"`
+	Summary   string            `json:"summary"`
+	Subject   string            `json:"subject"`
+	Actor     string            `json:"actor"`
+	State     model.EventState  `json:"state"`
+	Severity  model.Severity    `json:"severity"`
+	StartedAt time.Time         `json:"started_at"`
+	UpdatedAt time.Time         `json:"updated_at"`
+	EndedAt   *time.Time        `json:"ended_at"`
+	Detail    model.EventDetail `json:"detail"`
 }
 
 func (q *Queries) EventUpsert(ctx context.Context, db DBTX, arg EventUpsertParams) error {
@@ -445,7 +420,6 @@ func (q *Queries) EventUpsert(ctx context.Context, db DBTX, arg EventUpsertParam
 		arg.UpdatedAt,
 		arg.EndedAt,
 		arg.Detail,
-		arg.Counts,
 	)
 	return err
 }

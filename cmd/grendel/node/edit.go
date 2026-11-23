@@ -38,7 +38,7 @@ var (
 
 			var response *client.GenericResponse
 			err = util.EditLoop(originalText, func(editedText []byte) error {
-				var editedJson []client.NilNodeAddRequestNodeListItem
+				var editedJson []client.NodeAddRequestNodeListItem
 				err = json.Unmarshal(editedText, &editedJson)
 				if err != nil {
 					return err
@@ -47,25 +47,25 @@ var (
 				// Verify IDs
 				for _, originalNode := range originalNodes {
 					for _, editedNode := range editedJson {
-						if originalNode.Name.Value != editedNode.Value.Name.Value {
+						if originalNode.Name.Value != editedNode.Name.Value {
 							continue
 						}
 						// Compare node ID
-						if originalNode.ID.Value != editedNode.Value.ID.Value {
+						if originalNode.ID.Value != editedNode.ID.Value {
 							return errors.New("failed to save, id field cannot be modified")
 						}
 
 						// Compare interface IDs
 						for _, originalInterface := range originalNode.Interfaces {
 							found := false
-							for _, editedInterfaces := range editedNode.Value.Interfaces {
-								if originalInterface.Value.ID != editedInterfaces.Value.ID {
+							for _, editedInterfaces := range editedNode.Interfaces {
+								if originalInterface.ID != editedInterfaces.ID {
 									continue
 								}
 								found = true
 							}
 							// Only error if ID is BOTH not found and no interfaces were removed (allow iface delete)
-							if !found && (len(originalNode.Interfaces) == len(editedNode.Value.Interfaces)) {
+							if !found && (len(originalNode.Interfaces) == len(editedNode.Interfaces)) {
 								return errors.New("failed to save, interface id fields cannot be modified")
 							}
 						}
@@ -73,13 +73,13 @@ var (
 						// Compare bond IDs
 						for _, originalBond := range originalNode.Bonds {
 							found := false
-							for _, editedBonds := range editedNode.Value.Bonds {
-								if originalBond.Value.ID != editedBonds.Value.ID {
+							for _, editedBonds := range editedNode.Bonds {
+								if originalBond.ID != editedBonds.ID {
 									continue
 								}
 								found = true
 							}
-							if !found && (len(originalNode.Bonds) == len(editedNode.Value.Bonds)) {
+							if !found && (len(originalNode.Bonds) == len(editedNode.Bonds)) {
 								return errors.New("failed to save, bond id fields cannot be modified")
 							}
 						}

@@ -4,7 +4,6 @@ import LocationForm from "@/components/identity/location-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AuthRedirect from "@/lib/auth";
 import { expand, parseNodeSet } from "@/lib/nodeset";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
@@ -14,7 +13,6 @@ import { z } from "zod";
 export const Route = createFileRoute("/nodes/identity/$nodes")({
   staticData: { crumb: ["Identity", { param: "nodes" }] },
   component: RouteComponent,
-  beforeLoad: AuthRedirect,
   validateSearch: z.object({
     tab: z.enum(["location", "asset-tag"]).default("location").catch("location"),
   }),

@@ -9,10 +9,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
-import { Link, useRouter } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { ExternalLink } from "lucide-react";
-import { type MouseEvent, useState } from "react";
-import { toast } from "sonner";
+import { type MouseEvent } from "react";
 
 export type Detail = "status" | "image" | "arch" | "firmware" | "tags" | "bmc";
 
@@ -26,7 +25,6 @@ type Shared = {
   onSelect: (name: string, on: boolean, e: MouseEvent) => void;
 };
 
-// Rail is one upright of the rack: the U number stamped beside three cage-nut holes, as on a real rail
 function Rail({
   label,
   side,
@@ -59,25 +57,11 @@ function Rail({
   );
 }
 
-// ProvisionLed shows whether a node is set to provision and turns it on or off when pressed
 function ProvisionLed({ host }: { host: Host }) {
-  const router = useRouter();
-  const { mutateAsync } = useMutation(patchV1NodesProvisionMutation());
-  // busy lasts until the page has reloaded, so the light doesn't flash back to the old state between the change and the reload
-  const [busy, setBusy] = useState(false);
-  const on = !!host.provision;
-  const toggle = async () => {
-    setBusy(true);
-    try {
-      await mutateAsync({ query: { nodeset: host.name ?? "" }, body: { provision: !on } });
-      await router.invalidate();
-    } catch (e) {
-      const err = e as { title?: string; detail?: string };
-      toast.error(err.title ?? "Could not change provision", { description: err.detail });
-    } finally {
-      setBusy(false);
-    }
-  };
+  const { mutate, isPending: busy, variables } = useMutation(patchV1NodesProvisionMutation());
+  // what was asked for stands in while the change is stored and the nodes are read again, so the light doesn't flash back to the old state in between
+  const on = busy ? !!variables.body.provision : !!host.provision;
+  const toggle = () => mutate({ query: { nodeset: host.name ?? "" }, body: { provision: !on } });
   return (
     <button
       type="button"
@@ -103,7 +87,6 @@ function ProvisionLed({ host }: { host: Host }) {
   );
 }
 
-// StatusCard is a node's provision state badge. Hovering or focusing it shows a summary of its last provision, and clicking it opens the node's provision tab
 function StatusCard({
   status,
   node,
@@ -138,7 +121,6 @@ function StatusCard({
   );
 }
 
-// Faceplate is one node's front in the rack: selection, provision light and last provision on the left, the name in the middle like an asset label, and the chosen details on the right
 function Faceplate({
   host,
   rack,
@@ -230,7 +212,7 @@ function Faceplate({
   );
 }
 
-// TagList shows the first max tags and folds the rest into a +N chip, which opens every tag in a hover card when hovered or focused, so a node with many tags keeps to its row. When linked, each tag opens the node list filtered by it
+// TagList shows at most max chips: past that the last one is a +N chip, which opens every tag in a hover card. When linked, each tag opens the node list filtered by it
 export function TagList({
   tags,
   max,
@@ -292,7 +274,6 @@ export function TagList({
   );
 }
 
-// Ear is the mounting flange at either end of a chassis, with its thumbscrew
 function Ear() {
   return (
     <span
@@ -306,7 +287,6 @@ function Ear() {
 
 const row = "grid grid-cols-[2.75rem_1fr] sm:grid-cols-[3.25rem_1fr_3.25rem]";
 
-// RackElevation draws the rack from its top unit down, each node in the U its name gives, sleds sharing a U side by side
 export function RackElevation(props: Shared & { placement: Placement }) {
   const rows = rackRows(props.placement);
   return (
@@ -359,7 +339,6 @@ export function RackElevation(props: Shared & { placement: Placement }) {
   );
 }
 
-// UnplacedNodes lists the rack's nodes whose name doesn't say which U they are in, so they aren't lost from the view
 export function UnplacedNodes(props: Shared & { hosts: Host[] }) {
   if (props.hosts.length === 0) return null;
   return (

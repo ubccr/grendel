@@ -37,6 +37,7 @@ func TestNewUsesFirstInterface(t *testing.T) {
 		{name: "the flag does not move it to another interface", interfaces: []*model.NetInterface{first, {IP: second.IP, BMC: true}}},
 		{name: "the flag on the first interface changes nothing", interfaces: []*model.NetInterface{{IP: first.IP, BMC: true}, second}},
 		{name: "no interfaces is an error", wantErr: ErrNoInterfaces},
+		{name: "a first interface with no IP is an error, not a dial to this host", interfaces: []*model.NetInterface{{}, second}, wantErr: ErrNoInterfaces},
 	}
 
 	for _, tt := range tests {

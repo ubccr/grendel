@@ -9,7 +9,7 @@ import { Finder } from "./finder";
 
 export type Port = { bmc: boolean; others: string[] };
 
-// AddressInput is a port's IP field with a finder for a free address beside it. port gives whether this port is a BMC, which decides the ranges suggested first, and the addresses on the node's other ports, which count as taken though they aren't saved yet. It is read when the finder opens, as the ports' list doesn't render again when a port's fields change
+// port gives whether this port is a BMC, which decides the ranges suggested first, and the addresses on the node's other ports, which count as taken though they aren't saved yet. It is read when the finder opens, as the ports' list doesn't render again when a port's fields change
 export function AddressInput({
   value,
   onChange,

@@ -20,6 +20,7 @@ with replaced(old_method, old_path, new_method, new_path) as
   values
     ('GET', '/v1/bmc', 'GET', '/v1/bmc/status'),
     ('GET', '/v1/bmc', 'GET', '/v1/bmc/sel'),
+    ('GET', '/v1/bmc', 'GET', '/v1/bmc/firmware/updates'),
     ('POST', '/v1/bmc/power/os', 'POST', '/v1/bmc/power'),
     ('POST', '/v1/bmc/power/os', 'POST', '/v1/bmc/indicator'),
     ('POST', '/v1/bmc/power/bmc', 'POST', '/v1/bmc/power'),
@@ -37,30 +38,21 @@ join role_permission rp on rp.permission_id = old.id
 join permission new on (new.method, new.path) = (replaced.new_method, replaced.new_path)
 ;
 
--- the reads go to every built in role. The admin grant in the rbac migration selected every permission that existed at the time, so a permission added later has to name admin itself
+-- admin holds every permission. The other roles get only what the grants above carry over, so a permission taken away from one of them is not given back under its new path
 insert or ignore into role_permission(role_id, permission_id)
 select role.id, permission.id
 from role, permission
-where role.name in ('admin', 'user', 'read-only')
+where role.name = 'admin'
   and (permission.method, permission.path) in
   (
     ('GET', '/v1/bmc/status'),
     ('GET', '/v1/bmc/sel'),
-    ('GET', '/v1/bmc/firmware/updates')
-  )
-;
-
--- the writes stop short of read-only
-insert or ignore into role_permission(role_id, permission_id)
-select role.id, permission.id
-from role, permission
-where role.name in ('admin', 'user')
-  and (permission.method, permission.path) in
-  (
+    ('GET', '/v1/bmc/firmware/updates'),
     ('POST', '/v1/bmc/power'),
     ('POST', '/v1/bmc/indicator'),
     ('POST', '/v1/bmc/jobs/clear'),
-    ('POST', '/v1/bmc/sel/clear')
+    ('POST', '/v1/bmc/sel/clear'),
+    ('POST', '/v1/bmc/firmware/install')
   )
 ;
 

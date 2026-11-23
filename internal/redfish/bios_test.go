@@ -287,18 +287,3 @@ func TestBiosRegistryOnlyPublished(t *testing.T) {
 	assert.False(t, results[0].Data.Available)
 	assert.Empty(t, results[0].Data.Attributes)
 }
-
-func TestRegistryCacheEvictsOldest(t *testing.T) {
-	c := newRegistryCache(2)
-	c.put("a", nil)
-	c.put("b", nil)
-	c.get("a")
-	c.put("c", nil)
-
-	_, a := c.get("a")
-	_, b := c.get("b")
-	_, cc := c.get("c")
-	assert.True(t, a, "a was used most recently before c arrived")
-	assert.False(t, b)
-	assert.True(t, cc)
-}

@@ -23,7 +23,6 @@ export default function NodesImageAction({ nodes }: { nodes: string }) {
               { query: { nodeset: nodes }, body: { image: image } },
               {
                 onSuccess: (data) => toast.success(data?.title, { description: data?.detail }),
-                onError: (e) => toast.error(e.title, { description: e.detail }),
               },
             )
           }

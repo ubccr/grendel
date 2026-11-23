@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/empty";
 import { ServerOff, type LucideIcon } from "lucide-react";
 
-// ErrorPanel fills a page or tab that has nothing to show because loading it failed, with what was being loaded and the reason the server gave
 export function ErrorPanel({
   title,
   message,

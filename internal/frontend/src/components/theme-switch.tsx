@@ -3,7 +3,6 @@ import { Moon, Sun } from "lucide-react";
 import { DropdownMenuRadioGroup, DropdownMenuRadioItem } from "@/components/ui/dropdown-menu";
 import { Theme, useTheme } from "@/hooks/theme-provider";
 
-// ThemeIcon is a sun in light mode and a moon in dark, turning between them as the theme changes
 export function ThemeIcon() {
   return (
     <span className="relative inline-flex size-4">
@@ -13,7 +12,6 @@ export function ThemeIcon() {
   );
 }
 
-// ThemeRadioGroup picks the theme inside a dropdown menu
 export function ThemeRadioGroup() {
   const { theme, setTheme } = useTheme();
   return (

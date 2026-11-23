@@ -9,7 +9,6 @@ type Props = {
   footer: ReactNode;
 };
 
-// AuthCard sets the sign-in and sign-up forms on a card floating over the node field, under a blackletter wordmark in the standard text colour
 export function AuthCard({ title, description, children, footer }: Props) {
   return (
     <div className="flex flex-1 items-start justify-center px-2 py-6 sm:items-center sm:pt-10 sm:pb-[8vh]">

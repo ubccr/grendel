@@ -1,9 +1,9 @@
-// helpers for IPv4 addresses and ranges, as the address finder on a node's ports uses them
-
 // the largest range the API searches
 const MIN_RANGE_BITS = 16;
 
-// ipToInt reads a dotted IPv4 address, or gives undefined for anything else
+// rangeKey is where this browser remembers the range last used for each kind of port, since a rack's nodes usually go in the same ranges as the last one's
+export const rangeKey = (bmc: boolean) => `grendel.address-range.${bmc ? "bmc" : "port"}`;
+
 export function ipToInt(ip: string): number | undefined {
   const parts = ip.trim().split(".");
   if (parts.length !== 4 || parts.some((p) => !/^\d{1,3}$/.test(p) || +p > 255)) return undefined;
@@ -18,7 +18,7 @@ function network(n: number, bits: number) {
   return bits === 0 ? 0 : (n & (-1 << (32 - bits))) >>> 0;
 }
 
-// parseRange reads what someone types as a range into the CIDR the API takes. A range written out, like 10.17.25.0/24, is kept to its network; an address without a prefix, or the first three octets of one, stand for its /24. Anything else, or a range larger than a /16, gives undefined
+// parseRange keeps a range written out, like 10.17.25.0/24, to its network, and reads an address without a prefix, or its first three octets, as its /24. Anything else, or a range larger than a /16, gives undefined
 export function parseRange(text: string): string | undefined {
   const [addr, bits, ...rest] = text.trim().split("/");
   if (rest.length || !addr) return undefined;
@@ -30,7 +30,7 @@ export function parseRange(text: string): string | undefined {
   return `${intToIp(network(n, +bits))}/${+bits}`;
 }
 
-// rangeOf is the range a port's address suggests searching: its own subnet when that is from a /24 to a /30, and otherwise the /24 it sits in, as a rack's share of a larger subnet usually is. A /31 or /32 is a point to point link or a single host rather than a subnet to fill, so it too gives its /24
+// rangeOf suggests a port's own subnet when that is from a /24 to a /30, and otherwise the /24 it sits in. A /31 or /32 is a point to point link or a single host rather than a subnet to fill, so it too gives its /24
 export function rangeOf(ip?: string): string | undefined {
   const [addr, bits] = (ip ?? "").split("/");
   const n = ipToInt(addr ?? "");
@@ -51,7 +51,6 @@ export function stepRange(range: string, dir: 1 | -1): string | undefined {
   return `${intToIp(next)}/${b}`;
 }
 
-// stripPrefix gives the address of a port's IP without its prefix length
 export function stripPrefix(ip?: string) {
   return (ip ?? "").split("/")[0]?.trim() ?? "";
 }
@@ -67,7 +66,6 @@ export function blockOf(range: string, focus?: string): { start: number; size: n
   return { start: network(inRange ? f : n, 24), size: 256 };
 }
 
-// lastOctet names an address by its last octet, as .214, for saying which address in a /24 is meant
 export function lastOctet(ip: string) {
   return `.${ip.split(".")[3] ?? ""}`;
 }

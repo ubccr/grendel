@@ -33,6 +33,7 @@ func TestParseAssetCSV(t *testing.T) {
 			want: map[string]string{"ABC123": "UB-1"}},
 		{name: "conflicting duplicate", csv: "serial,tag\nABC123,UB-1\nABC123,UB-2\n", err: "listed twice, with asset tags"},
 		{name: "duplicate", csv: "ABC123,UB-1\nABC123,UB-1\n", err: "line 2: serial ABC123 is listed twice"},
+		{name: "duplicate after blank lines names its line in the file", csv: "serial,tag\n\n\nABC123,UB-1\nABC123,UB-1\n", err: "line 5: serial ABC123 is listed twice"},
 		{name: "header names one column", csv: "serial,inventory\nABC123,UB-1\n", err: "--tag-column"},
 		{name: "named column missing", csv: "a,b\nABC123,UB-1\n", serialCol: "st", tagCol: "inv", err: "has no"},
 		{name: "short row", csv: "serial,tag\nABC123\n", err: "line 2 has 1 column"},
@@ -54,8 +55,8 @@ func TestParseAssetCSV(t *testing.T) {
 
 func TestFormatLocation(t *testing.T) {
 	unit := client.NewOptNilInt(4)
-	assert.Equal(t, "f01 U4 (VTC/Suite 3)", formatLocation("VTC", "Suite 3", "", "f01", unit))
-	assert.Equal(t, "f01 U4 row A", formatLocation("", "", "A", "f01", unit))
-	assert.Equal(t, "VTC", formatLocation("VTC", "", "", "", client.OptNilInt{}))
-	assert.Equal(t, "", formatLocation("", "", "", "", client.OptNilInt{}))
+	assert.Equal(t, "f01 U4 (VTC/Suite 3)", formatLocation(location{Datacenter: "VTC", Room: "Suite 3", Rack: "f01", RackUnit: unit}))
+	assert.Equal(t, "f01 U4 row A", formatLocation(location{Row: "A", Rack: "f01", RackUnit: unit}))
+	assert.Equal(t, "VTC", formatLocation(location{Datacenter: "VTC"}))
+	assert.Equal(t, "", formatLocation(location{}))
 }

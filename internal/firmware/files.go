@@ -37,7 +37,6 @@ const (
 	VersionOutdated
 )
 
-// Set is the build served for each firmware type
 type Set map[Build]File
 
 // IsEFI reports whether a build is a UEFI binary, the only kind secure boot checks and so the only kind the firmware directory holds
@@ -76,7 +75,7 @@ func Embedded() Set {
 	return set
 }
 
-// Load starts from the embedded builds and replaces each EFI build found in dir under its build name, such as snponly-x86_64.efi. A build missing from dir keeps the embedded copy, so dir only needs the builds that were signed. BIOS builds are always the embedded ones, see Ignored. An empty dir is the embedded set. A file that is there but is not an EFI binary is an error rather than something to find out about when a node fails to boot
+// Load replaces each embedded EFI build with the file of the same build name in dir, such as snponly-x86_64.efi, and keeps the embedded copy of any build missing there. A file there that is not an EFI binary is an error, so it is found at start rather than when a node fails to boot
 func Load(dir string) (Set, error) {
 	set := Embedded()
 	if dir == "" {
@@ -189,7 +188,7 @@ func Signed(data []byte) (bool, error) {
 	return s.dir.Size > 0, nil
 }
 
-// imageDigest hashes a PE with what signing changes left out: the checksum, the certificate table entry, the signatures appended at the end, and the zero padding a signer adds before them. A signed copy and the build it was signed from hash the same, the way Authenticode itself ignores those parts. A file that is not a PE hashes whole
+// imageDigest hashes a PE without what signing changes: the checksum, the certificate table entry, the appended signatures and the zero padding before them. A signed copy and the build it was signed from hash the same, and a file that is not a PE hashes whole
 func imageDigest(data []byte) [32]byte {
 	s, err := readSecurity(data)
 	if err != nil || s.offset+8 > len(data) || s.sum+4 > len(data) {

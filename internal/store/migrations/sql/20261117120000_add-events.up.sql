@@ -2,7 +2,7 @@
 --
 -- SPDX-License-Identifier: GPL-3.0-or-later
 
--- an event is something that was done to grendel or its nodes. Most are over when they are written. A tracked event, such as a provisioning or a firmware update, is written while it is still running and updated as its nodes report in
+-- most events are over when they are written. A tracked one, such as a provisioning or a firmware update, is written while it is still running and updated as its nodes report in
 create table event (
   id          text      primary key,
   kind        text      not null,
@@ -20,7 +20,6 @@ create table event (
   counts      text      not null default '{}'
 );
 
--- events are listed newest first
 create index event_started on event(started_at desc, id desc);
 create index event_state on event(state);
 

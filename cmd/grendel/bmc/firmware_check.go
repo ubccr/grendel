@@ -5,8 +5,6 @@
 package bmc
 
 import (
-	"strings"
-
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd/grendel/apiclient"
 	"github.com/ubccr/grendel/cmd/shared"
@@ -14,8 +12,7 @@ import (
 )
 
 var (
-	firmwareCheckFilter  []string
-	firmwareCheckOptions *shared.TableOptions
+	firmwareCheckTable   *shared.TableFlags
 	firmwareCheckColumns = []shared.Column{
 		{Name: "Node"},
 		{Name: "State"},
@@ -31,54 +28,44 @@ var (
 		Long:  "Check for updates on Dell servers. Lists what the iDRAC found in its last catalog comparison, which bmc firmware upgrade runs without --apply-update",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			nodeset, all := selector(args[0])
-			params := client.GETV1BmcFirmwareUpdatesParams{
-				Nodeset: nodeset,
-				All:     all,
-				Tags:    client.NewOptString(strings.Join(tags, ",")),
-			}
+			params := client.GETV1BmcFirmwareUpdatesParams(selected(args[0]))
 
 			res, err := apiclient.API.GETV1BmcFirmwareUpdates(command.Context(), params)
 			if err != nil {
 				return apiclient.NewApiError(err)
 			}
 
-			t := shared.NewTable(firmwareCheckColumns, firmwareCheckFilter).Options(*firmwareCheckOptions).Empty("-")
-			for _, r := range res.Results.Value {
-				result := r.Value
-				state := colorState(result.Success.Value)
+			t := firmwareCheckTable.Table()
+			for _, result := range res.Results {
+				state := colorState(result.Success)
 
 				updates := result.Data.Value.Updates.Value
 				if len(updates) == 0 {
-					t.AppendRow(result.Node.Value, state, result.Message.Value, "", "", "", "")
+					t.AppendRow(result.Node, state, result.Message, "", "", "", "")
 					continue
 				}
 
-				for _, u := range updates {
-					update := u.Value
+				for _, update := range updates {
 					t.AppendRow(
-						result.Node.Value,
+						result.Node,
 						state,
-						result.Message.Value,
-						update.DisplayName.Value,
-						update.InstalledVersion.Value,
-						colorVersion(update.InstalledVersion.Value, update.PackageVersion.Value),
-						update.RebootType.Value,
+						result.Message,
+						update.DisplayName,
+						update.InstalledVersion,
+						colorVersion(update.InstalledVersion, update.PackageVersion),
+						update.RebootType,
 					)
 				}
 			}
 			t.Print()
 
-			s := res.Summary.Value
-			return summaryLine(s.Total.Value, s.Succeeded.Value, s.Failed.Value, s.FailedNodes.Value, s.DurationMs.Value)
+			return summaryLine(summary(res.Summary))
 		},
 	}
 )
 
 func init() {
-	firmwareCheckOptions = shared.RegisterTableFlags(firmwareCheckCmd)
-	firmwareCheckCmd.Flags().StringSliceVar(&firmwareCheckFilter, "filter", nil, "filter table columns by name")
-	firmwareCheckCmd.RegisterFlagCompletionFunc("filter", shared.ColumnCompletion(firmwareCheckColumns))
+	firmwareCheckTable = shared.RegisterTableFlags(firmwareCheckCmd, firmwareCheckColumns)
 
 	firmwareCmd.AddCommand(firmwareCheckCmd)
 }

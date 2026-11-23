@@ -1,4 +1,5 @@
-import { getV1NodesFind, getV1SwitchNodesetLldp, type Lldp } from "@/client";
+import { type Lldp } from "@/client";
+import { getV1NodesFindOptions } from "@/client/@tanstack/react-query.gen";
 import { NodeLink } from "@/components/nodes/node-link";
 import type { DataTableColumnDef } from "@/components/data-table/features";
 import { DataTableColumnHeader } from "@/components/data-table/header";
@@ -14,13 +15,13 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
+import { lldpOptions, nodeOptions } from "@/lib/queries";
 import { neighborKind, shortName, switchNos } from "@/lib/switch-ports";
-import { createFileRoute, useLoaderData } from "@tanstack/react-router";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { Unplug } from "lucide-react";
 import { useMemo } from "react";
 import { z } from "zod";
-
-type Problem = { type?: string; title?: string; detail?: string };
 
 export const Route = createFileRoute("/nodes/$node/lldp")({
   staticData: { crumb: "LLDP" },
@@ -28,30 +29,26 @@ export const Route = createFileRoute("/nodes/$node/lldp")({
   pendingComponent: Pending,
   // port_name is also the table's Port filter, so picking a cage filters the table to it and clearing the filter lets the cage go
   validateSearch: z.object({ port_name: z.string().optional() }),
-  loader: async ({ params: { node } }) => {
-    let rows: Lldp[];
-    try {
-      rows = (await getV1SwitchNodesetLldp({ path: { nodeset: node } })).data ?? [];
-    } catch (e) {
-      return { rows: [], nodes: [], problem: e as Problem };
-    }
-    return { rows, nodes: await knownNodes(rows), problem: undefined };
+  // the switch is only asked once the tab is opened, not when its link is hovered
+  preload: false,
+  // waited on so the tab opens with the table, but a switch that can't be reached is a problem the tab explains, not a failed page
+  loader: async ({ context: { queryClient }, params: { node } }) => {
+    await queryClient.prefetchQuery(lldpOptions(node));
+    const neighbors = neighborNodeset(queryClient.getQueryData(lldpOptions(node).queryKey) ?? []);
+    if (neighbors) await queryClient.prefetchQuery(knownNodesOptions(neighbors));
   },
 });
 
-// knownNodes is which neighbors are nodes in Grendel. Names a nodeset can't hold are left out, and a failed lookup only costs the links, not the page
-async function knownNodes(rows: Lldp[]) {
-  const names = [...new Set(rows.map((r) => shortName(r.system_name)))].filter((n) =>
-    /^[A-Za-z0-9_-]+$/.test(n),
-  );
-  if (names.length === 0) return [];
-  try {
-    const res = await getV1NodesFind({ query: { nodeset: names.join(",") } });
-    return (res.data ?? []).map((h) => h.name ?? "");
-  } catch {
-    return [];
-  }
+// neighborNodeset is the neighbors' names as a nodeset to look up in Grendel. Names a nodeset can't hold are left out
+function neighborNodeset(rows: Lldp[]) {
+  return [...new Set(rows.map((r) => shortName(r.system_name)))]
+    .filter((n) => /^[A-Za-z0-9_-]+$/.test(n))
+    .join(",");
 }
+
+const knownNodesOptions = (nodeset: string) => getV1NodesFindOptions({ query: { nodeset } });
+
+const noRows: Lldp[] = [];
 
 function Pending() {
   return (
@@ -63,12 +60,17 @@ function Pending() {
 }
 
 function RouteComponent() {
-  const { rows, nodes, problem } = Route.useLoaderData();
-  const { data: hosts } = useLoaderData({ from: "/nodes/$node" });
-  const host = hosts?.[0];
-  const known = useMemo(() => new Set(nodes), [nodes]);
+  const { node } = Route.useParams();
+  const { data: rows = noRows, error: problem, isPending } = useQuery(lldpOptions(node));
+  const { data: hosts } = useSuspenseQuery(nodeOptions(node));
+  const host = hosts[0];
+  const neighbors = neighborNodeset(rows);
+  // which neighbors are nodes in Grendel. A failed lookup only costs the links, not the page
+  const { data: found } = useQuery({ ...knownNodesOptions(neighbors), enabled: !!neighbors });
+  const known = useMemo(() => new Set(found?.map((h) => h.name ?? "")), [found]);
   const kindOf = (row: Lldp) => neighborKind(row, known);
 
+  if (isPending) return <Pending />;
   if (problem)
     return (
       <SwitchProblem

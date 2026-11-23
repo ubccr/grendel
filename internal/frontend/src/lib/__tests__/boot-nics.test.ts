@@ -14,7 +14,14 @@ import {
 } from "../boot-nics";
 import { parseTemplate } from "../name-template";
 
-const nic = (id: string, mac: string, link = "LinkDown") => ({ id, mac, link });
+const nic = (id: string, mac: string, link = "LinkDown") => ({
+  id,
+  mac,
+  link,
+  name: id,
+  enabled: true,
+  speed_mbps: 0,
+});
 
 const r650 = (node: string, upSlot = true): NodeNics => ({
   node,
@@ -203,5 +210,19 @@ describe("boot NIC rules", () => {
       none,
     );
     expect(rows[0].status).toBe("invalid");
+  });
+
+  it("refuses every row while the FQDN template has a syntax error", () => {
+    const rows = bootRows(
+      [r760("n01")],
+      [],
+      { [layout(r760("n01").nics)]: { kind: "link" } },
+      {},
+      parseTemplate("{nme}.cluster"),
+      none,
+    );
+    expect(rows[0].status).toBe("invalid");
+    expect(rows[0].problem).toMatch(/isn't a field/);
+    expect(toBootImport(rows, defaultBootSettings)).toEqual([]);
   });
 });

@@ -7,7 +7,6 @@ package bmc
 import (
 	"fmt"
 	"strconv"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/ubccr/grendel/cmd/grendel/apiclient"
@@ -16,9 +15,8 @@ import (
 )
 
 var (
-	locationFilter  []string
 	locationDryRun  bool
-	locationOptions *shared.TableOptions
+	locationTable   *shared.TableFlags
 	locationFields  = map[string]*string{}
 	locationColumns = []shared.Column{
 		{Name: "Node"},
@@ -28,8 +26,7 @@ var (
 		{Name: "Message"},
 	}
 
-	locationListFilter  []string
-	locationListOptions *shared.TableOptions
+	locationListTable   *shared.TableFlags
 	locationListColumns = []shared.Column{
 		{Name: "Node"},
 		{Name: "Datacenter"},
@@ -50,38 +47,34 @@ var (
 		Use:     "list <nodeset | all>",
 		Aliases: []string{"ls"},
 		Short:   "List the rack location each BMC reports",
-		Example: `  grendel bmc location list cpn-f01-[01-40]
-  grendel bmc location list all --filter Datacenter,Room,Message`,
-		Args: cobra.ExactArgs(1),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
 			res, err := bmcStatus(command, args[0])
 			if err != nil {
 				return err
 			}
 
-			t := shared.NewTable(locationListColumns, locationListFilter).Options(*locationListOptions).Empty("-")
-			for _, r := range res.Results.Value {
-				result := r.Value
+			t := locationListTable.Table()
+			for _, result := range res.Results {
 				loc := result.Data.Value.Location.Value
 				ru := ""
-				if loc.RackUnit.Set && !loc.RackUnit.Null {
-					ru = strconv.Itoa(loc.RackUnit.Value)
+				if unit, ok := loc.RackUnit.Get(); ok {
+					ru = strconv.Itoa(unit)
 				}
 				t.AppendRow(
-					result.Node.Value,
-					loc.Datacenter.Value,
-					loc.Room.Value,
-					loc.Row.Value,
-					loc.Rack.Value,
+					result.Node,
+					loc.Datacenter,
+					loc.Room,
+					loc.Row,
+					loc.Rack,
 					ru,
-					colorState(result.Success.Value),
-					result.Message.Value,
+					colorState(result.Success),
+					result.Message,
 				)
 			}
 			t.Print()
 
-			s := res.Summary.Value
-			return summaryLine(s.Total.Value, s.Succeeded.Value, s.Failed.Value, s.FailedNodes.Value, s.DurationMs.Value)
+			return summaryLine(summary(res.Summary))
 		},
 	}
 
@@ -93,9 +86,6 @@ var (
 Templates see .Name, .Parts (the name split on -), .Tags (key=value tags by key), .TagList, and .Index and .Count (the node's 0-based position among the selected nodes, in natural name order, and how many there are), with the functions split, join, trimPrefix, trimSuffix, trimLeft, replace, upper, lower, default, atoi, add, printf and tag "key". --rack-unit must render to a whole number, so "04" is fine.
 
 On a Dell iDRAC this writes the ServerTopology attributes, and elsewhere the chassis Location.`,
-		Example: `  grendel bmc location set cpn-f01-[01-40] --rack '{{ index .Parts 1 }}' --rack-unit '{{ index .Parts 2 }}' --dry-run
-  grendel bmc location set all --room 'Suite 3' --datacenter VTC
-  grendel bmc location set all --tags gpu`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
 			req := &client.BmcLocationBody{DryRun: client.NewOptBool(locationDryRun)}
@@ -112,29 +102,22 @@ On a Dell iDRAC this writes the ServerTopology attributes, and elsewhere the cha
 			req.Rack = field("rack")
 			req.RackUnit = field("rack-unit")
 
-			nodeset, all := selector(args[0])
-			params := client.POSTV1BmcLocationParams{
-				Nodeset: nodeset,
-				All:     all,
-				Tags:    client.NewOptString(strings.Join(tags, ",")),
-			}
+			params := client.POSTV1BmcLocationParams(selected(args[0]))
 
 			res, err := apiclient.API.POSTV1BmcLocation(command.Context(), req, params)
 			if err != nil {
 				return apiclient.NewApiError(err)
 			}
 
-			t := shared.NewTable(locationColumns, locationFilter).Options(*locationOptions).Empty("-")
-			for _, r := range res.Results.Value {
-				result := r.Value
+			t := locationTable.Table()
+			for _, result := range res.Results {
 				d := result.Data.Value
-				cur, want := d.Current.Value, d.Desired.Value
 				t.AppendRow(
-					result.Node.Value,
-					formatLocation(cur.Datacenter.Value, cur.Room.Value, cur.Row.Value, cur.Rack.Value, cur.RackUnit),
-					changedCell(formatLocation(want.Datacenter.Value, want.Room.Value, want.Row.Value, want.Rack.Value, want.RackUnit), d.Changed.Value),
-					colorState(result.Success.Value),
-					result.Message.Value,
+					result.Node,
+					formatLocation(location(d.Current)),
+					changedCell(formatLocation(location(d.Desired)), d.Changed),
+					colorState(result.Success),
+					result.Message,
 				)
 			}
 			t.Print()
@@ -143,16 +126,14 @@ On a Dell iDRAC this writes the ServerTopology attributes, and elsewhere the cha
 				fmt.Println("\ndry run, nothing was written")
 			}
 
-			s := res.Summary.Value
-			return summaryLine(s.Total.Value, s.Succeeded.Value, s.Failed.Value, s.FailedNodes.Value, s.DurationMs.Value)
+			return summaryLine(summary(res.Summary))
 		},
 	}
 )
 
 func init() {
-	locationOptions = shared.RegisterTableFlags(locationSetCmd)
+	locationTable = shared.RegisterTableFlags(locationSetCmd, locationColumns)
 	flags := locationSetCmd.Flags()
-	flags.StringSliceVar(&locationFilter, "filter", nil, "filter table columns by name")
 	flags.BoolVar(&locationDryRun, "dry-run", false, "read the BMCs and show what would change, without writing")
 	for _, f := range []struct{ name, usage string }{
 		{"datacenter", "template for the data center or building"},
@@ -163,11 +144,8 @@ func init() {
 	} {
 		locationFields[f.name] = flags.String(f.name, "", f.usage)
 	}
-	locationSetCmd.RegisterFlagCompletionFunc("filter", shared.ColumnCompletion(locationColumns))
 
-	locationListOptions = shared.RegisterTableFlags(locationListCmd)
-	locationListCmd.Flags().StringSliceVar(&locationListFilter, "filter", nil, "filter table columns by name")
-	locationListCmd.RegisterFlagCompletionFunc("filter", shared.ColumnCompletion(locationListColumns))
+	locationListTable = shared.RegisterTableFlags(locationListCmd, locationListColumns)
 
 	locationCmd.AddCommand(locationListCmd, locationSetCmd)
 	bmcCmd.AddCommand(locationCmd)

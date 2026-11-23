@@ -1,5 +1,4 @@
 import {
-  formatAgo,
   groupFacts,
   imageCheck,
   formatDuration,
@@ -50,47 +49,71 @@ describe("isFinished", () => {
 });
 
 describe("stepStates", () => {
+  const all = { pxe: "t1", ipxe: "t2", config: "t3", booting: "t4" };
+
   it("marks the steps before the current one done", () => {
-    expect(stepStates("config")).toEqual(["done", "done", "current", "pending", "pending"]);
-    expect(stepStates("pxe")).toEqual(["current", "pending", "pending", "pending", "pending"]);
-  });
-
-  it("finishes every step on completion, even one that skipped stages", () => {
-    expect(stepStates("completed")).toEqual(["done", "done", "done", "done", "done"]);
-  });
-
-  it("fails the last step", () => {
-    expect(stepStates("failed")).toEqual(["done", "done", "done", "done", "failed"]);
-  });
-  it("marks passed steps without a stage time as skipped", () => {
-    const stages = { pxe: "t1", ipxe: "t2", completed: "t3" };
-    expect(stepStates("completed", stages)).toEqual(["done", "done", "skipped", "skipped", "done"]);
-    expect(stepStates("booting", { pxe: "t1", ipxe: "t2", booting: "t3" })).toEqual([
+    expect(stepStates({ state: "config", stages: all })).toEqual([
       "done",
       "done",
-      "skipped",
       "current",
+      "pending",
+      "pending",
+    ]);
+    expect(stepStates({ state: "pxe", stages: { pxe: "t1" } })).toEqual([
+      "current",
+      "pending",
+      "pending",
+      "pending",
       "pending",
     ]);
   });
-  it("keeps passed steps as done when no stage times were recorded", () => {
-    expect(stepStates("completed", {})).toEqual(["done", "done", "done", "done", "done"]);
-  });
-});
 
-describe("formatAgo", () => {
-  const now = Date.parse("2026-11-11T10:00:00Z");
-  it("picks the largest whole unit", () => {
-    expect(formatAgo("2026-11-11T09:59:56Z", now)).toBe("4s ago");
-    expect(formatAgo("2026-11-11T09:57:00Z", now)).toBe("3m ago");
-    expect(formatAgo("2026-11-11T07:00:00Z", now)).toBe("3h ago");
-    expect(formatAgo("2026-11-09T10:00:00Z", now)).toBe("2d ago");
+  it("finishes every step on completion", () => {
+    expect(stepStates({ state: "completed", stages: { ...all, completed: "t5" } })).toEqual([
+      "done",
+      "done",
+      "done",
+      "done",
+      "done",
+    ]);
   });
-  it("never shows a future time", () => {
-    expect(formatAgo("2026-11-11T10:00:05Z", now)).toBe("just now");
+
+  it("fails the last step", () => {
+    expect(stepStates({ state: "failed", stages: { ...all, failed: "t5" } })).toEqual([
+      "done",
+      "done",
+      "done",
+      "done",
+      "failed",
+    ]);
   });
-  it("is empty without a time", () => {
-    expect(formatAgo(undefined, now)).toBe("");
+
+  it("marks passed steps without a stage time as skipped", () => {
+    const stages = { pxe: "t1", ipxe: "t2", completed: "t3" };
+    expect(stepStates({ state: "completed", stages })).toEqual([
+      "done",
+      "done",
+      "skipped",
+      "skipped",
+      "done",
+    ]);
+    expect(
+      stepStates({ state: "booting", stages: { pxe: "t1", ipxe: "t2", booting: "t3" } }),
+    ).toEqual(["done", "done", "skipped", "current", "pending"]);
+  });
+
+  it("skips every step for a node the complete endpoint finished", () => {
+    expect(stepStates({ state: "completed", stages: { completed: "t1" } })).toEqual([
+      "skipped",
+      "skipped",
+      "skipped",
+      "skipped",
+      "done",
+    ]);
+  });
+
+  it("has nothing reached before a provision is recorded", () => {
+    expect(stepStates({})).toEqual(["pending", "pending", "pending", "pending", "pending"]);
   });
 });
 
@@ -115,9 +138,9 @@ describe("stepTimes", () => {
     expect(stepTimes(c)[4]).toBe("t6");
   });
 
-  it("falls back to the start and last update for statuses without stage times", () => {
-    const s = { state: "booting", started_at: "start", updated_at: "update" };
-    expect(stepTimes(s)).toEqual(["start", undefined, undefined, "update", undefined]);
+  it("has no finish time while the provision is going, even if an earlier one finished", () => {
+    const s = { state: "booting", stages: { booting: "t4", completed: "t0" } };
+    expect(stepTimes(s)[4]).toBeUndefined();
   });
 });
 

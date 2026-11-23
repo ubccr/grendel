@@ -1,7 +1,7 @@
 import { ErrorPanel } from "@/components/error-panel";
 import { KeyRound, Tag, Unplug } from "lucide-react";
 
-// SwitchProblem explains why a switch couldn't be read and what to do about it, from the stable code the API sends with the error: error_code on a scan, type on an HTTP error
+// The explanation is chosen by the stable code the API sends with the error: error_code on a scan, type on an HTTP error
 export function SwitchProblem({
   what,
   code,

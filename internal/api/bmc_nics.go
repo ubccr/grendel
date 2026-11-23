@@ -12,7 +12,6 @@ import (
 	"github.com/ubccr/grendel/pkg/model"
 )
 
-// BmcNICs lists the host network ports each node's BMC reports, for choosing which one boots
 func (h *Handler) BmcNICs(c fuego.ContextNoBody) (model.BmcResponse[model.BmcNICList], error) {
 	return runBmc(h, c, "bmc nics", nil,
 		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[model.BmcNICList] {

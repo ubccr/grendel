@@ -27,6 +27,7 @@ type Part =
 type Op = { kind: "+" | "-" | "*" | "/"; by: number };
 
 export type Template = {
+  source: string;
   parts: Part[];
   error?: TemplateError;
   uses: Set<string>;
@@ -43,14 +44,15 @@ export function parseTemplate(source: string): Template {
     const open = source.indexOf("{", i);
     const close = source.indexOf("}", i);
     if (close !== -1 && (open === -1 || close < open))
-      return { parts, uses, error: { message: "A } has no { before it.", at: close } };
+      return { source, parts, uses, error: { message: "A } has no { before it.", at: close } };
     if (open === -1) {
       parts.push({ text: source.slice(i) });
       break;
     }
     if (open > i) parts.push({ text: source.slice(i, open) });
     const end = source.indexOf("}", open);
-    if (end === -1) return { parts, uses, error: { message: "A { is never closed.", at: open } };
+    if (end === -1)
+      return { source, parts, uses, error: { message: "A { is never closed.", at: open } };
 
     const body = source.slice(open + 1, end).replace(/\s+/g, "");
     const swap = swapRe.exec(body);
@@ -67,6 +69,7 @@ export function parseTemplate(source: string): Template {
     const m = fieldRe.exec(body);
     if (!m)
       return {
+        source,
         parts,
         uses,
         error: {
@@ -77,18 +80,20 @@ export function parseTemplate(source: string): Template {
     const [, name, group, opKind, by, pad] = m;
     if (group && name !== "sw")
       return {
+        source,
         parts,
         uses,
         error: { message: `Only {sw} takes a .number, as in {sw.1}.`, at: open },
       };
     if (opKind && name !== "port" && name !== "n" && !group)
       return {
+        source,
         parts,
         uses,
         error: { message: `{${name}} is text, so it can't take arithmetic.`, at: open },
       };
     if (opKind === "/" && Number(by) === 0)
-      return { parts, uses, error: { message: "Can't divide by 0.", at: open } };
+      return { source, parts, uses, error: { message: "Can't divide by 0.", at: open } };
 
     const field = group ? "swn" : (name as "port" | "n" | "sw" | "name");
     uses.add(group ? `sw.${group}` : name);
@@ -101,7 +106,7 @@ export function parseTemplate(source: string): Template {
     });
     i = end + 1;
   }
-  return { parts, uses };
+  return { source, parts, uses };
 }
 
 function apply(v: number, op?: Op) {
@@ -161,12 +166,14 @@ export function renderTemplate(t: Template, vars: TemplateVars): { value: string
         text = String(apply(v, p.op));
       }
     }
+    // a minus sign would read as one more dash in a name like cpn--1
+    if (p.op && text.startsWith("-")) {
+      const field = p.field === "swn" ? `sw.${p.group}` : p.field;
+      return { value: out, error: `{${field}${p.op.kind}${p.op.by}} is below 0 here.` };
+    }
     // only the first match is swapped, and text without one is left as it is, so a node renamed by hand keeps its own name
     if (p.swap) text = text.replace(p.swap.from, p.swap.to);
-    if (p.pad && /^-?\d+$/.test(text)) {
-      const neg = text.startsWith("-");
-      text = (neg ? "-" : "") + text.replace("-", "").padStart(p.pad, "0");
-    }
+    if (p.pad && /^\d+$/.test(text)) text = text.padStart(p.pad, "0");
     out += text;
   }
   return { value: out };

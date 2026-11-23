@@ -61,27 +61,22 @@ type ResetSecureBootKeysRequest struct {
 	Type     schemas.ResetKeysType
 }
 
-// SecureBoot reads the UEFI secure boot state of every target, and their keys when asked
 func (s *Service) SecureBoot(ctx context.Context, targets []Target, req SecureBootRequest) []NodeResult[model.BmcSecureBoot] {
 	return run(ctx, s, targets, func(ctx context.Context, t Target) (*model.BmcSecureBoot, error) { return s.secureBootOne(ctx, t, req) })
 }
 
-// SetSecureBoot turns UEFI secure boot on or off on every target, from the next boot
 func (s *Service) SetSecureBoot(ctx context.Context, targets []Target, enable bool) []NodeResult[Ack] {
 	return run(ctx, s, targets, func(ctx context.Context, t Target) (*Ack, error) { return s.setSecureBootOne(ctx, t, enable) })
 }
 
-// AddSecureBootKey enrolls certificates or a signature in a secure boot database on every target
 func (s *Service) AddSecureBootKey(ctx context.Context, targets []Target, req AddSecureBootKeyRequest) []NodeResult[Ack] {
 	return run(ctx, s, targets, func(ctx context.Context, t Target) (*Ack, error) { return s.addSecureBootKeyOne(ctx, t, req) })
 }
 
-// DeleteSecureBootKey removes a certificate or signature from a secure boot database on every target
 func (s *Service) DeleteSecureBootKey(ctx context.Context, targets []Target, req DeleteSecureBootKeyRequest) []NodeResult[Ack] {
 	return run(ctx, s, targets, func(ctx context.Context, t Target) (*Ack, error) { return s.deleteSecureBootKeyOne(ctx, t, req) })
 }
 
-// ResetSecureBootKeys resets or empties the secure boot databases of every target
 func (s *Service) ResetSecureBootKeys(ctx context.Context, targets []Target, req ResetSecureBootKeysRequest) []NodeResult[Ack] {
 	return run(ctx, s, targets, func(ctx context.Context, t Target) (*Ack, error) { return s.resetSecureBootKeysOne(ctx, t, req) })
 }
@@ -172,15 +167,6 @@ func (b *secureBootConn) pendingEnable() (*bool, error) {
 		return nil, nil
 	}
 	return raw.SecureBootEnable, nil
-}
-
-func (b *secureBootConn) getJSON(uri string, out any) error {
-	res, err := b.client.Get(uri)
-	defer schemas.DeferredCleanupHTTPResponse(res)
-	if err != nil {
-		return err
-	}
-	return json.NewDecoder(res.Body).Decode(out)
 }
 
 // dbLink is one database as the collection lists it. Name is the last part of its uri, which the spec makes its Id and so its DatabaseId

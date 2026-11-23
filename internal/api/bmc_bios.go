@@ -19,13 +19,11 @@ import (
 	"github.com/ubccr/grendel/pkg/model"
 )
 
-// BmcSetBiosBody is the BIOS attribute changes staged on every node
 type BmcSetBiosBody struct {
 	Attributes map[string]any `json:"attributes" description:"Attribute names and their new values. A string value is converted to the number or boolean the attribute holds"`
 	ApplyTime  string         `json:"apply_time" description:"When the bmc applies the change. Immediate, OnReset, AtMaintenanceWindowStart or InMaintenanceWindowOnReset, limited to what each bmc accepts. Empty for the bmc's default" example:"OnReset"`
 }
 
-// BmcBios reads the BIOS attributes of node(s), with any staged changes
 func (h *Handler) BmcBios(c fuego.ContextNoBody) (model.BmcResponse[model.BmcBios], error) {
 	var names []string
 	if raw := c.QueryParam("names"); raw != "" {
@@ -44,11 +42,10 @@ func (h *Handler) BmcBios(c fuego.ContextNoBody) (model.BmcResponse[model.BmcBio
 	)
 }
 
-// BmcSetBios stages BIOS attribute changes on node(s)
 func (h *Handler) BmcSetBios(c fuego.ContextWithBody[BmcSetBiosBody]) (model.BmcResponse[model.BmcAck], error) {
 	body, err := c.Body()
 	if err != nil {
-		return model.BmcResponse[model.BmcAck]{}, badRequest(err, "failed to parse the bios request")
+		return model.BmcResponse[model.BmcAck]{}, err
 	}
 
 	names, err := biosChanges(body)
@@ -63,29 +60,28 @@ func (h *Handler) BmcSetBios(c fuego.ContextWithBody[BmcSetBiosBody]) (model.Bmc
 	}
 
 	req := redfish.SetBiosRequest{Attributes: body.Attributes, ApplyTime: body.ApplyTime}
-	return runAck(h, c, operation, func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
+	return runAck(h, c, "bmc.bios.set", operation, func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
 		return h.Redfish.SetBios(ctx, t, req)
 	})
 }
 
-// BmcDiscardBios drops the BIOS changes staged on node(s)
 func (h *Handler) BmcDiscardBios(c fuego.ContextNoBody) (model.BmcResponse[model.BmcAck], error) {
-	return runAck(h, c, "bmc bios discard", func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
+	return runAck(h, c, "bmc.bios.discard", "bmc bios discard", func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
 		return h.Redfish.DiscardPendingBios(ctx, t)
 	})
 }
 
-// BmcBiosRegistry describes the BIOS attributes of one node. It is a single node route because a registry runs to thousands of entries, and the nodes of one model share it
+// A single node route because a registry runs to thousands of entries, and the nodes of one model share it
 func (h *Handler) BmcBiosRegistry(c fuego.ContextNoBody) (model.BmcResponse[model.BmcBiosRegistry], error) {
-	targets, err := h.bmcTargets(c)
+	nodes, err := h.bmcNodes(c)
 	if err != nil {
 		return model.BmcResponse[model.BmcBiosRegistry]{}, err
 	}
-	if len(targets) != 1 {
-		return model.BmcResponse[model.BmcBiosRegistry]{}, badRequest(fmt.Errorf("%d nodes selected", len(targets)), "the bios registry is read from one node at a time")
+	if n := len(nodes.hosts) + len(nodes.noBMC); n != 1 {
+		return model.BmcResponse[model.BmcBiosRegistry]{}, badRequest(fmt.Errorf("%d nodes selected", n), "the bios registry is read from one node at a time")
 	}
 
-	return runBmc(h, c, "bmc bios registry", nil,
+	return runBmcOn(h, c, nodes, "bmc bios registry", nil,
 		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[model.BmcBiosRegistry] {
 			return h.Redfish.BiosRegistry(ctx, t)
 		},

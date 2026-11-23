@@ -17,8 +17,7 @@ import (
 )
 
 var (
-	biosDiffFilter  []string
-	biosDiffOptions *shared.TableOptions
+	biosDiffTable   *shared.TableFlags
 	biosDiffColumns = []shared.Column{
 		{Name: "Attribute"},
 		{Name: "Value"},
@@ -31,12 +30,8 @@ var (
 		Long:  "Show the BIOS attributes that differ between nodes, with the nodes holding each value. A staged change counts as the node's value. Nodes that could not be read are listed after the table and left out of the comparison",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			nodeset, all := selector(args[0])
-			params := client.GETV1BmcBiosParams{
-				Nodeset: nodeset,
-				All:     all,
-				Tags:    client.NewOptString(strings.Join(tags, ",")),
-			}
+			sel := selected(args[0])
+			params := client.GETV1BmcBiosParams{Nodeset: sel.Nodeset, Tags: sel.Tags, All: sel.All}
 			if len(args) > 1 {
 				params.Names = client.NewOptString(strings.Join(args[1:], ","))
 			}
@@ -47,9 +42,10 @@ var (
 			}
 
 			nodes := map[string]map[string]string{}
-			for _, r := range res.Results.Value {
-				result := r.Value
-				if !result.Success.Value {
+			var failed failures
+			for _, result := range res.Results {
+				if !result.Success {
+					failed.add(result.Node, result.Message)
 					continue
 				}
 				data := result.Data.Value
@@ -60,7 +56,7 @@ var (
 				for name, raw := range data.Pending.Value {
 					values[name] = rawValue(raw)
 				}
-				nodes[result.Node.Value] = values
+				nodes[result.Node] = values
 			}
 
 			diff := biosDiff(nodes, args[1:])
@@ -70,25 +66,23 @@ var (
 			}
 			sort.Strings(names)
 
-			t := shared.NewTable(biosDiffColumns, biosDiffFilter).Options(*biosDiffOptions).Empty("-")
+			t := biosDiffTable.Table()
 			for _, name := range names {
 				for _, g := range diff[name] {
 					t.AppendRow(name, g.Value, strconv.Itoa(len(g.Nodes)), fold(g.Nodes))
 				}
 			}
 			t.Print()
+			failed.print()
 
 			fmt.Printf("\n%d attribute(s) differ across %d node(s)\n", len(names), len(nodes))
-			s := res.Summary.Value
-			return summaryLine(s.Total.Value, s.Succeeded.Value, s.Failed.Value, s.FailedNodes.Value, s.DurationMs.Value)
+			return summaryLine(summary(res.Summary))
 		},
 	}
 )
 
 func init() {
-	biosDiffOptions = shared.RegisterTableFlags(biosDiffCmd)
-	biosDiffCmd.Flags().StringSliceVar(&biosDiffFilter, "filter", nil, "filter table columns by name")
-	biosDiffCmd.RegisterFlagCompletionFunc("filter", shared.ColumnCompletion(biosDiffColumns))
+	biosDiffTable = shared.RegisterTableFlags(biosDiffCmd, biosDiffColumns)
 
 	biosCmd.AddCommand(biosDiffCmd)
 }

@@ -315,16 +315,92 @@ func TestNodeImportCommitRefusesConflicts(t *testing.T) {
 	assert.Error(t, err, "nothing is stored when any row conflicts")
 }
 
+func TestNodeImportPingedDryRunBadRows(t *testing.T) {
+	h := newTestHandler(t)
+	fakePing(t)
+
+	res, err := runImport(t, h, NodeImportRequest{DryRun: true, Ping: true, Rows: []NodeImportRow{
+		{Node: "n1", MAC: "zz", IP: "10.9.0.7"},
+		{Node: "n2", MAC: "aa:aa:aa:00:00:02", IP: "10.9.0.300"},
+	}})
+	require.NoError(t, err)
+	assert.Equal(t, NodeImportSummary{Conflict: 2}, res.Summary)
+	assert.Contains(t, res.Rows[0].Reason, "is not a MAC address")
+	assert.Equal(t, "10.9.0.7", res.Rows[0].IP, "a row that conflicts keeps what was given")
+	assert.Contains(t, res.Rows[1].Reason, "is not an IPv4 address")
+}
+
+func TestPlanImportOverlappingRanges(t *testing.T) {
+	both := netip.MustParsePrefix("10.9.0.0/24")
+	rows := []NodeImportRow{
+		{Node: "n1", MAC: "aa:aa:aa:00:00:01", BMC: true},
+		{Node: "n1", MAC: "aa:aa:aa:00:00:02"},
+		{Node: "n2", MAC: "aa:aa:aa:00:00:03", BMC: true},
+	}
+	p := planImport(nil, rows, importOpts{bmc: both, boot: both})
+	assert.Equal(t, []string{"10.9.0.1/24", "10.9.0.2/24", "10.9.0.3/24"}, []string{p.rows[0].IP, p.rows[1].IP, p.rows[2].IP}, "ranges that overlap share what has been handed out")
+	assert.Zero(t, p.summary().Conflict)
+}
+
+func TestPlanWithPingOverlappingRanges(t *testing.T) {
+	asked := fakePing(t, "10.9.0.2")
+	both := netip.MustParsePrefix("10.9.0.0/24")
+	rows := []NodeImportRow{
+		{Node: "n1", MAC: "aa:aa:aa:00:00:01", BMC: true},
+		{Node: "n1", MAC: "aa:aa:aa:00:00:02"},
+	}
+	p, pinged, perr := planWithPing(context.Background(), nil, rows, importOpts{bmc: both, boot: both})
+	require.True(t, pinged, perr)
+	assert.Equal(t, "10.9.0.1/24", p.rows[0].IP)
+	assert.Equal(t, "10.9.0.3/24", p.rows[1].IP, "past the address the BMC row took and the one that answered")
+	assert.Contains(t, *asked, netip.MustParseAddr("10.9.0.3"))
+}
+
+func TestPlanImportAfterHighestAtTopOfRange(t *testing.T) {
+	hosts := model.HostList{{Name: "n0", Interfaces: []*model.NetInterface{port("aa:aa:aa:00:00:00", "10.9.0.254/24", true)}}}
+	o := importOpts{bmc: netip.MustParsePrefix("10.9.0.0/24"), afterHighest: true}
+	p := planImport(hosts, []NodeImportRow{{Node: "n1", MAC: "aa:aa:aa:00:00:01", BMC: true}}, o)
+	assert.Equal(t, ImportConflict, p.rows[0].Action)
+	assert.Equal(t, "no free address in 10.9.0.0/24 after 10.9.0.254, the highest in use", p.rows[0].Reason, "the range is not full, so it isn't called full")
+}
+
+func TestPlanImportSkipsTheGateway(t *testing.T) {
+	withSubnets(t, "10.9.0.1/24")
+	p := planImport(nil, []NodeImportRow{{Node: "n1", MAC: "aa:aa:aa:00:00:01", BMC: true}}, importOpts{bmc: netip.MustParsePrefix("10.9.0.0/24")})
+	assert.Equal(t, "10.9.0.2/24", p.rows[0].IP)
+}
+
+func TestPlanWithPingNeverAssignsUnpinged(t *testing.T) {
+	asked := map[netip.Addr]bool{}
+	old := pingAddrs
+	pingAddrs = func(_ context.Context, addrs []netip.Addr, _ int, _ time.Duration) (map[netip.Addr]bool, error) {
+		out := map[netip.Addr]bool{}
+		for _, a := range addrs {
+			asked[a], out[a] = true, true
+		}
+		return out, nil
+	}
+	t.Cleanup(func() { pingAddrs = old })
+
+	rows := []NodeImportRow{{Node: "n1", MAC: "aa:aa:aa:00:00:01", BMC: true}}
+	p, pinged, perr := planWithPing(context.Background(), nil, rows, importOpts{bmc: netip.MustParsePrefix("10.9.0.0/24")})
+	require.True(t, pinged, perr)
+	assert.NotEmpty(t, asked)
+	assert.Equal(t, ImportConflict, p.rows[0].Action, "an address that was not pinged is not handed out as pinged")
+	assert.False(t, p.rows[0].Assigned)
+	assert.Contains(t, p.rows[0].Reason, "answered a ping")
+}
+
 type fakeSwitch struct {
 	macs      model.MACTable
-	status    model.InterfaceTable
+	status    map[string]string
 	macErr    error
 	statusErr error
 }
 
 func (f fakeSwitch) GetMACTable(context.Context) (model.MACTable, error) { return f.macs, f.macErr }
 func (fakeSwitch) Close() error                                          { return nil }
-func (f fakeSwitch) GetInterfaceStatus(context.Context) (model.InterfaceTable, error) {
+func (f fakeSwitch) GetInterfaceDescriptions(context.Context) (map[string]string, error) {
 	return f.status, f.statusErr
 }
 func (fakeSwitch) GetLLDPNeighbors(context.Context) (model.LLDPNeighbors, error) { return nil, nil }
@@ -339,12 +415,7 @@ func TestScanSwitch(t *testing.T) {
 			{Ifname: "Ethernet4", VLAN: "3001", MAC: mac("b8:ca:3a:00:00:04")},
 			{Ifname: "Port-Channel1", VLAN: "1", MAC: mac("aa:aa:aa:00:00:01")},
 		},
-		status: model.InterfaceTable{
-			"Ethernet1":  {Name: "Ethernet1", LineProtocolStatus: "up"},
-			"Ethernet2":  {Name: "Ethernet2", LineProtocolStatus: "down", Description: "spare"},
-			"Ethernet10": {Name: "Ethernet10", LineProtocolStatus: "up"},
-			"Vlan3001":   {Name: "Vlan3001", LineProtocolStatus: "up"},
-		},
+		status: map[string]string{"Ethernet1": "", "Ethernet2": "spare", "Ethernet10": "", "Vlan3001": ""},
 	}
 	for i := range 10 {
 		fs.macs = append(fs.macs, &model.MACTableEntry{Ifname: "Ethernet49/1", VLAN: "1", MAC: net.HardwareAddr{0xaa, 0, 0, 0, 1, byte(i)}})

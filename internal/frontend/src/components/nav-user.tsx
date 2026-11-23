@@ -21,17 +21,18 @@ import {
 } from "@/components/ui/sidebar";
 import { useUser } from "@/hooks/user-provider";
 import { useMutation } from "@tanstack/react-query";
-import { Link, useRouter } from "@tanstack/react-router";
-import { ChevronsUpDown, LogIn, LogOut, UserRound } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { ChevronsUpDown, Info, LogIn, LogOut, UserRound } from "lucide-react";
 import { toast } from "sonner";
 import { ThemeIcon, ThemeRadioGroup } from "./theme-switch";
 
-// NavUser sits in the sidebar footer: the signed in user and their account menu, which holds the theme, or a way to sign in with the theme beside it
 export function NavUser() {
-  const { user, setUser } = useUser();
+  const { user, signOut: endSession } = useUser();
   const { isMobile } = useSidebar();
-  const router = useRouter();
-  const { mutate } = useMutation(deleteV1AuthSignoutMutation());
+  const { mutate } = useMutation({
+    ...deleteV1AuthSignoutMutation(),
+    meta: { changesNothing: true },
+  });
 
   if (!user) {
     return (
@@ -60,11 +61,9 @@ export function NavUser() {
       {},
       {
         onSuccess: (data) => {
-          setUser(null);
+          endSession();
           toast.success(data?.title, { description: data?.detail });
-          router.invalidate();
         },
-        onError: (e) => toast.error(e.title, { description: e.detail }),
       },
     );
 
@@ -118,6 +117,10 @@ export function NavUser() {
                   <ThemeRadioGroup />
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
+              <DropdownMenuItem render={<Link to="/about" />}>
+                <Info />
+                About Grendel
+              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={signOut}>

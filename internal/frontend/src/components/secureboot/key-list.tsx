@@ -4,7 +4,6 @@ import NodesetView from "@/components/nodeset-view";
 import { Button } from "@/components/ui/button";
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { toastBmcResponse } from "@/lib/bmc";
 import { fold } from "@/lib/nodeset";
 import { expiry, groupFingerprint, hashName, type Coverage } from "@/lib/secureboot";
 import { useMutation } from "@tanstack/react-query";
@@ -17,7 +16,6 @@ type Props = {
   rows: Coverage[];
   // reached is every node whose BMC answered, so a key can say which of them lack it
   reached: string[];
-  onChanged: () => void;
 };
 
 const expiryTone = {
@@ -27,8 +25,7 @@ const expiryTone = {
   unknown: "text-muted-foreground",
 };
 
-// KeyList is the keys of one database, with how many nodes hold each when there is more than one node
-export default function KeyList({ db, rows, reached, onChanged }: Props) {
+export default function KeyList({ db, rows, reached }: Props) {
   const many = reached.length > 1;
 
   if (rows.length === 0)
@@ -89,7 +86,7 @@ export default function KeyList({ db, rows, reached, onChanged }: Props) {
               )}
             </div>
 
-            <RemoveKey k={k} onDone={onChanged} />
+            <RemoveKey k={k} />
           </li>
         );
       })}
@@ -158,8 +155,11 @@ function Fingerprint({ value }: { value: string }) {
   );
 }
 
-function RemoveKey({ k, onDone }: { k: Coverage; onDone: () => void }) {
-  const { mutate, isPending } = useMutation(postV1BmcSecurebootKeysDeleteMutation());
+function RemoveKey({ k }: { k: Coverage }) {
+  const { mutate, isPending } = useMutation({
+    ...postV1BmcSecurebootKeysDeleteMutation(),
+    meta: { bmc: `Remove from ${k.db}` },
+  });
   const nodes = fold(k.nodes);
   const body = k.fingerprint
     ? { database: k.db, fingerprint: k.fingerprint }
@@ -178,18 +178,7 @@ function RemoveKey({ k, onDone }: { k: Coverage; onDone: () => void }) {
           Remove
         </Button>
       }
-      onConfirm={() =>
-        mutate(
-          { query: { nodeset: nodes }, body },
-          {
-            onSuccess: (data) => {
-              toastBmcResponse(`Remove from ${k.db}`, data);
-              onDone();
-            },
-            onError: (e) => toast.error(e.title, { description: e.detail }),
-          },
-        )
-      }
+      onConfirm={() => mutate({ query: { nodeset: nodes }, body })}
     >
       {removeWarning(k.db)} It will be removed from {k.db} on:
       <NodesetView nodes={nodes} />

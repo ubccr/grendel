@@ -2,7 +2,7 @@ export { cn } from "cn";
 
 export type Severity = "success" | "info" | "warning" | "error";
 
-// severityOf reads the severities grendel writes (an event's Success, Info, Warning or Error, a node's success or error under it) and the ones Redfish reports (OK, Warning, Critical) as one of four, so every badge, dot and rail colours them the same way. Anything else has none
+// severityOf reads the severities grendel writes (an event's Success, Info, Warning or Error, a node's success or error) and the ones Redfish reports (OK, Warning, Critical) as one of four. Anything else has none
 export function severityOf(value?: string): Severity | undefined {
   switch (value?.toLowerCase()) {
     case "success":
@@ -25,7 +25,6 @@ const severityVariants = {
   error: "destructive",
 } as const;
 
-// severityVariant picks the Badge variant for a severity
 export function severityVariant(value?: string) {
   const severity = severityOf(value);
   return severity ? severityVariants[severity] : "secondary";

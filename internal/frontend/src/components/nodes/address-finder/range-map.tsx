@@ -21,7 +21,7 @@ const legend: { cell: Cell; label: string }[] = [
   { cell: "chosen", label: "Chosen" },
 ];
 
-// RangeMap draws up to a /24 of the range as a grid, a row for each 32 addresses, so how full it is and where the gaps are shows at a glance. It is a picture of what the summary and the suggestions say, so it is hidden from screen readers in favour of them. others are the addresses on the node's other ports
+// RangeMap draws up to a /24 of the range, a row for each 32 addresses. It repeats what the summary and the suggestions say, so it is hidden from screen readers. others are the addresses on the node's other ports
 export function RangeMap({
   data,
   others,

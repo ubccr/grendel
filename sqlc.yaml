@@ -56,3 +56,28 @@ sql:
           - column: "user_view.enabled"
             go_type:
               type: "bool"
+          - column: "event.kind"
+            go_type:
+              import: "github.com/ubccr/grendel/pkg/model"
+              type: "EventKind"
+          - column: "event.state"
+            go_type:
+              import: "github.com/ubccr/grendel/pkg/model"
+              type: "EventState"
+          - column: "event.severity"
+            go_type:
+              import: "github.com/ubccr/grendel/pkg/model"
+              type: "Severity"
+          - column: "event.detail"
+            go_type:
+              import: "github.com/ubccr/grendel/pkg/model"
+              type: "EventDetail"
+          - column: "event.ended_at"
+            go_type:
+              import: "time"
+              type: "Time"
+              pointer: true
+          - column: "event_node.state"
+            go_type:
+              import: "github.com/ubccr/grendel/pkg/model"
+              type: "EventNodeState"

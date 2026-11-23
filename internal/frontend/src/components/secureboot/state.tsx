@@ -7,7 +7,6 @@ export type Status = NonNullable<
   NonNullable<BmcResponseModelBmcSecureBoot["results"]>[number]["data"]
 >;
 
-// modes say in plain words what each UEFI secure boot mode means for what the node will boot
 const modes: Record<string, string> = {
   SetupMode: "No platform key is enrolled, so the firmware checks nothing and accepts any new key.",
   UserMode: "A platform key is enrolled. Boot loaders and kernels are checked against db and dbx.",
@@ -73,11 +72,9 @@ export function look(s: Status): Look {
 type Props = {
   node: string;
   status: Status;
-  onChanged: () => void;
 };
 
-// SecureBootState is the headline of a node's secure boot tab, with the control that flips it
-export default function SecureBootState({ node, status, onChanged }: Props) {
+export default function SecureBootState({ node, status }: Props) {
   const l = look(status);
   const Icon = l.icon;
   const next = nextBoot(status);
@@ -107,12 +104,7 @@ export default function SecureBootState({ node, status, onChanged }: Props) {
         </div>
       </div>
       <div className="flex flex-wrap gap-2">
-        <SecureBootToggle
-          nodes={node}
-          enable={!next}
-          variant={next ? "secondary" : "default"}
-          onDone={onChanged}
-        />
+        <SecureBootToggle nodes={node} enable={!next} variant={next ? "secondary" : "default"} />
       </div>
     </div>
   );

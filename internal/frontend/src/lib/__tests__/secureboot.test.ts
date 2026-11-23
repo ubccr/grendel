@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  type SecureBootResult,
   coverage,
   derToPem,
   expiry,
@@ -53,23 +54,35 @@ describe("hashName", () => {
 });
 
 describe("coverage", () => {
-  const db = (certs: object[], sigs: object[] = []) => ({
-    keys: [
-      { id: "dbx", certificates: [], signatures: sigs },
-      { id: "db", certificates: certs, signatures: [] },
-    ],
-  });
+  // fixtures name only the fields a test is about
+  type Data = NonNullable<SecureBootResult["data"]>;
+  const db = (certs: object[], sigs: object[] = []) => {
+    const data: object = {
+      keys: [
+        { id: "dbx", certificates: [], signatures: sigs },
+        { id: "db", certificates: certs, signatures: [] },
+      ],
+    };
+    return data as Data;
+  };
+  const results = (r: object[]) => r as SecureBootResult[];
 
   it("groups a key by fingerprint across nodes whatever id each gives it", () => {
-    const rows = coverage([
-      { node: "a", success: true, data: db([{ id: "3", fingerprint: "ff", subject: "Grendel" }]) },
-      {
-        node: "b",
-        success: true,
-        data: db([{ id: "9", fingerprint: "ff", subject: "Grendel" }], [{ id: "1", hash: "AB" }]),
-      },
-      { node: "c", success: false, message: "unreachable" },
-    ]);
+    const rows = coverage(
+      results([
+        {
+          node: "a",
+          success: true,
+          data: db([{ id: "3", fingerprint: "ff", subject: "Grendel" }]),
+        },
+        {
+          node: "b",
+          success: true,
+          data: db([{ id: "9", fingerprint: "ff", subject: "Grendel" }], [{ id: "1", hash: "AB" }]),
+        },
+        { node: "c", success: false, message: "unreachable" },
+      ]),
+    );
     expect(rows.map((r) => [r.db, r.fingerprint, r.nodes])).toEqual([
       ["db", "ff", ["a", "b"]],
       ["dbx", "ab", ["b"]],
@@ -77,10 +90,12 @@ describe("coverage", () => {
   });
 
   it("keeps a key with no fingerprint to its own node", () => {
-    const rows = coverage([
-      { node: "a", success: true, data: db([{ id: "1" }]) },
-      { node: "b", success: true, data: db([{ id: "1" }]) },
-    ]);
+    const rows = coverage(
+      results([
+        { node: "a", success: true, data: db([{ id: "1" }]) },
+        { node: "b", success: true, data: db([{ id: "1" }]) },
+      ]),
+    );
     expect(rows.map((r) => r.nodes)).toEqual([["a"], ["b"]]);
   });
 

@@ -23,8 +23,7 @@ var (
 // the missing permissions via a migration file or add it to the ignored list if
 // it should not be restricted by a permission.
 //
-// Remember to also insert into role_permission for the applicable roles so
-// existing installs gain the permission.
+// Remember to also insert into role_permission for the user and read-only roles that should hold it, so existing installs gain the permission. The admin role needs no grant.
 func TestAccessControlRoutes(t *testing.T) {
 	db, err := sqlstore.New(":memory:")
 	if err != nil {

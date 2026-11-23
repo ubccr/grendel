@@ -54,7 +54,6 @@ type frontend struct {
 	files sync.Map // name -> *frontendFile
 }
 
-// frontendFile is one embedded file with its validator and, when worth it, its gzipped body
 type frontendFile struct {
 	data   []byte
 	ctype  string

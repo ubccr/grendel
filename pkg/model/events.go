@@ -4,7 +4,12 @@
 
 package model
 
-import "time"
+import (
+	"database/sql/driver"
+	"encoding/json"
+	"fmt"
+	"time"
+)
 
 type Severity string
 
@@ -41,7 +46,6 @@ const (
 	EventStateDone    EventState = "done"
 )
 
-// EventNodeState is how an event is going on one node
 type EventNodeState string
 
 const (
@@ -62,14 +66,12 @@ func (s EventNodeState) Finished() bool {
 // EventActorSystem is the actor of an event nobody asked for, such as a node network booting
 const EventActorSystem = "system"
 
-// Event is something that was done to grendel or its nodes. Most are done when they are written. A tracked event is written while it is running and updated as its nodes report in, then closed
-//
-// Event is only ever a response, so validate:"required" marks the fields always sent as required in the OpenAPI schema, which keeps them from being optional in the generated clients, and never validates anything
+// Event is something that was done to grendel or its nodes. Most are done when they are written; a tracked event is written while it is running and updated as its nodes report in. It is only ever a response, so validate:"required" validates nothing and only keeps the fields always sent from being optional in the generated clients
 type Event struct {
 	// ID is unique and sorts by the second the event started. Events are ordered by StartedAt, with the ID breaking ties
 	ID   string    `json:"id" validate:"required"`
 	Kind EventKind `json:"kind" validate:"required" enum:"audit,bmc,provision,firmware"`
-	// Action names what was done for a program to read, such as node.save or bmc.power.cycle
+	// Action names what was done for a program to read, such as node.save or bmc.power
 	Action string `json:"action" validate:"required"`
 	// Summary says what was done for a person to read, without how it went, which the counts say
 	Summary string `json:"summary" validate:"required"`
@@ -83,7 +85,7 @@ type Event struct {
 	UpdatedAt time.Time  `json:"updated_at" validate:"required"`
 	EndedAt   *time.Time `json:"ended_at,omitempty"`
 	// Detail is what only this kind of event has, such as a bmc action's run id
-	Detail map[string]string `json:"detail,omitempty"`
+	Detail EventDetail `json:"detail,omitempty"`
 	// Counts are the event's nodes by how it is going on them. An event with no rows of nodes has none
 	Counts EventCounts `json:"counts" validate:"required"`
 	// Stages are the nodes still running by the stage they are at, such as booting for a provision
@@ -94,7 +96,27 @@ type Event struct {
 
 type EventList []Event
 
-// EventCounts are an event's nodes by state
+// EventDetail is kept in the database as a JSON object
+type EventDetail map[string]string
+
+func (d *EventDetail) Scan(value any) error {
+	switch v := value.(type) {
+	case string:
+		return json.Unmarshal([]byte(v), d)
+	case []byte:
+		return json.Unmarshal(v, d)
+	}
+	return fmt.Errorf("event detail is stored as %T, not text", value)
+}
+
+func (d EventDetail) Value() (driver.Value, error) {
+	if len(d) == 0 {
+		return "{}", nil
+	}
+	raw, err := json.Marshal(d)
+	return string(raw), err
+}
+
 type EventCounts struct {
 	Total     int `json:"total" validate:"required"`
 	Pending   int `json:"pending" validate:"required"`
@@ -120,7 +142,6 @@ func (c EventCounts) Severity() Severity {
 	return SeveritySuccess
 }
 
-// Add counts n nodes at a state
 func (c *EventCounts) Add(state EventNodeState, n int) {
 	c.Total += n
 	switch state {
@@ -160,7 +181,6 @@ func (e *Event) Settle(now time.Time) bool {
 	return true
 }
 
-// EventNode is how an event went on one node
 type EventNode struct {
 	Node  string         `json:"node" validate:"required"`
 	State EventNodeState `json:"state" validate:"required" enum:"pending,running,succeeded,failed,stalled"`

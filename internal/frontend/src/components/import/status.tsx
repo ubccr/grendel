@@ -22,7 +22,7 @@ export const statusLook: Record<Status, Look> = {
   existing: { label: "Already in Grendel", icon: <Database />, color: "var(--node-blue)" },
   pick: { label: "Pick a MAC", icon: <MousePointerClick />, color: "var(--node-amber)" },
   conflict: { label: "Conflict", icon: <CircleX />, color: "var(--destructive)" },
-  invalid: { label: "Fix the name", icon: <CircleAlert />, color: "var(--destructive)" },
+  invalid: { label: "Needs fixing", icon: <CircleAlert />, color: "var(--destructive)" },
   empty: { label: "No MAC learned", icon: <CircleDashed /> },
   unnamed: { label: "Needs a name", icon: <PencilLine /> },
   badmac: { label: "Fix the MAC", icon: <CircleAlert />, color: "var(--destructive)" },

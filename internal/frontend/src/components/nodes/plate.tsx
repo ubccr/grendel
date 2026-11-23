@@ -1,8 +1,8 @@
 import type { Host, ProvisionStatus } from "@/client";
-import { getV1NodesProvisionStatusOptions } from "@/client/@tanstack/react-query.gen";
 import { Fact, Unset } from "@/components/detail-header";
+import { useFollowedProvision } from "@/components/nodes/provision-status";
+import { stateLabel } from "@/lib/provision";
 import { cn, relativeTime } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 
 type Nic = NonNullable<Host["interfaces"]>[number];
@@ -15,17 +15,6 @@ export function bmcNic(nics?: Nic[]) {
   return nics?.find((n) => n.bmc);
 }
 
-// match model.ProvisionState
-const provisionText: Record<string, string> = {
-  pxe: "PXE booting",
-  ipxe: "loading image",
-  config: "fetched config",
-  booting: "booting",
-  failed: "failed",
-  completed: "completed",
-};
-
-// ProvisionLight is whether a node provisions: a green light when it does
 export function ProvisionLight({ on, className }: { on?: boolean; className?: string }) {
   return (
     <span
@@ -39,7 +28,6 @@ export function ProvisionLight({ on, className }: { on?: boolean; className?: st
   );
 }
 
-// LastProvision is how a node's last provision went and when, linked to its provision tab
 export function LastProvision({ status, node }: { status: ProvisionStatus; node: string }) {
   const updated = status.updated_at ? relativeTime(status.updated_at) : undefined;
   return (
@@ -52,16 +40,13 @@ export function LastProvision({ status, node }: { status: ProvisionStatus; node:
       )}
       title={updated?.title}
     >
-      {provisionText[status.state ?? ""] ?? status.state} {updated?.text}
+      {stateLabel(status.state)} {updated?.text}
     </Link>
   );
 }
 
-// NodeFacts are the facts about a node that every tab of the node view needs at a glance, like the asset label on the front of a server
 export function NodeFacts({ host, name }: { host?: Host; name: string }) {
-  const { data: statuses } = useQuery(
-    getV1NodesProvisionStatusOptions({ query: { nodeset: name } }),
-  );
+  const { data: statuses } = useFollowedProvision(name);
   const status = statuses?.[0];
   const boot = bootNic(host?.interfaces);
   const bmc = bmcNic(host?.interfaces);

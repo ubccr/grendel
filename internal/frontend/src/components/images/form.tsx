@@ -1,5 +1,5 @@
 import { BootImage } from "@/client";
-import { getV1ImagesQueryKey, postV1ImagesMutation } from "@/client/@tanstack/react-query.gen";
+import { postV1ImagesMutation } from "@/client/@tanstack/react-query.gen";
 import {
   cellInput,
   Field,
@@ -17,15 +17,13 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useForm } from "@tanstack/react-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useRouter } from "@tanstack/react-router";
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { Plus, X } from "lucide-react";
-import { useEffect } from "react";
 import { toast } from "sonner";
 
 type Templates = NonNullable<BootImage["provision_templates"]>;
 
-// renameTemplate gives a template a new name and keeps it in its place, so a row doesn't jump while its name is typed. A name another template already has is refused, since the two would merge into one
 // incompleteTemplates refuses a template without a name or a file, since the API would store it as is and a node asking for it would fail to boot
 export function incompleteTemplates({ value }: { value?: Templates }) {
   return Object.entries(value ?? {}).some(([name, file]) => !name.trim() || !file.trim())
@@ -37,6 +35,7 @@ const nameRequired = required("Enter a name.");
 const kernelRequired = required("Enter the kernel's path.");
 const initrdRequired = required("Enter a path or remove this initrd.");
 
+// renameTemplate gives a template a new name and keeps it in its place, so a row doesn't jump while its name is typed. A name another template already has is refused, since the two would merge into one
 export function renameTemplate(
   templates: Templates,
   from: string,
@@ -46,38 +45,31 @@ export function renameTemplate(
   return Object.fromEntries(Object.entries(templates).map(([k, v]) => [k === from ? to : k, v]));
 }
 
-export default function ImageForm({ data, reset }: { data?: BootImage; reset?: boolean }) {
-  const router = useRouter();
+export default function ImageForm({ data }: { data?: BootImage }) {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { mutateAsync, isPending } = useMutation(postV1ImagesMutation());
   const adding = data == undefined;
 
   const form = useForm({
     defaultValues: data,
+    validationLogic: validateOnSave,
     onSubmit: async ({ value }) => {
       if (value == undefined) return;
+      // a refused save is toasted like any failed change, so the rejection is dropped here rather than left unhandled
       await mutateAsync(
         { body: { boot_images: [value] } },
         {
           onSuccess: (res) => {
             toast.success(res?.title, { description: res?.detail });
             if (!adding) form.reset(value);
-            // a renamed image is only found under its new name, so the page moves there rather than reloading the old one
+            // a renamed image is only found under its new name, so the page moves there
             if (!adding && value.name !== data?.name)
               navigate({ to: "/images/$image", params: { image: value.name } });
-            else router.invalidate();
-            queryClient.invalidateQueries({ queryKey: getV1ImagesQueryKey() });
           },
-          onError: (e) => toast.error(e.title, { description: e.detail }),
         },
-      );
+      ).catch(() => undefined);
     },
   });
-
-  useEffect(() => {
-    form.reset();
-  }, [reset]);
 
   return (
     <form
@@ -89,7 +81,7 @@ export default function ImageForm({ data, reset }: { data?: BootImage; reset?: b
       }}
     >
       <div className="grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
-        <form.Field name="name" validators={validateOnSave(nameRequired)}>
+        <form.Field name="name" validators={{ onDynamic: nameRequired }}>
           {(field) => (
             <Field label="Name">
               {(id) => (
@@ -143,7 +135,7 @@ export default function ImageForm({ data, reset }: { data?: BootImage; reset?: b
       </div>
 
       <Section title="Boot files" action={<TemplateHelp />}>
-        <form.Field name="kernel" validators={validateOnSave(kernelRequired)}>
+        <form.Field name="kernel" validators={{ onDynamic: kernelRequired }}>
           {(field) => (
             <Field label="Kernel">
               {(id) => (
@@ -203,7 +195,7 @@ export default function ImageForm({ data, reset }: { data?: BootImage; reset?: b
                         </span>
                         <form.Field
                           name={`initrd[${i}]`}
-                          validators={validateOnSave(initrdRequired)}
+                          validators={{ onDynamic: initrdRequired }}
                         >
                           {(f) => (
                             <div className="grid min-w-0 flex-1 gap-1">
@@ -239,7 +231,7 @@ export default function ImageForm({ data, reset }: { data?: BootImage; reset?: b
           }}
         </form.Field>
       </Section>
-      <form.Field name="provision_templates" validators={validateOnSave(incompleteTemplates)}>
+      <form.Field name="provision_templates" validators={{ onDynamic: incompleteTemplates }}>
         {(field) => {
           const templates = field.state.value ?? {};
           const entries = Object.entries(templates);

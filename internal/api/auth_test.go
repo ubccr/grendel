@@ -5,6 +5,7 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -19,7 +20,6 @@ import (
 	"github.com/ubccr/grendel/pkg/model"
 )
 
-// newAuthTestServer serves the real routes over an in-memory store, wired the way Serve wires them
 func newAuthTestServer(t *testing.T) (*sqlstore.SqlStore, http.Handler) {
 	t.Helper()
 	viper.Set("api.secret", "auth-test-secret-0123456789abcdef")
@@ -51,7 +51,7 @@ func postJSON(t *testing.T, mux http.Handler, path, body string) *httptest.Respo
 	return rec
 }
 
-// signup is unauthenticated, so it must never change an account that already exists; it used to upsert, which let anyone set any user's password, the administrator's included
+// signup is unauthenticated, so it must never change an account that already exists, or anyone could set any user's password, the administrator's included
 func TestSignupCannotTakeOverAnExistingUser(t *testing.T) {
 	db, mux := newAuthTestServer(t)
 
@@ -118,7 +118,6 @@ func TestUpdateUserPassword(t *testing.T) {
 	assert.ErrorIs(t, db.UpdateUserPassword("nobody", "password-3"), store.ErrNotFound)
 }
 
-// send makes a request as the account whose session cookies are given
 func send(t *testing.T, mux http.Handler, method, path, body string, cookies []*http.Cookie) *httptest.ResponseRecorder {
 	t.Helper()
 	req := httptest.NewRequest(method, path, strings.NewReader(body))
@@ -191,7 +190,6 @@ func TestUserListLeavesOutPasswordHashes(t *testing.T) {
 	assert.Contains(t, dump.Body.String(), `"hash":"$2a$`)
 }
 
-// signinAs makes an enabled account with the given role and gives its session
 func signinAs(t *testing.T, db *sqlstore.SqlStore, mux http.Handler, username, role string) []*http.Cookie {
 	t.Helper()
 	require.Equal(t, http.StatusOK, postJSON(t, mux, "/v1/auth/signup", `{"username":"`+username+`","password":"password-1"}`).Code)
@@ -202,7 +200,7 @@ func signinAs(t *testing.T, db *sqlstore.SqlStore, mux http.Handler, username, r
 	return signin.Result().Cookies()
 }
 
-// the user role may tag nodes and list roles; read-only may do neither
+// the user role may tag nodes and list roles; read-only may only list roles
 func TestUserRoleMayTagNodesAndListRoles(t *testing.T) {
 	db, mux := newAuthTestServer(t)
 	signinAs(t, db, mux, "admin", model.RoleAdmin.String())
@@ -219,5 +217,41 @@ func TestUserRoleMayTagNodesAndListRoles(t *testing.T) {
 	assert.NotEqual(t, http.StatusForbidden, tag(user))
 	assert.Equal(t, http.StatusOK, roles(user))
 	assert.Equal(t, http.StatusForbidden, tag(readOnly))
-	assert.Equal(t, http.StatusForbidden, roles(readOnly))
+	assert.Equal(t, http.StatusOK, roles(readOnly))
+}
+
+func TestUserRoleMayNotCreateUsers(t *testing.T) {
+	db, mux := newAuthTestServer(t)
+	admin := signinAs(t, db, mux, "admin", model.RoleAdmin.String())
+	user := signinAs(t, db, mux, "alice", model.RoleUser.String())
+
+	create := func(session []*http.Cookie, name string) int {
+		return send(t, mux, http.MethodPost, "/v1/users", `{"username":"`+name+`","password":"password-1"}`, session).Code
+	}
+
+	assert.Equal(t, http.StatusForbidden, create(user, "carol"))
+	assert.Equal(t, http.StatusOK, create(admin, "dave"))
+}
+
+func TestRolesDescribeTheirPermissions(t *testing.T) {
+	db, mux := newAuthTestServer(t)
+	admin := signinAs(t, db, mux, "admin", model.RoleAdmin.String())
+
+	res := send(t, mux, http.MethodGet, "/v1/roles?name=admin", "", admin)
+	require.Equal(t, http.StatusOK, res.Code, res.Body.String())
+
+	var body GetRolesResponse
+	require.NoError(t, json.Unmarshal(res.Body.Bytes(), &body))
+	require.Len(t, body.Roles, 1)
+
+	byKey := map[string]model.Permission{}
+	for _, p := range body.Roles[0].PermissionList {
+		byKey[p.Method+" "+p.Path] = p
+		assert.NotEmpty(t, p.Summary, "%s %s has no summary", p.Method, p.Path)
+		assert.NotEmpty(t, p.Group, "%s %s has no group", p.Method, p.Path)
+		assert.NotEmpty(t, p.Kind, "%s %s has no kind", p.Method, p.Path)
+	}
+	assert.Equal(t, model.Permission{Method: "POST", Path: "/v1/bmc/sel/clear", Summary: "Clear the system event log", Group: "BMC", Kind: model.PermissionDelete}, byKey["POST /v1/bmc/sel/clear"])
+	assert.Equal(t, model.Permission{Method: "PATCH", Path: "/v1/nodes/tags/%", Summary: "Add and remove tags", Group: "Nodes", Kind: model.PermissionChange}, byKey["PATCH /v1/nodes/tags/%"])
+	assert.Equal(t, model.Permission{Method: "GET", Path: "/v1/bmc/console", Summary: "Open the serial console", Group: "BMC", Kind: model.PermissionChange}, byKey["GET /v1/bmc/console"])
 }

@@ -99,18 +99,7 @@ func run(ctx context.Context, svcs []*Service) error {
 		})
 	}
 
-	for i, srv := range runners {
-		if b, ok := srv.(Backgrounder); ok {
-			g.Go(func() error {
-				if err := b.Background(gctx); err != nil {
-					return fmt.Errorf("%s: %w", svcs[i].Name, err)
-				}
-				return nil
-			})
-		}
-	}
-
-	// whichever services run, something has to write the reports of nodes provisioning, mark stalled nodes, close the events they leave finished and delete old ones
+	// whichever services run, something has to mark stalled nodes, close the events they leave finished and delete old ones
 	g.Go(func() error { return events.New(DB).Run(gctx) })
 
 	return g.Wait()

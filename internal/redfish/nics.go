@@ -5,8 +5,10 @@
 package redfish
 
 import (
+	"cmp"
 	"context"
 	"errors"
+	"fmt"
 	"net"
 
 	"github.com/stmcginnis/gofish"
@@ -29,9 +31,11 @@ func (s *Service) nicsOne(ctx context.Context, t Target) (*model.BmcNICList, err
 		return nil, errors.New("bmc exposes no computer systems")
 	}
 
+	// a read that fails is passed over for whatever the others turn up, and only fails the node when they turn up nothing, since an empty list would then say the node has no NICs when it could not be asked
+	var failed error
 	ifaces, err := systems[0].EthernetInterfaces()
 	if err != nil {
-		log.Debugf("node %s: reading ethernet interfaces: %s", t.Name, err)
+		failed = fmt.Errorf("reading ethernet interfaces: %s", errorMessage(err))
 	}
 	out := &model.BmcNICList{NICs: systemNICs(ifaces)}
 	if len(out.NICs) > 0 {
@@ -41,13 +45,13 @@ func (s *Service) nicsOne(ctx context.Context, t Target) (*model.BmcNICList, err
 	// iDRACs can report no system ethernet interfaces while the host is off, but still list the adapters under the chassis
 	chassis, err := systems[0].Chassis()
 	if err != nil {
-		return out, nil
+		failed = cmp.Or(failed, fmt.Errorf("reading the chassis: %s", errorMessage(err)))
 	}
 	var adapters []*schemas.NetworkAdapter
 	for _, ch := range chassis {
 		a, err := ch.NetworkAdapters()
 		if err != nil {
-			log.Debugf("node %s: reading network adapters of %s: %s", t.Name, ch.ID, err)
+			failed = cmp.Or(failed, fmt.Errorf("reading network adapters of %s: %s", ch.ID, errorMessage(err)))
 			continue
 		}
 		adapters = append(adapters, a...)
@@ -55,6 +59,7 @@ func (s *Service) nicsOne(ctx context.Context, t Target) (*model.BmcNICList, err
 	for _, a := range adapters {
 		funcs, err := a.NetworkDeviceFunctions()
 		if err != nil {
+			failed = cmp.Or(failed, fmt.Errorf("reading network device functions of %s: %s", a.ID, errorMessage(err)))
 			continue
 		}
 		for _, f := range funcs {
@@ -67,6 +72,9 @@ func (s *Service) nicsOne(ctx context.Context, t Target) (*model.BmcNICList, err
 			}
 			out.NICs = append(out.NICs, nic)
 		}
+	}
+	if len(out.NICs) == 0 && failed != nil {
+		return nil, failed
 	}
 	return out, nil
 }

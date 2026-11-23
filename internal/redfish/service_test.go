@@ -281,7 +281,6 @@ func TestStatusParsesSystem(t *testing.T) {
 
 }
 
-// TestStatusOverPlainHTTP is the whole bmc.scheme path: a bare address with no scheme, as TargetsFromHosts produces from a bmc interface, reaching a server that speaks plain http. This is what pointing the daemon at a redfish mockup server looks like
 // TestStatusVendorBootProgress is a vendor boot state, which Redfish reports as LastState OEM with the real name beside it
 func TestStatusVendorBootProgress(t *testing.T) {
 	f := dellFixture()
@@ -295,6 +294,7 @@ func TestStatusVendorBootProgress(t *testing.T) {
 	assert.Equal(t, "UEFIShellRunning", r.Data.BootProgress)
 }
 
+// TestStatusOverPlainHTTP covers bmc.scheme: a bare address with no scheme, as TargetsFromHosts produces from a bmc interface, reaching a server that speaks plain http, such as a redfish mockup server
 func TestStatusOverPlainHTTP(t *testing.T) {
 	srv := dellFixture().serve(t)
 	addr := strings.TrimPrefix(srv.URL, "http://")

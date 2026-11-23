@@ -6,7 +6,6 @@ package redfish
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
@@ -33,22 +32,18 @@ type SetBiosRequest struct {
 	ApplyTime string
 }
 
-// Bios reads the BIOS attributes of every target, with any staged changes
 func (s *Service) Bios(ctx context.Context, targets []Target, req BiosRequest) []NodeResult[model.BmcBios] {
 	return run(ctx, s, targets, func(ctx context.Context, t Target) (*model.BmcBios, error) { return s.biosOne(ctx, t, req) })
 }
 
-// SetBios stages BIOS attribute changes on every target
 func (s *Service) SetBios(ctx context.Context, targets []Target, req SetBiosRequest) []NodeResult[Ack] {
 	return run(ctx, s, targets, func(ctx context.Context, t Target) (*Ack, error) { return s.setBiosOne(ctx, t, req) })
 }
 
-// DiscardPendingBios drops the BIOS changes staged on every target
 func (s *Service) DiscardPendingBios(ctx context.Context, targets []Target) []NodeResult[Ack] {
 	return run(ctx, s, targets, s.discardBiosOne)
 }
 
-// BiosRegistry reads the attribute registry describing every target's BIOS attributes
 func (s *Service) BiosRegistry(ctx context.Context, targets []Target) []NodeResult[model.BmcBiosRegistry] {
 	return run(ctx, s, targets, s.biosRegistryOne)
 }
@@ -103,17 +98,11 @@ func biosOf(c *conn) (*biosConn, error) {
 
 // redfishSettings reads a resource's @Redfish.Settings, which gofish keeps private on Bios. A resource with no settings object takes its changes directly, and settings.SettingsObject is then empty
 func redfishSettings(c *conn, uri string) (schemas.Settings, error) {
-	res, err := c.client.Get(uri)
-	defer schemas.DeferredCleanupHTTPResponse(res)
-	if err != nil {
-		return schemas.Settings{}, err
-	}
-
 	var raw struct {
 		Settings schemas.Settings `json:"@Redfish.Settings"`
 	}
-	if err := json.NewDecoder(res.Body).Decode(&raw); err != nil {
-		return schemas.Settings{}, fmt.Errorf("reading the bios resource: %w", err)
+	if err := c.getJSON(uri, &raw); err != nil {
+		return schemas.Settings{}, fmt.Errorf("reading the settings of %s: %w", uri, err)
 	}
 	return raw.Settings, nil
 }
@@ -125,16 +114,10 @@ func (b *biosConn) pending() (map[string]any, error) {
 		return out, nil
 	}
 
-	res, err := b.client.Get(b.settings.SettingsObject)
-	defer schemas.DeferredCleanupHTTPResponse(res)
-	if err != nil {
-		return nil, err
-	}
-
 	var staged struct {
 		Attributes map[string]any
 	}
-	if err := json.NewDecoder(res.Body).Decode(&staged); err != nil {
+	if err := b.getJSON(b.settings.SettingsObject, &staged); err != nil {
 		return nil, fmt.Errorf("reading the bios settings object: %w", err)
 	}
 
@@ -411,7 +394,7 @@ func fetchRegistry(c *conn, name string) (*model.BmcBiosRegistry, error) {
 	return out, nil
 }
 
-// findRegistryFile picks the registry file for the registry a Bios resource names. An exact id or registry match wins. Failing that the names are compared without their versions, because BMCs do not version them consistently: an iDRAC names BiosAttributeRegistry.v1_0_3 on the Bios resource, files it as BiosAttributeRegistry.v1_0_0, and calls it BiosAttributeRegistry1.0 inside the file
+// findRegistryFile prefers an exact id or registry match, then compares the names without their versions, because BMCs do not version them consistently. An iDRAC names BiosAttributeRegistry.v1_0_3 on the Bios resource, files it as BiosAttributeRegistry.v1_0_0, and calls it BiosAttributeRegistry1.0 inside the file
 func findRegistryFile(files []*schemas.MessageRegistryFile, name string) *schemas.MessageRegistryFile {
 	for _, f := range files {
 		if f != nil && (f.ID == name || f.Registry == name) {
@@ -496,16 +479,10 @@ func bound(v *uint64) *int64 {
 	return &n
 }
 
-// registryCache keeps the attribute registries already fetched. A registry is the same for every node of one model and bios version, and is large enough that a rack of them should cost one fetch
+// registryCache keeps the attribute registries already fetched, so the next node of the same model and bios version costs no fetch. Nothing is evicted, which bounds it at one registry per model and bios version in the fleet
 type registryCache struct {
 	mu    sync.Mutex
-	max   int
-	order []string
 	items map[string]*model.BmcBiosRegistry
-}
-
-func newRegistryCache(max int) *registryCache {
-	return &registryCache{max: max, items: map[string]*model.BmcBiosRegistry{}}
 }
 
 func (r *registryCache) get(key string) (*model.BmcBiosRegistry, bool) {
@@ -513,9 +490,6 @@ func (r *registryCache) get(key string) (*model.BmcBiosRegistry, bool) {
 	defer r.mu.Unlock()
 
 	reg, ok := r.items[key]
-	if ok {
-		r.touch(key)
-	}
 	return reg, ok
 }
 
@@ -523,19 +497,8 @@ func (r *registryCache) put(key string, reg *model.BmcBiosRegistry) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if _, ok := r.items[key]; !ok && len(r.order) >= r.max {
-		oldest := r.order[0]
-		r.order = r.order[1:]
-		delete(r.items, oldest)
+	if r.items == nil {
+		r.items = map[string]*model.BmcBiosRegistry{}
 	}
 	r.items[key] = reg
-	r.touch(key)
-}
-
-// touch moves key to the most recently used end
-func (r *registryCache) touch(key string) {
-	if i := slices.Index(r.order, key); i >= 0 {
-		r.order = slices.Delete(r.order, i, i+1)
-	}
-	r.order = append(r.order, key)
 }

@@ -6,7 +6,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { nodeOptions } from "@/lib/queries";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import { Link, useMatch, useMatches } from "@tanstack/react-router";
 import { Fragment } from "react";
 
@@ -33,7 +35,7 @@ type CrumbMatch = {
   staticData: { crumb?: CrumbPart | CrumbPart[] };
 };
 
-// crumbsFrom turns the matched routes into the trail shown in the header. A node opened from its rack is shown under that rack in place of the node list
+// A node opened from its rack is shown under that rack in place of the node list
 export function crumbsFrom(matches: CrumbMatch[], rack?: string): Crumb[] {
   return matches.flatMap((match): Crumb[] => {
     if (rack && match.routeId === "/nodes") {
@@ -55,18 +57,16 @@ export function crumbsFrom(matches: CrumbMatch[], rack?: string): Crumb[] {
   });
 }
 
-// useCrumbs is the trail for the current page
 export function useCrumbs(): Crumb[] {
   const matches = useMatches();
   const node = useMatch({ from: "/nodes/$node", shouldThrow: false });
   // only trust the rack a link says a node came from when the node is tagged with it
   const from = node?.search.from;
-  const rack =
-    from && node.loaderData?.data?.[0]?.tags?.includes(`rack=${from}`) ? from : undefined;
+  const { data: hosts } = useQuery({ ...nodeOptions(node?.params.node ?? ""), enabled: !!from });
+  const rack = from && hosts?.[0]?.tags?.includes(`rack=${from}`) ? from : undefined;
   return crumbsFrom(matches, rack);
 }
 
-// AppBreadcrumbs draws a trail on one line; on narrow screens only the page itself is shown
 export function AppBreadcrumbs({ crumbs, className }: { crumbs: Crumb[]; className?: string }) {
   return (
     <Breadcrumb className={cn("min-w-0", className)}>

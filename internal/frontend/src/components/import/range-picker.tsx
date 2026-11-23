@@ -10,14 +10,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useStoredValue } from "@/hooks/use-stored-value";
-import { parseRange } from "@/lib/addresses";
+import { parseRange, rangeKey } from "@/lib/addresses";
 import { Radar } from "lucide-react";
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 
-// the same keys the address finder remembers its last range under, so a range found there is offered here
-export const rangeKey = (bmc: boolean) => `grendel.address-range.${bmc ? "bmc" : "port"}`;
-
-// RangePicker is the range addresses are handed out from, with a finder for the ranges similar nodes already use
 export function RangePicker({
   bmc,
   value,
@@ -28,14 +24,9 @@ export function RangePicker({
   onChange: (range: string) => void;
 }) {
   const id = useId();
-  const [remembered, remember] = useStoredValue(rangeKey(bmc));
+  const [, remember] = useStoredValue(rangeKey(bmc));
   const [open, setOpen] = useState(false);
   const bad = value.trim() !== "" && !parseRange(value);
-
-  // the remembered range fills the field only on first draw, so clearing it leaves it clear
-  useEffect(() => {
-    if (!value && remembered) onChange(remembered);
-  }, []);
 
   const pick = (r: string) => {
     onChange(r);

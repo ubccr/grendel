@@ -129,15 +129,34 @@ func TestClearJobsRejectsEmptyID(t *testing.T) {
 	assert.Empty(t, *deleted, "an empty id would target the Jobs collection itself")
 }
 
-// TestClearJobsTrailingSlash covers a service whose JobService @odata.id ends in a slash, which must not produce //Jobs
+// TestClearJobsTrailingSlash covers a service that advertises no Jobs link and whose JobService @odata.id ends in a slash, which must not produce //Jobs
 func TestClearJobsTrailingSlash(t *testing.T) {
 	f, deleted := jobFixture(nil)
-	f.tree[jobServicePath] = strings.Replace(f.tree[jobServicePath], fmt.Sprintf(`"@odata.id": %q`, jobServicePath), fmt.Sprintf(`"@odata.id": %q`, jobServicePath+"/"), 1)
+	f.tree[jobServicePath] = fmt.Sprintf(`{"@odata.id": %q, "@odata.type": "#JobService.v1_0_0.JobService", "Id": "JobService", "Name": "Job Service"}`, jobServicePath+"/")
 
 	r := clearJobs(t, f, ClearJobsRequest{IDs: []string{"JID_1"}})
 
 	assert.True(t, r.Success, "message was: %s", r.Message)
 	assert.Equal(t, []string{jobServicePath + "/Jobs/JID_1"}, *deleted)
+}
+
+// TestClearJobsFollowsServiceLinks covers a service that keeps its jobs somewhere other than {JobService}/Jobs: a named job is deleted under the collection it advertises, and a listed job at the uri it was listed with
+func TestClearJobsFollowsServiceLinks(t *testing.T) {
+	const queue, elsewhere = "/redfish/v1/Managers/1/Queue", "/redfish/v1/Managers/1/Oem/Jobs/JID_1"
+
+	f, deleted := jobFixture(nil)
+	f.tree[jobServicePath] = strings.Replace(f.tree[jobServicePath], jobServicePath+"/Jobs", queue+"/", 1)
+	f.tree[queue+"/"] = fmt.Sprintf(`{"@odata.id": %q, "Members@odata.count": 1, "Members": [{"@odata.id": %q}]}`, queue, elsewhere)
+	f.tree[elsewhere] = fmt.Sprintf(`{"@odata.id": %q, "@odata.type": "#Job.v1_0_0.Job", "Id": "JID_1", "Name": "Job", "JobState": "Scheduled"}`, elsewhere)
+
+	r := clearJobs(t, f, ClearJobsRequest{IDs: []string{"JID_9"}})
+	assert.True(t, r.Success, "message was: %s", r.Message)
+	assert.Equal(t, []string{queue + "/JID_9"}, *deleted)
+
+	*deleted = nil
+	r = clearJobs(t, f, ClearJobsRequest{All: true})
+	assert.True(t, r.Success, "message was: %s", r.Message)
+	assert.Equal(t, []string{elsewhere}, *deleted)
 }
 
 func TestSortJobsNewestFirst(t *testing.T) {

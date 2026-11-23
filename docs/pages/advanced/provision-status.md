@@ -36,7 +36,7 @@ directly over `/run/systemd/private` (or the system bus), so it needs nothing el
 works on any systemd distro.
 
 ```
-grendel-beacon watch [--complete] [--interval 10s] [--timeout 1h]
+grendel-beacon watch [--complete] [--interval 10s] [--timeout 45m]
 ```
 
 `watch` follows systemd until the boot finishes. It reports `booting` while units are starting,
@@ -44,6 +44,15 @@ then the result:
 - `completed` when the system reaches `running`
 - `failed` with the list of failed units when it ends up `degraded`
 - `failed` when the boot hasn't finished by `--timeout`
+
+Grendel only takes a report while the node's boot token is valid, which is `provision.token_ttl`
+(1 hour by default) from its network boot. `--timeout` counts from when `watch` starts, so it has
+to run out before the token does or the failed report is refused. The default butane template
+sets it from the token, to 10 minutes before the token expires. A custom template can do the same
+with `{{ $.beacon.timeout }}`, as the unit under [Baked into the image](#baked-into-the-image)
+does. That value is worked out when the config is rendered, so where the beacon only starts much
+later, such as on the first boot after a kickstart install, raise `provision.token_ttl` to cover
+the install as well.
 
 With `--complete`, a clean boot also turns provisioning off for the node, just as the `complete`
 endpoint does. The node status will flip to completed regardless of this flag so you may leave it off for nodes that network boot every time.
@@ -61,7 +70,7 @@ when the provision server has a self-signed certificate.
 
 ### Facts
 
-Each report can carry **facts**: named values describing the node, shown on its Provision tab and returned by `GET /v1/nodes/provision-status`. `watch` collects them for its first progress report, so a stuck boot still shows what it is running, and again for its final report, once the boot timings exist.
+Each report can carry **facts**: named values describing the node, shown on its Provision tab and returned by `GET /v1/nodes/provision-status`. `watch` sends them with its first progress report, so a stuck boot still shows what it is running, and again with its final report.
 
 Built in:
 
@@ -69,35 +78,20 @@ Built in:
 |---|---|
 | `os.*` | every key in `/etc/os-release`, lowercased: `os.id`, `os.version_id`, `os.pretty_name`, `os.image_version`... |
 | `kernel.release` | the running kernel, as `uname -r` prints it |
-| `boot.*` | systemd's boot timings, split as `systemd-analyze` does: `boot.firmware`, `boot.loader`, `boot.kernel`, `boot.initrd`, `boot.userspace`, `boot.total` |
 
-**Site facts** come from drop-ins in `/etc/grendel/beacon.d` (`--facts-dir` to change it):
-- an executable is run (10 second limit) and its output read
-- any other file is read as it is
-
-Both hold `key=value` lines, and each key is prefixed with the file's name, so `beacon.d/slurm` printing `version=24.05` reports `slurm.version`.
-
-```sh
-#!/bin/sh
-# /etc/grendel/beacon.d/slurm
-echo "version=$(sinfo --version | cut -d' ' -f2)"
-```
-
-Rules for drop-ins:
-- **File names:** lowercase letters, digits, `-` and `_`. Anything else, such as `slurm.rpmsave`, is skipped.
-- **No overriding:** a drop-in can't replace a built in fact.
-- **Checking:** `grendel-beacon facts` prints what would be sent, which is the quickest way to check a new drop-in.
-
-`report` sends only the facts given with `--fact key=value`, since an installer's `%post` would otherwise report the installer's os-release. Add `--collect` to include the built in and drop-in facts as well:
+**Site facts** are given with `--fact key=value`, which can be repeated, on either command:
 
 ```
+grendel-beacon watch --fact site.rack_pdu=pdu-f01-a --fact slurm.version=24.05
 grendel-beacon report --state booting --fact site.raid_layout=raid10
 ```
 
+`watch` always sends the built in facts as well. `report` sends only the facts given with `--fact`, since an installer's `%post` would otherwise report the installer's os-release. Add `--collect` to include the built in facts.
+
 **Limits:**
-- **Keys:** lowercase letters, digits, `.`, `_` and `-`, up to 64 characters.
+- **Keys:** lowercase letters, digits, `.`, `_` and `-`, up to 64 characters. The beacon refuses a `--fact` with any other key.
 - **Values:** up to 1 KB.
-- **Count:** a node keeps at most 200 facts.
+- **Count:** a node keeps at most 64 facts.
 - **Invalid facts:** dropped.
 
 Each report's facts are merged into the ones already reported for that provision. A new network boot starts over.
@@ -120,7 +114,7 @@ Grendel serves the binaries at `/beacon/<arch>`. The default butane template the
 things to the ignition config:
 - a download of the binary for the node's arch to `path`
 - `/etc/grendel/beacon.env` with the status URL
-- an enabled `grendel-beacon.service` that runs `watch`
+- an enabled `grendel-beacon.service` that runs `watch`, with a `--timeout` that ends before the boot token expires
 
 `complete = true` adds `--complete` to that service.
 
@@ -143,7 +137,7 @@ After=network-online.target
 [Service]
 Type=simple
 Environment=GRENDEL_STATUS_URL={{ $.endpoints.StatusURL }}
-ExecStart=/usr/bin/grendel-beacon watch
+ExecStart=/usr/bin/grendel-beacon watch{{ with $.beacon.timeout }} --timeout {{ . }}{{ end }}
 
 [Install]
 WantedBy=multi-user.target
@@ -160,7 +154,7 @@ routes:
   forged or changed to name another node. A token only lets someone report on its own node, and
   unprovision it with `complete`.
 - **Expiry:** the token expires after `provision.token_ttl` (1 hour by default). A provision that
-  runs longer than that stops being able to report.
+  runs longer than that stops being able to report, which is why `watch` has to time out first.
 - **Source address:** a report must come from one of the node's own addresses, checked against
   the TCP connection rather than any forwarded header. Set `provision.status_check_source = false`
   when nodes reach Grendel through NAT or a proxy.

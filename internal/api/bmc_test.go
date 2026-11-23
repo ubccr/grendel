@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"slices"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -38,6 +39,14 @@ func newFakeBmcContext(query map[string]string) *fakeBmcContext {
 }
 
 func (f *fakeBmcContext) QueryParam(name string) string { return f.query[name] }
+
+// an absent parameter reads as false, the default the routes declare
+func (f *fakeBmcContext) QueryParamBoolErr(name string) (bool, error) {
+	if f.query[name] == "" {
+		return false, nil
+	}
+	return strconv.ParseBool(f.query[name])
+}
 func (f *fakeBmcContext) Context() context.Context      { return f.ctx }
 func (f *fakeBmcContext) Response() http.ResponseWriter { return f.recorder }
 
@@ -81,16 +90,12 @@ func TestBmcSelect(t *testing.T) {
 		{name: "a name not in the database fails even with all", all: "true", nodeset: tagged.Name + ",notindb01", wantErr: true},
 		{name: "a name not in the database fails even when the tag would exclude it", nodeset: tagged.Name + ",notindb01", tags: "gpu", wantErr: true},
 		{name: "an unparseable nodeset fails the request", nodeset: "cpn-[", wantErr: true},
+		{name: "all that is not a boolean fails the request", all: "yes", nodeset: tagged.Name, wantErr: true},
 	}
 
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			c := fuego.NewMockContextNoBody()
-			c.SetQueryParam("all", tt.all)
-			c.SetQueryParam("nodeset", tt.nodeset)
-			c.SetQueryParam("tags", tt.tags)
-
-			hosts, err := h.bmcSelect(c)
+			hosts, err := h.bmcSelect(newFakeBmcContext(map[string]string{"all": tt.all, "nodeset": tt.nodeset, "tags": tt.tags}))
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("err = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -111,8 +116,8 @@ func TestBmcSelect(t *testing.T) {
 	}
 }
 
-// TestBmcTargets covers the two ways a request can resolve to nothing, which have to be errors because an empty success would exit 0 having done nothing
-func TestBmcTargets(t *testing.T) {
+// TestBmcNodes covers the two ways a request can resolve to nothing, which have to be errors because an empty success would exit 0 having done nothing
+func TestBmcNodes(t *testing.T) {
 	h := newTestHandler(t)
 
 	withBMC := tests.HostFactory.MustCreate().(*model.Host)
@@ -132,25 +137,109 @@ func TestBmcTargets(t *testing.T) {
 		}
 	}
 
-	t.Run("a node without a bmc interface is ignored", func(t *testing.T) {
-		targets, err := h.bmcTargets(newFakeBmcContext(map[string]string{"nodeset": withBMC.Name + "," + noBMC.Name}))
+	t.Run("a named node without a bmc interface is reported, not contacted", func(t *testing.T) {
+		nodes, err := h.bmcNodes(newFakeBmcContext(map[string]string{"nodeset": withBMC.Name + "," + noBMC.Name}))
 		if err != nil {
 			t.Fatal(err)
 		}
-		if len(targets) != 1 || targets[0].Name != withBMC.Name {
-			t.Errorf("targets = %+v, want only %s", targets, withBMC.Name)
+		if len(nodes.hosts) != 1 || nodes.hosts[0].Name != withBMC.Name {
+			t.Errorf("hosts = %+v, want only %s", nodes.hosts, withBMC.Name)
+		}
+		if !slices.Equal(nodes.noBMC, []string{noBMC.Name}) {
+			t.Errorf("noBMC = %v, want %s", nodes.noBMC, noBMC.Name)
+		}
+	})
+
+	t.Run("a node without a bmc interface that all swept in is left out", func(t *testing.T) {
+		nodes, err := h.bmcNodes(newFakeBmcContext(map[string]string{"all": "true"}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(nodes.hosts) != 1 || len(nodes.noBMC) != 0 {
+			t.Errorf("hosts = %+v, noBMC = %v, want only %s", nodes.hosts, nodes.noBMC, withBMC.Name)
+		}
+	})
+
+	t.Run("hosts are in natural order, which is the order templates number them in", func(t *testing.T) {
+		h := newTestHandler(t)
+		for _, name := range []string{"cpn-f01-10", "cpn-f01-9", "cpn-f01-2"} {
+			host := tests.HostFactory.MustCreate().(*model.Host)
+			host.Name = name
+			if err := h.DB.StoreHost(host); err != nil {
+				t.Fatal(err)
+			}
+		}
+
+		nodes, err := h.bmcNodes(newFakeBmcContext(map[string]string{"all": "true"}))
+		if err != nil {
+			t.Fatal(err)
+		}
+		var names []string
+		for _, host := range nodes.hosts {
+			names = append(names, host.Name)
+		}
+		if want := []string{"cpn-f01-2", "cpn-f01-9", "cpn-f01-10"}; !slices.Equal(names, want) {
+			t.Errorf("hosts = %v, want %v", names, want)
 		}
 	})
 
 	t.Run("only nodes without a bmc interface", func(t *testing.T) {
-		_, err := h.bmcTargets(newFakeBmcContext(map[string]string{"nodeset": noBMC.Name}))
+		_, err := h.bmcNodes(newFakeBmcContext(map[string]string{"nodeset": noBMC.Name}))
 		assertNotFound(t, err)
 	})
 
 	t.Run("only names not in the database", func(t *testing.T) {
-		_, err := h.bmcTargets(newFakeBmcContext(map[string]string{"nodeset": "notindb01"}))
+		_, err := h.bmcNodes(newFakeBmcContext(map[string]string{"nodeset": "notindb01"}))
 		assertNotFound(t, err)
 	})
+}
+
+// a named node that cannot be contacted still gets a row, so a run over a nodeset accounts for every name in it
+func TestRunBmcReportsNamedNodeWithoutBMC(t *testing.T) {
+	h := newTestHandler(t)
+
+	withBMC := tests.HostFactory.MustCreate().(*model.Host)
+	withBMC.Name = "cpn-1"
+	noBMC := tests.HostFactory.MustCreate().(*model.Host)
+	noBMC.Name = "cpn-2"
+	for _, nic := range noBMC.Interfaces {
+		nic.BMC = false
+	}
+	if err := h.DB.StoreHosts(model.HostList{withBMC, noBMC}); err != nil {
+		t.Fatal(err)
+	}
+
+	var contacted []string
+	res, err := runAck(h, newFakeBmcContext(map[string]string{"nodeset": "cpn-[1-2]"}), "bmc.power", "bmc power On",
+		func(_ context.Context, targets []redfish.Target) []redfish.NodeResult[redfish.Ack] {
+			results := make([]redfish.NodeResult[redfish.Ack], 0, len(targets))
+			for _, target := range targets {
+				contacted = append(contacted, target.Name)
+				results = append(results, redfish.NodeResult[redfish.Ack]{Node: target.Name, Success: true})
+			}
+			return results
+		})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !slices.Equal(contacted, []string{"cpn-1"}) {
+		t.Errorf("contacted %v, want only cpn-1", contacted)
+	}
+	if res.Summary.Total != 2 || res.Summary.Failed != 1 || res.Summary.FailedNodes != "cpn-2" {
+		t.Errorf("summary = %+v, want cpn-2 counted as failed", res.Summary)
+	}
+	if row := res.Results[1]; row.Node != "cpn-2" || row.Success || !strings.Contains(row.Message, "no interface marked bmc") {
+		t.Errorf("row = %+v, want cpn-2 failed for having no bmc interface", row)
+	}
+
+	event, err := h.DB.LoadEvent(listEvents(t, h)[0].ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(event.Nodes) != 2 {
+		t.Errorf("event has %d nodes, want both", len(event.Nodes))
+	}
 }
 
 // TestRunBmcMistypedNodeContactsNothing is the behaviour that matters most for a command that powers machines off: one bad name stops the whole run
@@ -163,7 +252,7 @@ func TestRunBmcMistypedNodeContactsNothing(t *testing.T) {
 	}
 
 	contacted := false
-	_, err := runAck(h, newFakeBmcContext(map[string]string{"nodeset": host.Name + ",notindb01,notindb02"}), "bmc power ForceOff",
+	_, err := runAck(h, newFakeBmcContext(map[string]string{"nodeset": host.Name + ",notindb01,notindb02"}), "bmc.power", "bmc power ForceOff",
 		func(context.Context, []redfish.Target) []redfish.NodeResult[redfish.Ack] {
 			contacted = true
 			return nil
@@ -211,7 +300,7 @@ func TestRunBmc(t *testing.T) {
 
 	c := newFakeBmcContext(map[string]string{"nodeset": "cpn-[2-3],cpn-10"})
 
-	res, err := runAck(h, c, "bmc power ForceOff", stub)
+	res, err := runAck(h, c, "bmc.power", "bmc power ForceOff", stub)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -240,7 +329,7 @@ func TestRunBmc(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if event.Kind != model.EventKindBmc || event.Action != "bmc.power.forceoff" || event.Summary != "bmc power ForceOff" {
+	if event.Kind != model.EventKindBmc || event.Action != "bmc.power" || event.Summary != "bmc power ForceOff" {
 		t.Errorf("event is %s %q %q", event.Kind, event.Action, event.Summary)
 	}
 	if event.State != model.EventStateDone || event.EndedAt == nil {
@@ -311,24 +400,24 @@ func TestGeneratedClientDecodesResponses(t *testing.T) {
 			t.Fatalf("decoding %s: %v", body, err)
 		}
 
-		if got := res.Summary.Value.FailedNodes.Value; got != "cpn-2" {
+		if got := res.Summary.FailedNodes; got != "cpn-2" {
 			t.Errorf("failed nodes = %q", got)
 		}
 
-		reached := res.Results.Value[0].Value.Data.Value
-		if reached.SerialNumber.Value != "S1" {
-			t.Errorf("serial = %q", reached.SerialNumber.Value)
+		reached := res.Results[0].Data.Value
+		if reached.SerialNumber != "S1" {
+			t.Errorf("serial = %q", reached.SerialNumber)
 		}
 		if !reached.OemDell.Null {
 			t.Errorf("a non dell node should decode a null oem block, got %+v", reached.OemDell)
 		}
-		if !res.Results.Value[0].Value.Success.Value {
+		if !res.Results[0].Success {
 			t.Error("the reached node should decode as a success")
 		}
-		if res.Results.Value[1].Value.Success.Value {
+		if res.Results[1].Success {
 			t.Error("the failed node should decode as a failure")
 		}
-		if !res.Results.Value[1].Value.Data.Null {
+		if !res.Results[1].Data.Null {
 			t.Error("a failed node should decode null data")
 		}
 	})
@@ -347,7 +436,7 @@ func TestGeneratedClientDecodesResponses(t *testing.T) {
 			t.Fatalf("decoding %s: %v", body, err)
 		}
 
-		if got := res.Results.Value[0].Value.Message.Value; got != "cleared 1 job(s)" {
+		if got := res.Results[0].Message; got != "cleared 1 job(s)" {
 			t.Errorf("message = %q", got)
 		}
 	})
@@ -374,4 +463,22 @@ func listEvents(t *testing.T, h *Handler) model.EventList {
 		t.Fatal(err)
 	}
 	return events
+}
+
+// a bmc target is always a graceful restart, so a body that also asks for a reset type must not be answered with one
+func TestPowerRequestBmcTargetTakesNothingElse(t *testing.T) {
+	req, err := powerRequest(BmcPowerBody{Target: "bmc"})
+	if err != nil || req.Target != redfish.TargetBMC {
+		t.Fatalf("req = %+v, err = %v, want a bmc restart", req, err)
+	}
+
+	for _, body := range []BmcPowerBody{
+		{Target: "bmc", Action: "ForceOff"},
+		{Target: "bmc", BootOverride: "Pxe"},
+	} {
+		var httpErr fuego.HTTPError
+		if _, err := powerRequest(body); !errors.As(err, &httpErr) || httpErr.Status != http.StatusBadRequest {
+			t.Errorf("%+v: err = %v, want a 400", body, err)
+		}
+	}
 }

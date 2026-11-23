@@ -106,6 +106,20 @@ func schemaCustomizer() openapi3gen.SchemaCustomizerFn {
 			schema.Nullable = true
 		}
 
+		// fuego reads validate:"required" only off a route's own type and its struct fields, so a struct reached through a slice or a pointer gets its required list here
+		if t.Kind() == reflect.Struct {
+			for i := range t.NumField() {
+				field := t.Field(i)
+				name, _, _ := strings.Cut(field.Tag.Get("json"), ",")
+				if !field.IsExported() || name == "" || name == "-" {
+					continue
+				}
+				if slices.Contains(strings.Split(field.Tag.Get("validate"), ","), "required") && !slices.Contains(schema.Required, name) {
+					schema.Required = append(schema.Required, name)
+				}
+			}
+		}
+
 		// enum lists the values a string field takes, so the generated clients get a type for it rather than any string
 		if enum := tag.Get("enum"); enum != "" {
 			for _, v := range strings.Split(enum, ",") {
@@ -128,6 +142,11 @@ func schemaCustomizer() openapi3gen.SchemaCustomizerFn {
 			case "formatNone":
 				schema.Format = ""
 			}
+		}
+
+		// a slice's elements are customized under the field's name and tag before the slice is, which marks them nullable along with it. No route sends or takes a null element
+		if t.Kind() == reflect.Slice && schema.Items != nil && schema.Items.Value != nil {
+			schema.Items.Value.Nullable = false
 		}
 
 		return nil

@@ -1,6 +1,7 @@
 import type { Event } from "@/client";
 import { describe, expect, it } from "vitest";
 import {
+  type EventNode,
   eventParts,
   eventResult,
   eventRows,
@@ -12,7 +13,6 @@ import {
 
 const noNodes = { total: 0, pending: 0, running: 0, succeeded: 0, failed: 0, stalled: 0 };
 
-// event is a whole event, the given fields over ones for a finished audit event, with counts given only where they are not zero
 function event(
   over: Partial<Omit<Event, "counts">> & { counts?: Partial<Event["counts"]> },
 ): Event {
@@ -174,12 +174,17 @@ describe("eventRows", () => {
   });
 });
 
+// fixtures name only the fields a test is about
+const row = (n: Partial<EventNode>) => n as EventNode;
+
 describe("nodeNote", () => {
   it("is the stage a node is at, with what it said", () => {
-    expect(nodeNote({ node: "cpn-01", state: "running", stage: "booting" })).toBe("booting");
+    expect(nodeNote(row({ node: "cpn-01", state: "running", stage: "booting" }))).toBe("booting");
     expect(
-      nodeNote({ node: "cpn-02", state: "failed", stage: "exception", message: "JID_1 timed out" }),
+      nodeNote(
+        row({ node: "cpn-02", state: "failed", stage: "exception", message: "JID_1 timed out" }),
+      ),
     ).toBe("exception: JID_1 timed out");
-    expect(nodeNote({ node: "cpn-03", state: "succeeded" })).toBe("");
+    expect(nodeNote(row({ node: "cpn-03", state: "succeeded" }))).toBe("");
   });
 });

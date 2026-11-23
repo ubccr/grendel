@@ -26,27 +26,23 @@ import (
 	"github.com/ubccr/grendel/pkg/nodeset"
 )
 
-// BmcPowerBody is one power request, for either a host or its BMC
 type BmcPowerBody struct {
-	Target       string `json:"target" description:"What to power, 'host' or 'bmc'. Defaults to host. A bmc target is always a graceful restart and ignores the other fields" example:"host"`
+	Target       string `json:"target" description:"What to power, 'host' or 'bmc'. Defaults to host. A bmc target is always a graceful restart and takes no action or boot_override" example:"host"`
 	Action       string `json:"action" description:"schemas.ResetType. On, ForceOn, ForceOff, ForceRestart, GracefulRestart, GracefulShutdown, PowerCycle, Nmi, PushPowerButton, Suspend, Pause, Resume, FullPowerCycle" example:"PowerCycle"`
 	BootOverride string `json:"boot_override" description:"schemas.BootSource to boot from once. None, Pxe, Floppy, Cd, Usb, Hdd, BiosSetup, Utilities, Diags, UefiShell, UefiTarget, SDCard, UefiHttp, RemoteDrive, UefiBootNext, Recovery" example:"Pxe"`
 }
 
-// BmcIndicatorBody turns the location indicator on or off
 type BmcIndicatorBody struct {
 	State string `json:"state" description:"on or off" example:"on"`
 }
 
-// BmcClearJobsBody names what to clear. Clearing everything is its own field, so no job id is reserved to mean it
+// Clearing everything is its own field, so no job id is reserved to mean it
 type BmcClearJobsBody struct {
 	All bool     `json:"all" description:"Clear every job in the queue. Mutually exclusive with ids"`
 	IDs []string `json:"ids" oai3:"nullable" description:"Clear only these job ids" example:"JID_000000000001"`
 }
 
-// BmcStatus reports one row per node
 func (h *Handler) BmcStatus(c fuego.ContextNoBody) (model.BmcResponse[model.RedfishSystem], error) {
-	// this does not tag hosts with grendel:serial. Status is a read and changes nothing in the store
 	return runBmc(h, c, "bmc status", nil,
 		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[model.RedfishSystem] {
 			return h.Redfish.Status(ctx, t)
@@ -55,11 +51,10 @@ func (h *Handler) BmcStatus(c fuego.ContextNoBody) (model.BmcResponse[model.Redf
 	)
 }
 
-// BmcPower changes the power state of node(s), or restarts their BMCs
 func (h *Handler) BmcPower(c fuego.ContextWithBody[BmcPowerBody]) (model.BmcResponse[model.BmcAck], error) {
 	body, err := c.Body()
 	if err != nil {
-		return model.BmcResponse[model.BmcAck]{}, badRequest(err, "failed to parse the power request")
+		return model.BmcResponse[model.BmcAck]{}, err
 	}
 
 	req, err := powerRequest(body)
@@ -67,16 +62,20 @@ func (h *Handler) BmcPower(c fuego.ContextWithBody[BmcPowerBody]) (model.BmcResp
 		return model.BmcResponse[model.BmcAck]{}, err
 	}
 
-	return runAck(h, c, powerOperation(req), func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
+	action := "bmc.power"
+	if req.Target == redfish.TargetBMC {
+		action = "bmc.reboot"
+	}
+
+	return runAck(h, c, action, powerOperation(req), func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
 		return h.Redfish.Power(ctx, t, req)
 	})
 }
 
-// BmcIndicator turns the location indicator of node(s) on or off, so they can be found in the rack
 func (h *Handler) BmcIndicator(c fuego.ContextWithBody[BmcIndicatorBody]) (model.BmcResponse[model.BmcAck], error) {
 	body, err := c.Body()
 	if err != nil {
-		return model.BmcResponse[model.BmcAck]{}, badRequest(err, "failed to parse the indicator request")
+		return model.BmcResponse[model.BmcAck]{}, err
 	}
 
 	var req redfish.IndicatorRequest
@@ -88,12 +87,11 @@ func (h *Handler) BmcIndicator(c fuego.ContextWithBody[BmcIndicatorBody]) (model
 		return model.BmcResponse[model.BmcAck]{}, badRequest(fmt.Errorf("unknown indicator state %q", body.State), "state must be on or off")
 	}
 
-	return runAck(h, c, "bmc indicator "+strings.ToLower(body.State), func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
+	return runAck(h, c, "bmc.indicator", "bmc indicator "+strings.ToLower(body.State), func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
 		return h.Redfish.Indicator(ctx, t, req)
 	})
 }
 
-// BmcJobs lists the jobs queued on node(s)
 func (h *Handler) BmcJobs(c fuego.ContextNoBody) (model.BmcResponse[model.BmcJobList], error) {
 	return runBmc(h, c, "bmc jobs", nil,
 		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.JobList] {
@@ -103,11 +101,11 @@ func (h *Handler) BmcJobs(c fuego.ContextNoBody) (model.BmcResponse[model.BmcJob
 	)
 }
 
-// BmcClearJobs removes jobs from node(s). It is a POST rather than a DELETE with a body, which some intermediaries strip
+// A POST rather than a DELETE with a body, which some intermediaries strip
 func (h *Handler) BmcClearJobs(c fuego.ContextWithBody[BmcClearJobsBody]) (model.BmcResponse[model.BmcAck], error) {
 	body, err := c.Body()
 	if err != nil {
-		return model.BmcResponse[model.BmcAck]{}, badRequest(err, "failed to parse the clear jobs request")
+		return model.BmcResponse[model.BmcAck]{}, err
 	}
 
 	// rejecting these here means one 400 rather than one failed row per node in the nodeset
@@ -130,16 +128,15 @@ func (h *Handler) BmcClearJobs(c fuego.ContextWithBody[BmcClearJobsBody]) (model
 		operation = "bmc clear all jobs"
 	}
 
-	return runAck(h, c, operation, func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
+	return runAck(h, c, "bmc.jobs.clear", operation, func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
 		return h.Redfish.ClearJobs(ctx, t, req)
 	})
 }
 
-// BmcSEL reads the system event log of node(s)
 func (h *Handler) BmcSEL(c fuego.ContextNoBody) (model.BmcResponse[model.BmcSELLog], error) {
-	limit, err := selLimit(c.QueryParam("limit"))
-	if err != nil {
-		return model.BmcResponse[model.BmcSELLog]{}, err
+	limit, err := c.QueryParamIntErr("limit")
+	if err != nil || limit < 0 {
+		return model.BmcResponse[model.BmcSELLog]{}, badRequest(fmt.Errorf("bad limit %q", c.QueryParam("limit")), "limit must be a number, zero or more. Zero returns the whole log")
 	}
 
 	return runBmc(h, c, "bmc sel", nil,
@@ -150,23 +147,23 @@ func (h *Handler) BmcSEL(c fuego.ContextNoBody) (model.BmcResponse[model.BmcSELL
 	)
 }
 
-// BmcClearSEL clears the system event log of node(s)
 func (h *Handler) BmcClearSEL(c fuego.ContextNoBody) (model.BmcResponse[model.BmcAck], error) {
-	return runAck(h, c, "bmc clear sel", func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
+	return runAck(h, c, "bmc.sel.clear", "bmc clear sel", func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.Ack] {
 		return h.Redfish.ClearSEL(ctx, t)
 	})
 }
 
-// bmcContext is what the bmc routes need from a request. The ones that take a body and the ones that do not have different fuego context types but the same three methods
+// bmcContext is what the bmc routes need from a request. The ones that take a body and the ones that do not have different fuego context types but the same methods
 type bmcContext interface {
 	QueryParam(string) string
+	QueryParamBoolErr(string) (bool, error)
 	Context() context.Context
 	Response() http.ResponseWriter
 }
 
-// runAck runs an operation that changes something and returns no data, which is the kind recorded in the event log
-func runAck(h *Handler, c bmcContext, operation string, run func(context.Context, []redfish.Target) []redfish.NodeResult[redfish.Ack]) (model.BmcResponse[model.BmcAck], error) {
-	return runBmc(h, c, operation, trackBmc[redfish.Ack](true, actionName(operation)), run, func(*redfish.Ack) *model.BmcAck { return nil })
+// runAck runs an operation that changes something and returns no data, which is the kind recorded in the event log. action is the event's name for programs, operation its summary for people
+func runAck(h *Handler, c bmcContext, action, operation string, run func(context.Context, []redfish.Target) []redfish.NodeResult[redfish.Ack]) (model.BmcResponse[model.BmcAck], error) {
+	return runBmc(h, c, operation, trackBmc[redfish.Ack](true, action), run, func(*redfish.Ack) *model.BmcAck { return nil })
 }
 
 // bmcTrack is how a bmc operation is recorded as an event. node, when set, adjusts a node's row from its result, which is how an operation that only queued work leaves its nodes running
@@ -178,9 +175,7 @@ type bmcTrack[T any] struct {
 	node   func(row *model.EventNode, success bool, data *T)
 }
 
-// runBmc is every bmc route: pick the nodes, contact them, and report. track is for operations that change something. Reads have none and stay out of the event log, which status polling would otherwise fill
-//
-// A completed run always returns 200, since one that found every node unreachable is an accurate report rather than a failed request. The failure count goes in a header so a script can see it without parsing the body
+// runBmc picks the nodes, contacts them and reports. Only operations that change something pass track, so reads stay out of the event log, which status polling would otherwise fill
 func runBmc[T, D any](
 	h *Handler,
 	c bmcContext,
@@ -189,10 +184,27 @@ func runBmc[T, D any](
 	run func(context.Context, []redfish.Target) []redfish.NodeResult[T],
 	data func(*T) *D,
 ) (model.BmcResponse[D], error) {
-	targets, err := h.bmcTargets(c)
+	nodes, err := h.bmcNodes(c)
 	if err != nil {
 		return model.BmcResponse[D]{}, err
 	}
+
+	return runBmcOn(h, c, nodes, operation, track, run, data)
+}
+
+// runBmcOn is runBmc for a handler that needed the nodes first, to build its request from them
+//
+// A completed run always returns 200, since one that found every node unreachable is an accurate report rather than a failed request. The failure count goes in a header so a script can see it without parsing the body
+func runBmcOn[T, D any](
+	h *Handler,
+	c bmcContext,
+	selected bmcNodes,
+	operation string,
+	track *bmcTrack[T],
+	run func(context.Context, []redfish.Target) []redfish.NodeResult[T],
+	data func(*T) *D,
+) (model.BmcResponse[D], error) {
+	targets := redfish.TargetsFromHosts(selected.hosts)
 
 	// a fan-out over a large nodeset can outlast the write timeout set in server.go, depending on bmc.run_timeout, and would have its response truncated
 	if err := http.NewResponseController(c.Response()).SetWriteDeadline(time.Time{}); err != nil {
@@ -206,9 +218,12 @@ func runBmc[T, D any](
 	// the event is written before the BMCs are contacted, so a long run shows while it is going. A run that leaves its event open, as queued firmware updates do, has it closed by whatever follows it
 	var event *model.Event
 	if track != nil {
-		pending := make(model.EventNodeList, 0, len(targets))
+		pending := make(model.EventNodeList, 0, len(targets)+len(selected.noBMC))
 		for _, t := range targets {
 			pending = append(pending, model.EventNode{Node: t.Name, State: model.EventNodePending})
+		}
+		for _, name := range selected.noBMC {
+			pending = append(pending, model.EventNode{Node: name, State: model.EventNodePending})
 		}
 		detail := map[string]string{"run": runID}
 		maps.Copy(detail, track.detail)
@@ -223,6 +238,9 @@ func runBmc[T, D any](
 	}
 
 	results := run(c.Context(), targets)
+	for _, name := range selected.noBMC {
+		results = append(results, redfish.NodeResult[T]{Node: name, Message: "node has no interface marked bmc"})
+	}
 
 	sort.SliceStable(results, func(i, j int) bool { return natsort.Compare(results[i].Node, results[j].Node) })
 
@@ -275,11 +293,6 @@ func trackBmc[T any](on bool, action string) *bmcTrack[T] {
 	return &bmcTrack[T]{kind: model.EventKindBmc, action: action}
 }
 
-// actionName turns what an operation is called for people, such as "bmc power ForceOff", into the name programs read, bmc.power.forceoff
-func actionName(operation string) string {
-	return strings.ToLower(strings.Join(strings.Fields(operation), "."))
-}
-
 // foldNodes joins names into a nodeset string, or a plain list if they do not fold
 func foldNodes(names []string) string {
 	joined := strings.Join(names, ",")
@@ -290,29 +303,50 @@ func foldNodes(names []string) string {
 	return ns.String()
 }
 
-// bmcTargets resolves a request to the BMCs to contact. A request that resolves to nothing is an error rather than an empty success, since a script has no other way to learn that its nodeset named nothing
-func (h *Handler) bmcTargets(c bmcContext) ([]redfish.Target, error) {
-	hosts, err := h.bmcSelect(c)
+type bmcNodes struct {
+	// hosts are the nodes to contact, each with an interface marked bmc, in natural name order
+	hosts model.HostList
+	// noBMC are the nodes the nodeset named that have no interface marked bmc, which are reported as failed. A node without one that tags or all=true swept in is left out instead
+	noBMC []string
+}
+
+// bmcNodes resolves a request to the nodes it acts on. A request that resolves to nothing is an error rather than an empty success, since a script has no other way to learn that its nodeset named nothing
+func (h *Handler) bmcNodes(c bmcContext) (bmcNodes, error) {
+	selected, err := h.bmcSelect(c)
 	if err != nil {
-		return nil, err
+		return bmcNodes{}, err
 	}
-	if len(hosts) == 0 {
-		return nil, notFound("no nodes matched the given nodeset and tags")
-	}
-
-	targets := redfish.TargetsFromHosts(hosts)
-	if len(targets) == 0 {
-		return nil, notFound("none of the selected nodes have an interface marked bmc")
+	if len(selected) == 0 {
+		return bmcNodes{}, notFound("no nodes matched the given nodeset and tags")
 	}
 
-	return targets, nil
+	named := c.QueryParam("nodeset") != ""
+	var nodes bmcNodes
+	for _, host := range selected {
+		switch {
+		case host == nil:
+		case host.InterfaceBMC() != nil:
+			nodes.hosts = append(nodes.hosts, host)
+		case named:
+			nodes.noBMC = append(nodes.noBMC, host.Name)
+		}
+	}
+	if len(nodes.hosts) == 0 {
+		return bmcNodes{}, notFound("none of the selected nodes have an interface marked bmc")
+	}
+	sort.SliceStable(nodes.hosts, func(i, j int) bool { return natsort.Compare(nodes.hosts[i].Name, nodes.hosts[j].Name) })
+
+	return nodes, nil
 }
 
 // bmcSelect resolves which nodes a request is about. An empty nodeset does not mean every node, because FindHosts turns an empty slice into `where name in (NULL)`, so all=true is how to ask for that and a request naming no selector at all is rejected. A nodeset or tags given alongside all=true still narrow the selection, because `grendel bmc power off all --tags gpu` must never reach a node without that tag
 func (h *Handler) bmcSelect(c bmcContext) (model.HostList, error) {
 	nodes := c.QueryParam("nodeset")
 	tags := c.QueryParam("tags")
-	all := c.QueryParam("all") == "true"
+	all, err := c.QueryParamBoolErr("all")
+	if err != nil {
+		return nil, badRequest(err, "all must be true or false")
+	}
 
 	if !all && nodes == "" && tags == "" {
 		return nil, badRequest(errors.New("no node selector given"), "specify nodeset, tags, or all=true")
@@ -383,7 +417,10 @@ func powerRequest(body BmcPowerBody) (redfish.PowerRequest, error) {
 	switch body.Target {
 	case "", string(redfish.TargetHost):
 	case string(redfish.TargetBMC):
-		// a manager reset takes no reset type and no boot override, so the rest of the body is not read
+		// a manager reset is always graceful, so a body asking for anything else is refused rather than answered with a restart it did not ask for
+		if body.Action != "" || body.BootOverride != "" {
+			return req, badRequest(errors.New("action or boot_override given with a bmc target"), "a bmc target takes no action or boot_override")
+		}
 		return redfish.PowerRequest{Target: redfish.TargetBMC}, nil
 	default:
 		return req, badRequest(fmt.Errorf("unknown power target %q", body.Target), "target must be host or bmc")
@@ -407,7 +444,6 @@ func powerRequest(body BmcPowerBody) (redfish.PowerRequest, error) {
 	return req, nil
 }
 
-// powerOperation names a power request for the event log
 func powerOperation(req redfish.PowerRequest) string {
 	if req.Target == redfish.TargetBMC {
 		return "bmc reboot"
@@ -440,23 +476,7 @@ func validJobID(id string) bool {
 	return jobIDPattern.MatchString(id) && id != "." && id != ".."
 }
 
-// selLimit caps how much of each log comes back. A populated iDRAC log is thousands of entries, and a nodeset multiplies that, so the default keeps a whole rack readable
-func selLimit(raw string) (int, error) {
-	if raw == "" {
-		return defaultSELLimit, nil
-	}
-
-	limit, err := strconv.Atoi(raw)
-	if err != nil {
-		return 0, badRequest(err, "limit must be a number")
-	}
-	if limit < 0 {
-		return 0, badRequest(errors.New("negative limit"), "limit must be zero or more, zero returns the whole log")
-	}
-
-	return limit, nil
-}
-
+// defaultSELLimit keeps a whole rack readable: a populated iDRAC log is thousands of entries, and a nodeset multiplies that
 const defaultSELLimit = 50
 
 // selLog narrows gofish's log entry the same way jobList narrows its job

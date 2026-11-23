@@ -11,7 +11,6 @@ import { formatLocation } from "@/lib/identity";
 import { useMutation } from "@tanstack/react-query";
 import { Eye, LoaderCircle, MapPin } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 
 type Fields = { datacenter: string; room: string; row: string; rack: string; rack_unit: string };
 
@@ -23,7 +22,7 @@ const fieldInfo: Array<{ key: keyof Fields; label: string; hint: string }> = [
   { key: "datacenter", label: "Data center", hint: "Building or site" },
 ];
 
-// LocationForm renders the location templates for each node, previews the result against what the BMCs hold, and writes it. Editing a field drops the preview, so what gets applied is always what was last previewed
+// Editing a field drops the preview, so what gets applied is always what was last previewed
 export default function LocationForm({
   nodes,
   example,
@@ -42,7 +41,8 @@ export default function LocationForm({
   });
   const [preview, setPreview] = useState<{ rows: PreviewRow[]; applied: boolean }>();
   const [running, setRunning] = useState<"preview" | "apply">();
-  const { mutate } = useMutation(postV1BmcLocationMutation());
+  // only an apply is toasted, a preview shows its outcome in the table, so the toast is made here
+  const { mutate } = useMutation({ ...postV1BmcLocationMutation(), meta: { bmc: true } });
 
   const empty = Object.values(fields).every((v) => v.trim() === "");
 
@@ -65,7 +65,6 @@ export default function LocationForm({
             })),
           });
         },
-        onError: (e) => toast.error(e.title, { description: e.detail }),
         onSettled: () => setRunning(undefined),
       },
     );

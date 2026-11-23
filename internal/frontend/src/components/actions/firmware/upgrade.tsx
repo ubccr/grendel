@@ -5,14 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldSeparator, FieldSet } from "@/components/ui/field";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
 import { LoaderCircle } from "lucide-react";
 import { toastBmcResponse } from "@/lib/bmc";
-import { toast } from "sonner";
 
 export default function FirmwareUpgradeAction({ nodes }: { nodes: string }) {
-  const router = useRouter();
-  const mutation = useMutation(postV1BmcFirmwareInstallMutation());
+  // the name the outcome is toasted under depends on what was asked for, so it is toasted here
+  const mutation = useMutation({ ...postV1BmcFirmwareInstallMutation(), meta: { bmc: true } });
 
   const defaultValues: BmcInstallFirmwareBody = {
     ignore_cert_warning: true,
@@ -30,14 +28,8 @@ export default function FirmwareUpgradeAction({ nodes }: { nodes: string }) {
           body: data.value,
         },
         {
-          onSuccess: (res) => {
-            toastBmcResponse(data.value.apply_update ? "Firmware install" : "Firmware check", res);
-            router.invalidate();
-          },
-          onError: (e) =>
-            toast.error(e.title, {
-              description: e.detail,
-            }),
+          onSuccess: (res) =>
+            toastBmcResponse(data.value.apply_update ? "Firmware install" : "Firmware check", res),
         },
       );
     },

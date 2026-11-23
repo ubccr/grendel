@@ -14,7 +14,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/cmd/grendel/apiclient"
 	"github.com/ubccr/grendel/cmd/shared"
-	"github.com/ubccr/grendel/internal/logger"
 	"github.com/ubccr/grendel/internal/version"
 	"github.com/ubccr/grendel/pkg/client"
 )
@@ -32,7 +31,6 @@ type Stats struct {
 var (
 	tags      []string
 	nodes     []string
-	log       = logger.GetLogger("STATUS")
 	cyan      = color.New(color.FgCyan)
 	green     = color.New(color.FgGreen)
 	red       = color.New(color.FgRed)

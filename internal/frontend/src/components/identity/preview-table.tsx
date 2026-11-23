@@ -21,7 +21,6 @@ export type PreviewRow = {
   message: string;
 };
 
-// counts sums up a preview, so the apply button can say how many nodes it touches
 export function counts(rows: PreviewRow[]) {
   return {
     change: rows.filter((r) => r.success && r.changed).length,
@@ -30,7 +29,7 @@ export function counts(rows: PreviewRow[]) {
   };
 }
 
-// PreviewTable shows each node's value before and after, with the nodes that change first, so a run over a rack reads as what it is about to do
+// Failed nodes come first, then the ones that change, so a run over a rack reads as what it is about to do
 export default function PreviewTable({
   rows,
   applied,

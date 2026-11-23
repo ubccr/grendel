@@ -6,6 +6,7 @@ package redfish
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"net/url"
 	"slices"
@@ -103,6 +104,8 @@ func (s *Service) clearJobsOne(ctx context.Context, t Target, req ClearJobsReque
 		return nil, err
 	}
 
+	base := jobsCollection(js) + "/"
+
 	var ids, uris []string
 	if req.All {
 		jobs, err := js.Jobs()
@@ -116,13 +119,17 @@ func (s *Service) clearJobsOne(ctx context.Context, t Target, req ClearJobsReque
 
 		for _, job := range jobs {
 			ids = append(ids, job.ID)
+			uri := job.ODataID
+			if uri == "" {
+				uri = base + url.PathEscape(job.ID)
+			}
+			uris = append(uris, uri)
 		}
 	} else {
 		ids = req.IDs
-	}
-
-	for _, id := range ids {
-		uris = append(uris, strings.TrimRight(js.ODataID, "/")+"/Jobs/"+url.PathEscape(id))
+		for _, id := range ids {
+			uris = append(uris, base+url.PathEscape(id))
+		}
 	}
 
 	return clearEach("job(s)", ids, func(i int) error {
@@ -131,7 +138,20 @@ func (s *Service) clearJobsOne(ctx context.Context, t Target, req ClearJobsReque
 	})
 }
 
-// jobService returns a valid redfish JobService handling if the bmc does not implement one
+// jobsCollection is the uri a job named by id is deleted under: the collection link the service advertises, which gofish keeps private, or the usual place when it advertises none
+func jobsCollection(js *schemas.JobService) string {
+	var doc struct {
+		Jobs struct {
+			ID string `json:"@odata.id"`
+		}
+	}
+	if err := json.Unmarshal(js.RawData, &doc); err == nil && doc.Jobs.ID != "" {
+		return strings.TrimRight(doc.Jobs.ID, "/")
+	}
+	return strings.TrimRight(js.ODataID, "/") + "/Jobs"
+}
+
+// jobService fails when the bmc has no job service, which gofish reports as a nil service and no error
 func jobService(c *conn) (*schemas.JobService, error) {
 	js, err := c.service.JobService()
 	if err != nil {

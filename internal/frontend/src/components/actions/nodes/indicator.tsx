@@ -4,25 +4,22 @@ import { Button } from "@/components/ui/button";
 import { toastBmcResponse } from "@/lib/bmc";
 import { useMutation } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 
 // the indicator only lights an LED, so unlike the other bmc actions it runs without a confirmation
 export default function NodesIndicatorAction({ nodes }: { nodes: string }) {
-  const [pending, setPending] = useState<"on" | "off">();
-  const { mutate, isPending } = useMutation(postV1BmcIndicatorMutation());
+  // the outcome is toasted here, since its name says which way the light was switched
+  const { mutate, isPending, variables } = useMutation({
+    ...postV1BmcIndicatorMutation(),
+    meta: { bmc: true },
+  });
+  // the button pressed is the one that spins
+  const pending = isPending ? variables.body.state : undefined;
 
-  const set = (state: "on" | "off") => {
-    setPending(state);
+  const set = (state: "on" | "off") =>
     mutate(
       { query: { nodeset: nodes }, body: { state } },
-      {
-        onSuccess: (data) => toastBmcResponse(`Locate LED ${state}`, data),
-        onError: (e) => toast.error(e.title, { description: e.detail }),
-        onSettled: () => setPending(undefined),
-      },
+      { onSuccess: (data) => toastBmcResponse(`Locate LED ${state}`, data) },
     );
-  };
 
   return (
     <ActionCard

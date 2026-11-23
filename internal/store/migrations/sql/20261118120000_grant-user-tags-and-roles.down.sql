@@ -2,16 +2,5 @@
 --
 -- SPDX-License-Identifier: GPL-3.0-or-later
 
-delete from role_permission
-where role_id in (select id from role where name = 'user')
-  and permission_id in
-  (
-    select id
-    from permission
-    where (method, path) in
-    (
-      ('PATCH', '/v1/nodes/tags/%'),
-      ('GET', '/v1/roles')
-    )
-  )
-;
+-- the grants stay. Nothing records whether the user role already held them before the up, and both permissions exist in the schema this goes back to, so leaving one the up added costs less than taking away one an admin gave
+select 1;

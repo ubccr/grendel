@@ -68,7 +68,6 @@ function Code({ children }: { children: ReactNode }) {
   return <code className="rounded bg-muted px-1 py-0.5 font-mono text-[0.85em]">{children}</code>;
 }
 
-// TemplateHelp opens a summary of the Go template syntax the kernel, initrd and command line fields of an image are rendered with
 export function TemplateHelp() {
   return (
     <Dialog>

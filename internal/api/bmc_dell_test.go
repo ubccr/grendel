@@ -32,7 +32,7 @@ func TestShutdownType(t *testing.T) {
 		}
 	}
 
-	// v1 quietly turned an unknown value into NoReboot, which hid a typo of Forced
+	// an unknown value must be refused rather than read as NoReboot, which would hide a typo of Forced
 	if _, err := shutdownType("forced"); err == nil {
 		t.Error("an unknown shutdown type must be rejected")
 	}
@@ -104,18 +104,9 @@ func TestImportShare(t *testing.T) {
 }
 
 func TestShareNames(t *testing.T) {
-	withBMC := tests.HostFactory.MustCreate().(*model.Host)
-	noBMC := tests.HostFactory.MustCreate().(*model.Host)
-	for i := range noBMC.Interfaces {
-		noBMC.Interfaces[i].BMC = false
-	}
+	host := tests.HostFactory.MustCreate().(*model.Host)
 
-	names := shareNames(model.HostList{withBMC, noBMC, nil})
-
-	if len(names) != 1 {
-		t.Fatalf("names = %v, want only the node with a bmc interface", names)
-	}
-	path := names[withBMC.Name]
+	path := shareNames(model.HostList{host})[host.Name]
 	if !strings.HasPrefix(path, "/boot/") || !strings.HasSuffix(path, "/bmc") || strings.Count(path, "/") != 3 {
 		t.Errorf("share path = %q, want /boot/<token>/bmc", path)
 	}
@@ -160,11 +151,11 @@ func TestGeneratedClientDecodesFirmwareUpdates(t *testing.T) {
 		t.Fatalf("decoding %s: %v", body, err)
 	}
 
-	data := res.Results.Value[0].Value.Data.Value
-	if data.RebootType.Value != "HOST" || data.Updates.Value[0].Value.PackageVersion.Value != "2.20.0" {
+	data := res.Results[0].Data.Value
+	if data.RebootType != "HOST" || data.Updates.Value[0].PackageVersion != "2.20.0" {
 		t.Errorf("decoded %+v", data)
 	}
-	if !res.Results.Value[1].Value.Data.Null {
+	if !res.Results[1].Data.Null {
 		t.Error("a failed node should decode null data")
 	}
 }

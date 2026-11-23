@@ -11,14 +11,13 @@ import (
 	"net"
 	"net/http"
 	"net/netip"
-	"os"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/beacon/wire"
 	"github.com/ubccr/grendel/internal/events"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
@@ -33,12 +32,29 @@ const (
 	maxFailedUnits  = 100
 	maxStatusString = 512
 	maxStatusMsg    = 2048
-	maxFacts        = 200
+	maxFacts        = 64
 	maxFactValue    = 1024
 )
 
-// factKey is a dotted lowercase name such as os.image_version or slurm.version
-var factKey = regexp.MustCompile(`^[a-z0-9][a-z0-9_.-]{0,63}$`)
+// beaconTimeoutMargin is how much of a boot token's life is left once a beacon started with it gives up on the boot, for the time between the config being rendered and the beacon starting, and for its last report to be retried
+const beaconTimeoutMargin = 10 * time.Minute
+
+var errOtherBoot = errors.New("provision already finished in another boot")
+
+// beaconTimeout is how long a beacon given this token should wait for the boot before reporting it failed, as a duration for its --timeout. The report is only taken while the token is valid, so the wait ends before the token does. It is empty when tokens never expire, which leaves the beacon its own default
+func beaconTimeout(token string, now time.Time) string {
+	expires, err := model.BootTokenExpiry(token)
+	if err != nil || expires.IsZero() {
+		return ""
+	}
+
+	left := expires.Sub(now)
+	left -= min(beaconTimeoutMargin, left/2)
+	if left < time.Second {
+		return ""
+	}
+	return left.Round(time.Second).String()
+}
 
 func init() {
 	viper.SetDefault("provision.status_check_source", true)
@@ -48,68 +64,55 @@ func init() {
 	viper.SetDefault("provision.beacon.complete", false)
 }
 
-// StatusReport is what the beacon posts to /boot/:token/status
-type StatusReport struct {
-	State       model.ProvisionState `json:"state"`
-	Message     string               `json:"message,omitempty"`
-	FailedUnits []model.FailedUnit   `json:"failed_units,omitempty"`
-	QueuedJobs  int                  `json:"queued_jobs,omitempty"`
-	BootID      string               `json:"boot_id,omitempty"`
-	// Complete also turns provisioning off for the node, as the complete endpoint does, when State is completed
-	Complete bool `json:"complete,omitempty"`
-	// Facts are merged into the ones already reported for this provision, a later value for a key replacing the earlier one
-	Facts map[string]string `json:"facts,omitempty"`
+// recordStatus changes the host's provision status with update. Tracking status must never get in the way of a boot, so a failure is only logged
+func recordStatus(db store.Store, host *model.Host, update func(s *model.ProvisionStatus, now time.Time)) {
+	err := updateStatus(db, host, func(s *model.ProvisionStatus, now time.Time) error {
+		update(s, now)
+		return nil
+	})
+	if err != nil {
+		log.Warnf("failed to record provision status for %s: %s", host.Name, err)
+	}
 }
 
-// recordStatus loads the host's provision status, lets update change it, and stores it. Tracking status must never get in the way of a boot, so a failure is only logged
-func recordStatus(db store.Store, host *model.Host, update func(s *model.ProvisionStatus, now time.Time)) {
+// updateStatus lets update change the host's provision status and writes it with the node's row in the provisioning event, in one transaction. An error from update is returned with nothing written
+func updateStatus(db store.Store, host *model.Host, update func(s *model.ProvisionStatus, now time.Time) error) error {
 	now := time.Now().UTC()
-	uid := host.UID.String()
 
-	status, err := db.LoadProvisionStatus(uid)
-	if errors.Is(err, store.ErrNotFound) {
-		status = &model.ProvisionStatus{StartedAt: now}
-	} else if err != nil {
-		log.Warnf("failed to load provision status for %s: %s", host.Name, err)
-		return
-	}
+	return db.UpdateProvisionStatus(host.UID.String(), events.Provisioning(now), func(status *model.ProvisionStatus) (*model.EventNode, error) {
+		if status.StartedAt.IsZero() {
+			status.StartedAt = now
+		}
+		if err := update(status, now); err != nil {
+			return nil, err
+		}
+		status.UpdatedAt = now
+		if status.State == "" {
+			return nil, nil
+		}
 
-	update(status, now)
-	status.UpdatedAt = now
-	if status.State != "" {
 		if status.Stages == nil {
 			status.Stages = map[model.ProvisionState]time.Time{}
 		}
 		if _, ok := status.Stages[status.State]; !ok {
 			status.Stages[status.State] = now
 		}
-	}
 
-	if err := db.StoreProvisionStatus(uid, status); err != nil {
-		log.Warnf("failed to store provision status for %s: %s", host.Name, err)
-		return
-	}
-
-	trackProvision(db, host.Name, status.State, status.Message)
+		return eventNode(host.Name, status), nil
+	})
 }
 
-// trackProvision keeps the node's row in the provisioning event up to date. Provisions are not started in batches, so nodes are grouped as they arrive: a node starting out joins the provisioning already running, or opens one, and the event ends once it is over for every node in it. Every report is written, the same state again too, since a node that goes quiet is what counts as stalled
-func trackProvision(db store.Store, node string, state model.ProvisionState, message string) {
-	if state == "" {
-		return
-	}
-
+// eventNode is the node's row in the provisioning event. Every report writes the row, the same state again too, since a node that goes quiet is what counts as stalled
+func eventNode(node string, status *model.ProvisionStatus) *model.EventNode {
 	// the node's message, such as why its boot failed, is carried onto its row so the events page can show it
-	row := model.EventNode{Node: node, State: model.EventNodeRunning, Stage: string(state), Message: message}
-	switch state {
+	row := &model.EventNode{Node: node, State: model.EventNodeRunning, Stage: string(status.State), Message: status.Message, UpdatedAt: status.UpdatedAt}
+	switch status.State {
 	case model.ProvisionStateCompleted:
 		row.State = model.EventNodeSucceeded
 	case model.ProvisionStateFailed:
 		row.State = model.EventNodeFailed
 	}
-
-	// this is on the node's boot path, so the report is only queued, and written with the others within a second
-	events.TrackProvision(db, row)
+	return row
 }
 
 // restart starts a new provision attempt, dropping everything the last one reported
@@ -159,7 +162,7 @@ func mergeFacts(current, report map[string]string) map[string]string {
 	sort.Strings(keys)
 
 	for _, k := range keys {
-		if !factKey.MatchString(k) {
+		if !wire.ValidFactKey(k) {
 			continue
 		}
 		if _, ok := merged[k]; !ok && len(merged) >= maxFacts {
@@ -217,47 +220,50 @@ func (h *Handler) Status(c echo.Context) error {
 	}
 
 	c.Request().Body = http.MaxBytesReader(c.Response(), c.Request().Body, maxStatusBody)
-	var report StatusReport
+	var report wire.Report
 	if err := json.NewDecoder(c.Request().Body).Decode(&report); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid status report").SetInternal(err)
 	}
 
-	switch report.State {
+	state := model.ProvisionState(report.State)
+	switch state {
 	case model.ProvisionStateBooting, model.ProvisionStateFailed, model.ProvisionStateCompleted:
 	default:
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("state must be one of booting, failed, completed, got %q", report.State))
 	}
 
-	current, err := h.DB.LoadProvisionStatus(host.UID.String())
-	if err != nil && !errors.Is(err, store.ErrNotFound) {
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to load provision status").SetInternal(err)
-	}
+	log.Infof("Provision status from host %s: %s", host.Name, state)
 
-	// a finished provision only takes more reports from the boot that finished it, so a token copied off the node can't reopen it
-	if current != nil && current.State.Finished() && current.BootID != "" && report.BootID != current.BootID {
-		return echo.NewHTTPError(http.StatusConflict, "provision already finished in another boot")
-	}
+	err = updateStatus(h.DB, host, func(s *model.ProvisionStatus, now time.Time) error {
+		// a finished provision only takes more reports from the boot that finished it, so a token copied off the node can't reopen it
+		if s.State.Finished() && s.BootID != "" && report.BootID != s.BootID {
+			return errOtherBoot
+		}
 
-	log.Infof("Provision status from host %s: %s", host.Name, report.State)
-
-	recordStatus(h.DB, host, func(s *model.ProvisionStatus, now time.Time) {
-		s.State = report.State
+		s.State = state
 		s.Message = truncate(report.Message, maxStatusMsg)
 		s.FailedUnits = trimUnits(report.FailedUnits)
 		s.QueuedJobs = max(report.QueuedJobs, 0)
 		s.BootID = truncate(report.BootID, maxStatusString)
 		s.Addr = addr.String()
 		s.Facts = mergeFacts(s.Facts, report.Facts)
-		if report.State == model.ProvisionStateCompleted {
+		if state == model.ProvisionStateCompleted {
 			if s.CompletedAt == nil {
 				s.CompletedAt = &now
 			}
 		} else {
 			s.CompletedAt = nil
 		}
+		return nil
 	})
+	if errors.Is(err, errOtherBoot) {
+		return echo.NewHTTPError(http.StatusConflict, errOtherBoot.Error())
+	}
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to record provision status").SetInternal(err)
+	}
 
-	if report.Complete && report.State == model.ProvisionStateCompleted && host.Provision {
+	if report.Complete && state == model.ProvisionStateCompleted && host.Provision {
 		if err := h.unprovision(host); err != nil {
 			return err
 		}
@@ -274,12 +280,7 @@ func (h *Handler) Beacon(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, "")
 	}
 
-	file := filepath.Join(dir, "grendel-beacon-"+arch)
-	if _, err := os.Stat(file); err != nil {
-		return echo.NewHTTPError(http.StatusNotFound, "").SetInternal(err)
-	}
-
-	return c.File(file)
+	return c.File(filepath.Join(dir, "grendel-beacon-"+arch))
 }
 
 func peerAddr(r *http.Request) (netip.Addr, error) {
@@ -308,7 +309,7 @@ func hostHasAddr(host *model.Host, addr netip.Addr) bool {
 	return false
 }
 
-func trimUnits(units []model.FailedUnit) []model.FailedUnit {
+func trimUnits(units []wire.FailedUnit) []model.FailedUnit {
 	if len(units) > maxFailedUnits {
 		units = units[:maxFailedUnits]
 	}

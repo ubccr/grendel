@@ -57,7 +57,7 @@ systemd:
         [Service]
         Type=simple
         EnvironmentFile=/etc/grendel/beacon.env
-        ExecStart={{ $.beacon.path }} watch{{ if $.beacon.complete }} --complete{{ end }}
+        ExecStart={{ $.beacon.path }} watch{{ if $.beacon.complete }} --complete{{ end }}{{ with $.beacon.timeout }} --timeout {{ . }}{{ end }}
 
         [Install]
         WantedBy=multi-user.target

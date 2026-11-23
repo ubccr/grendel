@@ -21,8 +21,7 @@ import (
 var (
 	exportForce bool
 	listDir     string
-	listFilter  []string
-	listOptions *shared.TableOptions
+	listTable   *shared.TableFlags
 	listColumns = []shared.Column{
 		{Name: "Build"},
 		{Name: "Source"},
@@ -42,8 +41,6 @@ var (
 		Long: `Write the embedded EFI builds of iPXE to a directory, named as Grendel serves them, such as snponly-x86_64.efi. The BIOS builds are left out, since secure boot does not apply to them.
 
 Sign the files in place, point tftp.firmware_dir at the directory, and restart grendeld. A build missing from the directory is served from the embedded copy.`,
-		Example: `  grendeld firmware export /var/lib/grendel/firmware
-  sbsign --key db.key --cert db.crt --output /var/lib/grendel/firmware/snponly-x86_64.efi /var/lib/grendel/firmware/snponly-x86_64.efi`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
 			paths, err := firmware.Export(args[0], exportForce)
@@ -69,7 +66,7 @@ Sign the files in place, point tftp.firmware_dir at the directory, and restart g
 				return err
 			}
 
-			t := shared.NewTable(listColumns, listFilter).Options(*listOptions).Empty("-")
+			t := listTable.Table()
 			for _, b := range firmware.Builds() {
 				f, ok := set[b]
 				if !ok {
@@ -117,10 +114,8 @@ func init() {
 	exportCmd.Flags().BoolVar(&exportForce, "force", false, "overwrite files already in the directory, which may be signed copies")
 	firmwareCmd.AddCommand(exportCmd)
 
-	listOptions = shared.RegisterTableFlags(listCmd)
+	listTable = shared.RegisterTableFlags(listCmd, listColumns)
 	listCmd.Flags().StringVar(&listDir, "dir", "", "directory to check instead of tftp.firmware_dir")
-	listCmd.Flags().StringSliceVar(&listFilter, "filter", nil, "filter table columns by name")
-	listCmd.RegisterFlagCompletionFunc("filter", shared.ColumnCompletion(listColumns))
 	firmwareCmd.AddCommand(listCmd)
 
 	shared.Root.AddCommand(firmwareCmd)

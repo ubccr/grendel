@@ -24,10 +24,10 @@ export default defineConfig(() => {
     },
     base: "/ui/",
     build: {
-      // built straight into the directory grendeld embeds; it sits outside the Vite root, so emptying it has to be asked for, and that only clears ui/, leaving the committed .gitkeep beside it
+      // The directory grendeld embeds sits outside the Vite root, so emptying it has to be asked for. Only ui/ is cleared, which leaves the committed .gitkeep beside it
       outDir: "../api/build/ui",
       emptyOutDir: true,
-      // routes are split, so this only guards the entry chunk, about 630 kB with React, the router, Base UI and the shell; a vendor chunk was measured and made the first load larger
+      // routes are split, so this only guards the entry chunk; a vendor chunk was measured and made the first load larger
       chunkSizeWarningLimit: 700,
     },
   };

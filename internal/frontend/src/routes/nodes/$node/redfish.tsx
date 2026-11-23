@@ -1,9 +1,5 @@
-import { BmcResponseModelRedfishSystem, getV1BmcStatus } from "@/client";
-import {
-  getV1BmcJobsOptions,
-  getV1BmcSelOptions,
-  postV1BmcIndicatorMutation,
-} from "@/client/@tanstack/react-query.gen";
+import { BmcResponseModelRedfishSystem } from "@/client";
+import { postV1BmcIndicatorMutation } from "@/client/@tanstack/react-query.gen";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ErrorPanel } from "@/components/error-panel";
@@ -12,18 +8,20 @@ import { Progress, ProgressLabel, ProgressValue } from "@/components/ui/progress
 import { Skeleton } from "@/components/ui/skeleton";
 import { toastBmcResponse } from "@/lib/bmc";
 import { formatLocation } from "@/lib/identity";
+import { bmcStatusOptions, jobsOptions, selOptions } from "@/lib/queries";
 import { cn, relativeTime, severityOf, severityVariant, type Severity } from "@/lib/utils";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { ArrowRight } from "lucide-react";
-import { toast } from "sonner";
 
 export const Route = createFileRoute("/nodes/$node/redfish")({
   staticData: { crumb: "Redfish" },
   component: RouteComponent,
-  loader: ({ params: { node } }) => getV1BmcStatus({ query: { nodeset: node } }),
-  staleTime: 60_000,
+  // a BMC is only logged into once the tab is opened, not when its link is hovered
+  preload: false,
+  loader: ({ context: { queryClient }, params: { node } }) =>
+    queryClient.ensureQueryData(bmcStatusOptions(node)),
 });
 
 type System = NonNullable<NonNullable<BmcResponseModelRedfishSystem["results"]>[number]["data"]>;
@@ -31,8 +29,8 @@ type Dell = NonNullable<System["oem_dell"]>;
 
 function RouteComponent() {
   const { node } = Route.useParams();
-  const { data: res } = Route.useLoaderData();
-  const result = res?.results?.[0];
+  const { data: res } = useSuspenseQuery(bmcStatusOptions(node));
+  const result = res.results?.[0];
 
   if (result && !result.success)
     return <ErrorPanel title="Could not read the BMC" message={result.message} />;
@@ -106,7 +104,6 @@ const toneText: Record<Tone, string> = {
   locate: "text-foreground",
 };
 
-// Led is one indicator light; the locate light pulses the way it blinks in the rack
 function Led({ tone }: { tone: Tone }) {
   return (
     <span aria-hidden className="relative inline-flex size-2 shrink-0">
@@ -134,7 +131,6 @@ const subsystems = [
   ["Licensing", "LicensingRollupStatus"],
 ] as const satisfies ReadonlyArray<readonly [string, keyof Dell]>;
 
-// FrontPanel draws the server's bezel as the BMC sees it: power and health on the left ear, the locate light on the right, and the subsystem health across the front. On a phone the model takes the top row and the ears sit side by side under it
 function FrontPanel({ node, system, dell }: { node: string; system?: System; dell?: Dell }) {
   const present = dell
     ? subsystems.flatMap(([label, key]) => {
@@ -174,7 +170,6 @@ function FrontPanel({ node, system, dell }: { node: string; system?: System; del
 
 type Subsystem = { label: string; value: string; tone: Tone };
 
-// SubsystemHealth says in one line that every subsystem is OK, or names the ones that are not; the full list opens from it
 function SubsystemHealth({ present }: { present: Subsystem[] }) {
   const faults = present.filter((s) => s.tone !== "ok");
   const healthy = present.length - faults.length;
@@ -217,7 +212,6 @@ function SubsystemHealth({ present }: { present: Subsystem[] }) {
   );
 }
 
-// Ear is one rack ear of the front panel, with the screw holes that hold it to the rack at its outer edge, clear of its lights
 function Ear({ side, children }: { side: "left" | "right"; children: ReactNode }) {
   const left = side === "left";
   return (
@@ -245,7 +239,6 @@ function Ear({ side, children }: { side: "left" | "right"; children: ReactNode }
   );
 }
 
-// EarLight is one light on an ear with its name and state on one line, so two fit in a 1U panel
 function EarLight({ label, value }: { label: string; value?: string }) {
   const tone = toneOf(value);
   return (
@@ -259,17 +252,15 @@ function EarLight({ label, value }: { label: string; value?: string }) {
   );
 }
 
-// LocateLight is the locate light on the right ear, and a switch for it: clicking it turns the light on the node on or off, then rereads the BMC
 function LocateLight({ node, state }: { node: string; state?: string }) {
-  const router = useRouter();
+  const queryClient = useQueryClient();
   const { mutate, isPending, variables } = useMutation({
     ...postV1BmcIndicatorMutation(),
     // an onSuccess given here is awaited, so the mutation stays pending through the reread and its variables stand in for the light until the BMC reports it. A BMC that refused still answers 200, and returning early lets the light fall back to what the BMC last reported
     onSuccess: async (data, { body }) => {
       if (!data?.results?.[0]?.success) return toastBmcResponse(`Locate LED ${body.state}`, data);
-      await router.invalidate();
+      await queryClient.refetchQueries({ queryKey: bmcStatusOptions(node).queryKey });
     },
-    onError: (e) => toast.error(e.title, { description: e.detail }),
   });
   const on = isPending ? variables.body.state === "on" : state === "On";
   const next = on ? "off" : "on";
@@ -291,7 +282,6 @@ function LocateLight({ node, state }: { node: string; state?: string }) {
   );
 }
 
-// Section heads one part of the tab below the front panel, with an optional link or badge beside its title
 function Section({
   title,
   aside,
@@ -312,7 +302,6 @@ function Section({
   );
 }
 
-// Note is the line a section shows in place of what it could not show
 function Note({ children }: { children: ReactNode }) {
   return <p className="text-sm text-muted-foreground">{children}</p>;
 }
@@ -323,7 +312,6 @@ const joined = (...parts: Array<string | 0 | false | undefined>) =>
 
 type Spec = { label: string; value?: string; title?: string; wide?: boolean };
 
-// SpecSheet lists what the BMC knows about the hardware, laid out like the service tag pulled from the front of the server
 function SpecSheet({ system, dell }: { system?: System; dell?: Dell }) {
   const inventoried = dell?.LastSystemInventoryTime
     ? relativeTime(dell.LastSystemInventoryTime)
@@ -474,7 +462,6 @@ type BmcQuery = {
   data?: { results?: Array<{ success?: boolean; message?: string }> };
 };
 
-// BmcSection is a Section filled from one bmc query of one node: a skeleton while it loads, the BMC's message when it fails, and the empty line when it found nothing
 function BmcSection({
   title,
   aside,
@@ -513,10 +500,7 @@ function BmcSection({
 }
 
 function RecentEvents({ node }: { node: string }) {
-  const query = useQuery({
-    ...getV1BmcSelOptions({ query: { nodeset: node, limit: "5" } }),
-    staleTime: 60_000,
-  });
+  const query = useQuery(selOptions(node, 5));
   const entries = query.data?.results?.[0]?.data?.entries ?? [];
 
   return (
@@ -554,10 +538,7 @@ function RecentEvents({ node }: { node: string }) {
 }
 
 function JobQueue({ node }: { node: string }) {
-  const query = useQuery({
-    ...getV1BmcJobsOptions({ query: { nodeset: node } }),
-    staleTime: 60_000,
-  });
+  const query = useQuery(jobsOptions(node));
   const jobs = query.data?.results?.[0]?.data?.jobs ?? [];
 
   return (

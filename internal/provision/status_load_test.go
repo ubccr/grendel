@@ -79,7 +79,7 @@ func TestProvisionWaveLoad(t *testing.T) {
 	steps = append(steps, h.recordCompleted)
 
 	// the nodes move through their steps together, as a rack powered on at once does, with reports from different nodes at the same time
-	// the recorder flushes as grendeld runs it, competing with the reports for the database
+	// the recorder tidies as grendeld runs it, competing with the reports for the database
 	ctx, cancel := context.WithCancel(context.Background())
 	recorded := make(chan error, 1)
 	go func() { recorded <- events.New(db).Run(ctx) }()
@@ -112,7 +112,6 @@ func TestProvisionWaveLoad(t *testing.T) {
 		wg.Wait()
 	}
 	wall := time.Since(started)
-	// stopping the recorder writes what is still queued
 	cancel()
 	require.NoError(t, <-recorded)
 
@@ -126,12 +125,4 @@ func TestProvisionWaveLoad(t *testing.T) {
 	require.Len(t, list, 1, "every node joins the one provisioning")
 	require.Equal(t, model.EventStateDone, list[0].State)
 	require.Equal(t, model.EventCounts{Total: nodes, Succeeded: nodes}, list[0].Counts)
-
-	// the most a flush ever writes is every node's report at once
-	for _, host := range hosts {
-		recordStatus(db, host, func(s *model.ProvisionStatus, now time.Time) { restart(s, model.ProvisionStatePXE, now) })
-	}
-	t0 := time.Now()
-	events.New(db).Flush()
-	t.Logf("flushing all %d nodes at once took %s", nodes, time.Since(t0).Round(time.Millisecond))
 }

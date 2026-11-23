@@ -27,7 +27,6 @@ type Props = {
   onConfirm: () => void;
 };
 
-// ReviewDialog lists what is about to be staged, and where and when it applies, before anything is sent
 export default function ReviewDialog({
   trigger,
   changes,
@@ -122,7 +121,6 @@ export default function ReviewDialog({
   );
 }
 
-// display shows an enumeration value by its registry display name
 function display(attr: BiosAttribute | undefined, value: BiosValue) {
   const match = attr?.values?.find((v) => v.name === value);
   return match?.display_name || showValue(value);

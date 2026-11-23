@@ -1,6 +1,5 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { useStoredValue } from "@/hooks/use-stored-value";
-import { createContext, useContext, useEffect, useMemo } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 
 const userStorageKey = "user";
@@ -17,12 +16,15 @@ type UserProviderProps = {
 
 type UserProviderState = {
   user: User;
-  setUser: (User: User) => void;
+  signIn: (user: NonNullable<User>) => void;
+  // signOut ends the session in this browser. Whoever calls it has already ended it on the server, or the server has by expiring the token
+  signOut: () => void;
 };
 
 const initialState: UserProviderState = {
   user: null,
-  setUser: () => null,
+  signIn: () => null,
+  signOut: () => null,
 };
 
 const UserProviderContext = createContext<UserProviderState>(initialState);
@@ -37,24 +39,24 @@ export function UserProvider({ children, ...props }: UserProviderProps) {
       return null;
     }
   }, [stored]);
-  const queryClient = useQueryClient();
+  const signOut = useCallback(() => setStored(undefined), [setStored]);
 
-  // a new session starts with an empty cache and ends when its token expires; the timer goes with the session, so signing out, here or in another tab, cancels it
+  // the session ends when its token expires; the timer goes with the session, so signing out, here or in another tab, cancels it
   useEffect(() => {
     if (!user?.expire) return;
-    queryClient.clear();
     const timer = setTimeout(() => {
-      setStored(undefined);
+      signOut();
       toast.warning("Session expired", {
         description: "Authentication token has expired, please login again",
       });
     }, user.expire - Date.now());
     return () => clearTimeout(timer);
-  }, [user, queryClient, setStored]);
+  }, [user, signOut]);
 
   const value = {
     user,
-    setUser: (user: User) => setStored(user === null ? undefined : JSON.stringify(user)),
+    signIn: (user: NonNullable<User>) => setStored(JSON.stringify(user)),
+    signOut,
   };
 
   return (
@@ -64,10 +66,4 @@ export function UserProvider({ children, ...props }: UserProviderProps) {
   );
 }
 
-export const useUser = () => {
-  const context = useContext(UserProviderContext);
-
-  if (context === undefined) throw new Error("useUser must be used within a UserProvider");
-
-  return context;
-};
+export const useUser = () => useContext(UserProviderContext);

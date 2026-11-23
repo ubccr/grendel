@@ -19,11 +19,9 @@ import { assetCsv, guessColumns, parseCsv } from "@/lib/identity";
 import { useMutation } from "@tanstack/react-query";
 import { Eye, FileSpreadsheet, LoaderCircle, Tag, TriangleAlert } from "lucide-react";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 
 type Csv = { file: string; rows: string[][]; header: boolean; serial: number; tag: number };
 
-// AssetTagForm sets asset tags from a template, or from a CSV matched to each node by the serial its BMC reports
 export default function AssetTagForm({
   nodes,
   example,
@@ -38,7 +36,8 @@ export default function AssetTagForm({
   const [csv, setCsv] = useState<Csv>();
   const [preview, setPreview] = useState<{ rows: PreviewRow[]; applied: boolean }>();
   const [running, setRunning] = useState<"preview" | "apply">();
-  const { mutate } = useMutation(postV1BmcAssetTagMutation());
+  // only an apply is toasted, a preview shows its outcome in the table, so the toast is made here
+  const { mutate } = useMutation({ ...postV1BmcAssetTagMutation(), meta: { bmc: true } });
 
   const parsed = useMemo(
     () => (csv ? assetCsv(csv.rows, csv.header, csv.serial, csv.tag) : undefined),
@@ -82,7 +81,6 @@ export default function AssetTagForm({
             })),
           });
         },
-        onError: (e) => toast.error(e.title, { description: e.detail }),
         onSettled: () => setRunning(undefined),
       },
     );

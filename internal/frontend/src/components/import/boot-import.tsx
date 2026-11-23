@@ -1,13 +1,13 @@
 import type { GetV1BmcNicsResponse, NodeImportResponse } from "@/client";
-import { getV1BmcNics } from "@/client";
+import { getV1BmcNics, getV1SwitchScan } from "@/client";
 import {
   getV1BmcNicsOptions,
   getV1BmcNicsQueryKey,
-  getV1NodesQueryKey,
-  getV1SwitchScanOptions,
+  getV1SwitchScanQueryKey,
 } from "@/client/@tanstack/react-query.gen";
 import { BootGrid } from "@/components/import/boot-grid";
 import { BootSettingsPanel } from "@/components/import/boot-settings";
+import { Done } from "@/components/import/done";
 import { NodePicker, readable } from "@/components/import/node-picker";
 import { useNodeList } from "@/components/nodes/node-table";
 import { Review } from "@/components/import/review";
@@ -32,43 +32,44 @@ import {
   learned,
 } from "@/lib/boot-nics";
 import { expandOrEmpty, fold } from "@/lib/nodeset";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { useRefreshPart } from "./use-refresh-part";
-import { Link } from "@tanstack/react-router";
+import { getRouteApi } from "@tanstack/react-router";
 import {
   ArrowLeft,
   ArrowRight,
   ChevronRight,
-  CircleCheck,
-  Cpu,
-  IdCard,
   LoaderCircle,
   RefreshCw,
   ScanSearch,
 } from "lucide-react";
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState } from "react";
 
 const settingsKey = "grendel.boot-nics.settings";
 
 export const bootSteps = ["nodes", "ports", "review", "done"] as const;
 export type BootStep = (typeof bootSteps)[number];
 
-// the step, the nodes and the switches live in the URL, so a reload or a shared link lands in the same place, and the switch import can hand its nodes and switches over
 type NicResult = NonNullable<GetV1BmcNicsResponse["results"]>[number];
 
-export type BootSearch = { bootStep: BootStep; nodes: string; switches: string };
+const route = getRouteApi("/add/node");
 
-// BootImport is the interface wizard: read each node's interfaces from its BMC, pick one by a rule per interface layout, and store it with an address. Like SwitchImport, it hands its stepper and body to children to lay out
-export function BootImport({
-  search,
-  onSearch,
-  children,
-}: {
-  search: BootSearch;
-  onSearch: (patch: Partial<BootSearch>, replace?: boolean) => void;
-  children: (parts: { stepper?: ReactNode; body: ReactNode }) => ReactNode;
-}) {
-  const { bootStep: wanted, nodes, switches } = search;
+// kept apart from the switch import's scan of the same switches, which was taken before the nodes it imported had brought their interfaces up
+const scanKey = (switches: string) => [
+  ...getV1SwitchScanQueryKey({ query: { nodeset: switches } }),
+  "interfaces",
+];
+
+// forgetRead drops what the BMCs of nodes and the switches last answered, so the interfaces step asks them again
+export function forgetRead(queryClient: QueryClient, nodes: string, switches: string) {
+  queryClient.removeQueries({ queryKey: getV1BmcNicsQueryKey({ query: { nodeset: nodes } }) });
+  queryClient.removeQueries({ queryKey: scanKey(switches) });
+}
+
+// The step, nodes and switches are the add node page's search parameters, so Back and Forward move between steps and the switch import can hand its nodes and switches over
+export function BootImport() {
+  const { tab, bootStep: wanted, nodes, bootSwitches: switches } = route.useSearch();
+  const navigate = route.useNavigate();
   const queryClient = useQueryClient();
 
   const [settings, store] = useStoredJSON(settingsKey, defaultBootSettings);
@@ -96,19 +97,23 @@ export function BootImport({
 
   const step: BootStep =
     wanted !== "nodes" && !nodes ? "nodes" : wanted === "done" && !result ? "review" : wanted;
-  const go = (to: BootStep, extra?: Partial<BootSearch>) => onSearch({ ...extra, bootStep: to });
+  const go = (to: BootStep, extra?: { nodes?: string }) =>
+    navigate({ search: (s) => ({ ...s, ...extra, bootStep: to }) });
 
+  // the tab stays mounted behind the others, where a link changing its search parameters must not start a read nobody is looking at
+  const reading = tab === "boot" && step !== "nodes";
   const nicsOptions = getV1BmcNicsOptions({ query: { nodeset: nodes } });
   const nics = useQuery({
     ...nicsOptions,
-    enabled: step !== "nodes" && !!nodes,
+    enabled: reading && !!nodes,
     staleTime: Infinity,
     gcTime: Infinity,
   });
-  // the same query as the switch import's, so switches it just scanned aren't read again
   const scan = useQuery({
-    ...getV1SwitchScanOptions({ query: { nodeset: switches } }),
-    enabled: step !== "nodes" && !!switches,
+    queryKey: scanKey(switches),
+    queryFn: async () =>
+      (await getV1SwitchScan({ query: { nodeset: switches }, throwOnError: true })).data,
+    enabled: reading && !!switches,
     staleTime: Infinity,
     gcTime: Infinity,
   });
@@ -155,37 +160,44 @@ export function BootImport({
     { id: "review", label: "Addresses and review" },
   ];
 
-  const stepper = step !== "done" && (
-    <Stepper
-      steps={stepList}
-      current={step}
-      reachable={(id) =>
-        id === "nodes" || (id === "ports" && !!nodes) || (id === "review" && importRows.length > 0)
-      }
-      onGo={(id) => go(id as BootStep)}
-    />
-  );
-
   // only the nodes whose BMCs can be asked are read, since one name the API can't find fails the whole request
   const start = () => {
     if (toRead.length === 0) return;
     const nodeset = fold(toRead.map((h) => h.name ?? ""));
     setRuleEdits({});
     setOverrides({});
-    queryClient.removeQueries({
-      queryKey: getV1BmcNicsQueryKey({ query: { nodeset } }),
-    });
+    forgetRead(queryClient, nodeset, switches);
     go("ports", { nodes: nodeset });
   };
 
-  const body = (
+  const summary = result?.res.summary ?? {};
+
+  return (
     <>
+      {step !== "done" && (
+        // pulled up by the difference between the panel's gap and the gap under the tab list, so the steps sit midway between the tabs and the step itself
+        <div className="-mb-2 justify-self-center">
+          <Stepper
+            steps={stepList}
+            current={step}
+            reachable={(id) =>
+              id === "nodes" ||
+              (id === "ports" && !!nodes) ||
+              (id === "review" && importRows.length > 0)
+            }
+            onGo={(id) => go(id as BootStep)}
+          />
+        </div>
+      )}
+
       {step === "nodes" && (
         <div className="grid gap-6">
           <NodePicker selected={draft} onChange={setDraft} />
           <SwitchSection
             selected={selectedSwitches}
-            onChange={(names) => onSearch({ switches: fold(names) }, true)}
+            onChange={(names) =>
+              navigate({ search: (s) => ({ ...s, bootSwitches: fold(names) }), replace: true })
+            }
           />
           <StepBar>
             <p className="mr-auto text-sm text-muted-foreground">
@@ -282,6 +294,7 @@ export function BootImport({
         <Review
           rows={importRows}
           bmc={false}
+          needsAddresses={changes > 0}
           back={
             <Button variant="ghost" onClick={() => go("ports")}>
               <ArrowLeft />
@@ -289,7 +302,6 @@ export function BootImport({
             </Button>
           }
           onCommitted={(res, names) => {
-            void queryClient.invalidateQueries({ queryKey: getV1NodesQueryKey() });
             setResult({ res, nodes: names });
             go("done");
           }}
@@ -298,7 +310,14 @@ export function BootImport({
 
       {step === "done" && result && (
         <Done
-          result={result}
+          title={`Saved interfaces for ${result.nodes.length} node${result.nodes.length === 1 ? "" : "s"}`}
+          summary={[
+            summary.add && `${summary.add} given an interface`,
+            summary.replace && `${summary.replace} had an interface updated`,
+            summary.unchanged && `${summary.unchanged} already as shown`,
+          ]}
+          nodes={fold(result.nodes)}
+          again="Add more interfaces"
           onAgain={() => {
             setResult(undefined);
             setOverrides({});
@@ -309,11 +328,9 @@ export function BootImport({
       )}
     </>
   );
-
-  return children({ stepper: stepper || undefined, body });
 }
 
-// SwitchSection is the optional choice of switches to scan, closed until wanted unless switches are already chosen, as when the switch import hands them over
+// The switch choice is closed until wanted, unless switches are already chosen, as when the switch import hands them over
 function SwitchSection({
   selected,
   onChange,
@@ -361,82 +378,6 @@ function Reading({ nodes, switches }: { nodes: string; switches: number }) {
       </p>
       <Skeleton className="h-14 w-full" />
       <Skeleton className="h-64 w-full" />
-    </div>
-  );
-}
-
-function Done({
-  result,
-  onAgain,
-}: {
-  result: { res: NodeImportResponse; nodes: string[] };
-  onAgain: () => void;
-}) {
-  const s = result.res.summary ?? {};
-  const nodes = fold(result.nodes);
-  const next = [
-    {
-      to: "/nodes/bios/$nodes" as const,
-      icon: <Cpu />,
-      title: "Configure BIOS",
-      text: "Turn on PXE for the boot port and set the boot order.",
-    },
-    {
-      to: "/nodes/identity/$nodes" as const,
-      icon: <IdCard />,
-      title: "Set locations and asset tags",
-      text: "Write each node's rack location to its BMC.",
-    },
-  ];
-
-  return (
-    <div className="grid gap-6">
-      <div className="flex items-start gap-3">
-        <CircleCheck className="mt-0.5 size-6 shrink-0 text-(--node-ready)" />
-        <div className="grid gap-1">
-          <h2 className="text-lg font-semibold tracking-tight">
-            Saved interfaces for {result.nodes.length} node{result.nodes.length === 1 ? "" : "s"}
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            {[
-              s.add && `${s.add} given an interface`,
-              s.replace && `${s.replace} had an interface updated`,
-              s.unchanged && `${s.unchanged} already as shown`,
-            ]
-              .filter(Boolean)
-              .join(", ")}
-            .
-          </p>
-          <p className="font-mono text-sm break-all">{nodes}</p>
-        </div>
-      </div>
-
-      <div className="grid gap-2">
-        <h3 className="text-sm font-medium">Next, for these nodes</h3>
-        <ul className="grid gap-2 sm:grid-cols-2">
-          {next.map((n) => (
-            <li key={n.to}>
-              <Link
-                to={n.to}
-                params={{ nodes }}
-                className="flex h-full gap-3 rounded-lg border p-3 outline-none hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring [&>svg]:mt-0.5 [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-muted-foreground"
-              >
-                {n.icon}
-                <span className="grid gap-0.5">
-                  <span className="text-sm font-medium">{n.title}</span>
-                  <span className="text-xs text-muted-foreground">{n.text}</span>
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div>
-        <Button variant="outline" onClick={onAgain}>
-          Add more interfaces
-        </Button>
-      </div>
     </div>
   );
 }

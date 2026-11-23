@@ -86,8 +86,8 @@ var (
 					ipAddr := ""
 					macAddr := ""
 					if len(host.Interfaces) > 0 {
-						ipAddr = host.Interfaces[0].Value.IP.Value
-						macAddr = host.Interfaces[0].Value.MAC.Value
+						ipAddr = host.Interfaces[0].IP.Value
+						macAddr = host.Interfaces[0].MAC.Value
 					}
 
 					bi := host.BootImage.Value

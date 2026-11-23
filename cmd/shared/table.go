@@ -50,16 +50,29 @@ type TableOptions struct {
 	BorderRows bool
 }
 
-// RegisterTableFlags adds the shared table flags to a list command and returns the options they write into
-func RegisterTableFlags(command *cobra.Command) *TableOptions {
-	options := &TableOptions{}
+type TableFlags struct {
+	columns []Column
+	filter  []string
+	options TableOptions
+}
 
-	command.Flags().IntVar(&options.Width, "width", 0, "fit the table to this many columns instead of the terminal width")
-	command.Flags().BoolVar(&options.NoWrap, "no-wrap", false, "don't fit the table to the terminal width")
-	command.Flags().BoolVar(&options.NoBorder, "no-border", false, "don't draw the table border")
-	command.Flags().BoolVar(&options.BorderRows, "border-rows", false, "always draw a rule between rows, not just when a row wraps")
+// RegisterTableFlags adds the shared table flags to a list command: the display flags, and --filter, which hides columns and completes their names. hidden are the columns --filter starts out hiding
+func RegisterTableFlags(command *cobra.Command, columns []Column, hidden ...string) *TableFlags {
+	flags := &TableFlags{columns: columns}
 
-	return options
+	command.Flags().IntVar(&flags.options.Width, "width", 0, "fit the table to this many columns instead of the terminal width")
+	command.Flags().BoolVar(&flags.options.NoWrap, "no-wrap", false, "don't fit the table to the terminal width")
+	command.Flags().BoolVar(&flags.options.NoBorder, "no-border", false, "don't draw the table border")
+	command.Flags().BoolVar(&flags.options.BorderRows, "border-rows", false, "always draw a rule between rows, not just when a row wraps")
+	command.Flags().StringSliceVar(&flags.filter, "filter", hidden, "filter table columns by name")
+	command.RegisterFlagCompletionFunc("filter", ColumnCompletion(columns))
+
+	return flags
+}
+
+// Table builds the command's table as its flags ask for it, with a dash in the cells that have no value
+func (f *TableFlags) Table() *Table {
+	return NewTable(f.columns, f.filter).Options(f.options).Empty("-")
 }
 
 // Table renders the output of a list command, sizing the columns to the terminal when stdout is a tty

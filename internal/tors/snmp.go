@@ -5,9 +5,12 @@
 package tors
 
 import (
+	"cmp"
 	"context"
 	"fmt"
+	"maps"
 	"net"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -24,10 +27,6 @@ const (
 	oidDot1dBasePortIfIndex  = ".1.3.6.1.2.1.17.1.4.1.2"
 	oidIfName                = ".1.3.6.1.2.1.31.1.1.1.1"
 	oidIfAlias               = ".1.3.6.1.2.1.31.1.1.1.18"
-	oidIfHighSpeed           = ".1.3.6.1.2.1.31.1.1.1.15"
-	oidIfMtu                 = ".1.3.6.1.2.1.2.2.1.4"
-	oidIfAdminStatus         = ".1.3.6.1.2.1.2.2.1.7"
-	oidIfOperStatus          = ".1.3.6.1.2.1.2.2.1.8"
 	oidLldpLocPortID         = ".1.0.8802.1.1.2.1.3.7.1.3"
 	oidLldpLocPortDesc       = ".1.0.8802.1.1.2.1.3.7.1.4"
 	oidLldpRemTable          = ".1.0.8802.1.1.2.1.4.1.1"
@@ -39,8 +38,6 @@ const (
 	fdbStatusSelf = 4
 	fdbStatusMgmt = 5
 )
-
-var ifStatus = map[int]string{1: "up", 2: "down", 3: "testing", 4: "unknown", 5: "dormant", 6: "notpresent", 7: "lowerlayerdown"}
 
 var lldpChassisSubtype = map[int]string{1: "CHASSIS_COMPONENT", 2: "INTERFACE_ALIAS", 3: "PORT_COMPONENT", 4: "MAC_ADDRESS", 5: "NETWORK_ADDRESS", 6: "INTERFACE_NAME", 7: "LOCAL"}
 
@@ -190,8 +187,8 @@ func (s *SNMP) Close() error {
 	return err
 }
 
-func (s *SNMP) GetInterfaceStatus(ctx context.Context) (model.InterfaceTable, error) {
-	w, err := s.walk(ctx, oidIfName, oidIfAlias, oidIfHighSpeed, oidIfMtu, oidIfAdminStatus, oidIfOperStatus)
+func (s *SNMP) GetInterfaceDescriptions(ctx context.Context) (map[string]string, error) {
+	w, err := s.walk(ctx, oidIfName, oidIfAlias)
 	if err != nil {
 		return nil, err
 	}
@@ -269,28 +266,19 @@ func ifNames(w map[string][]gosnmp.SnmpPDU) map[int]string {
 	return out
 }
 
-func parseIfTable(w map[string][]gosnmp.SnmpPDU) model.InterfaceTable {
+func parseIfTable(w map[string][]gosnmp.SnmpPDU) map[string]string {
 	names := ifNames(w)
-	out := model.InterfaceTable{}
+	out := map[string]string{}
 	for _, name := range names {
-		out[name] = &model.InterfaceStatus{Name: name}
+		out[name] = ""
 	}
-	col := func(table string, set func(*model.InterfaceStatus, gosnmp.SnmpPDU)) {
-		for _, pdu := range w[table] {
-			idx := index(pdu, table)
-			if len(idx) != 1 {
-				continue
-			}
-			if st, ok := out[names[idx[0]]]; ok {
-				set(st, pdu)
+	for _, pdu := range w[oidIfAlias] {
+		if idx := index(pdu, oidIfAlias); len(idx) == 1 {
+			if name, ok := names[idx[0]]; ok {
+				out[name] = string(pduBytes(pdu))
 			}
 		}
 	}
-	col(oidIfAlias, func(st *model.InterfaceStatus, p gosnmp.SnmpPDU) { st.Description = string(pduBytes(p)) })
-	col(oidIfHighSpeed, func(st *model.InterfaceStatus, p gosnmp.SnmpPDU) { st.Bandwidth = pduInt(p) })
-	col(oidIfMtu, func(st *model.InterfaceStatus, p gosnmp.SnmpPDU) { st.MTU = pduInt(p) })
-	col(oidIfAdminStatus, func(st *model.InterfaceStatus, p gosnmp.SnmpPDU) { st.InterfaceStatus = ifStatus[pduInt(p)] })
-	col(oidIfOperStatus, func(st *model.InterfaceStatus, p gosnmp.SnmpPDU) { st.LineProtocolStatus = ifStatus[pduInt(p)] })
 	return out
 }
 
@@ -348,11 +336,12 @@ func parseSNMPFDB(w map[string][]gosnmp.SnmpPDU) model.MACTable {
 		}
 
 		ifIndex, ok := bridgeToIf[bridgePort]
-		if !ok {
-			ifIndex = bridgePort
+		// only a switch with no dot1dBasePortIfIndex table numbers its bridge ports by ifIndex; in a table that has rows, a port missing from it is not an interface
+		if !ok && len(bridgeToIf) == 0 {
+			ifIndex, ok = bridgePort, true
 		}
-		name, ok := names[ifIndex]
-		if !ok {
+		name, named := names[ifIndex]
+		if !ok || !named {
 			log.Debugf("fdb entry %s on bridge port %d has no interface name", mac, bridgePort)
 			continue
 		}
@@ -424,8 +413,14 @@ func parseSNMPLLDP(w map[string][]gosnmp.SnmpPDU) model.LLDPNeighbors {
 		mgmt[remKey{idx[1], idx[2]}] = fmt.Sprintf("%d.%d.%d.%d", idx[5], idx[6], idx[7], idx[8])
 	}
 
+	// a port can have several neighbors, such as a shared-LOM host and its BMC, but the result holds one per port: the lowest remote index, so every call picks the same one
+	keys := slices.SortedFunc(maps.Keys(rows), func(a, b remKey) int {
+		return cmp.Or(cmp.Compare(a.local, b.local), cmp.Compare(a.index, b.index))
+	})
+
 	out := model.LLDPNeighbors{}
-	for k, cols := range rows {
+	for _, k := range keys {
+		cols := rows[k]
 		str := func(c int) string { return pduText(pduBytes(cols[c])) }
 		chassisType := lldpChassisSubtype[pduInt(cols[4])]
 		portType := lldpPortSubtype[pduInt(cols[6])]
@@ -440,6 +435,9 @@ func parseSNMPLLDP(w map[string][]gosnmp.SnmpPDU) model.LLDPNeighbors {
 		}
 
 		name := portName(k.local)
+		if _, seen := out[name]; seen {
+			continue
+		}
 		out[name] = &model.LLDP{
 			PortName:          name,
 			ChassisIdType:     chassisType,

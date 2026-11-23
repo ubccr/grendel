@@ -17,7 +17,7 @@
 						"type": "integer"
 					},
 					"prefix_len": {
-						"description": "the prefix length most of the range's ports carry",
+						"description": "the prefix length to give a port in the range, the one a search of the range reports",
 						"example": 18,
 						"type": "integer"
 					},
@@ -158,7 +158,6 @@
 						"description": "Clear only these job ids",
 						"example": "JID_000000000001",
 						"items": {
-							"nullable": true,
 							"type": "string"
 						},
 						"nullable": true,
@@ -308,7 +307,7 @@
 						"type": "string"
 					},
 					"target": {
-						"description": "What to power, 'host' or 'bmc'. Defaults to host. A bmc target is always a graceful restart and ignores the other fields",
+						"description": "What to power, 'host' or 'bmc'. Defaults to host. A bmc target is always a graceful restart and takes no action or boot_override",
 						"example": "host",
 						"type": "string"
 					}
@@ -320,7 +319,6 @@
 				"properties": {
 					"results": {
 						"items": {
-							"nullable": true,
 							"properties": {
 								"data": {
 									"nullable": true
@@ -339,9 +337,14 @@
 									"type": "boolean"
 								}
 							},
+							"required": [
+								"node",
+								"success",
+								"message",
+								"duration_ms"
+							],
 							"type": "object"
 						},
-						"nullable": true,
 						"type": "array"
 					},
 					"run_id": {
@@ -366,9 +369,21 @@
 								"type": "integer"
 							}
 						},
+						"required": [
+							"total",
+							"succeeded",
+							"failed",
+							"failed_nodes",
+							"duration_ms"
+						],
 						"type": "object"
 					}
 				},
+				"required": [
+					"run_id",
+					"summary",
+					"results"
+				],
 				"type": "object"
 			},
 			"BmcResponse_model.BmcAssetTagResult": {
@@ -376,7 +391,6 @@
 				"properties": {
 					"results": {
 						"items": {
-							"nullable": true,
 							"properties": {
 								"data": {
 									"nullable": true,
@@ -394,6 +408,12 @@
 											"type": "string"
 										}
 									},
+									"required": [
+										"serial",
+										"current",
+										"desired",
+										"changed"
+									],
 									"type": "object"
 								},
 								"duration_ms": {
@@ -410,9 +430,14 @@
 									"type": "boolean"
 								}
 							},
+							"required": [
+								"node",
+								"success",
+								"message",
+								"duration_ms"
+							],
 							"type": "object"
 						},
-						"nullable": true,
 						"type": "array"
 					},
 					"run_id": {
@@ -437,9 +462,21 @@
 								"type": "integer"
 							}
 						},
+						"required": [
+							"total",
+							"succeeded",
+							"failed",
+							"failed_nodes",
+							"duration_ms"
+						],
 						"type": "object"
 					}
 				},
+				"required": [
+					"run_id",
+					"summary",
+					"results"
+				],
 				"type": "object"
 			},
 			"BmcResponse_model.BmcBios": {
@@ -447,7 +484,6 @@
 				"properties": {
 					"results": {
 						"items": {
-							"nullable": true,
 							"properties": {
 								"data": {
 									"nullable": true,
@@ -479,6 +515,12 @@
 											"type": "boolean"
 										}
 									},
+									"required": [
+										"attribute_registry",
+										"reset_pending",
+										"model",
+										"bios_version"
+									],
 									"type": "object"
 								},
 								"duration_ms": {
@@ -495,9 +537,14 @@
 									"type": "boolean"
 								}
 							},
+							"required": [
+								"node",
+								"success",
+								"message",
+								"duration_ms"
+							],
 							"type": "object"
 						},
-						"nullable": true,
 						"type": "array"
 					},
 					"run_id": {
@@ -522,9 +569,21 @@
 								"type": "integer"
 							}
 						},
+						"required": [
+							"total",
+							"succeeded",
+							"failed",
+							"failed_nodes",
+							"duration_ms"
+						],
 						"type": "object"
 					}
 				},
+				"required": [
+					"run_id",
+					"summary",
+					"results"
+				],
 				"type": "object"
 			},
 			"BmcResponse_model.BmcBiosRegistry": {
@@ -532,7 +591,6 @@
 				"properties": {
 					"results": {
 						"items": {
-							"nullable": true,
 							"properties": {
 								"data": {
 									"nullable": true,
@@ -607,6 +665,10 @@
 																	"type": "string"
 																}
 															},
+															"required": [
+																"name",
+																"display_name"
+															],
 															"type": "object"
 														},
 														"type": "array"
@@ -618,6 +680,22 @@
 														"type": "boolean"
 													}
 												},
+												"required": [
+													"name",
+													"display_name",
+													"help_text",
+													"warning_text",
+													"menu_path",
+													"display_order",
+													"type",
+													"read_only",
+													"write_only",
+													"hidden",
+													"immutable",
+													"gray_out",
+													"reset_required",
+													"system_unique"
+												],
 												"type": "object"
 											},
 											"type": "array"
@@ -635,6 +713,12 @@
 											"type": "string"
 										}
 									},
+									"required": [
+										"available",
+										"registry",
+										"version",
+										"language"
+									],
 									"type": "object"
 								},
 								"duration_ms": {
@@ -651,9 +735,14 @@
 									"type": "boolean"
 								}
 							},
+							"required": [
+								"node",
+								"success",
+								"message",
+								"duration_ms"
+							],
 							"type": "object"
 						},
-						"nullable": true,
 						"type": "array"
 					},
 					"run_id": {
@@ -678,9 +767,21 @@
 								"type": "integer"
 							}
 						},
+						"required": [
+							"total",
+							"succeeded",
+							"failed",
+							"failed_nodes",
+							"duration_ms"
+						],
 						"type": "object"
 					}
 				},
+				"required": [
+					"run_id",
+					"summary",
+					"results"
+				],
 				"type": "object"
 			},
 			"BmcResponse_model.BmcFirmwareUpdates": {
@@ -688,7 +789,6 @@
 				"properties": {
 					"results": {
 						"items": {
-							"nullable": true,
 							"properties": {
 								"data": {
 									"nullable": true,
@@ -698,7 +798,6 @@
 										},
 										"updates": {
 											"items": {
-												"nullable": true,
 												"properties": {
 													"component_type": {
 														"type": "string"
@@ -725,12 +824,25 @@
 														"type": "string"
 													}
 												},
+												"required": [
+													"name",
+													"display_name",
+													"component_type",
+													"installed_version",
+													"package_version",
+													"criticality",
+													"reboot_type",
+													"package_path"
+												],
 												"type": "object"
 											},
 											"nullable": true,
 											"type": "array"
 										}
 									},
+									"required": [
+										"reboot_type"
+									],
 									"type": "object"
 								},
 								"duration_ms": {
@@ -747,9 +859,14 @@
 									"type": "boolean"
 								}
 							},
+							"required": [
+								"node",
+								"success",
+								"message",
+								"duration_ms"
+							],
 							"type": "object"
 						},
-						"nullable": true,
 						"type": "array"
 					},
 					"run_id": {
@@ -774,9 +891,21 @@
 								"type": "integer"
 							}
 						},
+						"required": [
+							"total",
+							"succeeded",
+							"failed",
+							"failed_nodes",
+							"duration_ms"
+						],
 						"type": "object"
 					}
 				},
+				"required": [
+					"run_id",
+					"summary",
+					"results"
+				],
 				"type": "object"
 			},
 			"BmcResponse_model.BmcJobList": {
@@ -784,14 +913,12 @@
 				"properties": {
 					"results": {
 						"items": {
-							"nullable": true,
 							"properties": {
 								"data": {
 									"nullable": true,
 									"properties": {
 										"jobs": {
 											"items": {
-												"nullable": true,
 												"properties": {
 													"end_time": {
 														"type": "string"
@@ -821,6 +948,17 @@
 														"type": "string"
 													}
 												},
+												"required": [
+													"id",
+													"name",
+													"state",
+													"status",
+													"type",
+													"percent_complete",
+													"start_time",
+													"end_time",
+													"message"
+												],
 												"type": "object"
 											},
 											"nullable": true,
@@ -843,9 +981,14 @@
 									"type": "boolean"
 								}
 							},
+							"required": [
+								"node",
+								"success",
+								"message",
+								"duration_ms"
+							],
 							"type": "object"
 						},
-						"nullable": true,
 						"type": "array"
 					},
 					"run_id": {
@@ -870,9 +1013,21 @@
 								"type": "integer"
 							}
 						},
+						"required": [
+							"total",
+							"succeeded",
+							"failed",
+							"failed_nodes",
+							"duration_ms"
+						],
 						"type": "object"
 					}
 				},
+				"required": [
+					"run_id",
+					"summary",
+					"results"
+				],
 				"type": "object"
 			},
 			"BmcResponse_model.BmcLocationResult": {
@@ -880,7 +1035,6 @@
 				"properties": {
 					"results": {
 						"items": {
-							"nullable": true,
 							"properties": {
 								"data": {
 									"nullable": true,
@@ -907,6 +1061,12 @@
 													"type": "string"
 												}
 											},
+											"required": [
+												"datacenter",
+												"room",
+												"row",
+												"rack"
+											],
 											"type": "object"
 										},
 										"desired": {
@@ -928,9 +1088,20 @@
 													"type": "string"
 												}
 											},
+											"required": [
+												"datacenter",
+												"room",
+												"row",
+												"rack"
+											],
 											"type": "object"
 										}
 									},
+									"required": [
+										"current",
+										"desired",
+										"changed"
+									],
 									"type": "object"
 								},
 								"duration_ms": {
@@ -947,9 +1118,14 @@
 									"type": "boolean"
 								}
 							},
+							"required": [
+								"node",
+								"success",
+								"message",
+								"duration_ms"
+							],
 							"type": "object"
 						},
-						"nullable": true,
 						"type": "array"
 					},
 					"run_id": {
@@ -974,9 +1150,21 @@
 								"type": "integer"
 							}
 						},
+						"required": [
+							"total",
+							"succeeded",
+							"failed",
+							"failed_nodes",
+							"duration_ms"
+						],
 						"type": "object"
 					}
 				},
+				"required": [
+					"run_id",
+					"summary",
+					"results"
+				],
 				"type": "object"
 			},
 			"BmcResponse_model.BmcNICList": {
@@ -984,14 +1172,12 @@
 				"properties": {
 					"results": {
 						"items": {
-							"nullable": true,
 							"properties": {
 								"data": {
 									"nullable": true,
 									"properties": {
 										"nics": {
 											"items": {
-												"nullable": true,
 												"properties": {
 													"enabled": {
 														"type": "boolean"
@@ -1012,6 +1198,14 @@
 														"type": "integer"
 													}
 												},
+												"required": [
+													"id",
+													"name",
+													"mac",
+													"link",
+													"speed_mbps",
+													"enabled"
+												],
 												"type": "object"
 											},
 											"nullable": true,
@@ -1034,9 +1228,14 @@
 									"type": "boolean"
 								}
 							},
+							"required": [
+								"node",
+								"success",
+								"message",
+								"duration_ms"
+							],
 							"type": "object"
 						},
-						"nullable": true,
 						"type": "array"
 					},
 					"run_id": {
@@ -1061,9 +1260,21 @@
 								"type": "integer"
 							}
 						},
+						"required": [
+							"total",
+							"succeeded",
+							"failed",
+							"failed_nodes",
+							"duration_ms"
+						],
 						"type": "object"
 					}
 				},
+				"required": [
+					"run_id",
+					"summary",
+					"results"
+				],
 				"type": "object"
 			},
 			"BmcResponse_model.BmcSELLog": {
@@ -1071,14 +1282,12 @@
 				"properties": {
 					"results": {
 						"items": {
-							"nullable": true,
 							"properties": {
 								"data": {
 									"nullable": true,
 									"properties": {
 										"entries": {
 											"items": {
-												"nullable": true,
 												"properties": {
 													"created": {
 														"type": "string"
@@ -1105,6 +1314,16 @@
 														"type": "string"
 													}
 												},
+												"required": [
+													"id",
+													"created",
+													"severity",
+													"message",
+													"message_id",
+													"entry_type",
+													"sensor_type",
+													"resolution"
+												],
 												"type": "object"
 											},
 											"nullable": true,
@@ -1127,9 +1346,14 @@
 									"type": "boolean"
 								}
 							},
+							"required": [
+								"node",
+								"success",
+								"message",
+								"duration_ms"
+							],
 							"type": "object"
 						},
-						"nullable": true,
 						"type": "array"
 					},
 					"run_id": {
@@ -1154,9 +1378,21 @@
 								"type": "integer"
 							}
 						},
+						"required": [
+							"total",
+							"succeeded",
+							"failed",
+							"failed_nodes",
+							"duration_ms"
+						],
 						"type": "object"
 					}
 				},
+				"required": [
+					"run_id",
+					"summary",
+					"results"
+				],
 				"type": "object"
 			},
 			"BmcResponse_model.BmcSecureBoot": {
@@ -1164,7 +1400,6 @@
 				"properties": {
 					"results": {
 						"items": {
-							"nullable": true,
 							"properties": {
 								"data": {
 									"nullable": true,
@@ -1209,6 +1444,15 @@
 																	"type": "string"
 																}
 															},
+															"required": [
+																"id",
+																"subject",
+																"issuer",
+																"not_before",
+																"not_after",
+																"fingerprint",
+																"owner"
+															],
 															"type": "object"
 														},
 														"type": "array"
@@ -1232,11 +1476,20 @@
 																	"type": "string"
 																}
 															},
+															"required": [
+																"id",
+																"type",
+																"hash",
+																"owner"
+															],
 															"type": "object"
 														},
 														"type": "array"
 													}
 												},
+												"required": [
+													"id"
+												],
 												"type": "object"
 											},
 											"type": "array"
@@ -1249,6 +1502,11 @@
 											"type": "boolean"
 										}
 									},
+									"required": [
+										"enabled",
+										"mode",
+										"current_boot"
+									],
 									"type": "object"
 								},
 								"duration_ms": {
@@ -1265,9 +1523,14 @@
 									"type": "boolean"
 								}
 							},
+							"required": [
+								"node",
+								"success",
+								"message",
+								"duration_ms"
+							],
 							"type": "object"
 						},
-						"nullable": true,
 						"type": "array"
 					},
 					"run_id": {
@@ -1292,9 +1555,21 @@
 								"type": "integer"
 							}
 						},
+						"required": [
+							"total",
+							"succeeded",
+							"failed",
+							"failed_nodes",
+							"duration_ms"
+						],
 						"type": "object"
 					}
 				},
+				"required": [
+					"run_id",
+					"summary",
+					"results"
+				],
 				"type": "object"
 			},
 			"BmcResponse_model.RedfishSystem": {
@@ -1302,7 +1577,6 @@
 				"properties": {
 					"results": {
 						"items": {
-							"nullable": true,
 							"properties": {
 								"data": {
 									"nullable": true,
@@ -1321,7 +1595,6 @@
 										},
 										"boot_order": {
 											"items": {
-												"nullable": true,
 												"type": "string"
 											},
 											"nullable": true,
@@ -1365,6 +1638,12 @@
 													"type": "string"
 												}
 											},
+											"required": [
+												"datacenter",
+												"room",
+												"row",
+												"rack"
+											],
 											"type": "object"
 										},
 										"location_indicator": {
@@ -1390,7 +1669,6 @@
 															},
 															"MessageArgs": {
 																"items": {
-																	"nullable": true,
 																	"type": "string"
 																},
 																"nullable": true,
@@ -1407,7 +1685,6 @@
 															},
 															"RelatedProperties": {
 																"items": {
-																	"nullable": true,
 																	"type": "string"
 																},
 																"nullable": true,
@@ -1418,15 +1695,12 @@
 															},
 															"ResolutionSteps": {
 																"items": {
-																	"nullable": true,
 																	"properties": {
 																		"ActionParameters": {
 																			"items": {
-																				"nullable": true,
 																				"properties": {
 																					"AllowableNumbers": {
 																						"items": {
-																							"nullable": true,
 																							"type": "string"
 																						},
 																						"nullable": true,
@@ -1437,7 +1711,6 @@
 																					},
 																					"AllowableValueDescriptions": {
 																						"items": {
-																							"nullable": true,
 																							"type": "string"
 																						},
 																						"nullable": true,
@@ -1445,7 +1718,6 @@
 																					},
 																					"AllowableValues": {
 																						"items": {
-																							"nullable": true,
 																							"type": "string"
 																						},
 																						"nullable": true,
@@ -1734,6 +2006,29 @@
 											"type": "number"
 										}
 									},
+									"required": [
+										"name",
+										"host_name",
+										"bios_version",
+										"serial_number",
+										"manufacturer",
+										"model",
+										"power_status",
+										"health",
+										"total_memory",
+										"processor_count",
+										"processor_model",
+										"processor_sockets",
+										"processor_cores",
+										"boot_progress",
+										"boot_progress_time",
+										"boot_override_target",
+										"boot_override_enabled",
+										"boot_mode",
+										"boot_next",
+										"location_indicator",
+										"asset_tag"
+									],
 									"type": "object"
 								},
 								"duration_ms": {
@@ -1750,9 +2045,14 @@
 									"type": "boolean"
 								}
 							},
+							"required": [
+								"node",
+								"success",
+								"message",
+								"duration_ms"
+							],
 							"type": "object"
 						},
-						"nullable": true,
 						"type": "array"
 					},
 					"run_id": {
@@ -1777,9 +2077,21 @@
 								"type": "integer"
 							}
 						},
+						"required": [
+							"total",
+							"succeeded",
+							"failed",
+							"failed_nodes",
+							"duration_ms"
+						],
 						"type": "object"
 					}
 				},
+				"required": [
+					"run_id",
+					"summary",
+					"results"
+				],
 				"type": "object"
 			},
 			"BmcSecureBootBody": {
@@ -1941,7 +2253,6 @@
 				"properties": {
 					"boot_images": {
 						"items": {
-							"nullable": true,
 							"properties": {
 								"cmdline": {
 									"type": "string"
@@ -1985,6 +2296,10 @@
 									"type": "string"
 								}
 							},
+							"required": [
+								"name",
+								"kernel"
+							],
 							"type": "object"
 						},
 						"type": "array"
@@ -1997,14 +2312,12 @@
 				"properties": {
 					"Hosts": {
 						"items": {
-							"nullable": true,
 							"properties": {
 								"arch": {
 									"type": "string"
 								},
 								"bonds": {
 									"items": {
-										"nullable": true,
 										"properties": {
 											"bmc": {
 												"type": "boolean"
@@ -2058,7 +2371,6 @@
 								},
 								"interfaces": {
 									"items": {
-										"nullable": true,
 										"properties": {
 											"bmc": {
 												"type": "boolean"
@@ -2117,7 +2429,6 @@
 					},
 					"Images": {
 						"items": {
-							"nullable": true,
 							"properties": {
 								"cmdline": {
 									"type": "string"
@@ -2161,6 +2472,10 @@
 									"type": "string"
 								}
 							},
+							"required": [
+								"name",
+								"kernel"
+							],
 							"type": "object"
 						},
 						"type": "array"
@@ -2174,10 +2489,24 @@
 								"permission_list": {
 									"items": {
 										"properties": {
+											"group": {
+												"type": "string"
+											},
+											"kind": {
+												"enum": [
+													"view",
+													"change",
+													"delete"
+												],
+												"type": "string"
+											},
 											"method": {
 												"type": "string"
 											},
 											"path": {
+												"type": "string"
+											},
+											"summary": {
 												"type": "string"
 											}
 										},
@@ -2188,10 +2517,24 @@
 								"unassigned_permission_list": {
 									"items": {
 										"properties": {
+											"group": {
+												"type": "string"
+											},
+											"kind": {
+												"enum": [
+													"view",
+													"change",
+													"delete"
+												],
+												"type": "string"
+											},
 											"method": {
 												"type": "string"
 											},
 											"path": {
+												"type": "string"
+											},
+											"summary": {
 												"type": "string"
 											}
 										},
@@ -2333,6 +2676,11 @@
 									"type": "string"
 								}
 							},
+							"required": [
+								"node",
+								"state",
+								"updated_at"
+							],
 							"type": "object"
 						},
 						"nullable": true,
@@ -2418,10 +2766,24 @@
 								"permission_list": {
 									"items": {
 										"properties": {
+											"group": {
+												"type": "string"
+											},
+											"kind": {
+												"enum": [
+													"view",
+													"change",
+													"delete"
+												],
+												"type": "string"
+											},
 											"method": {
 												"type": "string"
 											},
 											"path": {
+												"type": "string"
+											},
+											"summary": {
 												"type": "string"
 											}
 										},
@@ -2432,10 +2794,24 @@
 								"unassigned_permission_list": {
 									"items": {
 										"properties": {
+											"group": {
+												"type": "string"
+											},
+											"kind": {
+												"enum": [
+													"view",
+													"change",
+													"delete"
+												],
+												"type": "string"
+											},
 											"method": {
 												"type": "string"
 											},
 											"path": {
+												"type": "string"
+											},
+											"summary": {
 												"type": "string"
 											}
 										},
@@ -2509,7 +2885,6 @@
 					},
 					"bonds": {
 						"items": {
-							"nullable": true,
 							"properties": {
 								"bmc": {
 									"type": "boolean"
@@ -2563,7 +2938,6 @@
 					},
 					"interfaces": {
 						"items": {
-							"nullable": true,
 							"properties": {
 								"bmc": {
 									"type": "boolean"
@@ -2710,14 +3084,14 @@
 						"type": "string"
 					},
 					"reserved": {
-						"description": "addresses in the range never suggested: the subnet's network and broadcast addresses, and in a subnet larger than a /24, ones ending in .0 or .255",
+						"description": "addresses in the range never suggested: the subnet's network and broadcast addresses, the gateway DHCP hands its nodes, and in a subnet larger than a /24, ones ending in .0 or .255",
 						"items": {
 							"type": "string"
 						},
 						"type": "array"
 					},
 					"subnet": {
-						"description": "the subnet the range lies in, taken from the prefix length of the nodes in and around it, or the range itself when there are none",
+						"description": "the subnet the range lies in: the one in dhcp.subnets holding it, or else taken from the prefix length of the nodes in and around it, or the range itself when there are none",
 						"example": "10.17.0.0/18",
 						"type": "string"
 					},
@@ -2747,14 +3121,12 @@
 				"properties": {
 					"node_list": {
 						"items": {
-							"nullable": true,
 							"properties": {
 								"arch": {
 									"type": "string"
 								},
 								"bonds": {
 									"items": {
-										"nullable": true,
 										"properties": {
 											"bmc": {
 												"type": "boolean"
@@ -2808,7 +3180,6 @@
 								},
 								"interfaces": {
 									"items": {
-										"nullable": true,
 										"properties": {
 											"bmc": {
 												"type": "boolean"
@@ -2956,7 +3327,6 @@
 								},
 								"tags": {
 									"items": {
-										"nullable": true,
 										"type": "string"
 									},
 									"nullable": true,
@@ -3029,7 +3399,6 @@
 								},
 								"tags": {
 									"items": {
-										"nullable": true,
 										"type": "string"
 									},
 									"nullable": true,
@@ -3092,10 +3461,24 @@
 					"permission_list": {
 						"items": {
 							"properties": {
+								"group": {
+									"type": "string"
+								},
+								"kind": {
+									"enum": [
+										"view",
+										"change",
+										"delete"
+									],
+									"type": "string"
+								},
 								"method": {
 									"type": "string"
 								},
 								"path": {
+									"type": "string"
+								},
+								"summary": {
 									"type": "string"
 								}
 							},
@@ -3266,7 +3649,6 @@
 								},
 								"warnings": {
 									"items": {
-										"nullable": true,
 										"type": "string"
 									},
 									"nullable": true,
@@ -3373,6 +3755,27 @@
 				"properties": {
 					"Version": {
 						"type": "string"
+					},
+					"commit": {
+						"nullable": true,
+						"type": "string"
+					},
+					"commit_time": {
+						"nullable": true,
+						"type": "string"
+					},
+					"go_version": {
+						"nullable": true,
+						"type": "string"
+					},
+					"modified": {
+						"nullable": true,
+						"type": "boolean"
+					},
+					"schema": {
+						"minimum": 0,
+						"nullable": true,
+						"type": "integer"
 					}
 				},
 				"type": "object"
@@ -3407,7 +3810,7 @@
 	"paths": {
 		"/v1/auth/reset": {
 			"patch": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).AuthReset`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nChange password",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).AuthReset`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nChange password",
 				"operationId": "PATCH_/v1/auth/reset",
 				"parameters": [
 					{
@@ -3464,16 +3867,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "auth reset",
+				"summary": "Change own password",
 				"tags": [
-					"v1",
-					"auth"
+					"Account"
 				]
 			}
 		},
 		"/v1/auth/signin": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).AuthSignin`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n\n---\n\nsignin user",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).AuthSignin`\n\n---\n\nsignin user",
 				"operationId": "POST_/v1/auth/signin",
 				"parameters": [
 					{
@@ -3531,16 +3933,15 @@
 					},
 					{}
 				],
-				"summary": "auth signin",
+				"summary": "Sign in",
 				"tags": [
-					"v1",
-					"auth"
+					"Account"
 				]
 			}
 		},
 		"/v1/auth/signout": {
 			"delete": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).AuthSignout`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n\n---\n\nSignout user",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).AuthSignout`\n\n---\n\nSignout user",
 				"operationId": "DELETE_/v1/auth/signout",
 				"parameters": [
 					{
@@ -3587,16 +3988,15 @@
 					},
 					{}
 				],
-				"summary": "auth signout",
+				"summary": "Sign out",
 				"tags": [
-					"v1",
-					"auth"
+					"Account"
 				]
 			}
 		},
 		"/v1/auth/signup": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).AuthSignup`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n\n---\n\nSignup user",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).AuthSignup`\n\n---\n\nSignup user",
 				"operationId": "POST_/v1/auth/signup",
 				"parameters": [
 					{
@@ -3654,16 +4054,15 @@
 					},
 					{}
 				],
-				"summary": "auth signup",
+				"summary": "Sign up",
 				"tags": [
-					"v1",
-					"auth"
+					"Account"
 				]
 			}
 		},
 		"/v1/auth/token": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).AuthToken`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nCreate API token",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).AuthToken`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nCreate API token",
 				"operationId": "POST_/v1/auth/token",
 				"parameters": [
 					{
@@ -3720,16 +4119,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "auth token",
+				"summary": "Create API tokens",
 				"tags": [
-					"v1",
-					"auth"
+					"Account"
 				]
 			}
 		},
 		"/v1/bmc/asset-tag": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcAssetTag`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nSet the asset tag of node(s), from a template or a table of serial numbers",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcAssetTag`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nSet the asset tag of node(s), from a template or a table of serial numbers",
 				"operationId": "POST_/v1/bmc/asset-tag",
 				"parameters": [
 					{
@@ -3760,15 +4158,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -3825,16 +4219,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc asset tag",
+				"summary": "Set asset tags",
 				"tags": [
-					"v1",
-					"bmc"
+					"BMC"
 				]
 			}
 		},
 		"/v1/bmc/bios": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcBios`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the BIOS attributes of node(s), with any staged changes",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcBios`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the BIOS attributes of node(s), with any staged changes",
 				"operationId": "GET_/v1/bmc/bios",
 				"parameters": [
 					{
@@ -3878,15 +4271,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -3932,14 +4321,13 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc bios",
+				"summary": "Read BIOS attributes",
 				"tags": [
-					"v1",
-					"bmc"
+					"BIOS"
 				]
 			},
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcSetBios`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nStage BIOS attribute changes on node(s), applied at the given apply time",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcSetBios`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nStage BIOS attribute changes on node(s), applied at the given apply time",
 				"operationId": "POST_/v1/bmc/bios",
 				"parameters": [
 					{
@@ -3970,15 +4358,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -4035,16 +4419,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc set bios",
+				"summary": "Stage BIOS changes",
 				"tags": [
-					"v1",
-					"bmc"
+					"BIOS"
 				]
 			}
 		},
 		"/v1/bmc/bios/discard": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcDiscardBios`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nDiscard the BIOS changes staged on node(s)",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcDiscardBios`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nDiscard the BIOS changes staged on node(s)",
 				"operationId": "POST_/v1/bmc/bios/discard",
 				"parameters": [
 					{
@@ -4075,15 +4458,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -4129,16 +4508,16 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc discard bios",
+				"summary": "Discard staged BIOS changes",
 				"tags": [
-					"v1",
-					"bmc"
-				]
+					"BIOS"
+				],
+				"x-grendel-kind": "delete"
 			}
 		},
 		"/v1/bmc/bios/registry": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcBiosRegistry`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the attribute registry describing one node's BIOS attributes",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcBiosRegistry`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the attribute registry describing one node's BIOS attributes",
 				"operationId": "GET_/v1/bmc/bios/registry",
 				"parameters": [
 					{
@@ -4169,15 +4548,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -4223,16 +4598,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc bios registry",
+				"summary": "Read the BIOS attribute registry",
 				"tags": [
-					"v1",
-					"bmc"
+					"BIOS"
 				]
 			}
 		},
 		"/v1/bmc/configure/auto": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcAutoConfigure`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nSet iDRAC(s) to auto configure once, on the node's next boot. Dell only",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcAutoConfigure`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nSet iDRAC(s) to auto configure once, on the node's next boot. Dell only",
 				"operationId": "POST_/v1/bmc/configure/auto",
 				"parameters": [
 					{
@@ -4263,15 +4637,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -4317,16 +4687,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc auto configure",
+				"summary": "Set iDRAC auto configure",
 				"tags": [
-					"v1",
-					"bmc"
+					"BMC"
 				]
 			}
 		},
 		"/v1/bmc/configure/import": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfig`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nHave iDRAC(s) download a config template from the provision server and import it. Dell only",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfig`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nHave iDRAC(s) download a config template from the provision server and import it. Dell only",
 				"operationId": "POST_/v1/bmc/configure/import",
 				"parameters": [
 					{
@@ -4357,15 +4726,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -4422,16 +4787,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc import config",
+				"summary": "Import an iDRAC config",
 				"tags": [
-					"v1",
-					"bmc"
+					"BMC"
 				]
 			}
 		},
 		"/v1/bmc/firmware/install": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcInstallFirmware`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nCompare the firmware of iDRAC(s) against an update catalog, and with apply_update queue the updates. A comparison waits for its job to finish, up to bmc.node_timeout. Dell only",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcInstallFirmware`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nCompare the firmware of iDRAC(s) against an update catalog, and with apply_update queue the updates. A comparison waits for its job to finish, up to bmc.node_timeout. Dell only",
 				"operationId": "POST_/v1/bmc/firmware/install",
 				"parameters": [
 					{
@@ -4462,15 +4826,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -4527,16 +4887,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc install firmware",
+				"summary": "Check and install firmware",
 				"tags": [
-					"v1",
-					"bmc"
+					"Firmware"
 				]
 			}
 		},
 		"/v1/bmc/firmware/updates": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcFirmwareUpdates`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList the firmware updates iDRAC(s) found in their last catalog comparison, which firmware/install with apply_update false runs. Dell only",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcFirmwareUpdates`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList the firmware updates iDRAC(s) found in their last catalog comparison, which firmware/install with apply_update false runs. Dell only",
 				"operationId": "GET_/v1/bmc/firmware/updates",
 				"parameters": [
 					{
@@ -4567,15 +4926,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -4621,16 +4976,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc firmware updates",
+				"summary": "List available firmware updates",
 				"tags": [
-					"v1",
-					"bmc"
+					"Firmware"
 				]
 			}
 		},
 		"/v1/bmc/identity/defaults": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcIdentityDefaults`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the location and asset tag templates configured as defaults",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcIdentityDefaults`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the location and asset tag templates configured as defaults",
 				"operationId": "GET_/v1/bmc/identity/defaults",
 				"parameters": [
 					{
@@ -4676,16 +5030,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc identity defaults",
+				"summary": "See asset tag and location defaults",
 				"tags": [
-					"v1",
-					"bmc"
+					"BMC"
 				]
 			}
 		},
 		"/v1/bmc/indicator": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcIndicator`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nTurn the location indicator of node(s) on or off",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcIndicator`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nTurn the location indicator of node(s) on or off",
 				"operationId": "POST_/v1/bmc/indicator",
 				"parameters": [
 					{
@@ -4716,15 +5069,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -4781,16 +5130,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc indicator",
+				"summary": "Turn the locate light on or off",
 				"tags": [
-					"v1",
-					"bmc"
+					"BMC"
 				]
 			}
 		},
 		"/v1/bmc/jobs": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcJobs`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the redfish job queue of node(s)",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcJobs`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the redfish job queue of node(s)",
 				"operationId": "GET_/v1/bmc/jobs",
 				"parameters": [
 					{
@@ -4821,15 +5169,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -4875,16 +5219,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc jobs",
+				"summary": "See the job queue",
 				"tags": [
-					"v1",
-					"bmc"
+					"BMC"
 				]
 			}
 		},
 		"/v1/bmc/jobs/clear": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcClearJobs`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nClear redfish jobs from node(s)",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcClearJobs`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nClear redfish jobs from node(s)",
 				"operationId": "POST_/v1/bmc/jobs/clear",
 				"parameters": [
 					{
@@ -4915,15 +5258,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -4980,16 +5319,16 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc clear jobs",
+				"summary": "Clear jobs",
 				"tags": [
-					"v1",
-					"bmc"
-				]
+					"BMC"
+				],
+				"x-grendel-kind": "delete"
 			}
 		},
 		"/v1/bmc/location": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcLocation`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nSet the rack location of node(s), rendered per node from templates",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcLocation`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nSet the rack location of node(s), rendered per node from templates",
 				"operationId": "POST_/v1/bmc/location",
 				"parameters": [
 					{
@@ -5020,15 +5359,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -5085,16 +5420,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc location",
+				"summary": "Set rack locations",
 				"tags": [
-					"v1",
-					"bmc"
+					"BMC"
 				]
 			}
 		},
 		"/v1/bmc/nics": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcNICs`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList the host network ports each node's BMC reports",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcNICs`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList the host network ports each node's BMC reports",
 				"operationId": "GET_/v1/bmc/nics",
 				"parameters": [
 					{
@@ -5125,15 +5459,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -5179,16 +5509,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc n i cs",
+				"summary": "List network ports",
 				"tags": [
-					"v1",
-					"bmc"
+					"BMC"
 				]
 			}
 		},
 		"/v1/bmc/power": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcPower`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nChange the power state of node(s), or restart their BMCs",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcPower`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nChange the power state of node(s), or restart their BMCs",
 				"operationId": "POST_/v1/bmc/power",
 				"parameters": [
 					{
@@ -5219,15 +5548,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -5284,16 +5609,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc power",
+				"summary": "Power nodes and restart BMCs",
 				"tags": [
-					"v1",
-					"bmc"
+					"BMC"
 				]
 			}
 		},
 		"/v1/bmc/secureboot": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcSecureBoot`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the UEFI secure boot state of node(s), with any staged change, and with keys the certificates and signatures in their databases",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcSecureBoot`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the UEFI secure boot state of node(s), with any staged change, and with keys the certificates and signatures in their databases",
 				"operationId": "GET_/v1/bmc/secureboot",
 				"parameters": [
 					{
@@ -5301,6 +5625,7 @@
 						"in": "query",
 						"name": "keys",
 						"schema": {
+							"default": false,
 							"type": "boolean"
 						}
 					},
@@ -5322,6 +5647,7 @@
 						"in": "query",
 						"name": "defaults",
 						"schema": {
+							"default": false,
 							"type": "boolean"
 						}
 					},
@@ -5353,15 +5679,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -5407,14 +5729,13 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc secure boot",
+				"summary": "See secure boot state and keys",
 				"tags": [
-					"v1",
-					"bmc"
+					"Secure boot"
 				]
 			},
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcSetSecureBoot`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nTurn UEFI secure boot on or off on node(s), from their next boot",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcSetSecureBoot`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nTurn UEFI secure boot on or off on node(s), from their next boot",
 				"operationId": "POST_/v1/bmc/secureboot",
 				"parameters": [
 					{
@@ -5445,15 +5766,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -5510,16 +5827,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc set secure boot",
+				"summary": "Turn secure boot on or off",
 				"tags": [
-					"v1",
-					"bmc"
+					"Secure boot"
 				]
 			}
 		},
 		"/v1/bmc/secureboot/keys": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcAddSecureBootKey`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nEnroll certificates or a signature in a secure boot database on node(s). A key already enrolled is left alone",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcAddSecureBootKey`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nEnroll certificates or a signature in a secure boot database on node(s). A key already enrolled is left alone",
 				"operationId": "POST_/v1/bmc/secureboot/keys",
 				"parameters": [
 					{
@@ -5550,15 +5866,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -5615,16 +5927,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc add secure boot key",
+				"summary": "Enroll secure boot keys",
 				"tags": [
-					"v1",
-					"bmc"
+					"Secure boot"
 				]
 			}
 		},
 		"/v1/bmc/secureboot/keys/delete": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcDeleteSecureBootKey`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nRemove a certificate or signature from a secure boot database on node(s)",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcDeleteSecureBootKey`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nRemove a certificate or signature from a secure boot database on node(s)",
 				"operationId": "POST_/v1/bmc/secureboot/keys/delete",
 				"parameters": [
 					{
@@ -5655,15 +5966,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -5720,16 +6027,16 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc delete secure boot key",
+				"summary": "Delete secure boot keys",
 				"tags": [
-					"v1",
-					"bmc"
-				]
+					"Secure boot"
+				],
+				"x-grendel-kind": "delete"
 			}
 		},
 		"/v1/bmc/secureboot/reset": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcResetSecureBootKeys`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nReset the secure boot databases of node(s) to their factory keys, or delete their keys",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcResetSecureBootKeys`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nReset the secure boot databases of node(s) to their factory keys, or delete their keys",
 				"operationId": "POST_/v1/bmc/secureboot/reset",
 				"parameters": [
 					{
@@ -5760,15 +6067,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -5825,29 +6128,25 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc reset secure boot keys",
+				"summary": "Reset secure boot keys",
 				"tags": [
-					"v1",
-					"bmc"
-				]
+					"Secure boot"
+				],
+				"x-grendel-kind": "delete"
 			}
 		},
 		"/v1/bmc/sel": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcSEL`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the system event log of node(s)",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcSEL`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the system event log of node(s)",
 				"operationId": "GET_/v1/bmc/sel",
 				"parameters": [
 					{
-						"description": "Keep only this many entries per node",
-						"examples": {
-							"limit": {
-								"value": "50"
-							}
-						},
+						"description": "Keep only the newest entries of each node, this many. 0 returns the whole log",
 						"in": "query",
 						"name": "limit",
 						"schema": {
-							"type": "string"
+							"default": 50,
+							"type": "integer"
 						}
 					},
 					{
@@ -5878,15 +6177,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -5932,16 +6227,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc s e l",
+				"summary": "Read the system event log",
 				"tags": [
-					"v1",
-					"bmc"
+					"BMC"
 				]
 			}
 		},
 		"/v1/bmc/sel/clear": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcClearSEL`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nClear the system event log on node(s)",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcClearSEL`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nClear the system event log on node(s)",
 				"operationId": "POST_/v1/bmc/sel/clear",
 				"parameters": [
 					{
@@ -5972,15 +6266,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -6026,16 +6316,16 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc clear s e l",
+				"summary": "Clear the system event log",
 				"tags": [
-					"v1",
-					"bmc"
-				]
+					"BMC"
+				],
+				"x-grendel-kind": "delete"
 			}
 		},
 		"/v1/bmc/status": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcStatus`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet redfish system information from node(s)",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BmcStatus`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet redfish system information from node(s)",
 				"operationId": "GET_/v1/bmc/status",
 				"parameters": [
 					{
@@ -6066,15 +6356,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -6120,16 +6406,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "bmc status",
+				"summary": "See system status",
 				"tags": [
-					"v1",
-					"bmc"
+					"BMC"
 				]
 			}
 		},
 		"/v1/db/dump": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).Dump`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet a backup of the DB",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).Dump`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet a backup of the DB",
 				"operationId": "GET_/v1/db/dump",
 				"parameters": [
 					{
@@ -6175,16 +6460,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "dump",
+				"summary": "Download a database backup",
 				"tags": [
-					"v1",
-					"db"
+					"Server"
 				]
 			}
 		},
 		"/v1/db/restore": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).Restore`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nRestore a backup of the DB",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).Restore`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nRestore a backup of the DB",
 				"operationId": "POST_/v1/db/restore",
 				"parameters": [
 					{
@@ -6241,16 +6525,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "restore",
+				"summary": "Restore a database backup",
 				"tags": [
-					"v1",
-					"db"
+					"Server"
 				]
 			}
 		},
 		"/v1/grendel/events": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).GetEvents`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList the latest events, newest first, with how many of their nodes are at each state",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).GetEvents`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList the latest events, newest first, with how many of their nodes are at each state",
 				"operationId": "GET_/v1/grendel/events",
 				"parameters": [
 					{
@@ -6345,16 +6628,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "get events",
+				"summary": "Follow events",
 				"tags": [
-					"v1",
-					"grendel"
+					"Server"
 				]
 			}
 		},
 		"/v1/grendel/events/{id}": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).GetEvent`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet one event with how it went on each of its nodes",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).GetEvent`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet one event with how it went on each of its nodes",
 				"operationId": "GET_/v1/grendel/events/:id",
 				"parameters": [
 					{
@@ -6409,16 +6691,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "get event",
+				"summary": "See how an event went on each node",
 				"tags": [
-					"v1",
-					"grendel"
+					"Server"
 				]
 			}
 		},
 		"/v1/grendel/version": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).GetVersion`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the server version",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).GetVersion`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the server version",
 				"operationId": "GET_/v1/grendel/version",
 				"parameters": [
 					{
@@ -6464,16 +6745,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "get version",
+				"summary": "See the server version",
 				"tags": [
-					"v1",
-					"grendel"
+					"Server"
 				]
 			}
 		},
 		"/v1/images": {
 			"delete": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageDelete`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nDelete images by name",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageDelete`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nDelete images by name",
 				"operationId": "DELETE_/v1/images",
 				"parameters": [
 					{
@@ -6532,14 +6812,13 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "boot image delete",
+				"summary": "Delete images",
 				"tags": [
-					"v1",
-					"images"
+					"Boot images"
 				]
 			},
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList all images",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageList`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList all images",
 				"operationId": "GET_/v1/images",
 				"parameters": [
 					{
@@ -6591,14 +6870,13 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "boot image list",
+				"summary": "List images",
 				"tags": [
-					"v1",
-					"images"
+					"Boot images"
 				]
 			},
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageAdd`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nAdd images",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageAdd`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nAdd images",
 				"operationId": "POST_/v1/images",
 				"parameters": [
 					{
@@ -6655,16 +6933,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "boot image add",
+				"summary": "Add and edit images",
 				"tags": [
-					"v1",
-					"images"
+					"Boot images"
 				]
 			}
 		},
 		"/v1/images/find": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageFind`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nFind images by name",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).BootImageFind`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nFind images by name",
 				"operationId": "GET_/v1/images/find",
 				"parameters": [
 					{
@@ -6729,16 +7006,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "boot image find",
+				"summary": "Find images",
 				"tags": [
-					"v1",
-					"images"
+					"Boot images"
 				]
 			}
 		},
 		"/v1/nodes": {
 			"delete": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeDelete`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nDelete nodes by nodeset and/or tags",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeDelete`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nDelete nodes by nodeset and/or tags",
 				"operationId": "DELETE_/v1/nodes",
 				"parameters": [
 					{
@@ -6810,14 +7086,13 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "node delete",
+				"summary": "Delete nodes",
 				"tags": [
-					"v1",
-					"nodes"
+					"Nodes"
 				]
 			},
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList all nodes",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeList`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList all nodes",
 				"operationId": "GET_/v1/nodes",
 				"parameters": [
 					{
@@ -6869,14 +7144,13 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "node list",
+				"summary": "List nodes",
 				"tags": [
-					"v1",
-					"nodes"
+					"Nodes"
 				]
 			},
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeAdd`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nAdd nodes",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeAdd`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nAdd nodes",
 				"operationId": "POST_/v1/nodes",
 				"parameters": [
 					{
@@ -6933,16 +7207,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "node add",
+				"summary": "Add and edit nodes",
 				"tags": [
-					"v1",
-					"nodes"
+					"Nodes"
 				]
 			}
 		},
 		"/v1/nodes/find": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeFind`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nFind nodes by nodeset and/or tags",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeFind`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nFind nodes by nodeset and/or tags",
 				"operationId": "GET_/v1/nodes/find",
 				"parameters": [
 					{
@@ -7020,16 +7293,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "node find",
+				"summary": "Find nodes",
 				"tags": [
-					"v1",
-					"nodes"
+					"Nodes"
 				]
 			}
 		},
 		"/v1/nodes/image": {
 			"patch": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeBootImage`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nUpdate nodes boot image by nodeset and/or tags",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeBootImage`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nUpdate nodes boot image by nodeset and/or tags",
 				"operationId": "PATCH_/v1/nodes/image",
 				"parameters": [
 					{
@@ -7112,16 +7384,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "node boot image",
+				"summary": "Change a node's boot image",
 				"tags": [
-					"v1",
-					"nodes"
+					"Nodes"
 				]
 			}
 		},
 		"/v1/nodes/import": {
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeImport`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nAdd a BMC or boot port to each node, creating nodes that do not exist, with addresses taken from ranges. A dry run reports what would change; a commit stores every row or none",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeImport`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nAdd a BMC or boot port to each node, creating nodes that do not exist, with addresses taken from ranges. A dry run reports what would change; a commit stores every row or none",
 				"operationId": "POST_/v1/nodes/import",
 				"parameters": [
 					{
@@ -7178,16 +7449,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "node import",
+				"summary": "Import nodes from switches and BMCs",
 				"tags": [
-					"v1",
-					"nodes"
+					"Nodes"
 				]
 			}
 		},
 		"/v1/nodes/ips/next": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeNextAddress`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nSuggest free addresses in a range: the lowest ones no node holds, and the ones after the highest held. Suggestions are pinged, and one that answers is listed but marked",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeNextAddress`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nSuggest free addresses in a range: the lowest ones no node holds, and the ones after the highest held. Suggestions are pinged, and one that answers is listed but marked",
 				"operationId": "GET_/v1/nodes/ips/next",
 				"parameters": [
 					{
@@ -7291,16 +7561,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "node next address",
+				"summary": "Find free addresses",
 				"tags": [
-					"v1",
-					"nodes"
+					"Addresses"
 				]
 			}
 		},
 		"/v1/nodes/ips/ranges": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeAddressRanges`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList the ranges the ports of some nodes sit in, each once however many ports share it: a /24 of a larger subnet, or a /24 to /30 subnet whole. Every node is taken when neither nodeset nor tags is given",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeAddressRanges`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList the ranges the ports of some nodes sit in, each once however many ports share it: a /24 of a larger subnet, or a /24 to /30 subnet whole. Every node is taken when neither nodeset nor tags is given",
 				"operationId": "GET_/v1/nodes/ips/ranges",
 				"parameters": [
 					{
@@ -7386,16 +7655,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "node address ranges",
+				"summary": "List address ranges in use",
 				"tags": [
-					"v1",
-					"nodes"
+					"Addresses"
 				]
 			}
 		},
 		"/v1/nodes/provision": {
 			"patch": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeProvision`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nProvision / Unprovision nodes by nodeset and/or tags",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeProvision`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nProvision / Unprovision nodes by nodeset and/or tags",
 				"operationId": "PATCH_/v1/nodes/provision",
 				"parameters": [
 					{
@@ -7478,16 +7746,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "node provision",
+				"summary": "Turn provisioning on or off",
 				"tags": [
-					"v1",
-					"nodes"
+					"Provisioning"
 				]
 			}
 		},
 		"/v1/nodes/provision-status": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeProvisionStatus`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the latest provision status of nodes by nodeset and/or tags, or of every node when neither is given",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeProvisionStatus`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet the latest provision status of nodes by nodeset and/or tags, or of every node when neither is given",
 				"operationId": "GET_/v1/nodes/provision-status",
 				"parameters": [
 					{
@@ -7565,16 +7832,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "node provision status",
+				"summary": "See provision status",
 				"tags": [
-					"v1",
-					"nodes"
+					"Provisioning"
 				]
 			}
 		},
 		"/v1/nodes/tags": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeTagList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList every tag on a node, with how many nodes have it",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeTagList`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList every tag on a node, with how many nodes have it",
 				"operationId": "GET_/v1/nodes/tags",
 				"parameters": [
 					{
@@ -7626,16 +7892,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "node tag list",
+				"summary": "List tags",
 				"tags": [
-					"v1",
-					"nodes"
+					"Nodes"
 				]
 			}
 		},
 		"/v1/nodes/tags/{action}": {
 			"patch": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeTags`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nUpdate nodes tags by nodeset and/or tags",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeTags`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nUpdate nodes tags by nodeset and/or tags",
 				"operationId": "PATCH_/v1/nodes/tags/:action",
 				"parameters": [
 					{
@@ -7732,16 +7997,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "node tags",
+				"summary": "Add and remove tags",
 				"tags": [
-					"v1",
-					"nodes"
+					"Nodes"
 				]
 			}
 		},
 		"/v1/nodes/token/{interface}": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeBootToken`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nCreate a boot token for the provision server. Used for debugging requests made by images",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).NodeBootToken`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nCreate a boot token for the provision server. Used for debugging requests made by images",
 				"operationId": "GET_/v1/nodes/token/:interface",
 				"parameters": [
 					{
@@ -7840,16 +8104,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "node boot token",
+				"summary": "Create boot tokens",
 				"tags": [
-					"v1",
-					"nodes"
+					"Provisioning"
 				]
 			}
 		},
 		"/v1/roles": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).GetRoles`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet roles and permissions",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).GetRoles`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet roles and permissions",
 				"operationId": "GET_/v1/roles",
 				"parameters": [
 					{
@@ -7908,14 +8171,13 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "get roles",
+				"summary": "List roles and permissions",
 				"tags": [
-					"v1",
-					"roles"
+					"Roles"
 				]
 			},
 			"patch": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).PatchRoles`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nEdit role permissions",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).PatchRoles`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nEdit role permissions",
 				"operationId": "PATCH_/v1/roles",
 				"parameters": [
 					{
@@ -7972,14 +8234,13 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "patch roles",
+				"summary": "Edit a role's permissions",
 				"tags": [
-					"v1",
-					"roles"
+					"Roles"
 				]
 			},
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).PostRoles`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nAdd roles",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).PostRoles`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nAdd roles",
 				"operationId": "POST_/v1/roles",
 				"parameters": [
 					{
@@ -8036,16 +8297,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "post roles",
+				"summary": "Add roles",
 				"tags": [
-					"v1",
-					"roles"
+					"Roles"
 				]
 			}
 		},
 		"/v1/roles/{names}": {
 			"delete": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).DeleteRoles`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nDelete roles",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).DeleteRoles`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nDelete roles",
 				"operationId": "DELETE_/v1/roles/:names",
 				"parameters": [
 					{
@@ -8105,16 +8365,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "delete roles",
+				"summary": "Delete roles",
 				"tags": [
-					"v1",
-					"roles"
+					"Roles"
 				]
 			}
 		},
 		"/v1/switch/scan": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).SwitchScan`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nRead the MAC table and interface status of switch(es), merged per port, with the node that already holds each MAC",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).SwitchScan`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nRead the MAC table and interface status of switch(es), merged per port, with the node that already holds each MAC",
 				"operationId": "GET_/v1/switch/scan",
 				"parameters": [
 					{
@@ -8145,15 +8404,11 @@
 					},
 					{
 						"description": "Select every node in the database. Required when no nodeset or tags are given",
-						"examples": {
-							"all": {
-								"value": "true"
-							}
-						},
 						"in": "query",
 						"name": "all",
 						"schema": {
-							"type": "string"
+							"default": false,
+							"type": "boolean"
 						}
 					},
 					{
@@ -8199,16 +8454,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "switch scan",
+				"summary": "Scan switch ports and MAC tables",
 				"tags": [
-					"v1",
-					"switch"
+					"Switches"
 				]
 			}
 		},
 		"/v1/switch/{nodeset}/lldp": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).SwitchGetLLDP`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet switch LLDP info",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).SwitchGetLLDP`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nGet switch LLDP info",
 				"operationId": "GET_/v1/switch/:nodeset/lldp",
 				"parameters": [
 					{
@@ -8281,16 +8535,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "switch get l l d p",
+				"summary": "Read LLDP neighbours",
 				"tags": [
-					"v1",
-					"switch"
+					"Switches"
 				]
 			}
 		},
 		"/v1/users": {
 			"get": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserList`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList all users",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserList`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nList all users",
 				"operationId": "GET_/v1/users",
 				"parameters": [
 					{
@@ -8355,14 +8608,13 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "user list",
+				"summary": "List users",
 				"tags": [
-					"v1",
-					"users"
+					"Users"
 				]
 			},
 			"post": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserStore`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nAdd new user",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserStore`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nAdd new user",
 				"operationId": "POST_/v1/users",
 				"parameters": [
 					{
@@ -8419,16 +8671,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "user store",
+				"summary": "Add users",
 				"tags": [
-					"v1",
-					"users"
+					"Users"
 				]
 			}
 		},
 		"/v1/users/{usernames}": {
 			"delete": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserDelete`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nDelete users",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserDelete`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nDelete users",
 				"operationId": "DELETE_/v1/users/:usernames",
 				"parameters": [
 					{
@@ -8488,16 +8739,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "user delete",
+				"summary": "Delete users",
 				"tags": [
-					"v1",
-					"users"
+					"Users"
 				]
 			}
 		},
 		"/v1/users/{usernames}/enable": {
 			"patch": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserEnable`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nUpdate users enable",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserEnable`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nUpdate users enable",
 				"operationId": "PATCH_/v1/users/:usernames/enable",
 				"parameters": [
 					{
@@ -8568,16 +8818,15 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "user enable",
+				"summary": "Enable and disable users",
 				"tags": [
-					"v1",
-					"users"
+					"Users"
 				]
 			}
 		},
 		"/v1/users/{usernames}/role": {
 			"patch": {
-				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserRole`\n\n#### Middlewares:\n\n- `github.com/go-fuego/fuego.defaultLogger.middleware`\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nUpdate users role",
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).UserRole`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nUpdate users role",
 				"operationId": "PATCH_/v1/users/:usernames/role",
 				"parameters": [
 					{
@@ -8648,10 +8897,9 @@
 						"cookieAuth": []
 					}
 				],
-				"summary": "user role",
+				"summary": "Change a user's role",
 				"tags": [
-					"v1",
-					"users"
+					"Users"
 				]
 			}
 		}
@@ -8664,34 +8912,43 @@
 	],
 	"tags": [
 		{
-			"name": "auth"
+			"name": "Account"
 		},
 		{
-			"name": "bmc"
+			"name": "Addresses"
 		},
 		{
-			"name": "db"
+			"name": "BIOS"
 		},
 		{
-			"name": "grendel"
+			"name": "BMC"
 		},
 		{
-			"name": "images"
+			"name": "Boot images"
 		},
 		{
-			"name": "nodes"
+			"name": "Firmware"
 		},
 		{
-			"name": "roles"
+			"name": "Nodes"
 		},
 		{
-			"name": "switch"
+			"name": "Provisioning"
 		},
 		{
-			"name": "users"
+			"name": "Roles"
 		},
 		{
-			"name": "v1"
+			"name": "Secure boot"
+		},
+		{
+			"name": "Server"
+		},
+		{
+			"name": "Switches"
+		},
+		{
+			"name": "Users"
 		}
 	]
 }

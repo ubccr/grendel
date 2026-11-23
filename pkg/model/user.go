@@ -33,7 +33,19 @@ type PermissionList []Permission
 type Permission struct {
 	Method string `json:"method"`
 	Path   string `json:"path"`
+	// Summary, Group and Kind say what the route does, which part of the API it belongs to, and whether it views, changes or deletes. The API fills them in when listing roles; they are not stored
+	Summary string         `json:"summary,omitempty"`
+	Group   string         `json:"group,omitempty"`
+	Kind    PermissionKind `json:"kind,omitempty" enum:"view,change,delete"`
 }
+
+type PermissionKind string
+
+const (
+	PermissionView   PermissionKind = "view"
+	PermissionChange PermissionKind = "change"
+	PermissionDelete PermissionKind = "delete"
+)
 
 func (r *RoleView) Scan(value interface{}) error {
 	data, ok := value.(string)

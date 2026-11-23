@@ -3,9 +3,12 @@ package api
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"regexp"
 	"slices"
 	"strings"
 
+	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/go-fuego/fuego"
 	"github.com/ubccr/grendel/pkg/model"
 )
@@ -35,6 +38,11 @@ func (h *Handler) GetRoles(ctx fuego.ContextNoBody) (*GetRolesResponse, error) {
 			Detail: "failed to get roles",
 		}
 	}
+	for i := range roles {
+		h.describe(roles[i].PermissionList)
+		h.describe(roles[i].UnassignedPermissionList)
+	}
+
 	var res GetRolesResponse
 
 	if filter != "" {
@@ -153,4 +161,53 @@ func (h *Handler) DeleteRoles(ctx fuego.ContextNoBody) (*GenericResponse, error)
 		Detail:  "succesfully deleted role(s)",
 		Changed: len(roles),
 	}, nil
+}
+
+// routeInfo is what a route says about itself where it is registered
+type routeInfo struct {
+	Summary string
+	Group   string
+	Kind    model.PermissionKind
+}
+
+var pathParam = regexp.MustCompile(`\{[^}]+\}`)
+
+// describeRoutes reads each route's summary, group and kind out of the spec, keyed the way permissions are stored, with % for a path parameter
+func describeRoutes(doc *openapi3.T) map[model.Permission]routeInfo {
+	routes := map[model.Permission]routeInfo{}
+	for path, item := range doc.Paths.Map() {
+		for method, op := range item.Operations() {
+			info := routeInfo{Summary: op.Summary, Kind: kindOf(method)}
+			if len(op.Tags) > 0 {
+				info.Group = op.Tags[len(op.Tags)-1]
+			}
+			if kind, ok := op.Extensions[kindExtension].(string); ok {
+				info.Kind = model.PermissionKind(kind)
+			}
+			routes[model.Permission{Method: method, Path: pathParam.ReplaceAllString(path, "%")}] = info
+		}
+	}
+	return routes
+}
+
+func kindOf(method string) model.PermissionKind {
+	switch method {
+	case http.MethodGet:
+		return model.PermissionView
+	case http.MethodDelete:
+		return model.PermissionDelete
+	}
+	return model.PermissionChange
+}
+
+func (h *Handler) describe(permissions model.PermissionList) {
+	for i, p := range permissions {
+		info, ok := h.routes[model.Permission{Method: p.Method, Path: p.Path}]
+		if !ok {
+			info.Kind = kindOf(p.Method)
+		}
+		permissions[i].Summary = info.Summary
+		permissions[i].Group = info.Group
+		permissions[i].Kind = info.Kind
+	}
 }

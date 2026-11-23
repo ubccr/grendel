@@ -20,7 +20,7 @@ var (
 		Short: "import nodes",
 		Args:  cobra.MinimumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			var nodes []client.NilNodeAddRequestNodeListItem
+			var nodes []client.NodeAddRequestNodeListItem
 			for _, name := range args {
 				file, err := os.Open(name)
 				if err != nil {
@@ -28,7 +28,7 @@ var (
 				}
 				defer file.Close()
 
-				var node []client.NilNodeAddRequestNodeListItem
+				var node []client.NodeAddRequestNodeListItem
 				if err := json.NewDecoder(file).Decode(&node); err != nil {
 					return err
 				}

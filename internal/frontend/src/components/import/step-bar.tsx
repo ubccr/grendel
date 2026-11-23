@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
-// StepBar floats a step's buttons at the bottom of the window, styled like the node form's SaveBar. The card around it must not clip overflow, or it can't stick
+// The card around the bar must not clip overflow, or it can't stick
 export function StepBar({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div

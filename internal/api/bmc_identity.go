@@ -9,19 +9,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sort"
 	"strconv"
 	"strings"
 	"text/template"
 
-	"github.com/facette/natsort"
 	"github.com/go-fuego/fuego"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/redfish"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
-// BmcAssetTagBody sets asset tags from a template, or from a table of serial numbers. With neither, the bmc.asset_tag template from the config is used
+// With neither a template nor a table of serial numbers, the bmc.asset_tag template from the config is used
 type BmcAssetTagBody struct {
 	Template *string           `json:"template" oai3:"nullable" description:"Go template rendered per node, such as UB-{{.Name}}. A plain string is a valid template"`
 	BySerial map[string]string `json:"by_serial" oai3:"nullable" description:"Asset tag for each serial number. A selected node whose serial is not listed fails"`
@@ -59,20 +57,19 @@ func identityDefaults() BmcIdentityDefaults {
 	}
 }
 
-// BmcIdentityDefaults returns the configured location and asset tag templates
 func (h *Handler) BmcIdentityDefaults(c fuego.ContextNoBody) (BmcIdentityDefaults, error) {
 	return identityDefaults(), nil
 }
 
-// BmcAssetTag sets the asset tag of node(s)
 func (h *Handler) BmcAssetTag(c fuego.ContextWithBody[BmcAssetTagBody]) (model.BmcResponse[model.BmcAssetTagResult], error) {
 	body, err := c.Body()
 	if err != nil {
-		return model.BmcResponse[model.BmcAssetTagResult]{}, badRequest(err, "failed to parse the asset tag request")
+		return model.BmcResponse[model.BmcAssetTagResult]{}, err
 	}
 
 	req := redfish.AssetTagRequest{DryRun: body.DryRun}
 	var operation string
+	var tmpl *template.Template
 
 	switch {
 	case body.Template != nil && body.BySerial != nil:
@@ -91,29 +88,30 @@ func (h *Handler) BmcAssetTag(c fuego.ContextWithBody[BmcAssetTagBody]) (model.B
 		if text == "" {
 			return model.BmcResponse[model.BmcAssetTagResult]{}, badRequest(errors.New("no asset tag given"), "give a template or by_serial, or set bmc.asset_tag in the config")
 		}
-		tmpl, err := parseIdentityTemplate("asset tag", text)
-		if err != nil {
+		if tmpl, err = parseIdentityTemplate("asset tag", text); err != nil {
 			return model.BmcResponse[model.BmcAssetTagResult]{}, err
 		}
-		hosts, err := h.bmcSelect(c)
-		if err != nil {
-			return model.BmcResponse[model.BmcAssetTagResult]{}, err
-		}
+		// the template, not the tags it produced, keeps the event short
+		operation = "bmc asset tag set to " + text
+	}
+
+	nodes, err := h.bmcNodes(c)
+	if err != nil {
+		return model.BmcResponse[model.BmcAssetTagResult]{}, err
+	}
+	if tmpl != nil {
 		req.ByNode, req.Invalid = map[string]string{}, map[string]error{}
-		hosts = identityHosts(hosts)
-		for i, host := range hosts {
-			v, err := renderIdentity(tmpl, host, position{i, len(hosts)})
+		for i, host := range nodes.hosts {
+			v, err := renderIdentity(tmpl, host, position{i, len(nodes.hosts)})
 			if err != nil {
 				req.Invalid[host.Name] = err
 				continue
 			}
 			req.ByNode[host.Name] = v
 		}
-		// the template, not the tags it produced, keeps the event short
-		operation = "bmc asset tag set to " + text
 	}
 
-	return runBmc(h, c, operation, trackBmc[redfish.AssetTagResult](!body.DryRun, "bmc.asset-tag.set"),
+	return runBmcOn(h, c, nodes, operation, trackBmc[redfish.AssetTagResult](!body.DryRun, "bmc.asset-tag.set"),
 		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.AssetTagResult] {
 			return h.Redfish.SetAssetTag(ctx, t, req)
 		},
@@ -121,11 +119,10 @@ func (h *Handler) BmcAssetTag(c fuego.ContextWithBody[BmcAssetTagBody]) (model.B
 	)
 }
 
-// BmcLocation sets the rack location of node(s), rendered per node from templates
 func (h *Handler) BmcLocation(c fuego.ContextWithBody[BmcLocationBody]) (model.BmcResponse[model.BmcLocationResult], error) {
 	body, err := c.Body()
 	if err != nil {
-		return model.BmcResponse[model.BmcLocationResult]{}, badRequest(err, "failed to parse the location request")
+		return model.BmcResponse[model.BmcLocationResult]{}, err
 	}
 
 	fields, err := locationTemplates(body, identityDefaults())
@@ -133,15 +130,14 @@ func (h *Handler) BmcLocation(c fuego.ContextWithBody[BmcLocationBody]) (model.B
 		return model.BmcResponse[model.BmcLocationResult]{}, err
 	}
 
-	hosts, err := h.bmcSelect(c)
+	nodes, err := h.bmcNodes(c)
 	if err != nil {
 		return model.BmcResponse[model.BmcLocationResult]{}, err
 	}
 
 	req := redfish.LocationRequest{ByNode: map[string]redfish.LocationUpdate{}, Invalid: map[string]error{}, DryRun: body.DryRun}
-	hosts = identityHosts(hosts)
-	for i, host := range hosts {
-		u, err := renderLocation(fields, host, position{i, len(hosts)})
+	for i, host := range nodes.hosts {
+		u, err := renderLocation(fields, host, position{i, len(nodes.hosts)})
 		if err != nil {
 			req.Invalid[host.Name] = err
 			continue
@@ -153,7 +149,7 @@ func (h *Handler) BmcLocation(c fuego.ContextWithBody[BmcLocationBody]) (model.B
 	for _, f := range fields {
 		names = append(names, f.name)
 	}
-	return runBmc(h, c, "bmc location set "+strings.Join(names, ","), trackBmc[redfish.LocationResult](!body.DryRun, "bmc.location.set"),
+	return runBmcOn(h, c, nodes, "bmc location set "+strings.Join(names, ","), trackBmc[redfish.LocationResult](!body.DryRun, "bmc.location.set"),
 		func(ctx context.Context, t []redfish.Target) []redfish.NodeResult[redfish.LocationResult] {
 			return h.Redfish.SetLocation(ctx, t, req)
 		},
@@ -176,20 +172,8 @@ func locationData(data *redfish.LocationResult) *model.BmcLocationResult {
 	return &data.BmcLocationResult
 }
 
-// position is a node's place among the nodes a request selected, so a template can number them
+// position is a node's place among the nodes a request contacts, in natural name order, so a template can number them. A node without a bmc interface gets no index, so the numbering has no gaps
 type position struct{ index, count int }
-
-// identityHosts keeps the hosts that will be contacted, in natural name order, which is the order .Index counts in. A host without a bmc interface gets no index, so the numbering has no gaps
-func identityHosts(hosts model.HostList) model.HostList {
-	out := make(model.HostList, 0, len(hosts))
-	for _, h := range hosts {
-		if h != nil && h.InterfaceBMC() != nil {
-			out = append(out, h)
-		}
-	}
-	sort.SliceStable(out, func(i, j int) bool { return natsort.Compare(out[i].Name, out[j].Name) })
-	return out
-}
 
 type locationField struct {
 	name string

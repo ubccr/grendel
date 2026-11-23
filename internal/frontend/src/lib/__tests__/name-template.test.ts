@@ -22,6 +22,12 @@ describe("name templates", () => {
     expect(render("r{sw.2+10}", { sw: "swe-a01-r05" }).value).toBe("r15");
   });
 
+  it("refuses arithmetic that goes below 0 rather than writing a minus into the name", () => {
+    expect(render("cpn-{port-2}", { port: 2 }).value).toBe("cpn-0");
+    expect(render("cpn-{port-2}", { port: 1 }).error).toMatch(/\{port-2\} is below 0/);
+    expect(render("r{sw.1-5}", { sw: "swe-a01" }).error).toMatch(/\{sw\.1-5\} is below 0/);
+  });
+
   it("keeps switch digits as written unless asked to do arithmetic", () => {
     expect(render("{sw.1}", { sw: "sw-007" }).value).toBe("007");
     expect(render("{sw.1+0}", { sw: "sw-007" }).value).toBe("7");

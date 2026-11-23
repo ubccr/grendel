@@ -15,21 +15,30 @@ import (
 	"github.com/ubccr/grendel/pkg/client"
 )
 
+// location is where a node sits, as its bmc records it. The generated client has one location type per response it appears in, all with these fields, so they convert to it
+type location struct {
+	Datacenter string
+	Rack       string
+	RackUnit   client.OptNilInt
+	Room       string
+	Row        string
+}
+
 // formatLocation shows a location as rack and unit first, since that is what finds the machine, with the wider place after it
-func formatLocation(datacenter, room, row, rack string, unit client.OptNilInt) string {
+func formatLocation(loc location) string {
 	var head []string
-	if rack != "" {
-		head = append(head, rack)
+	if loc.Rack != "" {
+		head = append(head, loc.Rack)
 	}
-	if unit.Set && !unit.Null {
-		head = append(head, fmt.Sprintf("U%d", unit.Value))
+	if unit, ok := loc.RackUnit.Get(); ok {
+		head = append(head, fmt.Sprintf("U%d", unit))
 	}
-	if row != "" {
-		head = append(head, "row "+row)
+	if loc.Row != "" {
+		head = append(head, "row "+loc.Row)
 	}
 
 	var place []string
-	for _, p := range []string{datacenter, room} {
+	for _, p := range []string{loc.Datacenter, loc.Room} {
 		if p != "" {
 			place = append(place, p)
 		}
@@ -69,39 +78,44 @@ func parseAssetCSV(r io.Reader, serialColumn, tagColumn string) (map[string]stri
 	cr := csv.NewReader(r)
 	cr.FieldsPerRecord = -1
 	cr.TrimLeadingSpace = true
-	rows, err := cr.ReadAll()
-	if err != nil {
-		return nil, fmt.Errorf("reading csv: %w", err)
-	}
-	if len(rows) == 0 {
-		return nil, errors.New("csv is empty")
-	}
-
-	serialIdx, tagIdx, header := findColumns(rows[0], serialColumn, tagColumn)
-	switch {
-	case header && (serialIdx < 0 || tagIdx < 0):
-		return nil, fmt.Errorf("csv header names only one of the serial and asset tag columns, pick them with --serial-column and --tag-column. The header is: %s", strings.Join(rows[0], ", "))
-	case !header && (serialColumn != "" || tagColumn != ""):
-		return nil, fmt.Errorf("csv header has no %q or %q column, it is: %s", serialColumn, tagColumn, strings.Join(rows[0], ", "))
-	case !header:
-		serialIdx, tagIdx = 0, 1
-	}
-	if header {
-		rows = rows[1:]
-	}
 
 	out := map[string]string{}
-	line := 1
-	if header {
-		line = 2
-	}
-	for i, row := range rows {
-		n := line + i
+	serialIdx, tagIdx := -1, -1
+	for first := true; ; first = false {
+		row, err := cr.Read()
+		if errors.Is(err, io.EOF) {
+			if first {
+				return nil, errors.New("csv is empty")
+			}
+			break
+		}
+		if err != nil {
+			return nil, fmt.Errorf("reading csv: %w", err)
+		}
+
+		if first {
+			var header bool
+			serialIdx, tagIdx, header = findColumns(row, serialColumn, tagColumn)
+			switch {
+			case header && (serialIdx < 0 || tagIdx < 0):
+				return nil, fmt.Errorf("csv header names only one of the serial and asset tag columns, pick them with --serial-column and --tag-column. The header is: %s", strings.Join(row, ", "))
+			case !header && (serialColumn != "" || tagColumn != ""):
+				return nil, fmt.Errorf("csv header has no %q or %q column, it is: %s", serialColumn, tagColumn, strings.Join(row, ", "))
+			case !header:
+				serialIdx, tagIdx = 0, 1
+			}
+			if header {
+				continue
+			}
+		}
+
+		// the reader skips blank lines and a quoted field can span several, so a row's number is not its line in the file
+		line, _ := cr.FieldPos(0)
 		if len(row) <= max(serialIdx, tagIdx) {
 			if len(row) == 1 && strings.TrimSpace(row[0]) == "" {
 				continue
 			}
-			return nil, fmt.Errorf("csv line %d has %d column(s), expected at least %d", n, len(row), max(serialIdx, tagIdx)+1)
+			return nil, fmt.Errorf("csv line %d has %d column(s), expected at least %d", line, len(row), max(serialIdx, tagIdx)+1)
 		}
 		serial := strings.TrimSpace(row[serialIdx])
 		tag := strings.TrimSpace(row[tagIdx])
@@ -110,9 +124,9 @@ func parseAssetCSV(r io.Reader, serialColumn, tagColumn string) (map[string]stri
 		}
 		if prev, ok := out[serial]; ok {
 			if prev != tag {
-				return nil, fmt.Errorf("csv line %d: serial %s is listed twice, with asset tags %q and %q", n, serial, prev, tag)
+				return nil, fmt.Errorf("csv line %d: serial %s is listed twice, with asset tags %q and %q", line, serial, prev, tag)
 			}
-			return nil, fmt.Errorf("csv line %d: serial %s is listed twice", n, serial)
+			return nil, fmt.Errorf("csv line %d: serial %s is listed twice", line, serial)
 		}
 		out[serial] = tag
 	}

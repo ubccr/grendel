@@ -11,18 +11,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toastBmcResponse } from "@/lib/bmc";
 import { useMutation } from "@tanstack/react-query";
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 
 const shutdownTypes = { NoReboot: "No Reboot", Graceful: "Graceful", Forced: "Forced" };
 
 export default function NodesImportConfigAction({ nodes }: { nodes: string }) {
   const [shutdownType, setShutdownType] = useState("");
   const [file, setFile] = useState("");
-  const { mutate, isPending } = useMutation(postV1BmcConfigureImportMutation());
+  const { mutate, isPending } = useMutation({
+    ...postV1BmcConfigureImportMutation(),
+    meta: { bmc: "Import config" },
+  });
 
   return (
     <ActionCard
@@ -37,16 +38,10 @@ export default function NodesImportConfigAction({ nodes }: { nodes: string }) {
             </Button>
           }
           onConfirm={() =>
-            mutate(
-              {
-                query: { nodeset: nodes },
-                body: { file: file, shutdown_type: shutdownType },
-              },
-              {
-                onSuccess: (data) => toastBmcResponse("Import config", data),
-                onError: (e) => toast.error(e.title, { description: e.detail }),
-              },
-            )
+            mutate({
+              query: { nodeset: nodes },
+              body: { file: file, shutdown_type: shutdownType },
+            })
           }
         >
           Import {file} with a {shutdownTypes[shutdownType as keyof typeof shutdownTypes]} shutdown

@@ -24,7 +24,6 @@ export default function NodesProvisionAction({ nodes }: { nodes: string }) {
               { query: { nodeset: nodes }, body: { provision: provision } },
               {
                 onSuccess: (data) => toast.success(data?.title, { description: data?.detail }),
-                onError: (e) => toast.error(e.title, { description: e.detail }),
               },
             )
           }

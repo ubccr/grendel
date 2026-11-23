@@ -70,7 +70,7 @@ export function groups(nodes: NodeNics[]): Group[] {
   return [...out.values()].sort((a, b) => b.nodes.length - a.nodes.length);
 }
 
-// learned maps every MAC the scanned switches hold to where they learned it, with the port numbered as on the faceplate so it can fill {port}. A MAC learned on more than one port, as on a server's own port and on the link to the switch above it when both switches are scanned, is left out rather than guessed at, so a node relying on it is picked by hand
+// learned maps every MAC the scanned switches hold to where they learned it, with the port numbered as on the faceplate so it can fill {port}. A MAC learned on more than one port, as on a server's own port and on an uplink between two scanned switches, is left out rather than guessed at
 export function learned(switches: ScanSwitch[]): Map<string, Seen> {
   const out = new Map<string, Seen>();
   const twice = new Set<string>();
@@ -181,22 +181,23 @@ export function bootRows(
           : "No interface matches the group's rule. Pick one.";
       return row;
     }
-    if (fqdn.parts.length) {
+    if (fqdn.parts.length || fqdn.error) {
       const r = renderTemplate(fqdn, {
         name: n.node,
         sw: row.seen?.sw,
         port: row.seen?.port,
       });
-      row.fqdn = r.value;
       if (r.error) {
         row.status = "invalid";
-        row.problem = row.seen
-          ? r.error
-          : [...fqdn.uses].some((u) => u === "port" || u.startsWith("sw"))
-            ? "No scanned switch has seen this interface, so the FQDN's switch fields are empty."
-            : r.error;
+        row.problem =
+          row.seen || fqdn.error
+            ? r.error
+            : [...fqdn.uses].some((u) => u === "port" || u.startsWith("sw"))
+              ? "No scanned switch has seen this interface, so the FQDN's switch fields are empty."
+              : r.error;
         return row;
       }
+      row.fqdn = r.value;
     }
     if (row.seen?.owner && row.seen.owner !== n.node) {
       row.status = "conflict";

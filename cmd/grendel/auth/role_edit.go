@@ -43,7 +43,7 @@ var (
 				role := args[0]
 				var permissions []client.PatchRolesRequestPermissionListItem
 				for _, p := range res.Roles[0].PermissionList {
-					permissions = append(permissions, client.PatchRolesRequestPermissionListItem(p))
+					permissions = append(permissions, client.PatchRolesRequestPermissionListItem{Method: p.Method, Path: p.Path})
 				}
 				for _, s := range args[2:] {
 					kvSlice := strings.Split(s, "=")

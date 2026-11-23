@@ -334,12 +334,19 @@ func (s *BmcPowerBody) SetFake() {
 func (s *BmcResponseModelBmcAck) SetFake() {
 	{
 		{
-			s.Results.SetFake()
+			s.Results = nil
+			for i := 0; i < 0; i++ {
+				var elem BmcResponseModelBmcAckResultsItem
+				{
+					elem.SetFake()
+				}
+				s.Results = append(s.Results, elem)
+			}
 		}
 	}
 	{
 		{
-			s.RunID.SetFake()
+			s.RunID = "string"
 		}
 	}
 	{
@@ -358,22 +365,22 @@ func (s *BmcResponseModelBmcAckResultsItem) SetFake() {
 	}
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Message.SetFake()
+			s.Message = "string"
 		}
 	}
 	{
 		{
-			s.Node.SetFake()
+			s.Node = "string"
 		}
 	}
 	{
 		{
-			s.Success.SetFake()
+			s.Success = true
 		}
 	}
 }
@@ -382,27 +389,27 @@ func (s *BmcResponseModelBmcAckResultsItem) SetFake() {
 func (s *BmcResponseModelBmcAckSummary) SetFake() {
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Failed.SetFake()
+			s.Failed = int(0)
 		}
 	}
 	{
 		{
-			s.FailedNodes.SetFake()
+			s.FailedNodes = "string"
 		}
 	}
 	{
 		{
-			s.Succeeded.SetFake()
+			s.Succeeded = int(0)
 		}
 	}
 	{
 		{
-			s.Total.SetFake()
+			s.Total = int(0)
 		}
 	}
 }
@@ -411,12 +418,19 @@ func (s *BmcResponseModelBmcAckSummary) SetFake() {
 func (s *BmcResponseModelBmcAssetTagResult) SetFake() {
 	{
 		{
-			s.Results.SetFake()
+			s.Results = nil
+			for i := 0; i < 0; i++ {
+				var elem BmcResponseModelBmcAssetTagResultResultsItem
+				{
+					elem.SetFake()
+				}
+				s.Results = append(s.Results, elem)
+			}
 		}
 	}
 	{
 		{
-			s.RunID.SetFake()
+			s.RunID = "string"
 		}
 	}
 	{
@@ -435,22 +449,22 @@ func (s *BmcResponseModelBmcAssetTagResultResultsItem) SetFake() {
 	}
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Message.SetFake()
+			s.Message = "string"
 		}
 	}
 	{
 		{
-			s.Node.SetFake()
+			s.Node = "string"
 		}
 	}
 	{
 		{
-			s.Success.SetFake()
+			s.Success = true
 		}
 	}
 }
@@ -459,22 +473,22 @@ func (s *BmcResponseModelBmcAssetTagResultResultsItem) SetFake() {
 func (s *BmcResponseModelBmcAssetTagResultResultsItemData) SetFake() {
 	{
 		{
-			s.Changed.SetFake()
+			s.Changed = true
 		}
 	}
 	{
 		{
-			s.Current.SetFake()
+			s.Current = "string"
 		}
 	}
 	{
 		{
-			s.Desired.SetFake()
+			s.Desired = "string"
 		}
 	}
 	{
 		{
-			s.Serial.SetFake()
+			s.Serial = "string"
 		}
 	}
 }
@@ -483,27 +497,27 @@ func (s *BmcResponseModelBmcAssetTagResultResultsItemData) SetFake() {
 func (s *BmcResponseModelBmcAssetTagResultSummary) SetFake() {
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Failed.SetFake()
+			s.Failed = int(0)
 		}
 	}
 	{
 		{
-			s.FailedNodes.SetFake()
+			s.FailedNodes = "string"
 		}
 	}
 	{
 		{
-			s.Succeeded.SetFake()
+			s.Succeeded = int(0)
 		}
 	}
 	{
 		{
-			s.Total.SetFake()
+			s.Total = int(0)
 		}
 	}
 }
@@ -512,12 +526,19 @@ func (s *BmcResponseModelBmcAssetTagResultSummary) SetFake() {
 func (s *BmcResponseModelBmcBios) SetFake() {
 	{
 		{
-			s.Results.SetFake()
+			s.Results = nil
+			for i := 0; i < 0; i++ {
+				var elem BmcResponseModelBmcBiosResultsItem
+				{
+					elem.SetFake()
+				}
+				s.Results = append(s.Results, elem)
+			}
 		}
 	}
 	{
 		{
-			s.RunID.SetFake()
+			s.RunID = "string"
 		}
 	}
 	{
@@ -531,12 +552,19 @@ func (s *BmcResponseModelBmcBios) SetFake() {
 func (s *BmcResponseModelBmcBiosRegistry) SetFake() {
 	{
 		{
-			s.Results.SetFake()
+			s.Results = nil
+			for i := 0; i < 0; i++ {
+				var elem BmcResponseModelBmcBiosRegistryResultsItem
+				{
+					elem.SetFake()
+				}
+				s.Results = append(s.Results, elem)
+			}
 		}
 	}
 	{
 		{
-			s.RunID.SetFake()
+			s.RunID = "string"
 		}
 	}
 	{
@@ -555,22 +583,22 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItem) SetFake() {
 	}
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Message.SetFake()
+			s.Message = "string"
 		}
 	}
 	{
 		{
-			s.Node.SetFake()
+			s.Node = "string"
 		}
 	}
 	{
 		{
-			s.Success.SetFake()
+			s.Success = true
 		}
 	}
 }
@@ -591,22 +619,22 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemData) SetFake() {
 	}
 	{
 		{
-			s.Available.SetFake()
+			s.Available = true
 		}
 	}
 	{
 		{
-			s.Language.SetFake()
+			s.Language = "string"
 		}
 	}
 	{
 		{
-			s.Registry.SetFake()
+			s.Registry = "string"
 		}
 	}
 	{
 		{
-			s.Version.SetFake()
+			s.Version = "string"
 		}
 	}
 }
@@ -620,32 +648,32 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetFake()
 	}
 	{
 		{
-			s.DisplayName.SetFake()
+			s.DisplayName = "string"
 		}
 	}
 	{
 		{
-			s.DisplayOrder.SetFake()
+			s.DisplayOrder = int(0)
 		}
 	}
 	{
 		{
-			s.GrayOut.SetFake()
+			s.GrayOut = true
 		}
 	}
 	{
 		{
-			s.HelpText.SetFake()
+			s.HelpText = "string"
 		}
 	}
 	{
 		{
-			s.Hidden.SetFake()
+			s.Hidden = true
 		}
 	}
 	{
 		{
-			s.Immutable.SetFake()
+			s.Immutable = true
 		}
 	}
 	{
@@ -660,7 +688,7 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetFake()
 	}
 	{
 		{
-			s.MenuPath.SetFake()
+			s.MenuPath = "string"
 		}
 	}
 	{
@@ -670,27 +698,27 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetFake()
 	}
 	{
 		{
-			s.Name.SetFake()
+			s.Name = "string"
 		}
 	}
 	{
 		{
-			s.ReadOnly.SetFake()
+			s.ReadOnly = true
 		}
 	}
 	{
 		{
-			s.ResetRequired.SetFake()
+			s.ResetRequired = true
 		}
 	}
 	{
 		{
-			s.SystemUnique.SetFake()
+			s.SystemUnique = true
 		}
 	}
 	{
 		{
-			s.Type.SetFake()
+			s.Type = "string"
 		}
 	}
 	{
@@ -712,12 +740,12 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetFake()
 	}
 	{
 		{
-			s.WarningText.SetFake()
+			s.WarningText = "string"
 		}
 	}
 	{
 		{
-			s.WriteOnly.SetFake()
+			s.WriteOnly = true
 		}
 	}
 }
@@ -726,12 +754,12 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) SetFake()
 func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem) SetFake() {
 	{
 		{
-			s.DisplayName.SetFake()
+			s.DisplayName = "string"
 		}
 	}
 	{
 		{
-			s.Name.SetFake()
+			s.Name = "string"
 		}
 	}
 }
@@ -740,27 +768,27 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem)
 func (s *BmcResponseModelBmcBiosRegistrySummary) SetFake() {
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Failed.SetFake()
+			s.Failed = int(0)
 		}
 	}
 	{
 		{
-			s.FailedNodes.SetFake()
+			s.FailedNodes = "string"
 		}
 	}
 	{
 		{
-			s.Succeeded.SetFake()
+			s.Succeeded = int(0)
 		}
 	}
 	{
 		{
-			s.Total.SetFake()
+			s.Total = int(0)
 		}
 	}
 }
@@ -774,22 +802,22 @@ func (s *BmcResponseModelBmcBiosResultsItem) SetFake() {
 	}
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Message.SetFake()
+			s.Message = "string"
 		}
 	}
 	{
 		{
-			s.Node.SetFake()
+			s.Node = "string"
 		}
 	}
 	{
 		{
-			s.Success.SetFake()
+			s.Success = true
 		}
 	}
 }
@@ -810,7 +838,7 @@ func (s *BmcResponseModelBmcBiosResultsItemData) SetFake() {
 	}
 	{
 		{
-			s.AttributeRegistry.SetFake()
+			s.AttributeRegistry = "string"
 		}
 	}
 	{
@@ -820,12 +848,12 @@ func (s *BmcResponseModelBmcBiosResultsItemData) SetFake() {
 	}
 	{
 		{
-			s.BiosVersion.SetFake()
+			s.BiosVersion = "string"
 		}
 	}
 	{
 		{
-			s.Model.SetFake()
+			s.Model = "string"
 		}
 	}
 	{
@@ -835,7 +863,7 @@ func (s *BmcResponseModelBmcBiosResultsItemData) SetFake() {
 	}
 	{
 		{
-			s.ResetPending.SetFake()
+			s.ResetPending = true
 		}
 	}
 }
@@ -866,27 +894,27 @@ func (s *BmcResponseModelBmcBiosResultsItemDataPending) SetFake() {
 func (s *BmcResponseModelBmcBiosSummary) SetFake() {
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Failed.SetFake()
+			s.Failed = int(0)
 		}
 	}
 	{
 		{
-			s.FailedNodes.SetFake()
+			s.FailedNodes = "string"
 		}
 	}
 	{
 		{
-			s.Succeeded.SetFake()
+			s.Succeeded = int(0)
 		}
 	}
 	{
 		{
-			s.Total.SetFake()
+			s.Total = int(0)
 		}
 	}
 }
@@ -895,12 +923,19 @@ func (s *BmcResponseModelBmcBiosSummary) SetFake() {
 func (s *BmcResponseModelBmcFirmwareUpdates) SetFake() {
 	{
 		{
-			s.Results.SetFake()
+			s.Results = nil
+			for i := 0; i < 0; i++ {
+				var elem BmcResponseModelBmcFirmwareUpdatesResultsItem
+				{
+					elem.SetFake()
+				}
+				s.Results = append(s.Results, elem)
+			}
 		}
 	}
 	{
 		{
-			s.RunID.SetFake()
+			s.RunID = "string"
 		}
 	}
 	{
@@ -919,22 +954,22 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) SetFake() {
 	}
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Message.SetFake()
+			s.Message = "string"
 		}
 	}
 	{
 		{
-			s.Node.SetFake()
+			s.Node = "string"
 		}
 	}
 	{
 		{
-			s.Success.SetFake()
+			s.Success = true
 		}
 	}
 }
@@ -943,7 +978,7 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) SetFake() {
 func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) SetFake() {
 	{
 		{
-			s.RebootType.SetFake()
+			s.RebootType = "string"
 		}
 	}
 	{
@@ -957,42 +992,42 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) SetFake() {
 func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetFake() {
 	{
 		{
-			s.ComponentType.SetFake()
+			s.ComponentType = "string"
 		}
 	}
 	{
 		{
-			s.Criticality.SetFake()
+			s.Criticality = "string"
 		}
 	}
 	{
 		{
-			s.DisplayName.SetFake()
+			s.DisplayName = "string"
 		}
 	}
 	{
 		{
-			s.InstalledVersion.SetFake()
+			s.InstalledVersion = "string"
 		}
 	}
 	{
 		{
-			s.Name.SetFake()
+			s.Name = "string"
 		}
 	}
 	{
 		{
-			s.PackagePath.SetFake()
+			s.PackagePath = "string"
 		}
 	}
 	{
 		{
-			s.PackageVersion.SetFake()
+			s.PackageVersion = "string"
 		}
 	}
 	{
 		{
-			s.RebootType.SetFake()
+			s.RebootType = "string"
 		}
 	}
 }
@@ -1001,27 +1036,27 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetFake()
 func (s *BmcResponseModelBmcFirmwareUpdatesSummary) SetFake() {
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Failed.SetFake()
+			s.Failed = int(0)
 		}
 	}
 	{
 		{
-			s.FailedNodes.SetFake()
+			s.FailedNodes = "string"
 		}
 	}
 	{
 		{
-			s.Succeeded.SetFake()
+			s.Succeeded = int(0)
 		}
 	}
 	{
 		{
-			s.Total.SetFake()
+			s.Total = int(0)
 		}
 	}
 }
@@ -1030,12 +1065,19 @@ func (s *BmcResponseModelBmcFirmwareUpdatesSummary) SetFake() {
 func (s *BmcResponseModelBmcJobList) SetFake() {
 	{
 		{
-			s.Results.SetFake()
+			s.Results = nil
+			for i := 0; i < 0; i++ {
+				var elem BmcResponseModelBmcJobListResultsItem
+				{
+					elem.SetFake()
+				}
+				s.Results = append(s.Results, elem)
+			}
 		}
 	}
 	{
 		{
-			s.RunID.SetFake()
+			s.RunID = "string"
 		}
 	}
 	{
@@ -1054,22 +1096,22 @@ func (s *BmcResponseModelBmcJobListResultsItem) SetFake() {
 	}
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Message.SetFake()
+			s.Message = "string"
 		}
 	}
 	{
 		{
-			s.Node.SetFake()
+			s.Node = "string"
 		}
 	}
 	{
 		{
-			s.Success.SetFake()
+			s.Success = true
 		}
 	}
 }
@@ -1087,47 +1129,47 @@ func (s *BmcResponseModelBmcJobListResultsItemData) SetFake() {
 func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetFake() {
 	{
 		{
-			s.EndTime.SetFake()
+			s.EndTime = "string"
 		}
 	}
 	{
 		{
-			s.ID.SetFake()
+			s.ID = "string"
 		}
 	}
 	{
 		{
-			s.Message.SetFake()
+			s.Message = "string"
 		}
 	}
 	{
 		{
-			s.Name.SetFake()
+			s.Name = "string"
 		}
 	}
 	{
 		{
-			s.PercentComplete.SetFake()
+			s.PercentComplete = int(0)
 		}
 	}
 	{
 		{
-			s.StartTime.SetFake()
+			s.StartTime = "string"
 		}
 	}
 	{
 		{
-			s.State.SetFake()
+			s.State = "string"
 		}
 	}
 	{
 		{
-			s.Status.SetFake()
+			s.Status = "string"
 		}
 	}
 	{
 		{
-			s.Type.SetFake()
+			s.Type = "string"
 		}
 	}
 }
@@ -1136,27 +1178,27 @@ func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) SetFake() {
 func (s *BmcResponseModelBmcJobListSummary) SetFake() {
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Failed.SetFake()
+			s.Failed = int(0)
 		}
 	}
 	{
 		{
-			s.FailedNodes.SetFake()
+			s.FailedNodes = "string"
 		}
 	}
 	{
 		{
-			s.Succeeded.SetFake()
+			s.Succeeded = int(0)
 		}
 	}
 	{
 		{
-			s.Total.SetFake()
+			s.Total = int(0)
 		}
 	}
 }
@@ -1165,12 +1207,19 @@ func (s *BmcResponseModelBmcJobListSummary) SetFake() {
 func (s *BmcResponseModelBmcLocationResult) SetFake() {
 	{
 		{
-			s.Results.SetFake()
+			s.Results = nil
+			for i := 0; i < 0; i++ {
+				var elem BmcResponseModelBmcLocationResultResultsItem
+				{
+					elem.SetFake()
+				}
+				s.Results = append(s.Results, elem)
+			}
 		}
 	}
 	{
 		{
-			s.RunID.SetFake()
+			s.RunID = "string"
 		}
 	}
 	{
@@ -1189,22 +1238,22 @@ func (s *BmcResponseModelBmcLocationResultResultsItem) SetFake() {
 	}
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Message.SetFake()
+			s.Message = "string"
 		}
 	}
 	{
 		{
-			s.Node.SetFake()
+			s.Node = "string"
 		}
 	}
 	{
 		{
-			s.Success.SetFake()
+			s.Success = true
 		}
 	}
 }
@@ -1213,7 +1262,7 @@ func (s *BmcResponseModelBmcLocationResultResultsItem) SetFake() {
 func (s *BmcResponseModelBmcLocationResultResultsItemData) SetFake() {
 	{
 		{
-			s.Changed.SetFake()
+			s.Changed = true
 		}
 	}
 	{
@@ -1232,12 +1281,12 @@ func (s *BmcResponseModelBmcLocationResultResultsItemData) SetFake() {
 func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) SetFake() {
 	{
 		{
-			s.Datacenter.SetFake()
+			s.Datacenter = "string"
 		}
 	}
 	{
 		{
-			s.Rack.SetFake()
+			s.Rack = "string"
 		}
 	}
 	{
@@ -1247,12 +1296,12 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) SetFake() {
 	}
 	{
 		{
-			s.Room.SetFake()
+			s.Room = "string"
 		}
 	}
 	{
 		{
-			s.Row.SetFake()
+			s.Row = "string"
 		}
 	}
 }
@@ -1261,12 +1310,12 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) SetFake() {
 func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) SetFake() {
 	{
 		{
-			s.Datacenter.SetFake()
+			s.Datacenter = "string"
 		}
 	}
 	{
 		{
-			s.Rack.SetFake()
+			s.Rack = "string"
 		}
 	}
 	{
@@ -1276,12 +1325,12 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) SetFake() {
 	}
 	{
 		{
-			s.Room.SetFake()
+			s.Room = "string"
 		}
 	}
 	{
 		{
-			s.Row.SetFake()
+			s.Row = "string"
 		}
 	}
 }
@@ -1290,27 +1339,27 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) SetFake() {
 func (s *BmcResponseModelBmcLocationResultSummary) SetFake() {
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Failed.SetFake()
+			s.Failed = int(0)
 		}
 	}
 	{
 		{
-			s.FailedNodes.SetFake()
+			s.FailedNodes = "string"
 		}
 	}
 	{
 		{
-			s.Succeeded.SetFake()
+			s.Succeeded = int(0)
 		}
 	}
 	{
 		{
-			s.Total.SetFake()
+			s.Total = int(0)
 		}
 	}
 }
@@ -1319,12 +1368,19 @@ func (s *BmcResponseModelBmcLocationResultSummary) SetFake() {
 func (s *BmcResponseModelBmcNICList) SetFake() {
 	{
 		{
-			s.Results.SetFake()
+			s.Results = nil
+			for i := 0; i < 0; i++ {
+				var elem BmcResponseModelBmcNICListResultsItem
+				{
+					elem.SetFake()
+				}
+				s.Results = append(s.Results, elem)
+			}
 		}
 	}
 	{
 		{
-			s.RunID.SetFake()
+			s.RunID = "string"
 		}
 	}
 	{
@@ -1343,22 +1399,22 @@ func (s *BmcResponseModelBmcNICListResultsItem) SetFake() {
 	}
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Message.SetFake()
+			s.Message = "string"
 		}
 	}
 	{
 		{
-			s.Node.SetFake()
+			s.Node = "string"
 		}
 	}
 	{
 		{
-			s.Success.SetFake()
+			s.Success = true
 		}
 	}
 }
@@ -1376,32 +1432,32 @@ func (s *BmcResponseModelBmcNICListResultsItemData) SetFake() {
 func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) SetFake() {
 	{
 		{
-			s.Enabled.SetFake()
+			s.Enabled = true
 		}
 	}
 	{
 		{
-			s.ID.SetFake()
+			s.ID = "string"
 		}
 	}
 	{
 		{
-			s.Link.SetFake()
+			s.Link = "string"
 		}
 	}
 	{
 		{
-			s.MAC.SetFake()
+			s.MAC = "string"
 		}
 	}
 	{
 		{
-			s.Name.SetFake()
+			s.Name = "string"
 		}
 	}
 	{
 		{
-			s.SpeedMbps.SetFake()
+			s.SpeedMbps = int(0)
 		}
 	}
 }
@@ -1410,27 +1466,27 @@ func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) SetFake() {
 func (s *BmcResponseModelBmcNICListSummary) SetFake() {
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Failed.SetFake()
+			s.Failed = int(0)
 		}
 	}
 	{
 		{
-			s.FailedNodes.SetFake()
+			s.FailedNodes = "string"
 		}
 	}
 	{
 		{
-			s.Succeeded.SetFake()
+			s.Succeeded = int(0)
 		}
 	}
 	{
 		{
-			s.Total.SetFake()
+			s.Total = int(0)
 		}
 	}
 }
@@ -1439,12 +1495,19 @@ func (s *BmcResponseModelBmcNICListSummary) SetFake() {
 func (s *BmcResponseModelBmcSELLog) SetFake() {
 	{
 		{
-			s.Results.SetFake()
+			s.Results = nil
+			for i := 0; i < 0; i++ {
+				var elem BmcResponseModelBmcSELLogResultsItem
+				{
+					elem.SetFake()
+				}
+				s.Results = append(s.Results, elem)
+			}
 		}
 	}
 	{
 		{
-			s.RunID.SetFake()
+			s.RunID = "string"
 		}
 	}
 	{
@@ -1463,22 +1526,22 @@ func (s *BmcResponseModelBmcSELLogResultsItem) SetFake() {
 	}
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Message.SetFake()
+			s.Message = "string"
 		}
 	}
 	{
 		{
-			s.Node.SetFake()
+			s.Node = "string"
 		}
 	}
 	{
 		{
-			s.Success.SetFake()
+			s.Success = true
 		}
 	}
 }
@@ -1496,42 +1559,42 @@ func (s *BmcResponseModelBmcSELLogResultsItemData) SetFake() {
 func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetFake() {
 	{
 		{
-			s.Created.SetFake()
+			s.Created = "string"
 		}
 	}
 	{
 		{
-			s.EntryType.SetFake()
+			s.EntryType = "string"
 		}
 	}
 	{
 		{
-			s.ID.SetFake()
+			s.ID = "string"
 		}
 	}
 	{
 		{
-			s.Message.SetFake()
+			s.Message = "string"
 		}
 	}
 	{
 		{
-			s.MessageID.SetFake()
+			s.MessageID = "string"
 		}
 	}
 	{
 		{
-			s.Resolution.SetFake()
+			s.Resolution = "string"
 		}
 	}
 	{
 		{
-			s.SensorType.SetFake()
+			s.SensorType = "string"
 		}
 	}
 	{
 		{
-			s.Severity.SetFake()
+			s.Severity = "string"
 		}
 	}
 }
@@ -1540,27 +1603,27 @@ func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetFake() {
 func (s *BmcResponseModelBmcSELLogSummary) SetFake() {
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Failed.SetFake()
+			s.Failed = int(0)
 		}
 	}
 	{
 		{
-			s.FailedNodes.SetFake()
+			s.FailedNodes = "string"
 		}
 	}
 	{
 		{
-			s.Succeeded.SetFake()
+			s.Succeeded = int(0)
 		}
 	}
 	{
 		{
-			s.Total.SetFake()
+			s.Total = int(0)
 		}
 	}
 }
@@ -1569,12 +1632,19 @@ func (s *BmcResponseModelBmcSELLogSummary) SetFake() {
 func (s *BmcResponseModelBmcSecureBoot) SetFake() {
 	{
 		{
-			s.Results.SetFake()
+			s.Results = nil
+			for i := 0; i < 0; i++ {
+				var elem BmcResponseModelBmcSecureBootResultsItem
+				{
+					elem.SetFake()
+				}
+				s.Results = append(s.Results, elem)
+			}
 		}
 	}
 	{
 		{
-			s.RunID.SetFake()
+			s.RunID = "string"
 		}
 	}
 	{
@@ -1593,22 +1663,22 @@ func (s *BmcResponseModelBmcSecureBootResultsItem) SetFake() {
 	}
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Message.SetFake()
+			s.Message = "string"
 		}
 	}
 	{
 		{
-			s.Node.SetFake()
+			s.Node = "string"
 		}
 	}
 	{
 		{
-			s.Success.SetFake()
+			s.Success = true
 		}
 	}
 }
@@ -1617,7 +1687,7 @@ func (s *BmcResponseModelBmcSecureBootResultsItem) SetFake() {
 func (s *BmcResponseModelBmcSecureBootResultsItemData) SetFake() {
 	{
 		{
-			s.CurrentBoot.SetFake()
+			s.CurrentBoot = "string"
 		}
 	}
 	{
@@ -1634,7 +1704,7 @@ func (s *BmcResponseModelBmcSecureBootResultsItemData) SetFake() {
 	}
 	{
 		{
-			s.Enabled.SetFake()
+			s.Enabled = true
 		}
 	}
 	{
@@ -1651,7 +1721,7 @@ func (s *BmcResponseModelBmcSecureBootResultsItemData) SetFake() {
 	}
 	{
 		{
-			s.Mode.SetFake()
+			s.Mode = "string"
 		}
 	}
 	{
@@ -1677,7 +1747,7 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) SetFake() {
 	}
 	{
 		{
-			s.ID.SetFake()
+			s.ID = "string"
 		}
 	}
 	{
@@ -1698,37 +1768,37 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) SetFake() {
 func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) SetFake() {
 	{
 		{
-			s.Fingerprint.SetFake()
+			s.Fingerprint = "string"
 		}
 	}
 	{
 		{
-			s.ID.SetFake()
+			s.ID = "string"
 		}
 	}
 	{
 		{
-			s.Issuer.SetFake()
+			s.Issuer = "string"
 		}
 	}
 	{
 		{
-			s.NotAfter.SetFake()
+			s.NotAfter = "string"
 		}
 	}
 	{
 		{
-			s.NotBefore.SetFake()
+			s.NotBefore = "string"
 		}
 	}
 	{
 		{
-			s.Owner.SetFake()
+			s.Owner = "string"
 		}
 	}
 	{
 		{
-			s.Subject.SetFake()
+			s.Subject = "string"
 		}
 	}
 }
@@ -1737,22 +1807,22 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) S
 func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) SetFake() {
 	{
 		{
-			s.Hash.SetFake()
+			s.Hash = "string"
 		}
 	}
 	{
 		{
-			s.ID.SetFake()
+			s.ID = "string"
 		}
 	}
 	{
 		{
-			s.Owner.SetFake()
+			s.Owner = "string"
 		}
 	}
 	{
 		{
-			s.Type.SetFake()
+			s.Type = "string"
 		}
 	}
 }
@@ -1761,27 +1831,27 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) Set
 func (s *BmcResponseModelBmcSecureBootSummary) SetFake() {
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Failed.SetFake()
+			s.Failed = int(0)
 		}
 	}
 	{
 		{
-			s.FailedNodes.SetFake()
+			s.FailedNodes = "string"
 		}
 	}
 	{
 		{
-			s.Succeeded.SetFake()
+			s.Succeeded = int(0)
 		}
 	}
 	{
 		{
-			s.Total.SetFake()
+			s.Total = int(0)
 		}
 	}
 }
@@ -1790,12 +1860,19 @@ func (s *BmcResponseModelBmcSecureBootSummary) SetFake() {
 func (s *BmcResponseModelRedfishSystem) SetFake() {
 	{
 		{
-			s.Results.SetFake()
+			s.Results = nil
+			for i := 0; i < 0; i++ {
+				var elem BmcResponseModelRedfishSystemResultsItem
+				{
+					elem.SetFake()
+				}
+				s.Results = append(s.Results, elem)
+			}
 		}
 	}
 	{
 		{
-			s.RunID.SetFake()
+			s.RunID = "string"
 		}
 	}
 	{
@@ -1814,22 +1891,22 @@ func (s *BmcResponseModelRedfishSystemResultsItem) SetFake() {
 	}
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Message.SetFake()
+			s.Message = "string"
 		}
 	}
 	{
 		{
-			s.Node.SetFake()
+			s.Node = "string"
 		}
 	}
 	{
 		{
-			s.Success.SetFake()
+			s.Success = true
 		}
 	}
 }
@@ -1838,22 +1915,22 @@ func (s *BmcResponseModelRedfishSystemResultsItem) SetFake() {
 func (s *BmcResponseModelRedfishSystemResultsItemData) SetFake() {
 	{
 		{
-			s.AssetTag.SetFake()
+			s.AssetTag = "string"
 		}
 	}
 	{
 		{
-			s.BiosVersion.SetFake()
+			s.BiosVersion = "string"
 		}
 	}
 	{
 		{
-			s.BootMode.SetFake()
+			s.BootMode = "string"
 		}
 	}
 	{
 		{
-			s.BootNext.SetFake()
+			s.BootNext = "string"
 		}
 	}
 	{
@@ -1863,32 +1940,32 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) SetFake() {
 	}
 	{
 		{
-			s.BootOverrideEnabled.SetFake()
+			s.BootOverrideEnabled = "string"
 		}
 	}
 	{
 		{
-			s.BootOverrideTarget.SetFake()
+			s.BootOverrideTarget = "string"
 		}
 	}
 	{
 		{
-			s.BootProgress.SetFake()
+			s.BootProgress = "string"
 		}
 	}
 	{
 		{
-			s.BootProgressTime.SetFake()
+			s.BootProgressTime = "string"
 		}
 	}
 	{
 		{
-			s.Health.SetFake()
+			s.Health = "string"
 		}
 	}
 	{
 		{
-			s.HostName.SetFake()
+			s.HostName = "string"
 		}
 	}
 	{
@@ -1898,22 +1975,22 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) SetFake() {
 	}
 	{
 		{
-			s.LocationIndicator.SetFake()
+			s.LocationIndicator = "string"
 		}
 	}
 	{
 		{
-			s.Manufacturer.SetFake()
+			s.Manufacturer = "string"
 		}
 	}
 	{
 		{
-			s.Model.SetFake()
+			s.Model = "string"
 		}
 	}
 	{
 		{
-			s.Name.SetFake()
+			s.Name = "string"
 		}
 	}
 	{
@@ -1923,37 +2000,37 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) SetFake() {
 	}
 	{
 		{
-			s.PowerStatus.SetFake()
+			s.PowerStatus = "string"
 		}
 	}
 	{
 		{
-			s.ProcessorCores.SetFake()
+			s.ProcessorCores = int(0)
 		}
 	}
 	{
 		{
-			s.ProcessorCount.SetFake()
+			s.ProcessorCount = int(0)
 		}
 	}
 	{
 		{
-			s.ProcessorModel.SetFake()
+			s.ProcessorModel = "string"
 		}
 	}
 	{
 		{
-			s.ProcessorSockets.SetFake()
+			s.ProcessorSockets = int(0)
 		}
 	}
 	{
 		{
-			s.SerialNumber.SetFake()
+			s.SerialNumber = "string"
 		}
 	}
 	{
 		{
-			s.TotalMemory.SetFake()
+			s.TotalMemory = float32(0)
 		}
 	}
 }
@@ -1962,12 +2039,12 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) SetFake() {
 func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) SetFake() {
 	{
 		{
-			s.Datacenter.SetFake()
+			s.Datacenter = "string"
 		}
 	}
 	{
 		{
-			s.Rack.SetFake()
+			s.Rack = "string"
 		}
 	}
 	{
@@ -1977,12 +2054,12 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) SetFake() {
 	}
 	{
 		{
-			s.Room.SetFake()
+			s.Room = "string"
 		}
 	}
 	{
 		{
-			s.Row.SetFake()
+			s.Row = "string"
 		}
 	}
 }
@@ -2464,27 +2541,27 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedIn
 func (s *BmcResponseModelRedfishSystemSummary) SetFake() {
 	{
 		{
-			s.DurationMs.SetFake()
+			s.DurationMs = int64(0)
 		}
 	}
 	{
 		{
-			s.Failed.SetFake()
+			s.Failed = int(0)
 		}
 	}
 	{
 		{
-			s.FailedNodes.SetFake()
+			s.FailedNodes = "string"
 		}
 	}
 	{
 		{
-			s.Succeeded.SetFake()
+			s.Succeeded = int(0)
 		}
 	}
 	{
 		{
-			s.Total.SetFake()
+			s.Total = int(0)
 		}
 	}
 }
@@ -2669,7 +2746,7 @@ func (s *BootImageAddRequest) SetFake() {
 		{
 			s.BootImages = nil
 			for i := 0; i < 0; i++ {
-				var elem NilBootImageAddRequestBootImagesItem
+				var elem BootImageAddRequestBootImagesItem
 				{
 					elem.SetFake()
 				}
@@ -2705,7 +2782,7 @@ func (s *BootImageAddRequestBootImagesItem) SetFake() {
 	}
 	{
 		{
-			s.Kernel.SetFake()
+			s.Kernel = "string"
 		}
 	}
 	{
@@ -2715,7 +2792,7 @@ func (s *BootImageAddRequestBootImagesItem) SetFake() {
 	}
 	{
 		{
-			s.Name.SetFake()
+			s.Name = "string"
 		}
 	}
 	{
@@ -2768,7 +2845,7 @@ func (s *DataDump) SetFake() {
 		{
 			s.Hosts = nil
 			for i := 0; i < 0; i++ {
-				var elem NilDataDumpHostsItem
+				var elem DataDumpHostsItem
 				{
 					elem.SetFake()
 				}
@@ -2780,7 +2857,7 @@ func (s *DataDump) SetFake() {
 		{
 			s.Images = nil
 			for i := 0; i < 0; i++ {
-				var elem NilDataDumpImagesItem
+				var elem DataDumpImagesItem
 				{
 					elem.SetFake()
 				}
@@ -2825,7 +2902,7 @@ func (s *DataDumpHostsItem) SetFake() {
 		{
 			s.Bonds = nil
 			for i := 0; i < 0; i++ {
-				var elem NilDataDumpHostsItemBondsItem
+				var elem DataDumpHostsItemBondsItem
 				{
 					elem.SetFake()
 				}
@@ -2852,7 +2929,7 @@ func (s *DataDumpHostsItem) SetFake() {
 		{
 			s.Interfaces = nil
 			for i := 0; i < 0; i++ {
-				var elem NilDataDumpHostsItemInterfacesItem
+				var elem DataDumpHostsItemInterfacesItem
 				{
 					elem.SetFake()
 				}
@@ -3008,7 +3085,7 @@ func (s *DataDumpImagesItem) SetFake() {
 	}
 	{
 		{
-			s.Kernel.SetFake()
+			s.Kernel = "string"
 		}
 	}
 	{
@@ -3018,7 +3095,7 @@ func (s *DataDumpImagesItem) SetFake() {
 	}
 	{
 		{
-			s.Name.SetFake()
+			s.Name = "string"
 		}
 	}
 	{
@@ -3091,6 +3168,16 @@ func (s *DataDumpRolesItem) SetFake() {
 func (s *DataDumpRolesItemPermissionListItem) SetFake() {
 	{
 		{
+			s.Group.SetFake()
+		}
+	}
+	{
+		{
+			s.Kind.SetFake()
+		}
+	}
+	{
+		{
 			s.Method.SetFake()
 		}
 	}
@@ -3099,12 +3186,32 @@ func (s *DataDumpRolesItemPermissionListItem) SetFake() {
 			s.Path.SetFake()
 		}
 	}
+	{
+		{
+			s.Summary.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *DataDumpRolesItemPermissionListItemKind) SetFake() {
+	*s = DataDumpRolesItemPermissionListItemKindView
 }
 
 // SetFake set fake values.
 func (s *DataDumpRolesItemUnassignedPermissionListItem) SetFake() {
 	{
 		{
+			s.Group.SetFake()
+		}
+	}
+	{
+		{
+			s.Kind.SetFake()
+		}
+	}
+	{
+		{
 			s.Method.SetFake()
 		}
 	}
@@ -3113,6 +3220,16 @@ func (s *DataDumpRolesItemUnassignedPermissionListItem) SetFake() {
 			s.Path.SetFake()
 		}
 	}
+	{
+		{
+			s.Summary.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *DataDumpRolesItemUnassignedPermissionListItemKind) SetFake() {
+	*s = DataDumpRolesItemUnassignedPermissionListItemKindView
 }
 
 // SetFake set fake values.
@@ -3292,7 +3409,7 @@ func (s *EventNodesItem) SetFake() {
 	}
 	{
 		{
-			s.Node.SetFake()
+			s.Node = "string"
 		}
 	}
 	{
@@ -3312,7 +3429,7 @@ func (s *EventNodesItem) SetFake() {
 	}
 	{
 		{
-			s.UpdatedAt.SetFake()
+			s.UpdatedAt = time.Now()
 		}
 	}
 }
@@ -3415,6 +3532,16 @@ func (s *GetRolesResponseRolesItem) SetFake() {
 func (s *GetRolesResponseRolesItemPermissionListItem) SetFake() {
 	{
 		{
+			s.Group.SetFake()
+		}
+	}
+	{
+		{
+			s.Kind.SetFake()
+		}
+	}
+	{
+		{
 			s.Method.SetFake()
 		}
 	}
@@ -3423,12 +3550,32 @@ func (s *GetRolesResponseRolesItemPermissionListItem) SetFake() {
 			s.Path.SetFake()
 		}
 	}
+	{
+		{
+			s.Summary.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *GetRolesResponseRolesItemPermissionListItemKind) SetFake() {
+	*s = GetRolesResponseRolesItemPermissionListItemKindView
 }
 
 // SetFake set fake values.
 func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) SetFake() {
 	{
 		{
+			s.Group.SetFake()
+		}
+	}
+	{
+		{
+			s.Kind.SetFake()
+		}
+	}
+	{
+		{
 			s.Method.SetFake()
 		}
 	}
@@ -3437,6 +3584,16 @@ func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) SetFake() {
 			s.Path.SetFake()
 		}
 	}
+	{
+		{
+			s.Summary.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *GetRolesResponseRolesItemUnassignedPermissionListItemKind) SetFake() {
+	*s = GetRolesResponseRolesItemUnassignedPermissionListItemKindView
 }
 
 // SetFake set fake values.
@@ -3514,7 +3671,7 @@ func (s *Host) SetFake() {
 		{
 			s.Bonds = nil
 			for i := 0; i < 0; i++ {
-				var elem NilHostBondsItem
+				var elem HostBondsItem
 				{
 					elem.SetFake()
 				}
@@ -3541,7 +3698,7 @@ func (s *Host) SetFake() {
 		{
 			s.Interfaces = nil
 			for i := 0; i < 0; i++ {
-				var elem NilHostInterfacesItem
+				var elem HostInterfacesItem
 				{
 					elem.SetFake()
 				}
@@ -3855,141 +4012,6 @@ func (s *NextAddressResponseUsedItem) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *NilBmcResponseModelBmcAckResultsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilBmcResponseModelBmcAssetTagResultResultsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilBmcResponseModelBmcBiosRegistryResultsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilBmcResponseModelBmcBiosResultsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilBmcResponseModelBmcFirmwareUpdatesResultsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilBmcResponseModelBmcJobListResultsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilBmcResponseModelBmcJobListResultsItemDataJobsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilBmcResponseModelBmcLocationResultResultsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilBmcResponseModelBmcNICListResultsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilBmcResponseModelBmcNICListResultsItemDataNicsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilBmcResponseModelBmcSELLogResultsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilBmcResponseModelBmcSecureBootResultsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilBmcResponseModelRedfishSystemResultsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilBootImageAddRequestBootImagesItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilDataDumpHostsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilDataDumpHostsItemBondsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilDataDumpHostsItemInterfacesItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilDataDumpImagesItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilHostBondsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilHostInterfacesItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilNodeAddRequestNodeListItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilNodeAddRequestNodeListItemBondsItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
-func (s *NilNodeAddRequestNodeListItemInterfacesItem) SetFake() {
-	s.Null = true
-}
-
-// SetFake set fake values.
 func (s *NilString) SetFake() {
 	s.Null = true
 }
@@ -4000,7 +4022,7 @@ func (s *NodeAddRequest) SetFake() {
 		{
 			s.NodeList = nil
 			for i := 0; i < 0; i++ {
-				var elem NilNodeAddRequestNodeListItem
+				var elem NodeAddRequestNodeListItem
 				{
 					elem.SetFake()
 				}
@@ -4021,7 +4043,7 @@ func (s *NodeAddRequestNodeListItem) SetFake() {
 		{
 			s.Bonds = nil
 			for i := 0; i < 0; i++ {
-				var elem NilNodeAddRequestNodeListItemBondsItem
+				var elem NodeAddRequestNodeListItemBondsItem
 				{
 					elem.SetFake()
 				}
@@ -4048,7 +4070,7 @@ func (s *NodeAddRequestNodeListItem) SetFake() {
 		{
 			s.Interfaces = nil
 			for i := 0; i < 0; i++ {
-				var elem NilNodeAddRequestNodeListItemInterfacesItem
+				var elem NodeAddRequestNodeListItemInterfacesItem
 				{
 					elem.SetFake()
 				}
@@ -4474,33 +4496,6 @@ func (s *NodeTagsRequest) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *OptBmcResponseModelBmcAckSummary) SetFake() {
-	var elem BmcResponseModelBmcAckSummary
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
-}
-
-// SetFake set fake values.
-func (s *OptBmcResponseModelBmcAssetTagResultSummary) SetFake() {
-	var elem BmcResponseModelBmcAssetTagResultSummary
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
-}
-
-// SetFake set fake values.
-func (s *OptBmcResponseModelBmcBiosRegistrySummary) SetFake() {
-	var elem BmcResponseModelBmcBiosRegistrySummary
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
-}
-
-// SetFake set fake values.
 func (s *OptBmcResponseModelBmcBiosResultsItemDataAttributes) SetFake() {
 	var elem BmcResponseModelBmcBiosResultsItemDataAttributes
 	{
@@ -4512,96 +4507,6 @@ func (s *OptBmcResponseModelBmcBiosResultsItemDataAttributes) SetFake() {
 // SetFake set fake values.
 func (s *OptBmcResponseModelBmcBiosResultsItemDataPending) SetFake() {
 	var elem BmcResponseModelBmcBiosResultsItemDataPending
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
-}
-
-// SetFake set fake values.
-func (s *OptBmcResponseModelBmcBiosSummary) SetFake() {
-	var elem BmcResponseModelBmcBiosSummary
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
-}
-
-// SetFake set fake values.
-func (s *OptBmcResponseModelBmcFirmwareUpdatesSummary) SetFake() {
-	var elem BmcResponseModelBmcFirmwareUpdatesSummary
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
-}
-
-// SetFake set fake values.
-func (s *OptBmcResponseModelBmcJobListSummary) SetFake() {
-	var elem BmcResponseModelBmcJobListSummary
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
-}
-
-// SetFake set fake values.
-func (s *OptBmcResponseModelBmcLocationResultResultsItemDataCurrent) SetFake() {
-	var elem BmcResponseModelBmcLocationResultResultsItemDataCurrent
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
-}
-
-// SetFake set fake values.
-func (s *OptBmcResponseModelBmcLocationResultResultsItemDataDesired) SetFake() {
-	var elem BmcResponseModelBmcLocationResultResultsItemDataDesired
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
-}
-
-// SetFake set fake values.
-func (s *OptBmcResponseModelBmcLocationResultSummary) SetFake() {
-	var elem BmcResponseModelBmcLocationResultSummary
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
-}
-
-// SetFake set fake values.
-func (s *OptBmcResponseModelBmcNICListSummary) SetFake() {
-	var elem BmcResponseModelBmcNICListSummary
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
-}
-
-// SetFake set fake values.
-func (s *OptBmcResponseModelBmcSELLogSummary) SetFake() {
-	var elem BmcResponseModelBmcSELLogSummary
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
-}
-
-// SetFake set fake values.
-func (s *OptBmcResponseModelBmcSecureBootSummary) SetFake() {
-	var elem BmcResponseModelBmcSecureBootSummary
-	{
-		elem.SetFake()
-	}
-	s.SetTo(elem)
-}
-
-// SetFake set fake values.
-func (s *OptBmcResponseModelRedfishSystemSummary) SetFake() {
-	var elem BmcResponseModelRedfishSystemSummary
 	{
 		elem.SetFake()
 	}
@@ -4645,6 +4550,24 @@ func (s *OptBool) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptDataDumpRolesItemPermissionListItemKind) SetFake() {
+	var elem DataDumpRolesItemPermissionListItemKind
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
+func (s *OptDataDumpRolesItemUnassignedPermissionListItemKind) SetFake() {
+	var elem DataDumpRolesItemUnassignedPermissionListItemKind
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
 func (s *OptDateTime) SetFake() {
 	var elem time.Time
 	{
@@ -4654,8 +4577,8 @@ func (s *OptDateTime) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *OptEventNodesItemState) SetFake() {
-	var elem EventNodesItemState
+func (s *OptGetRolesResponseRolesItemPermissionListItemKind) SetFake() {
+	var elem GetRolesResponseRolesItemPermissionListItemKind
 	{
 		elem.SetFake()
 	}
@@ -4663,10 +4586,10 @@ func (s *OptEventNodesItemState) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *OptFloat32) SetFake() {
-	var elem float32
+func (s *OptGetRolesResponseRolesItemUnassignedPermissionListItemKind) SetFake() {
+	var elem GetRolesResponseRolesItemUnassignedPermissionListItemKind
 	{
-		elem = float32(0)
+		elem.SetFake()
 	}
 	s.SetTo(elem)
 }
@@ -4729,7 +4652,19 @@ func (s *OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemData) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
 func (s *OptNilBmcResponseModelBmcJobListResultsItemData) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) SetFake() {
 	s.Null = true
 	s.Set = true
 }
@@ -4747,7 +4682,19 @@ func (s *OptNilBmcResponseModelBmcNICListResultsItemData) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
 func (s *OptNilBmcResponseModelBmcSELLogResultsItemData) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) SetFake() {
 	s.Null = true
 	s.Set = true
 }
@@ -4772,6 +4719,18 @@ func (s *OptNilBmcResponseModelRedfishSystemResultsItemDataLocation) SetFake() {
 
 // SetFake set fake values.
 func (s *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDell) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
+func (s *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) SetFake() {
 	s.Null = true
 	s.Set = true
 }
@@ -4849,114 +4808,6 @@ func (s *OptNilInt64) SetFake() {
 }
 
 // SetFake set fake values.
-func (s *OptNilNilBmcResponseModelBmcAckResultsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilBmcResponseModelBmcBiosResultsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilBmcResponseModelBmcJobListResultsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilBmcResponseModelBmcNICListResultsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilBmcResponseModelBmcSELLogResultsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilBmcResponseModelRedfishSystemResultsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
-func (s *OptNilNilStringArray) SetFake() {
-	s.Null = true
-	s.Set = true
-}
-
-// SetFake set fake values.
 func (s *OptNilProvisionStatusFacts) SetFake() {
 	s.Null = true
 	s.Set = true
@@ -5005,6 +4856,15 @@ func (s *OptNodeImportResponseSummary) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptPatchRolesRequestPermissionListItemKind) SetFake() {
+	var elem PatchRolesRequestPermissionListItemKind
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
 func (s *OptString) SetFake() {
 	var elem string
 	{
@@ -5038,6 +4898,16 @@ func (s *PatchRolesRequest) SetFake() {
 func (s *PatchRolesRequestPermissionListItem) SetFake() {
 	{
 		{
+			s.Group.SetFake()
+		}
+	}
+	{
+		{
+			s.Kind.SetFake()
+		}
+	}
+	{
+		{
 			s.Method.SetFake()
 		}
 	}
@@ -5046,6 +4916,16 @@ func (s *PatchRolesRequestPermissionListItem) SetFake() {
 			s.Path.SetFake()
 		}
 	}
+	{
+		{
+			s.Summary.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *PatchRolesRequestPermissionListItemKind) SetFake() {
+	*s = PatchRolesRequestPermissionListItemKindView
 }
 
 // SetFake set fake values.
@@ -5403,6 +5283,31 @@ func (s *Version) SetFake() {
 	{
 		{
 			s.Version.SetFake()
+		}
+	}
+	{
+		{
+			s.Commit.SetFake()
+		}
+	}
+	{
+		{
+			s.CommitTime.SetFake()
+		}
+	}
+	{
+		{
+			s.GoVersion.SetFake()
+		}
+	}
+	{
+		{
+			s.Modified.SetFake()
+		}
+	}
+	{
+		{
+			s.Schema.SetFake()
 		}
 	}
 }

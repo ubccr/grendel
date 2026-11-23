@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SplatRouteImport } from './routes/$'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ImagesRouteRouteImport } from './routes/images/route'
 import { Route as NodesRouteRouteImport } from './routes/nodes/route'
@@ -62,6 +63,11 @@ const IndexRoute = IndexRouteImport.update({
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
   path: '/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsRoute = EventsRouteImport.update({
@@ -282,6 +288,7 @@ export interface FileRoutesByFullPath {
   '/racks': typeof RacksRouteRouteWithChildren
   '/templates': typeof TemplatesRouteRouteWithChildren
   '/$': typeof SplatRoute
+  '/about': typeof AboutRoute
   '/events': typeof EventsRoute
   '/account/roles': typeof AccountRolesRouteRouteWithChildren
   '/nodes/$node': typeof NodesNodeRouteRouteWithChildren
@@ -324,6 +331,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/about': typeof AboutRoute
   '/events': typeof EventsRoute
   '/account': typeof AccountIndexRoute
   '/account/signin': typeof AccountSigninRoute
@@ -368,6 +376,7 @@ export interface FileRoutesById {
   '/racks': typeof RacksRouteRouteWithChildren
   '/templates': typeof TemplatesRouteRouteWithChildren
   '/$': typeof SplatRoute
+  '/about': typeof AboutRoute
   '/events': typeof EventsRoute
   '/account/roles': typeof AccountRolesRouteRouteWithChildren
   '/nodes/$node': typeof NodesNodeRouteRouteWithChildren
@@ -416,6 +425,7 @@ export interface FileRouteTypes {
     | '/racks'
     | '/templates'
     | '/$'
+    | '/about'
     | '/events'
     | '/account/roles'
     | '/nodes/$node'
@@ -458,6 +468,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/$'
+    | '/about'
     | '/events'
     | '/account'
     | '/account/signin'
@@ -501,6 +512,7 @@ export interface FileRouteTypes {
     | '/racks'
     | '/templates'
     | '/$'
+    | '/about'
     | '/events'
     | '/account/roles'
     | '/nodes/$node'
@@ -548,6 +560,7 @@ export interface RootRouteChildren {
   RacksRouteRoute: typeof RacksRouteRouteWithChildren
   TemplatesRouteRoute: typeof TemplatesRouteRouteWithChildren
   SplatRoute: typeof SplatRoute
+  AboutRoute: typeof AboutRoute
   EventsRoute: typeof EventsRoute
   AccountRolesRouteRoute: typeof AccountRolesRouteRouteWithChildren
   AccountAccountRoute: typeof AccountAccountRouteWithChildren
@@ -575,6 +588,13 @@ declare module '@tanstack/react-router' {
       path: '/$'
       fullPath: '/$'
       preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events': {
@@ -1004,6 +1024,7 @@ const rootRouteChildren: RootRouteChildren = {
   RacksRouteRoute: RacksRouteRouteWithChildren,
   TemplatesRouteRoute: TemplatesRouteRouteWithChildren,
   SplatRoute: SplatRoute,
+  AboutRoute: AboutRoute,
   EventsRoute: EventsRoute,
   AccountRolesRouteRoute: AccountRolesRouteRouteWithChildren,
   AccountAccountRoute: AccountAccountRouteWithChildren,

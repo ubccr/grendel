@@ -5,8 +5,12 @@
 package model
 
 import (
+	"encoding/binary"
 	"encoding/json"
+	"errors"
+	"time"
 
+	"github.com/eknkc/basex"
 	"github.com/hako/branca"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/firmware"
@@ -75,6 +79,32 @@ func ParseBootToken(token string) (*BootClaims, error) {
 	}
 
 	return &claims, nil
+}
+
+// brancaAlphabet is the base62 alphabet branca writes tokens in
+const brancaAlphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+
+// BootTokenExpiry is when a boot token stops being accepted, or the zero time when provision.token_ttl is 0 and tokens never expire. Branca decodes a token without saying when it was made, so that is read from its header: a version byte, then the time as four big-endian bytes. The header is not checked here, so this is only for a token already parsed
+func BootTokenExpiry(token string) (time.Time, error) {
+	ttl := viper.GetUint32("provision.token_ttl")
+	if ttl == 0 {
+		return time.Time{}, nil
+	}
+
+	base62, err := basex.NewEncoding(brancaAlphabet)
+	if err != nil {
+		return time.Time{}, err
+	}
+	raw, err := base62.Decode(token)
+	if err != nil {
+		return time.Time{}, err
+	}
+	if len(raw) < 5 {
+		return time.Time{}, errors.New("boot token is too short")
+	}
+
+	made := binary.BigEndian.Uint32(raw[1:5])
+	return time.Unix(int64(made)+int64(ttl), 0), nil
 }
 
 func NewFirmwareToken(mac string, fwtype firmware.Build) (string, error) {

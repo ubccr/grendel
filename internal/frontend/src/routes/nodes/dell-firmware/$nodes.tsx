@@ -1,4 +1,4 @@
-import { BmcResponseModelBmcFirmwareUpdates, getV1BmcFirmwareUpdates } from "@/client";
+import { BmcResponseModelBmcFirmwareUpdates } from "@/client";
 import { NodeLink } from "@/components/nodes/node-link";
 import ActionsSheet from "@/components/actions-sheet";
 import FirmwareUpgradeAction from "@/components/actions/firmware/upgrade";
@@ -14,7 +14,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import AuthRedirect from "@/lib/auth";
+import { firmwareUpdatesOptions } from "@/lib/queries";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import type { DataTableColumnDef, DataTableRow } from "@/components/data-table/features";
 import { CircleAlert, OctagonAlert, TriangleAlert } from "lucide-react";
@@ -24,11 +25,12 @@ type NodeFirmware = NonNullable<BmcResponseModelBmcFirmwareUpdates["results"]>[n
 export const Route = createFileRoute("/nodes/dell-firmware/$nodes")({
   staticData: { crumb: ["Dell firmware", { param: "nodes" }] },
   component: RouteComponent,
-  beforeLoad: AuthRedirect,
-  loader: async ({ params: { nodes } }) => getV1BmcFirmwareUpdates({ query: { nodeset: nodes } }),
+  // BMCs are only logged into once the page is opened, not when its link is hovered
+  preload: false,
+  loader: ({ context: { queryClient }, params: { nodes } }) =>
+    queryClient.ensureQueryData(firmwareUpdatesOptions(nodes)),
 });
 
-// columns are defined once, outside the component, so the table keeps the same column definitions across renders
 const columns: DataTableColumnDef<NodeFirmware, any>[] = [
   {
     accessorKey: "node",
@@ -60,8 +62,7 @@ const columns: DataTableColumnDef<NodeFirmware, any>[] = [
 ];
 
 function RouteComponent() {
-  const { data } = Route.useLoaderData();
-  const { isFetching } = Route.useMatch();
+  const { data, isFetching } = useSuspenseQuery(firmwareUpdatesOptions(Route.useParams().nodes));
 
   const renderSubComponent = ({ row }: { row: DataTableRow<NodeFirmware> }) => {
     const data = row.original.data?.updates;
@@ -130,7 +131,7 @@ function RouteComponent() {
           }
           Actions={actions}
           data={data?.results ?? []}
-          progress={isFetching !== false}
+          progress={isFetching}
         />
       </CardContent>
     </Card>

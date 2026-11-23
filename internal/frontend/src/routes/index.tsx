@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <div className="flex flex-1 items-center justify-center px-2 pb-[8vh]">
-      {/* the card needs a width of its own, because a Nova CardHeader is a size container and can't take its width from the title; it floats over the node field like the sidebar and header */}
+      {/* the card needs a width of its own, because a Nova CardHeader is a size container and can't take its width from the title */}
       <Card className="w-full max-w-lg">
         <CardHeader className="gap-4 px-8 py-4 text-center">
           <h1 className="font-[UnifrakturCook] text-7xl leading-none text-foreground sm:text-8xl">

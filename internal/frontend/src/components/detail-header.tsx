@@ -2,7 +2,6 @@ import { cn } from "@/lib/utils";
 import { Link, type LinkProps } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
-// DetailHeader heads the page for one thing, a node or an image: its name, a row of the facts about it worth seeing at a glance, its actions, and the tabs of its views when it has more than one
 export function DetailHeader({
   title,
   facts,
@@ -28,7 +27,6 @@ export function DetailHeader({
   );
 }
 
-// Fact is one labelled fact in a DetailHeader, divided from the one before it by a rule
 export function Fact({
   label,
   children,
@@ -51,7 +49,6 @@ export function Fact({
   );
 }
 
-// Unset is a fact's value when nothing is set, like a node with no image of its own
 export function Unset({ children }: { children: ReactNode }) {
   return <span className="text-muted-foreground">{children}</span>;
 }
@@ -59,7 +56,7 @@ export function Unset({ children }: { children: ReactNode }) {
 // a tab never links to the root, and leaving it out lets the paths be checked against from
 type Tab = { to: Exclude<LinkProps["to"], "/">; label: string };
 
-// DetailTabs are the tabs under a DetailHeader, one link for each view of the thing it heads, the current one underlined. from is the route the tabs' paths are relative to, which supplies their params, as a node's name
+// from is the route the tabs' paths are relative to, which supplies their params, such as a node's name
 export function DetailTabs({
   label,
   tabs,

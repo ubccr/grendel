@@ -52,9 +52,15 @@ const fields: { name: Name; label: string; autoComplete: string; hint?: string }
 ];
 
 function RouteComponent() {
-  const reset = useMutation(patchV1AuthResetMutation());
-  const signout = useMutation(deleteV1AuthSignoutMutation());
-  const { user, setUser } = useUser();
+  const reset = useMutation({
+    ...patchV1AuthResetMutation(),
+    meta: { quietError: true, changesNothing: true },
+  });
+  const signout = useMutation({
+    ...deleteV1AuthSignoutMutation(),
+    meta: { quietError: true, changesNothing: true },
+  });
+  const { user, signOut } = useUser();
   const router = useRouter();
 
   const form = useForm({
@@ -70,7 +76,7 @@ function RouteComponent() {
               {},
               {
                 onSuccess: () => {
-                  setUser(null);
+                  signOut();
                   toast.success("Password changed", {
                     description: "Sign in with your new password.",
                   });

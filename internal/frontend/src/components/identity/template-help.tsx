@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CircleHelp } from "lucide-react";
 
-// TemplateHelp lists what a template can use, worked through on one of the selected nodes so the parts of its name are concrete
 export default function TemplateHelp({ example }: { example?: string }) {
   const name = example || "cpn-f01-04";
   const parts = name.split("-");

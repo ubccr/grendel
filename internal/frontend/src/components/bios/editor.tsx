@@ -30,7 +30,6 @@ import {
   sameValue,
   showValue,
 } from "@/lib/bios";
-import { toastBmcResponse } from "@/lib/bmc";
 import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -43,7 +42,6 @@ import {
   Undo2,
 } from "lucide-react";
 import { ReactNode, useMemo, useState } from "react";
-import { toast } from "sonner";
 
 type Props = {
   // nodes is the nodeset a change is applied to
@@ -54,12 +52,10 @@ type Props = {
   registry?: BiosAttribute[];
   applyTimes: string[];
   notice?: ReactNode;
-  onApplied: () => void;
 };
 
 type Row = { name: string; attr?: BiosAttribute; section: string };
 
-// BiosEditor lists a node's BIOS attributes by setup menu, and stages the changes made to them on every node in nodes
 export default function BiosEditor({
   nodes,
   values,
@@ -67,7 +63,6 @@ export default function BiosEditor({
   registry,
   applyTimes,
   notice,
-  onApplied,
 }: Props) {
   const [search, setSearch] = useState("");
   const [section, setSection] = useState<string>();
@@ -79,8 +74,11 @@ export default function BiosEditor({
     applyTimes.includes("OnReset") ? "OnReset" : (applyTimes[0] ?? ""),
   );
 
-  const setBios = useMutation(postV1BmcBiosMutation());
-  const discard = useMutation(postV1BmcBiosDiscardMutation());
+  const setBios = useMutation({ ...postV1BmcBiosMutation(), meta: { bmc: "Stage BIOS changes" } });
+  const discard = useMutation({
+    ...postV1BmcBiosDiscardMutation(),
+    meta: { bmc: "Discard BIOS changes" },
+  });
 
   // the registry orders and groups the attributes. Any attribute it leaves out still gets a row, under Other
   const rows = useMemo(() => {
@@ -143,11 +141,8 @@ export default function BiosEditor({
       },
       {
         onSuccess: (data) => {
-          toastBmcResponse("Stage BIOS changes", data);
           if (!data.summary?.failed) setEdits({});
-          onApplied();
         },
-        onError: (e) => toast.error(e.title, { description: e.detail }),
       },
     );
 
@@ -254,18 +249,7 @@ export default function BiosEditor({
                 Discard pending
               </Button>
             }
-            onConfirm={() =>
-              discard.mutate(
-                { query: { nodeset: nodes } },
-                {
-                  onSuccess: (data) => {
-                    toastBmcResponse("Discard BIOS changes", data);
-                    onApplied();
-                  },
-                  onError: (e) => toast.error(e.title, { description: e.detail }),
-                },
-              )
-            }
+            onConfirm={() => discard.mutate({ query: { nodeset: nodes } })}
           >
             Every staged BIOS change will be dropped on:
             <NodesetView nodes={nodes} />

@@ -17,7 +17,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
+import { LoaderCircle } from "lucide-react";
 import React from "react";
+import { toast } from "sonner";
 
 type props = {
   title: string;
@@ -54,7 +57,6 @@ type confirmProps = {
   onConfirm: () => void;
 };
 
-// ConfirmDialog asks before running onConfirm, with children saying what will happen
 export function ConfirmDialog({ trigger, children, onConfirm }: confirmProps) {
   return (
     <Dialog>
@@ -72,5 +74,73 @@ export function ConfirmDialog({ trigger, children, onConfirm }: confirmProps) {
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+type confirmActionProps<TData, TError, TVariables> = {
+  title: string;
+  description: React.ReactNode;
+  label: string;
+  destructive?: boolean;
+  mutation: UseMutationOptions<TData, TError, TVariables>;
+  variables: TVariables;
+  children: React.ReactNode;
+};
+
+// The server's answer is toasted, unless the mutation is a BMC one, whose per-node outcome is toasted for it
+export function ConfirmAction<TData, TError, TVariables>({
+  title,
+  description,
+  label,
+  destructive,
+  mutation,
+  variables,
+  children,
+}: confirmActionProps<TData, TError, TVariables>) {
+  const { mutate, isPending } = useMutation(mutation);
+  const announce = (data: unknown) => {
+    if (mutation.meta?.bmc !== undefined) return;
+    const said = data as { title?: string; detail?: string } | undefined;
+    toast.success(said?.title ?? title, { description: said?.detail });
+  };
+
+  return (
+    <ActionCard
+      title={title}
+      description={description}
+      footer={
+        <ConfirmDialog
+          trigger={
+            <Button variant={destructive ? "destructive" : "default"} disabled={isPending}>
+              {isPending && <LoaderCircle className="animate-spin" />}
+              {label}
+            </Button>
+          }
+          onConfirm={() => mutate(variables, { onSuccess: announce })}
+        >
+          {children}
+        </ConfirmDialog>
+      }
+    />
+  );
+}
+
+type linkActionProps = {
+  title: string;
+  description: React.ReactNode;
+  link: React.ReactElement;
+};
+
+export function LinkAction({ title, description, link }: linkActionProps) {
+  return (
+    <ActionCard
+      title={title}
+      description={description}
+      footer={
+        <Button render={link} nativeButton={false}>
+          Open
+        </Button>
+      }
+    />
   );
 }

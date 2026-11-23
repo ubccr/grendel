@@ -7,7 +7,7 @@ import { RadioGroup } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDebounced } from "@/hooks/use-debounced";
 import { useStoredValue } from "@/hooks/use-stored-value";
-import { lastOctet, parseRange, rangeOf, stepRange, stripPrefix } from "@/lib/addresses";
+import { lastOctet, parseRange, rangeKey, rangeOf, stepRange, stripPrefix } from "@/lib/addresses";
 import { cn } from "@/lib/utils";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, LoaderCircle } from "lucide-react";
@@ -17,9 +17,6 @@ import type { Port } from ".";
 import { NodeRanges } from "./node-ranges";
 import { Option, type Choice } from "./option";
 import { RangeMap } from "./range-map";
-
-// the range last searched for each kind of port is remembered, since nodes are usually added a rack at a time and each one's ports go in the same ranges as the last one's
-const rangeKey = (bmc: boolean) => `grendel.address-range.${bmc ? "bmc" : "port"}`;
 
 type Suggestion = NonNullable<NextAddressResponse["lowest"]>[number];
 
@@ -32,16 +29,13 @@ function pick(list: Suggestion[] = []) {
   };
 }
 
-// subnetNote says which prefix length a picked address will carry, and where that came from
+// subnetNote says which prefix length a picked address will carry, and the subnet that makes it part of when that is wider than the range searched
 function subnetNote(data: NextAddressResponse) {
-  if (data.subnet === data.range)
-    return data.used?.length
-      ? `Addresses get /${data.prefix_len}, as the nodes in it have.`
-      : `No nodes near it yet, so addresses get the range's own /${data.prefix_len}.`;
-  return `Addresses get /${data.prefix_len}, as nodes in ${data.subnet} have.`;
+  if (data.subnet === data.range) return `Addresses get /${data.prefix_len}.`;
+  return `Addresses get /${data.prefix_len}, as part of ${data.subnet}.`;
 }
 
-// Finder searches a range for a free address and offers two, the lowest free and the first after the highest used, each pinged to check nothing unknown to Grendel is there. The range is typed in, stepped through, or picked from the ranges some nodes' ports sit in
+// Finder offers two addresses, the lowest free and the first after the highest used, each pinged to check nothing unknown to Grendel is there
 export function Finder({
   value,
   port,
@@ -95,7 +89,8 @@ export function Finder({
   const highest = data?.highest && (wide ? data.highest : lastOctet(data.highest));
 
   const use = () => {
-    if (!full || !range || stale) return;
+    // what is typed is searched once typing pauses, so until then the address on show belongs to the range before it
+    if (!full || !range || stale || shown !== range) return;
     remember(range);
     onPick(full);
   };

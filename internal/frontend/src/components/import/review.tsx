@@ -8,8 +8,10 @@ import type { ImportRow } from "@/lib/import-rows";
 import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { ArrowRight, Eye, LoaderCircle, Upload } from "lucide-react";
+import { useStoredValue } from "@/hooks/use-stored-value";
 import { useId, useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
+import { rangeKey } from "@/lib/addresses";
 import { RangePicker } from "./range-picker";
 import { StepBar } from "./step-bar";
 
@@ -36,24 +38,27 @@ const actionText: Record<Action, { label: string; count: (n: number) => string; 
   };
 const order: Action[] = ["conflict", "create", "add", "replace", "unchanged"];
 
-// Review hands out addresses and shows what the import will do to each node, then stores it. The preview is thrown away whenever the rows or the range change, so what is committed is always what was last shown
 export function Review({
   rows,
   bmc,
+  needsAddresses,
   back,
   onCommitted,
 }: {
   rows: ImportRow[];
   bmc: boolean;
-  // back is the button to the step before, which goes in the bar with the rest
+  // needsAddresses is whether any row is a port Grendel doesn't have yet. A port it already has keeps its address, so an import of only those needs no range
+  needsAddresses: boolean;
   back?: ReactNode;
   onCommitted: (res: NodeImportResponse, nodes: string[]) => void;
 }) {
   const id = useId();
-  const [range, setRange] = useState("");
+  // starts as the range last used for this kind of port, and stays empty once cleared
+  const [remembered] = useStoredValue(rangeKey(bmc));
+  const [range, setRange] = useState(remembered ?? "");
   const [from, setFrom] = useState<"lowest" | "after_highest">("lowest");
   const [ping, setPing] = useState(true);
-  const { mutateAsync, isPending } = useMutation(postV1NodesImportMutation());
+  const { mutate, isPending } = useMutation(postV1NodesImportMutation());
 
   const request = useMemo<NodeImportRequest>(
     () => ({
@@ -85,30 +90,27 @@ export function Review({
     }
   };
 
-  const commit = async () => {
-    try {
-      // the previewed addresses are sent back, so the server stores exactly what was shown, and a range filling up in between is a conflict rather than a different address
-      const shown = preview?.rows ?? [];
-      const body = {
-        ...request,
-        dry_run: false,
-        ping: false,
-        rows: rows.map((r, i) => ({ ...r, ip: shown[i]?.ip || r.ip })),
-      };
-      const res = await mutateAsync({ body });
-      onCommitted(res, [...new Set(rows.map((r) => r.node ?? ""))]);
-    } catch (e) {
-      const err = e as { title?: string; detail?: string };
-      toast.error(err.title ?? "Import failed", { description: err.detail });
-    }
+  const commit = () => {
+    // the previewed addresses are sent back, so the server stores exactly what was shown, and a range filling up in between is a conflict rather than a different address
+    const shown = preview?.rows ?? [];
+    const body = {
+      ...request,
+      dry_run: false,
+      ping: false,
+      rows: rows.map((r, i) => ({ ...r, ip: shown[i]?.ip || r.ip })),
+    };
+    mutate(
+      { body },
+      { onSuccess: (res) => onCommitted(res, [...new Set(rows.map((r) => r.node ?? ""))]) },
+    );
   };
 
   const summary = preview?.summary;
   const changes = summary ? (summary.create ?? 0) + (summary.add ?? 0) + (summary.replace ?? 0) : 0;
   const blocked = (summary?.conflict ?? 0) > 0;
   const dryRunning = dry.isFetching;
-  // a row without an address takes one from the range, so there is nothing to preview until one is given
-  const needsRange = !range.trim() && rows.some((r) => !r.ip);
+  // a new port takes its address from the range, so there is nothing to preview until one is given
+  const needsRange = !range.trim() && needsAddresses;
 
   return (
     <div className="grid gap-6">

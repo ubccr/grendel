@@ -129,7 +129,7 @@ actually declares, so a healthy R760 still reports that `ForceOn`, `Suspend`, `P
 | `auth` | Whether Redfish session login and basic auth are each accepted |
 | `status` | Every column `grendel bmc status` prints, failing on any that comes back empty |
 | `power` | Reset types and boot override targets the system declares, against what the CLI offers; that the manager supports the `GracefulRestart` that `bmc reboot-bmc` sends |
-| `jobs` | That the job service exists, that jobs parse, and that the URL Grendel builds to delete a job is where the service actually keeps it |
+| `jobs` | That the job service exists, that jobs parse, and that each job sits in the collection the service advertises, which is where clearing a job by id deletes it |
 | `sel` | Which log services are identified as the system event log, on the managers and then the systems; that entry timestamps are in a format Grendel can sort on; that `$top` returns the newest entries; that each one declares a `ClearLog` action |
 | `bios` | That the BIOS attributes can be read; whether changes are staged in a separate settings object, which pending values and discard need; whether the BMC serves its attribute registry, and which attributes it leaves undescribed; with `-redfish.bios-change`, that a staged change shows as pending and can be discarded |
 | `secureboot` | That the secure boot state can be read, and whether a change to it is staged in a separate settings object; that every database lists its keys, and that each certificate comes with the certificate itself or a SHA-256 fingerprint, which delete needs; with `-redfish.secureboot-cert`, that a certificate enrolled in `db` can be found and removed again |

@@ -6,7 +6,6 @@ package model
 
 import "time"
 
-// ProvisionState is how far a node has got through provisioning
 type ProvisionState string
 
 const (
@@ -34,7 +33,6 @@ var ProvisionStates = []ProvisionState{
 	ProvisionStateCompleted,
 }
 
-// Valid reports whether s is one of the known states
 func (s ProvisionState) Valid() bool {
 	for _, state := range ProvisionStates {
 		if s == state {

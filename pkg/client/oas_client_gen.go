@@ -25,8 +25,6 @@ type Invoker interface {
 	//
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).AuthSignout`
-	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// ---
 	// Signout user.
 	//
@@ -37,7 +35,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BootImageDelete`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Delete images by name.
@@ -49,7 +46,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeDelete`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Delete nodes by nodeset and/or tags.
@@ -61,7 +57,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).DeleteRoles`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Delete roles.
@@ -73,7 +68,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).UserDelete`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Delete users.
@@ -85,7 +79,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcBios`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Get the BIOS attributes of node(s), with any staged changes.
@@ -97,7 +90,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcBiosRegistry`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Get the attribute registry describing one node's BIOS attributes.
@@ -109,7 +101,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcFirmwareUpdates`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// List the firmware updates iDRAC(s) found in their last catalog comparison, which firmware/install
@@ -122,7 +113,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcIdentityDefaults`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Get the location and asset tag templates configured as defaults.
@@ -134,7 +124,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobs`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Get the redfish job queue of node(s).
@@ -146,7 +135,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcNICs`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// List the host network ports each node's BMC reports.
@@ -158,7 +146,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcSecureBoot`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Get the UEFI secure boot state of node(s), with any staged change, and with keys the certificates
@@ -171,7 +158,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcSEL`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Get the system event log of node(s).
@@ -183,7 +169,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcStatus`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Get redfish system information from node(s).
@@ -195,7 +180,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).Dump`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Get a backup of the DB.
@@ -207,7 +191,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).GetEvents`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// List the latest events, newest first, with how many of their nodes are at each state.
@@ -219,7 +202,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).GetEvent`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Get one event with how it went on each of its nodes.
@@ -231,7 +213,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).GetVersion`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Get the server version.
@@ -243,7 +224,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BootImageList`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// List all images.
@@ -255,7 +235,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BootImageFind`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Find images by name.
@@ -267,7 +246,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeList`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// List all nodes.
@@ -279,7 +257,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeFind`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Find nodes by nodeset and/or tags.
@@ -291,7 +268,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeNextAddress`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Suggest free addresses in a range: the lowest ones no node holds, and the ones after the highest
@@ -304,7 +280,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeAddressRanges`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// List the ranges the ports of some nodes sit in, each once however many ports share it: a /24 of a
@@ -318,7 +293,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeProvisionStatus`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Get the latest provision status of nodes by nodeset and/or tags, or of every node when neither is
@@ -331,7 +305,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeTagList`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// List every tag on a node, with how many nodes have it.
@@ -343,7 +316,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeBootToken`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Create a boot token for the provision server. Used for debugging requests made by images.
@@ -355,7 +327,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).GetRoles`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Get roles and permissions.
@@ -367,7 +338,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).SwitchGetLLDP`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Get switch LLDP info.
@@ -379,7 +349,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).SwitchScan`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Read the MAC table and interface status of switch(es), merged per port, with the node that already
@@ -392,7 +361,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).UserList`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// List all users.
@@ -404,7 +372,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).AuthReset`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Change password.
@@ -416,7 +383,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeBootImage`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Update nodes boot image by nodeset and/or tags.
@@ -428,7 +394,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeProvision`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Provision / Unprovision nodes by nodeset and/or tags.
@@ -440,7 +405,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeTags`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Update nodes tags by nodeset and/or tags.
@@ -452,7 +416,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).PatchRoles`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Edit role permissions.
@@ -464,7 +427,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).UserEnable`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Update users enable.
@@ -476,7 +438,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).UserRole`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Update users role.
@@ -487,8 +448,6 @@ type Invoker interface {
 	//
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).AuthSignin`
-	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// ---
 	// signin user.
 	//
@@ -498,8 +457,6 @@ type Invoker interface {
 	//
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).AuthSignup`
-	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// ---
 	// Signup user.
 	//
@@ -510,7 +467,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).AuthToken`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Create API token.
@@ -522,7 +478,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcAssetTag`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Set the asset tag of node(s), from a template or a table of serial numbers.
@@ -534,7 +489,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcSetBios`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Stage BIOS attribute changes on node(s), applied at the given apply time.
@@ -546,7 +500,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcDiscardBios`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Discard the BIOS changes staged on node(s).
@@ -558,7 +511,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcAutoConfigure`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Set iDRAC(s) to auto configure once, on the node's next boot. Dell only.
@@ -570,7 +522,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfig`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Have iDRAC(s) download a config template from the provision server and import it. Dell only.
@@ -582,7 +533,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcInstallFirmware`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Compare the firmware of iDRAC(s) against an update catalog, and with apply_update queue the
@@ -595,7 +545,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcIndicator`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Turn the location indicator of node(s) on or off.
@@ -607,7 +556,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcClearJobs`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Clear redfish jobs from node(s).
@@ -619,7 +567,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcLocation`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Set the rack location of node(s), rendered per node from templates.
@@ -631,7 +578,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcPower`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Change the power state of node(s), or restart their BMCs.
@@ -643,7 +589,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcSetSecureBoot`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Turn UEFI secure boot on or off on node(s), from their next boot.
@@ -655,7 +600,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcAddSecureBootKey`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Enroll certificates or a signature in a secure boot database on node(s). A key already enrolled is
@@ -668,7 +612,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcDeleteSecureBootKey`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Remove a certificate or signature from a secure boot database on node(s).
@@ -680,7 +623,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcResetSecureBootKeys`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Reset the secure boot databases of node(s) to their factory keys, or delete their keys.
@@ -692,7 +634,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BmcClearSEL`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Clear the system event log on node(s).
@@ -704,7 +645,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).Restore`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Restore a backup of the DB.
@@ -716,7 +656,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).BootImageAdd`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Add images.
@@ -728,7 +667,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeAdd`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Add nodes.
@@ -740,7 +678,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).NodeImport`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Add a BMC or boot port to each node, creating nodes that do not exist, with addresses taken from
@@ -753,7 +690,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).PostRoles`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Add roles.
@@ -765,7 +701,6 @@ type Invoker interface {
 	// #### Controller:
 	// `github.com/ubccr/grendel/internal/api.(*Handler).UserStore`
 	// #### Middlewares:
-	// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 	// ---
 	// Add new user.
@@ -819,8 +754,6 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 //
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).AuthSignout`
-// #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // ---
 // Signout user.
 //
@@ -924,7 +857,6 @@ func (c *Client) sendDELETEV1AuthSignout(ctx context.Context, params DELETEV1Aut
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BootImageDelete`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Delete images by name.
@@ -1048,7 +980,6 @@ func (c *Client) sendDELETEV1Images(ctx context.Context, params DELETEV1ImagesPa
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeDelete`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Delete nodes by nodeset and/or tags.
@@ -1189,7 +1120,6 @@ func (c *Client) sendDELETEV1Nodes(ctx context.Context, params DELETEV1NodesPara
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).DeleteRoles`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Delete roles.
@@ -1311,7 +1241,6 @@ func (c *Client) sendDELETEV1RolesNames(ctx context.Context, params DELETEV1Role
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).UserDelete`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Delete users.
@@ -1433,7 +1362,6 @@ func (c *Client) sendDELETEV1UsersUsernames(ctx context.Context, params DELETEV1
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcBios`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Get the BIOS attributes of node(s), with any staged changes.
@@ -1513,7 +1441,7 @@ func (c *Client) sendGETV1BmcBios(ctx context.Context, params GETV1BmcBiosParams
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -1608,7 +1536,6 @@ func (c *Client) sendGETV1BmcBios(ctx context.Context, params GETV1BmcBiosParams
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcBiosRegistry`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Get the attribute registry describing one node's BIOS attributes.
@@ -1671,7 +1598,7 @@ func (c *Client) sendGETV1BmcBiosRegistry(ctx context.Context, params GETV1BmcBi
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -1766,7 +1693,6 @@ func (c *Client) sendGETV1BmcBiosRegistry(ctx context.Context, params GETV1BmcBi
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcFirmwareUpdates`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // List the firmware updates iDRAC(s) found in their last catalog comparison, which firmware/install
@@ -1830,7 +1756,7 @@ func (c *Client) sendGETV1BmcFirmwareUpdates(ctx context.Context, params GETV1Bm
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -1925,7 +1851,6 @@ func (c *Client) sendGETV1BmcFirmwareUpdates(ctx context.Context, params GETV1Bm
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcIdentityDefaults`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Get the location and asset tag templates configured as defaults.
@@ -2029,7 +1954,6 @@ func (c *Client) sendGETV1BmcIdentityDefaults(ctx context.Context, params GETV1B
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcJobs`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Get the redfish job queue of node(s).
@@ -2092,7 +2016,7 @@ func (c *Client) sendGETV1BmcJobs(ctx context.Context, params GETV1BmcJobsParams
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -2187,7 +2111,6 @@ func (c *Client) sendGETV1BmcJobs(ctx context.Context, params GETV1BmcJobsParams
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcNICs`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // List the host network ports each node's BMC reports.
@@ -2250,7 +2173,7 @@ func (c *Client) sendGETV1BmcNics(ctx context.Context, params GETV1BmcNicsParams
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -2345,7 +2268,6 @@ func (c *Client) sendGETV1BmcNics(ctx context.Context, params GETV1BmcNicsParams
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcSecureBoot`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Get the UEFI secure boot state of node(s), with any staged change, and with keys the certificates
@@ -2460,7 +2382,7 @@ func (c *Client) sendGETV1BmcSecureboot(ctx context.Context, params GETV1BmcSecu
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -2555,7 +2477,6 @@ func (c *Client) sendGETV1BmcSecureboot(ctx context.Context, params GETV1BmcSecu
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcSEL`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Get the system event log of node(s).
@@ -2584,7 +2505,7 @@ func (c *Client) sendGETV1BmcSel(ctx context.Context, params GETV1BmcSelParams) 
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.Limit.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.IntToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -2635,7 +2556,7 @@ func (c *Client) sendGETV1BmcSel(ctx context.Context, params GETV1BmcSelParams) 
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -2730,7 +2651,6 @@ func (c *Client) sendGETV1BmcSel(ctx context.Context, params GETV1BmcSelParams) 
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcStatus`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Get redfish system information from node(s).
@@ -2793,7 +2713,7 @@ func (c *Client) sendGETV1BmcStatus(ctx context.Context, params GETV1BmcStatusPa
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -2888,7 +2808,6 @@ func (c *Client) sendGETV1BmcStatus(ctx context.Context, params GETV1BmcStatusPa
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).Dump`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Get a backup of the DB.
@@ -2992,7 +2911,6 @@ func (c *Client) sendGETV1DbDump(ctx context.Context, params GETV1DbDumpParams) 
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).GetEvents`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // List the latest events, newest first, with how many of their nodes are at each state.
@@ -3167,7 +3085,6 @@ func (c *Client) sendGETV1GrendelEvents(ctx context.Context, params GETV1Grendel
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).GetEvent`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Get one event with how it went on each of its nodes.
@@ -3289,7 +3206,6 @@ func (c *Client) sendGETV1GrendelEventsID(ctx context.Context, params GETV1Grend
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).GetVersion`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Get the server version.
@@ -3393,7 +3309,6 @@ func (c *Client) sendGETV1GrendelVersion(ctx context.Context, params GETV1Grende
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BootImageList`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // List all images.
@@ -3497,7 +3412,6 @@ func (c *Client) sendGETV1Images(ctx context.Context, params GETV1ImagesParams) 
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BootImageFind`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Find images by name.
@@ -3621,7 +3535,6 @@ func (c *Client) sendGETV1ImagesFind(ctx context.Context, params GETV1ImagesFind
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeList`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // List all nodes.
@@ -3725,7 +3638,6 @@ func (c *Client) sendGETV1Nodes(ctx context.Context, params GETV1NodesParams) (r
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeFind`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Find nodes by nodeset and/or tags.
@@ -3866,7 +3778,6 @@ func (c *Client) sendGETV1NodesFind(ctx context.Context, params GETV1NodesFindPa
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeNextAddress`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Suggest free addresses in a range: the lowest ones no node holds, and the ones after the highest
@@ -4056,7 +3967,6 @@ func (c *Client) sendGETV1NodesIpsNext(ctx context.Context, params GETV1NodesIps
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeAddressRanges`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // List the ranges the ports of some nodes sit in, each once however many ports share it: a /24 of a
@@ -4216,7 +4126,6 @@ func (c *Client) sendGETV1NodesIpsRanges(ctx context.Context, params GETV1NodesI
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeProvisionStatus`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Get the latest provision status of nodes by nodeset and/or tags, or of every node when neither is
@@ -4358,7 +4267,6 @@ func (c *Client) sendGETV1NodesProvisionStatus(ctx context.Context, params GETV1
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeTagList`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // List every tag on a node, with how many nodes have it.
@@ -4462,7 +4370,6 @@ func (c *Client) sendGETV1NodesTags(ctx context.Context, params GETV1NodesTagsPa
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeBootToken`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Create a boot token for the provision server. Used for debugging requests made by images.
@@ -4638,7 +4545,6 @@ func (c *Client) sendGETV1NodesTokenInterface(ctx context.Context, params GETV1N
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).GetRoles`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Get roles and permissions.
@@ -4762,7 +4668,6 @@ func (c *Client) sendGETV1Roles(ctx context.Context, params GETV1RolesParams) (r
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).SwitchGetLLDP`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Get switch LLDP info.
@@ -4905,7 +4810,6 @@ func (c *Client) sendGETV1SwitchNodesetLldp(ctx context.Context, params GETV1Swi
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).SwitchScan`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Read the MAC table and interface status of switch(es), merged per port, with the node that already
@@ -4969,7 +4873,7 @@ func (c *Client) sendGETV1SwitchScan(ctx context.Context, params GETV1SwitchScan
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -5064,7 +4968,6 @@ func (c *Client) sendGETV1SwitchScan(ctx context.Context, params GETV1SwitchScan
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).UserList`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // List all users.
@@ -5188,7 +5091,6 @@ func (c *Client) sendGETV1Users(ctx context.Context, params GETV1UsersParams) (r
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).AuthReset`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Change password.
@@ -5304,7 +5206,6 @@ func (c *Client) sendPATCHV1AuthReset(ctx context.Context, request *AuthResetReq
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeBootImage`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Update nodes boot image by nodeset and/or tags.
@@ -5448,7 +5349,6 @@ func (c *Client) sendPATCHV1NodesImage(ctx context.Context, request *NodeBootIma
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeProvision`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Provision / Unprovision nodes by nodeset and/or tags.
@@ -5592,7 +5492,6 @@ func (c *Client) sendPATCHV1NodesProvision(ctx context.Context, request *NodePro
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeTags`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Update nodes tags by nodeset and/or tags.
@@ -5754,7 +5653,6 @@ func (c *Client) sendPATCHV1NodesTagsAction(ctx context.Context, request *NodeTa
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).PatchRoles`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Edit role permissions.
@@ -5766,6 +5664,15 @@ func (c *Client) PATCHV1Roles(ctx context.Context, request *PatchRolesRequest, p
 }
 
 func (c *Client) sendPATCHV1Roles(ctx context.Context, request *PatchRolesRequest, params PATCHV1RolesParams) (res *GenericResponse, err error) {
+	// Validate request before sending.
+	if err := func() error {
+		if err := request.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return res, errors.Wrap(err, "validate")
+	}
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
@@ -5861,7 +5768,6 @@ func (c *Client) sendPATCHV1Roles(ctx context.Context, request *PatchRolesReques
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).UserEnable`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Update users enable.
@@ -5987,7 +5893,6 @@ func (c *Client) sendPATCHV1UsersUsernamesEnable(ctx context.Context, request *U
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).UserRole`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Update users role.
@@ -6112,8 +6017,6 @@ func (c *Client) sendPATCHV1UsersUsernamesRole(ctx context.Context, request *Use
 //
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).AuthSignin`
-// #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // ---
 // signin user.
 //
@@ -6219,8 +6122,6 @@ func (c *Client) sendPOSTV1AuthSignin(ctx context.Context, request *AuthRequest,
 //
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).AuthSignup`
-// #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // ---
 // Signup user.
 //
@@ -6336,7 +6237,6 @@ func (c *Client) sendPOSTV1AuthSignup(ctx context.Context, request *AuthSignupRe
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).AuthToken`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Create API token.
@@ -6443,7 +6343,6 @@ func (c *Client) sendPOSTV1AuthToken(ctx context.Context, request *AuthTokenRequ
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcAssetTag`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Set the asset tag of node(s), from a template or a table of serial numbers.
@@ -6506,7 +6405,7 @@ func (c *Client) sendPOSTV1BmcAssetTag(ctx context.Context, request *BmcAssetTag
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -6604,7 +6503,6 @@ func (c *Client) sendPOSTV1BmcAssetTag(ctx context.Context, request *BmcAssetTag
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcSetBios`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Stage BIOS attribute changes on node(s), applied at the given apply time.
@@ -6667,7 +6565,7 @@ func (c *Client) sendPOSTV1BmcBios(ctx context.Context, request *BmcSetBiosBody,
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -6765,7 +6663,6 @@ func (c *Client) sendPOSTV1BmcBios(ctx context.Context, request *BmcSetBiosBody,
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcDiscardBios`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Discard the BIOS changes staged on node(s).
@@ -6828,7 +6725,7 @@ func (c *Client) sendPOSTV1BmcBiosDiscard(ctx context.Context, params POSTV1BmcB
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -6923,7 +6820,6 @@ func (c *Client) sendPOSTV1BmcBiosDiscard(ctx context.Context, params POSTV1BmcB
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcAutoConfigure`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Set iDRAC(s) to auto configure once, on the node's next boot. Dell only.
@@ -6986,7 +6882,7 @@ func (c *Client) sendPOSTV1BmcConfigureAuto(ctx context.Context, params POSTV1Bm
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -7081,7 +6977,6 @@ func (c *Client) sendPOSTV1BmcConfigureAuto(ctx context.Context, params POSTV1Bm
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcImportConfig`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Have iDRAC(s) download a config template from the provision server and import it. Dell only.
@@ -7144,7 +7039,7 @@ func (c *Client) sendPOSTV1BmcConfigureImport(ctx context.Context, request *BmcI
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -7242,7 +7137,6 @@ func (c *Client) sendPOSTV1BmcConfigureImport(ctx context.Context, request *BmcI
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcInstallFirmware`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Compare the firmware of iDRAC(s) against an update catalog, and with apply_update queue the
@@ -7306,7 +7200,7 @@ func (c *Client) sendPOSTV1BmcFirmwareInstall(ctx context.Context, request *BmcI
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -7404,7 +7298,6 @@ func (c *Client) sendPOSTV1BmcFirmwareInstall(ctx context.Context, request *BmcI
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcIndicator`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Turn the location indicator of node(s) on or off.
@@ -7467,7 +7360,7 @@ func (c *Client) sendPOSTV1BmcIndicator(ctx context.Context, request *BmcIndicat
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -7565,7 +7458,6 @@ func (c *Client) sendPOSTV1BmcIndicator(ctx context.Context, request *BmcIndicat
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcClearJobs`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Clear redfish jobs from node(s).
@@ -7637,7 +7529,7 @@ func (c *Client) sendPOSTV1BmcJobsClear(ctx context.Context, request *BmcClearJo
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -7735,7 +7627,6 @@ func (c *Client) sendPOSTV1BmcJobsClear(ctx context.Context, request *BmcClearJo
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcLocation`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Set the rack location of node(s), rendered per node from templates.
@@ -7798,7 +7689,7 @@ func (c *Client) sendPOSTV1BmcLocation(ctx context.Context, request *BmcLocation
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -7896,7 +7787,6 @@ func (c *Client) sendPOSTV1BmcLocation(ctx context.Context, request *BmcLocation
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcPower`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Change the power state of node(s), or restart their BMCs.
@@ -7959,7 +7849,7 @@ func (c *Client) sendPOSTV1BmcPower(ctx context.Context, request *BmcPowerBody, 
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -8057,7 +7947,6 @@ func (c *Client) sendPOSTV1BmcPower(ctx context.Context, request *BmcPowerBody, 
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcSetSecureBoot`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Turn UEFI secure boot on or off on node(s), from their next boot.
@@ -8120,7 +8009,7 @@ func (c *Client) sendPOSTV1BmcSecureboot(ctx context.Context, request *BmcSecure
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -8218,7 +8107,6 @@ func (c *Client) sendPOSTV1BmcSecureboot(ctx context.Context, request *BmcSecure
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcAddSecureBootKey`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Enroll certificates or a signature in a secure boot database on node(s). A key already enrolled is
@@ -8291,7 +8179,7 @@ func (c *Client) sendPOSTV1BmcSecurebootKeys(ctx context.Context, request *BmcSe
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -8389,7 +8277,6 @@ func (c *Client) sendPOSTV1BmcSecurebootKeys(ctx context.Context, request *BmcSe
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcDeleteSecureBootKey`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Remove a certificate or signature from a secure boot database on node(s).
@@ -8452,7 +8339,7 @@ func (c *Client) sendPOSTV1BmcSecurebootKeysDelete(ctx context.Context, request 
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -8550,7 +8437,6 @@ func (c *Client) sendPOSTV1BmcSecurebootKeysDelete(ctx context.Context, request 
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcResetSecureBootKeys`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Reset the secure boot databases of node(s) to their factory keys, or delete their keys.
@@ -8622,7 +8508,7 @@ func (c *Client) sendPOSTV1BmcSecurebootReset(ctx context.Context, request *BmcS
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -8720,7 +8606,6 @@ func (c *Client) sendPOSTV1BmcSecurebootReset(ctx context.Context, request *BmcS
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BmcClearSEL`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Clear the system event log on node(s).
@@ -8783,7 +8668,7 @@ func (c *Client) sendPOSTV1BmcSelClear(ctx context.Context, params POSTV1BmcSelC
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.All.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -8878,7 +8763,6 @@ func (c *Client) sendPOSTV1BmcSelClear(ctx context.Context, params POSTV1BmcSelC
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).Restore`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Restore a backup of the DB.
@@ -8994,7 +8878,6 @@ func (c *Client) sendPOSTV1DbRestore(ctx context.Context, request *DataDump, par
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).BootImageAdd`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Add images.
@@ -9101,7 +8984,6 @@ func (c *Client) sendPOSTV1Images(ctx context.Context, request *BootImageAddRequ
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeAdd`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Add nodes.
@@ -9217,7 +9099,6 @@ func (c *Client) sendPOSTV1Nodes(ctx context.Context, request *NodeAddRequest, p
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).NodeImport`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Add a BMC or boot port to each node, creating nodes that do not exist, with addresses taken from
@@ -9334,7 +9215,6 @@ func (c *Client) sendPOSTV1NodesImport(ctx context.Context, request *NodeImportR
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).PostRoles`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Add roles.
@@ -9441,7 +9321,6 @@ func (c *Client) sendPOSTV1Roles(ctx context.Context, request *PostRolesRequest,
 // #### Controller:
 // `github.com/ubccr/grendel/internal/api.(*Handler).UserStore`
 // #### Middlewares:
-// - `github.com/go-fuego/fuego.defaultLogger.middleware`
 // - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
 // ---
 // Add new user.

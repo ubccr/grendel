@@ -17,8 +17,7 @@ import (
 )
 
 var (
-	statusFilter  []string
-	statusOptions *shared.TableOptions
+	statusTable   *shared.TableFlags
 	statusColumns = []shared.Column{
 		{Name: "Node"},
 		{Name: "State"},
@@ -50,64 +49,56 @@ var (
 				return err
 			}
 
-			t := shared.NewTable(statusColumns, statusFilter).Options(*statusOptions).Empty("-")
-			for _, r := range res.Results.Value {
-				result := r.Value
+			t := statusTable.Table()
+			for _, result := range res.Results {
 				// data is null unless the node was reached, so every other column stays empty and the row still names the node and why it failed
-				o := result.Data.Value
-				loc := o.Location.Value
-
-				bootOrder := make([]string, 0, len(o.BootOrder.Value))
-				for _, s := range o.BootOrder.Value {
-					bootOrder = append(bootOrder, s.Value)
-				}
+				o, reached := result.Data.Get()
 
 				var oem []byte
-				if o.OemDell.Set && !o.OemDell.Null {
-					oem, err = json.MarshalIndent(o.OemDell, "", "  ")
+				if dell, ok := o.OemDell.Get(); ok {
+					oem, err = json.MarshalIndent(dell, "", "  ")
 					if err != nil {
-						log.WithField("node", result.Node.Value).Error(fmt.Errorf("failed to marshal OEM json: %w", err))
+						log.WithField("node", result.Node).Error(fmt.Errorf("failed to marshal OEM json: %w", err))
 					}
 				}
 
+				// a count the bmc never gave must not show as a made up zero
+				cpu, memory := "", ""
+				if reached {
+					cpu, memory = strconv.Itoa(o.ProcessorCount), fmt.Sprintf("%.2f", o.TotalMemory)
+				}
+
 				t.AppendRow(
-					result.Node.Value,
-					colorState(result.Success.Value),
-					result.Message.Value,
-					o.HostName.Value,
-					o.PowerStatus.Value,
-					o.SerialNumber.Value,
-					o.BiosVersion.Value,
-					o.Manufacturer.Value,
-					o.Model.Value,
-					o.Health.Value,
-					o.LocationIndicator.Value,
-					o.AssetTag.Value,
-					formatLocation(loc.Datacenter.Value, loc.Room.Value, loc.Row.Value, loc.Rack.Value, loc.RackUnit),
-					optInt(o.ProcessorCount),
-					optFloat(o.TotalMemory),
-					strings.Join(bootOrder, "\n"),
-					o.BootNext.Value,
+					result.Node,
+					colorState(result.Success),
+					result.Message,
+					o.HostName,
+					o.PowerStatus,
+					o.SerialNumber,
+					o.BiosVersion,
+					o.Manufacturer,
+					o.Model,
+					o.Health,
+					o.LocationIndicator,
+					o.AssetTag,
+					formatLocation(location(o.Location.Value)),
+					cpu,
+					memory,
+					strings.Join(o.BootOrder.Value, "\n"),
+					o.BootNext,
 					string(oem),
 				)
 			}
 
 			t.Print()
 
-			s := res.Summary.Value
-			return summaryLine(s.Total.Value, s.Succeeded.Value, s.Failed.Value, s.FailedNodes.Value, s.DurationMs.Value)
+			return summaryLine(summary(res.Summary))
 		},
 	}
 )
 
-// bmcStatus fetches the status of the selected nodes, which the asset tag and location list commands read as well
 func bmcStatus(command *cobra.Command, selection string) (*client.BmcResponseModelRedfishSystem, error) {
-	nodeset, all := selector(selection)
-	params := client.GETV1BmcStatusParams{
-		Nodeset: nodeset,
-		All:     all,
-		Tags:    client.NewOptString(strings.Join(tags, ",")),
-	}
+	params := client.GETV1BmcStatusParams(selected(selection))
 
 	res, err := apiclient.API.GETV1BmcStatus(command.Context(), params)
 	if err != nil {
@@ -116,26 +107,8 @@ func bmcStatus(command *cobra.Command, selection string) (*client.BmcResponseMod
 	return res, nil
 }
 
-// optInt and optFloat leave the cell empty when the field was absent, so an unreached node shows the table's placeholder rather than a made up zero
-func optInt(v client.OptInt) string {
-	if !v.Set {
-		return ""
-	}
-	return strconv.Itoa(v.Value)
-}
-
-func optFloat(v client.OptFloat32) string {
-	if !v.Set {
-		return ""
-	}
-	return fmt.Sprintf("%.2f", v.Value)
-}
-
 func init() {
-	statusOptions = shared.RegisterTableFlags(statusCmd)
-	statusCmd.Flags().StringSliceVar(&statusFilter, "filter", []string{"Host Name", "Manufacturer", "Locate LED", "Asset Tag", "Location", "CPU", "Memory", "Boot Order", "Boot Next", "OEM"}, "filter table columns by name")
-
-	statusCmd.RegisterFlagCompletionFunc("filter", shared.ColumnCompletion(statusColumns))
+	statusTable = shared.RegisterTableFlags(statusCmd, statusColumns, "Host Name", "Manufacturer", "Locate LED", "Asset Tag", "Location", "CPU", "Memory", "Boot Order", "Boot Next", "OEM")
 
 	bmcCmd.AddCommand(statusCmd)
 }

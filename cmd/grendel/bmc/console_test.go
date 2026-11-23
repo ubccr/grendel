@@ -21,17 +21,25 @@ func TestEscapeFilter(t *testing.T) {
 		{"an unknown escape passes through", []string{"~x"}, "~x", escapeNone},
 		{"help", []string{"~?"}, "", escapeHelp},
 		{"split across reads", []string{"\r", "~", "."}, "\r", escapeQuit},
+		{"input pasted after help is still sent", []string{"~?uptime\r"}, "uptime\r", escapeHelp},
+		{"nothing is sent after a disconnect", []string{"~.uptime\r"}, "", escapeQuit},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			f := &escapeFilter{lineStart: true}
 			var got []byte
 			action := escapeNone
+		reads:
 			for _, r := range tc.reads {
-				out, a := f.filter([]byte(r))
-				got = append(got, out...)
-				if a != escapeNone {
-					action = a
-					break
+				for in := []byte(r); len(in) > 0; {
+					out, a, rest := f.filter(in)
+					in = rest
+					got = append(got, out...)
+					if a != escapeNone {
+						action = a
+					}
+					if a == escapeQuit {
+						break reads
+					}
 				}
 			}
 			if string(got) != tc.want || action != tc.action {

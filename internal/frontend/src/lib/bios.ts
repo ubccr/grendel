@@ -43,7 +43,6 @@ export function inputKind(attr: BiosAttribute | undefined, current: BiosValue): 
   return "string";
 }
 
-// editable is whether the registry lets an attribute be changed
 export function editable(attr: BiosAttribute | undefined) {
   return !(attr?.read_only || attr?.immutable || attr?.gray_out || attr?.type === "Password");
 }
@@ -72,7 +71,7 @@ export function showValue(value: BiosValue | undefined) {
 export type DiffGroup = { value: string; nodes: string[]; nodeset: string };
 export type DiffRow = { name: string; groups: DiffGroup[] };
 
-// biosDiff finds the attributes that differ between nodes, with the nodes holding each value folded into a nodeset. It matches `grendel bmc bios diff`: a staged value counts as the node's, a missing attribute counts as its own value, and the most common value comes first
+// biosDiff matches `grendel bmc bios diff`: a staged value counts as the node's, a missing attribute counts as its own value, and the most common value comes first
 export function biosDiff(nodes: Record<string, BiosValues>, names?: string[]): DiffRow[] {
   const all = new Set<string>(names?.length ? names : []);
   if (!names?.length) {
@@ -100,7 +99,7 @@ export function biosDiff(nodes: Record<string, BiosValues>, names?: string[]): D
   return rows;
 }
 
-// parseInput turns what was typed into the value sent for an attribute. The server converts strings too, but sending the right type keeps the change list accurate
+// The server converts strings too, but sending the right type keeps the change list accurate
 export function parseInput(kind: InputKind, raw: string): BiosValue {
   if (kind === "integer") {
     const n = Number(raw);

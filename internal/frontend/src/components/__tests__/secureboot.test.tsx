@@ -1,9 +1,14 @@
 import KeysPanel from "@/components/secureboot/keys-panel";
-import SecureBootState, { look } from "@/components/secureboot/state";
+import SecureBootState, { look, type Status } from "@/components/secureboot/state";
+import type { SecureBootResult } from "@/lib/secureboot";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+
+// fixtures name only the fields a test is about
+const status = (s: Partial<Status>) => s as Status;
+const results = (r: object[]) => r as SecureBootResult[];
 
 const render = (node: ReactNode) =>
   renderToStaticMarkup(
@@ -12,19 +17,19 @@ const render = (node: ReactNode) =>
 
 describe("look", () => {
   it("reads the setting, a staged change and the current boot as one state", () => {
-    expect(look({ enabled: true, current_boot: "Enabled", mode: "DeployedMode" }).title).toBe(
-      "Secure boot is on",
-    );
-    expect(look({ enabled: false, pending_enabled: true, current_boot: "Disabled" }).title).toBe(
-      "Secure boot turns on at the next boot",
-    );
-    expect(look({ enabled: true, pending_enabled: false, current_boot: "Enabled" }).title).toBe(
-      "Secure boot turns off at the next boot",
-    );
-    expect(look({ enabled: true, mode: "SetupMode" }).title).toBe(
+    expect(
+      look(status({ enabled: true, current_boot: "Enabled", mode: "DeployedMode" })).title,
+    ).toBe("Secure boot is on");
+    expect(
+      look(status({ enabled: false, pending_enabled: true, current_boot: "Disabled" })).title,
+    ).toBe("Secure boot turns on at the next boot");
+    expect(
+      look(status({ enabled: true, pending_enabled: false, current_boot: "Enabled" })).title,
+    ).toBe("Secure boot turns off at the next boot");
+    expect(look(status({ enabled: true, mode: "SetupMode" })).title).toBe(
       "Secure boot is on, but has no platform key",
     );
-    expect(look({ enabled: false }).title).toBe("Secure boot is off");
+    expect(look(status({ enabled: false })).title).toBe("Secure boot is off");
   });
 });
 
@@ -33,8 +38,7 @@ describe("secure boot views", () => {
     const html = render(
       <SecureBootState
         node="cpn-01"
-        status={{ enabled: false, current_boot: "Disabled", mode: "UserMode" }}
-        onChanged={() => {}}
+        status={status({ enabled: false, current_boot: "Disabled", mode: "UserMode" })}
       />,
     );
     expect(html).toContain("Secure boot is off");
@@ -52,8 +56,7 @@ describe("secure boot views", () => {
     const html = render(
       <KeysPanel
         nodes="cpn-[01-02]"
-        onChanged={() => {}}
-        results={[
+        results={results([
           {
             node: "cpn-01",
             success: true,
@@ -69,7 +72,7 @@ describe("secure boot views", () => {
               ],
             },
           },
-        ]}
+        ])}
       />,
     );
     expect(html).toContain("Grendel DB");

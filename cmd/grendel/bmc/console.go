@@ -36,8 +36,6 @@ var (
 Type ~. at the start of a line to disconnect, ~~ to send a ~, and ~? for help. A BMC allows one console session at a time, --force ends whoever else has it.
 
 The BMC needs IPMI over LAN and SOL enabled, and the node needs serial redirection in its BIOS and a console= kernel argument to print anything.`,
-		Example: `  grendel bmc console cpn-f01-04
-  grendel bmc console cpn-f01-04 --force`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
 			return runConsole(command.Context(), args[0], consoleForce)
@@ -99,8 +97,9 @@ func runConsole(ctx context.Context, node string, force bool) error {
 		buf := make([]byte, 1024)
 		for {
 			n, err := os.Stdin.Read(buf)
-			if n > 0 {
-				out, action := f.filter(buf[:n])
+			for in := buf[:n]; len(in) > 0; {
+				out, action, rest := f.filter(in)
+				in = rest
 				if len(out) > 0 {
 					if werr := conn.Write(ctx, websocket.MessageBinary, out); werr != nil {
 						return
@@ -141,7 +140,6 @@ func runConsole(ctx context.Context, node string, force bool) error {
 	}
 }
 
-// closeText is the reason the server gave in its close frame
 func closeText(err error) string {
 	var ce websocket.CloseError
 	if errors.As(err, &ce) && ce.Reason != "" {
@@ -164,17 +162,17 @@ type escapeFilter struct {
 	pending   bool
 }
 
-// filter returns the bytes to send to the console, and stops at an escape that needs acting on
-func (f *escapeFilter) filter(in []byte) ([]byte, escapeAction) {
-	out := make([]byte, 0, len(in))
-	for _, b := range in {
+// filter returns the bytes to send to the console up to an escape that needs acting on, and the input after that escape, which is still to be filtered
+func (f *escapeFilter) filter(in []byte) (out []byte, action escapeAction, rest []byte) {
+	out = make([]byte, 0, len(in))
+	for i, b := range in {
 		if f.pending {
 			f.pending = false
 			switch b {
 			case '.':
-				return out, escapeQuit
+				return out, escapeQuit, in[i+1:]
 			case '?':
-				return out, escapeHelp
+				return out, escapeHelp, in[i+1:]
 			case '~':
 				out = append(out, '~')
 				f.lineStart = false
@@ -190,5 +188,5 @@ func (f *escapeFilter) filter(in []byte) ([]byte, escapeAction) {
 		out = append(out, b)
 		f.lineStart = b == '\r' || b == '\n'
 	}
-	return out, escapeNone
+	return out, escapeNone, nil
 }

@@ -18,7 +18,6 @@ import (
 	"github.com/ubccr/grendel/pkg/nodeset"
 )
 
-// LoadProvisionStatus returns the provision status of the host with the given ID, or store.ErrNotFound when it has none
 func (s *SqlStore) LoadProvisionStatus(uid string) (*model.ProvisionStatus, error) {
 	id, err := ksuid.Parse(uid)
 	if err != nil {
@@ -36,42 +35,62 @@ func (s *SqlStore) LoadProvisionStatus(uid string) (*model.ProvisionStatus, erro
 	return provisionStatusFromRow(row)
 }
 
-// StoreProvisionStatus replaces the provision status of the host with the given ID
-func (s *SqlStore) StoreProvisionStatus(uid string, status *model.ProvisionStatus) error {
+// The status is read and written in one transaction on the write connection, so two reports for a host never start from the same stored status
+func (s *SqlStore) UpdateProvisionStatus(uid string, open *model.Event, update func(status *model.ProvisionStatus) (*model.EventNode, error)) error {
 	id, err := ksuid.Parse(uid)
 	if err != nil {
 		return err
 	}
 
-	detail, err := json.Marshal(status.ProvisionStatusDetail)
-	if err != nil {
-		return err
-	}
+	return s.write(func(tx *sql.Tx) error {
+		ctx := context.Background()
 
-	completed := sql.NullTime{}
-	if status.CompletedAt != nil {
-		completed = sql.NullTime{Time: status.CompletedAt.UTC(), Valid: true}
-	}
+		status := &model.ProvisionStatus{}
+		row, err := s.q.ProvisionStatusFetch(ctx, tx, id)
+		switch {
+		case err == nil:
+			if status, err = provisionStatusFromRow(row); err != nil {
+				return err
+			}
+		case !errors.Is(err, sql.ErrNoRows):
+			return err
+		}
 
-	n, err := s.q.ProvisionStatusUpsert(context.Background(), s.rw, db.ProvisionStatusUpsertParams{
-		UID:         id,
-		State:       string(status.State),
-		StartedAt:   status.StartedAt.UTC(),
-		UpdatedAt:   status.UpdatedAt.UTC(),
-		CompletedAt: completed,
-		Detail:      string(detail),
+		node, err := update(status)
+		if err != nil {
+			return err
+		}
+
+		detail, err := json.Marshal(status.ProvisionStatusDetail)
+		if err != nil {
+			return err
+		}
+		completed := sql.NullTime{}
+		if status.CompletedAt != nil {
+			completed = sql.NullTime{Time: status.CompletedAt.UTC(), Valid: true}
+		}
+		n, err := s.q.ProvisionStatusUpsert(ctx, tx, db.ProvisionStatusUpsertParams{
+			UID:         id,
+			State:       string(status.State),
+			StartedAt:   status.StartedAt.UTC(),
+			UpdatedAt:   status.UpdatedAt.UTC(),
+			CompletedAt: completed,
+			Detail:      string(detail),
+		})
+		if err != nil {
+			return err
+		}
+		if n == 0 {
+			return fmt.Errorf("no host with id %s: %w", uid, store.ErrNotFound)
+		}
+
+		if node == nil {
+			return nil
+		}
+		return s.trackEventNode(tx, open, *node, node.UpdatedAt)
 	})
-	if err != nil {
-		return err
-	}
-	if n == 0 {
-		return fmt.Errorf("no host with id %s: %w", uid, store.ErrNotFound)
-	}
-
-	return nil
 }
 
-// ProvisionStatuses returns the provision status of every host in ns that has one, or of every host when ns is nil
 func (s *SqlStore) ProvisionStatuses(ns *nodeset.NodeSet) (model.ProvisionStatusList, error) {
 	var rows []db.ProvisionStatusFetchRow
 	if ns == nil {

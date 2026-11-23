@@ -52,7 +52,6 @@ export const Route = createFileRoute("/account/_account/token")({
 
 const dateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" });
 
-// expiryNote says when a token made now with the expiry would stop working
 function expiryNote(expiry: string) {
   if (expiry === NEVER) return "The token never expires.";
   const seconds = expirySeconds(expiry) ?? 0;
@@ -62,7 +61,10 @@ function expiryNote(expiry: string) {
 function RouteComponent() {
   const { user } = useUser();
   const isAdmin = user?.role === "admin";
-  const mint = useMutation(postV1AuthTokenMutation());
+  const mint = useMutation({
+    ...postV1AuthTokenMutation(),
+    meta: { quietError: true, changesNothing: true },
+  });
   // a new request clears the last result, so the token shown is always the one just made
   const token = mint.data?.token;
 
@@ -215,7 +217,7 @@ function RouteComponent() {
   );
 }
 
-// ExpiryCombobox picks how long a token lasts from common lengths, or takes one typed in, like 45d or 1h30m. Typing a length chooses it straight away, so it counts without being picked from the list, and when the list closes the combobox puts the chosen expiry's name back in the input, which also drops any text that wasn't a length
+// Typing a length, like 45d or 1h30m, chooses it straight away without picking it from the list. When the list closes the chosen expiry's name goes back in the input, which also drops any text that wasn't a length
 function ExpiryCombobox({
   id,
   value,
@@ -256,7 +258,6 @@ function ExpiryCombobox({
   );
 }
 
-// AboutTokens stands where a new token appears, saying what to know before making one
 function AboutTokens() {
   return (
     <SideNote title="Info">
@@ -266,7 +267,6 @@ function AboutTokens() {
   );
 }
 
-// TokenSlip shows a token just made, once: who it acts as, until when, and the token itself
 function TokenSlip({ token }: { token: string }) {
   const ref = useRef<HTMLElement>(null);
   const claims = tokenClaims(token);

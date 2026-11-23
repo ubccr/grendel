@@ -14,18 +14,17 @@ insert into permission(method, path) values
   ('GET', '/v1/bmc/metrics')
 ;
 
--- the old routes get back the roles that hold their replacement
+-- the old routes get back the roles that hold their replacement. The repo listing follows the firmware install rather than the firmware updates it became, since every role that could read a BMC was given those and only some could list the repo
 with replaced(old_method, old_path, new_method, new_path) as
 (
   values
     ('GET', '/v1/bmc', 'GET', '/v1/bmc/status'),
-    ('GET', '/v1/bmc/metrics', 'GET', '/v1/bmc/status'),
     ('POST', '/v1/bmc/power/os', 'POST', '/v1/bmc/power'),
     ('POST', '/v1/bmc/power/bmc', 'POST', '/v1/bmc/power'),
     ('DELETE', '/v1/bmc/sel', 'POST', '/v1/bmc/sel/clear'),
     ('DELETE', '/v1/bmc/jobs', 'POST', '/v1/bmc/jobs/clear'),
     ('DELETE', '/v1/bmc/jobs/%', 'POST', '/v1/bmc/jobs/clear'),
-    ('GET', '/v1/bmc/upgrade/dell/repo', 'GET', '/v1/bmc/firmware/updates'),
+    ('GET', '/v1/bmc/upgrade/dell/repo', 'POST', '/v1/bmc/firmware/install'),
     ('POST', '/v1/bmc/upgrade/dell/installfromrepo', 'POST', '/v1/bmc/firmware/install')
 )
 insert or ignore into role_permission(role_id, permission_id)
@@ -34,6 +33,14 @@ from replaced
 join permission new on (new.method, new.path) = (replaced.new_method, replaced.new_path)
 join role_permission rp on rp.permission_id = new.id
 join permission old on (old.method, old.path) = (replaced.old_method, replaced.old_path)
+;
+
+-- metrics was removed with nothing replacing it, so which roles held it is not known. Only admin, which holds every permission, gets it back
+insert or ignore into role_permission(role_id, permission_id)
+select role.id, permission.id
+from role, permission
+where role.name = 'admin'
+  and (permission.method, permission.path) = ('GET', '/v1/bmc/metrics')
 ;
 
 delete from role_permission where permission_id in

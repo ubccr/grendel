@@ -1,6 +1,6 @@
 import type { RowData } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown, Info, X } from "lucide-react";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { TagCombobox } from "@/components/tag-combobox";
 import {
@@ -21,11 +21,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { cn } from "@/lib/utils";
 import type { DataTableColumn } from "./features";
 
-// DataTableFilterContext carries a DataTable's filter setter to its headers, which puts the filter in the url and clears the selection as well as filtering. A header outside a DataTable sets the column's filter directly
-export const DataTableFilterContext = createContext<((id: string, value: unknown) => void) | null>(
-  null,
-);
-
 interface DataTableColumnHeaderProps<TData extends RowData> {
   column: DataTableColumn<TData, any>;
   title: string;
@@ -34,7 +29,7 @@ interface DataTableColumnHeaderProps<TData extends RowData> {
   options?: FilterOption[];
 }
 
-// DataTableColumnHeader is a column's whole header in one line: a filter box named for the column, with the sort control at its end. The name is the box's placeholder and gives way to what is typed, since the column being filtered is already known. A column that cannot be filtered shows its name with the sort control beside it
+// The column name is the filter box's placeholder and gives way to what is typed. A column that cannot be filtered shows its name with the sort control beside it
 export function DataTableColumnHeader<TData extends RowData>({
   column,
   title,
@@ -42,8 +37,6 @@ export function DataTableColumnHeader<TData extends RowData>({
   options,
 }: DataTableColumnHeaderProps<TData>) {
   const filterValue = column.getFilterValue();
-  const setFilter =
-    useContext(DataTableFilterContext) ?? ((_: string, v: unknown) => column.setFilterValue(v));
   const sort = column.getCanSort() ? <SortButton column={column} title={title} /> : null;
 
   if (!column.getCanFilter()) {
@@ -62,7 +55,7 @@ export function DataTableColumnHeader<TData extends RowData>({
           title={title}
           options={options}
           value={(filterValue as string) ?? ""}
-          onValueChange={(v) => setFilter(column.id, v || undefined)}
+          onValueChange={(v) => column.setFilterValue(v || undefined)}
         />
         {sort}
       </div>
@@ -74,8 +67,11 @@ export function DataTableColumnHeader<TData extends RowData>({
       <div className={cn("flex items-center gap-1", className)}>
         <TagsFilter
           title={title}
-          value={(filterValue as string[]) ?? []}
-          onValueChange={(val) => setFilter(column.id, val)}
+          // a url written by hand can hold one tag as plain text rather than a list
+          value={
+            Array.isArray(filterValue) ? filterValue : filterValue ? [String(filterValue)] : []
+          }
+          onValueChange={(val) => column.setFilterValue(val)}
         />
         {sort}
       </div>
@@ -87,16 +83,14 @@ export function DataTableColumnHeader<TData extends RowData>({
       title={title}
       className={className}
       value={(filterValue as string) ?? ""}
-      onValueChange={(v) => setFilter(column.id, v)}
+      onValueChange={(v) => column.setFilterValue(v)}
       sort={sort}
     />
   );
 }
 
-// FilterOption is one choice of a column's choice filter: the value its filter function is given, and how many rows it would show
 export type FilterOption = { value: string; label: string; count?: number };
 
-// ChoiceFilter is the filter of a column whose values are a few known kinds, like a status, picked from a list rather than typed
 function ChoiceFilter({
   title,
   options,
@@ -141,7 +135,7 @@ function ChoiceFilter({
   );
 }
 
-// FilterBox is a column's filter input. It keeps what is typed in its own state and hands it to the table after a short pause, so typing never waits on the table filtering and rendering its rows. A change made elsewhere, such as clearing all filters, still reaches the box
+// FilterBox keeps what is typed in its own state and hands it to the table after a short pause, so typing never waits on the table filtering its rows. A change made elsewhere, such as clearing all filters, still reaches the box
 export function FilterBox({
   title,
   hint,
@@ -205,7 +199,7 @@ export function FilterBox({
   );
 }
 
-// SortButton cycles the column through its sort orders and back to unsorted. It stays faint until the column is sorted, so the active sort is the one that stands out across a row of headers
+// The button stays faint until the column is sorted, so the active sort stands out across a row of headers
 function SortButton<TData extends RowData>({
   column,
   title,

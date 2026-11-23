@@ -9,10 +9,12 @@ import {
   tagsColumn,
   useNodeList,
 } from "@/components/nodes/node-table";
+import { ErrorPanel } from "@/components/error-panel";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { switchNos } from "@/lib/switch-ports";
 import { Link } from "@tanstack/react-router";
-import { Network } from "lucide-react";
+import { Network, RefreshCw } from "lucide-react";
 import { useMemo, type ReactNode } from "react";
 import {
   Empty,
@@ -61,7 +63,7 @@ const columns: DataTableColumnDef<Host, any>[] = [
   },
 ];
 
-// SwitchPicker is the nodes tagged switch, in a table to pick the ones to scan from. children is the step's bar, drawn under the table
+// children is the step's bar, drawn under the table
 export function SwitchPicker({
   selected,
   onChange,
@@ -86,7 +88,18 @@ export function SwitchPicker({
       </div>
     );
 
-  if (error || switches.length === 0)
+  if (error)
+    return (
+      <div className="grid justify-items-center gap-3">
+        <ErrorPanel title="Couldn't list the switches" message={error.detail} />
+        <Button variant="outline" onClick={() => void refetch()}>
+          <RefreshCw />
+          Try again
+        </Button>
+      </div>
+    );
+
+  if (switches.length === 0)
     return (
       <Empty className="border">
         <EmptyHeader>

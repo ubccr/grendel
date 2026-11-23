@@ -77,14 +77,7 @@ function ImageImportJSON() {
             mutate(
               { body: JSON.parse(text) },
               {
-                onSuccess: (data) => {
-                  toast.success(data?.title, { description: data?.detail });
-                },
-                onError: (e) => {
-                  toast.error(e.title, {
-                    description: e.detail,
-                  });
-                },
+                onSuccess: (data) => toast.success(data?.title, { description: data?.detail }),
               },
             )
           }

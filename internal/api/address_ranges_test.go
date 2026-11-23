@@ -15,7 +15,6 @@ import (
 	"github.com/ubccr/grendel/pkg/model"
 )
 
-// storeRacked stores a node with a boot port and a BMC port, tagged into rack
 func storeRacked(t *testing.T, h *Handler, name, rack, boot, bmc string) {
 	t.Helper()
 	host := tests.HostFactory.MustCreate().(*model.Host)
@@ -60,9 +59,18 @@ func TestNodeAddressRanges(t *testing.T) {
 		assert.Equal(t, []AddressRange{
 			{Range: "10.17.25.0/24", PrefixLen: 18, Ports: 2, BMCPorts: 0, Nodes: 2},
 			{Range: "10.17.26.0/24", PrefixLen: 18, Ports: 1, BMCPorts: 0, Nodes: 1},
-			{Range: "10.18.0.0/24", PrefixLen: 32, Ports: 1, BMCPorts: 1, Nodes: 1},
+			{Range: "10.18.0.0/24", PrefixLen: 18, Ports: 1, BMCPorts: 1, Nodes: 1},
 			{Range: "10.18.25.0/24", PrefixLen: 18, Ports: 2, BMCPorts: 2, Nodes: 2},
 		}, res)
+	})
+
+	t.Run("a range has the prefix length a search of it reports", func(t *testing.T) {
+		fakePing(t)
+		for _, r := range addressRangesOf(t, h, map[string]string{"tags": "rack=u26"}) {
+			next, err := nextAddress(t, h, map[string]string{"cidr": r.Range, "count": "1"})
+			require.NoError(t, err)
+			assert.Equal(t, next.PrefixLen, r.PrefixLen, r.Range)
+		}
 	})
 
 	t.Run("by tag", func(t *testing.T) {

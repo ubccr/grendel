@@ -1,24 +1,24 @@
-import { getV1BmcSecureboot } from "@/client";
 import { ErrorPanel } from "@/components/error-panel";
 import KeysPanel from "@/components/secureboot/keys-panel";
 import SecureBootState from "@/components/secureboot/state";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { secureBootOptions } from "@/lib/queries";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { ShieldQuestion } from "lucide-react";
 
 export const Route = createFileRoute("/nodes/$node/secureboot")({
   staticData: { crumb: "Secure boot" },
   component: RouteComponent,
-  // one request reads the state and the keys over a single login to the BMC
-  loader: ({ params: { node } }) => getV1BmcSecureboot({ query: { nodeset: node, keys: true } }),
-  staleTime: 30_000,
+  // a BMC is only logged into once the tab is opened, not when its link is hovered
+  preload: false,
+  loader: ({ context: { queryClient }, params: { node } }) =>
+    queryClient.ensureQueryData(secureBootOptions(node)),
 });
 
 function RouteComponent() {
-  const router = useRouter();
   const { node } = Route.useParams();
-  const { data } = Route.useLoaderData();
-  const result = data?.results?.[0];
-  const refresh = () => router.invalidate();
+  const { data } = useSuspenseQuery(secureBootOptions(node));
+  const result = data.results?.[0];
 
   if (!result?.success || !result.data)
     return (
@@ -31,8 +31,8 @@ function RouteComponent() {
 
   return (
     <div className="grid gap-6">
-      <SecureBootState node={node} status={result.data} onChanged={refresh} />
-      <KeysPanel nodes={node} results={data?.results ?? []} onChanged={refresh} />
+      <SecureBootState node={node} status={result.data} />
+      <KeysPanel nodes={node} results={data.results ?? []} />
     </div>
   );
 }

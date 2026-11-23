@@ -1,4 +1,5 @@
-import { getV1Nodes, getV1NodesProvisionStatus, type Host, type ProvisionStatus } from "@/client";
+import { type Host, type ProvisionStatus } from "@/client";
+import { getV1NodesOptions } from "@/client/@tanstack/react-query.gen";
 import {
   isFinished,
   LastProvisionCounts,
@@ -18,9 +19,10 @@ import {
 } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import AuthRedirect from "@/lib/auth";
 import { parseNodeSet } from "@/lib/nodeset";
+import { provisionStatusOptions } from "@/lib/queries";
 import { cn } from "@/lib/utils";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Copy, SearchX, SquareMenu } from "lucide-react";
 import {
@@ -43,17 +45,15 @@ const rackSearchSchema = z.object({
 
 export const Route = createFileRoute("/racks/")({
   component: RouteComponent,
-  beforeLoad: AuthRedirect,
   validateSearch: rackSearchSchema,
-  // the statuses load with the nodes so the racks can light failed and running provisions. A failed status request only leaves those lights off, as for a role without that permission
-  loader: async () => {
-    const [nodes, statuses] = await Promise.all([
-      getV1Nodes(),
-      getV1NodesProvisionStatus().catch(() => undefined),
-    ]);
-    return { ...nodes, statuses: statuses?.data ?? [] };
+  // the statuses light failed and running provisions. They are not waited on, so a failed status request only leaves those lights off, as for a role without that permission
+  loader: ({ context: { queryClient } }) => {
+    void queryClient.prefetchQuery(provisionStatusOptions());
+    return queryClient.ensureQueryData(getV1NodesOptions());
   },
 });
+
+const noStatuses: ProvisionStatus[] = [];
 
 type Rack = {
   name: string;
@@ -111,7 +111,8 @@ function hallRows(racks: Rack[]): [string, Rack[]][] {
 }
 
 function RouteComponent() {
-  const { data, statuses } = Route.useLoaderData();
+  const { data } = useSuspenseQuery(getV1NodesOptions());
+  const { data: statuses = noStatuses } = useQuery(provisionStatusOptions());
   const { name = "", tag = "" } = Route.useSearch();
   const navigate = useNavigate();
 
@@ -265,7 +266,6 @@ function RouteComponent() {
   );
 }
 
-// Legend names the colours a node is lit in
 function Legend() {
   return (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
@@ -279,7 +279,7 @@ function Legend() {
   );
 }
 
-// MiniRack draws a rack the way it stands in the hall, top unit first, each node a lit slot in the unit its name gives and sleds side by side. Hovering it shows the rack's facts and a click opens the rack. A tap or a key opens the facts instead, with focus inside them, since touch has no hover and a keyboard can't otherwise reach the card's links
+// A click opens the rack and hovering it shows the rack's facts. A tap or a key opens the facts instead, with focus inside them, since touch has no hover and a keyboard can't otherwise reach the card's links
 function MiniRack({
   rack,
   statuses,
@@ -364,7 +364,6 @@ function MiniRack({
   );
 }
 
-// RackSummary is what the popover tells about a rack: how full it is, how its nodes are set to provision and how their last provisions went, the tags on all or some of them, its nodeset to copy, and a link to open it
 function RackSummary({
   rack,
   statuses,
@@ -485,7 +484,6 @@ function RackSummary({
   );
 }
 
-// copy puts the nodeset on the clipboard and says whether it got there, since the browser can refuse, as on a page not served over https
 async function copy(nodeset: string) {
   try {
     await navigator.clipboard.writeText(nodeset);

@@ -7,7 +7,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useRouter } from "@tanstack/react-router";
+import { copyText } from "@/lib/clipboard";
 import { CopyCheckIcon, CopyIcon, Hammer } from "lucide-react";
 import React, { useState } from "react";
 import { Button } from "./ui/button";
@@ -30,8 +30,8 @@ function SelectedItems({ checked }: { checked: string }) {
         <Button
           size="icon"
           variant="outline"
-          onClick={() => {
-            navigator.clipboard.writeText(checked);
+          onClick={async () => {
+            if (!(await copyText(checked))) return;
             setCopied(true);
             setTimeout(() => setCopied(false), 3000);
           }}
@@ -47,9 +47,8 @@ function SelectedItems({ checked }: { checked: string }) {
 }
 
 export default function ActionsSheet({ checked, length, children, type = "other" }: props) {
-  const router = useRouter();
   return (
-    <Sheet onOpenChange={(open) => !open && router.invalidate()}>
+    <Sheet>
       <SheetTrigger render={<Button variant="secondary" className="relative" />}>
         <Hammer />
         <span className="sr-only md:not-sr-only">Actions</span>

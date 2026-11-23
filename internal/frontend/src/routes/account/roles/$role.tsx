@@ -1,5 +1,8 @@
-import { getV1Roles } from "@/client";
-import { getV1UsersOptions, patchV1RolesMutation } from "@/client/@tanstack/react-query.gen";
+import {
+  getV1RolesOptions,
+  getV1UsersOptions,
+  patchV1RolesMutation,
+} from "@/client/@tanstack/react-query.gen";
 import ActionsSheet from "@/components/actions-sheet";
 import RolesDeleteAction from "@/components/actions/roles/delete";
 import { DetailHeader, Fact, Unset } from "@/components/detail-header";
@@ -20,10 +23,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useUser } from "@/hooks/user-provider";
-import AuthRedirect from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Lock, Search, ShieldOff, TriangleAlert, UserRound } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -31,13 +33,8 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/account/roles/$role")({
   staticData: { crumb: { param: "role" } },
   component: RouteComponent,
-  beforeLoad: AuthRedirect,
-  // the server answers an unknown role with an error, and the client throws on one, so it is caught here and shown in the page
-  loader: ({ params: { role } }) =>
-    getV1Roles({ query: { name: role } }).then(
-      (res) => ({ roles: res.data?.roles, error: undefined }),
-      (e: { detail?: string }) => ({ roles: undefined, error: e?.detail }),
-    ),
+  // every role is listed and this one picked out, as the server answers an unknown role and a failed request alike. A failure is shown in the page, so it is waited on but not thrown
+  loader: ({ context: { queryClient } }) => queryClient.prefetchQuery(getV1RolesOptions()),
 });
 
 // builtIn are the roles the server refuses to change, so their permissions show read only
@@ -46,7 +43,6 @@ const builtIn = new Set(["admin", "user", "read-only"]);
 // access are the permissions this page needs: the loader lists the role and saving edits it
 const access = ["GET /v1/roles", "PATCH /v1/roles"];
 
-// kindStyle colors a permission by what it does, the same in its method, its tick and the header counts: sky to view, amber to change, red to delete
 const kindStyle: Record<Kind, { text: string; tick: string; label: string }> = {
   view: { text: "text-sky-700 dark:text-sky-400", tick: "bg-sky-500", label: "View" },
   change: { text: "text-amber-700 dark:text-amber-400", tick: "bg-amber-500", label: "Change" },
@@ -56,25 +52,34 @@ const kindStyle: Record<Kind, { text: string; tick: string; label: string }> = {
 type Show = "all" | "granted" | "missing";
 
 function RouteComponent() {
-  const { roles, error } = Route.useLoaderData();
+  const { data, error, isPending } = useQuery(getV1RolesOptions());
   const name = Route.useParams().role;
-  const role = roles?.find((r) => r.name === name);
+  const role = data?.roles?.find((r) => r.name === name);
 
+  if (isPending) return null;
   if (!role)
     return (
       <Card>
         <CardContent className="p-6">
-          <ErrorPanel
-            title="Role not found"
-            message={error || `No role is named ${name}.`}
-            icon={ShieldOff}
-          />
+          {error ? (
+            <ErrorPanel
+              title="Could not load the role"
+              message={error.detail || error.title}
+              icon={ShieldOff}
+            />
+          ) : (
+            <ErrorPanel
+              title="Role not found"
+              message={`No role is named ${name}.`}
+              icon={ShieldOff}
+            />
+          )}
         </CardContent>
       </Card>
     );
 
   const saved = role.permission_list ?? [];
-  // after a save the loader reloads, so saved catches up with granted and the save bar goes away
+  // after a save the roles are fetched again, so saved catches up with granted and the save bar goes away
   return (
     <RoleEditor
       name={name}
@@ -93,7 +98,6 @@ function RoleEditor({
   saved: Permission[];
   all: Permission[];
 }) {
-  const router = useRouter();
   const { user } = useUser();
   const { mutate, isPending } = useMutation(patchV1RolesMutation());
   const groups = groupPermissions(all);
@@ -138,11 +142,7 @@ function RoleEditor({
         },
       },
       {
-        onSuccess: (res) => {
-          toast.success("Saved permissions", { description: res?.detail });
-          router.invalidate();
-        },
-        onError: (e) => toast.error(e.title, { description: e.detail }),
+        onSuccess: (res) => toast.success("Saved permissions", { description: res?.detail }),
       },
     );
 
@@ -258,7 +258,6 @@ function RoleEditor({
   );
 }
 
-// RoleFacts count what the role may do by kind, and who has it
 function RoleFacts({
   name,
   entries,
@@ -268,7 +267,7 @@ function RoleFacts({
   entries: Entry[];
   granted: Set<string>;
 }) {
-  const { data: users } = useQuery({ ...getV1UsersOptions(), staleTime: 60_000, retry: false });
+  const { data: users } = useQuery(getV1UsersOptions());
   const holders = users?.filter((u) => u.role === name).length;
   const count = (kind: Kind) => {
     const of = entries.filter((e) => e.kind === kind);
@@ -303,7 +302,6 @@ function RoleFacts({
   );
 }
 
-// Ticks draw one mark per permission in a group, filled in its kind's color when granted, so a group's access reads at a glance
 function Ticks({ entries, granted }: { entries: Entry[]; granted: Set<string> }) {
   return (
     <span aria-hidden className="flex items-center gap-[3px]">

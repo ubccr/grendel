@@ -1,4 +1,4 @@
-import type { DataTableColumnDef } from "@/components/data-table/features";
+import type { DataTableColumnDef, DataTableInstance } from "@/components/data-table/features";
 import { DataTableColumnHeader } from "@/components/data-table/header";
 import type { ReactNode } from "react";
 
@@ -7,7 +7,7 @@ export type StatusFilter<R> = { value: string; label: string; test: (r: R) => bo
 // statusColumn is an import grid's status column: a choice filter of filters, each with how many of the grid's rows it matches, read from the table meta's rows so the counts follow edits
 export function statusColumn<G extends { row?: R }, R extends { status: string }>(
   filters: StatusFilter<R>[],
-  cell: (r: R) => ReactNode,
+  cell: (r: R, table: DataTableInstance<G>) => ReactNode,
 ): DataTableColumnDef<G, any> {
   return {
     id: "status",
@@ -33,6 +33,8 @@ export function statusColumn<G extends { row?: R }, R extends { status: string }
       const f = filters.find((x) => x.value === value);
       return !r || !f || f.test(r);
     },
-    cell: ({ row }) => <div className="whitespace-normal">{cell(row.original.row!)}</div>,
+    cell: ({ row, table }) => (
+      <div className="whitespace-normal">{cell(row.original.row!, table)}</div>
+    ),
   };
 }

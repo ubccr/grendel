@@ -91,8 +91,9 @@ func NewServer(db store.Store, socket, address string) (*Server, error) {
 	return s, nil
 }
 
-func (s *Server) Serve() error {
-	s.server = fuego.NewServer(
+func (s *Server) newFuego() *fuego.Server {
+	return fuego.NewServer(
+		fuego.WithoutAutoGroupTags(),
 		fuego.WithEngineOptions(
 			fuego.WithOpenAPIGeneratorOptions(
 				openapi3gen.UseAllExportedFields(),
@@ -107,7 +108,13 @@ func (s *Server) Serve() error {
 			logMiddleware,
 		),
 		fuego.WithSecurity(setupSecurity()),
+		// fuego's logging middleware wraps the response writer in a type that hides the connection, so a handler could neither clear its write deadline nor upgrade to a websocket
+		fuego.WithLoggingMiddleware(fuego.LoggingConfig{DisableRequest: true, DisableResponse: true}),
 	)
+}
+
+func (s *Server) Serve() error {
+	s.server = s.newFuego()
 
 	s.server.OpenAPI.Description().Info.Title = "Grendel API"
 	s.server.OpenAPI.Description().Info.Description = "OpenAPI spec for the Grendel API"
@@ -119,6 +126,18 @@ func (s *Server) Serve() error {
 	}
 
 	h.SetupRoutes(s.server)
+
+	// the tracker runs on the handler that serves the routes, so both go through the one redfish service and its rate limit
+	ctx, stop := context.WithCancel(context.Background())
+	tracked := make(chan struct{})
+	go func() {
+		defer close(tracked)
+		h.trackFirmware(ctx)
+	}()
+	defer func() {
+		stop()
+		<-tracked
+	}()
 
 	// Fix >30s handlers from returning an empty body
 	s.server.Server.WriteTimeout = time.Minute * 5
@@ -171,16 +190,6 @@ func (s *Server) Serve() error {
 		return <-socketErr
 	}
 
-	return nil
-}
-
-// Background follows the firmware updates queued on BMCs until ctx ends
-func (s *Server) Background(ctx context.Context) error {
-	h, err := NewHandler(s.DB)
-	if err != nil {
-		return err
-	}
-	h.trackFirmware(ctx)
 	return nil
 }
 

@@ -46,7 +46,7 @@ export function Led({
   );
 }
 
-// Jack draws a cage: the metal frame with its latch notch, and the transceiver face with its two fiber sockets when something is plugged in. The bottom row is drawn upside down, as switches mount it
+// The bottom row is drawn upside down, as switches mount it
 function Jack({ plugged, flipped }: { plugged: boolean; flipped: boolean }) {
   const w = 24;
   const h = 17;
@@ -109,7 +109,6 @@ function Jack({ plugged, flipped }: { plugged: boolean; flipped: boolean }) {
   );
 }
 
-// Light is how one cage is drawn: the color of its light, whether something is plugged in, and whether it can be picked
 export type Light = {
   label: string;
   plugged: boolean;
@@ -175,7 +174,6 @@ function Cage({
   );
 }
 
-// Faceplate draws the switch as it looks in the rack: the ears either side, and the cages in blocks with odd ports above even ones, each lit as light says
 export function Faceplate<T>({
   blocks,
   light,

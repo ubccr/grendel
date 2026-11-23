@@ -11,7 +11,7 @@ function plural(n: number, noun: string) {
   return `${n} ${noun}${n === 1 ? "" : "s"}`;
 }
 
-// NodeRanges finds the ranges some nodes' ports sit in, so a range can be picked by where similar nodes are rather than looked up. Nodes are picked by nodeset, by tags, or both, which narrows to the nodes matching both. The server picks them: the nodeset narrows by name as it is typed, so it works before it is a whole nodeset, and tags pick any node with one of them, as tags do elsewhere in the API. Both tabs stay mounted, so what is typed here survives a trip to the range tab
+// A nodeset and tags together narrow to the nodes matching both. The server picks them: the nodeset narrows by name as it is typed, and tags pick any node with one of them. Both tabs stay mounted, so what is typed here survives a trip to the range tab
 export function NodeRanges({
   bmc,
   current,

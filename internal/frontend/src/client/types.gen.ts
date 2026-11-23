@@ -21,7 +21,7 @@ export type AddressRange = {
      */
     ports?: number;
     /**
-     * the prefix length most of the range's ports carry
+     * the prefix length to give a port in the range, the one a search of the range reports
      */
     prefix_len?: number;
     range?: string;
@@ -225,7 +225,7 @@ export type BmcPowerBody = {
      */
     boot_override?: string;
     /**
-     * What to power, 'host' or 'bmc'. Defaults to host. A bmc target is always a graceful restart and ignores the other fields
+     * What to power, 'host' or 'bmc'. Defaults to host. A bmc target is always a graceful restart and takes no action or boot_override
      */
     target?: string;
 };
@@ -234,20 +234,20 @@ export type BmcPowerBody = {
  * BmcResponse_model.BmcAck schema
  */
 export type BmcResponseModelBmcAck = {
-    results?: Array<{
+    results: Array<{
         data?: unknown;
-        duration_ms?: number;
-        message?: string;
-        node?: string;
-        success?: boolean;
+        duration_ms: number;
+        message: string;
+        node: string;
+        success: boolean;
     }>;
-    run_id?: string;
-    summary?: {
-        duration_ms?: number;
-        failed?: number;
-        failed_nodes?: string;
-        succeeded?: number;
-        total?: number;
+    run_id: string;
+    summary: {
+        duration_ms: number;
+        failed: number;
+        failed_nodes: string;
+        succeeded: number;
+        total: number;
     };
 };
 
@@ -255,25 +255,25 @@ export type BmcResponseModelBmcAck = {
  * BmcResponse_model.BmcAssetTagResult schema
  */
 export type BmcResponseModelBmcAssetTagResult = {
-    results?: Array<{
+    results: Array<{
         data?: {
-            changed?: boolean;
-            current?: string;
-            desired?: string;
-            serial?: string;
+            changed: boolean;
+            current: string;
+            desired: string;
+            serial: string;
         };
-        duration_ms?: number;
-        message?: string;
-        node?: string;
-        success?: boolean;
+        duration_ms: number;
+        message: string;
+        node: string;
+        success: boolean;
     }>;
-    run_id?: string;
-    summary?: {
-        duration_ms?: number;
-        failed?: number;
-        failed_nodes?: string;
-        succeeded?: number;
-        total?: number;
+    run_id: string;
+    summary: {
+        duration_ms: number;
+        failed: number;
+        failed_nodes: string;
+        succeeded: number;
+        total: number;
     };
 };
 
@@ -281,32 +281,32 @@ export type BmcResponseModelBmcAssetTagResult = {
  * BmcResponse_model.BmcBios schema
  */
 export type BmcResponseModelBmcBios = {
-    results?: Array<{
+    results: Array<{
         data?: {
             apply_times?: Array<string>;
-            attribute_registry?: string;
+            attribute_registry: string;
             attributes?: {
                 [key: string]: unknown;
             };
-            bios_version?: string;
-            model?: string;
+            bios_version: string;
+            model: string;
             pending?: {
                 [key: string]: unknown;
             };
-            reset_pending?: boolean;
+            reset_pending: boolean;
         };
-        duration_ms?: number;
-        message?: string;
-        node?: string;
-        success?: boolean;
+        duration_ms: number;
+        message: string;
+        node: string;
+        success: boolean;
     }>;
-    run_id?: string;
-    summary?: {
-        duration_ms?: number;
-        failed?: number;
-        failed_nodes?: string;
-        succeeded?: number;
-        total?: number;
+    run_id: string;
+    summary: {
+        duration_ms: number;
+        failed: number;
+        failed_nodes: string;
+        succeeded: number;
+        total: number;
     };
 };
 
@@ -314,50 +314,50 @@ export type BmcResponseModelBmcBios = {
  * BmcResponse_model.BmcBiosRegistry schema
  */
 export type BmcResponseModelBmcBiosRegistry = {
-    results?: Array<{
+    results: Array<{
         data?: {
             attributes?: Array<{
                 default_value?: unknown;
-                display_name?: string;
-                display_order?: number;
-                gray_out?: boolean;
-                help_text?: string;
-                hidden?: boolean;
-                immutable?: boolean;
+                display_name: string;
+                display_order: number;
+                gray_out: boolean;
+                help_text: string;
+                hidden: boolean;
+                immutable: boolean;
                 lower_bound?: number;
                 max_length?: number;
-                menu_path?: string;
+                menu_path: string;
                 min_length?: number;
-                name?: string;
-                read_only?: boolean;
-                reset_required?: boolean;
-                system_unique?: boolean;
-                type?: string;
+                name: string;
+                read_only: boolean;
+                reset_required: boolean;
+                system_unique: boolean;
+                type: string;
                 upper_bound?: number;
                 values?: Array<{
-                    display_name?: string;
-                    name?: string;
+                    display_name: string;
+                    name: string;
                 }>;
-                warning_text?: string;
-                write_only?: boolean;
+                warning_text: string;
+                write_only: boolean;
             }>;
-            available?: boolean;
-            language?: string;
-            registry?: string;
-            version?: string;
+            available: boolean;
+            language: string;
+            registry: string;
+            version: string;
         };
-        duration_ms?: number;
-        message?: string;
-        node?: string;
-        success?: boolean;
+        duration_ms: number;
+        message: string;
+        node: string;
+        success: boolean;
     }>;
-    run_id?: string;
-    summary?: {
-        duration_ms?: number;
-        failed?: number;
-        failed_nodes?: string;
-        succeeded?: number;
-        total?: number;
+    run_id: string;
+    summary: {
+        duration_ms: number;
+        failed: number;
+        failed_nodes: string;
+        succeeded: number;
+        total: number;
     };
 };
 
@@ -365,32 +365,32 @@ export type BmcResponseModelBmcBiosRegistry = {
  * BmcResponse_model.BmcFirmwareUpdates schema
  */
 export type BmcResponseModelBmcFirmwareUpdates = {
-    results?: Array<{
+    results: Array<{
         data?: {
-            reboot_type?: string;
+            reboot_type: string;
             updates?: Array<{
-                component_type?: string;
-                criticality?: string;
-                display_name?: string;
-                installed_version?: string;
-                name?: string;
-                package_path?: string;
-                package_version?: string;
-                reboot_type?: string;
+                component_type: string;
+                criticality: string;
+                display_name: string;
+                installed_version: string;
+                name: string;
+                package_path: string;
+                package_version: string;
+                reboot_type: string;
             }>;
         };
-        duration_ms?: number;
-        message?: string;
-        node?: string;
-        success?: boolean;
+        duration_ms: number;
+        message: string;
+        node: string;
+        success: boolean;
     }>;
-    run_id?: string;
-    summary?: {
-        duration_ms?: number;
-        failed?: number;
-        failed_nodes?: string;
-        succeeded?: number;
-        total?: number;
+    run_id: string;
+    summary: {
+        duration_ms: number;
+        failed: number;
+        failed_nodes: string;
+        succeeded: number;
+        total: number;
     };
 };
 
@@ -398,32 +398,32 @@ export type BmcResponseModelBmcFirmwareUpdates = {
  * BmcResponse_model.BmcJobList schema
  */
 export type BmcResponseModelBmcJobList = {
-    results?: Array<{
+    results: Array<{
         data?: {
             jobs?: Array<{
-                end_time?: string;
-                id?: string;
-                message?: string;
-                name?: string;
-                percent_complete?: number;
-                start_time?: string;
-                state?: string;
-                status?: string;
-                type?: string;
+                end_time: string;
+                id: string;
+                message: string;
+                name: string;
+                percent_complete: number;
+                start_time: string;
+                state: string;
+                status: string;
+                type: string;
             }>;
         };
-        duration_ms?: number;
-        message?: string;
-        node?: string;
-        success?: boolean;
+        duration_ms: number;
+        message: string;
+        node: string;
+        success: boolean;
     }>;
-    run_id?: string;
-    summary?: {
-        duration_ms?: number;
-        failed?: number;
-        failed_nodes?: string;
-        succeeded?: number;
-        total?: number;
+    run_id: string;
+    summary: {
+        duration_ms: number;
+        failed: number;
+        failed_nodes: string;
+        succeeded: number;
+        total: number;
     };
 };
 
@@ -431,36 +431,36 @@ export type BmcResponseModelBmcJobList = {
  * BmcResponse_model.BmcLocationResult schema
  */
 export type BmcResponseModelBmcLocationResult = {
-    results?: Array<{
+    results: Array<{
         data?: {
-            changed?: boolean;
-            current?: {
-                datacenter?: string;
-                rack?: string;
+            changed: boolean;
+            current: {
+                datacenter: string;
+                rack: string;
                 rack_unit?: number;
-                room?: string;
-                row?: string;
+                room: string;
+                row: string;
             };
-            desired?: {
-                datacenter?: string;
-                rack?: string;
+            desired: {
+                datacenter: string;
+                rack: string;
                 rack_unit?: number;
-                room?: string;
-                row?: string;
+                room: string;
+                row: string;
             };
         };
-        duration_ms?: number;
-        message?: string;
-        node?: string;
-        success?: boolean;
+        duration_ms: number;
+        message: string;
+        node: string;
+        success: boolean;
     }>;
-    run_id?: string;
-    summary?: {
-        duration_ms?: number;
-        failed?: number;
-        failed_nodes?: string;
-        succeeded?: number;
-        total?: number;
+    run_id: string;
+    summary: {
+        duration_ms: number;
+        failed: number;
+        failed_nodes: string;
+        succeeded: number;
+        total: number;
     };
 };
 
@@ -468,29 +468,29 @@ export type BmcResponseModelBmcLocationResult = {
  * BmcResponse_model.BmcNICList schema
  */
 export type BmcResponseModelBmcNicList = {
-    results?: Array<{
+    results: Array<{
         data?: {
             nics?: Array<{
-                enabled?: boolean;
-                id?: string;
-                link?: string;
-                mac?: string;
-                name?: string;
-                speed_mbps?: number;
+                enabled: boolean;
+                id: string;
+                link: string;
+                mac: string;
+                name: string;
+                speed_mbps: number;
             }>;
         };
-        duration_ms?: number;
-        message?: string;
-        node?: string;
-        success?: boolean;
+        duration_ms: number;
+        message: string;
+        node: string;
+        success: boolean;
     }>;
-    run_id?: string;
-    summary?: {
-        duration_ms?: number;
-        failed?: number;
-        failed_nodes?: string;
-        succeeded?: number;
-        total?: number;
+    run_id: string;
+    summary: {
+        duration_ms: number;
+        failed: number;
+        failed_nodes: string;
+        succeeded: number;
+        total: number;
     };
 };
 
@@ -498,31 +498,31 @@ export type BmcResponseModelBmcNicList = {
  * BmcResponse_model.BmcSELLog schema
  */
 export type BmcResponseModelBmcSelLog = {
-    results?: Array<{
+    results: Array<{
         data?: {
             entries?: Array<{
-                created?: string;
-                entry_type?: string;
-                id?: string;
-                message?: string;
-                message_id?: string;
-                resolution?: string;
-                sensor_type?: string;
-                severity?: string;
+                created: string;
+                entry_type: string;
+                id: string;
+                message: string;
+                message_id: string;
+                resolution: string;
+                sensor_type: string;
+                severity: string;
             }>;
         };
-        duration_ms?: number;
-        message?: string;
-        node?: string;
-        success?: boolean;
+        duration_ms: number;
+        message: string;
+        node: string;
+        success: boolean;
     }>;
-    run_id?: string;
-    summary?: {
-        duration_ms?: number;
-        failed?: number;
-        failed_nodes?: string;
-        succeeded?: number;
-        total?: number;
+    run_id: string;
+    summary: {
+        duration_ms: number;
+        failed: number;
+        failed_nodes: string;
+        succeeded: number;
+        total: number;
     };
 };
 
@@ -530,44 +530,44 @@ export type BmcResponseModelBmcSelLog = {
  * BmcResponse_model.BmcSecureBoot schema
  */
 export type BmcResponseModelBmcSecureBoot = {
-    results?: Array<{
+    results: Array<{
         data?: {
-            current_boot?: string;
+            current_boot: string;
             databases?: Array<string>;
-            enabled?: boolean;
+            enabled: boolean;
             keys?: Array<{
                 certificates?: Array<{
-                    fingerprint?: string;
-                    id?: string;
-                    issuer?: string;
-                    not_after?: string;
-                    not_before?: string;
-                    owner?: string;
-                    subject?: string;
+                    fingerprint: string;
+                    id: string;
+                    issuer: string;
+                    not_after: string;
+                    not_before: string;
+                    owner: string;
+                    subject: string;
                 }>;
-                id?: string;
+                id: string;
                 signatures?: Array<{
-                    hash?: string;
-                    id?: string;
-                    owner?: string;
-                    type?: string;
+                    hash: string;
+                    id: string;
+                    owner: string;
+                    type: string;
                 }>;
             }>;
-            mode?: string;
+            mode: string;
             pending_enabled?: boolean;
         };
-        duration_ms?: number;
-        message?: string;
-        node?: string;
-        success?: boolean;
+        duration_ms: number;
+        message: string;
+        node: string;
+        success: boolean;
     }>;
-    run_id?: string;
-    summary?: {
-        duration_ms?: number;
-        failed?: number;
-        failed_nodes?: string;
-        succeeded?: number;
-        total?: number;
+    run_id: string;
+    summary: {
+        duration_ms: number;
+        failed: number;
+        failed_nodes: string;
+        succeeded: number;
+        total: number;
     };
 };
 
@@ -575,30 +575,30 @@ export type BmcResponseModelBmcSecureBoot = {
  * BmcResponse_model.RedfishSystem schema
  */
 export type BmcResponseModelRedfishSystem = {
-    results?: Array<{
+    results: Array<{
         data?: {
-            asset_tag?: string;
-            bios_version?: string;
-            boot_mode?: string;
-            boot_next?: string;
+            asset_tag: string;
+            bios_version: string;
+            boot_mode: string;
+            boot_next: string;
             boot_order?: Array<string>;
-            boot_override_enabled?: string;
-            boot_override_target?: string;
-            boot_progress?: string;
-            boot_progress_time?: string;
-            health?: string;
-            host_name?: string;
+            boot_override_enabled: string;
+            boot_override_target: string;
+            boot_progress: string;
+            boot_progress_time: string;
+            health: string;
+            host_name: string;
             location?: {
-                datacenter?: string;
-                rack?: string;
+                datacenter: string;
+                rack: string;
                 rack_unit?: number;
-                room?: string;
-                row?: string;
+                room: string;
+                row: string;
             };
-            location_indicator?: string;
-            manufacturer?: string;
-            model?: string;
-            name?: string;
+            location_indicator: string;
+            manufacturer: string;
+            model: string;
+            name: string;
             oem_dell?: {
                 '@Message.ExtendedInfo'?: Array<{
                     Message?: string;
@@ -694,26 +694,26 @@ export type BmcResponseModelRedfishSystem = {
                 VoltRollupStatus?: string;
                 smbiosGUID?: string;
             };
-            power_status?: string;
-            processor_cores?: number;
-            processor_count?: number;
-            processor_model?: string;
-            processor_sockets?: number;
-            serial_number?: string;
-            total_memory?: number;
+            power_status: string;
+            processor_cores: number;
+            processor_count: number;
+            processor_model: string;
+            processor_sockets: number;
+            serial_number: string;
+            total_memory: number;
         };
-        duration_ms?: number;
-        message?: string;
-        node?: string;
-        success?: boolean;
+        duration_ms: number;
+        message: string;
+        node: string;
+        success: boolean;
     }>;
-    run_id?: string;
-    summary?: {
-        duration_ms?: number;
-        failed?: number;
-        failed_nodes?: string;
-        succeeded?: number;
-        total?: number;
+    run_id: string;
+    summary: {
+        duration_ms: number;
+        failed: number;
+        failed_nodes: string;
+        succeeded: number;
+        total: number;
     };
 };
 
@@ -827,9 +827,9 @@ export type BootImageAddRequest = {
         cmdline?: string;
         id?: number;
         initrd?: Array<string>;
-        kernel?: string;
+        kernel: string;
         liveimg?: string;
-        name?: string;
+        name: string;
         provision_templates?: {
             [key: string]: string;
         };
@@ -878,9 +878,9 @@ export type DataDump = {
         cmdline?: string;
         id?: number;
         initrd?: Array<string>;
-        kernel?: string;
+        kernel: string;
         liveimg?: string;
-        name?: string;
+        name: string;
         provision_templates?: {
             [key: string]: string;
         };
@@ -891,12 +891,18 @@ export type DataDump = {
     Roles?: Array<{
         name?: string;
         permission_list?: Array<{
+            group?: string;
+            kind?: 'view' | 'change' | 'delete';
             method?: string;
             path?: string;
+            summary?: string;
         }>;
         unassigned_permission_list?: Array<{
+            group?: string;
+            kind?: 'view' | 'change' | 'delete';
             method?: string;
             path?: string;
+            summary?: string;
         }>;
     }>;
     Users?: Array<{
@@ -932,11 +938,11 @@ export type Event = {
     kind: 'audit' | 'bmc' | 'provision' | 'firmware';
     nodes?: Array<{
         message?: string;
-        node?: string;
+        node: string;
         ref?: string;
         stage?: string;
-        state?: 'pending' | 'running' | 'succeeded' | 'failed' | 'stalled';
-        updated_at?: string;
+        state: 'pending' | 'running' | 'succeeded' | 'failed' | 'stalled';
+        updated_at: string;
     }>;
     severity: 'success' | 'info' | 'warning' | 'error';
     stages?: {
@@ -965,12 +971,18 @@ export type GetRolesResponse = {
     roles?: Array<{
         name?: string;
         permission_list?: Array<{
+            group?: string;
+            kind?: 'view' | 'change' | 'delete';
             method?: string;
             path?: string;
+            summary?: string;
         }>;
         unassigned_permission_list?: Array<{
+            group?: string;
+            kind?: 'view' | 'change' | 'delete';
             method?: string;
             path?: string;
+            summary?: string;
         }>;
     }>;
 };
@@ -1089,11 +1101,11 @@ export type NextAddressResponse = {
     prefix_len?: number;
     range?: string;
     /**
-     * addresses in the range never suggested: the subnet's network and broadcast addresses, and in a subnet larger than a /24, ones ending in .0 or .255
+     * addresses in the range never suggested: the subnet's network and broadcast addresses, the gateway DHCP hands its nodes, and in a subnet larger than a /24, ones ending in .0 or .255
      */
     reserved?: Array<string>;
     /**
-     * the subnet the range lies in, taken from the prefix length of the nodes in and around it, or the range itself when there are none
+     * the subnet the range lies in: the one in dhcp.subnets holding it, or else taken from the prefix length of the nodes in and around it, or the range itself when there are none
      */
     subnet?: string;
     /**
@@ -1244,8 +1256,11 @@ export type NodeTagsRequest = {
  */
 export type PatchRolesRequest = {
     permission_list?: Array<{
+        group?: string;
+        kind?: 'view' | 'change' | 'delete';
         method?: string;
         path?: string;
+        summary?: string;
     }>;
     role?: string;
 };
@@ -1371,6 +1386,11 @@ export type UserStoreResponse = {
  */
 export type Version = {
     Version?: string;
+    commit?: string;
+    commit_time?: string;
+    go_version?: string;
+    modified?: boolean;
+    schema?: number;
 };
 
 /**
@@ -1551,7 +1571,7 @@ export type PostV1BmcAssetTagData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/asset-tag';
 };
@@ -1596,7 +1616,7 @@ export type GetV1BmcBiosData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/bios';
 };
@@ -1640,7 +1660,7 @@ export type PostV1BmcBiosData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/bios';
 };
@@ -1681,7 +1701,7 @@ export type PostV1BmcBiosDiscardData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/bios/discard';
 };
@@ -1722,7 +1742,7 @@ export type GetV1BmcBiosRegistryData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/bios/registry';
 };
@@ -1763,7 +1783,7 @@ export type PostV1BmcConfigureAutoData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/configure/auto';
 };
@@ -1807,7 +1827,7 @@ export type PostV1BmcConfigureImportData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/configure/import';
 };
@@ -1851,7 +1871,7 @@ export type PostV1BmcFirmwareInstallData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/firmware/install';
 };
@@ -1892,7 +1912,7 @@ export type GetV1BmcFirmwareUpdatesData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/firmware/updates';
 };
@@ -1964,7 +1984,7 @@ export type PostV1BmcIndicatorData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/indicator';
 };
@@ -2005,7 +2025,7 @@ export type GetV1BmcJobsData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/jobs';
 };
@@ -2049,7 +2069,7 @@ export type PostV1BmcJobsClearData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/jobs/clear';
 };
@@ -2093,7 +2113,7 @@ export type PostV1BmcLocationData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/location';
 };
@@ -2134,7 +2154,7 @@ export type GetV1BmcNicsData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/nics';
 };
@@ -2178,7 +2198,7 @@ export type PostV1BmcPowerData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/power';
 };
@@ -2231,7 +2251,7 @@ export type GetV1BmcSecurebootData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/secureboot';
 };
@@ -2275,7 +2295,7 @@ export type PostV1BmcSecurebootData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/secureboot';
 };
@@ -2319,7 +2339,7 @@ export type PostV1BmcSecurebootKeysData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/secureboot/keys';
 };
@@ -2363,7 +2383,7 @@ export type PostV1BmcSecurebootKeysDeleteData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/secureboot/keys/delete';
 };
@@ -2407,7 +2427,7 @@ export type PostV1BmcSecurebootResetData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/secureboot/reset';
 };
@@ -2438,9 +2458,9 @@ export type GetV1BmcSelData = {
     path?: never;
     query?: {
         /**
-         * Keep only this many entries per node
+         * Keep only the newest entries of each node, this many. 0 returns the whole log
          */
-        limit?: string;
+        limit?: number;
         /**
          * Filter by nodeset. Minimum of one query parameter is required
          */
@@ -2452,7 +2472,7 @@ export type GetV1BmcSelData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/sel';
 };
@@ -2493,7 +2513,7 @@ export type PostV1BmcSelClearData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/sel/clear';
 };
@@ -2534,7 +2554,7 @@ export type GetV1BmcStatusData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/bmc/status';
 };
@@ -3483,7 +3503,7 @@ export type GetV1SwitchScanData = {
         /**
          * Select every node in the database. Required when no nodeset or tags are given
          */
-        all?: string;
+        all?: boolean;
     };
     url: '/v1/switch/scan';
 };

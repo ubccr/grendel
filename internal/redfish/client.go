@@ -6,6 +6,7 @@ package redfish
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
@@ -41,6 +42,21 @@ func (c *conn) Close() {
 	if _, err := client.GetSession(); noSession == nil && err == nil {
 		log.Warnf("failed to end the redfish session on %s, it stays open until the bmc expires it", c.target.Name)
 	}
+}
+
+// getJSON reads a resource into out, for the fields gofish keeps private or does not model
+func (c *conn) getJSON(uri string, out any) error {
+	res, err := c.client.Get(uri)
+	defer schemas.DeferredCleanupHTTPResponse(res)
+	if err != nil {
+		return err
+	}
+	return json.NewDecoder(res.Body).Decode(out)
+}
+
+// expandsCollections reports whether gofish adds $expand to this connection's collection reads, which takes both bmc.gofish.auto_expand and a bmc that advertises support
+func (c *conn) expandsCollections() bool {
+	return schemas.BuildQuery(c.client, "", true) != ""
 }
 
 // attempt login to BMC trying each configured credential
@@ -127,6 +143,7 @@ func (s *Service) clientConfig(t Target) gofish.ClientConfig {
 		},
 		MaxConcurrentRequests: s.cfg.MaxConcurrentRequests,
 		ReuseConnections:      s.cfg.ReuseConnections,
+		AutoExpand:            s.cfg.AutoExpand,
 	}
 }
 

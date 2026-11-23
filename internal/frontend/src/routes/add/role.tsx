@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import AuthRedirect from "@/lib/auth";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
@@ -19,6 +20,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/add/role")({
   staticData: { crumb: [{ label: "Roles", to: "/account/roles" }, "Add role"] },
   component: RouteComponent,
+  beforeLoad: AuthRedirect,
 });
 
 function RouteComponent() {
@@ -41,11 +43,6 @@ function RouteComponent() {
 
             navigate({
               to: "/account/roles",
-            });
-          },
-          onError: (e) => {
-            toast.error(e.title, {
-              description: e.detail,
             });
           },
         },

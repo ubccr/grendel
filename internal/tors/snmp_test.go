@@ -65,7 +65,7 @@ func os10Walk() map[string][]gosnmp.SnmpPDU {
 
 func TestSNMPFDB(t *testing.T) {
 	table := parseSNMPFDB(os10Walk())
-	by := table.ByIfname()
+	by := byIfname(table)
 
 	if len(by["ethernet1/1/1"]) != 1 || by["ethernet1/1/1"][0].MAC.String() != "d0:8e:79:00:00:01" {
 		t.Errorf("ethernet1/1/1 = %v", by["ethernet1/1/1"])
@@ -92,24 +92,38 @@ func TestSNMPFDBFallsBackToFdbIDAndBridgePort(t *testing.T) {
 	delete(w, oidDot1dBasePortIfIndex)
 	w[oidIfName] = append(w[oidIfName], strPDU(oidIfName+".1", "ethernet1/1/1"))
 
-	by := parseSNMPFDB(w).ByIfname()
+	by := byIfname(parseSNMPFDB(w))
 	if e := by["ethernet1/1/1"]; len(e) != 1 || e[0].VLAN != "7" {
 		t.Errorf("without the vlan and bridge maps, fdb id and bridge port are used as is: %v", e)
 	}
 }
 
+func TestSNMPFDBDropsBridgePortMissingFromPartialMap(t *testing.T) {
+	w := os10Walk()
+	// bridge port 4 loses its row, and its number is the ifIndex of an unrelated interface
+	w[oidDot1dBasePortIfIndex] = []gosnmp.SnmpPDU{intPDU(oidDot1dBasePortIfIndex+".1", 1001)}
+	w[oidIfName] = append(w[oidIfName], strPDU(oidIfName+".4", "mgmt1/1/1"))
+
+	by := byIfname(parseSNMPFDB(w))
+	if len(by) != 1 || len(by["ethernet1/1/1"]) != 1 {
+		t.Errorf("entries by port = %v, want only the mapped port, with nothing put on mgmt1/1/1", by)
+	}
+}
+
 func TestSNMPInterfaces(t *testing.T) {
 	w := map[string][]gosnmp.SnmpPDU{
-		oidIfName:        {strPDU(oidIfName+".1001", "ethernet1/1/1")},
-		oidIfOperStatus:  {intPDU(oidIfOperStatus+".1001", 1)},
-		oidIfAdminStatus: {intPDU(oidIfAdminStatus+".1001", 1)},
-		oidIfHighSpeed:   {gosnmp.SnmpPDU{Name: oidIfHighSpeed + ".1001", Type: gosnmp.Gauge32, Value: uint(1000)}},
-		oidIfMtu:         {intPDU(oidIfMtu+".1001", 9216)},
-		oidIfAlias:       {strPDU(oidIfAlias+".1001", "cpn-a01-01")},
+		oidIfName: {
+			strPDU(oidIfName+".1001", "ethernet1/1/1"),
+			strPDU(oidIfName+".1002", "ethernet1/1/2"),
+		},
+		oidIfAlias: {strPDU(oidIfAlias+".1001", "cpn-a01-01")},
 	}
-	st := parseIfTable(w)["ethernet1/1/1"]
-	if st == nil || st.LineProtocolStatus != "up" || st.Bandwidth != 1000 || st.MTU != 9216 || st.Description != "cpn-a01-01" {
-		t.Errorf("ethernet1/1/1 = %+v", st)
+	got := parseIfTable(w)
+	if got["ethernet1/1/1"] != "cpn-a01-01" {
+		t.Errorf("ethernet1/1/1 = %q", got["ethernet1/1/1"])
+	}
+	if d, ok := got["ethernet1/1/2"]; !ok || d != "" {
+		t.Errorf("an interface with no alias must still be listed: %v", got)
 	}
 }
 
@@ -151,6 +165,24 @@ func TestSNMPLLDP(t *testing.T) {
 	}
 	if up.PortIdType != "INTERFACE_NAME" || up.PortId != "Ethernet1/1" || up.ManagementAddress != "10.0.0.254" {
 		t.Errorf("ethernet1/1/54 = %+v", up)
+	}
+}
+
+func TestSNMPLLDPPicksTheSameNeighborEveryTime(t *testing.T) {
+	rem := func(col, local, idx int) string {
+		return fmt.Sprintf("%s.%d.0.%d.%d", oidLldpRemTable, col, local, idx)
+	}
+	w := map[string][]gosnmp.SnmpPDU{
+		oidIfName: {strPDU(oidIfName+".1001", "ethernet1/1/1")},
+		oidLldpRemTable: {
+			strPDU(rem(9, 1001, 2), "idrac-ABC1234"),
+			strPDU(rem(9, 1001, 1), "cpn-a01-01"),
+		},
+	}
+	for range 50 {
+		if n := parseSNMPLLDP(w)["ethernet1/1/1"]; n == nil || n.SystemName != "cpn-a01-01" {
+			t.Fatalf("neighbor = %+v, want the one with the lowest remote index", n)
+		}
 	}
 }
 

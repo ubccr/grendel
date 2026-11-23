@@ -1,22 +1,20 @@
 import type { BootImage } from "@/client";
-import { getV1Images } from "@/client";
+import { getV1ImagesOptions } from "@/client/@tanstack/react-query.gen";
 import ActionsSheet from "@/components/actions-sheet";
 import ImagesDeleteAction from "@/components/actions/images/delete";
 import ImagesExportAction from "@/components/actions/images/export";
 import { DataTable, type DataTableActions } from "@/components/data-table/data-table";
 import { DataTableColumnHeader } from "@/components/data-table/header";
 import { Card, CardContent } from "@/components/ui/card";
-import AuthRedirect from "@/lib/auth";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { DataTableColumnDef } from "@/components/data-table/features";
 
 export const Route = createFileRoute("/images/")({
   component: TableComponent,
-  beforeLoad: AuthRedirect,
-  loader: () => getV1Images(),
+  loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(getV1ImagesOptions()),
 });
 
-// columns are defined once, outside the component, so the table keeps the same column definitions across renders
 const columns: DataTableColumnDef<BootImage, any>[] = [
   {
     accessorKey: "name",
@@ -96,8 +94,7 @@ const columns: DataTableColumnDef<BootImage, any>[] = [
 ];
 
 function TableComponent() {
-  const images = Route.useLoaderData();
-  const { isFetching } = Route.useMatch();
+  const { data: images, isFetching } = useSuspenseQuery(getV1ImagesOptions());
 
   const actions: DataTableActions<BootImage> = ({ table }) => {
     const checked = table
@@ -123,10 +120,10 @@ function TableComponent() {
           getRowId={(image) => String(image.id)}
           initialVisibility={{ initrd: false, cmdline: false, provision_templates: false }}
           columns={columns}
-          data={images.data ?? []}
+          data={images}
           add={"/add/image"}
           Actions={actions}
-          progress={isFetching !== false}
+          progress={isFetching}
         />
       </CardContent>
     </Card>

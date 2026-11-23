@@ -124,7 +124,7 @@ grendel bmc secureboot reset cpn-a01-01 --to-default
 | `--delete-all` | Removes every key, which leaves the node in setup mode, where secure boot enforces nothing until a new `PK` is enrolled |
 | `--delete-pk` | Removes only the platform key, which also leaves the node in setup mode |
 
-`disable`, `delete` and `reset` ask for confirmation. Pass `--yes` in a script, since with no
+`enable`, `disable`, `delete` and `reset` ask for confirmation. Pass `--yes` in a script, since with no
 terminal to ask on, they make no change.
 
 ## Permissions

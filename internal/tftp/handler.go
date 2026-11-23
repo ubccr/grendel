@@ -13,7 +13,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pin/tftp/v3"
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/provision"
 	"github.com/ubccr/grendel/pkg/model"
@@ -88,7 +87,6 @@ func (s *Server) ReadHandler(token string, rf io.ReaderFrom) error {
 		return err
 	}
 
-	rf.(tftp.OutgoingTransfer).SetSize(int64(len(bs)))
 	n, err := rf.ReadFrom(bytes.NewReader(bs))
 	if err != nil && !strings.Contains(err.Error(), "User aborted") {
 		log.Errorf("Failed to send firmware via tftp: %s", err)

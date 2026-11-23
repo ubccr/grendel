@@ -181,31 +181,26 @@ func TestSELLocationByVendor(t *testing.T) {
 			want:    []string{managerPath + "/LogServices/Sel"},
 		},
 		{
-			name:    "hpe keeps the iml under systems, the manager only has the ilo log",
+			name:    "a typed sel under systems is used when the managers type none",
 			manager: [][2]string{{"IEL", "Event"}},
-			system:  [][2]string{{"IML", "Oem"}, {"SL", "Oem"}, {"Event", "Oem"}},
-			want:    []string{"IML"},
+			system:  [][2]string{{"StandardLog", "Event"}, {"SEL", "SEL"}},
+			want:    []string{"SEL"},
 		},
 		{
-			name:    "supermicro keeps the health log under systems, even with a log1 on the manager",
+			name:    "a typed sel under systems wins over a manager log known only by its id",
 			manager: [][2]string{{"Log1", "Multiple"}},
-			system:  [][2]string{{"Log1", "Multiple"}},
+			system:  [][2]string{{"Log1", "SEL"}},
 			want:    []string{systemPath + "/LogServices/Log1"},
 		},
 		{
-			name:   "lenovo with a typed sel prefers it over the standard log",
-			system: [][2]string{{"StandardLog", "Event"}, {"AuditLog", "Event"}, {"SEL", "SEL"}},
-			want:   []string{"SEL"},
+			name:    "an untyped sel is found by its id beside other logs",
+			manager: [][2]string{{"Sel", ""}, {"Lclog", ""}},
+			want:    []string{"Sel"},
 		},
 		{
-			name:   "lenovo without one uses the standard log",
-			system: [][2]string{{"StandardLog", "Event"}, {"AuditLog", "Event"}},
-			want:   []string{"StandardLog"},
-		},
-		{
-			name:   "openbmc uses the event log",
-			system: [][2]string{{"EventLog", "Event"}, {"HostLogger", "Multiple"}},
-			want:   []string{"EventLog"},
+			name:    "supermicro's log1 on the manager is used when nothing is typed sel",
+			manager: [][2]string{{"Log1", "Multiple"}, {"Audit", "Event"}},
+			want:    []string{"Log1"},
 		},
 		{
 			name:    "a lone untyped service has nothing to be confused with",
@@ -213,9 +208,15 @@ func TestSELLocationByVendor(t *testing.T) {
 			want:    []string{"Whatever"},
 		},
 		{
+			name:    "a lone log typed as something else is not the event log",
+			manager: [][2]string{{"IEL", "Event"}},
+			system:  [][2]string{{"IML", "Oem"}},
+			want:    nil,
+		},
+		{
 			name:    "a log that is none of these is not guessed at",
 			manager: [][2]string{{"Audit", "Event"}, {"Other", "Event"}},
-			system:  [][2]string{{"Debug", "Event"}},
+			system:  [][2]string{{"Debug", ""}},
 			want:    nil,
 		},
 	}
@@ -256,13 +257,13 @@ func TestSELStopsAtTheManagersWhenTheyHaveIt(t *testing.T) {
 }
 
 func TestSELReadsFromSystems(t *testing.T) {
-	srv := logVendorFixture([][2]string{{"IEL", "Event"}}, [][2]string{{"IML", "Oem"}}).serve(t)
+	srv := logVendorFixture([][2]string{{"IEL", "Event"}}, [][2]string{{"SEL", "SEL"}}).serve(t)
 
 	results := testService(nil).SEL(context.Background(), []Target{{Name: "n", Addr: srv.URL}}, SELRequest{})
 
 	require.True(t, results[0].Success, "message was: %s", results[0].Message)
 	require.Len(t, results[0].Data.Entries, 1)
-	assert.Equal(t, "IML", results[0].Data.Entries[0].ID)
+	assert.Equal(t, "SEL", results[0].Data.Entries[0].ID)
 }
 
 func TestClearSELPartialFailure(t *testing.T) {

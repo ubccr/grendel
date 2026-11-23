@@ -31,7 +31,7 @@ func (s *Service) selOne(ctx context.Context, t Target, req SELRequest) (*SELLog
 
 	var out []*schemas.LogEntry
 	for _, l := range services {
-		entries, err := selEntries(l, req.Limit)
+		entries, err := selEntries(l, req.Limit, c.expandsCollections())
 		if err != nil {
 			return nil, err
 		}
@@ -47,9 +47,9 @@ func (s *Service) selOne(ctx context.Context, t Target, req SELRequest) (*SELLog
 	return &SELLog{Entries: out}, nil
 }
 
-// selEntries reads one log service's entries, asking for only the first limit of them when there is a limit
-func selEntries(l *schemas.LogService, limit int) ([]*schemas.LogEntry, error) {
-	if limit > 0 {
+// selEntries reads one log service's entries, asking for only the first limit of them when there is a limit. A connection that expands collections reads the whole log instead, because gofish appends ?$expand after the ?$top and the uri would carry two query strings
+func selEntries(l *schemas.LogService, limit int, expands bool) ([]*schemas.LogEntry, error) {
+	if limit > 0 && !expands {
 		return l.FilteredEntries(schemas.WithTop(limit))
 	}
 	return l.Entries()
@@ -81,75 +81,52 @@ func (s *Service) clearSELOne(ctx context.Context, t Target) (*Ack, error) {
 	})
 }
 
-// selLogServices finds the system event log, in the same places for reading and clearing. Vendors keep it in different places and some expose another copy elsewhere, so the first place with a match wins, which keeps a log from being read or cleared twice. Systems is only fetched when the managers have nothing
+// selLogServices finds the system event log, in the same places for reading and clearing: the log services typed SEL on the managers, else those on the systems, else a manager log that goes by a known id, or declares no type and is alone. The first place with a match wins, which keeps a copy exposed in two places from being read or cleared twice, and Systems is only fetched when the managers type none
 func selLogServices(c *conn) ([]*schemas.LogService, error) {
 	managers, err := c.service.Managers()
 	if err != nil {
 		return nil, err
 	}
 
-	var managerLogs [][]*schemas.LogService
+	var typed, fallback []*schemas.LogService
 	for _, m := range managers {
 		services, err := m.LogServices()
 		if err != nil {
 			return nil, err
 		}
-		managerLogs = append(managerLogs, services)
+		for _, l := range services {
+			switch {
+			case isDellFaultList(l):
+			case l.LogEntryType == schemas.SELLogEntryTypes:
+				typed = append(typed, l)
+			case isSELByID(l.ID), l.LogEntryType == "" && len(services) == 1:
+				fallback = append(fallback, l)
+			}
+		}
 	}
-	if found := pickLogs(managerLogs, isTypedSEL); len(found) > 0 {
-		return found, nil
+	if len(typed) > 0 {
+		return typed, nil
 	}
 
 	systems, err := c.service.Systems()
 	if err != nil {
 		return nil, err
 	}
-
-	var systemLogs [][]*schemas.LogService
 	for _, sys := range systems {
 		services, err := sys.LogServices()
 		if err != nil {
 			return nil, err
 		}
-		systemLogs = append(systemLogs, services)
-	}
-	if found := pickLogs(systemLogs, isTypedSEL); len(found) > 0 {
-		return found, nil
-	}
-	if found := pickLogs(systemLogs, isKnownSystemLog); len(found) > 0 {
-		return found, nil
-	}
-
-	// a service that declares no type and is alone on its resource has nothing to be confused with
-	if found := pickLogs(managerLogs, isLoneUntypedLog); len(found) > 0 {
-		return found, nil
-	}
-	return pickLogs(systemLogs, isLoneUntypedLog), nil
-}
-
-// pickLogs applies a rule to the log services of each manager or system, which is the group a lone service is alone in
-func pickLogs(groups [][]*schemas.LogService, match func(l *schemas.LogService, group []*schemas.LogService) bool) []*schemas.LogService {
-	var found []*schemas.LogService
-	for _, group := range groups {
-		for _, l := range group {
-			if !isDellFaultList(l) && match(l, group) {
-				found = append(found, l)
+		for _, l := range services {
+			if l.LogEntryType == schemas.SELLogEntryTypes && !isDellFaultList(l) {
+				typed = append(typed, l)
 			}
 		}
 	}
-	return found
-}
-
-func isTypedSEL(l *schemas.LogService, _ []*schemas.LogService) bool {
-	return l.LogEntryType == schemas.SELLogEntryTypes
-}
-
-func isKnownSystemLog(l *schemas.LogService, _ []*schemas.LogService) bool {
-	return isKnownSystemLogID(l.ID)
-}
-
-func isLoneUntypedLog(l *schemas.LogService, group []*schemas.LogService) bool {
-	return l.LogEntryType == "" && len(group) == 1
+	if len(typed) > 0 {
+		return typed, nil
+	}
+	return fallback, nil
 }
 
 // entryTime reads an entry's timestamp. An entry carrying none sorts as the oldest rather than to the top of the log, where it would crowd out the entries someone is actually looking for

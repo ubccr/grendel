@@ -38,7 +38,7 @@ var (
 
 			var response *client.GenericResponse
 			err = util.EditLoop(originalText, func(editedText []byte) error {
-				var editedJson []client.NilBootImageAddRequestBootImagesItem
+				var editedJson []client.BootImageAddRequestBootImagesItem
 				err = json.Unmarshal(editedText, &editedJson)
 				if err != nil {
 					return err
@@ -46,8 +46,8 @@ var (
 
 				// Verify IDs
 				for _, originalImage := range originalImages {
-					if !slices.ContainsFunc(editedJson, func(editedJson client.NilBootImageAddRequestBootImagesItem) bool {
-						return editedJson.Value.ID.Value == originalImage.ID.Value
+					if !slices.ContainsFunc(editedJson, func(editedJson client.BootImageAddRequestBootImagesItem) bool {
+						return editedJson.ID.Value == originalImage.ID.Value
 					}) {
 						return errors.New("failed to save, id field cannot be modified")
 					}

@@ -1,4 +1,3 @@
-import { getV1BmcBios } from "@/client";
 import BiosEditor from "@/components/bios/editor";
 import { useFailureToast } from "@/components/bios/use-failure-toast";
 import { useBiosRegistry } from "@/components/bios/use-registry";
@@ -13,11 +12,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AuthRedirect from "@/lib/auth";
 import { asValues, biosDiff, BiosValues, DiffRow } from "@/lib/bios";
 import { parseNodeSet } from "@/lib/nodeset";
+import { biosOptions } from "@/lib/queries";
 import { cn } from "@/lib/utils";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { CircleCheck, Clock, Cpu, GitCompare, Search, Server, ServerOff } from "lucide-react";
 import { ReactNode, useMemo, useState } from "react";
 import { z } from "zod";
@@ -25,25 +25,26 @@ import { z } from "zod";
 export const Route = createFileRoute("/nodes/bios/$nodes")({
   staticData: { crumb: ["BIOS", { param: "nodes" }] },
   component: RouteComponent,
-  beforeLoad: AuthRedirect,
   validateSearch: z.object({
     tab: z.enum(["diff", "edit"]).default("diff").catch("diff"),
   }),
-  loader: ({ params: { nodes } }) => getV1BmcBios({ query: { nodeset: nodes } }),
+  // BMCs are only logged into once the page is opened, not when its link is hovered
+  preload: false,
+  loader: ({ context: { queryClient }, params: { nodes } }) =>
+    queryClient.ensureQueryData(biosOptions(nodes)),
 });
 
 function RouteComponent() {
-  const router = useRouter();
   const { nodes } = Route.useParams();
   const { tab } = Route.useSearch();
   const navigate = Route.useNavigate();
-  const { data } = Route.useLoaderData();
+  const { data } = useSuspenseQuery(biosOptions(nodes));
 
-  const results = useMemo(() => data?.results ?? [], [data]);
+  const results = useMemo(() => data.results ?? [], [data]);
   const reached = results.filter((r) => r.success && r.data);
   const reference = reached[0];
   const { registry, isLoading } = useBiosRegistry(reference?.node, reference?.data);
-  useFailureToast(data?.run_id, results);
+  useFailureToast(data.run_id, results);
 
   // a staged value counts as the node's, since that is what it runs once the change applies
   const diff = useMemo(() => {
@@ -161,7 +162,6 @@ function RouteComponent() {
                         </p>
                       )
                     }
-                    onApplied={() => router.invalidate()}
                   />
                 )}
               </CardContent>
@@ -200,7 +200,6 @@ function Stat({
   );
 }
 
-// Differences lists each attribute that differs, with the most common value first and the nodes that stray from it below
 function Differences({
   rows,
   nodeCount,

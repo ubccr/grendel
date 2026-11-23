@@ -20,13 +20,13 @@ import (
 
 type AddressRange struct {
 	Range     string `json:"range" example:"10.17.25.0/24"`
-	PrefixLen int    `json:"prefix_len" description:"the prefix length most of the range's ports carry" example:"18"`
+	PrefixLen int    `json:"prefix_len" description:"the prefix length to give a port in the range, the one a search of the range reports" example:"18"`
 	Ports     int    `json:"ports" description:"how many of the nodes' ports have an address in the range"`
 	BMCPorts  int    `json:"bmc_ports" description:"how many of those ports are BMCs"`
 	Nodes     int    `json:"nodes" description:"how many nodes those ports belong to"`
 }
 
-// NodeAddressRanges lists the ranges the ports of some nodes sit in, each once however many ports share it, so a range for a new node can be found from where similar nodes are. Nodes are picked by name, by tags, or both, and every node is taken with neither
+// NodeAddressRanges lists the ranges the ports of the picked nodes sit in, each once however many ports share it. Nodes are picked by name, by tags, or both, and every node is taken with neither
 func (h *Handler) NodeAddressRanges(c fuego.ContextNoBody) ([]AddressRange, error) {
 	hosts, err := h.DB.Hosts()
 	if err != nil {
@@ -36,7 +36,7 @@ func (h *Handler) NodeAddressRanges(c fuego.ContextNoBody) ([]AddressRange, erro
 	named := nodeFilter(c.QueryParam("nodeset"))
 	tagged := func(string) bool { return true }
 	if t := strings.TrimSpace(c.QueryParam("tags")); t != "" {
-		// tags pick nodes as they do everywhere else in the API, any node with one of them
+		// a node with any one of the tags is picked
 		ns, err := h.DB.FindTags(strings.Split(t, ","))
 		if errors.Is(err, store.ErrNotFound) {
 			return []AddressRange{}, nil
@@ -47,13 +47,15 @@ func (h *Handler) NodeAddressRanges(c fuego.ContextNoBody) ([]AddressRange, erro
 		names := ns.Iterator().StringSlice()
 		tagged = func(name string) bool { return slices.Contains(names, name) }
 	}
+	// read before the nodes are narrowed, as a range's prefix length comes from every node around it
+	uses := addressUses(hosts)
 	picked := slices.DeleteFunc(hosts, func(host *model.Host) bool {
 		return !named(host.Name) || !tagged(host.Name)
 	})
 
 	// a missing bmc leaves the ranges in address order rather than putting one kind of port first
 	bmc, err := c.QueryParamBoolErr("bmc")
-	return addressRanges(picked, bmc, err == nil), nil
+	return addressRanges(picked, uses, bmc, err == nil), nil
 }
 
 // rangeOf is the range an address is searched in: its own subnet when that is from a /24 to a /30, and otherwise the /24 it sits in, as a rack's share of a larger subnet usually is. A /31 or /32 is a link or a single host rather than a subnet to fill, so it too gives its /24
@@ -65,12 +67,11 @@ func rangeOf(p netip.Prefix) netip.Prefix {
 	return netip.PrefixFrom(p.Addr(), bits).Masked()
 }
 
-// addressRanges groups the ports of hosts by rangeOf their address. With sortByKind, the ranges holding the kind of port asked for, BMC or not, come first, then the busiest; otherwise they are in address order
-func addressRanges(hosts model.HostList, bmc, sortByKind bool) []AddressRange {
+// addressRanges groups the ports of hosts by rangeOf their address, giving each range the prefix length a search of it would, which uses decides. With sortByKind, the ranges holding the kind of port asked for, BMC or not, come first, then the busiest; otherwise they are in address order
+func addressRanges(hosts model.HostList, uses []AddressUse, bmc, sortByKind bool) []AddressRange {
 	type group struct {
 		AddressRange
-		nodes    map[string]bool
-		prefixes map[int]int
+		nodes map[string]bool
 	}
 	groups := map[netip.Prefix]*group{}
 	for _, host := range hosts {
@@ -78,7 +79,7 @@ func addressRanges(hosts model.HostList, bmc, sortByKind bool) []AddressRange {
 			r := rangeOf(port.IP)
 			g := groups[r]
 			if g == nil {
-				g = &group{AddressRange: AddressRange{Range: r.String()}, nodes: map[string]bool{}, prefixes: map[int]int{}}
+				g = &group{AddressRange: AddressRange{Range: r.String()}, nodes: map[string]bool{}}
 				groups[r] = g
 			}
 			g.Ports++
@@ -86,7 +87,6 @@ func addressRanges(hosts model.HostList, bmc, sortByKind bool) []AddressRange {
 				g.BMCPorts++
 			}
 			g.nodes[host.Name] = true
-			g.prefixes[port.IP.Bits()]++
 		}
 	}
 
@@ -94,7 +94,7 @@ func addressRanges(hosts model.HostList, bmc, sortByKind bool) []AddressRange {
 	for _, r := range slices.SortedFunc(maps.Keys(groups), netip.Prefix.Compare) {
 		g := groups[r]
 		g.Nodes = len(g.nodes)
-		g.PrefixLen, _ = mostCommon(g.prefixes)
+		g.PrefixLen = subnetBits(r, uses)
 		out = append(out, g.AddressRange)
 	}
 	if sortByKind {

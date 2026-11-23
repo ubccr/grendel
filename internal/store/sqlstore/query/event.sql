@@ -5,8 +5,8 @@
  */
 
 -- name: EventUpsert :exec
-insert into event (id, kind, action, summary, subject, actor, state, severity, started_at, updated_at, ended_at, detail, counts)
-values (@id, @kind, @action, @summary, @subject, @actor, @state, @severity, @started_at, @updated_at, @ended_at, @detail, @counts)
+insert into event (id, kind, action, summary, subject, actor, state, severity, started_at, updated_at, ended_at, detail)
+values (@id, @kind, @action, @summary, @subject, @actor, @state, @severity, @started_at, @updated_at, @ended_at, @detail)
 on conflict (id)
 do update set
   summary = excluded.summary,
@@ -15,17 +15,21 @@ do update set
   severity = excluded.severity,
   updated_at = excluded.updated_at,
   ended_at = excluded.ended_at,
-  detail = excluded.detail,
-  counts = excluded.counts;
+  detail = excluded.detail;
 
 -- name: EventFetch :one
 select * from event where id = @id;
 
--- name: EventOpen :one
-select * from event
-where kind = @kind and state = 'running'
-order by started_at desc, id desc
-limit 1;
+-- name: EventTouchOpen :one
+-- says the newest running event of a kind was updated, and returns its id
+update event set updated_at = @updated_at
+where id = (
+  select o.id from event o
+  where o.kind = @kind and o.state = 'running'
+  order by o.started_at desc, o.id desc
+  limit 1
+)
+returning id;
 
 -- name: EventList :many
 select * from event
@@ -47,13 +51,13 @@ do update set
   ref = excluded.ref,
   updated_at = excluded.updated_at;
 
--- name: EventNodesLatest :many
--- the events of a kind each of the given nodes is in, newest first, for finding the one a node last joined
-select n.node, e.id
+-- name: EventNodeLatest :one
+select e.id
 from event_node n
 join event e on e.id = n.event_id
-where e.kind = @kind and n.node in (sqlc.slice(nodes))
-order by e.started_at desc, e.id desc;
+where e.kind = @kind and n.node = @node
+order by e.started_at desc, e.id desc
+limit 1;
 
 -- name: EventNodes :many
 select * from event_node where event_id = @event_id;
@@ -63,6 +67,12 @@ select event_id, state, stage, count(*) as nodes
 from event_node
 where event_id in (sqlc.slice(ids))
 group by event_id, state, stage;
+
+-- name: EventNodeOpen :one
+select exists (
+  select 1 from event_node
+  where event_id = @event_id and state in ('pending', 'running')
+);
 
 -- name: EventNodesStall :execrows
 update event_node

@@ -38,9 +38,9 @@ var (
 				return errors.New("failed to find node")
 			}
 
-			newInterfaces := make([]client.NilHostInterfacesItem, 0)
+			newInterfaces := make([]client.HostInterfacesItem, 0)
 			for _, iface := range res[0].Interfaces {
-				if iface.Value.Ifname.Value != args[1] {
+				if iface.Ifname.Value != args[1] {
 					newInterfaces = append(newInterfaces, iface)
 				}
 			}
@@ -52,7 +52,7 @@ var (
 				return err
 			}
 
-			decodedJson := []client.NilNodeAddRequestNodeListItem{}
+			decodedJson := []client.NodeAddRequestNodeListItem{}
 			err = json.Unmarshal(newJson, &decodedJson)
 			if err != nil {
 				return err
@@ -83,7 +83,7 @@ var (
 		Short: "add a new interface to a node",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			newIface := client.NewNilHostInterfacesItem(client.HostInterfacesItem{
+			newIface := client.HostInterfacesItem{
 				Bmc:    client.NewOptBool(interfaceAddBmc),
 				Fqdn:   client.NewOptString(interfaceAddFqdn),
 				Ifname: client.NewOptString(interfaceAddName),
@@ -91,7 +91,7 @@ var (
 				MAC:    client.NewOptString(interfaceAddMac),
 				Mtu:    client.NewOptInt(interfaceAddMtu),
 				Vlan:   client.NewOptString(interfaceAddVlan),
-			})
+			}
 
 			req := client.GETV1NodesFindParams{
 				Nodeset: client.NewOptString(args[0]),
@@ -113,7 +113,7 @@ var (
 				return err
 			}
 
-			decodedJson := []client.NilNodeAddRequestNodeListItem{}
+			decodedJson := []client.NodeAddRequestNodeListItem{}
 			err = json.Unmarshal(newJson, &decodedJson)
 			if err != nil {
 				return err

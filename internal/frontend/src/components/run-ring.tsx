@@ -45,7 +45,7 @@ export function ringShares(counts: number[]): number[] {
   return shares.map((s) => (s > MIN_SHARE ? s - (over * (s - MIN_SHARE)) / spare : s));
 }
 
-// RunRing shows how an action went across its nodes: green for the share that succeeded, red for the share that failed. A run that touched no nodes draws an empty ring. An action still under way, as a provision is, also has a blue share for the nodes still going, which pulses, and an amber one for those that stalled
+// A run that touched no nodes draws an empty ring. An action still under way also has a pulsing blue share for the nodes still going and an amber one for those that stalled
 export function RunRing({
   succeeded,
   failed,

@@ -5,6 +5,7 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -27,9 +28,7 @@ const (
 	ImportConflict  = "conflict"
 
 	maxImportRows = 5000
-	// importPingRounds bounds how many times addresses that answered a ping are swapped for the next free ones
-	importPingRounds = 3
-	maxImportPing    = 2048
+	maxImportPing = 2048
 )
 
 type NodeImportRow struct {
@@ -111,7 +110,7 @@ func (h *Handler) NodeImport(c fuego.ContextWithBody[NodeImportRequest]) (*NodeI
 	} else {
 		plan = planImport(hosts, req.Rows, opts)
 	}
-	res.Rows, res.Summary = plan.rows, plan.summary()
+	res.Rows, res.Summary = plan.results(), plan.summary()
 
 	if req.DryRun {
 		return res, nil
@@ -141,9 +140,8 @@ func (h *Handler) NodeImport(c fuego.ContextWithBody[NodeImportRequest]) (*NodeI
 }
 
 type importOpts struct {
-	bmc, boot      netip.Prefix
-	afterHighest   bool
-	excludeAnswers map[netip.Addr]bool
+	bmc, boot    netip.Prefix
+	afterHighest bool
 }
 
 func importOptions(req NodeImportRequest) (importOpts, error) {
@@ -172,66 +170,82 @@ func importOptions(req NodeImportRequest) (importOpts, error) {
 	return o, nil
 }
 
-// planWithPing plans, pings the addresses it took from the ranges, and plans again without the ones that answered, a few rounds at most
-func planWithPing(ctx context.Context, hosts model.HostList, rows []NodeImportRow, opts importOpts) (importPlan, bool, string) {
-	opts.excludeAnswers = map[netip.Addr]bool{}
-	asked := map[netip.Addr]bool{}
-	var plan importPlan
-	for range importPingRounds {
-		plan = planImport(hosts, rows, opts)
-		var toPing []netip.Addr
-		for _, r := range plan.rows {
-			if r.IP == "" {
-				continue
-			}
-			a := netip.MustParsePrefix(r.IP).Addr()
-			// the address a port already has answers from the node itself, which says nothing about whether it is free
-			if !asked[a] && (r.Assigned || r.Action != ImportUnchanged) && !ownPort(plan.existing[r.Node], r.BMC, r.MAC, a) {
-				toPing = append(toPing, a)
-			}
-		}
-		if len(toPing) == 0 {
-			break
-		}
-		if len(asked)+len(toPing) > maxImportPing {
-			return plan, false, fmt.Sprintf("not pinged: more than %d addresses", maxImportPing)
-		}
-		for _, a := range toPing {
-			asked[a] = true
-		}
+type plannedRow struct {
+	NodeImportResult
+	mac net.HardwareAddr
+	// ip is the address the row's port ends up with: the one given, the one the port has, or one taken from a range. It stays zero for a row that gets none, whatever text IP holds
+	ip netip.Prefix
+	// host is the stored node the row changes, nil for a node the import creates
+	host *model.Host
+	// port is the port of host the row changes, nil when the row adds one
+	port *model.NetInterface
+}
 
-		pctx, cancel := context.WithTimeout(ctx, pingTries*pingWait+time.Second)
-		answered, err := pingAddrs(pctx, toPing, pingTries, pingWait)
-		cancel()
-		if err != nil {
-			return plan, false, err.Error()
-		}
-		fresh := false
-		for a := range answered {
-			if !opts.excludeAnswers[a] {
-				opts.excludeAnswers[a] = true
-				fresh = true
-			}
-		}
-		if !fresh {
-			break
+func (r *plannedRow) conflict(reason string) {
+	if r.Action != ImportConflict {
+		r.Action = ImportConflict
+		r.Reason = reason
+	}
+}
+
+func (r *plannedRow) setIP(p netip.Prefix) {
+	r.ip = p
+	r.IP = p.String()
+}
+
+// holds is true when a is the address the row's port already has, which answers a ping from the node itself and so says nothing about whether it is free
+func (r *plannedRow) holds(a netip.Addr) bool {
+	return r.port != nil && r.port.IP.IsValid() && r.port.IP.Addr() == a
+}
+
+// apply writes what the row sets onto a port, and the tags it adds onto the port's node, and returns what that changed. The MAC is not its business: a row's port either has it already or is being swapped for it
+func (r *plannedRow) apply(h *model.Host, p *model.NetInterface) []string {
+	var changed []string
+	if r.ip.IsValid() && r.ip != p.IP {
+		p.IP = r.ip
+		changed = append(changed, "changes the address")
+	}
+	if r.FQDN != "" && r.FQDN != p.FQDN {
+		p.FQDN = r.FQDN
+		changed = append(changed, "changes the FQDN")
+	}
+	if r.Ifname != "" && r.Ifname != p.Name {
+		p.Name = r.Ifname
+		changed = append(changed, "changes the interface name")
+	}
+	if r.VLAN != "" && r.VLAN != p.VLAN {
+		p.VLAN = r.VLAN
+		changed = append(changed, "changes the VLAN")
+	}
+	if r.MTU != 0 && r.MTU != p.MTU {
+		p.MTU = r.MTU
+		changed = append(changed, "changes the MTU")
+	}
+	had := len(h.Tags)
+	for _, t := range r.Tags {
+		if t = strings.TrimSpace(t); t != "" && !slices.Contains(h.Tags, t) {
+			h.Tags = append(h.Tags, t)
 		}
 	}
-	plan = planImport(hosts, rows, opts)
-	for i, r := range plan.rows {
-		if r.IP == "" || r.Assigned {
-			continue
-		}
-		if a := netip.MustParsePrefix(r.IP).Addr(); opts.excludeAnswers[a] && !ownPort(plan.existing[r.Node], r.BMC, r.MAC, a) {
-			plan.rows[i].Answered = true
-		}
+	if len(h.Tags) > had {
+		changed = append(changed, "adds tags")
 	}
-	return plan, true, ""
+	return changed
 }
 
 type importPlan struct {
-	rows     []NodeImportResult
-	existing map[string]*model.Host
+	rows []plannedRow
+	uses []AddressUse
+	// taken is every address the import has spoken for: the ones given, the ones that answered a ping, and each one handed out from a range. The ranges share it, so two that overlap never hand out the same address
+	taken map[netip.Addr]bool
+}
+
+func (p importPlan) results() []NodeImportResult {
+	out := make([]NodeImportResult, len(p.rows))
+	for i, r := range p.rows {
+		out[i] = r.NodeImportResult
+	}
+	return out
 }
 
 func (p importPlan) summary() NodeImportSummary {
@@ -273,6 +287,62 @@ func macOwners(hosts model.HostList) map[string]macOwner {
 
 // planImport decides what each row does to the nodes in hosts, and which address it gets. It changes nothing; hosts builds the nodes to store
 func planImport(hosts model.HostList, rows []NodeImportRow, opts importOpts) importPlan {
+	p := resolveRows(hosts, rows)
+	p.assign(p.allocators(opts))
+	return p
+}
+
+// planWithPing plans as planImport does, but first pings the addresses it would take from the ranges, with some to spare, and the ones the rows give. It hands out only addresses that were pinged and stayed quiet, so a row is a conflict when too many answered for it to get one
+func planWithPing(ctx context.Context, hosts model.HostList, rows []NodeImportRow, opts importOpts) (importPlan, bool, string) {
+	p := resolveRows(hosts, rows)
+	allocs := p.allocators(opts)
+
+	var toPing []netip.Addr
+	for i := range p.rows {
+		if r := &p.rows[i]; r.ip.IsValid() && r.Action != ImportUnchanged && !r.holds(r.ip.Addr()) {
+			toPing = append(toPing, r.ip.Addr())
+		}
+	}
+	pinged := map[netip.Addr]bool{}
+	for _, a := range allocs {
+		if n := p.unaddressed(a.bmc); n > 0 {
+			for _, addr := range a.candidates(n+max(pingSpare, n/4), pinged) {
+				pinged[addr] = true
+				toPing = append(toPing, addr)
+			}
+		}
+	}
+	if len(toPing) > maxImportPing {
+		p.assign(allocs)
+		return p, false, fmt.Sprintf("not pinged: more than %d addresses", maxImportPing)
+	}
+
+	if len(toPing) > 0 {
+		pctx, cancel := context.WithTimeout(ctx, pingTries*pingWait+time.Second)
+		answered, err := pingAddrs(pctx, toPing, pingTries, pingWait)
+		cancel()
+		if err != nil {
+			p.assign(allocs)
+			return p, false, err.Error()
+		}
+		for i := range p.rows {
+			if r := &p.rows[i]; r.ip.IsValid() && answered[r.ip.Addr()] && !r.holds(r.ip.Addr()) {
+				r.Answered = true
+			}
+		}
+		for a := range answered {
+			p.taken[a] = true
+		}
+		for _, a := range allocs {
+			a.pinged = pinged
+		}
+	}
+	p.assign(allocs)
+	return p, true, ""
+}
+
+// resolveRows reads each row, finds the node and port it changes, and marks the rows that conflict with stored nodes or with each other. A row without an address is left without one, for assign to fill in
+func resolveRows(hosts model.HostList, rows []NodeImportRow) importPlan {
 	byName := map[string]*model.Host{}
 	for _, h := range hosts {
 		byName[h.Name] = h
@@ -284,162 +354,211 @@ func planImport(hosts model.HostList, rows []NodeImportRow, opts importOpts) imp
 		ipOwner[u.Addr] = u.Node
 	}
 
-	out := make([]NodeImportResult, len(rows))
-	macRows := map[string][]int{}
-	portRows := map[string][]int{}
-	givenIP := map[netip.Addr][]int{}
-
-	conflict := func(i int, reason string) {
-		if out[i].Action != ImportConflict {
-			out[i].Action = ImportConflict
-			out[i].Reason = reason
-		}
-	}
+	p := importPlan{rows: make([]plannedRow, len(rows)), uses: uses, taken: map[netip.Addr]bool{}}
+	macRows := map[string][]*plannedRow{}
+	bmcRows := map[string][]*plannedRow{}
+	givenIP := map[netip.Addr][]*plannedRow{}
 
 	for i, row := range rows {
 		row.Node = strings.TrimSpace(row.Node)
-		out[i] = NodeImportResult{NodeImportRow: row}
+		r := &p.rows[i]
+		r.NodeImportRow = row
 		hw, err := net.ParseMAC(strings.TrimSpace(row.MAC))
 		switch {
 		case row.Node == "":
-			conflict(i, "no node name")
+			r.conflict("no node name")
 			continue
 		case err != nil || len(hw) != 6:
-			conflict(i, fmt.Sprintf("%q is not a MAC address", row.MAC))
+			r.conflict(fmt.Sprintf("%q is not a MAC address", row.MAC))
 			continue
 		}
-		mac := hw.String()
-		out[i].MAC = mac
-		macRows[mac] = append(macRows[mac], i)
+		r.mac = hw
+		r.MAC = hw.String()
+		macRows[r.MAC] = append(macRows[r.MAC], r)
 		if row.BMC {
-			portRows[row.Node] = append(portRows[row.Node], i)
+			bmcRows[row.Node] = append(bmcRows[row.Node], r)
 		}
 
 		if row.IP != "" {
-			p, err := parseRowIP(row.IP, uses)
+			ip, err := parseRowIP(row.IP, uses)
 			if err != nil {
-				conflict(i, fmt.Sprintf("%q is not an IPv4 address", row.IP))
+				r.conflict(fmt.Sprintf("%q is not an IPv4 address", row.IP))
 				continue
 			}
-			out[i].IP = p.String()
-			givenIP[p.Addr()] = append(givenIP[p.Addr()], i)
+			r.setIP(ip)
+			givenIP[ip.Addr()] = append(givenIP[ip.Addr()], r)
+			p.taken[ip.Addr()] = true
 		}
 
-		if owner, ok := macs[mac]; ok && owner.node != row.Node {
-			conflict(i, fmt.Sprintf("MAC belongs to %s", owner.node))
+		if owner, ok := macs[r.MAC]; ok && owner.node != row.Node {
+			r.conflict(fmt.Sprintf("MAC belongs to %s", owner.node))
 			continue
 		} else if ok && owner.bmc != row.BMC {
-			conflict(i, fmt.Sprintf("MAC is already on another port of %s", row.Node))
+			r.conflict(fmt.Sprintf("MAC is already on another port of %s", row.Node))
 			continue
 		}
 
-		host := byName[row.Node]
-		if host == nil {
-			out[i].Action = ImportCreate
+		r.host = byName[row.Node]
+		if r.host == nil {
+			r.Action = ImportCreate
 			continue
 		}
-		port := importTarget(host, row.BMC, mac)
-		switch {
-		case port == nil:
-			out[i].Action = ImportAdd
-		case port.MAC.String() == mac:
-			if out[i].IP == "" && port.IP.IsValid() {
-				out[i].IP = port.IP.String()
-			}
-			out[i].Action = ImportUnchanged
-			if changes := portChanges(host, port, out[i].NodeImportRow); len(changes) > 0 {
-				out[i].Action = ImportReplace
-				out[i].Reason = strings.Join(changes, ", ")
-			}
-		default:
-			out[i].Action = ImportReplace
-			out[i].Replaces = port.MAC.String()
-			if out[i].IP == "" && port.IP.IsValid() {
-				out[i].IP = port.IP.String()
-			}
+		r.port = importTarget(r.host, row.BMC, r.mac)
+		if r.port == nil {
+			r.Action = ImportAdd
+			continue
+		}
+		if !r.ip.IsValid() && r.port.IP.IsValid() {
+			r.setIP(r.port.IP)
+		}
+		if !bytes.Equal(r.port.MAC, r.mac) {
+			r.Action = ImportReplace
+			r.Replaces = r.port.MAC.String()
+			continue
+		}
+		r.Action = ImportUnchanged
+		// applied to copies, as planning only needs to know what the row would change
+		node, port := model.Host{Tags: slices.Clone(r.host.Tags)}, *r.port
+		if changes := r.apply(&node, &port); len(changes) > 0 {
+			r.Action = ImportReplace
+			r.Reason = strings.Join(changes, ", ")
 		}
 	}
 
-	for _, idx := range macRows {
-		if len(idx) > 1 {
-			for _, i := range idx {
-				conflict(i, "MAC appears in more than one row")
+	for _, same := range macRows {
+		if len(same) > 1 {
+			for _, r := range same {
+				r.conflict("MAC appears in more than one row")
 			}
 		}
 	}
-	for _, idx := range portRows {
-		if len(idx) > 1 {
-			for _, i := range idx {
-				conflict(i, fmt.Sprintf("%s has more than one BMC row", out[i].Node))
+	for _, same := range bmcRows {
+		if len(same) > 1 {
+			for _, r := range same {
+				r.conflict(fmt.Sprintf("%s has more than one BMC row", r.Node))
 			}
 		}
 	}
-	for a, idx := range givenIP {
-		if len(idx) > 1 {
-			for _, i := range idx {
-				conflict(i, "address appears in more than one row")
+	for a, same := range givenIP {
+		if len(same) > 1 {
+			for _, r := range same {
+				r.conflict("address appears in more than one row")
 			}
 			continue
 		}
-		i := idx[0]
-		if owner, ok := ipOwner[a]; ok && !ownPort(byName[out[i].Node], out[i].BMC, out[i].MAC, a) {
-			conflict(i, fmt.Sprintf("address is held by %s", owner))
+		if owner, ok := ipOwner[a]; ok && !same[0].holds(a) {
+			same[0].conflict(fmt.Sprintf("address is held by %s", owner))
 		}
 	}
+	return p
+}
 
-	var exclude []netip.Addr
-	for a := range givenIP {
-		exclude = append(exclude, a)
-	}
-	for a := range opts.excludeAnswers {
-		exclude = append(exclude, a)
-	}
-	ranges := map[bool]*rangePlan{}
-	for bmc, r := range map[bool]netip.Prefix{true: opts.bmc, false: opts.boot} {
-		if r.IsValid() {
-			p := planRange(r, uses, exclude)
-			ranges[bmc] = &p
+// unaddressed is how many rows for that kind of port still need an address from a range
+func (p *importPlan) unaddressed(bmc bool) int {
+	n := 0
+	for i := range p.rows {
+		if r := &p.rows[i]; r.BMC == bmc && r.Action != ImportConflict && !r.ip.IsValid() {
+			n++
 		}
 	}
-	next := map[bool]netip.Addr{}
-	for i := range out {
-		r := &out[i]
-		if r.Action == ImportConflict || r.IP != "" {
+	return n
+}
+
+// allocators is one allocator for each range the import was given, the BMC range first
+func (p *importPlan) allocators(opts importOpts) []*allocator {
+	var out []*allocator
+	for _, kind := range []struct {
+		bmc bool
+		r   netip.Prefix
+	}{{true, opts.bmc}, {false, opts.boot}} {
+		if !kind.r.IsValid() {
 			continue
 		}
-		p := ranges[r.BMC]
-		if p == nil {
+		a := &allocator{rangePlan: planRange(kind.r, p.uses, p.taken), bmc: kind.bmc, next: kind.r.Addr()}
+		if top := a.highest(); opts.afterHighest && top.IsValid() {
+			a.after, a.next = top, top.Next()
+		}
+		out = append(out, a)
+	}
+	return out
+}
+
+// assign gives every row still without an address the next one its kind of port's range has to hand out
+func (p *importPlan) assign(allocs []*allocator) {
+	for i := range p.rows {
+		r := &p.rows[i]
+		if r.Action == ImportConflict || r.ip.IsValid() {
+			continue
+		}
+		at := slices.IndexFunc(allocs, func(a *allocator) bool { return a.bmc == r.BMC })
+		if at < 0 {
 			kind := "boot"
 			if r.BMC {
 				kind = "BMC"
 			}
-			conflict(i, fmt.Sprintf("no address given and no %s range to take one from", kind))
+			r.conflict(fmt.Sprintf("no address given and no %s range to take one from", kind))
 			continue
 		}
-		start, ok := next[r.BMC]
-		if !ok {
-			start = p.r.Addr()
-			if opts.afterHighest {
-				if top := p.highest(); top.IsValid() {
-					start = top.Next()
-				}
-			}
-		}
-		free := p.freeFrom(start, 1)
-		if len(free) == 0 {
-			conflict(i, fmt.Sprintf("no free address left in %s", p.r))
+		addr, why := allocs[at].take()
+		if why != "" {
+			r.conflict(why)
 			continue
 		}
-		r.IP = netip.PrefixFrom(free[0], p.bits).String()
+		r.setIP(netip.PrefixFrom(addr, allocs[at].bits))
 		r.Assigned = true
-		next[r.BMC] = free[0].Next()
 		if r.Action == ImportUnchanged {
 			r.Action = ImportReplace
 			r.Reason = "gives the port an address"
 		}
 	}
+}
 
-	return importPlan{rows: out, existing: byName}
+type allocator struct {
+	rangePlan
+	bmc bool
+	// next is where the search for the next free address resumes
+	next netip.Addr
+	// after is the highest address taken when the allocator was made, set when it starts past that address rather than at the bottom of the range
+	after netip.Addr
+	// pinged, once set, holds the only addresses that may be handed out
+	pinged map[netip.Addr]bool
+	// spent is why nothing more can be handed out, once that is so
+	spent string
+}
+
+// candidates is the next n free addresses no ping is planned for yet, which are the ones take would hand out first
+func (a *allocator) candidates(n int, planned map[netip.Addr]bool) []netip.Addr {
+	var out []netip.Addr
+	for addr := a.next; len(out) < n && addr.IsValid() && a.r.Contains(addr); addr = addr.Next() {
+		if a.free(addr) && !planned[addr] {
+			out = append(out, addr)
+		}
+	}
+	return out
+}
+
+// take hands out the next free address and marks it taken, or says why there is none
+func (a *allocator) take() (netip.Addr, string) {
+	if a.spent != "" {
+		return netip.Addr{}, a.spent
+	}
+	for addr := a.next; addr.IsValid() && a.r.Contains(addr); addr = addr.Next() {
+		if !a.free(addr) {
+			continue
+		}
+		if a.pinged != nil && !a.pinged[addr] {
+			a.spent = fmt.Sprintf("too many addresses in %s answered a ping, and none of those pinged is left", a.r)
+			return netip.Addr{}, a.spent
+		}
+		a.excluded[addr] = true
+		a.next = addr.Next()
+		return addr, ""
+	}
+	a.spent = fmt.Sprintf("no free address left in %s", a.r)
+	if a.after.IsValid() {
+		a.spent = fmt.Sprintf("no free address in %s after %s, the highest in use", a.r, a.after)
+	}
+	return netip.Addr{}, a.spent
 }
 
 // parseRowIP reads a given address. One without a prefix length takes the one its neighbours have
@@ -460,104 +579,46 @@ func parseRowIP(s string, uses []AddressUse) (netip.Prefix, error) {
 }
 
 // importTarget is the port a row changes: a node's one BMC, whatever its MAC, or the port that is not a BMC with the row's MAC. A row whose MAC is on no such port adds one, so a node can be given more ports than its boot port
-func importTarget(h *model.Host, bmc bool, mac string) *model.NetInterface {
+func importTarget(h *model.Host, bmc bool, mac net.HardwareAddr) *model.NetInterface {
 	if bmc {
 		return h.InterfaceBMC()
 	}
-	for _, p := range h.Interfaces {
-		if !p.BMC && p.MAC.String() == mac {
-			return p
-		}
+	if p := h.Interface(mac); p != nil && !p.BMC {
+		return p
 	}
 	return nil
-}
-
-// portChanges is what a row would change on a port that already has its MAC: every field the row sets that differs, and tags the node lacks
-func portChanges(h *model.Host, p *model.NetInterface, row NodeImportRow) []string {
-	var out []string
-	if row.IP != "" && row.IP != p.IP.String() {
-		out = append(out, "changes the address")
-	}
-	if row.FQDN != "" && row.FQDN != p.FQDN {
-		out = append(out, "changes the FQDN")
-	}
-	if row.Ifname != "" && row.Ifname != p.Name {
-		out = append(out, "changes the interface name")
-	}
-	if row.VLAN != "" && row.VLAN != p.VLAN {
-		out = append(out, "changes the VLAN")
-	}
-	if row.MTU != 0 && row.MTU != p.MTU {
-		out = append(out, "changes the MTU")
-	}
-	for _, t := range row.Tags {
-		if t = strings.TrimSpace(t); t != "" && !slices.Contains(h.Tags, t) {
-			out = append(out, "adds tags")
-			break
-		}
-	}
-	return out
-}
-
-func ownPort(h *model.Host, bmc bool, mac string, a netip.Addr) bool {
-	if h == nil {
-		return false
-	}
-	p := importTarget(h, bmc, mac)
-	return p != nil && p.IP.IsValid() && p.IP.Addr() == a
 }
 
 // hosts builds every node a commit stores, each a copy of the stored node with the rows' ports applied, since storing a node replaces all of its ports
 func (p importPlan) hosts() model.HostList {
 	changed := map[string]*model.Host{}
-	var order []string
-	for _, r := range p.rows {
+	var out model.HostList
+	for i := range p.rows {
+		r := &p.rows[i]
 		if r.Action == ImportUnchanged || r.Action == ImportConflict {
 			continue
 		}
 		h, ok := changed[r.Node]
 		if !ok {
-			if old := p.existing[r.Node]; old != nil {
-				h = copyHost(old)
-			} else {
-				h = &model.Host{Name: r.Node}
+			h = &model.Host{Name: r.Node}
+			if r.host != nil {
+				h = copyHost(r.host)
 			}
 			changed[r.Node] = h
-			order = append(order, r.Node)
+			out = append(out, h)
 		}
 
-		mac, _ := net.ParseMAC(r.MAC)
-		ip, _ := netip.ParsePrefix(r.IP)
-		port := importTarget(h, r.BMC, r.MAC)
-		if r.Action == ImportCreate || r.Action == ImportAdd || port == nil {
+		var port *model.NetInterface
+		if r.port != nil {
+			// copyHost keeps the ports in order, so the copy's port is at the stored one's place
+			port = h.Interfaces[slices.Index(r.host.Interfaces, r.port)]
+		} else {
 			// a new port goes after the others, so the boot port, the first that is not a BMC, stays the one it was
 			port = &model.NetInterface{BMC: r.BMC}
 			h.Interfaces = append(h.Interfaces, port)
 		}
-		port.MAC = mac
-		port.IP = ip
-		if r.FQDN != "" {
-			port.FQDN = r.FQDN
-		}
-		if r.Ifname != "" {
-			port.Name = r.Ifname
-		}
-		if r.VLAN != "" {
-			port.VLAN = r.VLAN
-		}
-		if r.MTU != 0 {
-			port.MTU = r.MTU
-		}
-		for _, t := range r.Tags {
-			if t = strings.TrimSpace(t); t != "" && !slices.Contains(h.Tags, t) {
-				h.Tags = append(h.Tags, t)
-			}
-		}
-	}
-
-	out := make(model.HostList, 0, len(order))
-	for _, n := range order {
-		out = append(out, changed[n])
+		port.MAC = r.mac
+		r.apply(h, port)
 	}
 	return out
 }

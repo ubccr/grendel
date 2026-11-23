@@ -6,7 +6,6 @@ package redfish
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
@@ -54,12 +53,10 @@ type LocationResult struct {
 
 func (r LocationResult) note() string { return r.Note }
 
-// SetAssetTag writes the asset tag of every target
 func (s *Service) SetAssetTag(ctx context.Context, targets []Target, req AssetTagRequest) []NodeResult[AssetTagResult] {
 	return run(ctx, s, targets, func(ctx context.Context, t Target) (*AssetTagResult, error) { return s.assetTagOne(ctx, t, req) })
 }
 
-// SetLocation writes the rack location of every target
 func (s *Service) SetLocation(ctx context.Context, targets []Target, req LocationRequest) []NodeResult[LocationResult] {
 	return run(ctx, s, targets, func(ctx context.Context, t Target) (*LocationResult, error) { return s.locationOne(ctx, t, req) })
 }
@@ -149,15 +146,10 @@ func stagedAssetTag(c *conn, sys *schemas.ComputerSystem) (string, bool) {
 
 // readAssetTag fetches the system again for the asset tag in effect, bypassing gofish's copy from before the write
 func readAssetTag(c *conn, uri string) (string, error) {
-	res, err := c.client.Get(uri)
-	defer schemas.DeferredCleanupHTTPResponse(res)
-	if err != nil {
-		return "", err
-	}
 	var sys struct {
 		AssetTag string
 	}
-	if err := json.NewDecoder(res.Body).Decode(&sys); err != nil {
+	if err := c.getJSON(uri, &sys); err != nil {
 		return "", err
 	}
 	return sys.AssetTag, nil
@@ -259,17 +251,11 @@ func dellLocationSource(c *conn) *locationSource {
 	}
 
 	uri := m.ODataID + "/Attributes"
-	res, err := c.client.Get(uri)
-	defer schemas.DeferredCleanupHTTPResponse(res)
-	if err != nil {
-		log.Debugf("node %s: no idrac attributes, using the chassis location: %s", c.target.Name, err)
-		return nil
-	}
-
 	var raw struct {
 		Attributes map[string]any
 	}
-	if err := json.NewDecoder(res.Body).Decode(&raw); err != nil {
+	if err := c.getJSON(uri, &raw); err != nil {
+		log.Debugf("node %s: no idrac attributes, using the chassis location: %s", c.target.Name, err)
 		return nil
 	}
 	if _, ok := raw.Attributes[dellRack]; !ok {

@@ -15,8 +15,7 @@ import (
 )
 
 var (
-	roleListFilter  []string
-	roleListOptions *shared.TableOptions
+	roleListTable   *shared.TableFlags
 	roleListColumns = []shared.Column{
 		{Name: "Name"},
 		{Name: "Permissions"},
@@ -34,7 +33,7 @@ var (
 				return apiclient.NewApiError(err)
 			}
 
-			t := shared.NewTable(roleListColumns, roleListFilter).Options(*roleListOptions).Empty("-")
+			t := roleListTable.Table()
 
 			for _, role := range res.Roles {
 				permissions := make([]string, 0, len(role.PermissionList))
@@ -54,9 +53,7 @@ var (
 )
 
 func init() {
-	roleListOptions = shared.RegisterTableFlags(roleListCmd)
-	roleListCmd.Flags().StringSliceVar(&roleListFilter, "filter", nil, "filter table columns by name")
-	roleListCmd.RegisterFlagCompletionFunc("filter", shared.ColumnCompletion(roleListColumns))
+	roleListTable = shared.RegisterTableFlags(roleListCmd, roleListColumns)
 
 	roleCmd.AddCommand(roleListCmd)
 }

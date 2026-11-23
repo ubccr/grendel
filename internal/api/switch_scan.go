@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"runtime/debug"
 	"slices"
 	"strings"
 	"sync"
@@ -20,6 +21,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/tors"
 	"github.com/ubccr/grendel/pkg/model"
+	"golang.org/x/sync/errgroup"
 )
 
 // physicalPort matches front-panel port names on the supported NOSes, leaving out VLANs, port-channels, loopbacks and the management port
@@ -52,7 +54,7 @@ type SwitchScanResponse struct {
 	Switches []SwitchScanResult `json:"switches"`
 }
 
-// SwitchScan reads the MAC table and interface status of each selected switch, and reports per port which MACs it has learned and whether Grendel already knows them
+// SwitchScan reads the MAC table and interface list of each selected switch, and reports per port which MACs it has learned and whether Grendel already knows them
 func (h *Handler) SwitchScan(c fuego.ContextNoBody) (*SwitchScanResponse, error) {
 	selected, err := h.bmcSelect(c)
 	if err != nil {
@@ -73,23 +75,18 @@ func (h *Handler) SwitchScan(c fuego.ContextNoBody) (*SwitchScanResponse, error)
 	}
 
 	cfg := tors.ConfigFromViper()
-	fanout := max(viper.GetInt("bmc.fanout"), 1)
-	sem := make(chan struct{}, fanout)
 	out := make([]SwitchScanResult, len(selected))
-	var wg sync.WaitGroup
+	var g errgroup.Group
+	g.SetLimit(max(viper.GetInt("bmc.fanout"), 1))
 	for i, host := range selected {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			sem <- struct{}{}
-			defer func() { <-sem }()
-
+		g.Go(func() error {
 			ctx, cancel := context.WithTimeout(c.Context(), cfg.Timeout)
 			defer cancel()
 			out[i] = scanSwitch(ctx, host, cfg, owners)
-		}()
+			return nil
+		})
 	}
-	wg.Wait()
+	g.Wait()
 
 	slices.SortFunc(out, func(a, b SwitchScanResult) int { return natCmp(a.Name, b.Name) })
 	return &SwitchScanResponse{Switches: out}, nil
@@ -108,8 +105,23 @@ func natCmp(a, b string) int {
 // newSwitch is tors.New, swapped out in tests
 var newSwitch = func(host *model.Host, cfg tors.Config) (tors.NetworkSwitch, error) { return tors.New(host, cfg) }
 
-func scanSwitch(ctx context.Context, host *model.Host, cfg tors.Config, owners map[string]macOwner) SwitchScanResult {
-	res := SwitchScanResult{Name: host.Name, NOS: tors.HostNOS(host), Ports: []SwitchScanPort{}, Warnings: []string{}}
+// recovered reports a panic as an error. A scan runs on goroutines outside net/http's recovery, where a panic in a driver's parser would end the daemon
+func recovered(r any) error {
+	log.Errorf("switch scan: panic: %v\n%s", r, debug.Stack())
+	return fmt.Errorf("panic: %v", r)
+}
+
+func guard[T any](read func() (T, error)) (out T, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = recovered(r)
+		}
+	}()
+	return read()
+}
+
+func scanSwitch(ctx context.Context, host *model.Host, cfg tors.Config, owners map[string]macOwner) (res SwitchScanResult) {
+	res = SwitchScanResult{Name: host.Name, NOS: tors.HostNOS(host), Ports: []SwitchScanPort{}, Warnings: []string{}}
 	if len(host.Interfaces) > 0 {
 		res.Address = host.Interfaces[0].AddrString()
 	}
@@ -117,6 +129,11 @@ func scanSwitch(ctx context.Context, host *model.Host, cfg tors.Config, owners m
 		res.Error, res.ErrorCode = err.Error(), tors.ErrorCode(err)
 		return res
 	}
+	defer func() {
+		if r := recover(); r != nil {
+			res = fail(recovered(r))
+		}
+	}()
 
 	sw, err := newSwitch(host, cfg)
 	if err != nil {
@@ -125,31 +142,37 @@ func scanSwitch(ctx context.Context, host *model.Host, cfg tors.Config, owners m
 	defer sw.Close()
 
 	var (
-		wg        sync.WaitGroup
-		macs      model.MACTable
-		status    model.InterfaceTable
-		macErr    error
-		statusErr error
+		wg           sync.WaitGroup
+		macs         model.MACTable
+		descriptions map[string]string
+		macErr       error
+		descErr      error
 	)
 	wg.Add(2)
-	go func() { defer wg.Done(); macs, macErr = sw.GetMACTable(ctx) }()
-	go func() { defer wg.Done(); status, statusErr = sw.GetInterfaceStatus(ctx) }()
+	go func() {
+		defer wg.Done()
+		macs, macErr = guard(func() (model.MACTable, error) { return sw.GetMACTable(ctx) })
+	}()
+	go func() {
+		defer wg.Done()
+		descriptions, descErr = guard(func() (map[string]string, error) { return sw.GetInterfaceDescriptions(ctx) })
+	}()
 	wg.Wait()
 
 	if macErr != nil {
 		log.Errorf("switch scan %s: mac table: %v", host.Name, macErr)
 		return fail(fmt.Errorf("failed to read the MAC table: %w", macErr))
 	}
-	if statusErr != nil {
-		res.Warnings = append(res.Warnings, "interface status: "+statusErr.Error())
+	if descErr != nil {
+		res.Warnings = append(res.Warnings, "interface status: "+descErr.Error())
 	}
 
-	res.Ports = scanPorts(macs, status, owners)
+	res.Ports = scanPorts(macs, descriptions, owners)
 	return res
 }
 
 // scanPorts merges what the switch reported into one row per physical port. Ports with no MACs are kept, since the import numbers ports over them so a BMC that hasn't come up doesn't shift the names after it
-func scanPorts(macs model.MACTable, status model.InterfaceTable, owners map[string]macOwner) []SwitchScanPort {
+func scanPorts(macs model.MACTable, descriptions map[string]string, owners map[string]macOwner) []SwitchScanPort {
 	ports := map[string]*SwitchScanPort{}
 	port := func(name string) *SwitchScanPort {
 		if !physicalPort.MatchString(name) {
@@ -163,9 +186,9 @@ func scanPorts(macs model.MACTable, status model.InterfaceTable, owners map[stri
 		return p
 	}
 
-	for name, st := range status {
+	for name, description := range descriptions {
 		if p := port(name); p != nil {
-			p.Description = st.Description
+			p.Description = description
 		}
 	}
 	for _, e := range macs {

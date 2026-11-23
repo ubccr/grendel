@@ -38,13 +38,12 @@ func rawValue(raw jx.Raw) string {
 	return string(raw)
 }
 
-// biosValueGroup is the nodes that hold one value of an attribute
 type biosValueGroup struct {
 	Value string
 	Nodes []string
 }
 
-// biosDiff finds the attributes that differ between nodes. Each node's value is its staged one when a change is pending, since that is what the node will run once it applies. A node missing the attribute counts as its own value, which is how a mix of models shows up
+// biosDiff finds the attributes that differ between nodes. A node's value is its staged one when a change is pending, since that is what it will run once applied. A node missing the attribute counts as its own value, which is how a mix of models shows up
 func biosDiff(nodes map[string]map[string]string, names []string) map[string][]biosValueGroup {
 	all := map[string]bool{}
 	for _, attrs := range nodes {

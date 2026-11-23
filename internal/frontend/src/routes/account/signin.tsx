@@ -28,7 +28,10 @@ export const Route = createFileRoute("/account/signin")({
 });
 
 function RouteComponent() {
-  const signin = useMutation(postV1AuthSigninMutation());
+  const signin = useMutation({
+    ...postV1AuthSigninMutation(),
+    meta: { quietError: true, changesNothing: true },
+  });
   const User = useUser();
   const search = Route.useSearch();
   const router = useRouter();
@@ -45,7 +48,7 @@ function RouteComponent() {
         { body: { username: value.username, password: value.password } },
         {
           onSuccess: (data) => {
-            User.setUser({
+            User.signIn({
               username: data?.username ?? "",
               role: data?.role ?? "",
               expire: data?.expire ?? 0,

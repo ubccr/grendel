@@ -197,6 +197,35 @@ describe("buildRows", () => {
     expect(r[0].fqdn).toBe("bmc-cpn-a02-01.cluster");
     expect(r[0].tags).toEqual(["a02", "bmc-import"]);
   });
+
+  it("refuses a row whose FQDN or tag template can't be filled, rather than importing part of it", () => {
+    const fqdn = rows([a02], { fqdn: "{name}.r{sw.2}.cluster" });
+    expect(fqdn[0].status).toBe("invalid");
+    expect(fqdn[0].problem).toMatch(/^FQDN: .*no number 2/);
+    expect(fqdn[0].fqdn).toBe("");
+    expect(toImportRows(fqdn, settings({}))).toEqual([]);
+
+    const tag = rows([a02], { tags: ["rack=r{sw.2}", "bmc-import"] });
+    expect(tag[0].status).toBe("invalid");
+    expect(tag[0].problem).toMatch(/^Tag rack=r\{sw\.2\}: .*no number 2/);
+    expect(tag[0].tags).toEqual([]);
+  });
+
+  it("refuses every row while the FQDN or a tag template has a syntax error", () => {
+    const fqdn = rows([a02], { fqdn: "{nme}.cluster" });
+    expect(fqdn[0].status).toBe("invalid");
+    expect(fqdn[0].problem).toMatch(/^FQDN: .*isn't a field/);
+
+    const tag = rows([a02], { tags: ["rack={sw.1"] });
+    expect(tag[0].status).toBe("invalid");
+    expect(tag[0].problem).toMatch(/^Tag rack=\{sw\.1: .*never closed/);
+  });
+
+  it("explains a port with several MACs by its MACs, not by its name template", () => {
+    const r = rows([sw("core", [a01.ports![2]])]);
+    expect(r[0].status).toBe("pick");
+    expect(r[0].problem).toMatch(/2 MACs on this port/);
+  });
 });
 
 describe("bulk helpers", () => {
@@ -215,6 +244,13 @@ describe("bulk helpers", () => {
       "d0:8e:79:00:00:01",
       "d0:8e:79:00:00:02",
     ]);
+  });
+
+  it("fills pasted values down only over the rows it is given", () => {
+    const r = rows([a01]);
+    const shown = r.filter((x) => x.key !== "swe-a01:Ethernet2");
+    const o = fillNames(shown, "swe-a01:Ethernet1", ["n1", "n2"], {});
+    expect(o).toEqual({ "swe-a01:Ethernet1": { name: "n1" }, "swe-a01:Ethernet3": { name: "n2" } });
   });
 
   it("fills pasted names down over included rows", () => {

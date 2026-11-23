@@ -1,4 +1,12 @@
-import { biosDiff, editable, inputKind, menuSection, parseInput, sameValue } from "@/lib/bios";
+import {
+  type BiosAttribute,
+  biosDiff,
+  editable,
+  inputKind,
+  menuSection,
+  parseInput,
+  sameValue,
+} from "@/lib/bios";
 import { describe, expect, it } from "vitest";
 
 describe("biosDiff", () => {
@@ -32,10 +40,13 @@ describe("biosDiff", () => {
   });
 });
 
+// fixtures name only the fields a test is about
+const attr = (a: Partial<BiosAttribute>) => a as BiosAttribute;
+
 describe("inputKind", () => {
   it("prefers the registry type", () => {
-    expect(inputKind({ type: "Enumeration" }, "x")).toBe("enum");
-    expect(inputKind({ type: "Password" }, null)).toBe("password");
+    expect(inputKind(attr({ type: "Enumeration" }), "x")).toBe("enum");
+    expect(inputKind(attr({ type: "Password" }), null)).toBe("password");
   });
 
   it("falls back to the current value's type without a registry", () => {
@@ -48,10 +59,10 @@ describe("inputKind", () => {
 describe("editable", () => {
   it("refuses read only, immutable, grayed out and password attributes", () => {
     expect(editable(undefined)).toBe(true);
-    expect(editable({ read_only: true })).toBe(false);
-    expect(editable({ immutable: true })).toBe(false);
-    expect(editable({ gray_out: true })).toBe(false);
-    expect(editable({ type: "Password" })).toBe(false);
+    expect(editable(attr({ read_only: true }))).toBe(false);
+    expect(editable(attr({ immutable: true }))).toBe(false);
+    expect(editable(attr({ gray_out: true }))).toBe(false);
+    expect(editable(attr({ type: "Password" }))).toBe(false);
   });
 });
 

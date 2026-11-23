@@ -1,8 +1,9 @@
 import { Faceplate } from "@/components/switches/front-panel";
+import { SwitchProblem } from "@/components/switches/switch-problem";
 import { needsAttention, type Row, type ScanSwitch, type Status } from "@/lib/import-rows";
 import { frontPanel } from "@/lib/switch-ports";
 import { cn } from "@/lib/utils";
-import { TriangleAlert, Unplug } from "lucide-react";
+import { TriangleAlert } from "lucide-react";
 import { statusLook } from "./status";
 
 const shown: Status[] = [
@@ -21,14 +22,13 @@ const legend: Record<Status, string> = {
   existing: "already in Grendel",
   pick: "need a MAC picked",
   conflict: "conflicting",
-  invalid: "with a bad name",
+  invalid: "to fix",
   empty: "with no MAC",
   unnamed: "waiting for a name",
   badmac: "with an unreadable MAC",
   excluded: "left out",
 };
 
-// SwitchSummary counts a switch's ports by what they will become, in the faceplate's colors
 export function SwitchSummary({ rows }: { rows: Row[] }) {
   const counts = new Map<Status, number>();
   for (const r of rows) if (r.include) counts.set(r.status, (counts.get(r.status) ?? 0) + 1);
@@ -54,7 +54,6 @@ export function SwitchSummary({ rows }: { rows: Row[] }) {
   );
 }
 
-// SwitchDetail is what sits under a switch's row: its faceplate with every cage lit by what its port will become, or why the switch couldn't be read
 export function SwitchDetail({
   sw,
   rows,
@@ -68,19 +67,12 @@ export function SwitchDetail({
 }) {
   if (sw.error)
     return (
-      <p className="flex items-start gap-2 text-sm text-destructive">
-        <Unplug className="mt-0.5 size-4 shrink-0" />
-        <span>
-          Couldn't read {sw.name}
-          {sw.address ? (
-            <>
-              {" "}
-              at <span className="font-mono">{sw.address}</span>
-            </>
-          ) : null}
-          : {sw.error}
-        </span>
-      </p>
+      <SwitchProblem
+        what="the MAC table"
+        code={sw.error_code}
+        detail={sw.error}
+        address={sw.address}
+      />
     );
 
   const blocks = frontPanel(
@@ -124,7 +116,10 @@ export function SwitchDetail({
           {sw.warnings!.map((w) => (
             <li key={w} className="flex items-start gap-1.5">
               <TriangleAlert className="mt-px size-3.5 shrink-0" />
-              <span>Couldn't read {w}. The MAC table is still complete.</span>
+              <span>
+                Couldn't read {w}. Ports that have learned no MAC are missing from the list, so{" "}
+                {"{n}"} doesn't count them.
+              </span>
             </li>
           ))}
         </ul>

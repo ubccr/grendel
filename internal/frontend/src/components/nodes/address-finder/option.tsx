@@ -7,7 +7,7 @@ export type Choice = "lowest" | "after";
 
 const quietLabel = "No node has it, and nothing answered a ping";
 
-// Option is one suggested address to choose. Skipped are the free addresses before it that answered a ping, named by last octet unless the range is wide. A quiet address needs no words, its icon says nothing answered; what was skipped, or why it wasn't pinged, still does
+// skipped are the free addresses before the suggested one that answered a ping, named by last octet unless the range is wide. A quiet address needs no words, since its icon says nothing answered
 export function Option({
   value,
   label,

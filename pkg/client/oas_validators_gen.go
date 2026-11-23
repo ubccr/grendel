@@ -139,15 +139,8 @@ func (s *BmcResponseModelBmcAck) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.Results.Get(); ok {
-			if err := func() error {
-				if value == nil {
-					return errors.New("nil is invalid value")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if s.Results == nil {
+			return errors.New("nil is invalid value")
 		}
 		return nil
 	}(); err != nil {
@@ -169,15 +162,8 @@ func (s *BmcResponseModelBmcAssetTagResult) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.Results.Get(); ok {
-			if err := func() error {
-				if value == nil {
-					return errors.New("nil is invalid value")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if s.Results == nil {
+			return errors.New("nil is invalid value")
 		}
 		return nil
 	}(); err != nil {
@@ -199,15 +185,8 @@ func (s *BmcResponseModelBmcBios) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.Results.Get(); ok {
-			if err := func() error {
-				if value == nil {
-					return errors.New("nil is invalid value")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if s.Results == nil {
+			return errors.New("nil is invalid value")
 		}
 		return nil
 	}(); err != nil {
@@ -229,15 +208,8 @@ func (s *BmcResponseModelBmcBiosRegistry) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.Results.Get(); ok {
-			if err := func() error {
-				if value == nil {
-					return errors.New("nil is invalid value")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if s.Results == nil {
+			return errors.New("nil is invalid value")
 		}
 		return nil
 	}(); err != nil {
@@ -259,39 +231,25 @@ func (s *BmcResponseModelBmcFirmwareUpdates) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.Results.Get(); ok {
+		if s.Results == nil {
+			return errors.New("nil is invalid value")
+		}
+		var failures []validate.FieldError
+		for i, elem := range s.Results {
 			if err := func() error {
-				if value == nil {
-					return errors.New("nil is invalid value")
-				}
-				var failures []validate.FieldError
-				for i, elem := range value {
-					if err := func() error {
-						if value, ok := elem.Get(); ok {
-							if err := func() error {
-								if err := value.Validate(); err != nil {
-									return err
-								}
-								return nil
-							}(); err != nil {
-								return err
-							}
-						}
-						return nil
-					}(); err != nil {
-						failures = append(failures, validate.FieldError{
-							Name:  fmt.Sprintf("[%d]", i),
-							Error: err,
-						})
-					}
-				}
-				if len(failures) > 0 {
-					return &validate.Error{Fields: failures}
+				if err := elem.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
-				return err
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
 			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
 		}
 		return nil
 	}(); err != nil {
@@ -373,39 +331,25 @@ func (s *BmcResponseModelBmcJobList) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.Results.Get(); ok {
+		if s.Results == nil {
+			return errors.New("nil is invalid value")
+		}
+		var failures []validate.FieldError
+		for i, elem := range s.Results {
 			if err := func() error {
-				if value == nil {
-					return errors.New("nil is invalid value")
-				}
-				var failures []validate.FieldError
-				for i, elem := range value {
-					if err := func() error {
-						if value, ok := elem.Get(); ok {
-							if err := func() error {
-								if err := value.Validate(); err != nil {
-									return err
-								}
-								return nil
-							}(); err != nil {
-								return err
-							}
-						}
-						return nil
-					}(); err != nil {
-						failures = append(failures, validate.FieldError{
-							Name:  fmt.Sprintf("[%d]", i),
-							Error: err,
-						})
-					}
-				}
-				if len(failures) > 0 {
-					return &validate.Error{Fields: failures}
+				if err := elem.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
-				return err
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
 			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
 		}
 		return nil
 	}(); err != nil {
@@ -487,15 +431,8 @@ func (s *BmcResponseModelBmcLocationResult) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.Results.Get(); ok {
-			if err := func() error {
-				if value == nil {
-					return errors.New("nil is invalid value")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if s.Results == nil {
+			return errors.New("nil is invalid value")
 		}
 		return nil
 	}(); err != nil {
@@ -517,39 +454,25 @@ func (s *BmcResponseModelBmcNICList) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.Results.Get(); ok {
+		if s.Results == nil {
+			return errors.New("nil is invalid value")
+		}
+		var failures []validate.FieldError
+		for i, elem := range s.Results {
 			if err := func() error {
-				if value == nil {
-					return errors.New("nil is invalid value")
-				}
-				var failures []validate.FieldError
-				for i, elem := range value {
-					if err := func() error {
-						if value, ok := elem.Get(); ok {
-							if err := func() error {
-								if err := value.Validate(); err != nil {
-									return err
-								}
-								return nil
-							}(); err != nil {
-								return err
-							}
-						}
-						return nil
-					}(); err != nil {
-						failures = append(failures, validate.FieldError{
-							Name:  fmt.Sprintf("[%d]", i),
-							Error: err,
-						})
-					}
-				}
-				if len(failures) > 0 {
-					return &validate.Error{Fields: failures}
+				if err := elem.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
-				return err
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
 			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
 		}
 		return nil
 	}(); err != nil {
@@ -631,39 +554,25 @@ func (s *BmcResponseModelBmcSELLog) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.Results.Get(); ok {
+		if s.Results == nil {
+			return errors.New("nil is invalid value")
+		}
+		var failures []validate.FieldError
+		for i, elem := range s.Results {
 			if err := func() error {
-				if value == nil {
-					return errors.New("nil is invalid value")
-				}
-				var failures []validate.FieldError
-				for i, elem := range value {
-					if err := func() error {
-						if value, ok := elem.Get(); ok {
-							if err := func() error {
-								if err := value.Validate(); err != nil {
-									return err
-								}
-								return nil
-							}(); err != nil {
-								return err
-							}
-						}
-						return nil
-					}(); err != nil {
-						failures = append(failures, validate.FieldError{
-							Name:  fmt.Sprintf("[%d]", i),
-							Error: err,
-						})
-					}
-				}
-				if len(failures) > 0 {
-					return &validate.Error{Fields: failures}
+				if err := elem.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
-				return err
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
 			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
 		}
 		return nil
 	}(); err != nil {
@@ -745,15 +654,8 @@ func (s *BmcResponseModelBmcSecureBoot) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.Results.Get(); ok {
-			if err := func() error {
-				if value == nil {
-					return errors.New("nil is invalid value")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if s.Results == nil {
+			return errors.New("nil is invalid value")
 		}
 		return nil
 	}(); err != nil {
@@ -775,39 +677,25 @@ func (s *BmcResponseModelRedfishSystem) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.Results.Get(); ok {
+		if s.Results == nil {
+			return errors.New("nil is invalid value")
+		}
+		var failures []validate.FieldError
+		for i, elem := range s.Results {
 			if err := func() error {
-				if value == nil {
-					return errors.New("nil is invalid value")
-				}
-				var failures []validate.FieldError
-				for i, elem := range value {
-					if err := func() error {
-						if value, ok := elem.Get(); ok {
-							if err := func() error {
-								if err := value.Validate(); err != nil {
-									return err
-								}
-								return nil
-							}(); err != nil {
-								return err
-							}
-						}
-						return nil
-					}(); err != nil {
-						failures = append(failures, validate.FieldError{
-							Name:  fmt.Sprintf("[%d]", i),
-							Error: err,
-						})
-					}
-				}
-				if len(failures) > 0 {
-					return &validate.Error{Fields: failures}
+				if err := elem.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
-				return err
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
 			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
 		}
 		return nil
 	}(); err != nil {
@@ -895,15 +783,8 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Validate() error {
 		})
 	}
 	if err := func() error {
-		if value, ok := s.TotalMemory.Get(); ok {
-			if err := func() error {
-				if err := (validate.Float{}).Validate(float64(value)); err != nil {
-					return errors.Wrap(err, "float")
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if err := (validate.Float{}).Validate(float64(s.TotalMemory)); err != nil {
+			return errors.Wrap(err, "float")
 		}
 		return nil
 	}(); err != nil {
@@ -1006,15 +887,8 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedIn
 				var failures []validate.FieldError
 				for i, elem := range value {
 					if err := func() error {
-						if value, ok := elem.Get(); ok {
-							if err := func() error {
-								if err := value.Validate(); err != nil {
-									return err
-								}
-								return nil
-							}(); err != nil {
-								return err
-							}
+						if err := elem.Validate(); err != nil {
+							return err
 						}
 						return nil
 					}(); err != nil {
@@ -1060,15 +934,8 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedIn
 				var failures []validate.FieldError
 				for i, elem := range value {
 					if err := func() error {
-						if value, ok := elem.Get(); ok {
-							if err := func() error {
-								if err := value.Validate(); err != nil {
-									return err
-								}
-								return nil
-							}(); err != nil {
-								return err
-							}
+						if err := elem.Validate(); err != nil {
+							return err
 						}
 						return nil
 					}(); err != nil {
@@ -1383,15 +1250,8 @@ func (s *DataDump) Validate() error {
 		var failures []validate.FieldError
 		for i, elem := range s.Hosts {
 			if err := func() error {
-				if value, ok := elem.Get(); ok {
-					if err := func() error {
-						if err := value.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						return err
-					}
+				if err := elem.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
@@ -1411,6 +1271,31 @@ func (s *DataDump) Validate() error {
 			Error: err,
 		})
 	}
+	if err := func() error {
+		var failures []validate.FieldError
+		for i, elem := range s.Roles {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "Roles",
+			Error: err,
+		})
+	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
@@ -1427,15 +1312,8 @@ func (s *DataDumpHostsItem) Validate() error {
 		var failures []validate.FieldError
 		for i, elem := range s.Bonds {
 			if err := func() error {
-				if value, ok := elem.Get(); ok {
-					if err := func() error {
-						if err := value.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						return err
-					}
+				if err := elem.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
@@ -1459,15 +1337,8 @@ func (s *DataDumpHostsItem) Validate() error {
 		var failures []validate.FieldError
 		for i, elem := range s.Interfaces {
 			if err := func() error {
-				if value, ok := elem.Get(); ok {
-					if err := func() error {
-						if err := value.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						return err
-					}
+				if err := elem.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
@@ -1591,6 +1462,154 @@ func (s *DataDumpHostsItemInterfacesItem) Validate() error {
 	return nil
 }
 
+func (s *DataDumpRolesItem) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		var failures []validate.FieldError
+		for i, elem := range s.PermissionList {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "permission_list",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		var failures []validate.FieldError
+		for i, elem := range s.UnassignedPermissionList {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "unassigned_permission_list",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *DataDumpRolesItemPermissionListItem) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.Kind.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "kind",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s DataDumpRolesItemPermissionListItemKind) Validate() error {
+	switch s {
+	case "view":
+		return nil
+	case "change":
+		return nil
+	case "delete":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s *DataDumpRolesItemUnassignedPermissionListItem) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.Kind.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "kind",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s DataDumpRolesItemUnassignedPermissionListItemKind) Validate() error {
+	switch s {
+	case "view":
+		return nil
+	case "change":
+		return nil
+	case "delete":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
 func (s *Event) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -1693,15 +1712,8 @@ func (s *EventNodesItem) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.State.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if err := s.State.Validate(); err != nil {
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -1753,6 +1765,191 @@ func (s EventState) Validate() error {
 	case "running":
 		return nil
 	case "done":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s *GetRolesResponse) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		var failures []validate.FieldError
+		for i, elem := range s.Roles {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "roles",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *GetRolesResponseRolesItem) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		var failures []validate.FieldError
+		for i, elem := range s.PermissionList {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "permission_list",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		var failures []validate.FieldError
+		for i, elem := range s.UnassignedPermissionList {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "unassigned_permission_list",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *GetRolesResponseRolesItemPermissionListItem) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.Kind.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "kind",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s GetRolesResponseRolesItemPermissionListItemKind) Validate() error {
+	switch s {
+	case "view":
+		return nil
+	case "change":
+		return nil
+	case "delete":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.Kind.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "kind",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s GetRolesResponseRolesItemUnassignedPermissionListItemKind) Validate() error {
+	switch s {
+	case "view":
+		return nil
+	case "change":
+		return nil
+	case "delete":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -1822,15 +2019,8 @@ func (s *Host) Validate() error {
 		var failures []validate.FieldError
 		for i, elem := range s.Bonds {
 			if err := func() error {
-				if value, ok := elem.Get(); ok {
-					if err := func() error {
-						if err := value.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						return err
-					}
+				if err := elem.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
@@ -1854,15 +2044,8 @@ func (s *Host) Validate() error {
 		var failures []validate.FieldError
 		for i, elem := range s.Interfaces {
 			if err := func() error {
-				if value, ok := elem.Get(); ok {
-					if err := func() error {
-						if err := value.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						return err
-					}
+				if err := elem.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
@@ -1996,15 +2179,8 @@ func (s *NodeAddRequest) Validate() error {
 		var failures []validate.FieldError
 		for i, elem := range s.NodeList {
 			if err := func() error {
-				if value, ok := elem.Get(); ok {
-					if err := func() error {
-						if err := value.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						return err
-					}
+				if err := elem.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
@@ -2040,15 +2216,8 @@ func (s *NodeAddRequestNodeListItem) Validate() error {
 		var failures []validate.FieldError
 		for i, elem := range s.Bonds {
 			if err := func() error {
-				if value, ok := elem.Get(); ok {
-					if err := func() error {
-						if err := value.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						return err
-					}
+				if err := elem.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
@@ -2072,15 +2241,8 @@ func (s *NodeAddRequestNodeListItem) Validate() error {
 		var failures []validate.FieldError
 		for i, elem := range s.Interfaces {
 			if err := func() error {
-				if value, ok := elem.Get(); ok {
-					if err := func() error {
-						if err := value.Validate(); err != nil {
-							return err
-						}
-						return nil
-					}(); err != nil {
-						return err
-					}
+				if err := elem.Validate(); err != nil {
+					return err
 				}
 				return nil
 			}(); err != nil {
@@ -2394,6 +2556,86 @@ func (s *NodeImportResponseRowsItem) Validate() error {
 	return nil
 }
 
+func (s *PatchRolesRequest) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		var failures []validate.FieldError
+		for i, elem := range s.PermissionList {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "permission_list",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *PatchRolesRequestPermissionListItem) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.Kind.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "kind",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s PatchRolesRequestPermissionListItemKind) Validate() error {
+	switch s {
+	case "view":
+		return nil
+	case "change":
+		return nil
+	case "delete":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
 func (s *ProvisionStatus) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -2482,6 +2724,46 @@ func (s *SwitchScanResponseSwitchesItem) Validate() error {
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "warnings",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *Version) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.Schema.Get(); ok {
+			if err := func() error {
+				if err := (validate.Int{
+					MinSet:        true,
+					Min:           0,
+					MaxSet:        false,
+					Max:           0,
+					MinExclusive:  false,
+					MaxExclusive:  false,
+					MultipleOfSet: false,
+					MultipleOf:    0,
+					Pattern:       nil,
+				}).Validate(int64(value)); err != nil {
+					return errors.Wrap(err, "int")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "schema",
 			Error: err,
 		})
 	}

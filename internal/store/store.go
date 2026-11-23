@@ -138,8 +138,8 @@ type Store interface {
 	// LoadProvisionStatus returns the provision status of the host with the given ID, or ErrNotFound when it has none
 	LoadProvisionStatus(uid string) (*model.ProvisionStatus, error)
 
-	// StoreProvisionStatus replaces the provision status of the host with the given ID
-	StoreProvisionStatus(uid string, status *model.ProvisionStatus) error
+	// UpdateProvisionStatus changes a host's provision status in one transaction. update is given the stored status, a zero one when the host has none, and an error from it is returned with nothing written. A node update returns is written in the same transaction to the running event of open's kind, which open is stored as when there is none, and that event is settled
+	UpdateProvisionStatus(uid string, open *model.Event, update func(status *model.ProvisionStatus) (*model.EventNode, error)) error
 
 	// ProvisionStatuses returns the provision status of every host in ns that has one, or of every host when ns is nil
 	ProvisionStatuses(ns *nodeset.NodeSet) (model.ProvisionStatusList, error)
@@ -147,19 +147,16 @@ type Store interface {
 	// StoreEvent writes an event, replacing what can change about one already stored with the same ID, and writes the rows of its Nodes, leaving its other nodes as they were
 	StoreEvent(event *model.Event) error
 
-	// StoreEventNodes writes how an event is going on the given nodes, leaving its other nodes and the event itself as they were, but for when it was last updated. It is ErrNotFound when there is no such event
+	// StoreEventNodes writes how an event is going on the given nodes, leaving its other nodes as they were, and settles the event in the same transaction. It is ErrNotFound when there is no such event
 	StoreEventNodes(id string, nodes model.EventNodeList, now time.Time) error
 
 	// SettleEvent brings an event up to date with how it is going on its nodes, as model.Event.Settle does, reading and writing in one transaction. It is ErrNotFound when there is no such event
 	SettleEvent(id string, now time.Time) error
 
-	// TrackEventNodes writes how a tracked event is going on nodes that report in on their own, as nodes provisioning do, in one transaction: a node joins the running event of open's kind, which open is stored as when there is none, and a node finishing after its event ended finishes in that event. The events written to are then settled
-	TrackEventNodes(open *model.Event, nodes model.EventNodeList, now time.Time) error
-
 	// LoadEvent returns the event with the given ID with its nodes, or ErrNotFound
 	LoadEvent(id string) (*model.Event, error)
 
-	// Events returns the events the filter picks, newest first, with their counts, and with their nodes when the filter asks
+	// Events returns the events the filter picks, newest first, with their counts, and with their nodes when the filter asks. It is ErrNotFound when the filter's Before names no event
 	Events(filter model.EventFilter) (model.EventList, error)
 
 	// StallEventNodes marks the nodes of running events of a kind as stalled when they were last updated before the given time, and returns how many

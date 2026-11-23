@@ -223,8 +223,8 @@ cors = false
 # Events
 #------------------------------------------------------------------------------
 [events]
-# How long finished events are kept before they are deleted, as a Go duration. 0 keeps them forever
-retention = 60d"
+# How long finished events are kept before they are deleted, as a Go duration. Hours are the largest unit, so 90 days is "2160h". 0 keeps them forever
+retention = "2160h"
 
 #------------------------------------------------------------------------------
 # Client Config
@@ -318,8 +318,7 @@ rate_limit_per_second = 30
 # certificate on the provision server
 #config_ignore_certificate_warning = "Disabled"
 
-# Default asset tag template for "grendel bmc asset-tag set" when none is given.
-# Templates see .Name, .Parts (the name split on -), .Tags (key=value tags by key)
+# Default asset tag template for "grendel bmc asset-tag set" when none is given. Templates see .Name, .Parts (the name split on -), .Tags (key=value tags by key)
 #asset_tag = "UB-{{ .Name }}"
 
 # Extra logins to try, useful for old bmc credentials or factory defaults
@@ -328,9 +327,7 @@ rate_limit_per_second = 30
 #password = "calvin"
 
 [bmc.location]
-# Default templates for "grendel bmc location set" and the GUI form, rendered
-# per node. A field left unset is not written. With node names like
-# cpn-f01-04 (<prefix>-<rack>-<rack unit>):
+# Default templates for "grendel bmc location set" and the GUI form, rendered per node. A field left unset is not written. With node names like cpn-f01-04 (<prefix>-<rack>-<rack unit>):
 #rack = "{{ index .Parts 1 }}"
 #rack_unit = "{{ index .Parts 2 }}"
 #row = ""
@@ -338,17 +335,18 @@ rate_limit_per_second = 30
 #datacenter = ""
 
 [bmc.ipmi]
-# IPMI settings for the serial console, "grendel bmc console". The BMCs need
-# IPMI over LAN and SOL enabled, and UDP 623 reachable from this server
+# IPMI settings for the serial console, "grendel bmc console". The BMCs need IPMI over LAN and SOL enabled, and UDP 623 reachable from this server
 port = 623
-# RMCP+ cipher suites to try, in order. 17 is the iDRAC9 default, 3 covers
-# older BMCs
+# RMCP+ cipher suites to try, in order. 17 is the iDRAC9 default, 3 covers older BMCs
 cipher_suites = [17, 3]
 
 [bmc.gofish]
 # Advanced gofish connection options. See https://github.com/ubccr/grendel/blob/main/internal/redfish/client.go for implementation details
 max_concurrent_requests = 1
 reuse_connections = true
+
+# Read a collection and its members in one request ($expand) on BMCs that advertise support, instead of one request per member. Off by default as it is untested against real BMCs
+auto_expand = false
 
 # Use basic auth instead of creating a Redfish session. Required for mockup server
 basic_auth = true

@@ -32,7 +32,6 @@ export type Key = {
   type: string;
 };
 
-// keysOf flattens one node's databases into keys, in the order the databases are listed
 export function keysOf(databases: Database[] | undefined): Key[] {
   return (databases ?? []).flatMap((d) => {
     const db = d.id ?? "";
@@ -121,7 +120,6 @@ function toPem(base64: string) {
   return `-----BEGIN CERTIFICATE-----\n${lines.join("\n")}\n-----END CERTIFICATE-----\n`;
 }
 
-// derToPem wraps a DER certificate as PEM, which is what the server takes
 export function derToPem(der: Uint8Array) {
   let binary = "";
   for (const b of der) binary += String.fromCharCode(b);

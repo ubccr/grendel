@@ -44,7 +44,7 @@ export function groupTags(tags: string[]): TagGroup[] {
 // a pasted list of tags may be separated by commas or whitespace
 const pasteSeparator = /[\s,]+/;
 
-// TagCombobox edits a list of tags as chips, suggesting the tags already on nodes with how many nodes have each. Text that isn't an existing tag can still be added, since a tag is created by putting it on a node and a filter can use operators like !gpu or rack=
+// Text that isn't an existing tag can still be added, since a tag is created by putting it on a node and a filter can use operators like !gpu or rack=
 export function TagCombobox({
   id,
   value,
@@ -63,7 +63,7 @@ export function TagCombobox({
 }) {
   const anchor = useComboboxAnchor();
   const [query, setQuery] = useState("");
-  const { data } = useQuery({ ...getV1NodesTagsOptions(), staleTime: 60_000 });
+  const { data } = useQuery(getV1NodesTagsOptions());
 
   const counts = useMemo(
     () => new Map((data ?? []).map((t) => [t.tag ?? "", t.nodes ?? 0])),

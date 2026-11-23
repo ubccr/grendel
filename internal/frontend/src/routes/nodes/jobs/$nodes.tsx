@@ -1,4 +1,4 @@
-import { BmcResponseModelBmcJobList, getV1BmcJobs } from "@/client";
+import { BmcResponseModelBmcJobList } from "@/client";
 import ActionsSheet from "@/components/actions-sheet";
 import JobsDeleteAction from "@/components/actions/jobs/delete";
 import { DataTable, DataTableActions } from "@/components/data-table/data-table";
@@ -13,7 +13,8 @@ import {
 } from "@/components/nodes/bmc-columns";
 import type { DataTableColumnDef } from "@/components/data-table/features";
 import { Card, CardContent } from "@/components/ui/card";
-import AuthRedirect from "@/lib/auth";
+import { jobsOptions } from "@/lib/queries";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 
@@ -23,7 +24,6 @@ type Job = ArrayElement<NonNullable<NonNullable<Result["data"]>["jobs"]>>;
 
 type nodeJob = NodeTreeRow<Job>;
 
-// columns are defined once, outside the component, so the table keeps the same column definitions across renders
 const columns: DataTableColumnDef<nodeJob, any>[] = [
   ...nodeColumns<Job>(),
   {
@@ -55,16 +55,17 @@ const columns: DataTableColumnDef<nodeJob, any>[] = [
 export const Route = createFileRoute("/nodes/jobs/$nodes")({
   staticData: { crumb: ["Jobs", { param: "nodes" }] },
   component: RouteComponent,
-  beforeLoad: AuthRedirect,
-  loader: async ({ params: { nodes } }) => getV1BmcJobs({ query: { nodeset: nodes } }),
+  // BMCs are only logged into once the page is opened, not when its link is hovered
+  preload: false,
+  loader: ({ context: { queryClient }, params: { nodes } }) =>
+    queryClient.ensureQueryData(jobsOptions(nodes)),
 });
 
 function RouteComponent() {
-  const { data } = Route.useLoaderData();
-  const { isFetching } = Route.useMatch();
+  const { data, isFetching } = useSuspenseQuery(jobsOptions(Route.useParams().nodes));
 
   const nodeJobList = useMemo(
-    () => nodeTree<Job>((data?.results ?? []).map((r) => ({ ...r, items: r.data?.jobs }))),
+    () => nodeTree<Job>((data.results ?? []).map((r) => ({ ...r, items: r.data?.jobs }))),
     [data],
   );
 
@@ -97,7 +98,7 @@ function RouteComponent() {
           tree={nodeTreeTable}
           getRowTone={nodeRowTone}
           data={nodeJobList}
-          progress={isFetching !== false}
+          progress={isFetching}
         />
       </CardContent>
     </Card>

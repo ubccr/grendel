@@ -14,7 +14,6 @@ import (
 	"github.com/ubccr/grendel/pkg/model"
 )
 
-// GetEvents lists the latest events, newest first, with how many of their nodes are at each state. The nodes themselves are in GetEvent
 func (h *Handler) GetEvents(c fuego.ContextNoBody) (model.EventList, error) {
 	limit, err := c.QueryParamIntErr("limit")
 	if err != nil {
@@ -27,13 +26,15 @@ func (h *Handler) GetEvents(c fuego.ContextNoBody) (model.EventList, error) {
 		Before: c.QueryParam("before"),
 		Limit:  limit,
 	})
+	if errors.Is(err, store.ErrNotFound) {
+		return nil, fuego.HTTPError{Err: err, Status: http.StatusNotFound, Title: "Not Found", Detail: "no event with the id given as before"}
+	}
 	if err != nil {
 		return nil, fuego.HTTPError{Err: err, Title: "Error", Detail: "failed to load events"}
 	}
 	return events, nil
 }
 
-// GetEvent returns one event with how it went on each of its nodes
 func (h *Handler) GetEvent(c fuego.ContextNoBody) (*model.Event, error) {
 	event, err := h.DB.LoadEvent(c.PathParam("id"))
 	if errors.Is(err, store.ErrNotFound) {

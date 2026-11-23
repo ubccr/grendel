@@ -6,7 +6,7 @@ import AuthRedirect from "@/lib/auth";
 import { relativeTime } from "@/lib/utils";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-// the signed in account's pages share this layout, which adds nothing to their paths, so they are headed by the account as a node's pages are headed by the node
+// the signed in account's pages share this layout, which adds nothing to their paths
 export const Route = createFileRoute("/account/_account")({
   staticData: { crumb: "Account" },
   component: RouteComponent,

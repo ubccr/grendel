@@ -16,8 +16,7 @@ import (
 )
 
 var (
-	userListFilter  []string
-	userListOptions *shared.TableOptions
+	userListTable   *shared.TableFlags
 	userListColumns = []shared.Column{
 		{Name: "Username"},
 		{Name: "Role"},
@@ -38,7 +37,7 @@ var (
 				return apiclient.NewApiError(err)
 			}
 
-			t := shared.NewTable(userListColumns, userListFilter).Options(*userListOptions).Empty("-")
+			t := userListTable.Table()
 
 			for _, u := range res {
 				t.AppendRow(
@@ -57,9 +56,7 @@ var (
 )
 
 func init() {
-	userListOptions = shared.RegisterTableFlags(userListCmd)
-	userListCmd.Flags().StringSliceVar(&userListFilter, "filter", nil, "filter table columns by name")
-	userListCmd.RegisterFlagCompletionFunc("filter", shared.ColumnCompletion(userListColumns))
+	userListTable = shared.RegisterTableFlags(userListCmd, userListColumns)
 
 	userCmd.AddCommand(userListCmd)
 }

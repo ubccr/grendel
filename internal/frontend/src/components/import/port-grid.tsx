@@ -19,12 +19,11 @@ import {
 import { patchOverride, withIncluded } from "@/lib/overrides";
 import { cn } from "@/lib/utils";
 import { LoaderCircle, RefreshCw, RotateCcw } from "lucide-react";
-import { useMemo, type ClipboardEvent } from "react";
+import { useMemo, useState, type ClipboardEvent } from "react";
 import { statusColumn, type StatusFilter } from "./grid";
 import { StatusTag } from "./status";
 import { SwitchDetail, SwitchSummary } from "./switch-map";
 
-// statusFilters are the choices of the status column's filter, each a test of a port
 const statusFilters: StatusFilter<Row>[] = [
   { value: "attention", label: "Needs attention", test: needsAttention },
   { value: "ready", label: "Ready", test: (r) => r.include && r.status === "ready" },
@@ -38,8 +37,6 @@ const statusFilters: StatusFilter<Row>[] = [
   { value: "excluded", label: "Left out", test: (r) => !r.include },
   { value: "edited", label: "Edited", test: (r) => r.nameOverridden || r.macOverridden },
 ];
-
-export type Reveal = { key: string; at: number };
 
 // GridRow is a switch with its ports under it, or one of those ports
 type GridRow = { key: string; sw?: ScanSwitch; all?: Row[]; items?: GridRow[]; row?: Row };
@@ -60,6 +57,10 @@ type GridMeta = {
 };
 
 const metaOf = (table: DataTableInstance<GridRow>) => table.options.meta as unknown as GridMeta;
+
+// shownRows are the ports the table is showing, in its order, leaving out the ones a filter or a closed switch hides
+const shownRows = (table: DataTableInstance<GridRow>) =>
+  table.getRowModel().rows.flatMap((r) => r.original.row ?? []);
 
 const attention: Status[] = ["conflict", "invalid", "badmac"];
 
@@ -166,7 +167,7 @@ const columns: DataTableColumnDef<GridRow, any>[] = [
           onSet={(mac) => m.override(r.key, { mac })}
           onFocus={() => m.focus(r.key)}
           onPasteLines={(lines) =>
-            m.setOverrides(fillNames(m.rows, r.key, lines, m.overrides, "mac"))
+            m.setOverrides(fillNames(shownRows(table), r.key, lines, m.overrides, "mac"))
           }
         />
       );
@@ -196,7 +197,7 @@ const columns: DataTableColumnDef<GridRow, any>[] = [
             onChange={(e) => m.override(r.key, { name: e.target.value })}
             onPaste={(e) => {
               const lines = pasteLines(e);
-              if (lines) m.setOverrides(fillNames(m.rows, r.key, lines, m.overrides));
+              if (lines) m.setOverrides(fillNames(shownRows(table), r.key, lines, m.overrides));
             }}
           />
           {r.nameOverridden && (
@@ -227,7 +228,7 @@ const columns: DataTableColumnDef<GridRow, any>[] = [
       );
     },
   },
-  statusColumn<GridRow, Row>(statusFilters, (r) => {
+  statusColumn<GridRow, Row>(statusFilters, (r, table) => {
     return (
       <>
         <StatusTag row={r} />
@@ -236,25 +237,30 @@ const columns: DataTableColumnDef<GridRow, any>[] = [
             {r.include ? r.problem : r.skipped}
           </p>
         )}
+        {!r.include && r.skipped && (
+          <Button
+            variant="link"
+            size="xs"
+            className="h-auto p-0"
+            onClick={() => metaOf(table).override(r.key, { include: true })}
+          >
+            Import it anyway
+          </Button>
+        )}
       </>
     );
   }),
 ];
 
-// PortGrid is every scanned port as an editable row, grouped under its switch with the switch's faceplate above its ports: whether each port is imported, which MAC is its BMC's, and its name when the template's isn't right
 export function PortGrid({
   switches,
   rows,
   ports,
   overrides,
-  focused,
-  reveal,
   rescanning,
   scanning,
   onOverrides,
   onPorts,
-  onFocus,
-  onReveal,
   onRescan,
   onRescanAll,
 }: {
@@ -262,19 +268,16 @@ export function PortGrid({
   rows: Row[];
   ports: string;
   overrides: Overrides;
-  focused?: string;
-  // reveal is a cage clicked on a faceplate, whose row is brought into view
-  reveal?: Reveal;
   rescanning: ReadonlySet<string>;
   scanning: boolean;
   onOverrides: (o: Overrides) => void;
   onPorts: (ports: string) => void;
-  onFocus: (key?: string) => void;
-  onReveal: (key: string) => void;
   onRescan: (sw: string) => void;
   onRescanAll: () => void;
 }) {
-  const revealRow = useMemo(() => reveal && { id: reveal.key, at: reveal.at }, [reveal]);
+  const [focused, setFocused] = useState<string>();
+  // reveal is a cage clicked on a faceplate, whose row is brought into view. at tells a second click on the same cage from the first
+  const [reveal, setReveal] = useState<{ id: string; at: number }>();
   const ouis = useMemo(() => ouiChoices(rows), [rows]);
 
   const data = useMemo<GridRow[]>(
@@ -316,7 +319,7 @@ export function PortGrid({
     rescanning,
     override,
     setOverrides: onOverrides,
-    focus: onFocus,
+    focus: setFocused,
     rescan: onRescan,
   };
 
@@ -346,9 +349,8 @@ export function PortGrid({
         data={data}
         tree={tree}
         selection={selection}
-        canSelect={(g) => !!g.row}
-        // ticking a whole switch or every port shown leaves ports with no number alone; those are ticked one at a time
-        bulkSelect={(g) => !g.row?.skipped}
+        // a port with no number in its name has no checkbox until it is asked for from its status, so ticking a whole switch or every port shown never sweeps it in
+        canSelect={(g) => !!g.row && (!g.row.skipped || g.row.include)}
         getRowId={(r) => r.key}
         meta={meta}
         paginate={false}
@@ -356,7 +358,7 @@ export function PortGrid({
         scrollHeight="min(75vh, 56rem)"
         refresh={onRescanAll}
         progress={scanning}
-        reveal={revealRow}
+        reveal={reveal}
         getRowTone={(row) => (row.original.row ? tone(row.original.row) : undefined)}
         getRowProps={(row) => {
           const r = row.original.row;
@@ -364,7 +366,9 @@ export function PortGrid({
             ? {
                 // a moving pointer focuses the row under it; rows sliding under a still pointer, as while a revealed row scrolls into view, send moves with no movement and are ignored
                 onMouseMove: (e) =>
-                  (e.movementX !== 0 || e.movementY !== 0) && focused !== r.key && onFocus(r.key),
+                  (e.movementX !== 0 || e.movementY !== 0) &&
+                  focused !== r.key &&
+                  setFocused(r.key),
                 className: cn(!r.include && "text-muted-foreground"),
               }
             : {};
@@ -375,7 +379,10 @@ export function PortGrid({
               sw={row.original.sw}
               rows={row.original.all ?? []}
               focused={focused}
-              onSelect={onReveal}
+              onSelect={(key) => {
+                setFocused(key);
+                setReveal({ id: key, at: Date.now() });
+              }}
             />
           )
         }
@@ -422,7 +429,6 @@ function pasteLines(e: ClipboardEvent<HTMLInputElement>) {
   return lines;
 }
 
-// Macs is the port's BMC MAC as a field that can be typed over, for a BMC the switch hasn't learned or got wrong, with the learned MACs to pick from when a port carries several
 function Macs({
   row,
   onSet,

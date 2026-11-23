@@ -18,6 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/ubccr/grendel/internal/config"
+	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -38,6 +39,12 @@ type ignitionConfig struct {
 
 // requestIgnition requests the ignition config for a provisioning host using the named template, or the built-in template when empty
 func requestIgnition(t *testing.T, tmplName string) (*httptest.ResponseRecorder, error) {
+	t.Helper()
+	_, _, rec, err := requestIgnitionFor(t, tmplName)
+	return rec, err
+}
+
+func requestIgnitionFor(t *testing.T, tmplName string) (*Handler, *model.Host, *httptest.ResponseRecorder, error) {
 	t.Helper()
 
 	origDNS := config.DefaultDNS
@@ -70,7 +77,26 @@ func requestIgnition(t *testing.T, tmplName string) (*httptest.ResponseRecorder,
 	c.SetParamNames("token")
 	c.SetParamValues(token)
 
-	return rec, TokenRequired(h.Ignition)(c)
+	return h, host, rec, TokenRequired(h.Ignition)(c)
+}
+
+func TestIgnitionRecordsStageOnceRendered(t *testing.T) {
+	dir := t.TempDir()
+	viper.Set("provision.templates_dir", dir)
+	t.Cleanup(func() { viper.Set("provision.templates_dir", nil) })
+
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "custom.tmpl"), []byte("variant: flatcar\nversion: 1.0.0\nstorge: {}\n"), 0o644))
+	h, host, _, err := requestIgnitionFor(t, "custom.tmpl")
+	require.Error(t, err)
+	_, err = h.DB.LoadProvisionStatus(host.UID.String())
+	assert.ErrorIs(t, err, store.ErrNotFound, "a config that failed to render is not a stage the node reached")
+
+	require.NoError(t, os.WriteFile(filepath.Join(dir, "custom.tmpl"), []byte("variant: flatcar\nversion: 1.0.0\n"), 0o644))
+	h, host, _, err = requestIgnitionFor(t, "custom.tmpl")
+	require.NoError(t, err)
+	status, err := h.DB.LoadProvisionStatus(host.UID.String())
+	require.NoError(t, err)
+	assert.Equal(t, model.ProvisionStateConfig, status.State)
 }
 
 func TestIgnitionBuiltinTemplate(t *testing.T) {

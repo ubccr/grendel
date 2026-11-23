@@ -28,6 +28,31 @@ func (s *StoreTestSuite) SetStore(db store.Store) {
 	s.db = db
 }
 
+func (s *StoreTestSuite) TestAdminHoldsEveryPermission() {
+	defer s.db.Close()
+
+	roles, err := s.db.GetRolesByRoute("GET", "/v1/route/no/migration/granted")
+	s.Require().NoError(err)
+	s.Assert().Equal([]string{model.RoleAdmin.String()}, *roles)
+
+	all, err := s.db.GetPermissions()
+	s.Require().NoError(err)
+
+	admin, err := s.db.GetRolesByName(model.RoleAdmin.String())
+	s.Require().NoError(err)
+	s.Assert().Len(admin.PermissionList, len(all))
+	s.Assert().Empty(admin.UnassignedPermissionList)
+
+	list, err := s.db.GetRoles()
+	s.Require().NoError(err)
+	for _, role := range list {
+		if role.Name == model.RoleAdmin.String() {
+			s.Assert().Len(role.PermissionList, len(all))
+			s.Assert().Empty(role.UnassignedPermissionList)
+		}
+	}
+}
+
 func (s *StoreTestSuite) TestUser() {
 	adminUsername := "admin"
 	adminPassword := "SuperSecureAdminPassword1234!@#$"

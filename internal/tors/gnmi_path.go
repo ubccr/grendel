@@ -12,54 +12,15 @@ import (
 	"strings"
 
 	gpb "github.com/openconfig/gnmi/proto/gnmi"
+	"github.com/openconfig/gnmi/value"
 )
 
-// splitPath splits on '/' outside of brackets, since key values such as Ethernet49/1 contain slashes.
-func splitPath(p string) []string {
-	var parts []string
-	depth, start := 0, 0
-	for i, r := range p {
-		switch r {
-		case '[':
-			depth++
-		case ']':
-			depth--
-		case '/':
-			if depth == 0 {
-				parts = append(parts, p[start:i])
-				start = i + 1
-			}
-		}
-	}
-	return append(parts, p[start:])
-}
-
-// parsePath turns an xpath like /a/b[name=x]/c into a gNMI path. Key values cannot contain ']' or '['.
-func parsePath(p string) (*gpb.Path, error) {
+func elems(names ...string) *gpb.Path {
 	path := &gpb.Path{}
-	for _, part := range splitPath(strings.Trim(p, "/")) {
-		if part == "" {
-			continue
-		}
-		name, rest, _ := strings.Cut(part, "[")
-		elem := &gpb.PathElem{Name: name}
-		if rest != "" {
-			elem.Key = map[string]string{}
-			for _, kv := range strings.Split("["+rest, "[") {
-				if kv == "" {
-					continue
-				}
-				kv = strings.TrimSuffix(kv, "]")
-				k, v, ok := strings.Cut(kv, "=")
-				if !ok {
-					return nil, fmt.Errorf("invalid key %q in path %s", kv, p)
-				}
-				elem.Key[k] = v
-			}
-		}
-		path.Elem = append(path.Elem, elem)
+	for _, name := range names {
+		path.Elem = append(path.Elem, &gpb.PathElem{Name: name})
 	}
-	return path, nil
+	return path
 }
 
 type leaf struct {
@@ -72,16 +33,16 @@ func (l leaf) str() string {
 	case nil:
 		return ""
 	case string:
-		return stripModule(v)
+		return v
 	default:
 		return fmt.Sprint(v)
 	}
 }
 
-// stripModule drops the YANG module prefix JSON_IETF puts on names and identity values, e.g. openconfig-lldp-types:MAC_ADDRESS.
+// stripModule drops the YANG module prefix JSON_IETF puts on names and identityref values, e.g. openconfig-lldp-types:MAC_ADDRESS. Neither can hold a colon of its own, but free text such as a description can, so it is never passed here.
 func stripModule(s string) string {
-	if i := strings.LastIndex(s, ":"); i >= 0 && !strings.ContainsAny(s[:i], ":/ ") && strings.Contains(s[:i], "-") {
-		return s[i+1:]
+	if _, name, ok := strings.Cut(s, ":"); ok {
+		return name
 	}
 	return s
 }
@@ -119,21 +80,14 @@ func decodeValue(v *gpb.TypedValue) (any, bool, error) {
 		raw = t.JsonIetfVal
 	case *gpb.TypedValue_JsonVal:
 		raw = t.JsonVal
-	case *gpb.TypedValue_StringVal:
-		return t.StringVal, false, nil
-	case *gpb.TypedValue_UintVal:
-		return t.UintVal, false, nil
-	case *gpb.TypedValue_IntVal:
-		return t.IntVal, false, nil
-	case *gpb.TypedValue_BoolVal:
-		return t.BoolVal, false, nil
 	case *gpb.TypedValue_AsciiVal:
 		return t.AsciiVal, false, nil
-	case nil:
-		return nil, false, nil
 	default:
-		return fmt.Sprint(v.GetValue()), false, nil
+		// a type ToScalar cannot read, such as any_val, is left empty so one odd leaf doesn't fail the whole response
+		scalar, _ := value.ToScalar(v)
+		return scalar, false, nil
 	}
+	// JSON is decoded here rather than by ToScalar, which reads numbers as float64 and so is inexact past 2^53
 	dec := json.NewDecoder(bytes.NewReader(raw))
 	dec.UseNumber()
 	var out any

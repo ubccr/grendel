@@ -1,25 +1,27 @@
-import { getV1BmcBios } from "@/client";
 import BiosEditor from "@/components/bios/editor";
 import { useBiosRegistry } from "@/components/bios/use-registry";
 import { ErrorPanel } from "@/components/error-panel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { asValues } from "@/lib/bios";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { biosOptions } from "@/lib/queries";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/nodes/$node/bios")({
   staticData: { crumb: "BIOS" },
   component: RouteComponent,
-  loader: ({ params: { node } }) => getV1BmcBios({ query: { nodeset: node } }),
-  staleTime: 30_000,
+  // a BMC is only logged into once the tab is opened, not when its link is hovered
+  preload: false,
+  loader: ({ context: { queryClient }, params: { node } }) =>
+    queryClient.ensureQueryData(biosOptions(node)),
 });
 
 function RouteComponent() {
-  const router = useRouter();
   const { node } = Route.useParams();
-  const { data: res } = Route.useLoaderData();
-  const result = res?.results?.[0];
+  const { data: res } = useSuspenseQuery(biosOptions(node));
+  const result = res.results?.[0];
   const bios = result?.success ? result.data : undefined;
   const { registry, isLoading, error } = useBiosRegistry(node, bios);
 
@@ -40,7 +42,6 @@ function RouteComponent() {
       pending={asValues(bios.pending)}
       registry={registry}
       applyTimes={bios.apply_times ?? []}
-      onApplied={() => router.invalidate()}
     />
   );
 }

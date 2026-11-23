@@ -27,7 +27,7 @@ import {
   type Table,
 } from "@tanstack/react-table";
 
-// features is every table feature the shared DataTable uses. TanStack Table v9 only gives a table the APIs of the features registered here, and the filter and sort names columns may use are the keys of the registries below. The filter and sort functions are the ones a column's "auto" setting picks from. It is defined once, outside any component, so its reference stays stable
+// TanStack Table v9 only gives a table the APIs of the features registered here, and columns may only name filter and sort functions from these registries. It is defined outside any component so its reference stays stable
 export const features = tableFeatures({
   columnFilteringFeature,
   rowSortingFeature,

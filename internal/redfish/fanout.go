@@ -93,7 +93,6 @@ func runOne[T any](
 		Data:    nil,
 	}
 
-	// goroutine panic recovery
 	defer func() {
 		if r := recover(); r != nil {
 			log.WithFields(logrus.Fields{

@@ -1,5 +1,7 @@
 import NodeForm from "@/components/nodes/form";
-import { createFileRoute, useLoaderData } from "@tanstack/react-router";
+import { nodeOptions } from "@/lib/queries";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/nodes/$node/node")({
   staticData: { crumb: "Node" },
@@ -7,7 +9,7 @@ export const Route = createFileRoute("/nodes/$node/node")({
 });
 
 function RouteComponent() {
-  const { data } = useLoaderData({ from: "/nodes/$node" });
+  const { data } = useSuspenseQuery(nodeOptions(Route.useParams().node));
 
-  return <NodeForm data={data?.[0]} />;
+  return <NodeForm data={data[0]} />;
 }

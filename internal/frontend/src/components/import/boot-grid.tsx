@@ -235,7 +235,6 @@ const columns: DataTableColumnDef<GridRow, any>[] = [
 const switchRule = "__switch";
 const linkRule = "__link";
 
-// RuleSelect is a group's rule for which port boots, with how many of its nodes the rule settles
 function RuleSelect({ group, meta }: { group: Group; meta: GridMeta }) {
   const rule = meta.rules[group.key];
   const settled = (r: Rule) =>
@@ -313,7 +312,7 @@ function RuleSelect({ group, meta }: { group: Group; meta: GridMeta }) {
   );
 }
 
-// NicSelect is the interface to add to a node, picked from the ones its BMC listed. Each shows its link, speed and the switch port it was seen on, which are what tell the cabled port apart
+// Each option shows its link, speed and the switch port it was seen on, which are what tell the cabled port apart
 function NicSelect({
   row,
   seen,
@@ -369,7 +368,6 @@ function NicSelect({
   );
 }
 
-// BootGrid is every node as a row under its port layout. Each layout's rule picks the interface for the nodes in it, and any node can be given another
 export function BootGrid({
   groups,
   rows,

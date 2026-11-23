@@ -16,8 +16,7 @@ import (
 )
 
 var (
-	secureBootStatusFilter  []string
-	secureBootStatusOptions *shared.TableOptions
+	secureBootStatusTable   *shared.TableFlags
 	secureBootStatusColumns = []shared.Column{
 		{Name: "Node"},
 		{Name: "State"},
@@ -34,23 +33,16 @@ var (
 		Long:  "Show whether UEFI secure boot is on. Enabled is what the next boot uses, Pending is a change staged for it, and Current Boot is whether secure boot was in effect for the boot the node is running now",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
-			nodeset, all := selector(args[0])
-			params := client.GETV1BmcSecurebootParams{
-				Nodeset: nodeset,
-				All:     all,
-				Tags:    client.NewOptString(strings.Join(tags, ",")),
-			}
-
-			res, err := apiclient.API.GETV1BmcSecureboot(command.Context(), params)
+			sel := selected(args[0])
+			res, err := apiclient.API.GETV1BmcSecureboot(command.Context(), client.GETV1BmcSecurebootParams{Nodeset: sel.Nodeset, Tags: sel.Tags, All: sel.All})
 			if err != nil {
 				return apiclient.NewApiError(err)
 			}
 
-			t := shared.NewTable(secureBootStatusColumns, secureBootStatusFilter).Options(*secureBootStatusOptions).Empty("-")
-			for _, r := range res.Results.Value {
-				result := r.Value
-				if !result.Success.Value {
-					t.AppendRow(result.Node.Value, colorState(false), "", "", "", "", "", result.Message.Value)
+			t := secureBootStatusTable.Table()
+			for _, result := range res.Results {
+				if !result.Success {
+					t.AppendRow(result.Node, colorState(false), "", "", "", "", "", result.Message)
 					continue
 				}
 
@@ -60,20 +52,19 @@ var (
 					pending = strconv.FormatBool(p)
 				}
 				t.AppendRow(
-					result.Node.Value,
+					result.Node,
 					colorState(true),
-					colorEnabled(data.Enabled.Value),
+					colorEnabled(data.Enabled),
 					pending,
-					data.Mode.Value,
-					data.CurrentBoot.Value,
+					data.Mode,
+					data.CurrentBoot,
 					strings.Join(data.Databases, ","),
-					result.Message.Value,
+					result.Message,
 				)
 			}
 			t.Print()
 
-			s := res.Summary.Value
-			return summaryLine(s.Total.Value, s.Succeeded.Value, s.Failed.Value, s.FailedNodes.Value, s.DurationMs.Value)
+			return summaryLine(summary(res.Summary))
 		},
 	}
 )
@@ -86,9 +77,7 @@ func colorEnabled(on bool) string {
 }
 
 func init() {
-	secureBootStatusOptions = shared.RegisterTableFlags(secureBootStatusCmd)
-	secureBootStatusCmd.Flags().StringSliceVar(&secureBootStatusFilter, "filter", []string{"Databases", "Message"}, "filter table columns by name")
-	secureBootStatusCmd.RegisterFlagCompletionFunc("filter", shared.ColumnCompletion(secureBootStatusColumns))
+	secureBootStatusTable = shared.RegisterTableFlags(secureBootStatusCmd, secureBootStatusColumns, "Databases")
 
 	secureBootCmd.AddCommand(secureBootStatusCmd)
 }

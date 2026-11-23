@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { CopyCheckIcon, CopyIcon } from "lucide-react";
 import clsx from "clsx";
+import { copyText } from "@/lib/clipboard";
 
 export default function NodesetView({ nodes, size = "md" }: { nodes: string; size?: "md" | "sm" }) {
   const nodeset = parseNodeSet(nodes);
@@ -22,12 +23,10 @@ export default function NodesetView({ nodes, size = "md" }: { nodes: string; siz
           <Button
             size="icon"
             variant="outline"
-            onClick={() => {
+            onClick={async () => {
+              if (!(await copyText(tab === "nodeset" ? nodeset.toString() : nodes))) return;
               setClicked(true);
-              navigator.clipboard.writeText(tab === "nodeset" ? nodeset.toString() : nodes);
-              setTimeout(() => {
-                setClicked(false);
-              }, 3000);
+              setTimeout(() => setClicked(false), 3000);
             }}
           >
             {clicked ? <CopyCheckIcon className="text-green-600" /> : <CopyIcon />}

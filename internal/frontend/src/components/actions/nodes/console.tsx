@@ -1,5 +1,4 @@
-import ActionCard from "@/components/actions/action-card";
-import { Button } from "@/components/ui/button";
+import { LinkAction } from "@/components/actions/action-card";
 import { expand } from "@/lib/nodeset";
 import { Link } from "@tanstack/react-router";
 
@@ -15,17 +14,10 @@ export default function NodesConsoleAction({ nodes }: { nodes: string }) {
   if (!single) return null;
 
   return (
-    <ActionCard
+    <LinkAction
       title="Serial Console"
       description="Watch the node boot or log in on its serial console, over IPMI SOL."
-      footer={
-        <Button
-          render={<Link to="/nodes/$node/console" params={{ node: single }} />}
-          nativeButton={false}
-        >
-          Open
-        </Button>
-      }
+      link={<Link to="/nodes/$node/console" params={{ node: single }} />}
     />
   );
 }

@@ -27,16 +27,16 @@ var (
 				provisionTemplatesMap[k] = client.NewNilString(v)
 			}
 
-			newImage := []client.NilBootImageAddRequestBootImagesItem{
-				client.NewNilBootImageAddRequestBootImagesItem(client.BootImageAddRequestBootImagesItem{
-					Name:               client.NewOptString(args[0]),
+			newImage := []client.BootImageAddRequestBootImagesItem{
+				{
+					Name:               args[0],
 					Cmdline:            client.NewOptString(cmdline),
 					Initrd:             initrd,
-					Kernel:             client.NewOptString(kernel),
+					Kernel:             kernel,
 					ProvisionTemplates: client.NewOptNilBootImageAddRequestBootImagesItemProvisionTemplates(provisionTemplatesMap),
 					Verify:             client.NewOptBool(verify),
 					Version:            client.NewOptString(version),
-				}),
+				},
 			}
 
 			storeReq := &client.BootImageAddRequest{

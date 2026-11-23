@@ -1683,22 +1683,20 @@ func (s *BmcResponseModelBmcAck) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcAck) encodeFields(e *jx.Encoder) {
 	{
-		if s.Results.Set {
-			e.FieldStart("results")
-			s.Results.Encode(e)
+		e.FieldStart("results")
+		e.ArrStart()
+		for _, elem := range s.Results {
+			elem.Encode(e)
 		}
+		e.ArrEnd()
 	}
 	{
-		if s.RunID.Set {
-			e.FieldStart("run_id")
-			s.RunID.Encode(e)
-		}
+		e.FieldStart("run_id")
+		e.Str(s.RunID)
 	}
 	{
-		if s.Summary.Set {
-			e.FieldStart("summary")
-			s.Summary.Encode(e)
-		}
+		e.FieldStart("summary")
+		s.Summary.Encode(e)
 	}
 }
 
@@ -1713,13 +1711,22 @@ func (s *BmcResponseModelBmcAck) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcAck to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "results":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Results.Reset()
-				if err := s.Results.Decode(d); err != nil {
+				s.Results = make([]BmcResponseModelBmcAckResultsItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem BmcResponseModelBmcAckResultsItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Results = append(s.Results, elem)
+					return nil
+				}); err != nil {
 					return err
 				}
 				return nil
@@ -1727,9 +1734,11 @@ func (s *BmcResponseModelBmcAck) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"results\"")
 			}
 		case "run_id":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.RunID.Reset()
-				if err := s.RunID.Decode(d); err != nil {
+				v, err := d.Str()
+				s.RunID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -1737,8 +1746,8 @@ func (s *BmcResponseModelBmcAck) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"run_id\"")
 			}
 		case "summary":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Summary.Reset()
 				if err := s.Summary.Decode(d); err != nil {
 					return err
 				}
@@ -1752,6 +1761,38 @@ func (s *BmcResponseModelBmcAck) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcAck")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcAck) {
+					name = jsonFieldsNameOfBmcResponseModelBmcAck[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -1786,28 +1827,20 @@ func (s *BmcResponseModelBmcAckResultsItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Message.Set {
-			e.FieldStart("message")
-			s.Message.Encode(e)
-		}
+		e.FieldStart("message")
+		e.Str(s.Message)
 	}
 	{
-		if s.Node.Set {
-			e.FieldStart("node")
-			s.Node.Encode(e)
-		}
+		e.FieldStart("node")
+		e.Str(s.Node)
 	}
 	{
-		if s.Success.Set {
-			e.FieldStart("success")
-			s.Success.Encode(e)
-		}
+		e.FieldStart("success")
+		e.Bool(s.Success)
 	}
 }
 
@@ -1824,6 +1857,7 @@ func (s *BmcResponseModelBmcAckResultsItem) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcAckResultsItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -1839,9 +1873,11 @@ func (s *BmcResponseModelBmcAckResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"data\"")
 			}
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -1849,9 +1885,11 @@ func (s *BmcResponseModelBmcAckResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "message":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Message = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -1859,9 +1897,11 @@ func (s *BmcResponseModelBmcAckResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"message\"")
 			}
 		case "node":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Node.Reset()
-				if err := s.Node.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Node = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -1869,9 +1909,11 @@ func (s *BmcResponseModelBmcAckResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"node\"")
 			}
 		case "success":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Success.Reset()
-				if err := s.Success.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.Success = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -1884,6 +1926,38 @@ func (s *BmcResponseModelBmcAckResultsItem) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcAckResultsItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011110,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcAckResultsItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcAckResultsItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -1912,34 +1986,24 @@ func (s *BmcResponseModelBmcAckSummary) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcAckSummary) encodeFields(e *jx.Encoder) {
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Failed.Set {
-			e.FieldStart("failed")
-			s.Failed.Encode(e)
-		}
+		e.FieldStart("failed")
+		e.Int(s.Failed)
 	}
 	{
-		if s.FailedNodes.Set {
-			e.FieldStart("failed_nodes")
-			s.FailedNodes.Encode(e)
-		}
+		e.FieldStart("failed_nodes")
+		e.Str(s.FailedNodes)
 	}
 	{
-		if s.Succeeded.Set {
-			e.FieldStart("succeeded")
-			s.Succeeded.Encode(e)
-		}
+		e.FieldStart("succeeded")
+		e.Int(s.Succeeded)
 	}
 	{
-		if s.Total.Set {
-			e.FieldStart("total")
-			s.Total.Encode(e)
-		}
+		e.FieldStart("total")
+		e.Int(s.Total)
 	}
 }
 
@@ -1956,13 +2020,16 @@ func (s *BmcResponseModelBmcAckSummary) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcAckSummary to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -1970,9 +2037,11 @@ func (s *BmcResponseModelBmcAckSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "failed":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Failed.Reset()
-				if err := s.Failed.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Failed = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -1980,9 +2049,11 @@ func (s *BmcResponseModelBmcAckSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed\"")
 			}
 		case "failed_nodes":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.FailedNodes.Reset()
-				if err := s.FailedNodes.Decode(d); err != nil {
+				v, err := d.Str()
+				s.FailedNodes = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -1990,9 +2061,11 @@ func (s *BmcResponseModelBmcAckSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed_nodes\"")
 			}
 		case "succeeded":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Succeeded.Reset()
-				if err := s.Succeeded.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Succeeded = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2000,9 +2073,11 @@ func (s *BmcResponseModelBmcAckSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"succeeded\"")
 			}
 		case "total":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Total.Reset()
-				if err := s.Total.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Total = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2015,6 +2090,38 @@ func (s *BmcResponseModelBmcAckSummary) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcAckSummary")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcAckSummary) {
+					name = jsonFieldsNameOfBmcResponseModelBmcAckSummary[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -2043,22 +2150,20 @@ func (s *BmcResponseModelBmcAssetTagResult) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcAssetTagResult) encodeFields(e *jx.Encoder) {
 	{
-		if s.Results.Set {
-			e.FieldStart("results")
-			s.Results.Encode(e)
+		e.FieldStart("results")
+		e.ArrStart()
+		for _, elem := range s.Results {
+			elem.Encode(e)
 		}
+		e.ArrEnd()
 	}
 	{
-		if s.RunID.Set {
-			e.FieldStart("run_id")
-			s.RunID.Encode(e)
-		}
+		e.FieldStart("run_id")
+		e.Str(s.RunID)
 	}
 	{
-		if s.Summary.Set {
-			e.FieldStart("summary")
-			s.Summary.Encode(e)
-		}
+		e.FieldStart("summary")
+		s.Summary.Encode(e)
 	}
 }
 
@@ -2073,13 +2178,22 @@ func (s *BmcResponseModelBmcAssetTagResult) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcAssetTagResult to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "results":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Results.Reset()
-				if err := s.Results.Decode(d); err != nil {
+				s.Results = make([]BmcResponseModelBmcAssetTagResultResultsItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem BmcResponseModelBmcAssetTagResultResultsItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Results = append(s.Results, elem)
+					return nil
+				}); err != nil {
 					return err
 				}
 				return nil
@@ -2087,9 +2201,11 @@ func (s *BmcResponseModelBmcAssetTagResult) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"results\"")
 			}
 		case "run_id":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.RunID.Reset()
-				if err := s.RunID.Decode(d); err != nil {
+				v, err := d.Str()
+				s.RunID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2097,8 +2213,8 @@ func (s *BmcResponseModelBmcAssetTagResult) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"run_id\"")
 			}
 		case "summary":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Summary.Reset()
 				if err := s.Summary.Decode(d); err != nil {
 					return err
 				}
@@ -2112,6 +2228,38 @@ func (s *BmcResponseModelBmcAssetTagResult) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcAssetTagResult")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcAssetTagResult) {
+					name = jsonFieldsNameOfBmcResponseModelBmcAssetTagResult[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -2146,28 +2294,20 @@ func (s *BmcResponseModelBmcAssetTagResultResultsItem) encodeFields(e *jx.Encode
 		}
 	}
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Message.Set {
-			e.FieldStart("message")
-			s.Message.Encode(e)
-		}
+		e.FieldStart("message")
+		e.Str(s.Message)
 	}
 	{
-		if s.Node.Set {
-			e.FieldStart("node")
-			s.Node.Encode(e)
-		}
+		e.FieldStart("node")
+		e.Str(s.Node)
 	}
 	{
-		if s.Success.Set {
-			e.FieldStart("success")
-			s.Success.Encode(e)
-		}
+		e.FieldStart("success")
+		e.Bool(s.Success)
 	}
 }
 
@@ -2184,6 +2324,7 @@ func (s *BmcResponseModelBmcAssetTagResultResultsItem) Decode(d *jx.Decoder) err
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcAssetTagResultResultsItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -2198,9 +2339,11 @@ func (s *BmcResponseModelBmcAssetTagResultResultsItem) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"data\"")
 			}
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2208,9 +2351,11 @@ func (s *BmcResponseModelBmcAssetTagResultResultsItem) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "message":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Message = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2218,9 +2363,11 @@ func (s *BmcResponseModelBmcAssetTagResultResultsItem) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"message\"")
 			}
 		case "node":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Node.Reset()
-				if err := s.Node.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Node = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2228,9 +2375,11 @@ func (s *BmcResponseModelBmcAssetTagResultResultsItem) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"node\"")
 			}
 		case "success":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Success.Reset()
-				if err := s.Success.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.Success = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2243,6 +2392,38 @@ func (s *BmcResponseModelBmcAssetTagResultResultsItem) Decode(d *jx.Decoder) err
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcAssetTagResultResultsItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011110,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcAssetTagResultResultsItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcAssetTagResultResultsItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -2271,28 +2452,20 @@ func (s *BmcResponseModelBmcAssetTagResultResultsItemData) Encode(e *jx.Encoder)
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcAssetTagResultResultsItemData) encodeFields(e *jx.Encoder) {
 	{
-		if s.Changed.Set {
-			e.FieldStart("changed")
-			s.Changed.Encode(e)
-		}
+		e.FieldStart("changed")
+		e.Bool(s.Changed)
 	}
 	{
-		if s.Current.Set {
-			e.FieldStart("current")
-			s.Current.Encode(e)
-		}
+		e.FieldStart("current")
+		e.Str(s.Current)
 	}
 	{
-		if s.Desired.Set {
-			e.FieldStart("desired")
-			s.Desired.Encode(e)
-		}
+		e.FieldStart("desired")
+		e.Str(s.Desired)
 	}
 	{
-		if s.Serial.Set {
-			e.FieldStart("serial")
-			s.Serial.Encode(e)
-		}
+		e.FieldStart("serial")
+		e.Str(s.Serial)
 	}
 }
 
@@ -2308,13 +2481,16 @@ func (s *BmcResponseModelBmcAssetTagResultResultsItemData) Decode(d *jx.Decoder)
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcAssetTagResultResultsItemData to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "changed":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Changed.Reset()
-				if err := s.Changed.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.Changed = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2322,9 +2498,11 @@ func (s *BmcResponseModelBmcAssetTagResultResultsItemData) Decode(d *jx.Decoder)
 				return errors.Wrap(err, "decode field \"changed\"")
 			}
 		case "current":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Current.Reset()
-				if err := s.Current.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Current = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2332,9 +2510,11 @@ func (s *BmcResponseModelBmcAssetTagResultResultsItemData) Decode(d *jx.Decoder)
 				return errors.Wrap(err, "decode field \"current\"")
 			}
 		case "desired":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Desired.Reset()
-				if err := s.Desired.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Desired = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2342,9 +2522,11 @@ func (s *BmcResponseModelBmcAssetTagResultResultsItemData) Decode(d *jx.Decoder)
 				return errors.Wrap(err, "decode field \"desired\"")
 			}
 		case "serial":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Serial.Reset()
-				if err := s.Serial.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Serial = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2357,6 +2539,38 @@ func (s *BmcResponseModelBmcAssetTagResultResultsItemData) Decode(d *jx.Decoder)
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcAssetTagResultResultsItemData")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00001111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcAssetTagResultResultsItemData) {
+					name = jsonFieldsNameOfBmcResponseModelBmcAssetTagResultResultsItemData[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -2385,34 +2599,24 @@ func (s *BmcResponseModelBmcAssetTagResultSummary) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcAssetTagResultSummary) encodeFields(e *jx.Encoder) {
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Failed.Set {
-			e.FieldStart("failed")
-			s.Failed.Encode(e)
-		}
+		e.FieldStart("failed")
+		e.Int(s.Failed)
 	}
 	{
-		if s.FailedNodes.Set {
-			e.FieldStart("failed_nodes")
-			s.FailedNodes.Encode(e)
-		}
+		e.FieldStart("failed_nodes")
+		e.Str(s.FailedNodes)
 	}
 	{
-		if s.Succeeded.Set {
-			e.FieldStart("succeeded")
-			s.Succeeded.Encode(e)
-		}
+		e.FieldStart("succeeded")
+		e.Int(s.Succeeded)
 	}
 	{
-		if s.Total.Set {
-			e.FieldStart("total")
-			s.Total.Encode(e)
-		}
+		e.FieldStart("total")
+		e.Int(s.Total)
 	}
 }
 
@@ -2429,13 +2633,16 @@ func (s *BmcResponseModelBmcAssetTagResultSummary) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcAssetTagResultSummary to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2443,9 +2650,11 @@ func (s *BmcResponseModelBmcAssetTagResultSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "failed":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Failed.Reset()
-				if err := s.Failed.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Failed = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2453,9 +2662,11 @@ func (s *BmcResponseModelBmcAssetTagResultSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed\"")
 			}
 		case "failed_nodes":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.FailedNodes.Reset()
-				if err := s.FailedNodes.Decode(d); err != nil {
+				v, err := d.Str()
+				s.FailedNodes = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2463,9 +2674,11 @@ func (s *BmcResponseModelBmcAssetTagResultSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed_nodes\"")
 			}
 		case "succeeded":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Succeeded.Reset()
-				if err := s.Succeeded.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Succeeded = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2473,9 +2686,11 @@ func (s *BmcResponseModelBmcAssetTagResultSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"succeeded\"")
 			}
 		case "total":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Total.Reset()
-				if err := s.Total.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Total = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2488,6 +2703,38 @@ func (s *BmcResponseModelBmcAssetTagResultSummary) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcAssetTagResultSummary")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcAssetTagResultSummary) {
+					name = jsonFieldsNameOfBmcResponseModelBmcAssetTagResultSummary[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -2516,22 +2763,20 @@ func (s *BmcResponseModelBmcBios) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcBios) encodeFields(e *jx.Encoder) {
 	{
-		if s.Results.Set {
-			e.FieldStart("results")
-			s.Results.Encode(e)
+		e.FieldStart("results")
+		e.ArrStart()
+		for _, elem := range s.Results {
+			elem.Encode(e)
 		}
+		e.ArrEnd()
 	}
 	{
-		if s.RunID.Set {
-			e.FieldStart("run_id")
-			s.RunID.Encode(e)
-		}
+		e.FieldStart("run_id")
+		e.Str(s.RunID)
 	}
 	{
-		if s.Summary.Set {
-			e.FieldStart("summary")
-			s.Summary.Encode(e)
-		}
+		e.FieldStart("summary")
+		s.Summary.Encode(e)
 	}
 }
 
@@ -2546,13 +2791,22 @@ func (s *BmcResponseModelBmcBios) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcBios to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "results":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Results.Reset()
-				if err := s.Results.Decode(d); err != nil {
+				s.Results = make([]BmcResponseModelBmcBiosResultsItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem BmcResponseModelBmcBiosResultsItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Results = append(s.Results, elem)
+					return nil
+				}); err != nil {
 					return err
 				}
 				return nil
@@ -2560,9 +2814,11 @@ func (s *BmcResponseModelBmcBios) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"results\"")
 			}
 		case "run_id":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.RunID.Reset()
-				if err := s.RunID.Decode(d); err != nil {
+				v, err := d.Str()
+				s.RunID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2570,8 +2826,8 @@ func (s *BmcResponseModelBmcBios) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"run_id\"")
 			}
 		case "summary":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Summary.Reset()
 				if err := s.Summary.Decode(d); err != nil {
 					return err
 				}
@@ -2585,6 +2841,38 @@ func (s *BmcResponseModelBmcBios) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcBios")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcBios) {
+					name = jsonFieldsNameOfBmcResponseModelBmcBios[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -2613,22 +2901,20 @@ func (s *BmcResponseModelBmcBiosRegistry) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcBiosRegistry) encodeFields(e *jx.Encoder) {
 	{
-		if s.Results.Set {
-			e.FieldStart("results")
-			s.Results.Encode(e)
+		e.FieldStart("results")
+		e.ArrStart()
+		for _, elem := range s.Results {
+			elem.Encode(e)
 		}
+		e.ArrEnd()
 	}
 	{
-		if s.RunID.Set {
-			e.FieldStart("run_id")
-			s.RunID.Encode(e)
-		}
+		e.FieldStart("run_id")
+		e.Str(s.RunID)
 	}
 	{
-		if s.Summary.Set {
-			e.FieldStart("summary")
-			s.Summary.Encode(e)
-		}
+		e.FieldStart("summary")
+		s.Summary.Encode(e)
 	}
 }
 
@@ -2643,13 +2929,22 @@ func (s *BmcResponseModelBmcBiosRegistry) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcBiosRegistry to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "results":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Results.Reset()
-				if err := s.Results.Decode(d); err != nil {
+				s.Results = make([]BmcResponseModelBmcBiosRegistryResultsItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem BmcResponseModelBmcBiosRegistryResultsItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Results = append(s.Results, elem)
+					return nil
+				}); err != nil {
 					return err
 				}
 				return nil
@@ -2657,9 +2952,11 @@ func (s *BmcResponseModelBmcBiosRegistry) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"results\"")
 			}
 		case "run_id":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.RunID.Reset()
-				if err := s.RunID.Decode(d); err != nil {
+				v, err := d.Str()
+				s.RunID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2667,8 +2964,8 @@ func (s *BmcResponseModelBmcBiosRegistry) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"run_id\"")
 			}
 		case "summary":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Summary.Reset()
 				if err := s.Summary.Decode(d); err != nil {
 					return err
 				}
@@ -2682,6 +2979,38 @@ func (s *BmcResponseModelBmcBiosRegistry) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcBiosRegistry")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcBiosRegistry) {
+					name = jsonFieldsNameOfBmcResponseModelBmcBiosRegistry[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -2716,28 +3045,20 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItem) encodeFields(e *jx.Encoder)
 		}
 	}
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Message.Set {
-			e.FieldStart("message")
-			s.Message.Encode(e)
-		}
+		e.FieldStart("message")
+		e.Str(s.Message)
 	}
 	{
-		if s.Node.Set {
-			e.FieldStart("node")
-			s.Node.Encode(e)
-		}
+		e.FieldStart("node")
+		e.Str(s.Node)
 	}
 	{
-		if s.Success.Set {
-			e.FieldStart("success")
-			s.Success.Encode(e)
-		}
+		e.FieldStart("success")
+		e.Bool(s.Success)
 	}
 }
 
@@ -2754,6 +3075,7 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItem) Decode(d *jx.Decoder) error
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcBiosRegistryResultsItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -2768,9 +3090,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItem) Decode(d *jx.Decoder) error
 				return errors.Wrap(err, "decode field \"data\"")
 			}
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2778,9 +3102,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItem) Decode(d *jx.Decoder) error
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "message":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Message = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2788,9 +3114,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItem) Decode(d *jx.Decoder) error
 				return errors.Wrap(err, "decode field \"message\"")
 			}
 		case "node":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Node.Reset()
-				if err := s.Node.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Node = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2798,9 +3126,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItem) Decode(d *jx.Decoder) error
 				return errors.Wrap(err, "decode field \"node\"")
 			}
 		case "success":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Success.Reset()
-				if err := s.Success.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.Success = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2813,6 +3143,38 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItem) Decode(d *jx.Decoder) error
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcBiosRegistryResultsItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011110,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcBiosRegistryResultsItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcBiosRegistryResultsItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -2851,28 +3213,20 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemData) encodeFields(e *jx.Enco
 		}
 	}
 	{
-		if s.Available.Set {
-			e.FieldStart("available")
-			s.Available.Encode(e)
-		}
+		e.FieldStart("available")
+		e.Bool(s.Available)
 	}
 	{
-		if s.Language.Set {
-			e.FieldStart("language")
-			s.Language.Encode(e)
-		}
+		e.FieldStart("language")
+		e.Str(s.Language)
 	}
 	{
-		if s.Registry.Set {
-			e.FieldStart("registry")
-			s.Registry.Encode(e)
-		}
+		e.FieldStart("registry")
+		e.Str(s.Registry)
 	}
 	{
-		if s.Version.Set {
-			e.FieldStart("version")
-			s.Version.Encode(e)
-		}
+		e.FieldStart("version")
+		e.Str(s.Version)
 	}
 }
 
@@ -2889,6 +3243,7 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemData) Decode(d *jx.Decoder) e
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcBiosRegistryResultsItemData to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -2910,9 +3265,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemData) Decode(d *jx.Decoder) e
 				return errors.Wrap(err, "decode field \"attributes\"")
 			}
 		case "available":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Available.Reset()
-				if err := s.Available.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.Available = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2920,9 +3277,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemData) Decode(d *jx.Decoder) e
 				return errors.Wrap(err, "decode field \"available\"")
 			}
 		case "language":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Language.Reset()
-				if err := s.Language.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Language = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2930,9 +3289,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemData) Decode(d *jx.Decoder) e
 				return errors.Wrap(err, "decode field \"language\"")
 			}
 		case "registry":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Registry.Reset()
-				if err := s.Registry.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Registry = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2940,9 +3301,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemData) Decode(d *jx.Decoder) e
 				return errors.Wrap(err, "decode field \"registry\"")
 			}
 		case "version":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Version.Reset()
-				if err := s.Version.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Version = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -2955,6 +3318,38 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemData) Decode(d *jx.Decoder) e
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcBiosRegistryResultsItemData")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011110,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcBiosRegistryResultsItemData) {
+					name = jsonFieldsNameOfBmcResponseModelBmcBiosRegistryResultsItemData[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -2989,40 +3384,28 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) encodeFie
 		}
 	}
 	{
-		if s.DisplayName.Set {
-			e.FieldStart("display_name")
-			s.DisplayName.Encode(e)
-		}
+		e.FieldStart("display_name")
+		e.Str(s.DisplayName)
 	}
 	{
-		if s.DisplayOrder.Set {
-			e.FieldStart("display_order")
-			s.DisplayOrder.Encode(e)
-		}
+		e.FieldStart("display_order")
+		e.Int(s.DisplayOrder)
 	}
 	{
-		if s.GrayOut.Set {
-			e.FieldStart("gray_out")
-			s.GrayOut.Encode(e)
-		}
+		e.FieldStart("gray_out")
+		e.Bool(s.GrayOut)
 	}
 	{
-		if s.HelpText.Set {
-			e.FieldStart("help_text")
-			s.HelpText.Encode(e)
-		}
+		e.FieldStart("help_text")
+		e.Str(s.HelpText)
 	}
 	{
-		if s.Hidden.Set {
-			e.FieldStart("hidden")
-			s.Hidden.Encode(e)
-		}
+		e.FieldStart("hidden")
+		e.Bool(s.Hidden)
 	}
 	{
-		if s.Immutable.Set {
-			e.FieldStart("immutable")
-			s.Immutable.Encode(e)
-		}
+		e.FieldStart("immutable")
+		e.Bool(s.Immutable)
 	}
 	{
 		if s.LowerBound.Set {
@@ -3037,10 +3420,8 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) encodeFie
 		}
 	}
 	{
-		if s.MenuPath.Set {
-			e.FieldStart("menu_path")
-			s.MenuPath.Encode(e)
-		}
+		e.FieldStart("menu_path")
+		e.Str(s.MenuPath)
 	}
 	{
 		if s.MinLength.Set {
@@ -3049,34 +3430,24 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) encodeFie
 		}
 	}
 	{
-		if s.Name.Set {
-			e.FieldStart("name")
-			s.Name.Encode(e)
-		}
+		e.FieldStart("name")
+		e.Str(s.Name)
 	}
 	{
-		if s.ReadOnly.Set {
-			e.FieldStart("read_only")
-			s.ReadOnly.Encode(e)
-		}
+		e.FieldStart("read_only")
+		e.Bool(s.ReadOnly)
 	}
 	{
-		if s.ResetRequired.Set {
-			e.FieldStart("reset_required")
-			s.ResetRequired.Encode(e)
-		}
+		e.FieldStart("reset_required")
+		e.Bool(s.ResetRequired)
 	}
 	{
-		if s.SystemUnique.Set {
-			e.FieldStart("system_unique")
-			s.SystemUnique.Encode(e)
-		}
+		e.FieldStart("system_unique")
+		e.Bool(s.SystemUnique)
 	}
 	{
-		if s.Type.Set {
-			e.FieldStart("type")
-			s.Type.Encode(e)
-		}
+		e.FieldStart("type")
+		e.Str(s.Type)
 	}
 	{
 		if s.UpperBound.Set {
@@ -3095,16 +3466,12 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) encodeFie
 		}
 	}
 	{
-		if s.WarningText.Set {
-			e.FieldStart("warning_text")
-			s.WarningText.Encode(e)
-		}
+		e.FieldStart("warning_text")
+		e.Str(s.WarningText)
 	}
 	{
-		if s.WriteOnly.Set {
-			e.FieldStart("write_only")
-			s.WriteOnly.Encode(e)
-		}
+		e.FieldStart("write_only")
+		e.Bool(s.WriteOnly)
 	}
 }
 
@@ -3136,6 +3503,7 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) Decode(d 
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem to nil")
 	}
+	var requiredBitSet [3]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -3151,9 +3519,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"default_value\"")
 			}
 		case "display_name":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.DisplayName.Reset()
-				if err := s.DisplayName.Decode(d); err != nil {
+				v, err := d.Str()
+				s.DisplayName = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3161,9 +3531,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"display_name\"")
 			}
 		case "display_order":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.DisplayOrder.Reset()
-				if err := s.DisplayOrder.Decode(d); err != nil {
+				v, err := d.Int()
+				s.DisplayOrder = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3171,9 +3543,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"display_order\"")
 			}
 		case "gray_out":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.GrayOut.Reset()
-				if err := s.GrayOut.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.GrayOut = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3181,9 +3555,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"gray_out\"")
 			}
 		case "help_text":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.HelpText.Reset()
-				if err := s.HelpText.Decode(d); err != nil {
+				v, err := d.Str()
+				s.HelpText = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3191,9 +3567,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"help_text\"")
 			}
 		case "hidden":
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				s.Hidden.Reset()
-				if err := s.Hidden.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.Hidden = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3201,9 +3579,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"hidden\"")
 			}
 		case "immutable":
+			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
-				s.Immutable.Reset()
-				if err := s.Immutable.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.Immutable = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3231,9 +3611,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"max_length\"")
 			}
 		case "menu_path":
+			requiredBitSet[1] |= 1 << 1
 			if err := func() error {
-				s.MenuPath.Reset()
-				if err := s.MenuPath.Decode(d); err != nil {
+				v, err := d.Str()
+				s.MenuPath = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3251,9 +3633,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"min_length\"")
 			}
 		case "name":
+			requiredBitSet[1] |= 1 << 3
 			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Name = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3261,9 +3645,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"name\"")
 			}
 		case "read_only":
+			requiredBitSet[1] |= 1 << 4
 			if err := func() error {
-				s.ReadOnly.Reset()
-				if err := s.ReadOnly.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.ReadOnly = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3271,9 +3657,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"read_only\"")
 			}
 		case "reset_required":
+			requiredBitSet[1] |= 1 << 5
 			if err := func() error {
-				s.ResetRequired.Reset()
-				if err := s.ResetRequired.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.ResetRequired = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3281,9 +3669,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"reset_required\"")
 			}
 		case "system_unique":
+			requiredBitSet[1] |= 1 << 6
 			if err := func() error {
-				s.SystemUnique.Reset()
-				if err := s.SystemUnique.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.SystemUnique = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3291,9 +3681,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"system_unique\"")
 			}
 		case "type":
+			requiredBitSet[1] |= 1 << 7
 			if err := func() error {
-				s.Type.Reset()
-				if err := s.Type.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Type = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3328,9 +3720,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"values\"")
 			}
 		case "warning_text":
+			requiredBitSet[2] |= 1 << 2
 			if err := func() error {
-				s.WarningText.Reset()
-				if err := s.WarningText.Decode(d); err != nil {
+				v, err := d.Str()
+				s.WarningText = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3338,9 +3732,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"warning_text\"")
 			}
 		case "write_only":
+			requiredBitSet[2] |= 1 << 3
 			if err := func() error {
-				s.WriteOnly.Reset()
-				if err := s.WriteOnly.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.WriteOnly = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3353,6 +3749,40 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) Decode(d 
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [3]uint8{
+		0b01111110,
+		0b11111010,
+		0b00001100,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcBiosRegistryResultsItemDataAttributesItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -3381,16 +3811,12 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem)
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.DisplayName.Set {
-			e.FieldStart("display_name")
-			s.DisplayName.Encode(e)
-		}
+		e.FieldStart("display_name")
+		e.Str(s.DisplayName)
 	}
 	{
-		if s.Name.Set {
-			e.FieldStart("name")
-			s.Name.Encode(e)
-		}
+		e.FieldStart("name")
+		e.Str(s.Name)
 	}
 }
 
@@ -3404,13 +3830,16 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem)
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "display_name":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.DisplayName.Reset()
-				if err := s.DisplayName.Decode(d); err != nil {
+				v, err := d.Str()
+				s.DisplayName = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3418,9 +3847,11 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem)
 				return errors.Wrap(err, "decode field \"display_name\"")
 			}
 		case "name":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Name = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3433,6 +3864,38 @@ func (s *BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem)
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000011,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcBiosRegistryResultsItemDataAttributesItemValuesItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -3461,34 +3924,24 @@ func (s *BmcResponseModelBmcBiosRegistrySummary) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcBiosRegistrySummary) encodeFields(e *jx.Encoder) {
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Failed.Set {
-			e.FieldStart("failed")
-			s.Failed.Encode(e)
-		}
+		e.FieldStart("failed")
+		e.Int(s.Failed)
 	}
 	{
-		if s.FailedNodes.Set {
-			e.FieldStart("failed_nodes")
-			s.FailedNodes.Encode(e)
-		}
+		e.FieldStart("failed_nodes")
+		e.Str(s.FailedNodes)
 	}
 	{
-		if s.Succeeded.Set {
-			e.FieldStart("succeeded")
-			s.Succeeded.Encode(e)
-		}
+		e.FieldStart("succeeded")
+		e.Int(s.Succeeded)
 	}
 	{
-		if s.Total.Set {
-			e.FieldStart("total")
-			s.Total.Encode(e)
-		}
+		e.FieldStart("total")
+		e.Int(s.Total)
 	}
 }
 
@@ -3505,13 +3958,16 @@ func (s *BmcResponseModelBmcBiosRegistrySummary) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcBiosRegistrySummary to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3519,9 +3975,11 @@ func (s *BmcResponseModelBmcBiosRegistrySummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "failed":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Failed.Reset()
-				if err := s.Failed.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Failed = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3529,9 +3987,11 @@ func (s *BmcResponseModelBmcBiosRegistrySummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed\"")
 			}
 		case "failed_nodes":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.FailedNodes.Reset()
-				if err := s.FailedNodes.Decode(d); err != nil {
+				v, err := d.Str()
+				s.FailedNodes = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3539,9 +3999,11 @@ func (s *BmcResponseModelBmcBiosRegistrySummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed_nodes\"")
 			}
 		case "succeeded":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Succeeded.Reset()
-				if err := s.Succeeded.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Succeeded = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3549,9 +4011,11 @@ func (s *BmcResponseModelBmcBiosRegistrySummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"succeeded\"")
 			}
 		case "total":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Total.Reset()
-				if err := s.Total.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Total = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3564,6 +4028,38 @@ func (s *BmcResponseModelBmcBiosRegistrySummary) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcBiosRegistrySummary")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcBiosRegistrySummary) {
+					name = jsonFieldsNameOfBmcResponseModelBmcBiosRegistrySummary[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -3598,28 +4094,20 @@ func (s *BmcResponseModelBmcBiosResultsItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Message.Set {
-			e.FieldStart("message")
-			s.Message.Encode(e)
-		}
+		e.FieldStart("message")
+		e.Str(s.Message)
 	}
 	{
-		if s.Node.Set {
-			e.FieldStart("node")
-			s.Node.Encode(e)
-		}
+		e.FieldStart("node")
+		e.Str(s.Node)
 	}
 	{
-		if s.Success.Set {
-			e.FieldStart("success")
-			s.Success.Encode(e)
-		}
+		e.FieldStart("success")
+		e.Bool(s.Success)
 	}
 }
 
@@ -3636,6 +4124,7 @@ func (s *BmcResponseModelBmcBiosResultsItem) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcBiosResultsItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -3650,9 +4139,11 @@ func (s *BmcResponseModelBmcBiosResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"data\"")
 			}
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3660,9 +4151,11 @@ func (s *BmcResponseModelBmcBiosResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "message":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Message = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3670,9 +4163,11 @@ func (s *BmcResponseModelBmcBiosResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"message\"")
 			}
 		case "node":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Node.Reset()
-				if err := s.Node.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Node = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3680,9 +4175,11 @@ func (s *BmcResponseModelBmcBiosResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"node\"")
 			}
 		case "success":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Success.Reset()
-				if err := s.Success.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.Success = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3695,6 +4192,38 @@ func (s *BmcResponseModelBmcBiosResultsItem) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcBiosResultsItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011110,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcBiosResultsItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcBiosResultsItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -3733,10 +4262,8 @@ func (s *BmcResponseModelBmcBiosResultsItemData) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.AttributeRegistry.Set {
-			e.FieldStart("attribute_registry")
-			s.AttributeRegistry.Encode(e)
-		}
+		e.FieldStart("attribute_registry")
+		e.Str(s.AttributeRegistry)
 	}
 	{
 		if s.Attributes.Set {
@@ -3745,16 +4272,12 @@ func (s *BmcResponseModelBmcBiosResultsItemData) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.BiosVersion.Set {
-			e.FieldStart("bios_version")
-			s.BiosVersion.Encode(e)
-		}
+		e.FieldStart("bios_version")
+		e.Str(s.BiosVersion)
 	}
 	{
-		if s.Model.Set {
-			e.FieldStart("model")
-			s.Model.Encode(e)
-		}
+		e.FieldStart("model")
+		e.Str(s.Model)
 	}
 	{
 		if s.Pending.Set {
@@ -3763,10 +4286,8 @@ func (s *BmcResponseModelBmcBiosResultsItemData) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.ResetPending.Set {
-			e.FieldStart("reset_pending")
-			s.ResetPending.Encode(e)
-		}
+		e.FieldStart("reset_pending")
+		e.Bool(s.ResetPending)
 	}
 }
 
@@ -3785,6 +4306,7 @@ func (s *BmcResponseModelBmcBiosResultsItemData) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcBiosResultsItemData to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -3808,9 +4330,11 @@ func (s *BmcResponseModelBmcBiosResultsItemData) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"apply_times\"")
 			}
 		case "attribute_registry":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.AttributeRegistry.Reset()
-				if err := s.AttributeRegistry.Decode(d); err != nil {
+				v, err := d.Str()
+				s.AttributeRegistry = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3828,9 +4352,11 @@ func (s *BmcResponseModelBmcBiosResultsItemData) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"attributes\"")
 			}
 		case "bios_version":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.BiosVersion.Reset()
-				if err := s.BiosVersion.Decode(d); err != nil {
+				v, err := d.Str()
+				s.BiosVersion = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3838,9 +4364,11 @@ func (s *BmcResponseModelBmcBiosResultsItemData) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"bios_version\"")
 			}
 		case "model":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Model.Reset()
-				if err := s.Model.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Model = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3858,9 +4386,11 @@ func (s *BmcResponseModelBmcBiosResultsItemData) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"pending\"")
 			}
 		case "reset_pending":
+			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
-				s.ResetPending.Reset()
-				if err := s.ResetPending.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.ResetPending = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -3873,6 +4403,38 @@ func (s *BmcResponseModelBmcBiosResultsItemData) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcBiosResultsItemData")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b01011010,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcBiosResultsItemData) {
+					name = jsonFieldsNameOfBmcResponseModelBmcBiosResultsItemData[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -4017,34 +4579,24 @@ func (s *BmcResponseModelBmcBiosSummary) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcBiosSummary) encodeFields(e *jx.Encoder) {
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Failed.Set {
-			e.FieldStart("failed")
-			s.Failed.Encode(e)
-		}
+		e.FieldStart("failed")
+		e.Int(s.Failed)
 	}
 	{
-		if s.FailedNodes.Set {
-			e.FieldStart("failed_nodes")
-			s.FailedNodes.Encode(e)
-		}
+		e.FieldStart("failed_nodes")
+		e.Str(s.FailedNodes)
 	}
 	{
-		if s.Succeeded.Set {
-			e.FieldStart("succeeded")
-			s.Succeeded.Encode(e)
-		}
+		e.FieldStart("succeeded")
+		e.Int(s.Succeeded)
 	}
 	{
-		if s.Total.Set {
-			e.FieldStart("total")
-			s.Total.Encode(e)
-		}
+		e.FieldStart("total")
+		e.Int(s.Total)
 	}
 }
 
@@ -4061,13 +4613,16 @@ func (s *BmcResponseModelBmcBiosSummary) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcBiosSummary to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4075,9 +4630,11 @@ func (s *BmcResponseModelBmcBiosSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "failed":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Failed.Reset()
-				if err := s.Failed.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Failed = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4085,9 +4642,11 @@ func (s *BmcResponseModelBmcBiosSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed\"")
 			}
 		case "failed_nodes":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.FailedNodes.Reset()
-				if err := s.FailedNodes.Decode(d); err != nil {
+				v, err := d.Str()
+				s.FailedNodes = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4095,9 +4654,11 @@ func (s *BmcResponseModelBmcBiosSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed_nodes\"")
 			}
 		case "succeeded":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Succeeded.Reset()
-				if err := s.Succeeded.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Succeeded = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4105,9 +4666,11 @@ func (s *BmcResponseModelBmcBiosSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"succeeded\"")
 			}
 		case "total":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Total.Reset()
-				if err := s.Total.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Total = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4120,6 +4683,38 @@ func (s *BmcResponseModelBmcBiosSummary) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcBiosSummary")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcBiosSummary) {
+					name = jsonFieldsNameOfBmcResponseModelBmcBiosSummary[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -4148,22 +4743,20 @@ func (s *BmcResponseModelBmcFirmwareUpdates) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcFirmwareUpdates) encodeFields(e *jx.Encoder) {
 	{
-		if s.Results.Set {
-			e.FieldStart("results")
-			s.Results.Encode(e)
+		e.FieldStart("results")
+		e.ArrStart()
+		for _, elem := range s.Results {
+			elem.Encode(e)
 		}
+		e.ArrEnd()
 	}
 	{
-		if s.RunID.Set {
-			e.FieldStart("run_id")
-			s.RunID.Encode(e)
-		}
+		e.FieldStart("run_id")
+		e.Str(s.RunID)
 	}
 	{
-		if s.Summary.Set {
-			e.FieldStart("summary")
-			s.Summary.Encode(e)
-		}
+		e.FieldStart("summary")
+		s.Summary.Encode(e)
 	}
 }
 
@@ -4178,13 +4771,22 @@ func (s *BmcResponseModelBmcFirmwareUpdates) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcFirmwareUpdates to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "results":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Results.Reset()
-				if err := s.Results.Decode(d); err != nil {
+				s.Results = make([]BmcResponseModelBmcFirmwareUpdatesResultsItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem BmcResponseModelBmcFirmwareUpdatesResultsItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Results = append(s.Results, elem)
+					return nil
+				}); err != nil {
 					return err
 				}
 				return nil
@@ -4192,9 +4794,11 @@ func (s *BmcResponseModelBmcFirmwareUpdates) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"results\"")
 			}
 		case "run_id":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.RunID.Reset()
-				if err := s.RunID.Decode(d); err != nil {
+				v, err := d.Str()
+				s.RunID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4202,8 +4806,8 @@ func (s *BmcResponseModelBmcFirmwareUpdates) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"run_id\"")
 			}
 		case "summary":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Summary.Reset()
 				if err := s.Summary.Decode(d); err != nil {
 					return err
 				}
@@ -4217,6 +4821,38 @@ func (s *BmcResponseModelBmcFirmwareUpdates) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcFirmwareUpdates")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcFirmwareUpdates) {
+					name = jsonFieldsNameOfBmcResponseModelBmcFirmwareUpdates[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -4251,28 +4887,20 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) encodeFields(e *jx.Encod
 		}
 	}
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Message.Set {
-			e.FieldStart("message")
-			s.Message.Encode(e)
-		}
+		e.FieldStart("message")
+		e.Str(s.Message)
 	}
 	{
-		if s.Node.Set {
-			e.FieldStart("node")
-			s.Node.Encode(e)
-		}
+		e.FieldStart("node")
+		e.Str(s.Node)
 	}
 	{
-		if s.Success.Set {
-			e.FieldStart("success")
-			s.Success.Encode(e)
-		}
+		e.FieldStart("success")
+		e.Bool(s.Success)
 	}
 }
 
@@ -4289,6 +4917,7 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) Decode(d *jx.Decoder) er
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcFirmwareUpdatesResultsItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -4303,9 +4932,11 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) Decode(d *jx.Decoder) er
 				return errors.Wrap(err, "decode field \"data\"")
 			}
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4313,9 +4944,11 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) Decode(d *jx.Decoder) er
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "message":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Message = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4323,9 +4956,11 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) Decode(d *jx.Decoder) er
 				return errors.Wrap(err, "decode field \"message\"")
 			}
 		case "node":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Node.Reset()
-				if err := s.Node.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Node = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4333,9 +4968,11 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) Decode(d *jx.Decoder) er
 				return errors.Wrap(err, "decode field \"node\"")
 			}
 		case "success":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Success.Reset()
-				if err := s.Success.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.Success = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4348,6 +4985,38 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItem) Decode(d *jx.Decoder) er
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcFirmwareUpdatesResultsItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011110,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcFirmwareUpdatesResultsItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcFirmwareUpdatesResultsItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -4376,10 +5045,8 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) Encode(e *jx.Encoder
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) encodeFields(e *jx.Encoder) {
 	{
-		if s.RebootType.Set {
-			e.FieldStart("reboot_type")
-			s.RebootType.Encode(e)
-		}
+		e.FieldStart("reboot_type")
+		e.Str(s.RebootType)
 	}
 	{
 		if s.Updates.Set {
@@ -4399,13 +5066,16 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) Decode(d *jx.Decoder
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcFirmwareUpdatesResultsItemData to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "reboot_type":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.RebootType.Reset()
-				if err := s.RebootType.Decode(d); err != nil {
+				v, err := d.Str()
+				s.RebootType = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4428,6 +5098,38 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemData) Decode(d *jx.Decoder
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcFirmwareUpdatesResultsItemData")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcFirmwareUpdatesResultsItemData) {
+					name = jsonFieldsNameOfBmcResponseModelBmcFirmwareUpdatesResultsItemData[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -4456,52 +5158,36 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) Encode(e 
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.ComponentType.Set {
-			e.FieldStart("component_type")
-			s.ComponentType.Encode(e)
-		}
+		e.FieldStart("component_type")
+		e.Str(s.ComponentType)
 	}
 	{
-		if s.Criticality.Set {
-			e.FieldStart("criticality")
-			s.Criticality.Encode(e)
-		}
+		e.FieldStart("criticality")
+		e.Str(s.Criticality)
 	}
 	{
-		if s.DisplayName.Set {
-			e.FieldStart("display_name")
-			s.DisplayName.Encode(e)
-		}
+		e.FieldStart("display_name")
+		e.Str(s.DisplayName)
 	}
 	{
-		if s.InstalledVersion.Set {
-			e.FieldStart("installed_version")
-			s.InstalledVersion.Encode(e)
-		}
+		e.FieldStart("installed_version")
+		e.Str(s.InstalledVersion)
 	}
 	{
-		if s.Name.Set {
-			e.FieldStart("name")
-			s.Name.Encode(e)
-		}
+		e.FieldStart("name")
+		e.Str(s.Name)
 	}
 	{
-		if s.PackagePath.Set {
-			e.FieldStart("package_path")
-			s.PackagePath.Encode(e)
-		}
+		e.FieldStart("package_path")
+		e.Str(s.PackagePath)
 	}
 	{
-		if s.PackageVersion.Set {
-			e.FieldStart("package_version")
-			s.PackageVersion.Encode(e)
-		}
+		e.FieldStart("package_version")
+		e.Str(s.PackageVersion)
 	}
 	{
-		if s.RebootType.Set {
-			e.FieldStart("reboot_type")
-			s.RebootType.Encode(e)
-		}
+		e.FieldStart("reboot_type")
+		e.Str(s.RebootType)
 	}
 }
 
@@ -4521,13 +5207,16 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) Decode(d 
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "component_type":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.ComponentType.Reset()
-				if err := s.ComponentType.Decode(d); err != nil {
+				v, err := d.Str()
+				s.ComponentType = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4535,9 +5224,11 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"component_type\"")
 			}
 		case "criticality":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Criticality.Reset()
-				if err := s.Criticality.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Criticality = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4545,9 +5236,11 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"criticality\"")
 			}
 		case "display_name":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.DisplayName.Reset()
-				if err := s.DisplayName.Decode(d); err != nil {
+				v, err := d.Str()
+				s.DisplayName = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4555,9 +5248,11 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"display_name\"")
 			}
 		case "installed_version":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.InstalledVersion.Reset()
-				if err := s.InstalledVersion.Decode(d); err != nil {
+				v, err := d.Str()
+				s.InstalledVersion = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4565,9 +5260,11 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"installed_version\"")
 			}
 		case "name":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Name = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4575,9 +5272,11 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"name\"")
 			}
 		case "package_path":
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				s.PackagePath.Reset()
-				if err := s.PackagePath.Decode(d); err != nil {
+				v, err := d.Str()
+				s.PackagePath = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4585,9 +5284,11 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"package_path\"")
 			}
 		case "package_version":
+			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
-				s.PackageVersion.Reset()
-				if err := s.PackageVersion.Decode(d); err != nil {
+				v, err := d.Str()
+				s.PackageVersion = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4595,9 +5296,11 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) Decode(d 
 				return errors.Wrap(err, "decode field \"package_version\"")
 			}
 		case "reboot_type":
+			requiredBitSet[0] |= 1 << 7
 			if err := func() error {
-				s.RebootType.Reset()
-				if err := s.RebootType.Decode(d); err != nil {
+				v, err := d.Str()
+				s.RebootType = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4610,6 +5313,38 @@ func (s *BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) Decode(d 
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b11111111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -4638,34 +5373,24 @@ func (s *BmcResponseModelBmcFirmwareUpdatesSummary) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcFirmwareUpdatesSummary) encodeFields(e *jx.Encoder) {
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Failed.Set {
-			e.FieldStart("failed")
-			s.Failed.Encode(e)
-		}
+		e.FieldStart("failed")
+		e.Int(s.Failed)
 	}
 	{
-		if s.FailedNodes.Set {
-			e.FieldStart("failed_nodes")
-			s.FailedNodes.Encode(e)
-		}
+		e.FieldStart("failed_nodes")
+		e.Str(s.FailedNodes)
 	}
 	{
-		if s.Succeeded.Set {
-			e.FieldStart("succeeded")
-			s.Succeeded.Encode(e)
-		}
+		e.FieldStart("succeeded")
+		e.Int(s.Succeeded)
 	}
 	{
-		if s.Total.Set {
-			e.FieldStart("total")
-			s.Total.Encode(e)
-		}
+		e.FieldStart("total")
+		e.Int(s.Total)
 	}
 }
 
@@ -4682,13 +5407,16 @@ func (s *BmcResponseModelBmcFirmwareUpdatesSummary) Decode(d *jx.Decoder) error 
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcFirmwareUpdatesSummary to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4696,9 +5424,11 @@ func (s *BmcResponseModelBmcFirmwareUpdatesSummary) Decode(d *jx.Decoder) error 
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "failed":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Failed.Reset()
-				if err := s.Failed.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Failed = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4706,9 +5436,11 @@ func (s *BmcResponseModelBmcFirmwareUpdatesSummary) Decode(d *jx.Decoder) error 
 				return errors.Wrap(err, "decode field \"failed\"")
 			}
 		case "failed_nodes":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.FailedNodes.Reset()
-				if err := s.FailedNodes.Decode(d); err != nil {
+				v, err := d.Str()
+				s.FailedNodes = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4716,9 +5448,11 @@ func (s *BmcResponseModelBmcFirmwareUpdatesSummary) Decode(d *jx.Decoder) error 
 				return errors.Wrap(err, "decode field \"failed_nodes\"")
 			}
 		case "succeeded":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Succeeded.Reset()
-				if err := s.Succeeded.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Succeeded = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4726,9 +5460,11 @@ func (s *BmcResponseModelBmcFirmwareUpdatesSummary) Decode(d *jx.Decoder) error 
 				return errors.Wrap(err, "decode field \"succeeded\"")
 			}
 		case "total":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Total.Reset()
-				if err := s.Total.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Total = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4741,6 +5477,38 @@ func (s *BmcResponseModelBmcFirmwareUpdatesSummary) Decode(d *jx.Decoder) error 
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcFirmwareUpdatesSummary")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcFirmwareUpdatesSummary) {
+					name = jsonFieldsNameOfBmcResponseModelBmcFirmwareUpdatesSummary[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -4769,22 +5537,20 @@ func (s *BmcResponseModelBmcJobList) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcJobList) encodeFields(e *jx.Encoder) {
 	{
-		if s.Results.Set {
-			e.FieldStart("results")
-			s.Results.Encode(e)
+		e.FieldStart("results")
+		e.ArrStart()
+		for _, elem := range s.Results {
+			elem.Encode(e)
 		}
+		e.ArrEnd()
 	}
 	{
-		if s.RunID.Set {
-			e.FieldStart("run_id")
-			s.RunID.Encode(e)
-		}
+		e.FieldStart("run_id")
+		e.Str(s.RunID)
 	}
 	{
-		if s.Summary.Set {
-			e.FieldStart("summary")
-			s.Summary.Encode(e)
-		}
+		e.FieldStart("summary")
+		s.Summary.Encode(e)
 	}
 }
 
@@ -4799,13 +5565,22 @@ func (s *BmcResponseModelBmcJobList) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcJobList to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "results":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Results.Reset()
-				if err := s.Results.Decode(d); err != nil {
+				s.Results = make([]BmcResponseModelBmcJobListResultsItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem BmcResponseModelBmcJobListResultsItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Results = append(s.Results, elem)
+					return nil
+				}); err != nil {
 					return err
 				}
 				return nil
@@ -4813,9 +5588,11 @@ func (s *BmcResponseModelBmcJobList) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"results\"")
 			}
 		case "run_id":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.RunID.Reset()
-				if err := s.RunID.Decode(d); err != nil {
+				v, err := d.Str()
+				s.RunID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4823,8 +5600,8 @@ func (s *BmcResponseModelBmcJobList) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"run_id\"")
 			}
 		case "summary":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Summary.Reset()
 				if err := s.Summary.Decode(d); err != nil {
 					return err
 				}
@@ -4838,6 +5615,38 @@ func (s *BmcResponseModelBmcJobList) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcJobList")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcJobList) {
+					name = jsonFieldsNameOfBmcResponseModelBmcJobList[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -4872,28 +5681,20 @@ func (s *BmcResponseModelBmcJobListResultsItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Message.Set {
-			e.FieldStart("message")
-			s.Message.Encode(e)
-		}
+		e.FieldStart("message")
+		e.Str(s.Message)
 	}
 	{
-		if s.Node.Set {
-			e.FieldStart("node")
-			s.Node.Encode(e)
-		}
+		e.FieldStart("node")
+		e.Str(s.Node)
 	}
 	{
-		if s.Success.Set {
-			e.FieldStart("success")
-			s.Success.Encode(e)
-		}
+		e.FieldStart("success")
+		e.Bool(s.Success)
 	}
 }
 
@@ -4910,6 +5711,7 @@ func (s *BmcResponseModelBmcJobListResultsItem) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcJobListResultsItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -4924,9 +5726,11 @@ func (s *BmcResponseModelBmcJobListResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"data\"")
 			}
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4934,9 +5738,11 @@ func (s *BmcResponseModelBmcJobListResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "message":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Message = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4944,9 +5750,11 @@ func (s *BmcResponseModelBmcJobListResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"message\"")
 			}
 		case "node":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Node.Reset()
-				if err := s.Node.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Node = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4954,9 +5762,11 @@ func (s *BmcResponseModelBmcJobListResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"node\"")
 			}
 		case "success":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Success.Reset()
-				if err := s.Success.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.Success = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -4969,6 +5779,38 @@ func (s *BmcResponseModelBmcJobListResultsItem) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcJobListResultsItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011110,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcJobListResultsItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcJobListResultsItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -5060,58 +5902,40 @@ func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) Encode(e *jx.Encoder
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.EndTime.Set {
-			e.FieldStart("end_time")
-			s.EndTime.Encode(e)
-		}
+		e.FieldStart("end_time")
+		e.Str(s.EndTime)
 	}
 	{
-		if s.ID.Set {
-			e.FieldStart("id")
-			s.ID.Encode(e)
-		}
+		e.FieldStart("id")
+		e.Str(s.ID)
 	}
 	{
-		if s.Message.Set {
-			e.FieldStart("message")
-			s.Message.Encode(e)
-		}
+		e.FieldStart("message")
+		e.Str(s.Message)
 	}
 	{
-		if s.Name.Set {
-			e.FieldStart("name")
-			s.Name.Encode(e)
-		}
+		e.FieldStart("name")
+		e.Str(s.Name)
 	}
 	{
-		if s.PercentComplete.Set {
-			e.FieldStart("percent_complete")
-			s.PercentComplete.Encode(e)
-		}
+		e.FieldStart("percent_complete")
+		e.Int(s.PercentComplete)
 	}
 	{
-		if s.StartTime.Set {
-			e.FieldStart("start_time")
-			s.StartTime.Encode(e)
-		}
+		e.FieldStart("start_time")
+		e.Str(s.StartTime)
 	}
 	{
-		if s.State.Set {
-			e.FieldStart("state")
-			s.State.Encode(e)
-		}
+		e.FieldStart("state")
+		e.Str(s.State)
 	}
 	{
-		if s.Status.Set {
-			e.FieldStart("status")
-			s.Status.Encode(e)
-		}
+		e.FieldStart("status")
+		e.Str(s.Status)
 	}
 	{
-		if s.Type.Set {
-			e.FieldStart("type")
-			s.Type.Encode(e)
-		}
+		e.FieldStart("type")
+		e.Str(s.Type)
 	}
 }
 
@@ -5132,13 +5956,16 @@ func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) Decode(d *jx.Decoder
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcJobListResultsItemDataJobsItem to nil")
 	}
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "end_time":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.EndTime.Reset()
-				if err := s.EndTime.Decode(d); err != nil {
+				v, err := d.Str()
+				s.EndTime = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5146,9 +5973,11 @@ func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) Decode(d *jx.Decoder
 				return errors.Wrap(err, "decode field \"end_time\"")
 			}
 		case "id":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.ID.Reset()
-				if err := s.ID.Decode(d); err != nil {
+				v, err := d.Str()
+				s.ID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5156,9 +5985,11 @@ func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) Decode(d *jx.Decoder
 				return errors.Wrap(err, "decode field \"id\"")
 			}
 		case "message":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Message = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5166,9 +5997,11 @@ func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) Decode(d *jx.Decoder
 				return errors.Wrap(err, "decode field \"message\"")
 			}
 		case "name":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Name = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5176,9 +6009,11 @@ func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) Decode(d *jx.Decoder
 				return errors.Wrap(err, "decode field \"name\"")
 			}
 		case "percent_complete":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.PercentComplete.Reset()
-				if err := s.PercentComplete.Decode(d); err != nil {
+				v, err := d.Int()
+				s.PercentComplete = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5186,9 +6021,11 @@ func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) Decode(d *jx.Decoder
 				return errors.Wrap(err, "decode field \"percent_complete\"")
 			}
 		case "start_time":
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				s.StartTime.Reset()
-				if err := s.StartTime.Decode(d); err != nil {
+				v, err := d.Str()
+				s.StartTime = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5196,9 +6033,11 @@ func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) Decode(d *jx.Decoder
 				return errors.Wrap(err, "decode field \"start_time\"")
 			}
 		case "state":
+			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
-				s.State.Reset()
-				if err := s.State.Decode(d); err != nil {
+				v, err := d.Str()
+				s.State = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5206,9 +6045,11 @@ func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) Decode(d *jx.Decoder
 				return errors.Wrap(err, "decode field \"state\"")
 			}
 		case "status":
+			requiredBitSet[0] |= 1 << 7
 			if err := func() error {
-				s.Status.Reset()
-				if err := s.Status.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Status = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5216,9 +6057,11 @@ func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) Decode(d *jx.Decoder
 				return errors.Wrap(err, "decode field \"status\"")
 			}
 		case "type":
+			requiredBitSet[1] |= 1 << 0
 			if err := func() error {
-				s.Type.Reset()
-				if err := s.Type.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Type = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5231,6 +6074,39 @@ func (s *BmcResponseModelBmcJobListResultsItemDataJobsItem) Decode(d *jx.Decoder
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcJobListResultsItemDataJobsItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [2]uint8{
+		0b11111111,
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcJobListResultsItemDataJobsItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcJobListResultsItemDataJobsItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -5259,34 +6135,24 @@ func (s *BmcResponseModelBmcJobListSummary) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcJobListSummary) encodeFields(e *jx.Encoder) {
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Failed.Set {
-			e.FieldStart("failed")
-			s.Failed.Encode(e)
-		}
+		e.FieldStart("failed")
+		e.Int(s.Failed)
 	}
 	{
-		if s.FailedNodes.Set {
-			e.FieldStart("failed_nodes")
-			s.FailedNodes.Encode(e)
-		}
+		e.FieldStart("failed_nodes")
+		e.Str(s.FailedNodes)
 	}
 	{
-		if s.Succeeded.Set {
-			e.FieldStart("succeeded")
-			s.Succeeded.Encode(e)
-		}
+		e.FieldStart("succeeded")
+		e.Int(s.Succeeded)
 	}
 	{
-		if s.Total.Set {
-			e.FieldStart("total")
-			s.Total.Encode(e)
-		}
+		e.FieldStart("total")
+		e.Int(s.Total)
 	}
 }
 
@@ -5303,13 +6169,16 @@ func (s *BmcResponseModelBmcJobListSummary) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcJobListSummary to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5317,9 +6186,11 @@ func (s *BmcResponseModelBmcJobListSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "failed":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Failed.Reset()
-				if err := s.Failed.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Failed = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5327,9 +6198,11 @@ func (s *BmcResponseModelBmcJobListSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed\"")
 			}
 		case "failed_nodes":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.FailedNodes.Reset()
-				if err := s.FailedNodes.Decode(d); err != nil {
+				v, err := d.Str()
+				s.FailedNodes = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5337,9 +6210,11 @@ func (s *BmcResponseModelBmcJobListSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed_nodes\"")
 			}
 		case "succeeded":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Succeeded.Reset()
-				if err := s.Succeeded.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Succeeded = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5347,9 +6222,11 @@ func (s *BmcResponseModelBmcJobListSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"succeeded\"")
 			}
 		case "total":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Total.Reset()
-				if err := s.Total.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Total = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5362,6 +6239,38 @@ func (s *BmcResponseModelBmcJobListSummary) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcJobListSummary")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcJobListSummary) {
+					name = jsonFieldsNameOfBmcResponseModelBmcJobListSummary[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -5390,22 +6299,20 @@ func (s *BmcResponseModelBmcLocationResult) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcLocationResult) encodeFields(e *jx.Encoder) {
 	{
-		if s.Results.Set {
-			e.FieldStart("results")
-			s.Results.Encode(e)
+		e.FieldStart("results")
+		e.ArrStart()
+		for _, elem := range s.Results {
+			elem.Encode(e)
 		}
+		e.ArrEnd()
 	}
 	{
-		if s.RunID.Set {
-			e.FieldStart("run_id")
-			s.RunID.Encode(e)
-		}
+		e.FieldStart("run_id")
+		e.Str(s.RunID)
 	}
 	{
-		if s.Summary.Set {
-			e.FieldStart("summary")
-			s.Summary.Encode(e)
-		}
+		e.FieldStart("summary")
+		s.Summary.Encode(e)
 	}
 }
 
@@ -5420,13 +6327,22 @@ func (s *BmcResponseModelBmcLocationResult) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcLocationResult to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "results":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Results.Reset()
-				if err := s.Results.Decode(d); err != nil {
+				s.Results = make([]BmcResponseModelBmcLocationResultResultsItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem BmcResponseModelBmcLocationResultResultsItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Results = append(s.Results, elem)
+					return nil
+				}); err != nil {
 					return err
 				}
 				return nil
@@ -5434,9 +6350,11 @@ func (s *BmcResponseModelBmcLocationResult) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"results\"")
 			}
 		case "run_id":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.RunID.Reset()
-				if err := s.RunID.Decode(d); err != nil {
+				v, err := d.Str()
+				s.RunID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5444,8 +6362,8 @@ func (s *BmcResponseModelBmcLocationResult) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"run_id\"")
 			}
 		case "summary":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Summary.Reset()
 				if err := s.Summary.Decode(d); err != nil {
 					return err
 				}
@@ -5459,6 +6377,38 @@ func (s *BmcResponseModelBmcLocationResult) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcLocationResult")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcLocationResult) {
+					name = jsonFieldsNameOfBmcResponseModelBmcLocationResult[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -5493,28 +6443,20 @@ func (s *BmcResponseModelBmcLocationResultResultsItem) encodeFields(e *jx.Encode
 		}
 	}
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Message.Set {
-			e.FieldStart("message")
-			s.Message.Encode(e)
-		}
+		e.FieldStart("message")
+		e.Str(s.Message)
 	}
 	{
-		if s.Node.Set {
-			e.FieldStart("node")
-			s.Node.Encode(e)
-		}
+		e.FieldStart("node")
+		e.Str(s.Node)
 	}
 	{
-		if s.Success.Set {
-			e.FieldStart("success")
-			s.Success.Encode(e)
-		}
+		e.FieldStart("success")
+		e.Bool(s.Success)
 	}
 }
 
@@ -5531,6 +6473,7 @@ func (s *BmcResponseModelBmcLocationResultResultsItem) Decode(d *jx.Decoder) err
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcLocationResultResultsItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -5545,9 +6488,11 @@ func (s *BmcResponseModelBmcLocationResultResultsItem) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"data\"")
 			}
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5555,9 +6500,11 @@ func (s *BmcResponseModelBmcLocationResultResultsItem) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "message":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Message = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5565,9 +6512,11 @@ func (s *BmcResponseModelBmcLocationResultResultsItem) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"message\"")
 			}
 		case "node":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Node.Reset()
-				if err := s.Node.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Node = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5575,9 +6524,11 @@ func (s *BmcResponseModelBmcLocationResultResultsItem) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"node\"")
 			}
 		case "success":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Success.Reset()
-				if err := s.Success.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.Success = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5590,6 +6541,38 @@ func (s *BmcResponseModelBmcLocationResultResultsItem) Decode(d *jx.Decoder) err
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcLocationResultResultsItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011110,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcLocationResultResultsItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcLocationResultResultsItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -5618,22 +6601,16 @@ func (s *BmcResponseModelBmcLocationResultResultsItemData) Encode(e *jx.Encoder)
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcLocationResultResultsItemData) encodeFields(e *jx.Encoder) {
 	{
-		if s.Changed.Set {
-			e.FieldStart("changed")
-			s.Changed.Encode(e)
-		}
+		e.FieldStart("changed")
+		e.Bool(s.Changed)
 	}
 	{
-		if s.Current.Set {
-			e.FieldStart("current")
-			s.Current.Encode(e)
-		}
+		e.FieldStart("current")
+		s.Current.Encode(e)
 	}
 	{
-		if s.Desired.Set {
-			e.FieldStart("desired")
-			s.Desired.Encode(e)
-		}
+		e.FieldStart("desired")
+		s.Desired.Encode(e)
 	}
 }
 
@@ -5648,13 +6625,16 @@ func (s *BmcResponseModelBmcLocationResultResultsItemData) Decode(d *jx.Decoder)
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcLocationResultResultsItemData to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "changed":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Changed.Reset()
-				if err := s.Changed.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.Changed = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5662,8 +6642,8 @@ func (s *BmcResponseModelBmcLocationResultResultsItemData) Decode(d *jx.Decoder)
 				return errors.Wrap(err, "decode field \"changed\"")
 			}
 		case "current":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Current.Reset()
 				if err := s.Current.Decode(d); err != nil {
 					return err
 				}
@@ -5672,8 +6652,8 @@ func (s *BmcResponseModelBmcLocationResultResultsItemData) Decode(d *jx.Decoder)
 				return errors.Wrap(err, "decode field \"current\"")
 			}
 		case "desired":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Desired.Reset()
 				if err := s.Desired.Decode(d); err != nil {
 					return err
 				}
@@ -5687,6 +6667,38 @@ func (s *BmcResponseModelBmcLocationResultResultsItemData) Decode(d *jx.Decoder)
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcLocationResultResultsItemData")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcLocationResultResultsItemData) {
+					name = jsonFieldsNameOfBmcResponseModelBmcLocationResultResultsItemData[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -5715,16 +6727,12 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) Encode(e *jx.E
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) encodeFields(e *jx.Encoder) {
 	{
-		if s.Datacenter.Set {
-			e.FieldStart("datacenter")
-			s.Datacenter.Encode(e)
-		}
+		e.FieldStart("datacenter")
+		e.Str(s.Datacenter)
 	}
 	{
-		if s.Rack.Set {
-			e.FieldStart("rack")
-			s.Rack.Encode(e)
-		}
+		e.FieldStart("rack")
+		e.Str(s.Rack)
 	}
 	{
 		if s.RackUnit.Set {
@@ -5733,16 +6741,12 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) encodeFields(e
 		}
 	}
 	{
-		if s.Room.Set {
-			e.FieldStart("room")
-			s.Room.Encode(e)
-		}
+		e.FieldStart("room")
+		e.Str(s.Room)
 	}
 	{
-		if s.Row.Set {
-			e.FieldStart("row")
-			s.Row.Encode(e)
-		}
+		e.FieldStart("row")
+		e.Str(s.Row)
 	}
 }
 
@@ -5759,13 +6763,16 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) Decode(d *jx.D
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcLocationResultResultsItemDataCurrent to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "datacenter":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Datacenter.Reset()
-				if err := s.Datacenter.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Datacenter = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5773,9 +6780,11 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) Decode(d *jx.D
 				return errors.Wrap(err, "decode field \"datacenter\"")
 			}
 		case "rack":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Rack.Reset()
-				if err := s.Rack.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Rack = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5793,9 +6802,11 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) Decode(d *jx.D
 				return errors.Wrap(err, "decode field \"rack_unit\"")
 			}
 		case "room":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Room.Reset()
-				if err := s.Room.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Room = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5803,9 +6814,11 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) Decode(d *jx.D
 				return errors.Wrap(err, "decode field \"room\"")
 			}
 		case "row":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Row.Reset()
-				if err := s.Row.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Row = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5818,6 +6831,38 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataCurrent) Decode(d *jx.D
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcLocationResultResultsItemDataCurrent")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011011,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcLocationResultResultsItemDataCurrent) {
+					name = jsonFieldsNameOfBmcResponseModelBmcLocationResultResultsItemDataCurrent[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -5846,16 +6891,12 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) Encode(e *jx.E
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) encodeFields(e *jx.Encoder) {
 	{
-		if s.Datacenter.Set {
-			e.FieldStart("datacenter")
-			s.Datacenter.Encode(e)
-		}
+		e.FieldStart("datacenter")
+		e.Str(s.Datacenter)
 	}
 	{
-		if s.Rack.Set {
-			e.FieldStart("rack")
-			s.Rack.Encode(e)
-		}
+		e.FieldStart("rack")
+		e.Str(s.Rack)
 	}
 	{
 		if s.RackUnit.Set {
@@ -5864,16 +6905,12 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) encodeFields(e
 		}
 	}
 	{
-		if s.Room.Set {
-			e.FieldStart("room")
-			s.Room.Encode(e)
-		}
+		e.FieldStart("room")
+		e.Str(s.Room)
 	}
 	{
-		if s.Row.Set {
-			e.FieldStart("row")
-			s.Row.Encode(e)
-		}
+		e.FieldStart("row")
+		e.Str(s.Row)
 	}
 }
 
@@ -5890,13 +6927,16 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) Decode(d *jx.D
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcLocationResultResultsItemDataDesired to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "datacenter":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Datacenter.Reset()
-				if err := s.Datacenter.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Datacenter = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5904,9 +6944,11 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) Decode(d *jx.D
 				return errors.Wrap(err, "decode field \"datacenter\"")
 			}
 		case "rack":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Rack.Reset()
-				if err := s.Rack.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Rack = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5924,9 +6966,11 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) Decode(d *jx.D
 				return errors.Wrap(err, "decode field \"rack_unit\"")
 			}
 		case "room":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Room.Reset()
-				if err := s.Room.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Room = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5934,9 +6978,11 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) Decode(d *jx.D
 				return errors.Wrap(err, "decode field \"room\"")
 			}
 		case "row":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Row.Reset()
-				if err := s.Row.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Row = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -5949,6 +6995,38 @@ func (s *BmcResponseModelBmcLocationResultResultsItemDataDesired) Decode(d *jx.D
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcLocationResultResultsItemDataDesired")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011011,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcLocationResultResultsItemDataDesired) {
+					name = jsonFieldsNameOfBmcResponseModelBmcLocationResultResultsItemDataDesired[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -5977,34 +7055,24 @@ func (s *BmcResponseModelBmcLocationResultSummary) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcLocationResultSummary) encodeFields(e *jx.Encoder) {
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Failed.Set {
-			e.FieldStart("failed")
-			s.Failed.Encode(e)
-		}
+		e.FieldStart("failed")
+		e.Int(s.Failed)
 	}
 	{
-		if s.FailedNodes.Set {
-			e.FieldStart("failed_nodes")
-			s.FailedNodes.Encode(e)
-		}
+		e.FieldStart("failed_nodes")
+		e.Str(s.FailedNodes)
 	}
 	{
-		if s.Succeeded.Set {
-			e.FieldStart("succeeded")
-			s.Succeeded.Encode(e)
-		}
+		e.FieldStart("succeeded")
+		e.Int(s.Succeeded)
 	}
 	{
-		if s.Total.Set {
-			e.FieldStart("total")
-			s.Total.Encode(e)
-		}
+		e.FieldStart("total")
+		e.Int(s.Total)
 	}
 }
 
@@ -6021,13 +7089,16 @@ func (s *BmcResponseModelBmcLocationResultSummary) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcLocationResultSummary to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6035,9 +7106,11 @@ func (s *BmcResponseModelBmcLocationResultSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "failed":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Failed.Reset()
-				if err := s.Failed.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Failed = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6045,9 +7118,11 @@ func (s *BmcResponseModelBmcLocationResultSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed\"")
 			}
 		case "failed_nodes":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.FailedNodes.Reset()
-				if err := s.FailedNodes.Decode(d); err != nil {
+				v, err := d.Str()
+				s.FailedNodes = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6055,9 +7130,11 @@ func (s *BmcResponseModelBmcLocationResultSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed_nodes\"")
 			}
 		case "succeeded":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Succeeded.Reset()
-				if err := s.Succeeded.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Succeeded = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6065,9 +7142,11 @@ func (s *BmcResponseModelBmcLocationResultSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"succeeded\"")
 			}
 		case "total":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Total.Reset()
-				if err := s.Total.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Total = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6080,6 +7159,38 @@ func (s *BmcResponseModelBmcLocationResultSummary) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcLocationResultSummary")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcLocationResultSummary) {
+					name = jsonFieldsNameOfBmcResponseModelBmcLocationResultSummary[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -6108,22 +7219,20 @@ func (s *BmcResponseModelBmcNICList) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcNICList) encodeFields(e *jx.Encoder) {
 	{
-		if s.Results.Set {
-			e.FieldStart("results")
-			s.Results.Encode(e)
+		e.FieldStart("results")
+		e.ArrStart()
+		for _, elem := range s.Results {
+			elem.Encode(e)
 		}
+		e.ArrEnd()
 	}
 	{
-		if s.RunID.Set {
-			e.FieldStart("run_id")
-			s.RunID.Encode(e)
-		}
+		e.FieldStart("run_id")
+		e.Str(s.RunID)
 	}
 	{
-		if s.Summary.Set {
-			e.FieldStart("summary")
-			s.Summary.Encode(e)
-		}
+		e.FieldStart("summary")
+		s.Summary.Encode(e)
 	}
 }
 
@@ -6138,13 +7247,22 @@ func (s *BmcResponseModelBmcNICList) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcNICList to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "results":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Results.Reset()
-				if err := s.Results.Decode(d); err != nil {
+				s.Results = make([]BmcResponseModelBmcNICListResultsItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem BmcResponseModelBmcNICListResultsItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Results = append(s.Results, elem)
+					return nil
+				}); err != nil {
 					return err
 				}
 				return nil
@@ -6152,9 +7270,11 @@ func (s *BmcResponseModelBmcNICList) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"results\"")
 			}
 		case "run_id":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.RunID.Reset()
-				if err := s.RunID.Decode(d); err != nil {
+				v, err := d.Str()
+				s.RunID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6162,8 +7282,8 @@ func (s *BmcResponseModelBmcNICList) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"run_id\"")
 			}
 		case "summary":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Summary.Reset()
 				if err := s.Summary.Decode(d); err != nil {
 					return err
 				}
@@ -6177,6 +7297,38 @@ func (s *BmcResponseModelBmcNICList) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcNICList")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcNICList) {
+					name = jsonFieldsNameOfBmcResponseModelBmcNICList[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -6211,28 +7363,20 @@ func (s *BmcResponseModelBmcNICListResultsItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Message.Set {
-			e.FieldStart("message")
-			s.Message.Encode(e)
-		}
+		e.FieldStart("message")
+		e.Str(s.Message)
 	}
 	{
-		if s.Node.Set {
-			e.FieldStart("node")
-			s.Node.Encode(e)
-		}
+		e.FieldStart("node")
+		e.Str(s.Node)
 	}
 	{
-		if s.Success.Set {
-			e.FieldStart("success")
-			s.Success.Encode(e)
-		}
+		e.FieldStart("success")
+		e.Bool(s.Success)
 	}
 }
 
@@ -6249,6 +7393,7 @@ func (s *BmcResponseModelBmcNICListResultsItem) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcNICListResultsItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -6263,9 +7408,11 @@ func (s *BmcResponseModelBmcNICListResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"data\"")
 			}
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6273,9 +7420,11 @@ func (s *BmcResponseModelBmcNICListResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "message":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Message = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6283,9 +7432,11 @@ func (s *BmcResponseModelBmcNICListResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"message\"")
 			}
 		case "node":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Node.Reset()
-				if err := s.Node.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Node = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6293,9 +7444,11 @@ func (s *BmcResponseModelBmcNICListResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"node\"")
 			}
 		case "success":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Success.Reset()
-				if err := s.Success.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.Success = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6308,6 +7461,38 @@ func (s *BmcResponseModelBmcNICListResultsItem) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcNICListResultsItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011110,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcNICListResultsItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcNICListResultsItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -6399,40 +7584,28 @@ func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) Encode(e *jx.Encoder
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.Enabled.Set {
-			e.FieldStart("enabled")
-			s.Enabled.Encode(e)
-		}
+		e.FieldStart("enabled")
+		e.Bool(s.Enabled)
 	}
 	{
-		if s.ID.Set {
-			e.FieldStart("id")
-			s.ID.Encode(e)
-		}
+		e.FieldStart("id")
+		e.Str(s.ID)
 	}
 	{
-		if s.Link.Set {
-			e.FieldStart("link")
-			s.Link.Encode(e)
-		}
+		e.FieldStart("link")
+		e.Str(s.Link)
 	}
 	{
-		if s.MAC.Set {
-			e.FieldStart("mac")
-			s.MAC.Encode(e)
-		}
+		e.FieldStart("mac")
+		e.Str(s.MAC)
 	}
 	{
-		if s.Name.Set {
-			e.FieldStart("name")
-			s.Name.Encode(e)
-		}
+		e.FieldStart("name")
+		e.Str(s.Name)
 	}
 	{
-		if s.SpeedMbps.Set {
-			e.FieldStart("speed_mbps")
-			s.SpeedMbps.Encode(e)
-		}
+		e.FieldStart("speed_mbps")
+		e.Int(s.SpeedMbps)
 	}
 }
 
@@ -6450,13 +7623,16 @@ func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) Decode(d *jx.Decoder
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcNICListResultsItemDataNicsItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "enabled":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Enabled.Reset()
-				if err := s.Enabled.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.Enabled = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6464,9 +7640,11 @@ func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) Decode(d *jx.Decoder
 				return errors.Wrap(err, "decode field \"enabled\"")
 			}
 		case "id":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.ID.Reset()
-				if err := s.ID.Decode(d); err != nil {
+				v, err := d.Str()
+				s.ID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6474,9 +7652,11 @@ func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) Decode(d *jx.Decoder
 				return errors.Wrap(err, "decode field \"id\"")
 			}
 		case "link":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Link.Reset()
-				if err := s.Link.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Link = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6484,9 +7664,11 @@ func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) Decode(d *jx.Decoder
 				return errors.Wrap(err, "decode field \"link\"")
 			}
 		case "mac":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.MAC.Reset()
-				if err := s.MAC.Decode(d); err != nil {
+				v, err := d.Str()
+				s.MAC = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6494,9 +7676,11 @@ func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) Decode(d *jx.Decoder
 				return errors.Wrap(err, "decode field \"mac\"")
 			}
 		case "name":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Name = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6504,9 +7688,11 @@ func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) Decode(d *jx.Decoder
 				return errors.Wrap(err, "decode field \"name\"")
 			}
 		case "speed_mbps":
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				s.SpeedMbps.Reset()
-				if err := s.SpeedMbps.Decode(d); err != nil {
+				v, err := d.Int()
+				s.SpeedMbps = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6519,6 +7705,38 @@ func (s *BmcResponseModelBmcNICListResultsItemDataNicsItem) Decode(d *jx.Decoder
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcNICListResultsItemDataNicsItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00111111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcNICListResultsItemDataNicsItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcNICListResultsItemDataNicsItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -6547,34 +7765,24 @@ func (s *BmcResponseModelBmcNICListSummary) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcNICListSummary) encodeFields(e *jx.Encoder) {
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Failed.Set {
-			e.FieldStart("failed")
-			s.Failed.Encode(e)
-		}
+		e.FieldStart("failed")
+		e.Int(s.Failed)
 	}
 	{
-		if s.FailedNodes.Set {
-			e.FieldStart("failed_nodes")
-			s.FailedNodes.Encode(e)
-		}
+		e.FieldStart("failed_nodes")
+		e.Str(s.FailedNodes)
 	}
 	{
-		if s.Succeeded.Set {
-			e.FieldStart("succeeded")
-			s.Succeeded.Encode(e)
-		}
+		e.FieldStart("succeeded")
+		e.Int(s.Succeeded)
 	}
 	{
-		if s.Total.Set {
-			e.FieldStart("total")
-			s.Total.Encode(e)
-		}
+		e.FieldStart("total")
+		e.Int(s.Total)
 	}
 }
 
@@ -6591,13 +7799,16 @@ func (s *BmcResponseModelBmcNICListSummary) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcNICListSummary to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6605,9 +7816,11 @@ func (s *BmcResponseModelBmcNICListSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "failed":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Failed.Reset()
-				if err := s.Failed.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Failed = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6615,9 +7828,11 @@ func (s *BmcResponseModelBmcNICListSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed\"")
 			}
 		case "failed_nodes":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.FailedNodes.Reset()
-				if err := s.FailedNodes.Decode(d); err != nil {
+				v, err := d.Str()
+				s.FailedNodes = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6625,9 +7840,11 @@ func (s *BmcResponseModelBmcNICListSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed_nodes\"")
 			}
 		case "succeeded":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Succeeded.Reset()
-				if err := s.Succeeded.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Succeeded = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6635,9 +7852,11 @@ func (s *BmcResponseModelBmcNICListSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"succeeded\"")
 			}
 		case "total":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Total.Reset()
-				if err := s.Total.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Total = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6650,6 +7869,38 @@ func (s *BmcResponseModelBmcNICListSummary) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcNICListSummary")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcNICListSummary) {
+					name = jsonFieldsNameOfBmcResponseModelBmcNICListSummary[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -6678,22 +7929,20 @@ func (s *BmcResponseModelBmcSELLog) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcSELLog) encodeFields(e *jx.Encoder) {
 	{
-		if s.Results.Set {
-			e.FieldStart("results")
-			s.Results.Encode(e)
+		e.FieldStart("results")
+		e.ArrStart()
+		for _, elem := range s.Results {
+			elem.Encode(e)
 		}
+		e.ArrEnd()
 	}
 	{
-		if s.RunID.Set {
-			e.FieldStart("run_id")
-			s.RunID.Encode(e)
-		}
+		e.FieldStart("run_id")
+		e.Str(s.RunID)
 	}
 	{
-		if s.Summary.Set {
-			e.FieldStart("summary")
-			s.Summary.Encode(e)
-		}
+		e.FieldStart("summary")
+		s.Summary.Encode(e)
 	}
 }
 
@@ -6708,13 +7957,22 @@ func (s *BmcResponseModelBmcSELLog) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcSELLog to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "results":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Results.Reset()
-				if err := s.Results.Decode(d); err != nil {
+				s.Results = make([]BmcResponseModelBmcSELLogResultsItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem BmcResponseModelBmcSELLogResultsItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Results = append(s.Results, elem)
+					return nil
+				}); err != nil {
 					return err
 				}
 				return nil
@@ -6722,9 +7980,11 @@ func (s *BmcResponseModelBmcSELLog) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"results\"")
 			}
 		case "run_id":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.RunID.Reset()
-				if err := s.RunID.Decode(d); err != nil {
+				v, err := d.Str()
+				s.RunID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6732,8 +7992,8 @@ func (s *BmcResponseModelBmcSELLog) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"run_id\"")
 			}
 		case "summary":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Summary.Reset()
 				if err := s.Summary.Decode(d); err != nil {
 					return err
 				}
@@ -6747,6 +8007,38 @@ func (s *BmcResponseModelBmcSELLog) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcSELLog")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcSELLog) {
+					name = jsonFieldsNameOfBmcResponseModelBmcSELLog[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -6781,28 +8073,20 @@ func (s *BmcResponseModelBmcSELLogResultsItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Message.Set {
-			e.FieldStart("message")
-			s.Message.Encode(e)
-		}
+		e.FieldStart("message")
+		e.Str(s.Message)
 	}
 	{
-		if s.Node.Set {
-			e.FieldStart("node")
-			s.Node.Encode(e)
-		}
+		e.FieldStart("node")
+		e.Str(s.Node)
 	}
 	{
-		if s.Success.Set {
-			e.FieldStart("success")
-			s.Success.Encode(e)
-		}
+		e.FieldStart("success")
+		e.Bool(s.Success)
 	}
 }
 
@@ -6819,6 +8103,7 @@ func (s *BmcResponseModelBmcSELLogResultsItem) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcSELLogResultsItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -6833,9 +8118,11 @@ func (s *BmcResponseModelBmcSELLogResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"data\"")
 			}
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6843,9 +8130,11 @@ func (s *BmcResponseModelBmcSELLogResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "message":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Message = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6853,9 +8142,11 @@ func (s *BmcResponseModelBmcSELLogResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"message\"")
 			}
 		case "node":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Node.Reset()
-				if err := s.Node.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Node = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6863,9 +8154,11 @@ func (s *BmcResponseModelBmcSELLogResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"node\"")
 			}
 		case "success":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Success.Reset()
-				if err := s.Success.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.Success = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -6878,6 +8171,38 @@ func (s *BmcResponseModelBmcSELLogResultsItem) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcSELLogResultsItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011110,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcSELLogResultsItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcSELLogResultsItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -6969,52 +8294,36 @@ func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) Encode(e *jx.Encod
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.Created.Set {
-			e.FieldStart("created")
-			s.Created.Encode(e)
-		}
+		e.FieldStart("created")
+		e.Str(s.Created)
 	}
 	{
-		if s.EntryType.Set {
-			e.FieldStart("entry_type")
-			s.EntryType.Encode(e)
-		}
+		e.FieldStart("entry_type")
+		e.Str(s.EntryType)
 	}
 	{
-		if s.ID.Set {
-			e.FieldStart("id")
-			s.ID.Encode(e)
-		}
+		e.FieldStart("id")
+		e.Str(s.ID)
 	}
 	{
-		if s.Message.Set {
-			e.FieldStart("message")
-			s.Message.Encode(e)
-		}
+		e.FieldStart("message")
+		e.Str(s.Message)
 	}
 	{
-		if s.MessageID.Set {
-			e.FieldStart("message_id")
-			s.MessageID.Encode(e)
-		}
+		e.FieldStart("message_id")
+		e.Str(s.MessageID)
 	}
 	{
-		if s.Resolution.Set {
-			e.FieldStart("resolution")
-			s.Resolution.Encode(e)
-		}
+		e.FieldStart("resolution")
+		e.Str(s.Resolution)
 	}
 	{
-		if s.SensorType.Set {
-			e.FieldStart("sensor_type")
-			s.SensorType.Encode(e)
-		}
+		e.FieldStart("sensor_type")
+		e.Str(s.SensorType)
 	}
 	{
-		if s.Severity.Set {
-			e.FieldStart("severity")
-			s.Severity.Encode(e)
-		}
+		e.FieldStart("severity")
+		e.Str(s.Severity)
 	}
 }
 
@@ -7034,13 +8343,16 @@ func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) Decode(d *jx.Decod
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcSELLogResultsItemDataEntriesItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "created":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Created.Reset()
-				if err := s.Created.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Created = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7048,9 +8360,11 @@ func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) Decode(d *jx.Decod
 				return errors.Wrap(err, "decode field \"created\"")
 			}
 		case "entry_type":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.EntryType.Reset()
-				if err := s.EntryType.Decode(d); err != nil {
+				v, err := d.Str()
+				s.EntryType = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7058,9 +8372,11 @@ func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) Decode(d *jx.Decod
 				return errors.Wrap(err, "decode field \"entry_type\"")
 			}
 		case "id":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.ID.Reset()
-				if err := s.ID.Decode(d); err != nil {
+				v, err := d.Str()
+				s.ID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7068,9 +8384,11 @@ func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) Decode(d *jx.Decod
 				return errors.Wrap(err, "decode field \"id\"")
 			}
 		case "message":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Message = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7078,9 +8396,11 @@ func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) Decode(d *jx.Decod
 				return errors.Wrap(err, "decode field \"message\"")
 			}
 		case "message_id":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.MessageID.Reset()
-				if err := s.MessageID.Decode(d); err != nil {
+				v, err := d.Str()
+				s.MessageID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7088,9 +8408,11 @@ func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) Decode(d *jx.Decod
 				return errors.Wrap(err, "decode field \"message_id\"")
 			}
 		case "resolution":
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				s.Resolution.Reset()
-				if err := s.Resolution.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Resolution = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7098,9 +8420,11 @@ func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) Decode(d *jx.Decod
 				return errors.Wrap(err, "decode field \"resolution\"")
 			}
 		case "sensor_type":
+			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
-				s.SensorType.Reset()
-				if err := s.SensorType.Decode(d); err != nil {
+				v, err := d.Str()
+				s.SensorType = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7108,9 +8432,11 @@ func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) Decode(d *jx.Decod
 				return errors.Wrap(err, "decode field \"sensor_type\"")
 			}
 		case "severity":
+			requiredBitSet[0] |= 1 << 7
 			if err := func() error {
-				s.Severity.Reset()
-				if err := s.Severity.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Severity = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7123,6 +8449,38 @@ func (s *BmcResponseModelBmcSELLogResultsItemDataEntriesItem) Decode(d *jx.Decod
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcSELLogResultsItemDataEntriesItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b11111111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcSELLogResultsItemDataEntriesItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcSELLogResultsItemDataEntriesItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -7151,34 +8509,24 @@ func (s *BmcResponseModelBmcSELLogSummary) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcSELLogSummary) encodeFields(e *jx.Encoder) {
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Failed.Set {
-			e.FieldStart("failed")
-			s.Failed.Encode(e)
-		}
+		e.FieldStart("failed")
+		e.Int(s.Failed)
 	}
 	{
-		if s.FailedNodes.Set {
-			e.FieldStart("failed_nodes")
-			s.FailedNodes.Encode(e)
-		}
+		e.FieldStart("failed_nodes")
+		e.Str(s.FailedNodes)
 	}
 	{
-		if s.Succeeded.Set {
-			e.FieldStart("succeeded")
-			s.Succeeded.Encode(e)
-		}
+		e.FieldStart("succeeded")
+		e.Int(s.Succeeded)
 	}
 	{
-		if s.Total.Set {
-			e.FieldStart("total")
-			s.Total.Encode(e)
-		}
+		e.FieldStart("total")
+		e.Int(s.Total)
 	}
 }
 
@@ -7195,13 +8543,16 @@ func (s *BmcResponseModelBmcSELLogSummary) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcSELLogSummary to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7209,9 +8560,11 @@ func (s *BmcResponseModelBmcSELLogSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "failed":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Failed.Reset()
-				if err := s.Failed.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Failed = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7219,9 +8572,11 @@ func (s *BmcResponseModelBmcSELLogSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed\"")
 			}
 		case "failed_nodes":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.FailedNodes.Reset()
-				if err := s.FailedNodes.Decode(d); err != nil {
+				v, err := d.Str()
+				s.FailedNodes = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7229,9 +8584,11 @@ func (s *BmcResponseModelBmcSELLogSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed_nodes\"")
 			}
 		case "succeeded":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Succeeded.Reset()
-				if err := s.Succeeded.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Succeeded = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7239,9 +8596,11 @@ func (s *BmcResponseModelBmcSELLogSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"succeeded\"")
 			}
 		case "total":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Total.Reset()
-				if err := s.Total.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Total = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7254,6 +8613,38 @@ func (s *BmcResponseModelBmcSELLogSummary) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcSELLogSummary")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcSELLogSummary) {
+					name = jsonFieldsNameOfBmcResponseModelBmcSELLogSummary[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -7282,22 +8673,20 @@ func (s *BmcResponseModelBmcSecureBoot) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcSecureBoot) encodeFields(e *jx.Encoder) {
 	{
-		if s.Results.Set {
-			e.FieldStart("results")
-			s.Results.Encode(e)
+		e.FieldStart("results")
+		e.ArrStart()
+		for _, elem := range s.Results {
+			elem.Encode(e)
 		}
+		e.ArrEnd()
 	}
 	{
-		if s.RunID.Set {
-			e.FieldStart("run_id")
-			s.RunID.Encode(e)
-		}
+		e.FieldStart("run_id")
+		e.Str(s.RunID)
 	}
 	{
-		if s.Summary.Set {
-			e.FieldStart("summary")
-			s.Summary.Encode(e)
-		}
+		e.FieldStart("summary")
+		s.Summary.Encode(e)
 	}
 }
 
@@ -7312,13 +8701,22 @@ func (s *BmcResponseModelBmcSecureBoot) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcSecureBoot to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "results":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Results.Reset()
-				if err := s.Results.Decode(d); err != nil {
+				s.Results = make([]BmcResponseModelBmcSecureBootResultsItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem BmcResponseModelBmcSecureBootResultsItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Results = append(s.Results, elem)
+					return nil
+				}); err != nil {
 					return err
 				}
 				return nil
@@ -7326,9 +8724,11 @@ func (s *BmcResponseModelBmcSecureBoot) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"results\"")
 			}
 		case "run_id":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.RunID.Reset()
-				if err := s.RunID.Decode(d); err != nil {
+				v, err := d.Str()
+				s.RunID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7336,8 +8736,8 @@ func (s *BmcResponseModelBmcSecureBoot) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"run_id\"")
 			}
 		case "summary":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Summary.Reset()
 				if err := s.Summary.Decode(d); err != nil {
 					return err
 				}
@@ -7351,6 +8751,38 @@ func (s *BmcResponseModelBmcSecureBoot) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcSecureBoot")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcSecureBoot) {
+					name = jsonFieldsNameOfBmcResponseModelBmcSecureBoot[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -7385,28 +8817,20 @@ func (s *BmcResponseModelBmcSecureBootResultsItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Message.Set {
-			e.FieldStart("message")
-			s.Message.Encode(e)
-		}
+		e.FieldStart("message")
+		e.Str(s.Message)
 	}
 	{
-		if s.Node.Set {
-			e.FieldStart("node")
-			s.Node.Encode(e)
-		}
+		e.FieldStart("node")
+		e.Str(s.Node)
 	}
 	{
-		if s.Success.Set {
-			e.FieldStart("success")
-			s.Success.Encode(e)
-		}
+		e.FieldStart("success")
+		e.Bool(s.Success)
 	}
 }
 
@@ -7423,6 +8847,7 @@ func (s *BmcResponseModelBmcSecureBootResultsItem) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcSecureBootResultsItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -7437,9 +8862,11 @@ func (s *BmcResponseModelBmcSecureBootResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"data\"")
 			}
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7447,9 +8874,11 @@ func (s *BmcResponseModelBmcSecureBootResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "message":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Message = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7457,9 +8886,11 @@ func (s *BmcResponseModelBmcSecureBootResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"message\"")
 			}
 		case "node":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Node.Reset()
-				if err := s.Node.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Node = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7467,9 +8898,11 @@ func (s *BmcResponseModelBmcSecureBootResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"node\"")
 			}
 		case "success":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Success.Reset()
-				if err := s.Success.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.Success = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7482,6 +8915,38 @@ func (s *BmcResponseModelBmcSecureBootResultsItem) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcSecureBootResultsItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011110,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcSecureBootResultsItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcSecureBootResultsItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -7510,10 +8975,8 @@ func (s *BmcResponseModelBmcSecureBootResultsItemData) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcSecureBootResultsItemData) encodeFields(e *jx.Encoder) {
 	{
-		if s.CurrentBoot.Set {
-			e.FieldStart("current_boot")
-			s.CurrentBoot.Encode(e)
-		}
+		e.FieldStart("current_boot")
+		e.Str(s.CurrentBoot)
 	}
 	{
 		if s.Databases != nil {
@@ -7526,10 +8989,8 @@ func (s *BmcResponseModelBmcSecureBootResultsItemData) encodeFields(e *jx.Encode
 		}
 	}
 	{
-		if s.Enabled.Set {
-			e.FieldStart("enabled")
-			s.Enabled.Encode(e)
-		}
+		e.FieldStart("enabled")
+		e.Bool(s.Enabled)
 	}
 	{
 		if s.Keys != nil {
@@ -7542,10 +9003,8 @@ func (s *BmcResponseModelBmcSecureBootResultsItemData) encodeFields(e *jx.Encode
 		}
 	}
 	{
-		if s.Mode.Set {
-			e.FieldStart("mode")
-			s.Mode.Encode(e)
-		}
+		e.FieldStart("mode")
+		e.Str(s.Mode)
 	}
 	{
 		if s.PendingEnabled.Set {
@@ -7569,13 +9028,16 @@ func (s *BmcResponseModelBmcSecureBootResultsItemData) Decode(d *jx.Decoder) err
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcSecureBootResultsItemData to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "current_boot":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.CurrentBoot.Reset()
-				if err := s.CurrentBoot.Decode(d); err != nil {
+				v, err := d.Str()
+				s.CurrentBoot = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7602,9 +9064,11 @@ func (s *BmcResponseModelBmcSecureBootResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"databases\"")
 			}
 		case "enabled":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Enabled.Reset()
-				if err := s.Enabled.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.Enabled = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7629,9 +9093,11 @@ func (s *BmcResponseModelBmcSecureBootResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"keys\"")
 			}
 		case "mode":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Mode.Reset()
-				if err := s.Mode.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Mode = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7654,6 +9120,38 @@ func (s *BmcResponseModelBmcSecureBootResultsItemData) Decode(d *jx.Decoder) err
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcSecureBootResultsItemData")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00010101,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcSecureBootResultsItemData) {
+					name = jsonFieldsNameOfBmcResponseModelBmcSecureBootResultsItemData[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -7692,10 +9190,8 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) encodeFields(e *j
 		}
 	}
 	{
-		if s.ID.Set {
-			e.FieldStart("id")
-			s.ID.Encode(e)
-		}
+		e.FieldStart("id")
+		e.Str(s.ID)
 	}
 	{
 		if s.Signatures != nil {
@@ -7720,6 +9216,7 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) Decode(d *jx.Deco
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcSecureBootResultsItemDataKeysItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -7741,9 +9238,11 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) Decode(d *jx.Deco
 				return errors.Wrap(err, "decode field \"certificates\"")
 			}
 		case "id":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.ID.Reset()
-				if err := s.ID.Decode(d); err != nil {
+				v, err := d.Str()
+				s.ID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7774,6 +9273,38 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItem) Decode(d *jx.Deco
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcSecureBootResultsItemDataKeysItem")
 	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000010,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcSecureBootResultsItemDataKeysItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcSecureBootResultsItemDataKeysItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
 
 	return nil
 }
@@ -7801,46 +9332,32 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) E
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.Fingerprint.Set {
-			e.FieldStart("fingerprint")
-			s.Fingerprint.Encode(e)
-		}
+		e.FieldStart("fingerprint")
+		e.Str(s.Fingerprint)
 	}
 	{
-		if s.ID.Set {
-			e.FieldStart("id")
-			s.ID.Encode(e)
-		}
+		e.FieldStart("id")
+		e.Str(s.ID)
 	}
 	{
-		if s.Issuer.Set {
-			e.FieldStart("issuer")
-			s.Issuer.Encode(e)
-		}
+		e.FieldStart("issuer")
+		e.Str(s.Issuer)
 	}
 	{
-		if s.NotAfter.Set {
-			e.FieldStart("not_after")
-			s.NotAfter.Encode(e)
-		}
+		e.FieldStart("not_after")
+		e.Str(s.NotAfter)
 	}
 	{
-		if s.NotBefore.Set {
-			e.FieldStart("not_before")
-			s.NotBefore.Encode(e)
-		}
+		e.FieldStart("not_before")
+		e.Str(s.NotBefore)
 	}
 	{
-		if s.Owner.Set {
-			e.FieldStart("owner")
-			s.Owner.Encode(e)
-		}
+		e.FieldStart("owner")
+		e.Str(s.Owner)
 	}
 	{
-		if s.Subject.Set {
-			e.FieldStart("subject")
-			s.Subject.Encode(e)
-		}
+		e.FieldStart("subject")
+		e.Str(s.Subject)
 	}
 }
 
@@ -7859,13 +9376,16 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) D
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "fingerprint":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Fingerprint.Reset()
-				if err := s.Fingerprint.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Fingerprint = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7873,9 +9393,11 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) D
 				return errors.Wrap(err, "decode field \"fingerprint\"")
 			}
 		case "id":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.ID.Reset()
-				if err := s.ID.Decode(d); err != nil {
+				v, err := d.Str()
+				s.ID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7883,9 +9405,11 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) D
 				return errors.Wrap(err, "decode field \"id\"")
 			}
 		case "issuer":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Issuer.Reset()
-				if err := s.Issuer.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Issuer = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7893,9 +9417,11 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) D
 				return errors.Wrap(err, "decode field \"issuer\"")
 			}
 		case "not_after":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.NotAfter.Reset()
-				if err := s.NotAfter.Decode(d); err != nil {
+				v, err := d.Str()
+				s.NotAfter = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7903,9 +9429,11 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) D
 				return errors.Wrap(err, "decode field \"not_after\"")
 			}
 		case "not_before":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.NotBefore.Reset()
-				if err := s.NotBefore.Decode(d); err != nil {
+				v, err := d.Str()
+				s.NotBefore = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7913,9 +9441,11 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) D
 				return errors.Wrap(err, "decode field \"not_before\"")
 			}
 		case "owner":
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				s.Owner.Reset()
-				if err := s.Owner.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Owner = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7923,9 +9453,11 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) D
 				return errors.Wrap(err, "decode field \"owner\"")
 			}
 		case "subject":
+			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
-				s.Subject.Reset()
-				if err := s.Subject.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Subject = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -7938,6 +9470,38 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) D
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b01111111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcSecureBootResultsItemDataKeysItemCertificatesItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -7966,28 +9530,20 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) Enc
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) encodeFields(e *jx.Encoder) {
 	{
-		if s.Hash.Set {
-			e.FieldStart("hash")
-			s.Hash.Encode(e)
-		}
+		e.FieldStart("hash")
+		e.Str(s.Hash)
 	}
 	{
-		if s.ID.Set {
-			e.FieldStart("id")
-			s.ID.Encode(e)
-		}
+		e.FieldStart("id")
+		e.Str(s.ID)
 	}
 	{
-		if s.Owner.Set {
-			e.FieldStart("owner")
-			s.Owner.Encode(e)
-		}
+		e.FieldStart("owner")
+		e.Str(s.Owner)
 	}
 	{
-		if s.Type.Set {
-			e.FieldStart("type")
-			s.Type.Encode(e)
-		}
+		e.FieldStart("type")
+		e.Str(s.Type)
 	}
 }
 
@@ -8003,13 +9559,16 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) Dec
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "hash":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Hash.Reset()
-				if err := s.Hash.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Hash = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8017,9 +9576,11 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) Dec
 				return errors.Wrap(err, "decode field \"hash\"")
 			}
 		case "id":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.ID.Reset()
-				if err := s.ID.Decode(d); err != nil {
+				v, err := d.Str()
+				s.ID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8027,9 +9588,11 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) Dec
 				return errors.Wrap(err, "decode field \"id\"")
 			}
 		case "owner":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Owner.Reset()
-				if err := s.Owner.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Owner = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8037,9 +9600,11 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) Dec
 				return errors.Wrap(err, "decode field \"owner\"")
 			}
 		case "type":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Type.Reset()
-				if err := s.Type.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Type = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8052,6 +9617,38 @@ func (s *BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) Dec
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00001111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem) {
+					name = jsonFieldsNameOfBmcResponseModelBmcSecureBootResultsItemDataKeysItemSignaturesItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -8080,34 +9677,24 @@ func (s *BmcResponseModelBmcSecureBootSummary) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelBmcSecureBootSummary) encodeFields(e *jx.Encoder) {
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Failed.Set {
-			e.FieldStart("failed")
-			s.Failed.Encode(e)
-		}
+		e.FieldStart("failed")
+		e.Int(s.Failed)
 	}
 	{
-		if s.FailedNodes.Set {
-			e.FieldStart("failed_nodes")
-			s.FailedNodes.Encode(e)
-		}
+		e.FieldStart("failed_nodes")
+		e.Str(s.FailedNodes)
 	}
 	{
-		if s.Succeeded.Set {
-			e.FieldStart("succeeded")
-			s.Succeeded.Encode(e)
-		}
+		e.FieldStart("succeeded")
+		e.Int(s.Succeeded)
 	}
 	{
-		if s.Total.Set {
-			e.FieldStart("total")
-			s.Total.Encode(e)
-		}
+		e.FieldStart("total")
+		e.Int(s.Total)
 	}
 }
 
@@ -8124,13 +9711,16 @@ func (s *BmcResponseModelBmcSecureBootSummary) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelBmcSecureBootSummary to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8138,9 +9728,11 @@ func (s *BmcResponseModelBmcSecureBootSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "failed":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Failed.Reset()
-				if err := s.Failed.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Failed = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8148,9 +9740,11 @@ func (s *BmcResponseModelBmcSecureBootSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed\"")
 			}
 		case "failed_nodes":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.FailedNodes.Reset()
-				if err := s.FailedNodes.Decode(d); err != nil {
+				v, err := d.Str()
+				s.FailedNodes = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8158,9 +9752,11 @@ func (s *BmcResponseModelBmcSecureBootSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed_nodes\"")
 			}
 		case "succeeded":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Succeeded.Reset()
-				if err := s.Succeeded.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Succeeded = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8168,9 +9764,11 @@ func (s *BmcResponseModelBmcSecureBootSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"succeeded\"")
 			}
 		case "total":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Total.Reset()
-				if err := s.Total.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Total = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8183,6 +9781,38 @@ func (s *BmcResponseModelBmcSecureBootSummary) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelBmcSecureBootSummary")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelBmcSecureBootSummary) {
+					name = jsonFieldsNameOfBmcResponseModelBmcSecureBootSummary[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -8211,22 +9841,20 @@ func (s *BmcResponseModelRedfishSystem) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelRedfishSystem) encodeFields(e *jx.Encoder) {
 	{
-		if s.Results.Set {
-			e.FieldStart("results")
-			s.Results.Encode(e)
+		e.FieldStart("results")
+		e.ArrStart()
+		for _, elem := range s.Results {
+			elem.Encode(e)
 		}
+		e.ArrEnd()
 	}
 	{
-		if s.RunID.Set {
-			e.FieldStart("run_id")
-			s.RunID.Encode(e)
-		}
+		e.FieldStart("run_id")
+		e.Str(s.RunID)
 	}
 	{
-		if s.Summary.Set {
-			e.FieldStart("summary")
-			s.Summary.Encode(e)
-		}
+		e.FieldStart("summary")
+		s.Summary.Encode(e)
 	}
 }
 
@@ -8241,13 +9869,22 @@ func (s *BmcResponseModelRedfishSystem) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelRedfishSystem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "results":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Results.Reset()
-				if err := s.Results.Decode(d); err != nil {
+				s.Results = make([]BmcResponseModelRedfishSystemResultsItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem BmcResponseModelRedfishSystemResultsItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Results = append(s.Results, elem)
+					return nil
+				}); err != nil {
 					return err
 				}
 				return nil
@@ -8255,9 +9892,11 @@ func (s *BmcResponseModelRedfishSystem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"results\"")
 			}
 		case "run_id":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.RunID.Reset()
-				if err := s.RunID.Decode(d); err != nil {
+				v, err := d.Str()
+				s.RunID = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8265,8 +9904,8 @@ func (s *BmcResponseModelRedfishSystem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"run_id\"")
 			}
 		case "summary":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Summary.Reset()
 				if err := s.Summary.Decode(d); err != nil {
 					return err
 				}
@@ -8280,6 +9919,38 @@ func (s *BmcResponseModelRedfishSystem) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelRedfishSystem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelRedfishSystem) {
+					name = jsonFieldsNameOfBmcResponseModelRedfishSystem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -8314,28 +9985,20 @@ func (s *BmcResponseModelRedfishSystemResultsItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Message.Set {
-			e.FieldStart("message")
-			s.Message.Encode(e)
-		}
+		e.FieldStart("message")
+		e.Str(s.Message)
 	}
 	{
-		if s.Node.Set {
-			e.FieldStart("node")
-			s.Node.Encode(e)
-		}
+		e.FieldStart("node")
+		e.Str(s.Node)
 	}
 	{
-		if s.Success.Set {
-			e.FieldStart("success")
-			s.Success.Encode(e)
-		}
+		e.FieldStart("success")
+		e.Bool(s.Success)
 	}
 }
 
@@ -8352,6 +10015,7 @@ func (s *BmcResponseModelRedfishSystemResultsItem) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelRedfishSystemResultsItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -8366,9 +10030,11 @@ func (s *BmcResponseModelRedfishSystemResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"data\"")
 			}
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8376,9 +10042,11 @@ func (s *BmcResponseModelRedfishSystemResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "message":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Message.Reset()
-				if err := s.Message.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Message = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8386,9 +10054,11 @@ func (s *BmcResponseModelRedfishSystemResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"message\"")
 			}
 		case "node":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Node.Reset()
-				if err := s.Node.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Node = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8396,9 +10066,11 @@ func (s *BmcResponseModelRedfishSystemResultsItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"node\"")
 			}
 		case "success":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Success.Reset()
-				if err := s.Success.Decode(d); err != nil {
+				v, err := d.Bool()
+				s.Success = bool(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8411,6 +10083,38 @@ func (s *BmcResponseModelRedfishSystemResultsItem) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelRedfishSystemResultsItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011110,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelRedfishSystemResultsItem) {
+					name = jsonFieldsNameOfBmcResponseModelRedfishSystemResultsItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -8439,28 +10143,20 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelRedfishSystemResultsItemData) encodeFields(e *jx.Encoder) {
 	{
-		if s.AssetTag.Set {
-			e.FieldStart("asset_tag")
-			s.AssetTag.Encode(e)
-		}
+		e.FieldStart("asset_tag")
+		e.Str(s.AssetTag)
 	}
 	{
-		if s.BiosVersion.Set {
-			e.FieldStart("bios_version")
-			s.BiosVersion.Encode(e)
-		}
+		e.FieldStart("bios_version")
+		e.Str(s.BiosVersion)
 	}
 	{
-		if s.BootMode.Set {
-			e.FieldStart("boot_mode")
-			s.BootMode.Encode(e)
-		}
+		e.FieldStart("boot_mode")
+		e.Str(s.BootMode)
 	}
 	{
-		if s.BootNext.Set {
-			e.FieldStart("boot_next")
-			s.BootNext.Encode(e)
-		}
+		e.FieldStart("boot_next")
+		e.Str(s.BootNext)
 	}
 	{
 		if s.BootOrder.Set {
@@ -8469,40 +10165,28 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) encodeFields(e *jx.Encode
 		}
 	}
 	{
-		if s.BootOverrideEnabled.Set {
-			e.FieldStart("boot_override_enabled")
-			s.BootOverrideEnabled.Encode(e)
-		}
+		e.FieldStart("boot_override_enabled")
+		e.Str(s.BootOverrideEnabled)
 	}
 	{
-		if s.BootOverrideTarget.Set {
-			e.FieldStart("boot_override_target")
-			s.BootOverrideTarget.Encode(e)
-		}
+		e.FieldStart("boot_override_target")
+		e.Str(s.BootOverrideTarget)
 	}
 	{
-		if s.BootProgress.Set {
-			e.FieldStart("boot_progress")
-			s.BootProgress.Encode(e)
-		}
+		e.FieldStart("boot_progress")
+		e.Str(s.BootProgress)
 	}
 	{
-		if s.BootProgressTime.Set {
-			e.FieldStart("boot_progress_time")
-			s.BootProgressTime.Encode(e)
-		}
+		e.FieldStart("boot_progress_time")
+		e.Str(s.BootProgressTime)
 	}
 	{
-		if s.Health.Set {
-			e.FieldStart("health")
-			s.Health.Encode(e)
-		}
+		e.FieldStart("health")
+		e.Str(s.Health)
 	}
 	{
-		if s.HostName.Set {
-			e.FieldStart("host_name")
-			s.HostName.Encode(e)
-		}
+		e.FieldStart("host_name")
+		e.Str(s.HostName)
 	}
 	{
 		if s.Location.Set {
@@ -8511,28 +10195,20 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) encodeFields(e *jx.Encode
 		}
 	}
 	{
-		if s.LocationIndicator.Set {
-			e.FieldStart("location_indicator")
-			s.LocationIndicator.Encode(e)
-		}
+		e.FieldStart("location_indicator")
+		e.Str(s.LocationIndicator)
 	}
 	{
-		if s.Manufacturer.Set {
-			e.FieldStart("manufacturer")
-			s.Manufacturer.Encode(e)
-		}
+		e.FieldStart("manufacturer")
+		e.Str(s.Manufacturer)
 	}
 	{
-		if s.Model.Set {
-			e.FieldStart("model")
-			s.Model.Encode(e)
-		}
+		e.FieldStart("model")
+		e.Str(s.Model)
 	}
 	{
-		if s.Name.Set {
-			e.FieldStart("name")
-			s.Name.Encode(e)
-		}
+		e.FieldStart("name")
+		e.Str(s.Name)
 	}
 	{
 		if s.OemDell.Set {
@@ -8541,46 +10217,32 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) encodeFields(e *jx.Encode
 		}
 	}
 	{
-		if s.PowerStatus.Set {
-			e.FieldStart("power_status")
-			s.PowerStatus.Encode(e)
-		}
+		e.FieldStart("power_status")
+		e.Str(s.PowerStatus)
 	}
 	{
-		if s.ProcessorCores.Set {
-			e.FieldStart("processor_cores")
-			s.ProcessorCores.Encode(e)
-		}
+		e.FieldStart("processor_cores")
+		e.Int(s.ProcessorCores)
 	}
 	{
-		if s.ProcessorCount.Set {
-			e.FieldStart("processor_count")
-			s.ProcessorCount.Encode(e)
-		}
+		e.FieldStart("processor_count")
+		e.Int(s.ProcessorCount)
 	}
 	{
-		if s.ProcessorModel.Set {
-			e.FieldStart("processor_model")
-			s.ProcessorModel.Encode(e)
-		}
+		e.FieldStart("processor_model")
+		e.Str(s.ProcessorModel)
 	}
 	{
-		if s.ProcessorSockets.Set {
-			e.FieldStart("processor_sockets")
-			s.ProcessorSockets.Encode(e)
-		}
+		e.FieldStart("processor_sockets")
+		e.Int(s.ProcessorSockets)
 	}
 	{
-		if s.SerialNumber.Set {
-			e.FieldStart("serial_number")
-			s.SerialNumber.Encode(e)
-		}
+		e.FieldStart("serial_number")
+		e.Str(s.SerialNumber)
 	}
 	{
-		if s.TotalMemory.Set {
-			e.FieldStart("total_memory")
-			s.TotalMemory.Encode(e)
-		}
+		e.FieldStart("total_memory")
+		e.Float32(s.TotalMemory)
 	}
 }
 
@@ -8616,13 +10278,16 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelRedfishSystemResultsItemData to nil")
 	}
+	var requiredBitSet [3]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "asset_tag":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.AssetTag.Reset()
-				if err := s.AssetTag.Decode(d); err != nil {
+				v, err := d.Str()
+				s.AssetTag = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8630,9 +10295,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"asset_tag\"")
 			}
 		case "bios_version":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.BiosVersion.Reset()
-				if err := s.BiosVersion.Decode(d); err != nil {
+				v, err := d.Str()
+				s.BiosVersion = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8640,9 +10307,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"bios_version\"")
 			}
 		case "boot_mode":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.BootMode.Reset()
-				if err := s.BootMode.Decode(d); err != nil {
+				v, err := d.Str()
+				s.BootMode = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8650,9 +10319,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"boot_mode\"")
 			}
 		case "boot_next":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.BootNext.Reset()
-				if err := s.BootNext.Decode(d); err != nil {
+				v, err := d.Str()
+				s.BootNext = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8670,9 +10341,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"boot_order\"")
 			}
 		case "boot_override_enabled":
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				s.BootOverrideEnabled.Reset()
-				if err := s.BootOverrideEnabled.Decode(d); err != nil {
+				v, err := d.Str()
+				s.BootOverrideEnabled = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8680,9 +10353,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"boot_override_enabled\"")
 			}
 		case "boot_override_target":
+			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
-				s.BootOverrideTarget.Reset()
-				if err := s.BootOverrideTarget.Decode(d); err != nil {
+				v, err := d.Str()
+				s.BootOverrideTarget = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8690,9 +10365,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"boot_override_target\"")
 			}
 		case "boot_progress":
+			requiredBitSet[0] |= 1 << 7
 			if err := func() error {
-				s.BootProgress.Reset()
-				if err := s.BootProgress.Decode(d); err != nil {
+				v, err := d.Str()
+				s.BootProgress = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8700,9 +10377,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"boot_progress\"")
 			}
 		case "boot_progress_time":
+			requiredBitSet[1] |= 1 << 0
 			if err := func() error {
-				s.BootProgressTime.Reset()
-				if err := s.BootProgressTime.Decode(d); err != nil {
+				v, err := d.Str()
+				s.BootProgressTime = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8710,9 +10389,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"boot_progress_time\"")
 			}
 		case "health":
+			requiredBitSet[1] |= 1 << 1
 			if err := func() error {
-				s.Health.Reset()
-				if err := s.Health.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Health = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8720,9 +10401,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"health\"")
 			}
 		case "host_name":
+			requiredBitSet[1] |= 1 << 2
 			if err := func() error {
-				s.HostName.Reset()
-				if err := s.HostName.Decode(d); err != nil {
+				v, err := d.Str()
+				s.HostName = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8740,9 +10423,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"location\"")
 			}
 		case "location_indicator":
+			requiredBitSet[1] |= 1 << 4
 			if err := func() error {
-				s.LocationIndicator.Reset()
-				if err := s.LocationIndicator.Decode(d); err != nil {
+				v, err := d.Str()
+				s.LocationIndicator = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8750,9 +10435,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"location_indicator\"")
 			}
 		case "manufacturer":
+			requiredBitSet[1] |= 1 << 5
 			if err := func() error {
-				s.Manufacturer.Reset()
-				if err := s.Manufacturer.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Manufacturer = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8760,9 +10447,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"manufacturer\"")
 			}
 		case "model":
+			requiredBitSet[1] |= 1 << 6
 			if err := func() error {
-				s.Model.Reset()
-				if err := s.Model.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Model = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8770,9 +10459,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"model\"")
 			}
 		case "name":
+			requiredBitSet[1] |= 1 << 7
 			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Name = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8790,9 +10481,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"oem_dell\"")
 			}
 		case "power_status":
+			requiredBitSet[2] |= 1 << 1
 			if err := func() error {
-				s.PowerStatus.Reset()
-				if err := s.PowerStatus.Decode(d); err != nil {
+				v, err := d.Str()
+				s.PowerStatus = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8800,9 +10493,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"power_status\"")
 			}
 		case "processor_cores":
+			requiredBitSet[2] |= 1 << 2
 			if err := func() error {
-				s.ProcessorCores.Reset()
-				if err := s.ProcessorCores.Decode(d); err != nil {
+				v, err := d.Int()
+				s.ProcessorCores = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8810,9 +10505,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"processor_cores\"")
 			}
 		case "processor_count":
+			requiredBitSet[2] |= 1 << 3
 			if err := func() error {
-				s.ProcessorCount.Reset()
-				if err := s.ProcessorCount.Decode(d); err != nil {
+				v, err := d.Int()
+				s.ProcessorCount = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8820,9 +10517,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"processor_count\"")
 			}
 		case "processor_model":
+			requiredBitSet[2] |= 1 << 4
 			if err := func() error {
-				s.ProcessorModel.Reset()
-				if err := s.ProcessorModel.Decode(d); err != nil {
+				v, err := d.Str()
+				s.ProcessorModel = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8830,9 +10529,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"processor_model\"")
 			}
 		case "processor_sockets":
+			requiredBitSet[2] |= 1 << 5
 			if err := func() error {
-				s.ProcessorSockets.Reset()
-				if err := s.ProcessorSockets.Decode(d); err != nil {
+				v, err := d.Int()
+				s.ProcessorSockets = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8840,9 +10541,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"processor_sockets\"")
 			}
 		case "serial_number":
+			requiredBitSet[2] |= 1 << 6
 			if err := func() error {
-				s.SerialNumber.Reset()
-				if err := s.SerialNumber.Decode(d); err != nil {
+				v, err := d.Str()
+				s.SerialNumber = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8850,9 +10553,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 				return errors.Wrap(err, "decode field \"serial_number\"")
 			}
 		case "total_memory":
+			requiredBitSet[2] |= 1 << 7
 			if err := func() error {
-				s.TotalMemory.Reset()
-				if err := s.TotalMemory.Decode(d); err != nil {
+				v, err := d.Float32()
+				s.TotalMemory = float32(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8865,6 +10570,40 @@ func (s *BmcResponseModelRedfishSystemResultsItemData) Decode(d *jx.Decoder) err
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelRedfishSystemResultsItemData")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [3]uint8{
+		0b11101111,
+		0b11110111,
+		0b11111110,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelRedfishSystemResultsItemData) {
+					name = jsonFieldsNameOfBmcResponseModelRedfishSystemResultsItemData[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -8893,16 +10632,12 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) Encode(e *jx.Enco
 // encodeFields encodes fields.
 func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) encodeFields(e *jx.Encoder) {
 	{
-		if s.Datacenter.Set {
-			e.FieldStart("datacenter")
-			s.Datacenter.Encode(e)
-		}
+		e.FieldStart("datacenter")
+		e.Str(s.Datacenter)
 	}
 	{
-		if s.Rack.Set {
-			e.FieldStart("rack")
-			s.Rack.Encode(e)
-		}
+		e.FieldStart("rack")
+		e.Str(s.Rack)
 	}
 	{
 		if s.RackUnit.Set {
@@ -8911,16 +10646,12 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) encodeFields(e *j
 		}
 	}
 	{
-		if s.Room.Set {
-			e.FieldStart("room")
-			s.Room.Encode(e)
-		}
+		e.FieldStart("room")
+		e.Str(s.Room)
 	}
 	{
-		if s.Row.Set {
-			e.FieldStart("row")
-			s.Row.Encode(e)
-		}
+		e.FieldStart("row")
+		e.Str(s.Row)
 	}
 }
 
@@ -8937,13 +10668,16 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) Decode(d *jx.Deco
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelRedfishSystemResultsItemDataLocation to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "datacenter":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Datacenter.Reset()
-				if err := s.Datacenter.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Datacenter = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8951,9 +10685,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) Decode(d *jx.Deco
 				return errors.Wrap(err, "decode field \"datacenter\"")
 			}
 		case "rack":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Rack.Reset()
-				if err := s.Rack.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Rack = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8971,9 +10707,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) Decode(d *jx.Deco
 				return errors.Wrap(err, "decode field \"rack_unit\"")
 			}
 		case "room":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Room.Reset()
-				if err := s.Room.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Room = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8981,9 +10719,11 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) Decode(d *jx.Deco
 				return errors.Wrap(err, "decode field \"room\"")
 			}
 		case "row":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Row.Reset()
-				if err := s.Row.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Row = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -8996,6 +10736,38 @@ func (s *BmcResponseModelRedfishSystemResultsItemDataLocation) Decode(d *jx.Deco
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelRedfishSystemResultsItemDataLocation")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011011,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelRedfishSystemResultsItemDataLocation) {
+					name = jsonFieldsNameOfBmcResponseModelRedfishSystemResultsItemDataLocation[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -10752,34 +12524,24 @@ func (s *BmcResponseModelRedfishSystemSummary) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *BmcResponseModelRedfishSystemSummary) encodeFields(e *jx.Encoder) {
 	{
-		if s.DurationMs.Set {
-			e.FieldStart("duration_ms")
-			s.DurationMs.Encode(e)
-		}
+		e.FieldStart("duration_ms")
+		e.Int64(s.DurationMs)
 	}
 	{
-		if s.Failed.Set {
-			e.FieldStart("failed")
-			s.Failed.Encode(e)
-		}
+		e.FieldStart("failed")
+		e.Int(s.Failed)
 	}
 	{
-		if s.FailedNodes.Set {
-			e.FieldStart("failed_nodes")
-			s.FailedNodes.Encode(e)
-		}
+		e.FieldStart("failed_nodes")
+		e.Str(s.FailedNodes)
 	}
 	{
-		if s.Succeeded.Set {
-			e.FieldStart("succeeded")
-			s.Succeeded.Encode(e)
-		}
+		e.FieldStart("succeeded")
+		e.Int(s.Succeeded)
 	}
 	{
-		if s.Total.Set {
-			e.FieldStart("total")
-			s.Total.Encode(e)
-		}
+		e.FieldStart("total")
+		e.Int(s.Total)
 	}
 }
 
@@ -10796,13 +12558,16 @@ func (s *BmcResponseModelRedfishSystemSummary) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BmcResponseModelRedfishSystemSummary to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "duration_ms":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.DurationMs.Reset()
-				if err := s.DurationMs.Decode(d); err != nil {
+				v, err := d.Int64()
+				s.DurationMs = int64(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -10810,9 +12575,11 @@ func (s *BmcResponseModelRedfishSystemSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"duration_ms\"")
 			}
 		case "failed":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Failed.Reset()
-				if err := s.Failed.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Failed = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -10820,9 +12587,11 @@ func (s *BmcResponseModelRedfishSystemSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed\"")
 			}
 		case "failed_nodes":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.FailedNodes.Reset()
-				if err := s.FailedNodes.Decode(d); err != nil {
+				v, err := d.Str()
+				s.FailedNodes = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -10830,9 +12599,11 @@ func (s *BmcResponseModelRedfishSystemSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"failed_nodes\"")
 			}
 		case "succeeded":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Succeeded.Reset()
-				if err := s.Succeeded.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Succeeded = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -10840,9 +12611,11 @@ func (s *BmcResponseModelRedfishSystemSummary) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"succeeded\"")
 			}
 		case "total":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.Total.Reset()
-				if err := s.Total.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Total = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -10855,6 +12628,38 @@ func (s *BmcResponseModelRedfishSystemSummary) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BmcResponseModelRedfishSystemSummary")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00011111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBmcResponseModelRedfishSystemSummary) {
+					name = jsonFieldsNameOfBmcResponseModelRedfishSystemSummary[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -11812,9 +13617,9 @@ func (s *BootImageAddRequest) Decode(d *jx.Decoder) error {
 		switch string(k) {
 		case "boot_images":
 			if err := func() error {
-				s.BootImages = make([]NilBootImageAddRequestBootImagesItem, 0)
+				s.BootImages = make([]BootImageAddRequestBootImagesItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem NilBootImageAddRequestBootImagesItem
+					var elem BootImageAddRequestBootImagesItem
 					if err := elem.Decode(d); err != nil {
 						return err
 					}
@@ -11883,10 +13688,8 @@ func (s *BootImageAddRequestBootImagesItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Kernel.Set {
-			e.FieldStart("kernel")
-			s.Kernel.Encode(e)
-		}
+		e.FieldStart("kernel")
+		e.Str(s.Kernel)
 	}
 	{
 		if s.Liveimg.Set {
@@ -11895,10 +13698,8 @@ func (s *BootImageAddRequestBootImagesItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Name.Set {
-			e.FieldStart("name")
-			s.Name.Encode(e)
-		}
+		e.FieldStart("name")
+		e.Str(s.Name)
 	}
 	{
 		if s.ProvisionTemplates.Set {
@@ -11944,6 +13745,7 @@ func (s *BootImageAddRequestBootImagesItem) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode BootImageAddRequestBootImagesItem to nil")
 	}
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -11987,9 +13789,11 @@ func (s *BootImageAddRequestBootImagesItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"initrd\"")
 			}
 		case "kernel":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Kernel.Reset()
-				if err := s.Kernel.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Kernel = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -12007,9 +13811,11 @@ func (s *BootImageAddRequestBootImagesItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"liveimg\"")
 			}
 		case "name":
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Name = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -12062,6 +13868,39 @@ func (s *BootImageAddRequestBootImagesItem) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode BootImageAddRequestBootImagesItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [2]uint8{
+		0b00101000,
+		0b00000000,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfBootImageAddRequestBootImagesItem) {
+					name = jsonFieldsNameOfBootImageAddRequestBootImagesItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -12256,9 +14095,9 @@ func (s *DataDump) Decode(d *jx.Decoder) error {
 		switch string(k) {
 		case "Hosts":
 			if err := func() error {
-				s.Hosts = make([]NilDataDumpHostsItem, 0)
+				s.Hosts = make([]DataDumpHostsItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem NilDataDumpHostsItem
+					var elem DataDumpHostsItem
 					if err := elem.Decode(d); err != nil {
 						return err
 					}
@@ -12273,9 +14112,9 @@ func (s *DataDump) Decode(d *jx.Decoder) error {
 			}
 		case "Images":
 			if err := func() error {
-				s.Images = make([]NilDataDumpImagesItem, 0)
+				s.Images = make([]DataDumpImagesItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem NilDataDumpImagesItem
+					var elem DataDumpImagesItem
 					if err := elem.Decode(d); err != nil {
 						return err
 					}
@@ -12458,9 +14297,9 @@ func (s *DataDumpHostsItem) Decode(d *jx.Decoder) error {
 			}
 		case "bonds":
 			if err := func() error {
-				s.Bonds = make([]NilDataDumpHostsItemBondsItem, 0)
+				s.Bonds = make([]DataDumpHostsItemBondsItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem NilDataDumpHostsItemBondsItem
+					var elem DataDumpHostsItemBondsItem
 					if err := elem.Decode(d); err != nil {
 						return err
 					}
@@ -12505,9 +14344,9 @@ func (s *DataDumpHostsItem) Decode(d *jx.Decoder) error {
 			}
 		case "interfaces":
 			if err := func() error {
-				s.Interfaces = make([]NilDataDumpHostsItemInterfacesItem, 0)
+				s.Interfaces = make([]DataDumpHostsItemInterfacesItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem NilDataDumpHostsItemInterfacesItem
+					var elem DataDumpHostsItemInterfacesItem
 					if err := elem.Decode(d); err != nil {
 						return err
 					}
@@ -13010,10 +14849,8 @@ func (s *DataDumpImagesItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Kernel.Set {
-			e.FieldStart("kernel")
-			s.Kernel.Encode(e)
-		}
+		e.FieldStart("kernel")
+		e.Str(s.Kernel)
 	}
 	{
 		if s.Liveimg.Set {
@@ -13022,10 +14859,8 @@ func (s *DataDumpImagesItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Name.Set {
-			e.FieldStart("name")
-			s.Name.Encode(e)
-		}
+		e.FieldStart("name")
+		e.Str(s.Name)
 	}
 	{
 		if s.ProvisionTemplates.Set {
@@ -13071,6 +14906,7 @@ func (s *DataDumpImagesItem) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode DataDumpImagesItem to nil")
 	}
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -13114,9 +14950,11 @@ func (s *DataDumpImagesItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"initrd\"")
 			}
 		case "kernel":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.Kernel.Reset()
-				if err := s.Kernel.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Kernel = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -13134,9 +14972,11 @@ func (s *DataDumpImagesItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"liveimg\"")
 			}
 		case "name":
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Name = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -13189,6 +15029,39 @@ func (s *DataDumpImagesItem) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode DataDumpImagesItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [2]uint8{
+		0b00101000,
+		0b00000000,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfDataDumpImagesItem) {
+					name = jsonFieldsNameOfDataDumpImagesItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -13390,6 +15263,18 @@ func (s *DataDumpRolesItemPermissionListItem) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *DataDumpRolesItemPermissionListItem) encodeFields(e *jx.Encoder) {
 	{
+		if s.Group.Set {
+			e.FieldStart("group")
+			s.Group.Encode(e)
+		}
+	}
+	{
+		if s.Kind.Set {
+			e.FieldStart("kind")
+			s.Kind.Encode(e)
+		}
+	}
+	{
 		if s.Method.Set {
 			e.FieldStart("method")
 			s.Method.Encode(e)
@@ -13401,11 +15286,20 @@ func (s *DataDumpRolesItemPermissionListItem) encodeFields(e *jx.Encoder) {
 			s.Path.Encode(e)
 		}
 	}
+	{
+		if s.Summary.Set {
+			e.FieldStart("summary")
+			s.Summary.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfDataDumpRolesItemPermissionListItem = [2]string{
-	0: "method",
-	1: "path",
+var jsonFieldsNameOfDataDumpRolesItemPermissionListItem = [5]string{
+	0: "group",
+	1: "kind",
+	2: "method",
+	3: "path",
+	4: "summary",
 }
 
 // Decode decodes DataDumpRolesItemPermissionListItem from json.
@@ -13416,6 +15310,26 @@ func (s *DataDumpRolesItemPermissionListItem) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
+		case "group":
+			if err := func() error {
+				s.Group.Reset()
+				if err := s.Group.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"group\"")
+			}
+		case "kind":
+			if err := func() error {
+				s.Kind.Reset()
+				if err := s.Kind.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kind\"")
+			}
 		case "method":
 			if err := func() error {
 				s.Method.Reset()
@@ -13435,6 +15349,16 @@ func (s *DataDumpRolesItemPermissionListItem) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"path\"")
+			}
+		case "summary":
+			if err := func() error {
+				s.Summary.Reset()
+				if err := s.Summary.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"summary\"")
 			}
 		default:
 			return d.Skip()
@@ -13460,6 +15384,48 @@ func (s *DataDumpRolesItemPermissionListItem) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes DataDumpRolesItemPermissionListItemKind as json.
+func (s DataDumpRolesItemPermissionListItemKind) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes DataDumpRolesItemPermissionListItemKind from json.
+func (s *DataDumpRolesItemPermissionListItemKind) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode DataDumpRolesItemPermissionListItemKind to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch DataDumpRolesItemPermissionListItemKind(v) {
+	case DataDumpRolesItemPermissionListItemKindView:
+		*s = DataDumpRolesItemPermissionListItemKindView
+	case DataDumpRolesItemPermissionListItemKindChange:
+		*s = DataDumpRolesItemPermissionListItemKindChange
+	case DataDumpRolesItemPermissionListItemKindDelete:
+		*s = DataDumpRolesItemPermissionListItemKindDelete
+	default:
+		*s = DataDumpRolesItemPermissionListItemKind(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s DataDumpRolesItemPermissionListItemKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *DataDumpRolesItemPermissionListItemKind) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode implements json.Marshaler.
 func (s *DataDumpRolesItemUnassignedPermissionListItem) Encode(e *jx.Encoder) {
 	e.ObjStart()
@@ -13469,6 +15435,18 @@ func (s *DataDumpRolesItemUnassignedPermissionListItem) Encode(e *jx.Encoder) {
 
 // encodeFields encodes fields.
 func (s *DataDumpRolesItemUnassignedPermissionListItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Group.Set {
+			e.FieldStart("group")
+			s.Group.Encode(e)
+		}
+	}
+	{
+		if s.Kind.Set {
+			e.FieldStart("kind")
+			s.Kind.Encode(e)
+		}
+	}
 	{
 		if s.Method.Set {
 			e.FieldStart("method")
@@ -13481,11 +15459,20 @@ func (s *DataDumpRolesItemUnassignedPermissionListItem) encodeFields(e *jx.Encod
 			s.Path.Encode(e)
 		}
 	}
+	{
+		if s.Summary.Set {
+			e.FieldStart("summary")
+			s.Summary.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfDataDumpRolesItemUnassignedPermissionListItem = [2]string{
-	0: "method",
-	1: "path",
+var jsonFieldsNameOfDataDumpRolesItemUnassignedPermissionListItem = [5]string{
+	0: "group",
+	1: "kind",
+	2: "method",
+	3: "path",
+	4: "summary",
 }
 
 // Decode decodes DataDumpRolesItemUnassignedPermissionListItem from json.
@@ -13496,6 +15483,26 @@ func (s *DataDumpRolesItemUnassignedPermissionListItem) Decode(d *jx.Decoder) er
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
+		case "group":
+			if err := func() error {
+				s.Group.Reset()
+				if err := s.Group.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"group\"")
+			}
+		case "kind":
+			if err := func() error {
+				s.Kind.Reset()
+				if err := s.Kind.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kind\"")
+			}
 		case "method":
 			if err := func() error {
 				s.Method.Reset()
@@ -13515,6 +15522,16 @@ func (s *DataDumpRolesItemUnassignedPermissionListItem) Decode(d *jx.Decoder) er
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"path\"")
+			}
+		case "summary":
+			if err := func() error {
+				s.Summary.Reset()
+				if err := s.Summary.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"summary\"")
 			}
 		default:
 			return d.Skip()
@@ -13536,6 +15553,48 @@ func (s *DataDumpRolesItemUnassignedPermissionListItem) MarshalJSON() ([]byte, e
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *DataDumpRolesItemUnassignedPermissionListItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes DataDumpRolesItemUnassignedPermissionListItemKind as json.
+func (s DataDumpRolesItemUnassignedPermissionListItemKind) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes DataDumpRolesItemUnassignedPermissionListItemKind from json.
+func (s *DataDumpRolesItemUnassignedPermissionListItemKind) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode DataDumpRolesItemUnassignedPermissionListItemKind to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch DataDumpRolesItemUnassignedPermissionListItemKind(v) {
+	case DataDumpRolesItemUnassignedPermissionListItemKindView:
+		*s = DataDumpRolesItemUnassignedPermissionListItemKindView
+	case DataDumpRolesItemUnassignedPermissionListItemKindChange:
+		*s = DataDumpRolesItemUnassignedPermissionListItemKindChange
+	case DataDumpRolesItemUnassignedPermissionListItemKindDelete:
+		*s = DataDumpRolesItemUnassignedPermissionListItemKindDelete
+	default:
+		*s = DataDumpRolesItemUnassignedPermissionListItemKind(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s DataDumpRolesItemUnassignedPermissionListItemKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *DataDumpRolesItemUnassignedPermissionListItemKind) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -14329,10 +16388,8 @@ func (s *EventNodesItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Node.Set {
-			e.FieldStart("node")
-			s.Node.Encode(e)
-		}
+		e.FieldStart("node")
+		e.Str(s.Node)
 	}
 	{
 		if s.Ref.Set {
@@ -14347,16 +16404,12 @@ func (s *EventNodesItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.State.Set {
-			e.FieldStart("state")
-			s.State.Encode(e)
-		}
+		e.FieldStart("state")
+		s.State.Encode(e)
 	}
 	{
-		if s.UpdatedAt.Set {
-			e.FieldStart("updated_at")
-			s.UpdatedAt.Encode(e, json.EncodeDateTime)
-		}
+		e.FieldStart("updated_at")
+		json.EncodeDateTime(e, s.UpdatedAt)
 	}
 }
 
@@ -14374,6 +16427,7 @@ func (s *EventNodesItem) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode EventNodesItem to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -14388,9 +16442,11 @@ func (s *EventNodesItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"message\"")
 			}
 		case "node":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Node.Reset()
-				if err := s.Node.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Node = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -14418,8 +16474,8 @@ func (s *EventNodesItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"stage\"")
 			}
 		case "state":
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				s.State.Reset()
 				if err := s.State.Decode(d); err != nil {
 					return err
 				}
@@ -14428,9 +16484,11 @@ func (s *EventNodesItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"state\"")
 			}
 		case "updated_at":
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				s.UpdatedAt.Reset()
-				if err := s.UpdatedAt.Decode(d, json.DecodeDateTime); err != nil {
+				v, err := json.DecodeDateTime(d)
+				s.UpdatedAt = v
+				if err != nil {
 					return err
 				}
 				return nil
@@ -14443,6 +16501,38 @@ func (s *EventNodesItem) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode EventNodesItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00110010,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfEventNodesItem) {
+					name = jsonFieldsNameOfEventNodesItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -14947,6 +17037,18 @@ func (s *GetRolesResponseRolesItemPermissionListItem) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *GetRolesResponseRolesItemPermissionListItem) encodeFields(e *jx.Encoder) {
 	{
+		if s.Group.Set {
+			e.FieldStart("group")
+			s.Group.Encode(e)
+		}
+	}
+	{
+		if s.Kind.Set {
+			e.FieldStart("kind")
+			s.Kind.Encode(e)
+		}
+	}
+	{
 		if s.Method.Set {
 			e.FieldStart("method")
 			s.Method.Encode(e)
@@ -14958,11 +17060,20 @@ func (s *GetRolesResponseRolesItemPermissionListItem) encodeFields(e *jx.Encoder
 			s.Path.Encode(e)
 		}
 	}
+	{
+		if s.Summary.Set {
+			e.FieldStart("summary")
+			s.Summary.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfGetRolesResponseRolesItemPermissionListItem = [2]string{
-	0: "method",
-	1: "path",
+var jsonFieldsNameOfGetRolesResponseRolesItemPermissionListItem = [5]string{
+	0: "group",
+	1: "kind",
+	2: "method",
+	3: "path",
+	4: "summary",
 }
 
 // Decode decodes GetRolesResponseRolesItemPermissionListItem from json.
@@ -14973,6 +17084,26 @@ func (s *GetRolesResponseRolesItemPermissionListItem) Decode(d *jx.Decoder) erro
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
+		case "group":
+			if err := func() error {
+				s.Group.Reset()
+				if err := s.Group.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"group\"")
+			}
+		case "kind":
+			if err := func() error {
+				s.Kind.Reset()
+				if err := s.Kind.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kind\"")
+			}
 		case "method":
 			if err := func() error {
 				s.Method.Reset()
@@ -14992,6 +17123,16 @@ func (s *GetRolesResponseRolesItemPermissionListItem) Decode(d *jx.Decoder) erro
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"path\"")
+			}
+		case "summary":
+			if err := func() error {
+				s.Summary.Reset()
+				if err := s.Summary.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"summary\"")
 			}
 		default:
 			return d.Skip()
@@ -15017,6 +17158,48 @@ func (s *GetRolesResponseRolesItemPermissionListItem) UnmarshalJSON(data []byte)
 	return s.Decode(d)
 }
 
+// Encode encodes GetRolesResponseRolesItemPermissionListItemKind as json.
+func (s GetRolesResponseRolesItemPermissionListItemKind) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes GetRolesResponseRolesItemPermissionListItemKind from json.
+func (s *GetRolesResponseRolesItemPermissionListItemKind) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetRolesResponseRolesItemPermissionListItemKind to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch GetRolesResponseRolesItemPermissionListItemKind(v) {
+	case GetRolesResponseRolesItemPermissionListItemKindView:
+		*s = GetRolesResponseRolesItemPermissionListItemKindView
+	case GetRolesResponseRolesItemPermissionListItemKindChange:
+		*s = GetRolesResponseRolesItemPermissionListItemKindChange
+	case GetRolesResponseRolesItemPermissionListItemKindDelete:
+		*s = GetRolesResponseRolesItemPermissionListItemKindDelete
+	default:
+		*s = GetRolesResponseRolesItemPermissionListItemKind(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s GetRolesResponseRolesItemPermissionListItemKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetRolesResponseRolesItemPermissionListItemKind) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode implements json.Marshaler.
 func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) Encode(e *jx.Encoder) {
 	e.ObjStart()
@@ -15026,6 +17209,18 @@ func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) Encode(e *jx.Enc
 
 // encodeFields encodes fields.
 func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Group.Set {
+			e.FieldStart("group")
+			s.Group.Encode(e)
+		}
+	}
+	{
+		if s.Kind.Set {
+			e.FieldStart("kind")
+			s.Kind.Encode(e)
+		}
+	}
 	{
 		if s.Method.Set {
 			e.FieldStart("method")
@@ -15038,11 +17233,20 @@ func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) encodeFields(e *
 			s.Path.Encode(e)
 		}
 	}
+	{
+		if s.Summary.Set {
+			e.FieldStart("summary")
+			s.Summary.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfGetRolesResponseRolesItemUnassignedPermissionListItem = [2]string{
-	0: "method",
-	1: "path",
+var jsonFieldsNameOfGetRolesResponseRolesItemUnassignedPermissionListItem = [5]string{
+	0: "group",
+	1: "kind",
+	2: "method",
+	3: "path",
+	4: "summary",
 }
 
 // Decode decodes GetRolesResponseRolesItemUnassignedPermissionListItem from json.
@@ -15053,6 +17257,26 @@ func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) Decode(d *jx.Dec
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
+		case "group":
+			if err := func() error {
+				s.Group.Reset()
+				if err := s.Group.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"group\"")
+			}
+		case "kind":
+			if err := func() error {
+				s.Kind.Reset()
+				if err := s.Kind.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kind\"")
+			}
 		case "method":
 			if err := func() error {
 				s.Method.Reset()
@@ -15072,6 +17296,16 @@ func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) Decode(d *jx.Dec
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"path\"")
+			}
+		case "summary":
+			if err := func() error {
+				s.Summary.Reset()
+				if err := s.Summary.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"summary\"")
 			}
 		default:
 			return d.Skip()
@@ -15093,6 +17327,48 @@ func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) MarshalJSON() ([
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *GetRolesResponseRolesItemUnassignedPermissionListItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes GetRolesResponseRolesItemUnassignedPermissionListItemKind as json.
+func (s GetRolesResponseRolesItemUnassignedPermissionListItemKind) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes GetRolesResponseRolesItemUnassignedPermissionListItemKind from json.
+func (s *GetRolesResponseRolesItemUnassignedPermissionListItemKind) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode GetRolesResponseRolesItemUnassignedPermissionListItemKind to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch GetRolesResponseRolesItemUnassignedPermissionListItemKind(v) {
+	case GetRolesResponseRolesItemUnassignedPermissionListItemKindView:
+		*s = GetRolesResponseRolesItemUnassignedPermissionListItemKindView
+	case GetRolesResponseRolesItemUnassignedPermissionListItemKindChange:
+		*s = GetRolesResponseRolesItemUnassignedPermissionListItemKindChange
+	case GetRolesResponseRolesItemUnassignedPermissionListItemKindDelete:
+		*s = GetRolesResponseRolesItemUnassignedPermissionListItemKindDelete
+	default:
+		*s = GetRolesResponseRolesItemUnassignedPermissionListItemKind(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s GetRolesResponseRolesItemUnassignedPermissionListItemKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *GetRolesResponseRolesItemUnassignedPermissionListItemKind) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -15512,9 +17788,9 @@ func (s *Host) Decode(d *jx.Decoder) error {
 			}
 		case "bonds":
 			if err := func() error {
-				s.Bonds = make([]NilHostBondsItem, 0)
+				s.Bonds = make([]HostBondsItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem NilHostBondsItem
+					var elem HostBondsItem
 					if err := elem.Decode(d); err != nil {
 						return err
 					}
@@ -15559,9 +17835,9 @@ func (s *Host) Decode(d *jx.Decoder) error {
 			}
 		case "interfaces":
 			if err := func() error {
-				s.Interfaces = make([]NilHostInterfacesItem, 0)
+				s.Interfaces = make([]HostInterfacesItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem NilHostInterfacesItem
+					var elem HostInterfacesItem
 					if err := elem.Decode(d); err != nil {
 						return err
 					}
@@ -16767,1194 +19043,6 @@ func (s *NextAddressResponseUsedItem) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes BmcResponseModelBmcAckResultsItem as json.
-func (o NilBmcResponseModelBmcAckResultsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcAckResultsItem from json.
-func (o *NilBmcResponseModelBmcAckResultsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilBmcResponseModelBmcAckResultsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v BmcResponseModelBmcAckResultsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilBmcResponseModelBmcAckResultsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilBmcResponseModelBmcAckResultsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcAssetTagResultResultsItem as json.
-func (o NilBmcResponseModelBmcAssetTagResultResultsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcAssetTagResultResultsItem from json.
-func (o *NilBmcResponseModelBmcAssetTagResultResultsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilBmcResponseModelBmcAssetTagResultResultsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v BmcResponseModelBmcAssetTagResultResultsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilBmcResponseModelBmcAssetTagResultResultsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilBmcResponseModelBmcAssetTagResultResultsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcBiosRegistryResultsItem as json.
-func (o NilBmcResponseModelBmcBiosRegistryResultsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcBiosRegistryResultsItem from json.
-func (o *NilBmcResponseModelBmcBiosRegistryResultsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilBmcResponseModelBmcBiosRegistryResultsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v BmcResponseModelBmcBiosRegistryResultsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilBmcResponseModelBmcBiosRegistryResultsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilBmcResponseModelBmcBiosRegistryResultsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcBiosResultsItem as json.
-func (o NilBmcResponseModelBmcBiosResultsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcBiosResultsItem from json.
-func (o *NilBmcResponseModelBmcBiosResultsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilBmcResponseModelBmcBiosResultsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v BmcResponseModelBmcBiosResultsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilBmcResponseModelBmcBiosResultsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilBmcResponseModelBmcBiosResultsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcFirmwareUpdatesResultsItem as json.
-func (o NilBmcResponseModelBmcFirmwareUpdatesResultsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcFirmwareUpdatesResultsItem from json.
-func (o *NilBmcResponseModelBmcFirmwareUpdatesResultsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilBmcResponseModelBmcFirmwareUpdatesResultsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v BmcResponseModelBmcFirmwareUpdatesResultsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilBmcResponseModelBmcFirmwareUpdatesResultsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilBmcResponseModelBmcFirmwareUpdatesResultsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem as json.
-func (o NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem from json.
-func (o *NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcJobListResultsItem as json.
-func (o NilBmcResponseModelBmcJobListResultsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcJobListResultsItem from json.
-func (o *NilBmcResponseModelBmcJobListResultsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilBmcResponseModelBmcJobListResultsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v BmcResponseModelBmcJobListResultsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilBmcResponseModelBmcJobListResultsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilBmcResponseModelBmcJobListResultsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcJobListResultsItemDataJobsItem as json.
-func (o NilBmcResponseModelBmcJobListResultsItemDataJobsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcJobListResultsItemDataJobsItem from json.
-func (o *NilBmcResponseModelBmcJobListResultsItemDataJobsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilBmcResponseModelBmcJobListResultsItemDataJobsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v BmcResponseModelBmcJobListResultsItemDataJobsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilBmcResponseModelBmcJobListResultsItemDataJobsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilBmcResponseModelBmcJobListResultsItemDataJobsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcLocationResultResultsItem as json.
-func (o NilBmcResponseModelBmcLocationResultResultsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcLocationResultResultsItem from json.
-func (o *NilBmcResponseModelBmcLocationResultResultsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilBmcResponseModelBmcLocationResultResultsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v BmcResponseModelBmcLocationResultResultsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilBmcResponseModelBmcLocationResultResultsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilBmcResponseModelBmcLocationResultResultsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcNICListResultsItem as json.
-func (o NilBmcResponseModelBmcNICListResultsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcNICListResultsItem from json.
-func (o *NilBmcResponseModelBmcNICListResultsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilBmcResponseModelBmcNICListResultsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v BmcResponseModelBmcNICListResultsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilBmcResponseModelBmcNICListResultsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilBmcResponseModelBmcNICListResultsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcNICListResultsItemDataNicsItem as json.
-func (o NilBmcResponseModelBmcNICListResultsItemDataNicsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcNICListResultsItemDataNicsItem from json.
-func (o *NilBmcResponseModelBmcNICListResultsItemDataNicsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilBmcResponseModelBmcNICListResultsItemDataNicsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v BmcResponseModelBmcNICListResultsItemDataNicsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilBmcResponseModelBmcNICListResultsItemDataNicsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilBmcResponseModelBmcNICListResultsItemDataNicsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcSELLogResultsItem as json.
-func (o NilBmcResponseModelBmcSELLogResultsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcSELLogResultsItem from json.
-func (o *NilBmcResponseModelBmcSELLogResultsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilBmcResponseModelBmcSELLogResultsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v BmcResponseModelBmcSELLogResultsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilBmcResponseModelBmcSELLogResultsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilBmcResponseModelBmcSELLogResultsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcSELLogResultsItemDataEntriesItem as json.
-func (o NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcSELLogResultsItemDataEntriesItem from json.
-func (o *NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v BmcResponseModelBmcSELLogResultsItemDataEntriesItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcSecureBootResultsItem as json.
-func (o NilBmcResponseModelBmcSecureBootResultsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcSecureBootResultsItem from json.
-func (o *NilBmcResponseModelBmcSecureBootResultsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilBmcResponseModelBmcSecureBootResultsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v BmcResponseModelBmcSecureBootResultsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilBmcResponseModelBmcSecureBootResultsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilBmcResponseModelBmcSecureBootResultsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelRedfishSystemResultsItem as json.
-func (o NilBmcResponseModelRedfishSystemResultsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelRedfishSystemResultsItem from json.
-func (o *NilBmcResponseModelRedfishSystemResultsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilBmcResponseModelRedfishSystemResultsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v BmcResponseModelRedfishSystemResultsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilBmcResponseModelRedfishSystemResultsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilBmcResponseModelRedfishSystemResultsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem as json.
-func (o NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem from json.
-func (o *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem as json.
-func (o NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
-func (o *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BootImageAddRequestBootImagesItem as json.
-func (o NilBootImageAddRequestBootImagesItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BootImageAddRequestBootImagesItem from json.
-func (o *NilBootImageAddRequestBootImagesItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilBootImageAddRequestBootImagesItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v BootImageAddRequestBootImagesItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilBootImageAddRequestBootImagesItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilBootImageAddRequestBootImagesItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes DataDumpHostsItem as json.
-func (o NilDataDumpHostsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes DataDumpHostsItem from json.
-func (o *NilDataDumpHostsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilDataDumpHostsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v DataDumpHostsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilDataDumpHostsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilDataDumpHostsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes DataDumpHostsItemBondsItem as json.
-func (o NilDataDumpHostsItemBondsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes DataDumpHostsItemBondsItem from json.
-func (o *NilDataDumpHostsItemBondsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilDataDumpHostsItemBondsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v DataDumpHostsItemBondsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilDataDumpHostsItemBondsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilDataDumpHostsItemBondsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes DataDumpHostsItemInterfacesItem as json.
-func (o NilDataDumpHostsItemInterfacesItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes DataDumpHostsItemInterfacesItem from json.
-func (o *NilDataDumpHostsItemInterfacesItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilDataDumpHostsItemInterfacesItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v DataDumpHostsItemInterfacesItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilDataDumpHostsItemInterfacesItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilDataDumpHostsItemInterfacesItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes DataDumpImagesItem as json.
-func (o NilDataDumpImagesItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes DataDumpImagesItem from json.
-func (o *NilDataDumpImagesItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilDataDumpImagesItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v DataDumpImagesItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilDataDumpImagesItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilDataDumpImagesItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes HostBondsItem as json.
-func (o NilHostBondsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes HostBondsItem from json.
-func (o *NilHostBondsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilHostBondsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v HostBondsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilHostBondsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilHostBondsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes HostInterfacesItem as json.
-func (o NilHostInterfacesItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes HostInterfacesItem from json.
-func (o *NilHostInterfacesItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilHostInterfacesItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v HostInterfacesItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilHostInterfacesItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilHostInterfacesItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes NodeAddRequestNodeListItem as json.
-func (o NilNodeAddRequestNodeListItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes NodeAddRequestNodeListItem from json.
-func (o *NilNodeAddRequestNodeListItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilNodeAddRequestNodeListItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v NodeAddRequestNodeListItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilNodeAddRequestNodeListItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilNodeAddRequestNodeListItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes NodeAddRequestNodeListItemBondsItem as json.
-func (o NilNodeAddRequestNodeListItemBondsItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes NodeAddRequestNodeListItemBondsItem from json.
-func (o *NilNodeAddRequestNodeListItemBondsItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilNodeAddRequestNodeListItemBondsItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v NodeAddRequestNodeListItemBondsItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilNodeAddRequestNodeListItemBondsItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilNodeAddRequestNodeListItemBondsItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes NodeAddRequestNodeListItemInterfacesItem as json.
-func (o NilNodeAddRequestNodeListItemInterfacesItem) Encode(e *jx.Encoder) {
-	if o.Null {
-		e.Null()
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes NodeAddRequestNodeListItemInterfacesItem from json.
-func (o *NilNodeAddRequestNodeListItemInterfacesItem) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode NilNodeAddRequestNodeListItemInterfacesItem to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v NodeAddRequestNodeListItemInterfacesItem
-		o.Value = v
-		o.Null = true
-		return nil
-	}
-	o.Null = false
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s NilNodeAddRequestNodeListItemInterfacesItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *NilNodeAddRequestNodeListItemInterfacesItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes string as json.
 func (o NilString) Encode(e *jx.Encoder) {
 	if o.Null {
@@ -18036,9 +19124,9 @@ func (s *NodeAddRequest) Decode(d *jx.Decoder) error {
 		switch string(k) {
 		case "node_list":
 			if err := func() error {
-				s.NodeList = make([]NilNodeAddRequestNodeListItem, 0)
+				s.NodeList = make([]NodeAddRequestNodeListItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem NilNodeAddRequestNodeListItem
+					var elem NodeAddRequestNodeListItem
 					if err := elem.Decode(d); err != nil {
 						return err
 					}
@@ -18187,9 +19275,9 @@ func (s *NodeAddRequestNodeListItem) Decode(d *jx.Decoder) error {
 			}
 		case "bonds":
 			if err := func() error {
-				s.Bonds = make([]NilNodeAddRequestNodeListItemBondsItem, 0)
+				s.Bonds = make([]NodeAddRequestNodeListItemBondsItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem NilNodeAddRequestNodeListItemBondsItem
+					var elem NodeAddRequestNodeListItemBondsItem
 					if err := elem.Decode(d); err != nil {
 						return err
 					}
@@ -18234,9 +19322,9 @@ func (s *NodeAddRequestNodeListItem) Decode(d *jx.Decoder) error {
 			}
 		case "interfaces":
 			if err := func() error {
-				s.Interfaces = make([]NilNodeAddRequestNodeListItemInterfacesItem, 0)
+				s.Interfaces = make([]NodeAddRequestNodeListItemInterfacesItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem NilNodeAddRequestNodeListItemInterfacesItem
+					var elem NodeAddRequestNodeListItemInterfacesItem
 					if err := elem.Decode(d); err != nil {
 						return err
 					}
@@ -20028,105 +21116,6 @@ func (s *NodeTagsRequest) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes BmcResponseModelBmcAckSummary as json.
-func (o OptBmcResponseModelBmcAckSummary) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcAckSummary from json.
-func (o *OptBmcResponseModelBmcAckSummary) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptBmcResponseModelBmcAckSummary to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptBmcResponseModelBmcAckSummary) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptBmcResponseModelBmcAckSummary) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcAssetTagResultSummary as json.
-func (o OptBmcResponseModelBmcAssetTagResultSummary) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcAssetTagResultSummary from json.
-func (o *OptBmcResponseModelBmcAssetTagResultSummary) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptBmcResponseModelBmcAssetTagResultSummary to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptBmcResponseModelBmcAssetTagResultSummary) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptBmcResponseModelBmcAssetTagResultSummary) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcBiosRegistrySummary as json.
-func (o OptBmcResponseModelBmcBiosRegistrySummary) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcBiosRegistrySummary from json.
-func (o *OptBmcResponseModelBmcBiosRegistrySummary) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptBmcResponseModelBmcBiosRegistrySummary to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptBmcResponseModelBmcBiosRegistrySummary) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptBmcResponseModelBmcBiosRegistrySummary) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes BmcResponseModelBmcBiosResultsItemDataAttributes as json.
 func (o OptBmcResponseModelBmcBiosResultsItemDataAttributes) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -20191,336 +21180,6 @@ func (s OptBmcResponseModelBmcBiosResultsItemDataPending) MarshalJSON() ([]byte,
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptBmcResponseModelBmcBiosResultsItemDataPending) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcBiosSummary as json.
-func (o OptBmcResponseModelBmcBiosSummary) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcBiosSummary from json.
-func (o *OptBmcResponseModelBmcBiosSummary) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptBmcResponseModelBmcBiosSummary to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptBmcResponseModelBmcBiosSummary) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptBmcResponseModelBmcBiosSummary) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcFirmwareUpdatesSummary as json.
-func (o OptBmcResponseModelBmcFirmwareUpdatesSummary) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcFirmwareUpdatesSummary from json.
-func (o *OptBmcResponseModelBmcFirmwareUpdatesSummary) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptBmcResponseModelBmcFirmwareUpdatesSummary to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptBmcResponseModelBmcFirmwareUpdatesSummary) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptBmcResponseModelBmcFirmwareUpdatesSummary) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcJobListSummary as json.
-func (o OptBmcResponseModelBmcJobListSummary) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcJobListSummary from json.
-func (o *OptBmcResponseModelBmcJobListSummary) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptBmcResponseModelBmcJobListSummary to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptBmcResponseModelBmcJobListSummary) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptBmcResponseModelBmcJobListSummary) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcLocationResultResultsItemDataCurrent as json.
-func (o OptBmcResponseModelBmcLocationResultResultsItemDataCurrent) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcLocationResultResultsItemDataCurrent from json.
-func (o *OptBmcResponseModelBmcLocationResultResultsItemDataCurrent) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptBmcResponseModelBmcLocationResultResultsItemDataCurrent to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptBmcResponseModelBmcLocationResultResultsItemDataCurrent) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptBmcResponseModelBmcLocationResultResultsItemDataCurrent) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcLocationResultResultsItemDataDesired as json.
-func (o OptBmcResponseModelBmcLocationResultResultsItemDataDesired) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcLocationResultResultsItemDataDesired from json.
-func (o *OptBmcResponseModelBmcLocationResultResultsItemDataDesired) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptBmcResponseModelBmcLocationResultResultsItemDataDesired to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptBmcResponseModelBmcLocationResultResultsItemDataDesired) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptBmcResponseModelBmcLocationResultResultsItemDataDesired) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcLocationResultSummary as json.
-func (o OptBmcResponseModelBmcLocationResultSummary) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcLocationResultSummary from json.
-func (o *OptBmcResponseModelBmcLocationResultSummary) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptBmcResponseModelBmcLocationResultSummary to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptBmcResponseModelBmcLocationResultSummary) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptBmcResponseModelBmcLocationResultSummary) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcNICListSummary as json.
-func (o OptBmcResponseModelBmcNICListSummary) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcNICListSummary from json.
-func (o *OptBmcResponseModelBmcNICListSummary) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptBmcResponseModelBmcNICListSummary to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptBmcResponseModelBmcNICListSummary) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptBmcResponseModelBmcNICListSummary) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcSELLogSummary as json.
-func (o OptBmcResponseModelBmcSELLogSummary) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcSELLogSummary from json.
-func (o *OptBmcResponseModelBmcSELLogSummary) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptBmcResponseModelBmcSELLogSummary to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptBmcResponseModelBmcSELLogSummary) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptBmcResponseModelBmcSELLogSummary) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelBmcSecureBootSummary as json.
-func (o OptBmcResponseModelBmcSecureBootSummary) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelBmcSecureBootSummary from json.
-func (o *OptBmcResponseModelBmcSecureBootSummary) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptBmcResponseModelBmcSecureBootSummary to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptBmcResponseModelBmcSecureBootSummary) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptBmcResponseModelBmcSecureBootSummary) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes BmcResponseModelRedfishSystemSummary as json.
-func (o OptBmcResponseModelRedfishSystemSummary) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes BmcResponseModelRedfishSystemSummary from json.
-func (o *OptBmcResponseModelRedfishSystemSummary) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptBmcResponseModelRedfishSystemSummary to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptBmcResponseModelRedfishSystemSummary) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptBmcResponseModelRedfishSystemSummary) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -20660,6 +21319,72 @@ func (s *OptBool) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes DataDumpRolesItemPermissionListItemKind as json.
+func (o OptDataDumpRolesItemPermissionListItemKind) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes DataDumpRolesItemPermissionListItemKind from json.
+func (o *OptDataDumpRolesItemPermissionListItemKind) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptDataDumpRolesItemPermissionListItemKind to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptDataDumpRolesItemPermissionListItemKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptDataDumpRolesItemPermissionListItemKind) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes DataDumpRolesItemUnassignedPermissionListItemKind as json.
+func (o OptDataDumpRolesItemUnassignedPermissionListItemKind) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes DataDumpRolesItemUnassignedPermissionListItemKind from json.
+func (o *OptDataDumpRolesItemUnassignedPermissionListItemKind) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptDataDumpRolesItemUnassignedPermissionListItemKind to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptDataDumpRolesItemUnassignedPermissionListItemKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptDataDumpRolesItemUnassignedPermissionListItemKind) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes time.Time as json.
 func (o OptDateTime) Encode(e *jx.Encoder, format func(*jx.Encoder, time.Time)) {
 	if !o.Set {
@@ -20695,18 +21420,18 @@ func (s *OptDateTime) UnmarshalJSON(data []byte) error {
 	return s.Decode(d, json.DecodeDateTime)
 }
 
-// Encode encodes EventNodesItemState as json.
-func (o OptEventNodesItemState) Encode(e *jx.Encoder) {
+// Encode encodes GetRolesResponseRolesItemPermissionListItemKind as json.
+func (o OptGetRolesResponseRolesItemPermissionListItemKind) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
 	e.Str(string(o.Value))
 }
 
-// Decode decodes EventNodesItemState from json.
-func (o *OptEventNodesItemState) Decode(d *jx.Decoder) error {
+// Decode decodes GetRolesResponseRolesItemPermissionListItemKind from json.
+func (o *OptGetRolesResponseRolesItemPermissionListItemKind) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptEventNodesItemState to nil")
+		return errors.New("invalid: unable to decode OptGetRolesResponseRolesItemPermissionListItemKind to nil")
 	}
 	o.Set = true
 	if err := o.Value.Decode(d); err != nil {
@@ -20716,49 +21441,47 @@ func (o *OptEventNodesItemState) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptEventNodesItemState) MarshalJSON() ([]byte, error) {
+func (s OptGetRolesResponseRolesItemPermissionListItemKind) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptEventNodesItemState) UnmarshalJSON(data []byte) error {
+func (s *OptGetRolesResponseRolesItemPermissionListItemKind) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes float32 as json.
-func (o OptFloat32) Encode(e *jx.Encoder) {
+// Encode encodes GetRolesResponseRolesItemUnassignedPermissionListItemKind as json.
+func (o OptGetRolesResponseRolesItemUnassignedPermissionListItemKind) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
-	e.Float32(float32(o.Value))
+	e.Str(string(o.Value))
 }
 
-// Decode decodes float32 from json.
-func (o *OptFloat32) Decode(d *jx.Decoder) error {
+// Decode decodes GetRolesResponseRolesItemUnassignedPermissionListItemKind from json.
+func (o *OptGetRolesResponseRolesItemUnassignedPermissionListItemKind) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptFloat32 to nil")
+		return errors.New("invalid: unable to decode OptGetRolesResponseRolesItemUnassignedPermissionListItemKind to nil")
 	}
 	o.Set = true
-	v, err := d.Float32()
-	if err != nil {
+	if err := o.Value.Decode(d); err != nil {
 		return err
 	}
-	o.Value = float32(v)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptFloat32) MarshalJSON() ([]byte, error) {
+func (s OptGetRolesResponseRolesItemUnassignedPermissionListItemKind) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptFloat32) UnmarshalJSON(data []byte) error {
+func (s *OptGetRolesResponseRolesItemUnassignedPermissionListItemKind) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -21113,6 +21836,67 @@ func (s *OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemData) UnmarshalJSON(
 	return s.Decode(d)
 }
 
+// Encode encodes []BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem as json.
+func (o OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem from json.
+func (o *OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem BmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes BmcResponseModelBmcJobListResultsItemData as json.
 func (o OptNilBmcResponseModelBmcJobListResultsItemData) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -21158,6 +21942,67 @@ func (s OptNilBmcResponseModelBmcJobListResultsItemData) MarshalJSON() ([]byte, 
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptNilBmcResponseModelBmcJobListResultsItemData) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []BmcResponseModelBmcJobListResultsItemDataJobsItem as json.
+func (o OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []BmcResponseModelBmcJobListResultsItemDataJobsItem from json.
+func (o *OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []BmcResponseModelBmcJobListResultsItemDataJobsItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]BmcResponseModelBmcJobListResultsItemDataJobsItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem BmcResponseModelBmcJobListResultsItemDataJobsItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -21260,6 +22105,67 @@ func (s *OptNilBmcResponseModelBmcNICListResultsItemData) UnmarshalJSON(data []b
 	return s.Decode(d)
 }
 
+// Encode encodes []BmcResponseModelBmcNICListResultsItemDataNicsItem as json.
+func (o OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []BmcResponseModelBmcNICListResultsItemDataNicsItem from json.
+func (o *OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []BmcResponseModelBmcNICListResultsItemDataNicsItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]BmcResponseModelBmcNICListResultsItemDataNicsItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem BmcResponseModelBmcNICListResultsItemDataNicsItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes BmcResponseModelBmcSELLogResultsItemData as json.
 func (o OptNilBmcResponseModelBmcSELLogResultsItemData) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -21305,6 +22211,67 @@ func (s OptNilBmcResponseModelBmcSELLogResultsItemData) MarshalJSON() ([]byte, e
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptNilBmcResponseModelBmcSELLogResultsItemData) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []BmcResponseModelBmcSELLogResultsItemDataEntriesItem as json.
+func (o OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []BmcResponseModelBmcSELLogResultsItemDataEntriesItem from json.
+func (o *OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []BmcResponseModelBmcSELLogResultsItemDataEntriesItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]BmcResponseModelBmcSELLogResultsItemDataEntriesItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem BmcResponseModelBmcSELLogResultsItemDataEntriesItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -21501,6 +22468,128 @@ func (s OptNilBmcResponseModelRedfishSystemResultsItemDataOemDell) MarshalJSON()
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDell) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem as json.
+func (o OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
+func (o *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem as json.
+func (o OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem from json.
+func (o *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem BmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -22132,1104 +23221,6 @@ func (s *OptNilInt64) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes []NilBmcResponseModelBmcAckResultsItem as json.
-func (o OptNilNilBmcResponseModelBmcAckResultsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilBmcResponseModelBmcAckResultsItem from json.
-func (o *OptNilNilBmcResponseModelBmcAckResultsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcAckResultsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilBmcResponseModelBmcAckResultsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilBmcResponseModelBmcAckResultsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilBmcResponseModelBmcAckResultsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilBmcResponseModelBmcAckResultsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilBmcResponseModelBmcAckResultsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilBmcResponseModelBmcAssetTagResultResultsItem as json.
-func (o OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilBmcResponseModelBmcAssetTagResultResultsItem from json.
-func (o *OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilBmcResponseModelBmcAssetTagResultResultsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilBmcResponseModelBmcAssetTagResultResultsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilBmcResponseModelBmcAssetTagResultResultsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilBmcResponseModelBmcAssetTagResultResultsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilBmcResponseModelBmcBiosRegistryResultsItem as json.
-func (o OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilBmcResponseModelBmcBiosRegistryResultsItem from json.
-func (o *OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilBmcResponseModelBmcBiosRegistryResultsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilBmcResponseModelBmcBiosRegistryResultsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilBmcResponseModelBmcBiosRegistryResultsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilBmcResponseModelBmcBiosRegistryResultsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilBmcResponseModelBmcBiosResultsItem as json.
-func (o OptNilNilBmcResponseModelBmcBiosResultsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilBmcResponseModelBmcBiosResultsItem from json.
-func (o *OptNilNilBmcResponseModelBmcBiosResultsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcBiosResultsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilBmcResponseModelBmcBiosResultsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilBmcResponseModelBmcBiosResultsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilBmcResponseModelBmcBiosResultsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilBmcResponseModelBmcBiosResultsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilBmcResponseModelBmcBiosResultsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilBmcResponseModelBmcFirmwareUpdatesResultsItem as json.
-func (o OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilBmcResponseModelBmcFirmwareUpdatesResultsItem from json.
-func (o *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilBmcResponseModelBmcFirmwareUpdatesResultsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilBmcResponseModelBmcFirmwareUpdatesResultsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilBmcResponseModelBmcFirmwareUpdatesResultsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem as json.
-func (o OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem from json.
-func (o *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilBmcResponseModelBmcFirmwareUpdatesResultsItemDataUpdatesItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilBmcResponseModelBmcJobListResultsItem as json.
-func (o OptNilNilBmcResponseModelBmcJobListResultsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilBmcResponseModelBmcJobListResultsItem from json.
-func (o *OptNilNilBmcResponseModelBmcJobListResultsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcJobListResultsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilBmcResponseModelBmcJobListResultsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilBmcResponseModelBmcJobListResultsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilBmcResponseModelBmcJobListResultsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilBmcResponseModelBmcJobListResultsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilBmcResponseModelBmcJobListResultsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilBmcResponseModelBmcJobListResultsItemDataJobsItem as json.
-func (o OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilBmcResponseModelBmcJobListResultsItemDataJobsItem from json.
-func (o *OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilBmcResponseModelBmcJobListResultsItemDataJobsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilBmcResponseModelBmcJobListResultsItemDataJobsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilBmcResponseModelBmcJobListResultsItemDataJobsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilBmcResponseModelBmcJobListResultsItemDataJobsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilBmcResponseModelBmcLocationResultResultsItem as json.
-func (o OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilBmcResponseModelBmcLocationResultResultsItem from json.
-func (o *OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcLocationResultResultsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilBmcResponseModelBmcLocationResultResultsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilBmcResponseModelBmcLocationResultResultsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilBmcResponseModelBmcLocationResultResultsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilBmcResponseModelBmcLocationResultResultsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilBmcResponseModelBmcNICListResultsItem as json.
-func (o OptNilNilBmcResponseModelBmcNICListResultsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilBmcResponseModelBmcNICListResultsItem from json.
-func (o *OptNilNilBmcResponseModelBmcNICListResultsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcNICListResultsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilBmcResponseModelBmcNICListResultsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilBmcResponseModelBmcNICListResultsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilBmcResponseModelBmcNICListResultsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilBmcResponseModelBmcNICListResultsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilBmcResponseModelBmcNICListResultsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilBmcResponseModelBmcNICListResultsItemDataNicsItem as json.
-func (o OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilBmcResponseModelBmcNICListResultsItemDataNicsItem from json.
-func (o *OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilBmcResponseModelBmcNICListResultsItemDataNicsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilBmcResponseModelBmcNICListResultsItemDataNicsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilBmcResponseModelBmcNICListResultsItemDataNicsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilBmcResponseModelBmcNICListResultsItemDataNicsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilBmcResponseModelBmcSELLogResultsItem as json.
-func (o OptNilNilBmcResponseModelBmcSELLogResultsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilBmcResponseModelBmcSELLogResultsItem from json.
-func (o *OptNilNilBmcResponseModelBmcSELLogResultsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcSELLogResultsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilBmcResponseModelBmcSELLogResultsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilBmcResponseModelBmcSELLogResultsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilBmcResponseModelBmcSELLogResultsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilBmcResponseModelBmcSELLogResultsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilBmcResponseModelBmcSELLogResultsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem as json.
-func (o OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem from json.
-func (o *OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilBmcResponseModelBmcSELLogResultsItemDataEntriesItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilBmcResponseModelBmcSELLogResultsItemDataEntriesItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilBmcResponseModelBmcSecureBootResultsItem as json.
-func (o OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilBmcResponseModelBmcSecureBootResultsItem from json.
-func (o *OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelBmcSecureBootResultsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilBmcResponseModelBmcSecureBootResultsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilBmcResponseModelBmcSecureBootResultsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilBmcResponseModelBmcSecureBootResultsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilBmcResponseModelBmcSecureBootResultsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilBmcResponseModelRedfishSystemResultsItem as json.
-func (o OptNilNilBmcResponseModelRedfishSystemResultsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilBmcResponseModelRedfishSystemResultsItem from json.
-func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelRedfishSystemResultsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilBmcResponseModelRedfishSystemResultsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilBmcResponseModelRedfishSystemResultsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilBmcResponseModelRedfishSystemResultsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilBmcResponseModelRedfishSystemResultsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilBmcResponseModelRedfishSystemResultsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem as json.
-func (o OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem from json.
-func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemActionParametersItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem as json.
-func (o OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem from json.
-func (o *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItem
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilBmcResponseModelRedfishSystemResultsItemDataOemDellMessageDotExtendedInfoItemResolutionStepsItemArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes []NilString as json.
-func (o OptNilNilStringArray) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.ArrStart()
-	for _, elem := range o.Value {
-		elem.Encode(e)
-	}
-	e.ArrEnd()
-}
-
-// Decode decodes []NilString from json.
-func (o *OptNilNilStringArray) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilNilStringArray to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v []NilString
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	o.Value = make([]NilString, 0)
-	if err := d.Arr(func(d *jx.Decoder) error {
-		var elem NilString
-		if err := elem.Decode(d); err != nil {
-			return err
-		}
-		o.Value = append(o.Value, elem)
-		return nil
-	}); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilNilStringArray) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilNilStringArray) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes ProvisionStatusFacts as json.
 func (o OptNilProvisionStatusFacts) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -23571,6 +23562,39 @@ func (s *OptNodeImportResponseSummary) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes PatchRolesRequestPermissionListItemKind as json.
+func (o OptPatchRolesRequestPermissionListItemKind) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes PatchRolesRequestPermissionListItemKind from json.
+func (o *OptPatchRolesRequestPermissionListItemKind) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptPatchRolesRequestPermissionListItemKind to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptPatchRolesRequestPermissionListItemKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptPatchRolesRequestPermissionListItemKind) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes string as json.
 func (o OptString) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -23707,6 +23731,18 @@ func (s *PatchRolesRequestPermissionListItem) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *PatchRolesRequestPermissionListItem) encodeFields(e *jx.Encoder) {
 	{
+		if s.Group.Set {
+			e.FieldStart("group")
+			s.Group.Encode(e)
+		}
+	}
+	{
+		if s.Kind.Set {
+			e.FieldStart("kind")
+			s.Kind.Encode(e)
+		}
+	}
+	{
 		if s.Method.Set {
 			e.FieldStart("method")
 			s.Method.Encode(e)
@@ -23718,11 +23754,20 @@ func (s *PatchRolesRequestPermissionListItem) encodeFields(e *jx.Encoder) {
 			s.Path.Encode(e)
 		}
 	}
+	{
+		if s.Summary.Set {
+			e.FieldStart("summary")
+			s.Summary.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfPatchRolesRequestPermissionListItem = [2]string{
-	0: "method",
-	1: "path",
+var jsonFieldsNameOfPatchRolesRequestPermissionListItem = [5]string{
+	0: "group",
+	1: "kind",
+	2: "method",
+	3: "path",
+	4: "summary",
 }
 
 // Decode decodes PatchRolesRequestPermissionListItem from json.
@@ -23733,6 +23778,26 @@ func (s *PatchRolesRequestPermissionListItem) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
+		case "group":
+			if err := func() error {
+				s.Group.Reset()
+				if err := s.Group.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"group\"")
+			}
+		case "kind":
+			if err := func() error {
+				s.Kind.Reset()
+				if err := s.Kind.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kind\"")
+			}
 		case "method":
 			if err := func() error {
 				s.Method.Reset()
@@ -23752,6 +23817,16 @@ func (s *PatchRolesRequestPermissionListItem) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"path\"")
+			}
+		case "summary":
+			if err := func() error {
+				s.Summary.Reset()
+				if err := s.Summary.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"summary\"")
 			}
 		default:
 			return d.Skip()
@@ -23773,6 +23848,48 @@ func (s *PatchRolesRequestPermissionListItem) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *PatchRolesRequestPermissionListItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes PatchRolesRequestPermissionListItemKind as json.
+func (s PatchRolesRequestPermissionListItemKind) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes PatchRolesRequestPermissionListItemKind from json.
+func (s *PatchRolesRequestPermissionListItemKind) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PatchRolesRequestPermissionListItemKind to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch PatchRolesRequestPermissionListItemKind(v) {
+	case PatchRolesRequestPermissionListItemKindView:
+		*s = PatchRolesRequestPermissionListItemKindView
+	case PatchRolesRequestPermissionListItemKindChange:
+		*s = PatchRolesRequestPermissionListItemKindChange
+	case PatchRolesRequestPermissionListItemKindDelete:
+		*s = PatchRolesRequestPermissionListItemKindDelete
+	default:
+		*s = PatchRolesRequestPermissionListItemKind(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s PatchRolesRequestPermissionListItemKind) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PatchRolesRequestPermissionListItemKind) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -25402,10 +25519,45 @@ func (s *Version) encodeFields(e *jx.Encoder) {
 			s.Version.Encode(e)
 		}
 	}
+	{
+		if s.Commit.Set {
+			e.FieldStart("commit")
+			s.Commit.Encode(e)
+		}
+	}
+	{
+		if s.CommitTime.Set {
+			e.FieldStart("commit_time")
+			s.CommitTime.Encode(e)
+		}
+	}
+	{
+		if s.GoVersion.Set {
+			e.FieldStart("go_version")
+			s.GoVersion.Encode(e)
+		}
+	}
+	{
+		if s.Modified.Set {
+			e.FieldStart("modified")
+			s.Modified.Encode(e)
+		}
+	}
+	{
+		if s.Schema.Set {
+			e.FieldStart("schema")
+			s.Schema.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfVersion = [1]string{
+var jsonFieldsNameOfVersion = [6]string{
 	0: "Version",
+	1: "commit",
+	2: "commit_time",
+	3: "go_version",
+	4: "modified",
+	5: "schema",
 }
 
 // Decode decodes Version from json.
@@ -25425,6 +25577,56 @@ func (s *Version) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"Version\"")
+			}
+		case "commit":
+			if err := func() error {
+				s.Commit.Reset()
+				if err := s.Commit.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"commit\"")
+			}
+		case "commit_time":
+			if err := func() error {
+				s.CommitTime.Reset()
+				if err := s.CommitTime.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"commit_time\"")
+			}
+		case "go_version":
+			if err := func() error {
+				s.GoVersion.Reset()
+				if err := s.GoVersion.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"go_version\"")
+			}
+		case "modified":
+			if err := func() error {
+				s.Modified.Reset()
+				if err := s.Modified.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"modified\"")
+			}
+		case "schema":
+			if err := func() error {
+				s.Schema.Reset()
+				if err := s.Schema.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"schema\"")
 			}
 		default:
 			return d.Skip()

@@ -44,8 +44,12 @@ func TestServesTheFirmwareDirectory(t *testing.T) {
 
 	c, err := tftp.NewClient(conn.LocalAddr().String())
 	require.NoError(t, err)
+	c.RequestTSize(true)
 	wt, err := c.Receive(token, "octet")
 	require.NoError(t, err)
+	size, ok := wt.(tftp.IncomingTransfer).Size()
+	assert.True(t, ok, "the transfer says how large the firmware is")
+	assert.EqualValues(t, len(want), size)
 	var got bytes.Buffer
 	_, err = wt.WriteTo(&got)
 	require.NoError(t, err)

@@ -17,11 +17,11 @@ import (
 type Service struct {
 	cfg        Config
 	opts       Options
-	registries *registryCache
+	registries registryCache
 }
 
 func New(cfg Config) *Service {
-	return &Service{cfg: cfg, opts: cfg.options(), registries: newRegistryCache(32)}
+	return &Service{cfg: cfg, opts: cfg.options()}
 }
 
 func NewFromViper() *Service { return New(ConfigFromViper()) }
@@ -79,12 +79,10 @@ type FirmwareUpdates struct {
 	Updates dell.UpdateList
 }
 
-// Status reads system information from every target
 func (s *Service) Status(ctx context.Context, targets []Target) []NodeResult[model.RedfishSystem] {
 	return run(ctx, s, targets, s.statusOne)
 }
 
-// NICs lists the host network ports of every target
 func (s *Service) NICs(ctx context.Context, targets []Target) []NodeResult[model.BmcNICList] {
 	return run(ctx, s, targets, s.nicsOne)
 }
@@ -94,27 +92,22 @@ func (s *Service) Power(ctx context.Context, targets []Target, req PowerRequest)
 	return run(ctx, s, targets, func(ctx context.Context, t Target) (*Ack, error) { return s.powerOne(ctx, t, req) })
 }
 
-// Indicator turns the location indicator of every target on or off
 func (s *Service) Indicator(ctx context.Context, targets []Target, req IndicatorRequest) []NodeResult[Ack] {
 	return run(ctx, s, targets, func(ctx context.Context, t Target) (*Ack, error) { return s.indicatorOne(ctx, t, req) })
 }
 
-// Jobs lists the Redfish jobs queued on every target
 func (s *Service) Jobs(ctx context.Context, targets []Target) []NodeResult[JobList] {
 	return run(ctx, s, targets, s.jobsOne)
 }
 
-// ClearJobs removes jobs from every target's queue
 func (s *Service) ClearJobs(ctx context.Context, targets []Target, req ClearJobsRequest) []NodeResult[Ack] {
 	return run(ctx, s, targets, func(ctx context.Context, t Target) (*Ack, error) { return s.clearJobsOne(ctx, t, req) })
 }
 
-// SEL reads the system event log of every target
 func (s *Service) SEL(ctx context.Context, targets []Target, req SELRequest) []NodeResult[SELLog] {
 	return run(ctx, s, targets, func(ctx context.Context, t Target) (*SELLog, error) { return s.selOne(ctx, t, req) })
 }
 
-// ClearSEL clears the system event log on every target
 func (s *Service) ClearSEL(ctx context.Context, targets []Target) []NodeResult[Ack] {
 	return run(ctx, s, targets, s.clearSELOne)
 }
@@ -124,7 +117,6 @@ func (s *Service) AutoConfigure(ctx context.Context, targets []Target) []NodeRes
 	return run(ctx, s, targets, s.autoConfigureOne)
 }
 
-// ImportConfig submits a system configuration import job to every target's iDRAC
 func (s *Service) ImportConfig(ctx context.Context, targets []Target, req ImportConfigRequest) []NodeResult[Ack] {
 	return run(ctx, s, targets, func(ctx context.Context, t Target) (*Ack, error) { return s.importConfigOne(ctx, t, req) })
 }

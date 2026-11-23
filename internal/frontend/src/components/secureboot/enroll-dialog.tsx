@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { toastBmcResponse } from "@/lib/bmc";
 import {
   fingerprint,
   groupFingerprint,
@@ -44,7 +43,6 @@ import { toast } from "sonner";
 type Props = {
   nodes: string;
   db: Writable;
-  onDone: () => void;
 };
 
 // guid takes the forms the server does: plain, in braces, or as a urn
@@ -57,8 +55,8 @@ const dbHelp: Record<Writable, string> = {
   dbx: "Certificates and hashes that never boot, even when db allows them.",
 };
 
-// EnrollDialog adds certificates or a hash to one database on every node. Certificates are read in the browser and shown with their fingerprint before anything is sent, so they can be checked against openssl's
-export default function EnrollDialog({ nodes, db: initial, onDone }: Props) {
+// Certificates are read in the browser and shown with their fingerprint before anything is sent, so they can be checked against openssl's
+export default function EnrollDialog({ nodes, db: initial }: Props) {
   const [open, setOpen] = useState(false);
   const [db, setDb] = useState<Writable>(initial);
   const [kind, setKind] = useState<"cert" | "hash">(initial === "dbx" ? "hash" : "cert");
@@ -67,7 +65,10 @@ export default function EnrollDialog({ nodes, db: initial, onDone }: Props) {
   const [hash, setHash] = useState("");
   const [hashType, setHashType] = useState<SignatureType>("EFI_CERT_SHA256_GUID");
   const [owner, setOwner] = useState("");
-  const { mutate, isPending } = useMutation(postV1BmcSecurebootKeysMutation());
+  const { mutate, isPending } = useMutation({
+    ...postV1BmcSecurebootKeysMutation(),
+    meta: { bmc: `Enroll in ${db}` },
+  });
 
   const pems = file ? file.pems : splitPem(pasted);
   // React Query hashes the key by value, so the fingerprints are worked out again only when the certificates change, and a slow result never lands on newer ones
@@ -113,16 +114,13 @@ export default function EnrollDialog({ nodes, db: initial, onDone }: Props) {
     mutate(
       { query: { nodeset: nodes }, body },
       {
-        onSuccess: (data) => {
-          toastBmcResponse(`Enroll in ${db}`, data);
+        onSuccess: () => {
           setPasted("");
           setFile(undefined);
           setHash("");
           setOwner("");
           setOpen(false);
-          onDone();
         },
-        onError: (e) => toast.error(e.title, { description: e.detail }),
       },
     );
   };

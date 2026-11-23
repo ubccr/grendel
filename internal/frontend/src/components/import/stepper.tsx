@@ -3,7 +3,6 @@ import { Check } from "lucide-react";
 
 export type Step = { id: string; label: string };
 
-// Stepper shows where the import is. A step already done can be gone back to; one ahead can't be skipped to
 export function Stepper({
   steps,
   current,

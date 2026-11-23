@@ -7,13 +7,11 @@ import { matchesTags } from "@/lib/tags";
 import { useQuery } from "@tanstack/react-query";
 import { TriangleAlert } from "lucide-react";
 
-// useNodeList is every node in Grendel, shared by the tables that pick nodes and the steps that read what was picked
-export const useNodeList = () => useQuery({ ...getV1NodesOptions(), staleTime: 60_000 });
+export const useNodeList = () => useQuery(getV1NodesOptions());
 
 export const byName = (a: Host, b: Host) =>
   (a.name ?? "").localeCompare(b.name ?? "", undefined, { numeric: true });
 
-// ReadyNote is a picker row's status: Ready, or the amber reason its node can't be used
 export function ReadyNote({ problem }: { problem?: string }) {
   if (!problem) return <span className="text-muted-foreground">Ready</span>;
   return (

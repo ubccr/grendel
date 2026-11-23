@@ -1,5 +1,4 @@
 import { ProvisionStatus } from "@/client";
-import { getV1NodesProvisionStatusOptions } from "@/client/@tanstack/react-query.gen";
 import { Badge } from "@/components/ui/badge";
 import {
   Empty,
@@ -18,17 +17,16 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { ErrorPanel } from "@/components/error-panel";
-import { stateLabels } from "@/lib/provision";
-import { cn } from "@/lib/utils";
+import { isFinished, provisionState, runningStates, stateLabel } from "@/lib/provision";
+import { provisionStatusOptions } from "@/lib/queries";
+import { cn, relativeTime } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Check, LoaderCircle, Minus, Rocket, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useNow } from "@/hooks/use-now";
 import { Fragment, useState } from "react";
 
-export function isFinished(state?: string) {
-  return state === "completed" || state === "failed";
-}
+export { isFinished };
 
 // LastProvisionCounts sums up how the last provisions of a group of nodes went, failures first, as "2 failed, 1 in progress, 18 completed"
 export function LastProvisionCounts({ statuses }: { statuses: ProvisionStatus[] }) {
@@ -54,7 +52,7 @@ export function LastProvisionCounts({ statuses }: { statuses: ProvisionStatus[] 
 
 export function ProvisionStateBadge({ state }: { state?: string }) {
   if (!state) return null;
-  const label = stateLabels[state] ?? state;
+  const label = stateLabel(state);
   if (state === "failed")
     return (
       <Badge variant="destructive" className="whitespace-nowrap">
@@ -73,7 +71,6 @@ export function ProvisionStateBadge({ state }: { state?: string }) {
   );
 }
 
-// the badge for a node in a list, with when it last changed and the beacon's message on hover
 export function ProvisionStatusBadge({ status }: { status?: ProvisionStatus }) {
   if (!status) return null;
   const title = [
@@ -119,71 +116,36 @@ function time(t?: string) {
   return t ? new Date(t).toLocaleString() : "";
 }
 
-// a relative age like "4s ago", in the browser's clock
-export function formatAgo(t: string | undefined, now: number) {
-  if (!t) return "";
-  const then = Date.parse(t);
-  if (isNaN(then)) return "";
-  const sec = Math.max(0, Math.round((now - then) / 1000));
-  if (sec < 1) return "just now";
-  if (sec < 60) return `${sec}s ago`;
-  const min = Math.floor(sec / 60);
-  if (min < 60) return `${min}m ago`;
-  const h = Math.floor(min / 60);
-  if (h < 24) return `${h}h ago`;
-  return `${Math.floor(h / 24)}d ago`;
-}
+// how long ago a report was made. The server's clock can run ahead of the browser's, so a time in the future counts as now
+const ago = (t: string, now: number) =>
+  relativeTime(t, { now: Math.max(now, Date.parse(t) || 0), narrow: true }).text;
 
-// the stages a provision goes through, the last one is completed or failed
-const steps = ["pxe", "ipxe", "config", "booting", "done"] as const;
-const stepLabels: Record<(typeof steps)[number], string> = {
-  pxe: "PXE",
-  ipxe: "iPXE",
-  config: "Config",
-  booting: "Booting",
-  done: "Done",
-};
+// the steps of the timeline: each state a provision is still going in, then one for however it finished
+const steps = [...runningStates.map((s) => s.state), "done"] as const;
+const stepLabels = [...runningStates.map((s) => s.short), "Done"];
+const last = steps.length - 1;
 
 export type StepState = "done" | "current" | "pending" | "failed" | "skipped";
 
-// where each step stands for a provision in state. A node completed by the complete endpoint skips straight to the end, so every step before it counts as done
-export function stepStates(state?: string, stages?: ProvisionStatus["stages"]): StepState[] {
-  let states: StepState[];
-  if (state === "completed") states = steps.map(() => "done");
-  else if (state === "failed")
-    states = steps.map((_, i) => (i === steps.length - 1 ? "failed" : "done"));
-  else {
-    const cur = steps.indexOf(state as (typeof steps)[number]);
-    states = steps.map((_, i) => (i < cur ? "done" : i === cur ? "current" : "pending"));
-  }
-  // with stage times recorded, a step the node passed without ever reaching was skipped, such as config for a node that never fetched one. Statuses saved before stage times existed can't tell, so they keep every passed step as done
-  if (!stages || Object.keys(stages).length === 0) return states;
-  return states.map((st, i) =>
-    st === "done" && i < steps.length - 1 && !stages[steps[i] as keyof typeof stages]
-      ? "skipped"
-      : st,
-  );
+// where each step stands for a provision. A step the node passed with no time recorded for it was skipped, such as config for a node that never fetched one, or every step before the end for a node completed by the complete endpoint
+export function stepStates({ state, stages }: Pick<ProvisionStatus, "state" | "stages">) {
+  const reached = isFinished(state) ? last : steps.indexOf(state as (typeof steps)[number]);
+  return steps.map((step, i): StepState => {
+    if (i > reached) return "pending";
+    if (i === last) return state === "failed" ? "failed" : "done";
+    if (i === reached) return "current";
+    return stages?.[step as keyof typeof stages] ? "done" : "skipped";
+  });
 }
 
-// when each step was reached. Statuses saved before stage times were recorded fall back to the start time for the first step reached and the last update for the step the node is on
+// when each step was reached, for the steps that were
 export function stepTimes(s: ProvisionStatus): (string | undefined)[] {
-  const states = stepStates(s.state);
+  const states = stepStates(s);
   const stages = s.stages ?? {};
-  const legacy = Object.keys(stages).length === 0;
-  const first = states.findIndex((st) => st !== "pending");
-
   return steps.map((step, i) => {
-    const st = states[i];
-    if (st === "pending") return undefined;
-    if (step === "done")
-      return (
-        s.completed_at ?? stages.completed ?? stages.failed ?? (legacy ? s.updated_at : undefined)
-      );
-    if (stages[step]) return stages[step];
-    if (!legacy) return undefined;
-    if (st === "current") return s.updated_at;
-    if (i === first) return s.started_at;
-    return undefined;
+    if (states[i] === "pending") return undefined;
+    if (step === "done") return s.completed_at ?? stages.completed ?? stages.failed;
+    return stages[step];
   });
 }
 
@@ -193,7 +155,7 @@ export function stepTimeLabels(times: (string | undefined)[], now: number): stri
   const base = first ? Date.parse(first) : NaN;
   return times.map((t) => {
     if (!t) return "";
-    if (t === first) return formatAgo(t, now);
+    if (t === first) return ago(t, now);
     const at = Date.parse(t);
     if (isNaN(at)) return "";
     return `+${formatDuration(at - base)}`;
@@ -239,21 +201,18 @@ function StepIcon({ state }: { state: StepState }) {
 
 // a row of equal columns across the tab, and a vertical list on a phone
 function Timeline({ status, now }: { status: ProvisionStatus; now: number }) {
-  const states = stepStates(status.state, status.stages);
+  const states = stepStates(status);
   const times = stepTimes(status);
   const timeLabels = stepTimeLabels(times, now);
-  const last = steps.length - 1;
 
   return (
     <ol className="flex flex-col sm:flex-row" aria-label="Provision stages">
       {steps.map((step, i) => {
         const st = states[i];
         const label =
-          i === last && status.state === "completed"
-            ? "Completed"
-            : i === last && status.state === "failed"
-              ? "Failed"
-              : stepLabels[step];
+          i === last && isFinished(status.state)
+            ? provisionState(status.state)?.short
+            : stepLabels[i];
         return (
           <li
             key={step}
@@ -299,19 +258,11 @@ function Timeline({ status, now }: { status: ProvisionStatus; now: number }) {
   );
 }
 
-// what the node is doing in the stage it reached, read as "<doing> for 3m 2s"
-const doing: Record<string, string> = {
-  pxe: "Network booting",
-  ipxe: "Loading the boot image",
-  config: "Configuring the OS",
-  booting: "Starting services",
-};
-
 function headline(s: ProvisionStatus, now: number) {
   const took = provisionElapsed(s, now);
   if (s.state === "completed") return `Completed in ${took}`;
   if (s.state === "failed") return `Failed after ${took}`;
-  return `${doing[s.state ?? ""] ?? s.state} for ${took}`;
+  return `${provisionState(s.state)?.doing ?? s.state} for ${took}`;
 }
 
 // match model.FactImageVersion
@@ -433,12 +384,24 @@ function FailedUnits({ units }: { units: NonNullable<ProvisionStatus["failed_uni
   );
 }
 
-export function ProvisionStatusPanel({ node }: { node: string }) {
-  const { data, isLoading, error } = useQuery({
-    ...getV1NodesProvisionStatusOptions({ query: { nodeset: node } }),
-    // keep following a provision that is still going
-    refetchInterval: (q) => (isFinished(q.state.data?.[0]?.state) ? false : 15_000),
+// a provision still going is followed closely. One that is over, or none yet, is still looked at now and then, so the next one is noticed without a refresh
+const FOLLOW_MS = 15_000;
+const WATCH_MS = 60_000;
+
+// Each caller runs its own timer, so one place on a page follows the provision and the rest read what it fetched
+export function useFollowedProvision(node: string) {
+  return useQuery({
+    ...provisionStatusOptions({ nodeset: node }),
+    refetchInterval: (q) => {
+      const state = q.state.data?.[0]?.state;
+      return state && !isFinished(state) ? FOLLOW_MS : WATCH_MS;
+    },
   });
+}
+
+export function ProvisionStatusPanel({ node }: { node: string }) {
+  // kept up to date by the node's header, which is on every tab and follows the provision
+  const { data, isLoading, error } = useQuery(provisionStatusOptions({ nodeset: node }));
   const now = useNow(1000);
   const s = data?.[0];
 
@@ -510,10 +473,9 @@ export function ProvisionStatusPanel({ node }: { node: string }) {
   );
 }
 
-// ProvisionSummary is a node's last provision in brief, for a popover in a view of many nodes: where it got to, why it failed, and a way to the full tab
 export function ProvisionSummary({ status: s, node }: { status: ProvisionStatus; node: string }) {
   const now = useNow(1000);
-  const states = stepStates(s.state, s.stages);
+  const states = stepStates(s);
   const failed = s.failed_units ?? [];
   const image = imageText(s);
   const { mismatch } = imageCheck(s);
@@ -525,14 +487,14 @@ export function ProvisionSummary({ status: s, node }: { status: ProvisionStatus;
         <p className="font-medium">{headline(s, now)}</p>
         {s.updated_at && (
           <p className="text-xs text-muted-foreground" title={time(s.updated_at)}>
-            Last report {formatAgo(s.updated_at, now)}
+            Last report {ago(s.updated_at, now)}
             {s.addr && ` from ${s.addr}`}
           </p>
         )}
       </div>
       <ol className="flex items-center gap-1" aria-label="Provision stages">
         {steps.map((step, i) => (
-          <li key={step} className="flex items-center gap-1" title={stepLabels[step]}>
+          <li key={step} className="flex items-center gap-1" title={stepLabels[i]}>
             {i > 0 && (
               <span
                 aria-hidden
@@ -546,7 +508,7 @@ export function ProvisionSummary({ status: s, node }: { status: ProvisionStatus;
               <StepIcon state={states[i]} />
             </span>
             <span className="sr-only">
-              {stepLabels[step]}: {states[i]}
+              {stepLabels[i]}: {states[i]}
             </span>
           </li>
         ))}

@@ -1,4 +1,5 @@
-import { getV1NodesFind, getV1NodesProvisionStatus, type ProvisionStatus } from "@/client";
+import { type ProvisionStatus } from "@/client";
+import { getV1NodesFindOptions } from "@/client/@tanstack/react-query.gen";
 import ActionsSheet from "@/components/actions-sheet";
 import NodeActions from "@/components/actions/nodes";
 import { DetailHeader, Fact, Unset } from "@/components/detail-header";
@@ -17,25 +18,24 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import AuthRedirect from "@/lib/auth";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { provisionStatusOptions, useRefresh } from "@/lib/queries";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { RefreshCw, Server, Settings2 } from "lucide-react";
 import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 
 export const Route = createFileRoute("/racks/$rack")({
   staticData: { crumb: { param: "rack" } },
   component: RackPage,
-  beforeLoad: AuthRedirect,
-  // the statuses load with the nodes so a refresh reloads both. The client throws on an error, so a failed status request is caught here and only leaves the badges off, as for a role without that permission
-  loader: async ({ params: { rack } }) => {
-    const tags = `rack=${rack}`;
-    const [nodes, statuses] = await Promise.all([
-      getV1NodesFind({ query: { tags } }),
-      getV1NodesProvisionStatus({ query: { tags } }).catch(() => undefined),
-    ]);
-    return { ...nodes, statuses: statuses?.data ?? [] };
+  // the statuses are asked for with the nodes but not waited on, so a failed status request only leaves the badges off, as for a role without that permission
+  loader: ({ context: { queryClient }, params: { rack } }) => {
+    void queryClient.prefetchQuery(provisionStatusOptions(inRack(rack)));
+    return queryClient.ensureQueryData(getV1NodesFindOptions({ query: inRack(rack) }));
   },
 });
+
+const inRack = (rack: string) => ({ tags: `rack=${rack}` });
+const noStatuses: ProvisionStatus[] = [];
 
 const detailOptions: [Detail, string][] = [
   ["status", "Last provision"],
@@ -62,13 +62,12 @@ function useDetails() {
     try {
       localStorage.setItem(detailsKey, JSON.stringify(details));
     } catch {
-      // as above
+      // storage can be blocked, and the choice then lasts only until the page is left
     }
   }, [details]);
   return [details, setDetails] as const;
 }
 
-// RackFacts sum up the rack: how full it is, how many nodes will provision, and how their last provisions went
 function RackFacts({
   rack,
   nodes,
@@ -129,10 +128,10 @@ function RackFacts({
 }
 
 function RackPage() {
-  const router = useRouter();
+  const refresh = useRefresh();
   const rack = Route.useParams().rack;
-  const { data, statuses } = Route.useLoaderData();
-  const hosts = data ?? [];
+  const { data: hosts } = useSuspenseQuery(getV1NodesFindOptions({ query: inRack(rack) }));
+  const { data: statuses = noStatuses } = useQuery(provisionStatusOptions(inRack(rack)));
   const placement = useMemo(() => placeNodes(hosts), [hosts]);
   const order = useMemo(() => rackOrder(placement), [placement]);
   const common = useMemo(() => rackTags(hosts, rack).every, [hosts, rack]);
@@ -202,7 +201,7 @@ function RackPage() {
               <ActionsSheet type="node" checked={checked.join(",")} length={checked.length}>
                 <NodeActions nodes={checked.join(",")} />
               </ActionsSheet>
-              <Button variant="secondary" type="button" onClick={() => router.invalidate()}>
+              <Button variant="secondary" type="button" onClick={() => void refresh()}>
                 <RefreshCw />
                 <span className="sr-only md:not-sr-only">Refresh</span>
               </Button>

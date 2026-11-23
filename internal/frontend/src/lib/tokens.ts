@@ -78,7 +78,7 @@ export function expiryLabel(value: string) {
   return parts.join(" ");
 }
 
-// expiryOptions is what the expiry list shows for what has been typed, given the expiry chosen. While the input shows the chosen expiry's name, nothing has been typed, so every preset is shown, along with the chosen expiry if it is not one. Otherwise the typed duration comes first when it reads as one, then the presets whose name matches
+// While the input shows the chosen expiry's name nothing has been typed, so every preset is shown, along with the chosen expiry if it is not one. Otherwise the typed duration comes first when it reads as one, then the presets whose name matches
 export function expiryOptions(query: string, chosen: string) {
   if (query.trim() === "" || query === expiryLabel(chosen)) {
     return expiryPresets.includes(chosen) ? expiryPresets : [chosen, ...expiryPresets];
@@ -109,7 +109,6 @@ export function tokenRoles(roles: Role[], userRole: string) {
 
 export type TokenClaims = { username?: string; role?: string; exp?: number };
 
-// tokenParts splits a token into its header, claims and signature, the three parts a JWT is made of
 export function tokenParts(token: string) {
   const [header = "", claims = "", signature = ""] = token.split(".");
   return { header, claims, signature };

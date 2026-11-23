@@ -156,10 +156,10 @@ func TestGeneratedClientDecodesSecureBoot(t *testing.T) {
 	if err := sb.Decode(jx.DecodeBytes(body)); err != nil {
 		t.Fatalf("decoding the status %s: %v", body, err)
 	}
-	if v, ok := sb.Results.Value[0].Value.Data.Value.PendingEnabled.Get(); !ok || !v {
+	if v, ok := sb.Results[0].Data.Value.PendingEnabled.Get(); !ok || !v {
 		t.Error("pending_enabled lost")
 	}
-	if _, ok := sb.Results.Value[1].Value.Data.Value.PendingEnabled.Get(); ok {
+	if _, ok := sb.Results[1].Data.Value.PendingEnabled.Get(); ok {
 		t.Error("a null pending_enabled decoded as set")
 	}
 
@@ -176,7 +176,7 @@ func TestGeneratedClientDecodesSecureBoot(t *testing.T) {
 	if err := keys.Decode(jx.DecodeBytes(body)); err != nil {
 		t.Fatalf("decoding the keys %s: %v", body, err)
 	}
-	if got := keys.Results.Value[0].Value.Data.Value.Keys[0].Certificates[0].Subject.Value; got != "test" {
+	if got := keys.Results[0].Data.Value.Keys[0].Certificates[0].Subject; got != "test" {
 		t.Errorf("subject = %s", got)
 	}
 }

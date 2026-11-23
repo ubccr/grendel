@@ -6,6 +6,7 @@ package redfish
 
 import (
 	"context"
+	"net/http"
 	"strings"
 	"testing"
 
@@ -68,7 +69,21 @@ func TestNICsFallBackToNetworkAdapters(t *testing.T) {
 func TestNICsNoneReported(t *testing.T) {
 	f := nicFixture()
 	f.tree[sysPath+"/EthernetInterfaces"] = `{"Members": []}`
+	f.tree["/redfish/v1/Chassis/System.Embedded.1"] = `{"@odata.id": "/redfish/v1/Chassis/System.Embedded.1", "Id": "System.Embedded.1"}`
 	got := nics(t, f)
 	assert.NotNil(t, got.NICs, "an empty list, not null, so the UI can tell it from a node never reached")
 	assert.Empty(t, got.NICs)
+}
+
+// TestNICsReadFailure keeps a bmc that could not be asked apart from a node with no NICs
+func TestNICsReadFailure(t *testing.T) {
+	f := nicFixture()
+	f.status[sysPath+"/EthernetInterfaces"] = http.StatusInternalServerError
+	f.tree["/redfish/v1/Chassis/System.Embedded.1"] = `{"@odata.id": "/redfish/v1/Chassis/System.Embedded.1", "Id": "System.Embedded.1"}`
+
+	r := testService(nil).NICs(context.Background(), []Target{{Name: "cpn-a01-01", Addr: f.serve(t).URL}})[0]
+
+	assert.False(t, r.Success)
+	assert.Contains(t, r.Message, "reading ethernet interfaces")
+	assert.Nil(t, r.Data)
 }

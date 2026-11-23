@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-// Package beacon reports a node's provision status from its OS back to grendel. It deliberately imports nothing else from grendel, so the binary built from it stays small
+// Package beacon reports a node's provision status from its OS back to grendel. Of grendel it imports only the report it sends, so the binary built from it stays small
 package beacon
 
 import (
@@ -17,39 +17,13 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/ubccr/grendel/internal/beacon/wire"
 )
-
-// States the beacon reports, matching model.ProvisionState
-const (
-	StateBooting   = "booting"
-	StateFailed    = "failed"
-	StateCompleted = "completed"
-)
-
-// FailedUnit matches model.FailedUnit
-type FailedUnit struct {
-	Name        string `json:"name"`
-	Description string `json:"description,omitempty"`
-	ActiveState string `json:"active_state,omitempty"`
-	SubState    string `json:"sub_state,omitempty"`
-	Result      string `json:"result,omitempty"`
-}
-
-// Report matches provision.StatusReport, the body of POST /boot/:token/status
-type Report struct {
-	State       string            `json:"state"`
-	Message     string            `json:"message,omitempty"`
-	FailedUnits []FailedUnit      `json:"failed_units,omitempty"`
-	QueuedJobs  int               `json:"queued_jobs,omitempty"`
-	BootID      string            `json:"boot_id,omitempty"`
-	Complete    bool              `json:"complete,omitempty"`
-	Facts       map[string]string `json:"facts,omitempty"`
-}
 
 // ErrRejected means grendel refused the report, most often because the boot token expired. Sending it again won't help
 var ErrRejected = errors.New("grendel rejected the report")
 
-// Client posts reports to a node's status URL
 type Client struct {
 	URL  string
 	HTTP *http.Client
@@ -64,7 +38,7 @@ func NewClient(url string, insecure bool) *Client {
 }
 
 // Post sends one report. A 4xx answer wraps ErrRejected, anything else that fails is worth retrying
-func (c *Client) Post(ctx context.Context, r Report) error {
+func (c *Client) Post(ctx context.Context, r wire.Report) error {
 	body, err := json.Marshal(r)
 	if err != nil {
 		return err
@@ -95,7 +69,7 @@ func (c *Client) Post(ctx context.Context, r Report) error {
 }
 
 // PostRetry sends a report until it is accepted, rejected, ctx ends, or giveUp has passed, backing off between attempts
-func (c *Client) PostRetry(ctx context.Context, r Report, giveUp time.Duration) error {
+func (c *Client) PostRetry(ctx context.Context, r wire.Report, giveUp time.Duration) error {
 	ctx, cancel := context.WithTimeout(ctx, giveUp)
 	defer cancel()
 

@@ -1,4 +1,3 @@
-import { getV1SwitchScan } from "@/client";
 import type { DataTableColumnDef } from "@/components/data-table/features";
 import { DataTableColumnHeader } from "@/components/data-table/header";
 import { NodeLink } from "@/components/nodes/node-link";
@@ -13,13 +12,13 @@ import {
 } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ScanSwitch } from "@/lib/import-rows";
+import { nodeOptions, switchScanOptions } from "@/lib/queries";
 import { switchNos, type NeighborKind } from "@/lib/switch-ports";
-import { createFileRoute, useLoaderData } from "@tanstack/react-router";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { TriangleAlert, Unplug } from "lucide-react";
 import { useMemo } from "react";
 import { z } from "zod";
-
-type Problem = { type?: string; title?: string; detail?: string };
 
 export const Route = createFileRoute("/nodes/$node/macs")({
   staticData: { crumb: "MAC table" },
@@ -27,17 +26,13 @@ export const Route = createFileRoute("/nodes/$node/macs")({
   pendingComponent: Pending,
   // port_name is also the table's Port filter, so picking a cage filters the table to it
   validateSearch: z.object({ port_name: z.string().optional() }),
-  loader: async ({ params: { node } }) => {
-    try {
-      const res = await getV1SwitchScan({ query: { nodeset: node } });
-      return { sw: res.data?.switches?.[0], problem: undefined };
-    } catch (e) {
-      return { sw: undefined, problem: e as Problem };
-    }
-  },
+  // the switch is only asked once the tab is opened, not when its link is hovered
+  preload: false,
+  // waited on so the tab opens with the table, but a switch that can't be reached is a problem the tab explains, not a failed page
+  loader: ({ context: { queryClient }, params: { node } }) =>
+    queryClient.prefetchQuery(switchScanOptions(node)),
 });
 
-// Entry is one MAC the switch has learned, with the port it was learned on and the node holding it, if any
 type Entry = {
   id: string;
   port_name: string;
@@ -108,11 +103,15 @@ function Pending() {
 }
 
 function RouteComponent() {
-  const { sw, problem } = Route.useLoaderData();
-  const { data: hosts } = useLoaderData({ from: "/nodes/$node" });
-  const host = hosts?.[0];
+  const { node } = Route.useParams();
+  const { data, error, isPending } = useQuery(switchScanOptions(node));
+  const { data: hosts } = useSuspenseQuery(nodeOptions(node));
+  const host = hosts[0];
+  const sw = data?.switches?.[0];
+  const problem = error ?? undefined;
   const entries = useMemo(() => entriesOf(sw), [sw]);
 
+  if (isPending) return <Pending />;
   if (problem || sw?.error)
     return (
       <SwitchProblem

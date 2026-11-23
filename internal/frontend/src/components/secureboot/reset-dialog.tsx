@@ -20,12 +20,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toastBmcResponse } from "@/lib/bmc";
 import { writable } from "@/lib/secureboot";
 import { useMutation } from "@tanstack/react-query";
 import { LoaderCircle, RotateCcw } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 
 const types = [
   {
@@ -53,26 +51,21 @@ const types = [
 
 type Type = (typeof types)[number]["value"];
 
-// ResetDialog resets or empties the secure boot databases, every one or a single one
-export default function ResetDialog({ nodes, onDone }: { nodes: string; onDone: () => void }) {
+export default function ResetDialog({ nodes }: { nodes: string }) {
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<Type>("to-default");
   const [scope, setScope] = useState("all");
-  const { mutate, isPending } = useMutation(postV1BmcSecurebootResetMutation());
   const chosen = types.find((t) => t.value === type)!;
+  const { mutate, isPending } = useMutation({
+    ...postV1BmcSecurebootResetMutation(),
+    meta: { bmc: chosen.action },
+  });
   const database = type === "delete-pk" || scope === "all" ? undefined : scope;
 
   const run = () =>
     mutate(
       { query: { nodeset: nodes }, body: { type, database } },
-      {
-        onSuccess: (data) => {
-          toastBmcResponse(chosen.action, data);
-          setOpen(false);
-          onDone();
-        },
-        onError: (e) => toast.error(e.title, { description: e.detail }),
-      },
+      { onSuccess: () => setOpen(false) },
     );
 
   return (

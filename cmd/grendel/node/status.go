@@ -17,8 +17,7 @@ import (
 )
 
 var (
-	statusFilter  []string
-	statusOptions *shared.TableOptions
+	statusTable   *shared.TableFlags
 	statusColumns = []shared.Column{
 		{Name: "Node"},
 		{Name: "State"},
@@ -32,6 +31,8 @@ var (
 
 	statusCmd = &cobra.Command{
 		Use:               "status {nodeset | all}",
+		Short:             "Show the latest provision status of nodes",
+		Long:              "Show how far each node got in its latest provision: the state it last reported, when the provision started and was last heard from, the image version the node says it is running, and any systemd units that failed on boot",
 		Args:              cobra.ExactArgs(1),
 		ValidArgsFunction: nodesetCompletion,
 		RunE: func(command *cobra.Command, args []string) error {
@@ -49,7 +50,7 @@ var (
 			}
 
 			now := time.Now()
-			t := shared.NewTable(statusColumns, statusFilter).Options(*statusOptions).Empty("-")
+			t := statusTable.Table()
 			for _, s := range res {
 				var units []string
 				for _, u := range s.FailedUnits.Value {
@@ -109,18 +110,15 @@ func elapsed(s client.ProvisionStatus, now time.Time) string {
 		return ""
 	}
 	end := now
-	switch {
-	case s.CompletedAt.Set && !s.CompletedAt.Null:
-		end = s.CompletedAt.Value
-	case s.State.Value == "failed" && s.UpdatedAt.Set:
+	if completed, ok := s.CompletedAt.Get(); ok {
+		end = completed
+	} else if s.State.Value == "failed" && s.UpdatedAt.Set {
 		end = s.UpdatedAt.Value
 	}
 	return end.Sub(s.StartedAt.Value).Round(time.Second).String()
 }
 
 func init() {
-	statusOptions = shared.RegisterTableFlags(statusCmd)
-	statusCmd.Flags().StringSliceVar(&statusFilter, "filter", nil, "filter table columns by name")
-	statusCmd.RegisterFlagCompletionFunc("filter", shared.ColumnCompletion(statusColumns))
+	statusTable = shared.RegisterTableFlags(statusCmd, statusColumns)
 	nodeCmd.AddCommand(statusCmd)
 }

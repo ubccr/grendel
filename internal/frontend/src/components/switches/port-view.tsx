@@ -9,6 +9,36 @@ import { useMemo, useState, type ReactNode } from "react";
 
 type PortRow = { port_name?: string };
 
+// The picked port is kept in the route's port_name search parameter, which is also the table's Port filter. Picking the port already picked clears it
+function usePortSelection() {
+  const { port_name: port } = useSearch({ strict: false }) as { port_name?: string };
+  const navigate = useNavigate();
+  const select = (name?: string) =>
+    navigate({
+      to: ".",
+      search: (prev) => ({ ...prev, port_name: name && name !== port ? name : undefined }),
+      replace: true,
+      resetScroll: false,
+    });
+  return { port, select };
+}
+
+function PortButton({ name }: { name?: string }) {
+  const { port, select } = usePortSelection();
+  return (
+    <button
+      type="button"
+      onClick={() => select(name)}
+      className={cn(
+        "rounded-sm font-mono text-sm underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring",
+        name === port && "text-sky-600 dark:text-sky-400",
+      )}
+    >
+      {name}
+    </button>
+  );
+}
+
 const kinds: NeighborKind[] = ["node", "other"];
 
 // cageKind is how a cage is lit: one row Grendel doesn't know turns it amber, so a port holding new hardware is never hidden by a known neighbor beside it on a breakout
@@ -17,7 +47,6 @@ function cageKind<T>(rows: T[], kindOf: (row: T) => NeighborKind): NeighborKind 
   return rows.some((r) => kindOf(r) === "other") ? "other" : "node";
 }
 
-// SwitchPortView is a switch's ports as its faceplate, a legend that hides rows by kind, and a table with a row for each thing seen on a port. Picking a cage filters the table to its port through the table's own Port filter, which the route keeps in its port_name search parameter
 export function SwitchPortView<T extends PortRow>({
   nos,
   rows,
@@ -46,18 +75,10 @@ export function SwitchPortView<T extends PortRow>({
   // notice sits between the legend and the table, for warnings about what couldn't be read
   notice?: ReactNode;
 }) {
-  const { port_name: port } = useSearch({ strict: false }) as { port_name?: string };
-  const navigate = useNavigate();
+  const { port, select } = usePortSelection();
   const [hidden, setHidden] = useState<Set<NeighborKind>>(new Set());
   const blocks = useMemo(() => frontPanel(nos, rows), [nos, rows]);
 
-  const select = (name?: string) =>
-    navigate({
-      to: ".",
-      search: (prev) => ({ ...prev, port_name: name && name !== port ? name : undefined }),
-      replace: true,
-      resetScroll: false,
-    });
   const toggle = (kind: NeighborKind) =>
     setHidden((prev) => {
       const next = new Set(prev);
@@ -68,34 +89,29 @@ export function SwitchPortView<T extends PortRow>({
   const counts = { node: 0, other: 0 } satisfies Record<NeighborKind, number>;
   for (const r of rows) counts[kindOf(r)]++;
   const empty = blocks?.reduce((n, b) => n + b.slots.filter((s) => !s.neighbors.length).length, 0);
-  const portNames = new Set(rows.map((r) => r.port_name));
   const shown = rows.filter((r) => !hidden.has(kindOf(r)));
 
-  const portColumn: DataTableColumnDef<T, any> = {
-    id: "port_name",
-    accessorFn: (r) => r.port_name ?? "",
-    sortFn: "alphanumeric",
-    // a whole port name matches only that port, so Ethernet1 doesn't also list Ethernet10 to 19; anything else typed matches part of a name
-    filterFn: (row, id, value: string) => {
-      const name = row.getValue<string>(id);
-      return portNames.has(value)
-        ? name === value
-        : name.toLowerCase().includes(value.toLowerCase());
-    },
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Port" />,
-    cell: ({ row }) => (
-      <button
-        type="button"
-        onClick={() => select(row.original.port_name)}
-        className={cn(
-          "rounded-sm font-mono text-sm underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring",
-          row.original.port_name === port && "text-sky-600 dark:text-sky-400",
-        )}
-      >
-        {row.original.port_name}
-      </button>
-    ),
-  };
+  // the table draws a header or cell as a component, so one rebuilt on a render is remounted, which takes the focus out of the Port filter as it is typed in. The columns are kept until the rows change, and the picked port reaches the cells through PortButton instead
+  const allColumns = useMemo<DataTableColumnDef<T, any>[]>(() => {
+    const portNames = new Set(rows.map((r) => r.port_name));
+    return [
+      {
+        id: "port_name",
+        accessorFn: (r) => r.port_name ?? "",
+        sortFn: "alphanumeric",
+        // a whole port name matches only that port, so Ethernet1 doesn't also list Ethernet10 to 19; anything else typed matches part of a name
+        filterFn: (row, id, value: string) => {
+          const name = row.getValue<string>(id);
+          return portNames.has(value)
+            ? name === value
+            : name.toLowerCase().includes(value.toLowerCase());
+        },
+        header: ({ column }) => <DataTableColumnHeader column={column} title="Port" />,
+        cell: ({ row }) => <PortButton name={row.original.port_name} />,
+      },
+      ...columns,
+    ];
+  }, [rows, columns]);
 
   return (
     <div className="grid gap-4">
@@ -148,7 +164,7 @@ export function SwitchPortView<T extends PortRow>({
 
       <DataTable
         getRowId={getRowId}
-        columns={[portColumn, ...columns]}
+        columns={allColumns}
         data={shown}
         initialSorting={[{ id: "port_name", desc: false }]}
         initialVisibility={initialVisibility}

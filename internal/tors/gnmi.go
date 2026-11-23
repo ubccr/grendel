@@ -10,6 +10,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"math"
 	"net"
 	"os"
 	"strconv"
@@ -104,26 +105,20 @@ func (g *GNMI) Close() error {
 	return err
 }
 
-func (g *GNMI) get(ctx context.Context, paths ...string) ([]leaf, error) {
+func (g *GNMI) get(ctx context.Context, path *gpb.Path) ([]leaf, error) {
 	conn, err := g.client()
 	if err != nil {
 		return nil, err
 	}
 
-	req := &gpb.GetRequest{Type: gpb.GetRequest_STATE, Encoding: gpb.Encoding_JSON_IETF}
+	req := &gpb.GetRequest{Type: gpb.GetRequest_STATE, Encoding: gpb.Encoding_JSON_IETF, Path: []*gpb.Path{path}}
 	if g.cfg.Target != "" {
 		req.Prefix = &gpb.Path{Target: g.cfg.Target}
 	}
-	for _, p := range paths {
-		gp, err := parsePath(p)
-		if err != nil {
-			return nil, err
-		}
-		req.Path = append(req.Path, gp)
-	}
 
 	ctx = metadata.AppendToOutgoingContext(ctx, "username", g.username, "password", g.password)
-	res, err := gpb.NewGNMIClient(conn).Get(ctx, req)
+	// a switch answers with its whole MAC table in one message, which a full table takes past grpc's 4 MB default
+	res, err := gpb.NewGNMIClient(conn).Get(ctx, req, grpc.MaxCallRecvMsgSize(math.MaxInt32))
 	if err != nil {
 		return nil, fmt.Errorf("gnmi get from %s: %w", g.target(), err)
 	}
@@ -137,6 +132,11 @@ type record struct {
 
 func (r record) key(elem, k string) string {
 	return r.keys[elem][k]
+}
+
+// ident reads a field holding an identityref, which JSON_IETF prefixes with its module
+func (r record) ident(field string) string {
+	return stripModule(r.fields[field])
 }
 
 // group gathers leaves into one record per instance of the list called elem. Each record holds the keys of every path element down to that list and the leaves below it, named by their path relative to the list item, e.g. state/vlan.
@@ -185,35 +185,30 @@ next:
 	return out
 }
 
-func (g *GNMI) GetInterfaceStatus(ctx context.Context) (model.InterfaceTable, error) {
-	leaves, err := g.get(ctx, "/interfaces/interface/state")
+// GetInterfaceDescriptions asks for the whole state container rather than its description leaf, since an interface with no description has no such leaf and would be missing from the answer
+func (g *GNMI) GetInterfaceDescriptions(ctx context.Context) (map[string]string, error) {
+	leaves, err := g.get(ctx, elems("interfaces", "interface", "state"))
 	if err != nil {
 		return nil, err
 	}
 	return parseInterfaces(leaves), nil
 }
 
-func parseInterfaces(leaves []leaf) model.InterfaceTable {
-	out := model.InterfaceTable{}
+func parseInterfaces(leaves []leaf) map[string]string {
+	out := map[string]string{}
 	for _, r := range group(leaves, "interface", "subinterfaces") {
 		name := cmp.Or(r.key("interface", "name"), r.fields["state/name"], r.fields["name"])
 		if name == "" {
 			continue
 		}
-		mtu, _ := strconv.Atoi(r.fields["state/mtu"])
-		out[name] = &model.InterfaceStatus{
-			Name:               name,
-			LineProtocolStatus: strings.ToLower(r.fields["state/oper-status"]),
-			InterfaceStatus:    strings.ToLower(r.fields["state/admin-status"]),
-			Description:        r.fields["state/description"],
-			MTU:                mtu,
-		}
+		out[name] = r.fields["state/description"]
 	}
 	return out
 }
 
 func (g *GNMI) GetMACTable(ctx context.Context) (model.MACTable, error) {
-	path := fmt.Sprintf("/network-instances/network-instance[name=%s]/fdb/mac-table/entries", g.cfg.NetworkInstance)
+	path := elems("network-instances", "network-instance", "fdb", "mac-table", "entries")
+	path.Elem[1].Key = map[string]string{"name": g.cfg.NetworkInstance}
 	leaves, err := g.get(ctx, path)
 	if err != nil {
 		return nil, err
@@ -237,7 +232,7 @@ func parseFDB(leaves []leaf) model.MACTable {
 		out = append(out, &model.MACTableEntry{
 			Ifname: ifname,
 			VLAN:   cmp.Or(r.key("entry", "vlan"), r.fields["state/vlan"], r.fields["vlan"]),
-			Type:   strings.ToLower(r.fields["state/entry-type"]),
+			Type:   strings.ToLower(r.ident("state/entry-type")),
 			MAC:    mac,
 		})
 	}
@@ -245,7 +240,7 @@ func parseFDB(leaves []leaf) model.MACTable {
 }
 
 func (g *GNMI) GetLLDPNeighbors(ctx context.Context) (model.LLDPNeighbors, error) {
-	leaves, err := g.get(ctx, "/lldp/interfaces/interface/neighbors/neighbor/state")
+	leaves, err := g.get(ctx, elems("lldp", "interfaces", "interface", "neighbors", "neighbor", "state"))
 	if err != nil {
 		return nil, err
 	}
@@ -259,7 +254,7 @@ func parseLLDP(leaves []leaf) model.LLDPNeighbors {
 		if port == "" {
 			continue
 		}
-		chassisType := r.fields["state/chassis-id-type"]
+		chassisType := r.ident("state/chassis-id-type")
 		chassis := r.fields["state/chassis-id"]
 		if chassisType == "MAC_ADDRESS" {
 			if mac, err := net.ParseMAC(chassis); err == nil {
@@ -275,7 +270,7 @@ func parseLLDP(leaves []leaf) model.LLDPNeighbors {
 			ManagementAddress: r.fields["state/management-address"],
 			PortDescription:   r.fields["state/port-description"],
 			PortId:            r.fields["state/port-id"],
-			PortIdType:        r.fields["state/port-id-type"],
+			PortIdType:        r.ident("state/port-id-type"),
 		}
 	}
 	return out

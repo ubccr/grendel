@@ -22,8 +22,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/ubccr/grendel/internal/beacon"
-	"github.com/ubccr/grendel/internal/events"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
 	"github.com/ubccr/grendel/pkg/nodeset"
@@ -361,30 +359,34 @@ func TestIgnitionBeacon(t *testing.T) {
 
 	require.Len(t, ign.Systemd.Units, 1)
 	assert.True(t, ign.Systemd.Units[0].Enabled)
-	assert.Contains(t, ign.Systemd.Units[0].Contents, "ExecStart=/opt/bin/grendel-beacon watch --complete")
+	assert.Contains(t, ign.Systemd.Units[0].Contents, "ExecStart=/opt/bin/grendel-beacon watch --complete --timeout ")
 }
 
-// the beacon keeps its own copy of the report types so it doesn't pull in grendel's server packages, this keeps the two in step
-func TestBeaconReportMatchesServer(t *testing.T) {
-	in := beacon.Report{
-		State:       beacon.StateFailed,
-		Message:     "m",
-		FailedUnits: []beacon.FailedUnit{{Name: "a", Description: "b", ActiveState: "c", SubState: "d", Result: "e"}},
-		QueuedJobs:  3,
-		BootID:      "id",
-		Complete:    true,
-	}
-	data, err := json.Marshal(in)
+func TestBeaconTimeout(t *testing.T) {
+	now := time.Now()
+	token, err := model.NewBootToken("2BH7b1vYyOQgC2pzGJ9lOqSHvLq", "aa:bb:cc:dd:ee:ff")
 	require.NoError(t, err)
 
-	var out StatusReport
-	dec := json.NewDecoder(strings.NewReader(string(data)))
-	dec.DisallowUnknownFields()
-	require.NoError(t, dec.Decode(&out))
-
-	back, err := json.Marshal(out)
+	expires, err := model.BootTokenExpiry(token)
 	require.NoError(t, err)
-	assert.JSONEq(t, string(data), string(back))
+	assert.WithinDuration(t, now.Add(time.Hour), expires, 2*time.Second)
+
+	// the beacon gives up ten minutes before its token stops being accepted
+	got, err := time.ParseDuration(beaconTimeout(token, now))
+	require.NoError(t, err)
+	assert.InDelta(t, (50 * time.Minute).Seconds(), got.Seconds(), 2)
+
+	// a token near its end keeps half of what is left for the report
+	got, err = time.ParseDuration(beaconTimeout(token, expires.Add(-4*time.Minute)))
+	require.NoError(t, err)
+	assert.Equal(t, 2*time.Minute, got)
+
+	assert.Empty(t, beaconTimeout(token, expires.Add(time.Minute)), "an expired token")
+	assert.Empty(t, beaconTimeout("not a token!", now))
+
+	viper.Set("provision.token_ttl", 0)
+	t.Cleanup(func() { viper.Set("provision.token_ttl", 60*60) })
+	assert.Empty(t, beaconTimeout(token, now), "tokens that never expire leave the beacon its own default")
 }
 
 func TestStatusFacts(t *testing.T) {
@@ -441,10 +443,8 @@ func TestProvisionEvent(t *testing.T) {
 	}
 	require.NoError(t, h.DB.StoreHost(first))
 
-	// reports are written by the recorder's next flush, which is done here before each look
 	provisionings := func() model.EventList {
 		t.Helper()
-		events.New(h.DB).Flush()
 		list, err := h.DB.Events(model.EventFilter{Kind: model.EventKindProvision})
 		require.NoError(t, err)
 		return list

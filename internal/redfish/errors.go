@@ -15,7 +15,7 @@ import (
 	"github.com/stmcginnis/gofish/schemas"
 )
 
-// errorMessage parses and attempts to return the most relavent error
+// errorMessage parses and attempts to return the most relevant error
 func errorMessage(err error) string {
 	if err == nil {
 		return ""
@@ -23,12 +23,10 @@ func errorMessage(err error) string {
 
 	err = parseCollectionErrors(err)
 
-	// parse redfish errors
 	if err, ok := errors.AsType[*schemas.Error](err); ok && err.HTTPReturnedStatusCode != 0 {
 		return parseRedfishError(err)
 	}
 
-	// simplify HTTP connection errors
 	if err, ok := errors.AsType[*url.Error](err); ok {
 		return err.Err.Error()
 	}
@@ -45,7 +43,7 @@ func parseCollectionErrors(err error) error {
 	return err
 }
 
-// parseRedfishError tries to return the error with the most relavent information
+// parseRedfishError tries to return the error with the most relevant information
 func parseRedfishError(e *schemas.Error) string {
 	if len(e.ExtendedInfos) > 0 && e.ExtendedInfos[0].Message != "" {
 		return e.ExtendedInfos[0].Message
