@@ -23,7 +23,7 @@ var (
 // the missing permissions via a migration file or add it to the ignored list if
 // it should not be restricted by a permission.
 //
-// Remember to also insert into role_permission for the user and read-only roles that should hold it, so existing installs gain the permission. The admin role needs no grant.
+// Remember to also insert into role_permission for admin and for the user and read-only roles that should hold it, so existing installs gain the permission. The server lets admin call every route without a grant, but a role made from admin copies only its stored grants.
 func TestAccessControlRoutes(t *testing.T) {
 	db, err := sqlstore.New(":memory:")
 	if err != nil {

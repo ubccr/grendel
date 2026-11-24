@@ -54,6 +54,16 @@ func (s *StoreTestSuite) TestAdminHoldsEveryPermission() {
 	}
 }
 
+func (s *StoreTestSuite) TestRoleClonedFromAdminHoldsEveryPermission() {
+	defer s.db.Close()
+
+	s.Require().NoError(s.db.AddRole("admin-clone", model.RoleAdmin.String()))
+
+	clone, err := s.db.GetRolesByName("admin-clone")
+	s.Require().NoError(err)
+	s.Assert().Empty(clone.UnassignedPermissionList)
+}
+
 func (s *StoreTestSuite) TestUser() {
 	adminUsername := "admin"
 	adminPassword := "SuperSecureAdminPassword1234!@#$"

@@ -208,3 +208,26 @@ func TestReassignDefaultPermissionsRoundTrip(t *testing.T) {
 	assertGrants(t, db, "read-only", "/v1/roles")
 	assertGrants(t, db, "user", "/v1/users", userUsers...)
 }
+
+func TestSettingsAdminOnlyRoundTrip(t *testing.T) {
+	const before, after = 20261125120000, 20261126120000
+	db, m := migratedTo(t, before)
+
+	// a custom role keeps the settings it was given
+	exec(t, db, `insert into role(name) values ('ops')`)
+	grant(t, db, "ops", "GET", "/v1/settings")
+
+	move(t, m, after)
+
+	assertGrants(t, db, "admin", "/v1/settings", "GET /v1/settings", "PATCH /v1/settings")
+	assertGrants(t, db, "user", "/v1/settings")
+	assertGrants(t, db, "read-only", "/v1/settings")
+	assertGrants(t, db, "ops", "/v1/settings", "GET /v1/settings")
+
+	move(t, m, before)
+
+	assertGrants(t, db, "admin", "/v1/settings")
+	assertGrants(t, db, "user", "/v1/settings", "GET /v1/settings")
+	assertGrants(t, db, "read-only", "/v1/settings", "GET /v1/settings")
+	assertGrants(t, db, "ops", "/v1/settings", "GET /v1/settings")
+}

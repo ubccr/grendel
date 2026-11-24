@@ -25,8 +25,7 @@ func stored(t *testing.T, db *sqlstore.SqlStore) []settings.Row {
 	return slices.DeleteFunc(rows, func(r settings.Row) bool { return strings.HasSuffix(r.Key, ".secret") })
 }
 
-// anyone signed in may read the settings, which never carry a secret, but only an admin may change them
-func TestSettingsCanOnlyBeChangedByAnAdmin(t *testing.T) {
+func TestSettingsAreOnlyForAnAdmin(t *testing.T) {
 	db, mux := newAuthTestServer(t)
 	settings.Reset()
 	t.Cleanup(settings.Reset)
@@ -37,12 +36,12 @@ func TestSettingsCanOnlyBeChangedByAnAdmin(t *testing.T) {
 	user := signinAs(t, db, mux, "alice", model.RoleUser.String())
 	readOnly := signinAs(t, db, mux, "bob", model.RoleReadOnly.String())
 
-	assert.Equal(t, http.StatusOK, send(t, mux, http.MethodGet, "/v1/settings", "", admin).Code)
+	list := send(t, mux, http.MethodGet, "/v1/settings", "", admin)
+	assert.Equal(t, http.StatusOK, list.Code)
+	assert.NotContains(t, list.Body.String(), settings.APISecret.Get())
+	assert.NotContains(t, list.Body.String(), settings.ProvisionSecret.Get())
 	for _, session := range [][]*http.Cookie{user, readOnly} {
-		list := send(t, mux, http.MethodGet, "/v1/settings", "", session)
-		assert.Equal(t, http.StatusOK, list.Code)
-		assert.NotContains(t, list.Body.String(), settings.APISecret.Get())
-		assert.NotContains(t, list.Body.String(), settings.ProvisionSecret.Get())
+		assert.Equal(t, http.StatusForbidden, send(t, mux, http.MethodGet, "/v1/settings", "", session).Code)
 		assert.Equal(t, http.StatusForbidden, send(t, mux, http.MethodPatch, "/v1/settings", `{"set":{"dns.ttl":"600"}}`, session).Code)
 	}
 }
