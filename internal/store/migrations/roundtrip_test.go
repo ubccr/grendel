@@ -93,9 +93,11 @@ func assertGrants(t *testing.T, db *sql.DB, role, prefix string, want ...string)
 	}
 }
 
-func TestReplaceBmcRoutesKeepsRoleEdits(t *testing.T) {
-	const before, after = 20261026120000, 20261110120000
-	db, m := migratedTo(t, before)
+// the schema v0.2.10 leaves and the one 0.3.0 migrates it to
+const before030, after030 = 20261026120000, 20261126120000
+
+func TestRelease030KeepsRoleEdits(t *testing.T) {
+	db, m := migratedTo(t, before030)
 
 	// an admin took power and clearing the event log away from the user role, and made a role that only reads BMCs
 	revoke(t, db, "user", "POST", "/v1/bmc/power/os")
@@ -104,20 +106,17 @@ func TestReplaceBmcRoutesKeepsRoleEdits(t *testing.T) {
 	exec(t, db, `insert into role(name) values ('ops')`)
 	grant(t, db, "ops", "GET", "/v1/bmc")
 
-	move(t, m, after)
+	move(t, m, after030)
 
-	assertGrants(t, db, "admin", "/v1/bmc",
-		"GET /v1/bmc/status", "GET /v1/bmc/sel", "GET /v1/bmc/firmware/updates", "GET /v1/bmc/jobs",
-		"POST /v1/bmc/power", "POST /v1/bmc/indicator", "POST /v1/bmc/jobs/clear", "POST /v1/bmc/sel/clear", "POST /v1/bmc/firmware/install",
-		"POST /v1/bmc/configure/auto", "POST /v1/bmc/configure/import")
-	assertGrants(t, db, "user", "/v1/bmc",
-		"GET /v1/bmc/status", "GET /v1/bmc/sel", "GET /v1/bmc/firmware/updates", "GET /v1/bmc/jobs",
-		"POST /v1/bmc/jobs/clear", "POST /v1/bmc/firmware/install",
-		"POST /v1/bmc/configure/auto", "POST /v1/bmc/configure/import")
-	assertGrants(t, db, "read-only", "/v1/bmc", "GET /v1/bmc/status", "GET /v1/bmc/sel", "GET /v1/bmc/firmware/updates", "GET /v1/bmc/jobs")
-	assertGrants(t, db, "ops", "/v1/bmc", "GET /v1/bmc/status", "GET /v1/bmc/sel", "GET /v1/bmc/firmware/updates")
+	reads := []string{"GET /v1/bmc/status", "GET /v1/bmc/sel", "GET /v1/bmc/firmware/updates", "GET /v1/bmc/nics", "GET /v1/bmc/jobs", "GET /v1/bmc/bios", "GET /v1/bmc/bios/registry", "GET /v1/bmc/identity/defaults", "GET /v1/bmc/secureboot"}
+	userWrites := []string{"POST /v1/bmc/jobs/clear", "POST /v1/bmc/firmware/install", "POST /v1/bmc/configure/auto", "POST /v1/bmc/configure/import", "POST /v1/bmc/bios", "POST /v1/bmc/bios/discard", "POST /v1/bmc/asset-tag", "POST /v1/bmc/location", "GET /v1/bmc/console"}
+	adminOnly := []string{"POST /v1/bmc/power", "POST /v1/bmc/indicator", "POST /v1/bmc/sel/clear", "POST /v1/bmc/secureboot", "POST /v1/bmc/secureboot/keys", "POST /v1/bmc/secureboot/keys/delete", "POST /v1/bmc/secureboot/reset"}
+	assertGrants(t, db, "admin", "/v1/bmc", slices.Concat(reads, userWrites, adminOnly)...)
+	assertGrants(t, db, "user", "/v1/bmc", slices.Concat(reads, userWrites)...)
+	assertGrants(t, db, "read-only", "/v1/bmc", reads...)
+	assertGrants(t, db, "ops", "/v1/bmc", "GET /v1/bmc/status", "GET /v1/bmc/sel", "GET /v1/bmc/firmware/updates", "GET /v1/bmc/nics")
 
-	move(t, m, before)
+	move(t, m, before030)
 
 	assertGrants(t, db, "user", "/v1/bmc",
 		"GET /v1/bmc", "GET /v1/bmc/jobs",
@@ -131,103 +130,89 @@ func TestReplaceBmcRoutesKeepsRoleEdits(t *testing.T) {
 	}
 }
 
-func TestGrantUserTagsDownKeepsEarlierGrants(t *testing.T) {
-	const before, after = 20261117120000, 20261118120000
-	db, m := migratedTo(t, before)
+func TestRelease030DefaultGrantsRoundTrip(t *testing.T) {
+	db, m := migratedTo(t, before030)
+	readOnlySwitch := grants(t, db, "read-only", "/v1/switch")
+	userUsers := grants(t, db, "user", "/v1/users")
+	adminSwitch := grants(t, db, "admin", "/v1/switch")
+
+	move(t, m, after030)
+
+	var total, admin int
+	if err := db.QueryRow(`select (select count(*) from permission), (select count(*) from role_permission rp join role r on r.id = rp.role_id where r.name = 'admin')`).Scan(&total, &admin); err != nil || admin != total {
+		t.Errorf("admin holds %d of %d permissions, %v", admin, total, err)
+	}
+	assertGrants(t, db, "read-only", "/v1/switch", "GET /v1/switch/%/lldp", "GET /v1/switch/scan")
+	assertGrants(t, db, "read-only", "/v1/nodes/ips", "GET /v1/nodes/ips/next", "GET /v1/nodes/ips/ranges")
+	assertGrants(t, db, "read-only", "/v1/roles", "GET /v1/roles")
+	assertGrants(t, db, "user", "/v1/nodes/tags", "GET /v1/nodes/tags", "PATCH /v1/nodes/tags/%")
+	assertGrants(t, db, "user", "/v1/users")
+	assertGrants(t, db, "user", "/v1/nodes/render")
+	assertGrants(t, db, "user", "/v1/settings")
+	assertGrants(t, db, "read-only", "/v1/settings")
+	assertGrants(t, db, "admin", "/v1/settings", "GET /v1/settings", "PATCH /v1/settings")
+
+	move(t, m, before030)
+
+	assertGrants(t, db, "admin", "/v1/switch", adminSwitch...)
+	assertGrants(t, db, "read-only", "/v1/switch", readOnlySwitch...)
+	assertGrants(t, db, "read-only", "/v1/roles")
+	assertGrants(t, db, "user", "/v1/users", userUsers...)
+	var left int
+	if err := db.QueryRow(`select count(*) from permission where path like '/v1/settings%' or path like '/v1/nodes/ips/%' or path like '/v1/bmc/bios%'`).Scan(&left); err != nil || left != 0 {
+		t.Errorf("permissions of 0.3.0 left after the down: %d, %v", left, err)
+	}
+}
+
+func TestRelease030DownKeepsEarlierUserGrants(t *testing.T) {
+	db, m := migratedTo(t, before030)
 
 	// an admin had already let users list roles
 	grant(t, db, "user", "GET", "/v1/roles")
 
-	move(t, m, after)
-	assertGrants(t, db, "user", "/v1/nodes/tags/", "PATCH /v1/nodes/tags/%")
+	move(t, m, after030)
 	assertGrants(t, db, "user", "/v1/roles", "GET /v1/roles")
 
-	move(t, m, before)
+	move(t, m, before030)
 	assertGrants(t, db, "user", "/v1/roles", "GET /v1/roles")
 }
 
-func TestCountEventsFromNodesRoundTrip(t *testing.T) {
-	const before, after = 20261121120000, 20261122120000
-	db, m := migratedTo(t, before)
-
-	exec(t, db, `insert into event(id, kind, action, summary, actor, state, severity, started_at, updated_at, counts) values
-		('e1', 'bmc', 'bmc.power', 'bmc power', 'admin', 'done', 'warning', '2026-11-16 12:00:00', '2026-11-16 12:00:00', '{"total":2,"pending":0,"running":0,"succeeded":1,"failed":1,"stalled":0}'),
-		('e2', 'audit', 'node.save', 'Saved nodes', 'admin', 'done', 'success', '2026-11-16 12:00:00', '2026-11-16 12:00:00', '{}')`)
-	exec(t, db, `insert into event_node(event_id, node, state, updated_at) values
-		('e1', 'n1', 'succeeded', '2026-11-16 12:00:00'),
-		('e1', 'n2', 'failed', '2026-11-16 12:00:00')`)
-
-	counts := func(id string) string {
+func TestRelease030TablesRoundTrip(t *testing.T) {
+	db, m := migratedTo(t, before030)
+	tables := func() []string {
 		t.Helper()
-		var c string
-		if err := db.QueryRow(`select counts from event where id = ?`, id).Scan(&c); err != nil {
+		rows, err := db.Query(`select name from sqlite_master where type in ('table', 'index') and name in ('provision_status', 'event', 'event_node', 'event_node_open', 'event_open_provision', 'setting', 'setting_revision') order by 1`)
+		if err != nil {
 			t.Fatal(err)
 		}
-		return c
+		defer rows.Close()
+		out := []string{}
+		for rows.Next() {
+			var name string
+			if err := rows.Scan(&name); err != nil {
+				t.Fatal(err)
+			}
+			out = append(out, name)
+		}
+		return out
 	}
-	want := counts("e1")
 
-	move(t, m, after)
-	if _, err := db.Exec(`select counts from event`); err == nil {
-		t.Error("the counts column is still there after the up")
+	move(t, m, after030)
+	if got, want := tables(), []string{"event", "event_node", "event_node_open", "event_open_provision", "provision_status", "setting", "setting_revision"}; !slices.Equal(got, want) {
+		t.Errorf("after the up there is %q, want %q", got, want)
 	}
-	var open int
-	if err := db.QueryRow(`select count(*) from sqlite_master where type = 'index' and name = 'event_node_open'`).Scan(&open); err != nil || open != 1 {
-		t.Errorf("event_node_open index: %d, %v", open, err)
+	var revision int
+	if err := db.QueryRow(`select revision from setting_revision`).Scan(&revision); err != nil || revision != 0 {
+		t.Errorf("setting revision starts at %d, %v", revision, err)
 	}
 
-	move(t, m, before)
-	if got := counts("e1"); got != want {
-		t.Errorf("counts after the round trip are %s, want %s", got, want)
+	// rows in the new tables do not stop the down
+	exec(t, db, `insert into event(id, kind, action, summary, actor, state, severity, started_at, updated_at) values ('e1', 'bmc', 'bmc.power', 'bmc power', 'admin', 'done', 'warning', '2026-11-16 12:00:00', '2026-11-16 12:00:00')`)
+	exec(t, db, `insert into event_node(event_id, node, state, updated_at) values ('e1', 'n1', 'succeeded', '2026-11-16 12:00:00')`)
+	exec(t, db, `insert into setting(key, value) values ('dns.ttl', '600')`)
+
+	move(t, m, before030)
+	if got := tables(); len(got) != 0 {
+		t.Errorf("after the down there is still %q", got)
 	}
-	if got := counts("e2"); got != "{}" {
-		t.Errorf("an event with no nodes has counts %s, want {}", got)
-	}
-	if err := db.QueryRow(`select count(*) from sqlite_master where type = 'index' and name = 'event_node_open'`).Scan(&open); err != nil || open != 0 {
-		t.Errorf("event_node_open index after the down: %d, %v", open, err)
-	}
-}
-
-func TestReassignDefaultPermissionsRoundTrip(t *testing.T) {
-	const before, after = 20261122120000, 20261123120000
-	db, m := migratedTo(t, before)
-	readOnlySwitch := grants(t, db, "read-only", "/v1/switch")
-	userUsers := grants(t, db, "user", "/v1/users")
-
-	move(t, m, after)
-
-	assertGrants(t, db, "read-only", "/v1/switch", "GET /v1/switch/%/lldp", "GET /v1/switch/scan")
-	assertGrants(t, db, "read-only", "/v1/nodes/ips", "GET /v1/nodes/ips/next", "GET /v1/nodes/ips/ranges")
-	assertGrants(t, db, "read-only", "/v1/roles", "GET /v1/roles")
-	assertGrants(t, db, "user", "/v1/users")
-
-	move(t, m, before)
-
-	assertGrants(t, db, "read-only", "/v1/switch", readOnlySwitch...)
-	assertGrants(t, db, "read-only", "/v1/nodes/ips", "GET /v1/nodes/ips/ranges")
-	assertGrants(t, db, "read-only", "/v1/roles")
-	assertGrants(t, db, "user", "/v1/users", userUsers...)
-}
-
-func TestSettingsAdminOnlyRoundTrip(t *testing.T) {
-	const before, after = 20261125120000, 20261126120000
-	db, m := migratedTo(t, before)
-
-	// a custom role keeps the settings it was given
-	exec(t, db, `insert into role(name) values ('ops')`)
-	grant(t, db, "ops", "GET", "/v1/settings")
-
-	move(t, m, after)
-
-	assertGrants(t, db, "admin", "/v1/settings", "GET /v1/settings", "PATCH /v1/settings")
-	assertGrants(t, db, "user", "/v1/settings")
-	assertGrants(t, db, "read-only", "/v1/settings")
-	assertGrants(t, db, "ops", "/v1/settings", "GET /v1/settings")
-
-	move(t, m, before)
-
-	assertGrants(t, db, "admin", "/v1/settings")
-	assertGrants(t, db, "user", "/v1/settings", "GET /v1/settings")
-	assertGrants(t, db, "read-only", "/v1/settings", "GET /v1/settings")
-	assertGrants(t, db, "ops", "/v1/settings", "GET /v1/settings")
 }
