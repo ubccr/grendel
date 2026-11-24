@@ -65,7 +65,7 @@ func (s *Service) connect(ctx context.Context, t Target) (*conn, error) {
 		return nil, errors.New("bmc interface has no usable ip address")
 	}
 	if len(s.source().cfg.Credentials) == 0 {
-		return nil, errors.New("no bmc credentials configured, set bmc.user and bmc.password")
+		return nil, errors.New("no bmc credentials configured, set bmc.credentials")
 	}
 
 	base := s.clientConfig(t)

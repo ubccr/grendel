@@ -343,8 +343,8 @@ function GroupHeading({
 function Precedence({ configFile }: { configFile?: string }) {
   return (
     <div className="mt-4 grid gap-2 border-t px-3 pt-4 text-xs text-muted-foreground">
-      <p className="font-medium text-foreground">Where a value comes from</p>
-      <p>The first of these that sets a value wins.</p>
+      <p className="font-medium text-foreground">Legend</p>
+      <p>Listed in order of precedence</p>
       <ol className="grid justify-items-start gap-1.5">
         {layers.map((layer) => (
           <li key={layer}>
@@ -354,7 +354,7 @@ function Precedence({ configFile }: { configFile?: string }) {
                 layer === "file"
                   ? fileName(configFile)
                   : layer === "flag"
-                    ? "--flag"
+                    ? "command line"
                     : layer === "env"
                       ? "GRENDEL_*"
                       : undefined

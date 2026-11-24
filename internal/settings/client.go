@@ -6,15 +6,14 @@ package settings
 
 var (
 	ClientAPIEndpoint = register[string](Option{
-		Key:      "client.api_endpoint",
-		Packaged: "/var/lib/grendel/grendel-api.socket",
-		Summary:  "API endpoint",
-		Help:     "Where the grendel command finds the API: a URL such as http://localhost:8080, or the path of the server's unix socket.",
-		Kind:     KindString,
-		Default:  "grendel-api.socket",
-		Scope:    ScopeClient,
-		Apply:    ApplyLive,
-		Flag:     "endpoint",
+		Key:     "client.api_endpoint",
+		Summary: "API endpoint",
+		Help:    "Where the grendel command finds the API: a URL such as http://localhost:8080, or the path of the server's unix socket.",
+		Kind:    KindString,
+		Default: "grendel-api.socket",
+		Scope:   ScopeClient,
+		Apply:   ApplyLive,
+		Flag:    "endpoint",
 	})
 	ClientAPIKey = register[string](Option{
 		Key:     "client.api_key",

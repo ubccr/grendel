@@ -57,7 +57,7 @@ func ConfigFromSettings() Config {
 			Port:      settings.SwitchSNMPPort.Get(),
 			Timeout:   settings.SwitchSNMPTimeout.Get(),
 			Retries:   settings.SwitchSNMPRetries.Get(),
-			User:      settings.SwitchSNMPUser.Get(),
+			User:      cmp.Or(settings.SwitchSNMPUsername.Get(), settings.SwitchSNMPUser.Get()),
 			AuthProto: settings.SwitchSNMPAuthProto.Get(),
 			AuthPass:  settings.SwitchSNMPAuthPass.Get(),
 			PrivProto: settings.SwitchSNMPPrivProto.Get(),

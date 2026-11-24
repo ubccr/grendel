@@ -1,101 +1,104 @@
-# SPDX-FileCopyrightText: (C) 2019 Grendel Authors
-#
-# SPDX-License-Identifier: GPL-3.0-or-later
+# Grendel config file
 
-# The settings grendel reads from this file only: secrets, paths on this host and what is needed to open the database. The few a packaged install needs are set, and the rest are commented out at their default.
-# Every other setting is stored in the database and changed with `grendel config set` or in the web UI. Any of them can still be set here, and a value in this file wins over the database: `grendel config list` shows them all.
+# Settings in this file must be configured here and not in the DB. Other settings may be added to prevent runtime modification
+# See `grendel config -h` for more information.
 
-# Database type. The database backend. It is needed before the database can be opened, so it cannot be stored there.
-# One of: sqlite
-#dbtype = 'sqlite'
 
-# Database path. Where the database file lives. The default keeps everything in memory and loses it when grendeld stops. It is needed before the database can be opened, so it cannot be stored there.
+# Path to persistent DB file
 dbpath = '/var/lib/grendel/db/grendel.sqlite3'
 
-# Services to run. Which of api, dhcp, dns, provision, pxe and tftp this process runs. Empty runs them all. Naming services on the command line, as in `grendeld serve dhcp dns`, wins over this. It differs per process, so it is not stored in the database.
+# List of services to run, see `grendeld serve -h` for more info
 #services = []
 
+
 [api]
-# Unix socket path. Path of a unix socket the API also listens on. Requests over it skip authentication, so its file permissions decide who may use it. It is a path on the server, so it is not stored in the database.
-socket_path = 'grendel-api.socket'
+# UNIX socket path
+# Allows for local CLI access without API tokens, there is no RBAC and access control is UNIX permission based
+socket_path = '/var/lib/grendel/grendel-api.socket'
 
-# Signing secret. Signs login sessions and API tokens. When nothing sets it, one is generated and kept in the database. Changing it signs everyone out. Generate one with `openssl rand -hex 16`.
-#secret = ''
 
-# TLS certificate. Path to the certificate (.crt) the API serves. Setting both the certificate and the key turns on HTTPS, which you should always use over TCP.
+# Always use TLS when listening on a TCP socket:
+
+# Path to TLS certificate
 #cert = ''
 
-# TLS key. Path to the private key (.key) for the API certificate.
+# Path to TLS private key
 #key = ''
 
-# Skip role checks. Lets every signed-in account call every route. It turns access control off, so it can only be set in the config file or the environment.
+# Development only: disables RBAC
 #dev = false
 
-[bmc]
-# Password. Password for bmc.user.
+
+# Redfish BMC credentials
+# Tried in order so you can include factory defaults or old credentials
+#[[bmc.credentials]]
+#username = ''
+#password = ''
+#[[bmc.credentials]]
+#username = ''
 #password = ''
 
-[bmc.defaults]
-# Fallback logins. More logins to try, in order, when the first is refused. Useful for old passwords or factory defaults.
-#credentials = [{password = '', user = ''}]
 
 [tftp]
-# iPXE firmware directory. Directory of iPXE EFI builds to serve in place of the embedded ones, which Secure Boot needs. It is a path on the server, so it is not stored in the database.
+# Path to iPXE firmware. See `grendeld firmware -h`
 #firmware_dir = ''
 
+
+# CLI Client config
 [client]
-# API endpoint. Where the grendel command finds the API: a URL such as http://localhost:8080, or the path of the server's unix socket.
+# UNIX socket path or API URL
 api_endpoint = '/var/lib/grendel/grendel-api.socket'
 
-# API token. Token the grendel command signs in with over TCP. Create one with `grendel auth token`.
+# API auth token for connecting over TCP
 #api_key = ''
 
-# Skip certificate checks. Accept any certificate the API serves. Only for a server with a self-signed certificate that you trust.
+# Allow self-signed certificates
 #insecure = false
 
-# CA certificate. Path to a CA certificate to trust when checking the API's certificate.
+# Path to a CA certificate for API TLS verification
 #cacert = ''
 
-[database]
-# Database read connections. Most reads that may run at once. Reads do not block each other, so there is little to gain above the core count, and an unbounded pool lets a burst of slow queries exhaust file descriptors.
-#max_read_conns = 8
 
 [provision]
-# TLS certificate. Path to the certificate (.crt) the provision server serves. Setting both the certificate and the key turns on HTTPS.
+# Path to TLS certificate
 #cert = ''
 
-# TLS key. Path to the private key (.key) for the provision certificate.
+# Path to TLS private key
 #key = ''
 
-# Boot token secret. Signs the boot tokens handed to hosts. When nothing sets it, one is generated and kept in the database. Generate one with `openssl rand -hex 16`.
-#secret = ''
-
-# Repository directory. Directory on this machine served to hosts under /repo during provisioning. It is a path on the server, so it is not stored in the database.
+# Path to repo directory
+# Served to nodes at /repo
 repo_dir = '/var/lib/grendel/repo'
 
-# Templates directory. Directory of your own *.tmpl provision templates, which are loaded over the built-in ones and reloaded when they change. It is a path on the server, so it is not stored in the database.
+# Path to provision templates
+# Hot reloaded on file update, templates with matching names will override embedded templates
 templates_dir = '/var/lib/grendel/templates'
 
-# NetBox token. API token grendel sends to NetBox.
+# NetBox API token for fetching rendered NetBox templates for a node
 #netbox_token = ''
 
-# Extra template variables. Your own values passed to provision templates, read as {{ $.extra_vars.name }}. Entries in the config file win over the ones stored here and their values are never shown, so keep passwords and other secrets there. Entries stored here can be read by anyone who can read settings.
+# Custom variables used in templates as {{ $.extra_vars.name }}
+# Keep extra secrets in here, and non sensitive information in the DB
 [provision.extra_vars]
 
 [provision.beacon]
-# Beacon binaries directory. Directory holding grendel-beacon-amd64 and grendel-beacon-arm64, served at /beacon/<arch> for templates to download. The deb and rpm packages install both in /usr/lib/grendel/beacon. It is a path on the server, so it is not stored in the database.
+# Path to beacon binaries
+# Optional node service that reports boot status back to Grendel
 dir = '/usr/lib/grendel/beacon'
 
+
 [switch]
-# Password. Password for switch.username.
+# Switch credentials
+# Used for gNMI LLDP and MAC address table queries
+#username = ''
 #password = ''
 
 [switch.snmp]
-# Community. Community string for SNMP 2c. Defaults to public.
+# SNMPv2c community string
 #community = 'public'
 
-# SNMPv3 authentication password. Password for the authentication protocol.
+# SNMPv3 auth password
 #auth_pass = ''
 
-# SNMPv3 privacy password. Password for the privacy protocol.
+# SNMPv3 privacy password
 #priv_pass = ''

@@ -21,7 +21,7 @@ var (
 		Key:      "tftp.firmware_dir",
 		Section:  "boot",
 		Summary:  "iPXE firmware directory",
-		Help:     "Directory of iPXE EFI builds to serve in place of the embedded ones, which Secure Boot needs. It is a path on the server, so it is not stored in the database.",
+		Help:     "Directory of iPXE EFI builds to serve in place of the embedded ones, which Secure Boot needs.",
 		Kind:     KindPath,
 		Default:  "",
 		External: true,

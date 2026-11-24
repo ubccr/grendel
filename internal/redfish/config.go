@@ -5,6 +5,8 @@
 package redfish
 
 import (
+	"cmp"
+	"slices"
 	"strings"
 	"time"
 
@@ -71,16 +73,17 @@ func ConfigFromSettings() Config {
 		IPMICipherSuites: settings.BMCIPMICipherSuites.Get(),
 	}
 
-	if user := settings.BMCUser.Get(); user != "" {
+	if user := cmp.Or(settings.BMCUsername.Get(), settings.BMCUser.Get()); user != "" {
 		cfg.Credentials = append(cfg.Credentials, Credential{User: user, Password: settings.BMCPassword.Get()})
 	}
 
 	// an array of tables, rather than a username = "password" table, because viper lowercases keys and BMC usernames can be case sensitive. It also keeps the order they are tried in
-	for _, row := range settings.BMCDefaultCredentials.Get() {
-		user, _ := row["user"].(string)
+	for _, row := range slices.Concat(settings.BMCCredentials.Get(), settings.BMCDefaultCredentials.Get()) {
+		// the older bmc.defaults.credentials calls the field user
+		user, _ := cmp.Or(row["username"], row["user"]).(string)
 		password, _ := row["password"].(string)
 		if user == "" {
-			log.Warn("ignoring a bmc.defaults.credentials entry with no user")
+			log.Warn("ignoring a bmc.credentials entry with no username")
 			continue
 		}
 		cfg.Credentials = append(cfg.Credentials, Credential{User: user, Password: password})

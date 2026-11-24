@@ -10,11 +10,12 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/pelletier/go-toml/v2"
 	"github.com/stretchr/testify/require"
 )
 
@@ -51,9 +52,53 @@ func TestNothingElseReadsViper(t *testing.T) {
 	}
 }
 
-// the sample is written from the registry, so a new option shows up in it without anyone remembering to add it
-func TestSampleConfigIsCurrent(t *testing.T) {
-	committed, err := os.ReadFile(filepath.Join("..", "..", "configs", "grendel.toml.sample"))
+// the sample is written by hand and installed as the config of a packaged or container install, so it has to load cleanly and hold nothing the database could
+func TestSampleConfigHoldsOnlyFileSettings(t *testing.T) {
+	text, err := os.ReadFile(filepath.Join("..", "..", "configs", "grendel.toml.sample"))
 	require.NoError(t, err)
-	assert.Equal(t, sampleFile(), string(committed), "run `go generate ./internal/settings` to rewrite configs/grendel.toml.sample")
+
+	// the settings it leaves commented out are checked too, by reading it with them turned on
+	on := regexp.MustCompile(`(?m)^#(\[|[a-z_]+ = )`).ReplaceAllString(string(text), "$1")
+	var doc map[string]any
+	require.NoError(t, toml.Unmarshal([]byte(on), &doc))
+
+	var keys []string
+	var walk func(prefix string, m map[string]any)
+	walk = func(prefix string, m map[string]any) {
+		for name, v := range m {
+			if sub, ok := v.(map[string]any); ok {
+				walk(prefix+name+".", sub)
+				continue
+			}
+			keys = append(keys, prefix+name)
+		}
+	}
+	walk("", doc)
+	lookup := func(key string) (any, bool) {
+		var v any = doc
+		for _, part := range strings.Split(key, ".") {
+			m, ok := v.(map[string]any)
+			if !ok {
+				return nil, false
+			}
+			if v, ok = m[part]; !ok {
+				return nil, false
+			}
+		}
+		return v, true
+	}
+
+	Reset()
+	t.Cleanup(Reset)
+	plan, err := PlanImport(File{Path: "grendel.toml.sample", Keys: keys, Lookup: lookup}, nil)
+	require.NoError(t, err)
+	require.NotEmpty(t, plan.Items)
+	for _, item := range plan.Items {
+		switch item.Action {
+		case ImportUnknown, ImportInvalid, ImportDeprecated:
+			t.Errorf("%s: %s", item.Key, item.Note)
+		case ImportReady:
+			t.Errorf("%s can be stored in the database, so it does not belong in the sample", item.Key)
+		}
+	}
 }

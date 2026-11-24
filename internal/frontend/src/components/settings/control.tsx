@@ -106,6 +106,7 @@ export function Control({
   return (
     <div className="relative">
       <Input
+        autoComplete="off"
         id={id}
         type={numeric ? "number" : "text"}
         step={o.kind === "float" ? "any" : undefined}

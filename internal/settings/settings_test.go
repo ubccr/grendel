@@ -533,8 +533,8 @@ func TestImport(t *testing.T) {
 	assert.Equal(t, ImportClient, actions["client.api_endpoint"].Action)
 	assert.Equal(t, ImportDeprecated, actions["dhcp.netmask"].Action)
 	assert.Equal(t, "deprecated, it has no effect", actions["dhcp.netmask"].Note)
-	assert.Equal(t, ImportReady, actions["bmc.switch_admin_username"].Action)
-	assert.Equal(t, "deprecated, imported as switch.username", actions["bmc.switch_admin_username"].Note)
+	assert.Equal(t, ImportExternal, actions["bmc.switch_admin_username"].Action)
+	assert.Equal(t, "deprecated, kept in the config file as switch.username", actions["bmc.switch_admin_username"].Note)
 	assert.Equal(t, ImportUnknown, actions["dns.tll"].Action)
 	assert.Equal(t, "invalid setting", actions["dns.tll"].Note)
 	assert.Equal(t, ImportDefault, actions["dns.listen"].Action)
@@ -543,7 +543,7 @@ func TestImport(t *testing.T) {
 	assert.Equal(t, "root_password, timezone", actions["provision.extra_vars"].Value, "entries are named but their values are not shown")
 	assert.Equal(t, ImportReady, actions["dhcp.subnets"].Action, "subnets cannot be secrets, so they are imported like any other setting")
 	assert.Equal(t, "10, 20", actions["dhcp.subnets"].Value)
-	assert.Equal(t, 3, plan.Count())
+	assert.Equal(t, 2, plan.Count())
 	assert.Empty(t, plan.Invalid())
 
 	remaining := plan.Remaining()
@@ -551,6 +551,7 @@ func TestImport(t *testing.T) {
 	assert.Contains(t, remaining, "[bmc]\npassword = 'hunter2'")
 	assert.Contains(t, remaining, "[client]\napi_endpoint = 'https://grendel.example'")
 	assert.Contains(t, remaining, "[provision.extra_vars]\nroot_password = 's3cret'\ntimezone = 'UTC'")
+	assert.Contains(t, remaining, "[switch]\nusername = 'legacy'", "a value under an old key is kept under the key that replaced it")
 	for _, gone := range []string{"ttl", "tll", "listen", "netmask", "switch_admin_username", "subnets"} {
 		assert.NotContains(t, remaining, gone)
 	}
@@ -569,7 +570,7 @@ func TestImport(t *testing.T) {
 	assert.JSONEq(t, `{"timezone":"UTC"}`, string(b.rows["provision.extra_vars"].Value))
 	assert.JSONEq(t, `"10.1.0.254/24"`, string(b.rows["dhcp.subnets.10.gateway"].Value))
 	assert.JSONEq(t, `"10.2.0.254/24"`, string(b.rows["dhcp.subnets.20.gateway"].Value))
-	assert.JSONEq(t, `"legacy"`, string(b.rows["switch.username"].Value), "the value lands under the key that replaced the old one")
+	assert.NotContains(t, b.rows, "switch.username")
 	assert.NotContains(t, b.rows, "bmc.switch_admin_username")
 	assert.NotContains(t, b.rows, "bmc.password")
 	assert.NotContains(t, b.rows, "dns.listen")
@@ -585,7 +586,7 @@ func TestImport(t *testing.T) {
 	assert.Equal(t, "dns.query_timeout", plan.Invalid()[0].Key)
 }
 
-func TestExportAndSampleParseBackToTheSameValues(t *testing.T) {
+func TestExportWritesWhatTheDatabaseStores(t *testing.T) {
 	b := &memBackend{rows: map[string]Row{}}
 	start(t, b, nil, "")
 	_, err := Update(b, map[string]any{
@@ -607,7 +608,6 @@ func TestExportAndSampleParseBackToTheSameValues(t *testing.T) {
 	assert.NotContains(t, stored, "secret")
 
 	assert.NotContains(t, Export(true), "password")
-	assert.NotContains(t, Sample(), "netmask", "an option that does nothing is not offered")
 }
 
 func TestEveryOptionIsDescribed(t *testing.T) {
@@ -688,4 +688,37 @@ func TestRestoreLeavesOutWhatItCannotStore(t *testing.T) {
 	assert.Contains(t, skipped, "dns.gone")
 	assert.Contains(t, skipped, "bmc.password")
 	assert.Contains(t, skipped, "dhcp.subnets.b.gateway", "an entry missing a field it needs is left out whole")
+}
+
+func TestBMCLoginsStayInTheConfigFile(t *testing.T) {
+	b := &memBackend{rows: map[string]Row{}}
+	start(t, b, nil, "")
+	plan, err := PlanImport(testFile(map[string]any{
+		"bmc.user":                 "root",
+		"switch.snmp.user":         "monitor",
+		"bmc.password":             "calvin",
+		"bmc.credentials":          []any{map[string]any{"username": "Admin", "password": "x"}},
+		"bmc.defaults.credentials": []any{map[string]any{"user": "ADMIN", "password": "ADMIN"}},
+	}), nil)
+	require.NoError(t, err)
+	assert.Equal(t, 1, plan.Count(), "only the SNMP username can be stored")
+
+	var kept map[string]any
+	require.NoError(t, toml.Unmarshal([]byte(plan.Remaining()), &kept))
+	bmc := kept["bmc"].(map[string]any)
+	assert.Equal(t, "root", bmc["username"], "a login under the older key is kept under the one that replaced it")
+	assert.NotContains(t, bmc, "user")
+	assert.Equal(t, "calvin", bmc["password"])
+	assert.Equal(t, []any{map[string]any{"username": "Admin", "password": "x"}}, bmc["credentials"], "a username keeps its case")
+	assert.Contains(t, plan.Remaining(), "ADMIN", "logins under the older key are not dropped from the file")
+
+	refused, err := plan.Apply(b, "tester")
+	require.NoError(t, err)
+	require.Empty(t, refused)
+	assert.JSONEq(t, `"monitor"`, string(b.rows["switch.snmp.username"].Value), "a value under an old key is stored under the one that replaced it")
+
+	refused, err = Update(b, map[string]any{"bmc.username": "ops", "switch.username": "ops"}, nil, "tester")
+	require.NoError(t, err)
+	assert.Contains(t, refused["bmc.username"], "outside the database")
+	assert.Contains(t, refused["switch.username"], "outside the database")
 }

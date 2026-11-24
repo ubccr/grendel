@@ -27,8 +27,12 @@ var (
 	listenAddress string
 	serveCmd      = &cobra.Command{
 		Use:   "serve [service]...",
-		Short: "Run grendel services",
-		Args:  cobra.ArbitraryArgs,
+		Short: "Run grendel services: api, dhcp, dns, provision, pxe, tftp",
+		Long: `Run grendel services: api, dhcp, dns, provision, pxe, tftp
+
+With no arguments every service runs unless specified in the config file.
+Set one or more service to only run that subset`,
+		Args: cobra.ArbitraryArgs,
 		ValidArgsFunction: func(_ *cobra.Command, args []string, _ string) ([]string, cobra.ShellCompDirective) {
 			names := make([]string, 0, len(registry))
 			for _, s := range services() {

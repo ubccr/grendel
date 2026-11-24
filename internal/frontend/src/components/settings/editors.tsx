@@ -59,6 +59,7 @@ export function ListEditor({
       {!disabled && (
         <div className="flex gap-1">
           <Input
+            autoComplete="off"
             id={id}
             className="font-mono"
             inputMode={numeric ? "numeric" : undefined}
@@ -107,6 +108,7 @@ export function AddEntry({
   return (
     <div className="flex gap-2">
       <Input
+        autoComplete="off"
         id={id}
         className="font-mono"
         placeholder="name, such as 20-compute"
@@ -179,6 +181,7 @@ export function MapEditor({
             {key}
           </span>
           <Input
+            autoComplete="off"
             className={cn("font-mono", fileKeys.includes(key) && "line-through opacity-60")}
             disabled={disabled}
             title={
@@ -209,6 +212,7 @@ export function MapEditor({
       {!disabled && (
         <div className="flex gap-2">
           <Input
+            autoComplete="off"
             id={id}
             className="max-w-40 font-mono"
             placeholder="name"

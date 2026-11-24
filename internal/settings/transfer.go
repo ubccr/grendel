@@ -89,13 +89,16 @@ func PlanImport(f File, entries map[string][]string) (*ImportPlan, error) {
 		case o.Secret:
 			item.Action, item.Note = ImportSecret, "config file only"
 			plan.keep[o.Key] = v
-		case o.External:
-			item.Action, item.Value, item.Note = ImportExternal, Text(v), "config file only"
-			plan.keep[o.Key] = v
-		case o.Deprecated != "" && replaceable(o, f):
+		case o.Deprecated != "" && successor(o, f) != nil && successor(o, f).Writable():
 			// a value under an old key is imported under the key that replaced it
 			item.Action, item.Value, item.Note = ImportReady, Text(v), "deprecated, imported as "+o.ReplacedBy
 			plan.set[o.ReplacedBy] = v
+		case o.Deprecated != "" && successor(o, f) != nil:
+			item.Action, item.Value, item.Note = ImportExternal, Text(v), "deprecated, kept in the config file as "+o.ReplacedBy
+			plan.keep[o.ReplacedBy] = v
+		case o.External:
+			item.Action, item.Value, item.Note = ImportExternal, Text(v), "config file only"
+			plan.keep[o.Key] = v
 		case o.Deprecated != "":
 			item.Action, item.Value, item.Note = ImportDeprecated, Text(v), "deprecated, "+o.Deprecated
 		case o.Merged() && o.FileEntriesSecret:
@@ -146,14 +149,13 @@ func PlanImport(f File, entries map[string][]string) (*ImportPlan, error) {
 	return plan, nil
 }
 
-// replaceable reports whether a deprecated option's value can be imported under the key that replaced it, which it cannot when the file sets that key too
-func replaceable(o *Option, f File) bool {
+// successor is the option that replaced a deprecated one, when its value can move there, which it cannot when the file sets that key too
+func successor(o *Option, f File) *Option {
 	to, ok := registry[o.ReplacedBy]
-	if !ok || !to.Writable() {
-		return false
+	if _, set := f.Lookup(o.ReplacedBy); !ok || set {
+		return nil
 	}
-	_, set := f.Lookup(to.Key)
-	return !set
+	return to
 }
 
 func underKnown(key string, known map[string]bool) bool {
@@ -189,7 +191,7 @@ func (p *ImportPlan) Remaining() string {
 	return tomlDoc(All(), func(o *Option) (any, bool) {
 		v, ok := p.keep[o.Key]
 		return v, ok
-	}, false)
+	})
 }
 
 // Apply stores the plan in the database. A config file that still sets these keeps winning until the lines are removed from it and the server restarts.
@@ -222,40 +224,5 @@ func Export(effective bool) string {
 			return nil, false
 		}
 		return visible(o, saved), true
-	}, false)
-}
-
-// Sample is a config file describing the options that are only ever set in one, or that hold entries which are. The rest live in the database.
-func Sample() string {
-	shown := slices.DeleteFunc(All(), func(o *Option) bool {
-		return o.Deprecated != "" || (o.Writable() && !o.FileEntriesSecret)
 	})
-	return "# The settings grendel reads from this file only: secrets, paths on this host and what is needed to open the database. The few a packaged install needs are set, and the rest are commented out at their default.\n" +
-		"# Every other setting is stored in the database and changed with `grendel config set` or in the web UI. Any of them can still be set here, and a value in this file wins over the database: `grendel config list` shows them all.\n\n" +
-		tomlDoc(shown, func(o *Option) (any, bool) {
-			if o.Kind == KindTable && len(o.Default.([]map[string]any)) == 0 {
-				return sampleRows(o), true
-			}
-			if o.Kind == KindGroup {
-				return map[string]any{"example": sampleRows(o)[0]}, true
-			}
-			if o.Packaged != nil {
-				return o.Packaged, true
-			}
-			return o.Default, true
-		}, true)
-}
-
-// sampleRows is one made-up row for a table with no default, so the sample shows its shape
-func sampleRows(o *Option) []map[string]any {
-	row := map[string]any{}
-	for _, f := range o.Fields {
-		switch f.Kind {
-		case KindInt:
-			row[f.Name] = 0
-		default:
-			row[f.Name] = ""
-		}
-	}
-	return []map[string]any{row}
 }

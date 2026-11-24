@@ -7,30 +7,57 @@ package settings
 import "time"
 
 var (
+	BMCUsername = register[string](Option{
+		Key:      "bmc.username",
+		Section:  "bmc",
+		Summary:  "Username",
+		Help:     "A single BMC login, tried before the ones in bmc.credentials. It suits the environment, as GRENDEL_BMC_USERNAME and GRENDEL_BMC_PASSWORD.",
+		Kind:     KindString,
+		Default:  "",
+		Apply:    ApplyLive,
+		External: true,
+	})
 	BMCUser = register[string](Option{
-		Key:     "bmc.user",
-		Section: "bmc",
-		Summary: "Username",
-		Help:    "The login tried first on every BMC.",
-		Kind:    KindString,
-		Default: "",
-		Apply:   ApplyLive,
+		Key:        "bmc.user",
+		Section:    "bmc",
+		Summary:    "Username",
+		Help:       "Read when bmc.username is not set.",
+		Kind:       KindString,
+		Default:    "",
+		Apply:      ApplyLive,
+		External:   true,
+		Deprecated: "use bmc.username",
+		ReplacedBy: "bmc.username",
 	})
 	BMCPassword = register[string](Option{
 		Key:     "bmc.password",
 		Section: "bmc",
 		Summary: "Password",
-		Help:    "Password for bmc.user.",
+		Help:    "Password for bmc.username.",
 		Kind:    KindString,
 		Default: "",
 		Apply:   ApplyLive,
 		Secret:  true,
 	})
+	BMCCredentials = register[[]map[string]any](Option{
+		Key:     "bmc.credentials",
+		Section: "bmc",
+		Summary: "Logins",
+		Help:    "BMC logins, tried in order until one is accepted. List the current login first, then old passwords or factory defaults.",
+		Kind:    KindTable,
+		Default: []map[string]any{},
+		Apply:   ApplyLive,
+		Secret:  true,
+		Fields: []Field{
+			{Name: "username", Summary: "Username", Kind: KindString},
+			{Name: "password", Summary: "Password", Kind: KindString},
+		},
+	})
 	BMCDefaultCredentials = register[[]map[string]any](Option{
 		Key:     "bmc.defaults.credentials",
 		Section: "bmc",
 		Summary: "Fallback logins",
-		Help:    "More logins to try, in order, when the first is refused. Useful for old passwords or factory defaults.",
+		Help:    "Logins tried after the ones in bmc.credentials.",
 		Kind:    KindTable,
 		Default: []map[string]any{},
 		Apply:   ApplyLive,
@@ -39,6 +66,7 @@ var (
 			{Name: "user", Summary: "Username", Kind: KindString},
 			{Name: "password", Summary: "Password", Kind: KindString},
 		},
+		Deprecated: "list them under bmc.credentials",
 	})
 	BMCInsecure = register[bool](Option{
 		Key:     "bmc.insecure",

@@ -46,13 +46,14 @@ func gnmiOptions(prefix, group, inherit string) GNMIOptions {
 
 var (
 	SwitchUsername = register[string](Option{
-		Key:     "switch.username",
-		Section: "switch",
-		Summary: "Username",
-		Help:    "gNMI login used on every switch.",
-		Kind:    KindString,
-		Default: "",
-		Apply:   ApplyLive,
+		Key:      "switch.username",
+		Section:  "switch",
+		Summary:  "Username",
+		Help:     "gNMI login used on every switch.",
+		Kind:     KindString,
+		Default:  "",
+		Apply:    ApplyLive,
+		External: true,
 	})
 	SwitchPassword = register[string](Option{
 		Key:     "switch.password",
@@ -90,7 +91,7 @@ var (
 		Section: "switch",
 		Group:   "SNMP",
 		Summary: "Community",
-		Help:    "Community string for SNMP 2c. Defaults to public.",
+		Help:    "Community string for SNMP 2c.",
 		Kind:    KindString,
 		Default: "public",
 		Apply:   ApplyLive,
@@ -129,15 +130,27 @@ var (
 		Min:     ptr(0),
 		Apply:   ApplyLive,
 	})
-	SwitchSNMPUser = register[string](Option{
-		Key:     "switch.snmp.user",
+	SwitchSNMPUsername = register[string](Option{
+		Key:     "switch.snmp.username",
 		Section: "switch",
 		Group:   "SNMP",
-		Summary: "SNMPv3 user",
+		Summary: "SNMPv3 username",
 		Help:    "Username for SNMP version 3.",
 		Kind:    KindString,
 		Default: "",
 		Apply:   ApplyLive,
+	})
+	SwitchSNMPUser = register[string](Option{
+		Key:        "switch.snmp.user",
+		Section:    "switch",
+		Group:      "SNMP",
+		Summary:    "SNMPv3 username",
+		Help:       "Read when switch.snmp.username is not set.",
+		Kind:       KindString,
+		Default:    "",
+		Apply:      ApplyLive,
+		Deprecated: "use switch.snmp.username",
+		ReplacedBy: "switch.snmp.username",
 	})
 	SwitchSNMPAuthProto = register[string](Option{
 		Key:     "switch.snmp.auth_proto",
@@ -155,7 +168,7 @@ var (
 		Section: "switch",
 		Group:   "SNMP",
 		Summary: "SNMPv3 authentication password",
-		Help:    "Password for the authentication protocol.",
+		Help:    "Password for the SNMPv3 authentication protocol.",
 		Kind:    KindString,
 		Default: "",
 		Apply:   ApplyLive,
@@ -177,7 +190,7 @@ var (
 		Section: "switch",
 		Group:   "SNMP",
 		Summary: "SNMPv3 privacy password",
-		Help:    "Password for the privacy protocol.",
+		Help:    "Password for the SNMPv3 privacy protocol.",
 		Kind:    KindString,
 		Default: "",
 		Apply:   ApplyLive,

@@ -61,7 +61,7 @@ var (
 		Key:       "provision.secret",
 		Section:   "provision",
 		Summary:   "Boot token secret",
-		Help:      "Signs the boot tokens handed to hosts. When nothing sets it, one is generated and kept in the database. Generate one with `openssl rand -hex 16`.",
+		Help:      "Signs the boot tokens handed to hosts, and must be exactly 32 characters, as `openssl rand -hex 16` gives. Left unset, one is generated and kept in the database.",
 		Kind:      KindString,
 		Default:   "",
 		Apply:     ApplyLive,
@@ -82,10 +82,9 @@ var (
 	})
 	ProvisionRepoDir = register[string](Option{
 		Key:      "provision.repo_dir",
-		Packaged: "/var/lib/grendel/repo",
 		Section:  "provision",
 		Summary:  "Repository directory",
-		Help:     "Directory on this machine served to hosts under /repo during provisioning. It is a path on the server, so it is not stored in the database.",
+		Help:     "Directory on this machine served to hosts under /repo during provisioning.",
 		Kind:     KindPath,
 		Default:  "",
 		External: true,
@@ -93,10 +92,9 @@ var (
 	})
 	ProvisionTemplatesDir = register[string](Option{
 		Key:      "provision.templates_dir",
-		Packaged: "/var/lib/grendel/templates",
 		Section:  "provision",
 		Summary:  "Templates directory",
-		Help:     "Directory of your own *.tmpl provision templates, which are loaded over the built-in ones and reloaded when they change. It is a path on the server, so it is not stored in the database.",
+		Help:     "Directory of your own *.tmpl provision templates, which are loaded over the built-in ones and reloaded when they change.",
 		Kind:     KindPath,
 		Default:  "",
 		External: true,
@@ -115,7 +113,7 @@ var (
 		Key:               "provision.extra_vars",
 		Section:           "provision",
 		Summary:           "Extra template variables",
-		Help:              "Your own values passed to provision templates, read as {{ $.extra_vars.name }}. Entries in the config file win over the ones stored here and their values are never shown, so keep passwords and other secrets there. Entries stored here can be read by anyone who can read settings.",
+		Help:              "Your own values passed to provision templates, read as {{ $.extra_vars.name }}. Entries in the config file win and are never shown, so keep passwords there: entries in the database can be read by anyone who can read settings.",
 		Kind:              KindMap,
 		Default:           map[string]any{},
 		Apply:             ApplyLive,
@@ -178,11 +176,10 @@ var (
 	})
 	ProvisionBeaconDir = register[string](Option{
 		Key:      "provision.beacon.dir",
-		Packaged: "/usr/lib/grendel/beacon",
 		Section:  "provision",
 		Group:    "Beacon",
 		Summary:  "Beacon binaries directory",
-		Help:     "Directory holding grendel-beacon-amd64 and grendel-beacon-arm64, served at /beacon/<arch> for templates to download. The deb and rpm packages install both in /usr/lib/grendel/beacon. It is a path on the server, so it is not stored in the database.",
+		Help:     "Directory holding grendel-beacon-amd64 and grendel-beacon-arm64, served at /beacon/<arch> for templates to download. The deb and rpm packages install both in /usr/lib/grendel/beacon.",
 		Kind:     KindPath,
 		Default:  "",
 		External: true,

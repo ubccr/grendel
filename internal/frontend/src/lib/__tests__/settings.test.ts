@@ -7,6 +7,7 @@ import {
   isLocked,
   isSet,
   isWritable,
+  overriddenBy,
   refusals,
   type Setting,
   show,
@@ -60,6 +61,15 @@ describe("state derived from where a value comes from", () => {
     expect(isWritable(ttl)).toBe(true);
     expect(isWritable({ ...ttl, secret: true })).toBe(false);
     expect(isWritable({ ...ttl, external: true })).toBe(false);
+  });
+});
+
+describe("overriddenBy", () => {
+  it("names the flag, variable or file that sets a value", () => {
+    expect(overriddenBy({ source: "flag", flag: "dhcp-mtu" })).toBe("--dhcp-mtu");
+    expect(overriddenBy({ source: "flag" })).toBe("command line");
+    expect(overriddenBy({ source: "env", env: "GRENDEL_DHCP_MTU" })).toBe("GRENDEL_DHCP_MTU");
+    expect(overriddenBy({ source: "file" }, "/etc/grendel/grendel.toml")).toBe("grendel.toml");
   });
 });
 

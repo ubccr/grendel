@@ -48,25 +48,32 @@ func TestConfigFromSettingsCredentials(t *testing.T) {
 		name string
 		user string
 		rows []map[string]any
+		old  []map[string]any
 		want []Credential
 	}{
 		{
 			name: "nothing configured means no credentials",
 		},
 		{
-			name: "bmc.user alone adds no default login",
+			name: "bmc.username alone is the only login",
 			user: "ops",
 			want: []Credential{configured},
 		},
 		{
-			name: "defaults set in the config are tried after bmc.user",
-			user: "ops", rows: []map[string]any{{"user": "root", "password": "calvin"}},
+			name: "the list is tried after bmc.username",
+			user: "ops", rows: []map[string]any{{"username": "root", "password": "calvin"}},
 			want: []Credential{configured, {User: "root", Password: "calvin"}},
 		},
 		{
-			name: "defaults work without bmc.user",
-			rows: []map[string]any{{"user": "root", "password": "calvin"}},
+			name: "the list works without bmc.username",
+			rows: []map[string]any{{"username": "root", "password": "calvin"}},
 			want: []Credential{{User: "root", Password: "calvin"}},
+		},
+		{
+			name: "logins under the older key are tried last",
+			rows: []map[string]any{{"username": "root", "password": "calvin"}},
+			old:  []map[string]any{{"user": "ADMIN", "password": "ADMIN"}},
+			want: []Credential{{User: "root", Password: "calvin"}, {User: "ADMIN", Password: "ADMIN"}},
 		},
 		{
 			name: "an empty list adds nothing",
@@ -78,11 +85,14 @@ func TestConfigFromSettingsCredentials(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.user != "" {
-				settingstest.Set(t, "bmc.user", tt.user)
+				settingstest.Set(t, "bmc.username", tt.user)
 				settingstest.Set(t, "bmc.password", "secret")
 			}
 			if tt.rows != nil {
-				settingstest.Set(t, "bmc.defaults.credentials", tt.rows)
+				settingstest.Set(t, "bmc.credentials", tt.rows)
+			}
+			if tt.old != nil {
+				settingstest.Set(t, "bmc.defaults.credentials", tt.old)
 			}
 			assert.Equal(t, tt.want, ConfigFromSettings().Credentials)
 		})

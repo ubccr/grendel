@@ -113,8 +113,6 @@ type Option struct {
 	GeneratedBytes int
 	// External marks an option that only the config file, the environment or a flag may set. Unlike a secret its value is shown.
 	External bool
-	// Packaged is the value the sample config sets, for the few options a packaged install cannot run without. Every other option is commented out in the sample.
-	Packaged any
 	// EntryLabel is what one entry of a KindGroup option is called, such as Subnet
 	EntryLabel string
 	// InheritFrom names the option whose value this one takes while nothing sets it, as switch.gnmi.sonic.port follows switch.gnmi.port

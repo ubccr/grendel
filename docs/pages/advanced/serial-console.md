@@ -26,7 +26,7 @@ Several things have to line up for a console to show anything:
 - **Network**: UDP 623 open from the Grendel server to the BMCs.
 - **BMC**: IPMI over LAN and SOL enabled, for the user Grendel logs in as. On a Dell iDRAC these
   are the `IPMILan.1.Enable` and `IPMISOL.1.Enable` attributes. iDRAC uses the same account for
-  Redfish and IPMI, so `bmc.user` and `bmc.password` cover both.
+  Redfish and IPMI, so `bmc.username` and `bmc.password` cover both.
 - **BIOS**: serial redirection on, so the firmware and boot loader print to the serial port. On a
   Dell, set `SerialComm` to `OnConRedirCom2` (`grendel bmc bios set`), which puts the console on
   COM2, where iDRAC's SOL listens.
@@ -45,8 +45,8 @@ port = 623
 cipher_suites = [17, 3]
 ```
 
-Credentials are the same ones the Redfish commands use, `bmc.user`/`bmc.password` followed by any
-`[[bmc.defaults.credentials]]`, tried in order. The console is encrypted whenever the cipher suite
+Credentials are the same ones the Redfish commands use, `bmc.username`/`bmc.password` followed by any
+`[[bmc.credentials]]`, tried in order. The console is encrypted whenever the cipher suite
 supports it.
 
 ## Access

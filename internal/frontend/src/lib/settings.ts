@@ -139,7 +139,8 @@ export function fileName(path?: string): string {
 export function overriddenBy(o: Setting, configFile?: string): string {
   switch (o.source) {
     case "flag":
-      return `--${o.flag}`;
+      // log_level is set by --debug or --verbose rather than a flag of its own
+      return o.flag ? `--${o.flag}` : "command line";
     case "env":
       return o.env ?? "the environment";
     case "file":
