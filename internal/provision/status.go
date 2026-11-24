@@ -16,9 +16,9 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/beacon/wire"
 	"github.com/ubccr/grendel/internal/events"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
 	"github.com/ubccr/grendel/pkg/nodeset"
@@ -37,14 +37,6 @@ const (
 )
 
 var errOtherBoot = errors.New("provision already finished in another boot")
-
-func init() {
-	viper.SetDefault("provision.status_check_source", true)
-	viper.SetDefault("provision.beacon.enabled", false)
-	viper.SetDefault("provision.beacon.dir", "")
-	viper.SetDefault("provision.beacon.path", "/opt/bin/grendel-beacon")
-	viper.SetDefault("provision.beacon.complete", false)
-}
 
 // recordStatus changes the host's provision status with update. Tracking status must never get in the way of a boot, so a failure is only logged
 func recordStatus(db store.Store, host *model.Host, update func(s *model.ProvisionStatus, now time.Time)) {
@@ -197,7 +189,7 @@ func (h *Handler) Status(c echo.Context) error {
 	}
 
 	// the token alone would let anyone who saw it report for the node, so the report also has to come from one of the node's own addresses. This is the TCP peer, since X-Forwarded-For is whatever the client says
-	if viper.GetBool("provision.status_check_source") && !hostHasAddr(host, addr) {
+	if settings.ProvisionStatusCheckSource.Get() && !hostHasAddr(host, addr) {
 		return echo.NewHTTPError(http.StatusForbidden, "status must come from one of the node's addresses").SetInternal(fmt.Errorf("report for %s came from %s", host.Name, addr))
 	}
 
@@ -256,7 +248,7 @@ func (h *Handler) Status(c echo.Context) error {
 
 // Beacon serves the beacon binary for an architecture from provision.beacon.dir, for templates that download it rather than expect it in the image
 func (h *Handler) Beacon(c echo.Context) error {
-	dir := viper.GetString("provision.beacon.dir")
+	dir := settings.ProvisionBeaconDir.Get()
 	arch := c.Param("arch")
 	if dir == "" || (arch != "amd64" && arch != "arm64") {
 		return echo.NewHTTPError(http.StatusNotFound, "")

@@ -1237,6 +1237,18 @@ func TestDataDumpRolesItemUnassignedPermissionListItemKind_EncodeDecode(t *testi
 	var typ2 DataDumpRolesItemUnassignedPermissionListItemKind
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
+func TestDataDumpSettingsItem_EncodeDecode(t *testing.T) {
+	var typ DataDumpSettingsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 DataDumpSettingsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
 func TestDataDumpUsersItem_EncodeDecode(t *testing.T) {
 	var typ DataDumpUsersItem
 	typ.SetFake()
@@ -1529,6 +1541,54 @@ func TestLLDP_EncodeDecode(t *testing.T) {
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
 	var typ2 LLDP
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestListing_EncodeDecode(t *testing.T) {
+	var typ Listing
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 Listing
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestListingSectionsItem_EncodeDecode(t *testing.T) {
+	var typ ListingSectionsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 ListingSectionsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestListingSectionsItemOptionsItem_EncodeDecode(t *testing.T) {
+	var typ ListingSectionsItemOptionsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 ListingSectionsItemOptionsItem
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestListingSectionsItemOptionsItemFieldsItem_EncodeDecode(t *testing.T) {
+	var typ ListingSectionsItemOptionsItemFieldsItem
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 ListingSectionsItemOptionsItemFieldsItem
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestNextAddressResponse_EncodeDecode(t *testing.T) {
@@ -1877,6 +1937,32 @@ func TestPatchRolesRequestPermissionListItemKind_EncodeDecode(t *testing.T) {
 	require.True(t, std.Valid(data), "Encoded: %s", data)
 
 	var typ2 PatchRolesRequestPermissionListItemKind
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestPatchSettingsRequest_EncodeDecode(t *testing.T) {
+	var typ PatchSettingsRequest
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 PatchSettingsRequest
+	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
+}
+func TestPatchSettingsRequestSet_EncodeDecode(t *testing.T) {
+	var typ PatchSettingsRequestSet
+	typ = make(PatchSettingsRequestSet)
+	typ.SetFake()
+
+	e := jx.Encoder{}
+	typ.Encode(&e)
+	data := e.Bytes()
+	require.True(t, std.Valid(data), "Encoded: %s", data)
+
+	var typ2 PatchSettingsRequestSet
+	typ2 = make(PatchSettingsRequestSet)
 	require.NoError(t, typ2.Decode(jx.DecodeBytes(data)))
 }
 func TestPostRolesRequest_EncodeDecode(t *testing.T) {

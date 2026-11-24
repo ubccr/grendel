@@ -14,18 +14,16 @@ import (
 	"testing"
 
 	"github.com/pin/tftp/v3"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/ubccr/grendel/internal/firmware"
+	"github.com/ubccr/grendel/internal/settings/settingstest"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
 // a build in the firmware directory is what a node downloads, and its token names the build the same way the dhcp server does
 func TestServesTheFirmwareDirectory(t *testing.T) {
-	old := viper.Get("provision.secret")
-	viper.Set("provision.secret", "0123456789abcdef0123456789abcdef")
-	t.Cleanup(func() { viper.Set("provision.secret", old) })
+	settingstest.Set(t, "provision.secret", "0123456789abcdef0123456789abcdef")
 
 	dir := t.TempDir()
 	want := testPE(t)

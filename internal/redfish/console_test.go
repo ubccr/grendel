@@ -176,7 +176,9 @@ func TestConsoleBusyAndForce(t *testing.T) {
 
 func TestConsoleNoCredentialAccepted(t *testing.T) {
 	svc, target, _ := consoleFixture(t)
-	svc.cfg.Credentials = []Credential{{User: "root", Password: "wrong"}}
+	cfg := svc.source().cfg
+	cfg.Credentials = []Credential{{User: "root", Password: "wrong"}}
+	svc.source = New(cfg).source
 
 	s := openConsole(svc, target, false)
 	err := s.wait(t)

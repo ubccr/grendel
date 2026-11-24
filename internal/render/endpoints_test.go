@@ -5,19 +5,13 @@
 package render
 
 import (
-	"net/netip"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/ubccr/grendel/internal/config"
+	"github.com/ubccr/grendel/internal/settings/settingstest"
 )
 
 func TestEndpointsBaseURL(t *testing.T) {
-	origAddr, origHostname := config.ProvisionAddr, config.ProvisionHostname
-	t.Cleanup(func() {
-		config.ProvisionAddr, config.ProvisionHostname = origAddr, origHostname
-	})
-
 	tests := []struct {
 		name     string
 		listen   string
@@ -40,8 +34,8 @@ func TestEndpointsBaseURL(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			config.ProvisionAddr = netip.MustParseAddrPort(tt.listen)
-			config.ProvisionHostname = tt.hostname
+			settingstest.Set(t, "provision.listen", tt.listen)
+			settingstest.Set(t, "provision.hostname", tt.hostname)
 
 			e := NewEndpoints(tt.host, "token")
 			assert.Equal(t, tt.want, e.BaseURL())

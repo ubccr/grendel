@@ -14,8 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/config"
+	"github.com/ubccr/grendel/internal/settings"
 	"go4.org/netipx"
 )
 
@@ -182,7 +182,7 @@ func (n *NetInterface) InterfaceMTU() uint16 {
 		return n.MTU
 	}
 
-	for _, subnet := range config.Subnets {
+	for _, subnet := range config.Subnets() {
 		if subnet.MTU == 0 {
 			continue
 		}
@@ -192,30 +192,30 @@ func (n *NetInterface) InterfaceMTU() uint16 {
 		}
 	}
 
-	return config.DefaultMTU
+	return config.DefaultMTU()
 }
 
 func (n *NetInterface) Gateway() netip.Addr {
-	for _, subnet := range config.Subnets {
+	for _, subnet := range config.Subnets() {
 		if subnet.Gateway.Contains(n.IP.Addr()) {
 			return subnet.Gateway.Addr()
 		}
 	}
 
-	if n.IP.IsValid() && viper.IsSet("dhcp.router_octet4") {
+	if octet := settings.DHCPRouterOctet4.Get(); n.IP.IsValid() && octet > 0 {
 		lastIP := netipx.PrefixLastIP(n.IP)
 		ip4 := lastIP.As4()
-		ip4[3] = uint8(viper.GetInt("dhcp.router_octet4"))
+		ip4[3] = uint8(octet)
 		return netip.AddrFrom4(ip4)
 	}
 
-	return config.DefaultGateway
+	return config.DefaultGateway()
 }
 
 func (n *NetInterface) DNS() []net.IP {
 	dnsServers := make([]net.IP, 0)
 
-	for _, subnet := range config.Subnets {
+	for _, subnet := range config.Subnets() {
 		if len(subnet.DNS) == 0 {
 			continue
 		}
@@ -227,7 +227,7 @@ func (n *NetInterface) DNS() []net.IP {
 	}
 
 	if len(dnsServers) == 0 {
-		dnsServers = append(dnsServers, config.DefaultDNS...)
+		dnsServers = append(dnsServers, config.DefaultDNS()...)
 	}
 
 	if len(dnsServers) > 1 {
@@ -241,7 +241,7 @@ func (n *NetInterface) DNS() []net.IP {
 }
 
 func (n *NetInterface) DomainSearch() []string {
-	for _, subnet := range config.Subnets {
+	for _, subnet := range config.Subnets() {
 		if len(subnet.DomainSearch) == 0 {
 			continue
 		}
@@ -251,7 +251,7 @@ func (n *NetInterface) DomainSearch() []string {
 		}
 	}
 
-	return config.DefaultDomainSearch
+	return config.DefaultDomainSearch()
 }
 
 func (n *NetInterface) DNSList() []string {

@@ -7,16 +7,16 @@ package util
 import (
 	"net"
 
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/settings"
 )
 
 func DefaultGateway(ip net.IP) net.IP {
 	var router net.IP
-	if viper.IsSet("dhcp.router_octet4") {
+	if octet := settings.DHCPRouterOctet4.Get(); octet > 0 {
 		router = ip.Mask(net.CIDRMask(24, 32))
-		router[3] += byte(viper.GetInt("dhcp.router_octet4"))
-	} else if viper.IsSet("dhcp.router") {
-		router = net.ParseIP(viper.GetString("dhcp.router"))
+		router[3] += byte(octet)
+	} else if addr := settings.DHCPRouter.Get(); addr != "" {
+		router = net.ParseIP(addr)
 	}
 
 	return router

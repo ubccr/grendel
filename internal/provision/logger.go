@@ -199,12 +199,12 @@ func (l *MyLogger) SetOutput(w io.Writer) {
 
 // Level return logger level
 func (l *MyLogger) Level() echolog.Lvl {
-	return toEchoLevel(l.Logger.Level)
+	return toEchoLevel(l.Logger.GetLevel())
 }
 
 // SetLevel logger level
 func (l *MyLogger) SetLevel(v echolog.Lvl) {
-	l.Logger.Level = toLogrusLevel(v)
+	l.Logger.SetLevel(toLogrusLevel(v))
 }
 
 // SetHeader logger header

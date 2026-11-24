@@ -13,11 +13,9 @@ import (
 	"strings"
 
 	homedir "github.com/mitchellh/go-homedir"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/ubccr/grendel/internal/config"
-	"github.com/ubccr/grendel/internal/util"
+	"github.com/ubccr/grendel/internal/logger"
 )
 
 func OutputJSON(data any) error {
@@ -28,13 +26,7 @@ func OutputJSON(data any) error {
 }
 
 func SetupLogging() error {
-	if debug {
-		Log.Logger.SetLevel(logrus.DebugLevel)
-	} else if verbose {
-		Log.Logger.SetLevel(logrus.InfoLevel)
-	} else {
-		Log.Logger.SetLevel(logrus.WarnLevel)
-	}
+	logger.Apply()
 	golog.SetOutput(io.Discard)
 
 	Log.Infof("Using config file: %s", viper.ConfigFileUsed())
@@ -80,10 +72,6 @@ func initConfig() {
 		viper.SetConfigType("toml")
 	}
 
-	viper.AutomaticEnv()
-	viper.SetEnvPrefix("grendel")
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-
 	err := viper.ReadInConfig()
 	if errors.As(err, &viper.ConfigFileNotFoundError{}) {
 		// a missing config file is worth mentioning to someone running a command, but not to a shell sourcing the completion script, which puts it in front of them every time they open a terminal
@@ -94,17 +82,14 @@ func initConfig() {
 		Log.Errorln(err)
 	}
 
-	if !viper.IsSet("api.secret") {
-		secret, err := util.GenerateSecret(32)
-		if err != nil {
-			Log.Fatal(err)
-		}
-
-		viper.Set("api.secret", secret)
-	}
-
-	err = config.ParseConfigs()
+	// only the client's own settings are checked here, as grendeld checks the rest once its database is open
+	problems, err := LoadSettings(nil)
 	if err != nil {
 		Log.Fatal(err)
+	}
+	for _, p := range problems {
+		if strings.HasPrefix(p.Key, "client.") {
+			Log.Warn(p)
+		}
 	}
 }

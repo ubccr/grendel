@@ -8,10 +8,11 @@ import (
 	"fmt"
 	"maps"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/settings"
 )
 
 // Deprecated: merged with stanadard service-discovery endpoint
@@ -76,6 +77,6 @@ func (h *Handler) PDUServiceDiscovery(c echo.Context) error {
 		sd = append(sd, nodeExporter)
 	}
 
-	c.Response().Header().Set("X-Prometheus-Refresh-Interval-Seconds", viper.GetString("provision.prometheus_sd_refresh_interval"))
+	c.Response().Header().Set("X-Prometheus-Refresh-Interval-Seconds", strconv.Itoa(settings.ProvisionPrometheusSDRefreshInterval.Get()))
 	return c.JSON(http.StatusOK, sd)
 }

@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteV1AuthSignoutData, DeleteV1AuthSignoutErrors, DeleteV1AuthSignoutResponses, DeleteV1ImagesData, DeleteV1ImagesErrors, DeleteV1ImagesResponses, DeleteV1NodesData, DeleteV1NodesErrors, DeleteV1NodesResponses, DeleteV1RolesNamesData, DeleteV1RolesNamesErrors, DeleteV1RolesNamesResponses, DeleteV1UsersUsernamesData, DeleteV1UsersUsernamesErrors, DeleteV1UsersUsernamesResponses, GetV1BmcBiosData, GetV1BmcBiosErrors, GetV1BmcBiosRegistryData, GetV1BmcBiosRegistryErrors, GetV1BmcBiosRegistryResponses, GetV1BmcBiosResponses, GetV1BmcFirmwareUpdatesData, GetV1BmcFirmwareUpdatesErrors, GetV1BmcFirmwareUpdatesResponses, GetV1BmcIdentityDefaultsData, GetV1BmcIdentityDefaultsErrors, GetV1BmcIdentityDefaultsResponses, GetV1BmcJobsData, GetV1BmcJobsErrors, GetV1BmcJobsResponses, GetV1BmcNicsData, GetV1BmcNicsErrors, GetV1BmcNicsResponses, GetV1BmcSecurebootData, GetV1BmcSecurebootErrors, GetV1BmcSecurebootResponses, GetV1BmcSelData, GetV1BmcSelErrors, GetV1BmcSelResponses, GetV1BmcStatusData, GetV1BmcStatusErrors, GetV1BmcStatusResponses, GetV1DbDumpData, GetV1DbDumpErrors, GetV1DbDumpResponses, GetV1GrendelEventsData, GetV1GrendelEventsErrors, GetV1GrendelEventsIdData, GetV1GrendelEventsIdErrors, GetV1GrendelEventsIdResponses, GetV1GrendelEventsResponses, GetV1GrendelVersionData, GetV1GrendelVersionErrors, GetV1GrendelVersionResponses, GetV1ImagesData, GetV1ImagesErrors, GetV1ImagesFindData, GetV1ImagesFindErrors, GetV1ImagesFindResponses, GetV1ImagesResponses, GetV1NodesCheckData, GetV1NodesCheckErrors, GetV1NodesCheckResponses, GetV1NodesData, GetV1NodesErrors, GetV1NodesFindData, GetV1NodesFindErrors, GetV1NodesFindResponses, GetV1NodesIpsNextData, GetV1NodesIpsNextErrors, GetV1NodesIpsNextResponses, GetV1NodesIpsRangesData, GetV1NodesIpsRangesErrors, GetV1NodesIpsRangesResponses, GetV1NodesProvisionStatusData, GetV1NodesProvisionStatusErrors, GetV1NodesProvisionStatusResponses, GetV1NodesRenderTemplateData, GetV1NodesRenderTemplateErrors, GetV1NodesRenderTemplateResponses, GetV1NodesResponses, GetV1NodesTagsData, GetV1NodesTagsErrors, GetV1NodesTagsResponses, GetV1NodesTokenInterfaceData, GetV1NodesTokenInterfaceErrors, GetV1NodesTokenInterfaceResponses, GetV1RolesData, GetV1RolesErrors, GetV1RolesResponses, GetV1SwitchNodesetLldpData, GetV1SwitchNodesetLldpErrors, GetV1SwitchNodesetLldpResponses, GetV1SwitchScanData, GetV1SwitchScanErrors, GetV1SwitchScanResponses, GetV1UsersData, GetV1UsersErrors, GetV1UsersResponses, PatchV1AuthResetData, PatchV1AuthResetErrors, PatchV1AuthResetResponses, PatchV1NodesImageData, PatchV1NodesImageErrors, PatchV1NodesImageResponses, PatchV1NodesProvisionData, PatchV1NodesProvisionErrors, PatchV1NodesProvisionResponses, PatchV1NodesTagsActionData, PatchV1NodesTagsActionErrors, PatchV1NodesTagsActionResponses, PatchV1RolesData, PatchV1RolesErrors, PatchV1RolesResponses, PatchV1UsersUsernamesEnableData, PatchV1UsersUsernamesEnableErrors, PatchV1UsersUsernamesEnableResponses, PatchV1UsersUsernamesRoleData, PatchV1UsersUsernamesRoleErrors, PatchV1UsersUsernamesRoleResponses, PostV1AuthSigninData, PostV1AuthSigninErrors, PostV1AuthSigninResponses, PostV1AuthSignupData, PostV1AuthSignupErrors, PostV1AuthSignupResponses, PostV1AuthTokenData, PostV1AuthTokenErrors, PostV1AuthTokenResponses, PostV1BmcAssetTagData, PostV1BmcAssetTagErrors, PostV1BmcAssetTagResponses, PostV1BmcBiosData, PostV1BmcBiosDiscardData, PostV1BmcBiosDiscardErrors, PostV1BmcBiosDiscardResponses, PostV1BmcBiosErrors, PostV1BmcBiosResponses, PostV1BmcConfigureAutoData, PostV1BmcConfigureAutoErrors, PostV1BmcConfigureAutoResponses, PostV1BmcConfigureImportData, PostV1BmcConfigureImportErrors, PostV1BmcConfigureImportResponses, PostV1BmcFirmwareInstallData, PostV1BmcFirmwareInstallErrors, PostV1BmcFirmwareInstallResponses, PostV1BmcIndicatorData, PostV1BmcIndicatorErrors, PostV1BmcIndicatorResponses, PostV1BmcJobsClearData, PostV1BmcJobsClearErrors, PostV1BmcJobsClearResponses, PostV1BmcLocationData, PostV1BmcLocationErrors, PostV1BmcLocationResponses, PostV1BmcPowerData, PostV1BmcPowerErrors, PostV1BmcPowerResponses, PostV1BmcSecurebootData, PostV1BmcSecurebootErrors, PostV1BmcSecurebootKeysData, PostV1BmcSecurebootKeysDeleteData, PostV1BmcSecurebootKeysDeleteErrors, PostV1BmcSecurebootKeysDeleteResponses, PostV1BmcSecurebootKeysErrors, PostV1BmcSecurebootKeysResponses, PostV1BmcSecurebootResetData, PostV1BmcSecurebootResetErrors, PostV1BmcSecurebootResetResponses, PostV1BmcSecurebootResponses, PostV1BmcSelClearData, PostV1BmcSelClearErrors, PostV1BmcSelClearResponses, PostV1DbRestoreData, PostV1DbRestoreErrors, PostV1DbRestoreResponses, PostV1ImagesData, PostV1ImagesErrors, PostV1ImagesResponses, PostV1NodesData, PostV1NodesErrors, PostV1NodesImportData, PostV1NodesImportErrors, PostV1NodesImportResponses, PostV1NodesResponses, PostV1RolesData, PostV1RolesErrors, PostV1RolesResponses, PostV1UsersData, PostV1UsersErrors, PostV1UsersResponses } from './types.gen';
+import type { DeleteV1AuthSignoutData, DeleteV1AuthSignoutErrors, DeleteV1AuthSignoutResponses, DeleteV1ImagesData, DeleteV1ImagesErrors, DeleteV1ImagesResponses, DeleteV1NodesData, DeleteV1NodesErrors, DeleteV1NodesResponses, DeleteV1RolesNamesData, DeleteV1RolesNamesErrors, DeleteV1RolesNamesResponses, DeleteV1UsersUsernamesData, DeleteV1UsersUsernamesErrors, DeleteV1UsersUsernamesResponses, GetV1BmcBiosData, GetV1BmcBiosErrors, GetV1BmcBiosRegistryData, GetV1BmcBiosRegistryErrors, GetV1BmcBiosRegistryResponses, GetV1BmcBiosResponses, GetV1BmcFirmwareUpdatesData, GetV1BmcFirmwareUpdatesErrors, GetV1BmcFirmwareUpdatesResponses, GetV1BmcIdentityDefaultsData, GetV1BmcIdentityDefaultsErrors, GetV1BmcIdentityDefaultsResponses, GetV1BmcJobsData, GetV1BmcJobsErrors, GetV1BmcJobsResponses, GetV1BmcNicsData, GetV1BmcNicsErrors, GetV1BmcNicsResponses, GetV1BmcSecurebootData, GetV1BmcSecurebootErrors, GetV1BmcSecurebootResponses, GetV1BmcSelData, GetV1BmcSelErrors, GetV1BmcSelResponses, GetV1BmcStatusData, GetV1BmcStatusErrors, GetV1BmcStatusResponses, GetV1DbDumpData, GetV1DbDumpErrors, GetV1DbDumpResponses, GetV1GrendelEventsData, GetV1GrendelEventsErrors, GetV1GrendelEventsIdData, GetV1GrendelEventsIdErrors, GetV1GrendelEventsIdResponses, GetV1GrendelEventsResponses, GetV1GrendelVersionData, GetV1GrendelVersionErrors, GetV1GrendelVersionResponses, GetV1ImagesData, GetV1ImagesErrors, GetV1ImagesFindData, GetV1ImagesFindErrors, GetV1ImagesFindResponses, GetV1ImagesResponses, GetV1NodesCheckData, GetV1NodesCheckErrors, GetV1NodesCheckResponses, GetV1NodesData, GetV1NodesErrors, GetV1NodesFindData, GetV1NodesFindErrors, GetV1NodesFindResponses, GetV1NodesIpsNextData, GetV1NodesIpsNextErrors, GetV1NodesIpsNextResponses, GetV1NodesIpsRangesData, GetV1NodesIpsRangesErrors, GetV1NodesIpsRangesResponses, GetV1NodesProvisionStatusData, GetV1NodesProvisionStatusErrors, GetV1NodesProvisionStatusResponses, GetV1NodesRenderTemplateData, GetV1NodesRenderTemplateErrors, GetV1NodesRenderTemplateResponses, GetV1NodesResponses, GetV1NodesTagsData, GetV1NodesTagsErrors, GetV1NodesTagsResponses, GetV1NodesTokenInterfaceData, GetV1NodesTokenInterfaceErrors, GetV1NodesTokenInterfaceResponses, GetV1RolesData, GetV1RolesErrors, GetV1RolesResponses, GetV1SettingsData, GetV1SettingsErrors, GetV1SettingsResponses, GetV1SwitchNodesetLldpData, GetV1SwitchNodesetLldpErrors, GetV1SwitchNodesetLldpResponses, GetV1SwitchScanData, GetV1SwitchScanErrors, GetV1SwitchScanResponses, GetV1UsersData, GetV1UsersErrors, GetV1UsersResponses, PatchV1AuthResetData, PatchV1AuthResetErrors, PatchV1AuthResetResponses, PatchV1NodesImageData, PatchV1NodesImageErrors, PatchV1NodesImageResponses, PatchV1NodesProvisionData, PatchV1NodesProvisionErrors, PatchV1NodesProvisionResponses, PatchV1NodesTagsActionData, PatchV1NodesTagsActionErrors, PatchV1NodesTagsActionResponses, PatchV1RolesData, PatchV1RolesErrors, PatchV1RolesResponses, PatchV1SettingsData, PatchV1SettingsErrors, PatchV1SettingsResponses, PatchV1UsersUsernamesEnableData, PatchV1UsersUsernamesEnableErrors, PatchV1UsersUsernamesEnableResponses, PatchV1UsersUsernamesRoleData, PatchV1UsersUsernamesRoleErrors, PatchV1UsersUsernamesRoleResponses, PostV1AuthSigninData, PostV1AuthSigninErrors, PostV1AuthSigninResponses, PostV1AuthSignupData, PostV1AuthSignupErrors, PostV1AuthSignupResponses, PostV1AuthTokenData, PostV1AuthTokenErrors, PostV1AuthTokenResponses, PostV1BmcAssetTagData, PostV1BmcAssetTagErrors, PostV1BmcAssetTagResponses, PostV1BmcBiosData, PostV1BmcBiosDiscardData, PostV1BmcBiosDiscardErrors, PostV1BmcBiosDiscardResponses, PostV1BmcBiosErrors, PostV1BmcBiosResponses, PostV1BmcConfigureAutoData, PostV1BmcConfigureAutoErrors, PostV1BmcConfigureAutoResponses, PostV1BmcConfigureImportData, PostV1BmcConfigureImportErrors, PostV1BmcConfigureImportResponses, PostV1BmcFirmwareInstallData, PostV1BmcFirmwareInstallErrors, PostV1BmcFirmwareInstallResponses, PostV1BmcIndicatorData, PostV1BmcIndicatorErrors, PostV1BmcIndicatorResponses, PostV1BmcJobsClearData, PostV1BmcJobsClearErrors, PostV1BmcJobsClearResponses, PostV1BmcLocationData, PostV1BmcLocationErrors, PostV1BmcLocationResponses, PostV1BmcPowerData, PostV1BmcPowerErrors, PostV1BmcPowerResponses, PostV1BmcSecurebootData, PostV1BmcSecurebootErrors, PostV1BmcSecurebootKeysData, PostV1BmcSecurebootKeysDeleteData, PostV1BmcSecurebootKeysDeleteErrors, PostV1BmcSecurebootKeysDeleteResponses, PostV1BmcSecurebootKeysErrors, PostV1BmcSecurebootKeysResponses, PostV1BmcSecurebootResetData, PostV1BmcSecurebootResetErrors, PostV1BmcSecurebootResetResponses, PostV1BmcSecurebootResponses, PostV1BmcSelClearData, PostV1BmcSelClearErrors, PostV1BmcSelClearResponses, PostV1DbRestoreData, PostV1DbRestoreErrors, PostV1DbRestoreResponses, PostV1ImagesData, PostV1ImagesErrors, PostV1ImagesResponses, PostV1NodesData, PostV1NodesErrors, PostV1NodesImportData, PostV1NodesImportErrors, PostV1NodesImportResponses, PostV1NodesResponses, PostV1RolesData, PostV1RolesErrors, PostV1RolesResponses, PostV1UsersData, PostV1UsersErrors, PostV1UsersResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -1757,6 +1757,68 @@ export const deleteV1RolesNames = <ThrowOnError extends boolean = false>(options
         }],
     url: '/v1/roles/{names}',
     ...options
+});
+
+/**
+ * List settings
+ *
+ * #### Controller:
+ *
+ * `github.com/ubccr/grendel/internal/api.(*Handler).GetSettings`
+ *
+ * #### Middlewares:
+ *
+ * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+ *
+ * ---
+ *
+ * Every setting with its help text, its value and where that value comes from. Secrets never carry a value
+ */
+export const getV1Settings = <ThrowOnError extends boolean = false>(options?: Options<GetV1SettingsData, ThrowOnError>): RequestResult<GetV1SettingsResponses, GetV1SettingsErrors, ThrowOnError> => (options?.client ?? client).get<GetV1SettingsResponses, GetV1SettingsErrors, ThrowOnError>({
+    security: [{
+            key: 'headerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'cookieAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/v1/settings',
+    ...options
+});
+
+/**
+ * Change settings
+ *
+ * #### Controller:
+ *
+ * `github.com/ubccr/grendel/internal/api.(*Handler).PatchSettings`
+ *
+ * #### Middlewares:
+ *
+ * - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+ *
+ * ---
+ *
+ * Store settings in the database or remove them from it. Nothing is saved unless every change is valid
+ */
+export const patchV1Settings = <ThrowOnError extends boolean = false>(options: Options<PatchV1SettingsData, ThrowOnError>): RequestResult<PatchV1SettingsResponses, PatchV1SettingsErrors, ThrowOnError> => (options.client ?? client).patch<PatchV1SettingsResponses, PatchV1SettingsErrors, ThrowOnError>({
+    security: [{
+            key: 'headerAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }, {
+            key: 'cookieAuth',
+            scheme: 'bearer',
+            type: 'http'
+        }],
+    url: '/v1/settings',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**

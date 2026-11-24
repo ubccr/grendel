@@ -12,9 +12,9 @@ import (
 	"testing"
 
 	"github.com/go-fuego/fuego"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/ubccr/grendel/internal/settings/settingstest"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/store/sqlstore"
 	"github.com/ubccr/grendel/pkg/model"
@@ -22,8 +22,7 @@ import (
 
 func newAuthTestServer(t *testing.T) (*sqlstore.SqlStore, http.Handler) {
 	t.Helper()
-	viper.Set("api.secret", "auth-test-secret-0123456789abcdef")
-	t.Cleanup(func() { viper.Set("api.secret", nil) })
+	settingstest.Set(t, "api.secret", "auth-test-secret-0123456789abcdef")
 
 	db, err := sqlstore.New(":memory:")
 	require.NoError(t, err)

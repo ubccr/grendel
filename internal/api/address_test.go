@@ -12,10 +12,9 @@ import (
 	"time"
 
 	"github.com/go-fuego/fuego"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/ubccr/grendel/internal/config"
+	"github.com/ubccr/grendel/internal/settings/settingstest"
 	"github.com/ubccr/grendel/internal/tests"
 	"github.com/ubccr/grendel/pkg/model"
 )
@@ -237,12 +236,11 @@ func TestNextAddressPrefersNodesInTheRange(t *testing.T) {
 // withSubnets sets dhcp.subnets, each given as a gateway with its subnet's prefix length, until the test ends
 func withSubnets(t *testing.T, gateways ...string) {
 	t.Helper()
-	old := config.Subnets
-	t.Cleanup(func() { config.Subnets = old })
-	config.Subnets = nil
+	rows := []map[string]any{}
 	for _, g := range gateways {
-		config.Subnets = append(config.Subnets, config.Subnet{Gateway: netip.MustParsePrefix(g)})
+		rows = append(rows, map[string]any{"gateway": g})
 	}
+	settingstest.Set(t, "dhcp.subnets", rows)
 }
 
 func TestNextAddressConfiguredSubnetDecides(t *testing.T) {
@@ -274,8 +272,7 @@ func TestNextAddressNeverSuggestsTheGateway(t *testing.T) {
 	})
 
 	t.Run("from dhcp.router_octet4", func(t *testing.T) {
-		viper.Set("dhcp.router_octet4", 1)
-		t.Cleanup(func() { viper.Set("dhcp.router_octet4", nil) })
+		settingstest.Set(t, "dhcp.router_octet4", 1)
 		res, err := nextAddress(t, h, map[string]string{"cidr": "10.9.0.0/24", "count": "1", "ping": "false"})
 		require.NoError(t, err)
 		assert.Equal(t, []string{"10.9.0.0", "10.9.0.1", "10.9.0.255"}, res.Reserved)
@@ -284,8 +281,7 @@ func TestNextAddressNeverSuggestsTheGateway(t *testing.T) {
 
 	t.Run("a configured subnet's gateway wins over dhcp.router_octet4, as it does for a node", func(t *testing.T) {
 		withSubnets(t, "10.9.0.254/24")
-		viper.Set("dhcp.router_octet4", 1)
-		t.Cleanup(func() { viper.Set("dhcp.router_octet4", nil) })
+		settingstest.Set(t, "dhcp.router_octet4", 1)
 		res, err := nextAddress(t, h, map[string]string{"cidr": "10.9.0.0/24", "count": "1", "ping": "false"})
 		require.NoError(t, err)
 		assert.Equal(t, []string{"10.9.0.0", "10.9.0.254", "10.9.0.255"}, res.Reserved)

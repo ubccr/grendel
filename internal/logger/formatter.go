@@ -18,7 +18,7 @@ import (
 
 	"github.com/mgutz/ansi"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/settings"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -171,12 +171,10 @@ func (f *TextFormatter) SetColorScheme(colorScheme *ColorScheme) {
 }
 
 func (f *TextFormatter) Format(entry *logrus.Entry) ([]byte, error) {
-	if prefixValue, ok := entry.Data["prefix"]; ok {
-		loggers := viper.GetStringMapString("loggers")
-		status, ok := loggers[strings.ToLower(prefixValue.(string))]
-		if ok && "off" == strings.ToLower(status) {
-			return nil, nil
-		}
+	// the shared logger lets through the most detailed level any logger asks for, so each line is checked against its own logger's level here
+	name, _ := entry.Data["prefix"].(string)
+	if at := settings.LoggerLevel(name); at == "off" || entry.Level > level(at) {
+		return nil, nil
 	}
 
 	var b *bytes.Buffer
@@ -359,12 +357,12 @@ func (f *TextFormatter) appendValue(b *bytes.Buffer, value interface{}) {
 // This is to not silently overwrite `time`, `msg` and `level` fields when
 // dumping it. If this code wasn't there doing:
 //
-//  logrus.WithField("level", 1).Info("hello")
+//	logrus.WithField("level", 1).Info("hello")
 //
 // would just silently drop the user provided level. Instead with this code
 // it'll be logged as:
 //
-//  {"level": "info", "fields.level": 1, "msg": "hello", "time": "..."}
+//	{"level": "info", "fields.level": 1, "msg": "hello", "time": "..."}
 func prefixFieldClashes(data logrus.Fields) {
 	if t, ok := data["time"]; ok {
 		data["fields.time"] = t

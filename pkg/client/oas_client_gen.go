@@ -361,6 +361,18 @@ type Invoker interface {
 	//
 	// GET /v1/roles
 	GETV1Roles(ctx context.Context, params GETV1RolesParams) (*GetRolesResponse, error)
+	// GETV1Settings invokes GET_/v1/settings operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).GetSettings`
+	// #### Middlewares:
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Every setting with its help text, its value and where that value comes from. Secrets never carry a
+	// value.
+	//
+	// GET /v1/settings
+	GETV1Settings(ctx context.Context, params GETV1SettingsParams) (*Listing, error)
 	// GETV1SwitchNodesetLldp invokes GET_/v1/switch/:nodeset/lldp operation.
 	//
 	// #### Controller:
@@ -450,6 +462,18 @@ type Invoker interface {
 	//
 	// PATCH /v1/roles
 	PATCHV1Roles(ctx context.Context, request *PatchRolesRequest, params PATCHV1RolesParams) (*GenericResponse, error)
+	// PATCHV1Settings invokes PATCH_/v1/settings operation.
+	//
+	// #### Controller:
+	// `github.com/ubccr/grendel/internal/api.(*Handler).PatchSettings`
+	// #### Middlewares:
+	// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+	// ---
+	// Store settings in the database or remove them from it. Nothing is saved unless every change is
+	// valid.
+	//
+	// PATCH /v1/settings
+	PATCHV1Settings(ctx context.Context, request *PatchSettingsRequest, params PATCHV1SettingsParams) (*Listing, error)
 	// PATCHV1UsersUsernamesEnable invokes PATCH_/v1/users/:usernames/enable operation.
 	//
 	// #### Controller:
@@ -5080,6 +5104,110 @@ func (c *Client) sendGETV1Roles(ctx context.Context, params GETV1RolesParams) (r
 	return result, nil
 }
 
+// GETV1Settings invokes GET_/v1/settings operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).GetSettings`
+// #### Middlewares:
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Every setting with its help text, its value and where that value comes from. Secrets never carry a
+// value.
+//
+// GET /v1/settings
+func (c *Client) GETV1Settings(ctx context.Context, params GETV1SettingsParams) (*Listing, error) {
+	res, err := c.sendGETV1Settings(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendGETV1Settings(ctx context.Context, params GETV1SettingsParams) (res *Listing, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/settings"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, GETV1SettingsOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, GETV1SettingsOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer body.Close()
+
+	result, err := decodeGETV1SettingsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // GETV1SwitchNodesetLldp invokes GET_/v1/switch/:nodeset/lldp operation.
 //
 // #### Controller:
@@ -6173,6 +6301,113 @@ func (c *Client) sendPATCHV1Roles(ctx context.Context, request *PatchRolesReques
 	defer body.Close()
 
 	result, err := decodePATCHV1RolesResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// PATCHV1Settings invokes PATCH_/v1/settings operation.
+//
+// #### Controller:
+// `github.com/ubccr/grendel/internal/api.(*Handler).PatchSettings`
+// #### Middlewares:
+// - `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`
+// ---
+// Store settings in the database or remove them from it. Nothing is saved unless every change is
+// valid.
+//
+// PATCH /v1/settings
+func (c *Client) PATCHV1Settings(ctx context.Context, request *PatchSettingsRequest, params PATCHV1SettingsParams) (*Listing, error) {
+	res, err := c.sendPATCHV1Settings(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendPATCHV1Settings(ctx context.Context, request *PatchSettingsRequest, params PATCHV1SettingsParams) (res *Listing, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/v1/settings"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodePATCHV1SettingsRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "Accept",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Accept.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityHeaderAuth(ctx, PATCHV1SettingsOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"HeaderAuth\"")
+			}
+		}
+		{
+
+			switch err := c.securityCookieAuth(ctx, PATCHV1SettingsOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 1
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+				{0b00000010},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer body.Close()
+
+	result, err := decodePATCHV1SettingsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

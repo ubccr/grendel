@@ -13,7 +13,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/settings"
 )
 
 var (
@@ -91,7 +91,7 @@ func NewOnieFromHeaders(header http.Header) (*Onie, error) {
 
 func (o Onie) UpdaterFilePath() string {
 	return filepath.Join(
-		viper.GetString("provision.repo_dir"),
+		settings.ProvisionRepoDir.Get(),
 		"onie",
 		fmt.Sprintf("%s-%s-%s-r%d", "onie-updater", o.Arch, o.Machine, o.MachineRev))
 }

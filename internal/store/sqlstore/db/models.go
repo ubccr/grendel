@@ -151,6 +151,18 @@ type RoleView struct {
 	PermissionJson model.RoleView `json:"permission_json"`
 }
 
+type Setting struct {
+	Key       string    `json:"key"`
+	Value     string    `json:"value"`
+	UpdatedAt time.Time `json:"updated_at"`
+	UpdatedBy string    `json:"updated_by"`
+}
+
+type SettingRevision struct {
+	ID       int64 `json:"id"`
+	Revision int64 `json:"revision"`
+}
+
 type Tag struct {
 	ID  int64  `json:"id"`
 	Key string `json:"key"`

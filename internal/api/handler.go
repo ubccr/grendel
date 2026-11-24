@@ -11,9 +11,9 @@ import (
 	"github.com/go-fuego/fuego"
 	"github.com/go-fuego/fuego/option"
 	"github.com/go-fuego/fuego/param"
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/events"
 	"github.com/ubccr/grendel/internal/redfish"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
 )
@@ -27,13 +27,13 @@ type Handler struct {
 }
 
 func NewHandler(db store.Store) (*Handler, error) {
-	h := &Handler{DB: db, Events: events.New(db), Redfish: redfish.NewFromViper()}
+	h := &Handler{DB: db, Events: events.New(db), Redfish: redfish.NewFromSettings()}
 
 	return h, nil
 }
 
 func (h *Handler) SetupRoutes(s *fuego.Server) {
-	if viper.GetBool("api.web_ui") {
+	if settings.APIWebUI.Get() {
 		fuego.Handle(s, "/ui/", setupFrontend())
 		fuego.Handle(s, "/{$}", http.RedirectHandler("/ui", http.StatusMovedPermanently))
 	}
@@ -75,6 +75,7 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 	bmc := fuego.Group(v1, "/bmc", option.Middleware(h.authMiddleware), globalOptions)
 	roles := fuego.Group(v1, "/roles", option.Middleware(h.authMiddleware), globalOptions)
 	sw := fuego.Group(v1, "/switch", option.Middleware(h.authMiddleware), globalOptions)
+	config := fuego.Group(v1, "/settings", option.Middleware(h.authMiddleware), globalOptions)
 
 	// Routes
 	fuego.Get(grendel, "/events", h.GetEvents, about("Follow events", "Server"),
@@ -350,6 +351,13 @@ func (h *Handler) SetupRoutes(s *fuego.Server) {
 	fuego.Delete(roles, "/{names}", h.DeleteRoles, about("Delete roles", "Roles"),
 		option.Description("Delete roles"),
 		option.Path("names", "Delete by name", param.Example("names", "admin,user")),
+	)
+
+	fuego.Get(config, "", h.GetSettings, about("List settings", "Settings"),
+		option.Description("Every setting with its help text, its value and where that value comes from. Secrets never carry a value"),
+	)
+	fuego.Patch(config, "", h.PatchSettings, about("Change settings", "Settings"),
+		option.Description("Store settings in the database or remove them from it. Nothing is saved unless every change is valid"),
 	)
 
 	h.routes = describeRoutes(s.OpenAPI.Description())

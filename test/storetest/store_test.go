@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/suite"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/tests"
 	"github.com/ubccr/grendel/pkg/model"
@@ -1189,4 +1190,44 @@ func (s *StoreTestSuite) BenchmarkReverseResolve(size int, b *testing.B) {
 			}
 		})
 	})
+}
+
+func (s *StoreTestSuite) TestSettings() {
+	defer s.db.Close()
+
+	rows, start, err := s.db.Settings()
+	s.Require().NoError(err)
+	s.Empty(rows)
+
+	first, err := s.db.UpdateSettings([]settings.Row{
+		{Key: "dns.ttl", Value: []byte("600")},
+		{Key: "dns.forward", Value: []byte(`"1.1.1.1:53"`)},
+	}, nil, "alice")
+	s.Require().NoError(err)
+	s.Greater(first, start, "a change moves the revision, which is how another process notices it")
+
+	second, err := s.db.UpdateSettings([]settings.Row{{Key: "dns.ttl", Value: []byte("900")}}, []string{"dns.forward"}, "bob")
+	s.Require().NoError(err)
+	s.Greater(second, first)
+
+	rows, revision, err := s.db.Settings()
+	s.Require().NoError(err)
+	s.Equal(second, revision)
+	s.Require().Len(rows, 1)
+	s.Equal("dns.ttl", rows[0].Key)
+	s.JSONEq("900", string(rows[0].Value))
+	s.Equal("bob", rows[0].UpdatedBy)
+
+	// a value that is not JSON fails the whole change, so neither the valid row with it nor the revision moves
+	_, err = s.db.UpdateSettings([]settings.Row{
+		{Key: "events.retention", Value: []byte(`"24h"`)},
+		{Key: "dns.listen", Value: []byte("not json")},
+	}, nil, "bob")
+	s.Error(err)
+	rows, _, err = s.db.Settings()
+	s.Require().NoError(err)
+	s.Len(rows, 1)
+	revision, err = s.db.SettingsRevision()
+	s.Require().NoError(err)
+	s.Equal(second, revision)
 }

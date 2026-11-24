@@ -14,9 +14,9 @@ import (
 	"strings"
 
 	"github.com/go-fuego/fuego"
-	"github.com/spf13/viper"
 	"github.com/stmcginnis/gofish/oem/dell"
 	"github.com/ubccr/grendel/internal/redfish"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/internal/util"
 	"github.com/ubccr/grendel/pkg/model"
 )
@@ -58,7 +58,7 @@ func (h *Handler) BmcImportConfig(c fuego.ContextWithBody[BmcImportConfigBody]) 
 		return model.BmcResponse[model.BmcAck]{}, badRequest(fmt.Errorf("invalid file %q", body.File), "file must be a template name with no path")
 	}
 
-	share, err := importShare(viper.GetViper())
+	share, err := importShare()
 	if err != nil {
 		return model.BmcResponse[model.BmcAck]{}, fuego.HTTPError{Err: err, Title: "Error", Detail: "failed to work out the address bmcs fetch the config from"}
 	}
@@ -156,21 +156,21 @@ type configShare struct {
 }
 
 // importShare is where iDRACs fetch an imported config from, the provision server. bmc.config_share_ip wins, then the address provision listens on, then this machine's first external address when provision listens on every interface. The port is always provision's, and is only set when it is not the share type's default
-func importShare(v *viper.Viper) (configShare, error) {
+func importShare() (configShare, error) {
 	share := configShare{
 		shareType:  dell.HTTPISCShareType,
 		ignoreCert: dell.DisabledISCIgnoreCertificateWarning,
 	}
 	defaultPort := "80"
-	if v.IsSet("provision.cert") {
+	if settings.ProvisionCert.Get() != "" {
 		share.shareType = dell.HTTPSISCShareType
 		defaultPort = "443"
 	}
-	if v.GetString("bmc.config_ignore_certificate_warning") == "Enabled" {
+	if settings.BMCConfigIgnoreCertificateWarning.Get() == "Enabled" {
 		share.ignoreCert = dell.EnabledISCIgnoreCertificateWarning
 	}
 
-	listen, port, err := net.SplitHostPort(v.GetString("provision.listen"))
+	listen, port, err := net.SplitHostPort(settings.ProvisionListen.Get())
 	if err != nil {
 		return share, fmt.Errorf("parsing provision.listen: %w", err)
 	}
@@ -178,7 +178,7 @@ func importShare(v *viper.Viper) (configShare, error) {
 		share.port = port
 	}
 
-	share.ip = v.GetString("bmc.config_share_ip")
+	share.ip = settings.BMCConfigShareIP.Get()
 	if share.ip == "" {
 		if share.ip, err = util.ServerAddress(listen); err != nil {
 			return share, err

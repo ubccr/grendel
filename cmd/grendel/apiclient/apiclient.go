@@ -18,9 +18,10 @@ import (
 	"time"
 
 	"github.com/coder/websocket"
+	"github.com/go-faster/jx"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/cmd/shared"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/pkg/client"
 )
 
@@ -29,8 +30,7 @@ var API *client.Client
 
 // Register adds the endpoint flag and builds the client during PersistentPreRunE. Only grendel calls it, grendeld serves the api rather than calling it and cannot reach the socket it has not created yet
 func Register() {
-	shared.Root.PersistentFlags().String("endpoint", "grendel-api.socket", "Grendel API endpoint")
-	viper.BindPFlag("client.api_endpoint", shared.Root.PersistentFlags().Lookup("endpoint"))
+	shared.BindSettingFlags(shared.Root.PersistentFlags(), settings.ScopeClient)
 
 	shared.Root.PersistentPreRunE = func(command *cobra.Command, args []string) error {
 		err := shared.SetupLogging()
@@ -56,12 +56,12 @@ func newAuthHandler() ogenAuth {
 }
 
 func (o ogenAuth) HeaderAuth(ctx context.Context, operationName string, c *client.Client) (client.HeaderAuth, error) {
-	auth := client.HeaderAuth{Token: viper.GetString("client.api_key")}
+	auth := client.HeaderAuth{Token: settings.ClientAPIKey.Get()}
 	return auth, nil
 }
 
 func (o ogenAuth) CookieAuth(ctx context.Context, operationName string, c *client.Client) (client.CookieAuth, error) {
-	auth := client.CookieAuth{Token: viper.GetString("client.api_key")}
+	auth := client.CookieAuth{Token: settings.ClientAPIKey.Get()}
 	return auth, nil
 }
 
@@ -83,8 +83,8 @@ func NewOgenClient() (*client.Client, error) {
 
 // transport reaches the configured endpoint, a unix socket or a URL, and returns the base URL to use with it
 func transport() (*http.Transport, string, error) {
-	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: viper.GetBool("client.insecure")}}
-	cacert := viper.GetString("client.cacert")
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: settings.ClientInsecure.Get()}}
+	cacert := settings.ClientCACert.Get()
 	pem, err := os.ReadFile(cacert)
 	if err == nil {
 		certPool := x509.NewCertPool()
@@ -94,12 +94,12 @@ func transport() (*http.Transport, string, error) {
 		tr = &http.Transport{TLSClientConfig: &tls.Config{RootCAs: certPool, InsecureSkipVerify: false}}
 	}
 
-	endpoint := viper.GetString("client.api_endpoint")
+	endpoint := settings.ClientAPIEndpoint.Get()
 	if !strings.HasPrefix(endpoint, "http") {
 		tr = &http.Transport{
 			DialContext: func(ctx context.Context, _, addr string) (net.Conn, error) {
 				dialer := net.Dialer{}
-				return dialer.DialContext(ctx, "unix", viper.GetString("client.api_endpoint"))
+				return dialer.DialContext(ctx, "unix", settings.ClientAPIEndpoint.Get())
 			},
 		}
 		endpoint = "http://localhost"
@@ -116,7 +116,7 @@ func Websocket(ctx context.Context, path string) (*websocket.Conn, error) {
 	}
 
 	header := http.Header{}
-	if key := viper.GetString("client.api_key"); key != "" {
+	if key := settings.ClientAPIKey.Get(); key != "" {
 		header.Set("Authorization", "Bearer "+key)
 	}
 
@@ -148,6 +148,22 @@ func upgradeError(res *http.Response, err error) error {
 	return fmt.Errorf("API Error: status=%d title=%s detail=%s", res.StatusCode, body.Title, body.Detail)
 }
 
+// DefaultImage is the server's provision.default_image. A server too old to list its settings, or an account that may not read them, falls back to what this machine's config file says.
+func DefaultImage(ctx context.Context) string {
+	res, err := API.GETV1Settings(ctx, client.GETV1SettingsParams{})
+	if err != nil {
+		return settings.ProvisionDefaultImage.Get()
+	}
+	for _, section := range res.Sections {
+		for _, o := range section.Options {
+			if o.Key.Value == "provision.default_image" {
+				return Text(o.Value)
+			}
+		}
+	}
+	return settings.ProvisionDefaultImage.Get()
+}
+
 func NewApiError(apiError error) error {
 	var t *client.HTTPErrorStatusCode
 	if !errors.As(apiError, &t) {
@@ -162,4 +178,23 @@ func NewApiError(apiError error) error {
 func NewApiResponse(res *client.GenericResponse) error {
 	fmt.Printf("%s: %s \nchanged: %d \n", res.GetTitle().Value, res.GetDetail().Value, res.GetChanged().Value)
 	return nil
+}
+
+// Text writes a setting's value the way it is typed on the command line: text as it is, a list with commas, and anything else as JSON
+func Text(raw jx.Raw) string {
+	var s string
+	var list []any
+	switch {
+	case len(raw) == 0 || raw.Type() == jx.Null:
+		return ""
+	case json.Unmarshal(raw, &s) == nil:
+		return s
+	case json.Unmarshal(raw, &list) == nil:
+		parts := make([]string, len(list))
+		for i, item := range list {
+			parts[i] = fmt.Sprint(item)
+		}
+		return strings.Join(parts, ",")
+	}
+	return string(raw)
 }

@@ -2561,6 +2561,21 @@
 						},
 						"type": "array"
 					},
+					"Settings": {
+						"items": {
+							"properties": {
+								"key": {
+									"type": "string"
+								},
+								"value": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"nullable": true,
+						"type": "array"
+					},
 					"Users": {
 						"items": {
 							"properties": {
@@ -3035,6 +3050,153 @@
 					},
 					"system_name": {
 						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"Listing": {
+				"description": "Listing schema",
+				"properties": {
+					"config_file": {
+						"type": "string"
+					},
+					"pending": {
+						"type": "integer"
+					},
+					"persistent": {
+						"type": "boolean"
+					},
+					"sections": {
+						"items": {
+							"properties": {
+								"description": {
+									"type": "string"
+								},
+								"id": {
+									"type": "string"
+								},
+								"options": {
+									"items": {
+										"properties": {
+											"apply": {
+												"type": "string"
+											},
+											"default": {},
+											"deprecated": {
+												"type": "string"
+											},
+											"entry": {
+												"type": "string"
+											},
+											"entry_label": {
+												"type": "string"
+											},
+											"entry_of": {
+												"type": "string"
+											},
+											"enum": {
+												"items": {
+													"type": "string"
+												},
+												"type": "array"
+											},
+											"env": {
+												"type": "string"
+											},
+											"external": {
+												"type": "boolean"
+											},
+											"fields": {
+												"items": {
+													"properties": {
+														"help": {
+															"type": "string"
+														},
+														"kind": {
+															"type": "string"
+														},
+														"name": {
+															"type": "string"
+														},
+														"required": {
+															"type": "boolean"
+														},
+														"summary": {
+															"type": "string"
+														}
+													},
+													"type": "object"
+												},
+												"type": "array"
+											},
+											"file_entries_secret": {
+												"type": "boolean"
+											},
+											"file_keys": {
+												"items": {
+													"type": "string"
+												},
+												"type": "array"
+											},
+											"flag": {
+												"type": "string"
+											},
+											"group": {
+												"type": "string"
+											},
+											"help": {
+												"type": "string"
+											},
+											"inherit_from": {
+												"type": "string"
+											},
+											"key": {
+												"type": "string"
+											},
+											"kind": {
+												"type": "string"
+											},
+											"max": {
+												"nullable": true,
+												"type": "integer"
+											},
+											"min": {
+												"nullable": true,
+												"type": "integer"
+											},
+											"pending": {
+												"type": "boolean"
+											},
+											"running": {},
+											"secret": {
+												"type": "boolean"
+											},
+											"shadowed": {
+												"type": "boolean"
+											},
+											"source": {
+												"type": "string"
+											},
+											"stored": {},
+											"summary": {
+												"type": "string"
+											},
+											"unit": {
+												"type": "string"
+											},
+											"value": {}
+										},
+										"type": "object"
+									},
+									"type": "array"
+								},
+								"title": {
+									"type": "string"
+								}
+							},
+							"type": "object"
+						},
+						"type": "array"
 					}
 				},
 				"type": "object"
@@ -3615,6 +3777,22 @@
 					},
 					"role": {
 						"type": "string"
+					}
+				},
+				"type": "object"
+			},
+			"PatchSettingsRequest": {
+				"description": "PatchSettingsRequest schema",
+				"properties": {
+					"set": {
+						"additionalProperties": {},
+						"type": "object"
+					},
+					"unset": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
 					}
 				},
 				"type": "object"
@@ -8750,6 +8928,123 @@
 				]
 			}
 		},
+		"/v1/settings": {
+			"get": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).GetSettings`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nEvery setting with its help text, its value and where that value comes from. Secrets never carry a value",
+				"operationId": "GET_/v1/settings",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Listing"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/Listing"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "List settings",
+				"tags": [
+					"Settings"
+				]
+			},
+			"patch": {
+				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).PatchSettings`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nStore settings in the database or remove them from it. Nothing is saved unless every change is valid",
+				"operationId": "PATCH_/v1/settings",
+				"parameters": [
+					{
+						"in": "header",
+						"name": "Accept",
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/PatchSettingsRequest"
+							}
+						}
+					},
+					"description": "Request body for api.PatchSettingsRequest",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Listing"
+								}
+							},
+							"application/xml": {
+								"schema": {
+									"$ref": "#/components/schemas/Listing"
+								}
+							}
+						},
+						"description": "OK"
+					},
+					"default": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPError"
+								}
+							}
+						},
+						"description": "Default Error"
+					}
+				},
+				"security": [
+					{
+						"headerAuth": []
+					},
+					{
+						"cookieAuth": []
+					}
+				],
+				"summary": "Change settings",
+				"tags": [
+					"Settings"
+				]
+			}
+		},
 		"/v1/switch/scan": {
 			"get": {
 				"description": "#### Controller: \n\n`github.com/ubccr/grendel/internal/api.(*Handler).SwitchScan`\n\n#### Middlewares:\n\n- `github.com/ubccr/grendel/internal/api.(*Handler).authMiddleware`\n\n---\n\nRead the MAC table and interface status of switch(es), merged per port, with the node that already holds each MAC",
@@ -9322,6 +9617,9 @@
 		},
 		{
 			"name": "Server"
+		},
+		{
+			"name": "Settings"
 		},
 		{
 			"name": "Switches"

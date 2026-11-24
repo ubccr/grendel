@@ -8,6 +8,7 @@ import (
 	"github.com/ubccr/grendel/cmd/grendel/apiclient"
 	_ "github.com/ubccr/grendel/cmd/grendel/auth"
 	_ "github.com/ubccr/grendel/cmd/grendel/bmc"
+	_ "github.com/ubccr/grendel/cmd/grendel/config"
 	_ "github.com/ubccr/grendel/cmd/grendel/db"
 	_ "github.com/ubccr/grendel/cmd/grendel/image"
 	_ "github.com/ubccr/grendel/cmd/grendel/lldp"

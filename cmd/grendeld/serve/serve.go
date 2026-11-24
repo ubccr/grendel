@@ -12,8 +12,9 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/cmd/shared"
+	"github.com/ubccr/grendel/internal/logger"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/store/sqlstore"
 	"github.com/ubccr/grendel/pkg/model"
@@ -38,11 +39,11 @@ var (
 		},
 		RunE: func(command *cobra.Command, args []string) error {
 			// cobra skips PersistentPostRunE when RunE returns an error, so the close belongs here where a failed start still reaches it
-			defer closeDB()
+			defer CloseDB()
 
 			names := args
 			if len(names) == 0 {
-				names = viper.GetStringSlice("services")
+				names = settings.Services.Get()
 			}
 
 			svcs, err := selectServices(names)
@@ -69,45 +70,70 @@ var (
 )
 
 func init() {
-	serveCmd.PersistentFlags().String("dbtype", "sqlite", "database backend to use")
-	viper.BindPFlag("dbtype", serveCmd.PersistentFlags().Lookup("dbtype"))
-	serveCmd.PersistentFlags().String("dbpath", ":memory:", "path to database file")
-	viper.BindPFlag("dbpath", serveCmd.PersistentFlags().Lookup("dbpath"))
 	serveCmd.PersistentFlags().StringVar(&hostsFile, "hosts", "", "path to hosts file")
 	serveCmd.PersistentFlags().StringVar(&imagesFile, "images", "", "path to boot images file")
-	serveCmd.PersistentFlags().StringSlice("services", []string{}, "enabled services, ignored when services are named on the command line")
 	serveCmd.PersistentFlags().StringVar(&listenAddress, "listen", "", "listen address")
-	viper.BindPFlag("services", serveCmd.PersistentFlags().Lookup("services"))
-	serveCmd.PersistentFlags().Duration("shutdown-timeout", defaultShutdownTimeout, "how long to wait for a service to stop")
-	viper.BindPFlag("shutdown_timeout", serveCmd.PersistentFlags().Lookup("shutdown-timeout"))
 
 	serveCmd.PersistentPreRunE = func(command *cobra.Command, args []string) error {
-		err := shared.SetupLogging()
+		problems, err := OpenDB()
 		if err != nil {
 			return err
 		}
-
-		dbType := viper.GetString("dbtype")
-
-		switch dbType {
-		case "sqlite":
-			DB, err = sqlstore.New(viper.GetString("dbpath"))
-			if err != nil {
-				return err
+		for _, p := range problems {
+			// a bad value in the database is skipped so it can be fixed from the running server, but one in the config file, the environment or a flag stops the start, as nothing would be using what was asked for
+			if p.Source != settings.SourceDatabase {
+				return fmt.Errorf("invalid setting: %s", p)
 			}
-		default:
-			shared.Log.Fatalf("unsupported dbtype: %s", dbType)
+			shared.Log.Warn(p)
 		}
-
-		shared.Log.Infof("Using %s database path: %s", dbType, viper.GetString("dbpath"))
+		logger.Apply()
+		settings.OnChange(logger.Apply)
+		importHint()
 		return nil
 	}
 
+	shared.BindSettingFlags(serveCmd.PersistentFlags(), settings.ScopeServer)
 	shared.Root.AddCommand(serveCmd)
 }
 
-// closeDB is deferred by RunE rather than run from a post run hook, so that a service that fails to start still checkpoints and releases the database
-func closeDB() {
+// OpenDB opens the database into DB and loads the settings it holds, returning the values that were skipped as invalid
+func OpenDB() ([]settings.Problem, error) {
+	if err := shared.SetupLogging(); err != nil {
+		return nil, err
+	}
+	if dbType := settings.DBType.Get(); dbType != "sqlite" {
+		return nil, fmt.Errorf("unsupported dbtype: %s", dbType)
+	}
+	db, err := sqlstore.New(settings.DBPath.Get())
+	if err != nil {
+		return nil, err
+	}
+	DB = db
+	shared.Log.Infof("Using database path: %s", settings.DBPath.Get())
+
+	problems, err := shared.LoadSettings(DB)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load settings: %w", err)
+	}
+	return problems, nil
+}
+
+func importHint() {
+	path := settings.List().ConfigFile
+	if path == "" {
+		return
+	}
+	file, err := shared.ReadSettingsFile(path)
+	if err != nil {
+		return
+	}
+	if plan, err := settings.PlanImport(file, nil); err == nil && plan.Count() > 0 {
+		shared.Log.Warnf("%d setting(s) in %s can be kept in the database instead: run `grendeld config import` to see them", plan.Count(), path)
+	}
+}
+
+// CloseDB is deferred by RunE rather than run from a post run hook, so that a service that fails to start still checkpoints and releases the database
+func CloseDB() {
 	if DB == nil {
 		return
 	}
@@ -161,11 +187,10 @@ func loadImageJSON() error {
 	return nil
 }
 
-// GetListenAddress takes a viper key and returns a listen address
-//
-// Local `--tftp-listen` flags override the global `--listen` flag
+// getListenAddress returns the listen address a setting holds, with its host swapped for the one given with --listen unless the service's own listen flag was given
 func getListenAddress(key string) string {
-	address := viper.GetString(key)
+	v, _ := settings.Value(key)
+	address, _ := v.(string)
 	if listenAddress == "" {
 		return address
 	}

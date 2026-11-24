@@ -8,7 +8,7 @@ import (
 	"cmp"
 	"time"
 
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/settings"
 )
 
 type GNMIConfig struct {
@@ -44,36 +44,44 @@ type Config struct {
 	gnmiByNOS map[string]GNMIConfig
 }
 
-// defaultConfig is decoded over rather than set with viper.SetDefault, since viper leaves nested defaults out of a table once any key in it is set
-var defaultConfig = Config{
-	Timeout: 30 * time.Second,
-	GNMI:    GNMIConfig{Port: 6030, SkipVerify: true, NetworkInstance: "default"},
-	SNMP:    SNMPConfig{Version: "2c", Community: "public", Port: 161, Timeout: 5 * time.Second, Retries: 2},
-}
-
-func ConfigFromViper() Config {
-	cfg := defaultConfig
-	if err := viper.UnmarshalKey("switch", &cfg); err != nil {
-		log.Warnf("reading the [switch] config: %v", err)
+func ConfigFromSettings() Config {
+	cfg := Config{
+		// each falls back on its own, so a config that sets only switch.username still finds the password under the older key
+		Username: cmp.Or(settings.SwitchUsername.Get(), settings.BMCSwitchAdminUsername.Get()),
+		Password: cmp.Or(settings.SwitchPassword.Get(), settings.BMCSwitchAdminPassword.Get()),
+		Timeout:  settings.SwitchTimeout.Get(),
+		GNMI:     gnmiConfig(settings.SwitchGNMI),
+		SNMP: SNMPConfig{
+			Version:   settings.SwitchSNMPVersion.Get(),
+			Community: settings.SwitchSNMPCommunity.Get(),
+			Port:      settings.SwitchSNMPPort.Get(),
+			Timeout:   settings.SwitchSNMPTimeout.Get(),
+			Retries:   settings.SwitchSNMPRetries.Get(),
+			User:      settings.SwitchSNMPUser.Get(),
+			AuthProto: settings.SwitchSNMPAuthProto.Get(),
+			AuthPass:  settings.SwitchSNMPAuthPass.Get(),
+			PrivProto: settings.SwitchSNMPPrivProto.Get(),
+			PrivPass:  settings.SwitchSNMPPrivPass.Get(),
+		},
 	}
 
-	// a [switch.gnmi.<nos>] table overrides only the keys it sets, since decoding into a copy keeps the fields the table leaves out
-	cfg.gnmiByNOS = map[string]GNMIConfig{}
-	for _, nos := range []string{NOSArista, NOSSonic} {
-		g := cfg.GNMI
-		if sub := viper.Sub("switch.gnmi." + nos); sub != nil {
-			if err := sub.Unmarshal(&g); err != nil {
-				log.Warnf("reading the [switch.gnmi.%s] config: %v", nos, err)
-			}
-		}
-		cfg.gnmiByNOS[nos] = g
+	cfg.gnmiByNOS = map[string]GNMIConfig{
+		NOSArista: gnmiConfig(settings.SwitchGNMIArista),
+		NOSSonic:  gnmiConfig(settings.SwitchGNMISonic),
 	}
-
-	// each falls back on its own, so a config that sets only switch.username still finds the password under the older key
-	cfg.Username = cmp.Or(cfg.Username, viper.GetString("bmc.switch_admin_username"))
-	cfg.Password = cmp.Or(cfg.Password, viper.GetString("bmc.switch_admin_password"))
 
 	return cfg
+}
+
+func gnmiConfig(o settings.GNMIOptions) GNMIConfig {
+	return GNMIConfig{
+		Port:            o.Port.Get(),
+		Plaintext:       o.Plaintext.Get(),
+		SkipVerify:      o.SkipVerify.Get(),
+		CACert:          o.CACert.Get(),
+		Target:          o.Target.Get(),
+		NetworkInstance: o.NetworkInstance.Get(),
+	}
 }
 
 func (c Config) gnmiFor(nos string) GNMIConfig {

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/settings"
 	"golang.org/x/time/rate"
 )
 
@@ -16,31 +16,6 @@ const (
 	schemeHTTP  = "http"
 	schemeHTTPS = "https"
 )
-
-func init() {
-	viper.SetDefault("bmc.fanout", 5)
-
-	viper.SetDefault("bmc.scheme", schemeHTTPS)
-
-	viper.SetDefault("bmc.node_timeout", time.Second*60)
-	viper.SetDefault("bmc.run_timeout", time.Minute*4)
-	viper.SetDefault("bmc.rate_limit_per_second", 0)
-
-	// basic auth sends the credentials with each request rather than logging in and out of a Redfish session, which saves a login and a logout per node per operation and never holds one of the few sessions a BMC allows
-	viper.SetDefault("bmc.gofish.basic_auth", true)
-	viper.SetDefault("bmc.gofish.max_concurrent_requests", 1)
-	// reusing connections keeps one connection open for all of an operation's requests to a BMC, rather than a TCP connection and TLS handshake for each. It lasts as long as the operation, since each one builds its own client
-	viper.SetDefault("bmc.gofish.reuse_connections", true)
-	viper.SetDefault("bmc.gofish.auto_expand", true)
-	viper.SetDefault("bmc.gofish.client_timeout", time.Second*60)
-	viper.SetDefault("bmc.gofish.dial_timeout", time.Second*5)
-	viper.SetDefault("bmc.gofish.dial_keep_alive_timeout", time.Second*30)
-	viper.SetDefault("bmc.gofish.tls_handshake_timeout", time.Second*10)
-	viper.SetDefault("bmc.gofish.idle_conn_timeout", time.Second*90)
-
-	viper.SetDefault("bmc.ipmi.port", 623)
-	viper.SetDefault("bmc.ipmi.cipher_suites", []int{17, 3})
-}
 
 type Credential struct {
 	User     string `mapstructure:"user"`
@@ -71,46 +46,44 @@ type Config struct {
 	IPMICipherSuites []int
 }
 
-func ConfigFromViper() Config {
+func ConfigFromSettings() Config {
 	cfg := Config{
-		Insecure:  viper.GetBool("bmc.insecure"),
-		BasicAuth: viper.GetBool("bmc.gofish.basic_auth"),
-		Scheme:    scheme(viper.GetString("bmc.scheme")),
+		Insecure:  settings.BMCInsecure.Get(),
+		BasicAuth: settings.BMCGofishBasicAuth.Get(),
+		Scheme:    scheme(settings.BMCScheme.Get()),
 
-		Fanout:          viper.GetInt("bmc.fanout"),
-		NodeTimeout:     viper.GetDuration("bmc.node_timeout"),
-		RunTimeout:      viper.GetDuration("bmc.run_timeout"),
-		RateLimitPerSec: viper.GetFloat64("bmc.rate_limit_per_second"),
+		Fanout:          settings.BMCFanout.Get(),
+		NodeTimeout:     settings.BMCNodeTimeout.Get(),
+		RunTimeout:      settings.BMCRunTimeout.Get(),
+		RateLimitPerSec: settings.BMCRateLimitPerSecond.Get(),
 
-		ClientTimeout:       viper.GetDuration("bmc.gofish.client_timeout"),
-		DialTimeout:         viper.GetDuration("bmc.gofish.dial_timeout"),
-		DialKeepAlive:       viper.GetDuration("bmc.gofish.dial_keep_alive_timeout"),
-		TLSHandshakeTimeout: viper.GetDuration("bmc.gofish.tls_handshake_timeout"),
-		IdleConnTimeout:     viper.GetDuration("bmc.gofish.idle_conn_timeout"),
+		ClientTimeout:       settings.BMCGofishClientTimeout.Get(),
+		DialTimeout:         settings.BMCGofishDialTimeout.Get(),
+		DialKeepAlive:       settings.BMCGofishDialKeepAliveTimeout.Get(),
+		TLSHandshakeTimeout: settings.BMCGofishTLSHandshakeTimeout.Get(),
+		IdleConnTimeout:     settings.BMCGofishIdleConnTimeout.Get(),
 
-		MaxConcurrentRequests: viper.GetInt64("bmc.gofish.max_concurrent_requests"),
-		ReuseConnections:      viper.GetBool("bmc.gofish.reuse_connections"),
-		AutoExpand:            viper.GetBool("bmc.gofish.auto_expand"),
+		MaxConcurrentRequests: int64(settings.BMCGofishMaxConcurrentRequests.Get()),
+		ReuseConnections:      settings.BMCGofishReuseConnections.Get(),
+		AutoExpand:            settings.BMCGofishAutoExpand.Get(),
 
-		IPMIPort:         viper.GetInt("bmc.ipmi.port"),
-		IPMICipherSuites: viper.GetIntSlice("bmc.ipmi.cipher_suites"),
+		IPMIPort:         settings.BMCIPMIPort.Get(),
+		IPMICipherSuites: settings.BMCIPMICipherSuites.Get(),
 	}
 
-	if user := viper.GetString("bmc.user"); user != "" {
-		cfg.Credentials = append(cfg.Credentials, Credential{User: user, Password: viper.GetString("bmc.password")})
+	if user := settings.BMCUser.Get(); user != "" {
+		cfg.Credentials = append(cfg.Credentials, Credential{User: user, Password: settings.BMCPassword.Get()})
 	}
 
 	// an array of tables, rather than a username = "password" table, because viper lowercases keys and BMC usernames can be case sensitive. It also keeps the order they are tried in
-	var defaults []Credential
-	if err := viper.UnmarshalKey("bmc.defaults.credentials", &defaults); err != nil {
-		log.Warnf("ignoring bmc.defaults.credentials, it must be a list of [[bmc.defaults.credentials]] tables with user and password: %s", err)
-	}
-	for _, c := range defaults {
-		if c.User == "" {
+	for _, row := range settings.BMCDefaultCredentials.Get() {
+		user, _ := row["user"].(string)
+		password, _ := row["password"].(string)
+		if user == "" {
 			log.Warn("ignoring a bmc.defaults.credentials entry with no user")
 			continue
 		}
-		cfg.Credentials = append(cfg.Credentials, c)
+		cfg.Credentials = append(cfg.Credentials, Credential{User: user, Password: password})
 	}
 
 	return cfg

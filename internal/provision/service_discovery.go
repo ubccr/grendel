@@ -7,9 +7,10 @@ package provision
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/settings"
 )
 
 type promServiceDiscovery struct {
@@ -58,6 +59,6 @@ func (h *Handler) ServiceDiscovery(c echo.Context) error {
 	}
 
 	sd = append(sd, nodeExporter)
-	c.Response().Header().Set("X-Prometheus-Refresh-Interval-Seconds", viper.GetString("provision.prometheus_sd_refresh_interval"))
+	c.Response().Header().Set("X-Prometheus-Refresh-Interval-Seconds", strconv.Itoa(settings.ProvisionPrometheusSDRefreshInterval.Get()))
 	return c.JSON(http.StatusOK, sd)
 }

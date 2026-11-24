@@ -10,7 +10,6 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/cmd/grendel/apiclient"
 	"github.com/ubccr/grendel/internal/version"
 	"github.com/ubccr/grendel/pkg/client"
@@ -30,7 +29,7 @@ var (
 		Long:  `Detailed node status`,
 		Args:  cobra.NoArgs,
 		RunE: func(command *cobra.Command, args []string) error {
-			defaultImage := viper.GetString("provision.default_image")
+			defaultImage := apiclient.DefaultImage(command.Context())
 			inputTags := strings.Join(tags, ",")
 
 			req := client.GETV1NodesFindParams{

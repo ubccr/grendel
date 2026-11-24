@@ -14,7 +14,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/settings"
 )
 
 type Client struct {
@@ -32,7 +32,7 @@ func NewClient() *Client {
 }
 
 func (c *Client) netBoxApiCall(path string, data io.Reader) (*http.Response, error) {
-	req, err := http.NewRequest("POST", viper.GetString("provision.netbox_url")+path, data)
+	req, err := http.NewRequest("POST", settings.ProvisionNetboxURL.Get()+path, data)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +44,7 @@ func (c *Client) netBoxApiCall(path string, data io.Reader) (*http.Response, err
 
 	}
 
-	req.Header.Set("Authorization", "Token "+viper.GetString("provision.netbox_token"))
+	req.Header.Set("Authorization", "Token "+settings.ProvisionNetboxToken.Get())
 
 	return c.httpClient.Do(req)
 }

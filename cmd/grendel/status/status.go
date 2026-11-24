@@ -11,7 +11,6 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/cmd/grendel/apiclient"
 	"github.com/ubccr/grendel/cmd/shared"
 	"github.com/ubccr/grendel/internal/version"
@@ -42,7 +41,7 @@ var (
 		Long:  `Status commands`,
 		Args:  cobra.NoArgs,
 		RunE: func(command *cobra.Command, args []string) error {
-			defaultImage := viper.GetString("provision.default_image")
+			defaultImage := apiclient.DefaultImage(command.Context())
 			inputTags := strings.Join(tags, ",")
 
 			params := client.GETV1ImagesParams{}

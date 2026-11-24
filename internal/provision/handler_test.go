@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"net/netip"
 	"os"
 	"path/filepath"
 	"testing"
@@ -16,8 +15,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
-	"github.com/ubccr/grendel/internal/config"
 	"github.com/ubccr/grendel/internal/render"
+	"github.com/ubccr/grendel/internal/settings/settingstest"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/store/sqlstore"
 	"github.com/ubccr/grendel/internal/tests"
@@ -139,9 +138,7 @@ func TestIpxe(t *testing.T) {
 func TestIpxeURLsNonDefaultPort(t *testing.T) {
 	assert := assert.New(t)
 
-	origAddr := config.ProvisionAddr
-	t.Cleanup(func() { config.ProvisionAddr = origAddr })
-	config.ProvisionAddr = netip.MustParseAddrPort("0.0.0.0:8081")
+	settingstest.Set(t, "provision.listen", "0.0.0.0:8081")
 
 	h := &Handler{DB: newTestDB(t)}
 

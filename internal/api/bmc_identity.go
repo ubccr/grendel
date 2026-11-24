@@ -14,8 +14,8 @@ import (
 	"text/template"
 
 	"github.com/go-fuego/fuego"
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/redfish"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -48,12 +48,12 @@ type BmcIdentityDefaults struct {
 
 func identityDefaults() BmcIdentityDefaults {
 	return BmcIdentityDefaults{
-		Datacenter: viper.GetString("bmc.location.datacenter"),
-		Room:       viper.GetString("bmc.location.room"),
-		Row:        viper.GetString("bmc.location.row"),
-		Rack:       viper.GetString("bmc.location.rack"),
-		RackUnit:   viper.GetString("bmc.location.rack_unit"),
-		AssetTag:   viper.GetString("bmc.asset_tag"),
+		Datacenter: settings.BMCLocationDatacenter.Get(),
+		Room:       settings.BMCLocationRoom.Get(),
+		Row:        settings.BMCLocationRow.Get(),
+		Rack:       settings.BMCLocationRack.Get(),
+		RackUnit:   settings.BMCLocationRackUnit.Get(),
+		AssetTag:   settings.BMCAssetTag.Get(),
 	}
 }
 

@@ -13,7 +13,7 @@ import (
 
 	"github.com/miekg/dns"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/util"
 )
@@ -25,10 +25,10 @@ type handler struct {
 }
 
 func NewHandler(db store.Store, ttl uint32) (*handler, error) {
-	timeout := viper.GetDuration("dns.query_timeout")
+	timeout := settings.DNSQueryTimeout.Get()
 	// A zero timeout would expire every context immediately.
 	if timeout <= 0 {
-		timeout = defaultQueryTimeout
+		timeout = settings.DNSQueryTimeout.DefaultValue()
 	}
 
 	h := &handler{
@@ -90,7 +90,7 @@ func (h *handler) ServeDNS(w dns.ResponseWriter, r *dns.Msg) {
 		return
 	}
 
-	fwAddr := viper.GetString("dns.forward")
+	fwAddr := settings.DNSForward.Get()
 	if len(answers) != 0 {
 		m.Authoritative = true
 		m.Answer = answers

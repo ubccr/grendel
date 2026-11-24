@@ -5,11 +5,10 @@
 package redfish
 
 import (
-	"strings"
 	"testing"
 
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
+	"github.com/ubccr/grendel/internal/settings/settingstest"
 )
 
 func TestScheme(t *testing.T) {
@@ -33,23 +32,22 @@ func TestScheme(t *testing.T) {
 	}
 }
 
-// TestConfigFromViperScheme pins the key name, since viper returns a quiet zero value for a misspelled one
-func TestConfigFromViperScheme(t *testing.T) {
-	assert.Equal(t, schemeHTTPS, ConfigFromViper().Scheme, "the default is https, without any config file")
+func TestConfigFromSettingsScheme(t *testing.T) {
+	assert.Equal(t, schemeHTTPS, ConfigFromSettings().Scheme, "the default is https, without any config file")
 
-	viper.Set("bmc.scheme", schemeHTTP)
-	t.Cleanup(func() { viper.Set("bmc.scheme", schemeHTTPS) })
+	settingstest.Set(t, "bmc.scheme", schemeHTTP)
 
-	assert.Equal(t, schemeHTTP, ConfigFromViper().Scheme)
+	assert.Equal(t, schemeHTTP, ConfigFromSettings().Scheme)
 }
 
-// TestConfigFromViperCredentials reads real toml rather than using viper.Set, because the point is that only what a config file sets is ever sent to a bmc
-func TestConfigFromViperCredentials(t *testing.T) {
+// only what is configured is ever sent to a bmc, so with nothing set there is no login to try
+func TestConfigFromSettingsCredentials(t *testing.T) {
 	configured := Credential{User: "ops", Password: "secret"}
 
 	tests := []struct {
 		name string
-		toml string
+		user string
+		rows []map[string]any
 		want []Credential
 	}{
 		{
@@ -57,33 +55,36 @@ func TestConfigFromViperCredentials(t *testing.T) {
 		},
 		{
 			name: "bmc.user alone adds no default login",
-			toml: "[bmc]\nuser = \"ops\"\npassword = \"secret\"\n",
+			user: "ops",
 			want: []Credential{configured},
 		},
 		{
 			name: "defaults set in the config are tried after bmc.user",
-			toml: "[bmc]\nuser = \"ops\"\npassword = \"secret\"\n[[bmc.defaults.credentials]]\nuser = \"root\"\npassword = \"calvin\"\n",
+			user: "ops", rows: []map[string]any{{"user": "root", "password": "calvin"}},
 			want: []Credential{configured, {User: "root", Password: "calvin"}},
 		},
 		{
 			name: "defaults work without bmc.user",
-			toml: "[[bmc.defaults.credentials]]\nuser = \"root\"\npassword = \"calvin\"\n",
+			rows: []map[string]any{{"user": "root", "password": "calvin"}},
 			want: []Credential{{User: "root", Password: "calvin"}},
 		},
 		{
 			name: "an empty list adds nothing",
-			toml: "[bmc]\nuser = \"ops\"\npassword = \"secret\"\n[bmc.defaults]\ncredentials = []\n",
+			user: "ops", rows: []map[string]any{},
 			want: []Credential{configured},
 		},
 	}
 
-	viper.SetConfigType("toml")
-	t.Cleanup(func() { assert.NoError(t, viper.ReadConfig(strings.NewReader(""))) })
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.NoError(t, viper.ReadConfig(strings.NewReader(tt.toml)))
-			assert.Equal(t, tt.want, ConfigFromViper().Credentials)
+			if tt.user != "" {
+				settingstest.Set(t, "bmc.user", tt.user)
+				settingstest.Set(t, "bmc.password", "secret")
+			}
+			if tt.rows != nil {
+				settingstest.Set(t, "bmc.defaults.credentials", tt.rows)
+			}
+			assert.Equal(t, tt.want, ConfigFromSettings().Credentials)
 		})
 	}
 }

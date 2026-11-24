@@ -1,358 +1,101 @@
-#------------------------------------------------------------------------------
-# Grendel Config
-#------------------------------------------------------------------------------
+# SPDX-FileCopyrightText: (C) 2019 Grendel Authors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
-#------------------------------------------------------------------------------
-# General
-#------------------------------------------------------------------------------
+# The settings grendel reads from this file only: secrets, paths on this host and what is needed to open the database. The few a packaged install needs are set, and the rest are commented out at their default.
+# Every other setting is stored in the database and changed with `grendel config set` or in the web UI. Any of them can still be set here, and a value in this file wins over the database: `grendel config list` shows them all.
 
-#
-# Database type: sqlite (default)
-dbtype = "sqlite"
-#
+# Database type. The database backend. It is needed before the database can be opened, so it cannot be stored there.
+# One of: sqlite
+#dbtype = 'sqlite'
 
-#
-# Path database file. Defaults to ":memory:" which uses in-memory store. Change
-# this to a filepath for persisent storage.
-#
-dbpath = "/var/lib/grendel/db/grendel.sqlite3"
+# Database path. Where the database file lives. The default keeps everything in memory and loses it when grendeld stops. It is needed before the database can be opened, so it cannot be stored there.
+dbpath = '/var/lib/grendel/db/grendel.sqlite3'
 
-#
-# By default, all loggers are on. You can turn off logging for specific
-# services here.
-#
-loggers = {cli="on", tftp="off", dhcp="on", dns="off", provision="on", api="on", pxe="off"}
+# Services to run. Which of api, dhcp, dns, provision, pxe and tftp this process runs. Empty runs them all. Naming services on the command line, as in `grendeld serve dhcp dns`, wins over this. It differs per process, so it is not stored in the database.
+#services = []
 
-#
-# Services to run. Valid entries are api, dhcp, dns, provision, pxe and tftp.
-# Leave this empty or unset to run all of them. Naming services on the command
-# line, as in `grendeld serve dhcp dns`, overrides this.
-#
-services = []
+[api]
+# Unix socket path. Path of a unix socket the API also listens on. Requests over it skip authentication, so its file permissions decide who may use it. It is a path on the server, so it is not stored in the database.
+socket_path = 'grendel-api.socket'
 
-#
-# How long to wait for a service to stop before giving up on it during shutdown
-#
-shutdown_timeout = "10s"
+# Signing secret. Signs login sessions and API tokens. When nothing sets it, one is generated and kept in the database. Changing it signs everyone out. Generate one with `openssl rand -hex 16`.
+#secret = ''
 
-#------------------------------------------------------------------------------
-# Database
-#------------------------------------------------------------------------------
+# TLS certificate. Path to the certificate (.crt) the API serves. Setting both the certificate and the key turns on HTTPS, which you should always use over TCP.
+#cert = ''
+
+# TLS key. Path to the private key (.key) for the API certificate.
+#key = ''
+
+# Skip role checks. Lets every signed-in account call every route. It turns access control off, so it can only be set in the config file or the environment.
+#dev = false
+
+[bmc]
+# Password. Password for bmc.user.
+#password = ''
+
+[bmc.defaults]
+# Fallback logins. More logins to try, in order, when the first is refused. Useful for old passwords or factory defaults.
+#credentials = [{password = '', user = ''}]
+
+[tftp]
+# iPXE firmware directory. Directory of iPXE EFI builds to serve in place of the embedded ones, which Secure Boot needs. It is a path on the server, so it is not stored in the database.
+#firmware_dir = ''
+
+[client]
+# API endpoint. Where the grendel command finds the API: a URL such as http://localhost:8080, or the path of the server's unix socket.
+api_endpoint = '/var/lib/grendel/grendel-api.socket'
+
+# API token. Token the grendel command signs in with over TCP. Create one with `grendel auth token`.
+#api_key = ''
+
+# Skip certificate checks. Accept any certificate the API serves. Only for a server with a self-signed certificate that you trust.
+#insecure = false
+
+# CA certificate. Path to a CA certificate to trust when checking the API's certificate.
+#cacert = ''
+
 [database]
+# Database read connections. Most reads that may run at once. Reads do not block each other, so there is little to gain above the core count, and an unbounded pool lets a burst of slow queries exhaust file descriptors.
+#max_read_conns = 8
 
-#
-# Maximum number of concurrent read connections. Reads do not block each other,
-# so there is little to gain above the core count, and an unbounded pool lets a
-# burst of slow queries exhaust file descriptors and OS threads.
-#
-max_read_conns = 8
-
-#------------------------------------------------------------------------------
-# HTTP Provision Server
-#------------------------------------------------------------------------------
 [provision]
+# TLS certificate. Path to the certificate (.crt) the provision server serves. Setting both the certificate and the key turns on HTTPS.
+#cert = ''
 
-# Listen address for provision server
-listen = "0.0.0.0:80"
+# TLS key. Path to the private key (.key) for the provision certificate.
+#key = ''
 
-# Set static hostname for grendel (should match SSL certificate and resolve in DNS)
-#hostname = "my.host.name"
+# Boot token secret. Signs the boot tokens handed to hosts. When nothing sets it, one is generated and kept in the database. Generate one with `openssl rand -hex 16`.
+#secret = ''
 
-# Path to ssl cert (.crt file)
-#cert = "/path/to/cert/file/hostname.crt"
+# Repository directory. Directory on this machine served to hosts under /repo during provisioning. It is a path on the server, so it is not stored in the database.
+repo_dir = '/var/lib/grendel/repo'
 
-# Path to ssl key (.key file)
-#key = "/path/to/cert/file/hostname.key"
+# Templates directory. Directory of your own *.tmpl provision templates, which are loaded over the built-in ones and reloaded when they change. It is a path on the server, so it is not stored in the database.
+templates_dir = '/var/lib/grendel/templates'
 
-# TTL in seconds for provision tokens. Defaults to 1 hour
-token_ttl = 3600
+# NetBox token. API token grendel sends to NetBox.
+#netbox_token = ''
 
-# Can generate secret with `openssl rand -hex 16`
-#secret = "_provisioning_secret_here_"
-
-# Default OS image name
-default_image = ""
-
-# Path to repo directory
-repo_dir = "/var/lib/grendel/repo"
-
-# Path to templates directory
-templates_dir = "/var/lib/grendel/templates"
-
-# Enable prometheus service discover endpoint
-enable_prometheus_sd = false
-
-# Prometheus service discovery refresh interval in seconds
-prometheus_sd_refresh_interval = 3600
-
-# Enable netbox render config support
-# netbox_token=""
-# netbox_url=""
-
-# Verify provision status reports come from the nodes IP
-status_check_source = true
-
-# Here is where you can pass extra variables into provision templates
-# They can be accessed like so: {{ $.extra_vars.root_password }}
+# Extra template variables. Your own values passed to provision templates, read as {{ $.extra_vars.name }}. Entries in the config file win over the ones stored here and their values are never shown, so keep passwords and other secrets there. Entries stored here can be read by anyone who can read settings.
 [provision.extra_vars]
-# root_password = ""
-# ssh_keys = ["ssh-rsa..."]
 
 [provision.beacon]
-# Add the beacon to the default butane template
-enabled = false
-# Directory holding grendel-beacon-amd64 and grendel-beacon-arm64, served at /beacon/<arch> for templates to download. The deb and rpm packages install both in /usr/lib/grendel/beacon.
-dir = "/usr/lib/grendel/beacon"
-# Where the beacon lives on the node
-path = "/opt/bin/grendel-beacon"
-# On a clean boot, also turn provisioning off for the node, as the complete endpoint does
-complete = false
+# Beacon binaries directory. Directory holding grendel-beacon-amd64 and grendel-beacon-arm64, served at /beacon/<arch> for templates to download. The deb and rpm packages install both in /usr/lib/grendel/beacon. It is a path on the server, so it is not stored in the database.
+dir = '/usr/lib/grendel/beacon'
 
-#------------------------------------------------------------------------------
-# DHCP Server
-#------------------------------------------------------------------------------
-[dhcp]
-listen = "0.0.0.0:67"
-
-# Default lease time
-lease_time = "24h"
-
-# List of default DNS servers
-dns_servers = []
-
-# List of default DNS search domains
-domain_search = []
-
-# Default MTU
-mtu = 1500
-
-# Only run DHCP Proxy server
-proxy_only = false
-
-# Dynamic router configuration. Grendel will generate the router option 3 for
-# DHCP responses based on the hosts IP address, netmask, and router_octet4. For
-# example, if all subnets in your data center have routers 10.x.x.254 you can
-# set router_octet4 = 254. If a host ip address is 10.104.13.10, Grendel will
-# set the router option in the dhcp response to 10.104.13.254. This setting is
-# off by default.
-router_octet4 = 0
-
-# Default netmask
-netmask = 24
-
-# Hard code a static default gateway. (Not set by default)
-#gateway = ""
-
-# Configure settings for specific subnets. If a hosts IP address is contained
-# inside the subnet, the static dhcp response will contain the gateway IP
-# address, dns, and MTU settings for the given subnet. The gateway defines both
-# the gateway IP and the netmask prefix for the subnet. For example, gateway =
-# "10.17.41.254/23" will check if host IP falls in the network prefix
-# 10.17.40.0/23 and if so set the dhcp gateway/router to 10.17.41.254.
-#
-#subnets = [
-#    {gateway = "10.17.41.254/23",  dns = "10.17.40.248", mtu="1500"}
-# ]
-
-#------------------------------------------------------------------------------
-# DNS Server
-#------------------------------------------------------------------------------
-[dns]
-listen = "0.0.0.0:53"
-
-# Default TTL for dns responses
-ttl = 86400
-
-# Address that Grendel should forward unknown DNS queries to
-# By default Grendel is only a recursive resolver
-#forward = "1.1.1.1:53"
-
-# DNS context timeout for requests. Defaults to 2s to reduce active DB read
-# connections. Cannot be 0.
-#query_timeout = "2s"
-
-#------------------------------------------------------------------------------
-# TFTP Server
-#------------------------------------------------------------------------------
-[tftp]
-listen = "0.0.0.0:69"
-
-# Directory of iPXE EFI builds to serve instead of the embedded ones. See the Secure Boot and iPXE docs for more details.
-#firmware_dir = "/var/lib/grendel/firmware"
-
-#------------------------------------------------------------------------------
-# PXE Server
-#------------------------------------------------------------------------------
-[pxe]
-listen = "0.0.0.0:4011"
-
-#------------------------------------------------------------------------------
-# API Server
-#------------------------------------------------------------------------------
-[api]
-# API server listen config:
-
-# socket_path will bind the api server to a unix socket
-socket_path = "grendel-api.socket"
-
-# listen will bind the api server to a tcp socket
-# If possible, always bind the address to an internal mgmt network
-# all TCP requests will have authentication and RBAC enforced
-#listen = "0.0.0.0:8080"
-
-# Required for auth to work across restarts
-# Can be generated with `openssl rand -hex 16`
-#secret = ""
-
-# HTTPS certs, setting both key and cert will enable https
-# You should always use https if listening over tcp
-#key = "/etc/grendel/api/hostname.key"
-#cert = "/etc/grendel/api/hostname.crt"
-
-# Enables or disables Web UI
-# Only served on tcp listener
-web_ui = false
-
-# Development settings:
-# Swagger API browser, requires CORS = true to test api routes
-swagger_ui = false
-# When enabled, allow any request method from any origin
-cors = false
-
-#------------------------------------------------------------------------------
-# Events
-#------------------------------------------------------------------------------
-[events]
-# How long finished events are kept before they are deleted, as a Go duration. Hours are the largest unit, so 90 days is "2160h". 0 keeps them forever
-retention = "2160h"
-
-#------------------------------------------------------------------------------
-# Client Config
-#------------------------------------------------------------------------------
-[client]
-# Grendel API endpoint
-# Can be a URL or unix socket path
-# Example if binding the API over tcp: api_endpoint = "http://localhost:8080"
-api_endpoint = "/var/lib/grendel/grendel-api.socket"
-
-# JWT for client auth when using TCP
-#api_key = ""
-
-# Verify ssl certs? false (yes) true (no)
-insecure = false
-
-#------------------------------------------------------------------------------
-# Network switches
-#------------------------------------------------------------------------------
-# Switches are nodes tagged "switch" plus one of arista, sonic or dellos10, and Grendel reaches them on their first interface. Arista and SONiC are read over gNMI, Dell OS10 over SNMP.
 [switch]
-# gNMI login. Either left empty falls back to the older bmc.switch_admin_username or bmc.switch_admin_password.
-username = ""
-password = ""
-timeout = "30s"
-
-[switch.gnmi]
-port = 6030
-# Plaintext gRPC with no TLS, which is the EOS default for "management api gnmi".
-plaintext = false
-# Accept the switch's self-signed certificate. Ignored when ca_cert is set.
-skip_verify = true
-ca_cert = ""
-# Network instance holding the MAC table. Some SONiC builds need "*" or a VLAN name here.
-network_instance = "default"
-# gNMI target sent in the request prefix, for switches or proxies that serve several targets. Empty sends none.
-target = ""
-
-# Any gNMI setting above can be overridden per NOS.
-[switch.gnmi.arista]
-plaintext = true
-
-[switch.gnmi.sonic]
-port = 8080
+# Password. Password for switch.username.
+#password = ''
 
 [switch.snmp]
-# "2c" or "3"
-version = "2c"
-community = "public"
-port = 161
-timeout = "5s"
-retries = 2
-# SNMPv3 only. auth_proto: MD5, SHA, SHA224, SHA256, SHA384, SHA512. priv_proto: DES, AES, AES192, AES256, AES192C, AES256C.
-#user = ""
-#auth_proto = "SHA"
-#auth_pass = ""
-#priv_proto = "AES"
-#priv_pass = ""
+# Community. Community string for SNMP 2c. Defaults to public.
+#community = 'public'
 
-#------------------------------------------------------------------------------
-# Global BMC Config
-#------------------------------------------------------------------------------
-[bmc]
-user = ""
-password = ""
+# SNMPv3 authentication password. Password for the authentication protocol.
+#auth_pass = ''
 
-# Allow unsigned https certs for redfish queries
-insecure = true
-
-# Scheme used to reach a BMC, https or http.
-scheme = "https"
-
-# bmc runner settings:
-# sets number of active queries allowed at one time
-fanout = 20
-
-node_timeout = "60s"
-# how long a whole run over a nodeset may take
-run_timeout = "4m"
-# how many nodes to start contacting per second
-rate_limit_per_second = 30
-
-# After a firmware update is submitted with apply_update, the BMC job queues are polled every firmware_poll_interval until the update finishes. A node whose BMC has not answered for firmware_timeout is marked stalled, and is still checked for 24h after the update was queued in case it comes back. An update not finished 24h after it was queued is marked stalled however its BMC answers
-#firmware_poll_interval = "1m"
-#firmware_timeout = "2h"
-
-# IP sent to the BMC for import system config, should be an IP of the provision
-# server which is reachable by the BMCs
-#config_share_ip = "0.0.0.0"
-# Import System Config setting: Set to "Enabled" if using a self signed
-# certificate on the provision server
-#config_ignore_certificate_warning = "Disabled"
-
-# Default asset tag template for "grendel bmc asset-tag set" when none is given. Templates see .Name, .Parts (the name split on -), .Tags (key=value tags by key)
-#asset_tag = "UB-{{ .Name }}"
-
-# Extra logins to try, useful for old bmc credentials or factory defaults
-#[[bmc.defaults.credentials]]
-#user = "root"
-#password = "calvin"
-
-[bmc.location]
-# Default templates for "grendel bmc location set" and the GUI form, rendered per node. A field left unset is not written. With node names like cpn-f01-04 (<prefix>-<rack>-<rack unit>):
-#rack = "{{ index .Parts 1 }}"
-#rack_unit = "{{ index .Parts 2 }}"
-#row = ""
-#room = ""
-#datacenter = ""
-
-[bmc.ipmi]
-# IPMI settings for the serial console, "grendel bmc console". The BMCs need IPMI over LAN and SOL enabled, and UDP 623 reachable from this server
-port = 623
-# RMCP+ cipher suites to try, in order. 17 is the iDRAC9 default, 3 covers older BMCs
-cipher_suites = [17, 3]
-
-[bmc.gofish]
-# Advanced gofish connection options. See https://github.com/ubccr/grendel/blob/main/internal/redfish/client.go for implementation details
-max_concurrent_requests = 1
-reuse_connections = true
-
-# Read a collection and its members in one request ($expand) on BMCs that advertise support, instead of one request per member. A BMC that fails the expanded read is asked again without it
-auto_expand = true
-
-# Use basic auth instead of creating a Redfish session. Required for mockup server
-basic_auth = true
-
-client_timeout = "60s"
-dial_timeout = "5s"
-dial_keep_alive_timeout = "30s"
-tls_handshake_timeout = "10s"
-idle_conn_timeout = "90s"
+# SNMPv3 privacy password. Password for the privacy protocol.
+#priv_pass = ''

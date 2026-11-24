@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/spf13/viper"
 	"github.com/stmcginnis/gofish/schemas"
 	"github.com/ubccr/grendel/internal/redfish"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/pkg/model"
 	"github.com/ubccr/grendel/pkg/nodeset"
 )
@@ -34,10 +34,6 @@ const (
 	firmwareDetailReboot = "reboot"
 )
 
-func init() {
-	viper.SetDefault("bmc.firmware_poll_interval", "1m")
-}
-
 // firmwareQueued leaves a node whose update was queued as running, so the event stays open for trackFirmware to follow. Its ref is the id of the job the iDRAC gave, which is how its jobs are found again
 func firmwareQueued(row *model.EventNode, success bool, ack *redfish.Ack) {
 	if !success || ack == nil || ack.Job == "" {
@@ -53,7 +49,7 @@ type jobReader func(context.Context, []redfish.Target) []redfish.NodeResult[redf
 
 // trackFirmware follows the firmware updates queued on BMCs until their jobs finish, by reading the job queues of the nodes in recent firmware events. What it knows is all in the events, so it picks up where it was after a restart
 func (h *Handler) trackFirmware(ctx context.Context) {
-	interval := viper.GetDuration("bmc.firmware_poll_interval")
+	interval := settings.BMCFirmwarePollInterval.Get()
 	if interval <= 0 {
 		return
 	}

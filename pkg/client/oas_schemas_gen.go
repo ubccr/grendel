@@ -5591,10 +5591,11 @@ func (s *CookieAuth) SetRoles(val []string) {
 // DataDump schema.
 // Ref: #/components/schemas/DataDump
 type DataDump struct {
-	Hosts  []DataDumpHostsItem  `json:"Hosts"`
-	Images []DataDumpImagesItem `json:"Images"`
-	Roles  []DataDumpRolesItem  `json:"Roles"`
-	Users  []DataDumpUsersItem  `json:"Users"`
+	Hosts    []DataDumpHostsItem             `json:"Hosts"`
+	Images   []DataDumpImagesItem            `json:"Images"`
+	Roles    []DataDumpRolesItem             `json:"Roles"`
+	Settings OptNilDataDumpSettingsItemArray `json:"Settings"`
+	Users    []DataDumpUsersItem             `json:"Users"`
 }
 
 // GetHosts returns the value of Hosts.
@@ -5610,6 +5611,11 @@ func (s *DataDump) GetImages() []DataDumpImagesItem {
 // GetRoles returns the value of Roles.
 func (s *DataDump) GetRoles() []DataDumpRolesItem {
 	return s.Roles
+}
+
+// GetSettings returns the value of Settings.
+func (s *DataDump) GetSettings() OptNilDataDumpSettingsItemArray {
+	return s.Settings
 }
 
 // GetUsers returns the value of Users.
@@ -5630,6 +5636,11 @@ func (s *DataDump) SetImages(val []DataDumpImagesItem) {
 // SetRoles sets the value of Roles.
 func (s *DataDump) SetRoles(val []DataDumpRolesItem) {
 	s.Roles = val
+}
+
+// SetSettings sets the value of Settings.
+func (s *DataDump) SetSettings(val OptNilDataDumpSettingsItemArray) {
+	s.Settings = val
 }
 
 // SetUsers sets the value of Users.
@@ -6313,6 +6324,31 @@ func (s *DataDumpRolesItemUnassignedPermissionListItemKind) UnmarshalText(data [
 	default:
 		return errors.Errorf("invalid value: %q", data)
 	}
+}
+
+type DataDumpSettingsItem struct {
+	Key   OptString `json:"key"`
+	Value OptString `json:"value"`
+}
+
+// GetKey returns the value of Key.
+func (s *DataDumpSettingsItem) GetKey() OptString {
+	return s.Key
+}
+
+// GetValue returns the value of Value.
+func (s *DataDumpSettingsItem) GetValue() OptString {
+	return s.Value
+}
+
+// SetKey sets the value of Key.
+func (s *DataDumpSettingsItem) SetKey(val OptString) {
+	s.Key = val
+}
+
+// SetValue sets the value of Value.
+func (s *DataDumpSettingsItem) SetValue(val OptString) {
+	s.Value = val
 }
 
 type DataDumpUsersItem struct {
@@ -7823,6 +7859,482 @@ func (s *LLDP) SetSystemDescription(val OptString) {
 // SetSystemName sets the value of SystemName.
 func (s *LLDP) SetSystemName(val OptString) {
 	s.SystemName = val
+}
+
+// Listing schema.
+// Ref: #/components/schemas/Listing
+type Listing struct {
+	ConfigFile OptString             `json:"config_file"`
+	Pending    OptInt                `json:"pending"`
+	Persistent OptBool               `json:"persistent"`
+	Sections   []ListingSectionsItem `json:"sections"`
+}
+
+// GetConfigFile returns the value of ConfigFile.
+func (s *Listing) GetConfigFile() OptString {
+	return s.ConfigFile
+}
+
+// GetPending returns the value of Pending.
+func (s *Listing) GetPending() OptInt {
+	return s.Pending
+}
+
+// GetPersistent returns the value of Persistent.
+func (s *Listing) GetPersistent() OptBool {
+	return s.Persistent
+}
+
+// GetSections returns the value of Sections.
+func (s *Listing) GetSections() []ListingSectionsItem {
+	return s.Sections
+}
+
+// SetConfigFile sets the value of ConfigFile.
+func (s *Listing) SetConfigFile(val OptString) {
+	s.ConfigFile = val
+}
+
+// SetPending sets the value of Pending.
+func (s *Listing) SetPending(val OptInt) {
+	s.Pending = val
+}
+
+// SetPersistent sets the value of Persistent.
+func (s *Listing) SetPersistent(val OptBool) {
+	s.Persistent = val
+}
+
+// SetSections sets the value of Sections.
+func (s *Listing) SetSections(val []ListingSectionsItem) {
+	s.Sections = val
+}
+
+type ListingSectionsItem struct {
+	Description OptString                        `json:"description"`
+	ID          OptString                        `json:"id"`
+	Options     []ListingSectionsItemOptionsItem `json:"options"`
+	Title       OptString                        `json:"title"`
+}
+
+// GetDescription returns the value of Description.
+func (s *ListingSectionsItem) GetDescription() OptString {
+	return s.Description
+}
+
+// GetID returns the value of ID.
+func (s *ListingSectionsItem) GetID() OptString {
+	return s.ID
+}
+
+// GetOptions returns the value of Options.
+func (s *ListingSectionsItem) GetOptions() []ListingSectionsItemOptionsItem {
+	return s.Options
+}
+
+// GetTitle returns the value of Title.
+func (s *ListingSectionsItem) GetTitle() OptString {
+	return s.Title
+}
+
+// SetDescription sets the value of Description.
+func (s *ListingSectionsItem) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetID sets the value of ID.
+func (s *ListingSectionsItem) SetID(val OptString) {
+	s.ID = val
+}
+
+// SetOptions sets the value of Options.
+func (s *ListingSectionsItem) SetOptions(val []ListingSectionsItemOptionsItem) {
+	s.Options = val
+}
+
+// SetTitle sets the value of Title.
+func (s *ListingSectionsItem) SetTitle(val OptString) {
+	s.Title = val
+}
+
+type ListingSectionsItemOptionsItem struct {
+	Apply             OptString                                  `json:"apply"`
+	Default           jx.Raw                                     `json:"default"`
+	Deprecated        OptString                                  `json:"deprecated"`
+	Entry             OptString                                  `json:"entry"`
+	EntryLabel        OptString                                  `json:"entry_label"`
+	EntryOf           OptString                                  `json:"entry_of"`
+	Enum              []string                                   `json:"enum"`
+	Env               OptString                                  `json:"env"`
+	External          OptBool                                    `json:"external"`
+	Fields            []ListingSectionsItemOptionsItemFieldsItem `json:"fields"`
+	FileEntriesSecret OptBool                                    `json:"file_entries_secret"`
+	FileKeys          []string                                   `json:"file_keys"`
+	Flag              OptString                                  `json:"flag"`
+	Group             OptString                                  `json:"group"`
+	Help              OptString                                  `json:"help"`
+	InheritFrom       OptString                                  `json:"inherit_from"`
+	Key               OptString                                  `json:"key"`
+	Kind              OptString                                  `json:"kind"`
+	Max               OptNilInt                                  `json:"max"`
+	Min               OptNilInt                                  `json:"min"`
+	Pending           OptBool                                    `json:"pending"`
+	Running           jx.Raw                                     `json:"running"`
+	Secret            OptBool                                    `json:"secret"`
+	Shadowed          OptBool                                    `json:"shadowed"`
+	Source            OptString                                  `json:"source"`
+	Stored            jx.Raw                                     `json:"stored"`
+	Summary           OptString                                  `json:"summary"`
+	Unit              OptString                                  `json:"unit"`
+	Value             jx.Raw                                     `json:"value"`
+}
+
+// GetApply returns the value of Apply.
+func (s *ListingSectionsItemOptionsItem) GetApply() OptString {
+	return s.Apply
+}
+
+// GetDefault returns the value of Default.
+func (s *ListingSectionsItemOptionsItem) GetDefault() jx.Raw {
+	return s.Default
+}
+
+// GetDeprecated returns the value of Deprecated.
+func (s *ListingSectionsItemOptionsItem) GetDeprecated() OptString {
+	return s.Deprecated
+}
+
+// GetEntry returns the value of Entry.
+func (s *ListingSectionsItemOptionsItem) GetEntry() OptString {
+	return s.Entry
+}
+
+// GetEntryLabel returns the value of EntryLabel.
+func (s *ListingSectionsItemOptionsItem) GetEntryLabel() OptString {
+	return s.EntryLabel
+}
+
+// GetEntryOf returns the value of EntryOf.
+func (s *ListingSectionsItemOptionsItem) GetEntryOf() OptString {
+	return s.EntryOf
+}
+
+// GetEnum returns the value of Enum.
+func (s *ListingSectionsItemOptionsItem) GetEnum() []string {
+	return s.Enum
+}
+
+// GetEnv returns the value of Env.
+func (s *ListingSectionsItemOptionsItem) GetEnv() OptString {
+	return s.Env
+}
+
+// GetExternal returns the value of External.
+func (s *ListingSectionsItemOptionsItem) GetExternal() OptBool {
+	return s.External
+}
+
+// GetFields returns the value of Fields.
+func (s *ListingSectionsItemOptionsItem) GetFields() []ListingSectionsItemOptionsItemFieldsItem {
+	return s.Fields
+}
+
+// GetFileEntriesSecret returns the value of FileEntriesSecret.
+func (s *ListingSectionsItemOptionsItem) GetFileEntriesSecret() OptBool {
+	return s.FileEntriesSecret
+}
+
+// GetFileKeys returns the value of FileKeys.
+func (s *ListingSectionsItemOptionsItem) GetFileKeys() []string {
+	return s.FileKeys
+}
+
+// GetFlag returns the value of Flag.
+func (s *ListingSectionsItemOptionsItem) GetFlag() OptString {
+	return s.Flag
+}
+
+// GetGroup returns the value of Group.
+func (s *ListingSectionsItemOptionsItem) GetGroup() OptString {
+	return s.Group
+}
+
+// GetHelp returns the value of Help.
+func (s *ListingSectionsItemOptionsItem) GetHelp() OptString {
+	return s.Help
+}
+
+// GetInheritFrom returns the value of InheritFrom.
+func (s *ListingSectionsItemOptionsItem) GetInheritFrom() OptString {
+	return s.InheritFrom
+}
+
+// GetKey returns the value of Key.
+func (s *ListingSectionsItemOptionsItem) GetKey() OptString {
+	return s.Key
+}
+
+// GetKind returns the value of Kind.
+func (s *ListingSectionsItemOptionsItem) GetKind() OptString {
+	return s.Kind
+}
+
+// GetMax returns the value of Max.
+func (s *ListingSectionsItemOptionsItem) GetMax() OptNilInt {
+	return s.Max
+}
+
+// GetMin returns the value of Min.
+func (s *ListingSectionsItemOptionsItem) GetMin() OptNilInt {
+	return s.Min
+}
+
+// GetPending returns the value of Pending.
+func (s *ListingSectionsItemOptionsItem) GetPending() OptBool {
+	return s.Pending
+}
+
+// GetRunning returns the value of Running.
+func (s *ListingSectionsItemOptionsItem) GetRunning() jx.Raw {
+	return s.Running
+}
+
+// GetSecret returns the value of Secret.
+func (s *ListingSectionsItemOptionsItem) GetSecret() OptBool {
+	return s.Secret
+}
+
+// GetShadowed returns the value of Shadowed.
+func (s *ListingSectionsItemOptionsItem) GetShadowed() OptBool {
+	return s.Shadowed
+}
+
+// GetSource returns the value of Source.
+func (s *ListingSectionsItemOptionsItem) GetSource() OptString {
+	return s.Source
+}
+
+// GetStored returns the value of Stored.
+func (s *ListingSectionsItemOptionsItem) GetStored() jx.Raw {
+	return s.Stored
+}
+
+// GetSummary returns the value of Summary.
+func (s *ListingSectionsItemOptionsItem) GetSummary() OptString {
+	return s.Summary
+}
+
+// GetUnit returns the value of Unit.
+func (s *ListingSectionsItemOptionsItem) GetUnit() OptString {
+	return s.Unit
+}
+
+// GetValue returns the value of Value.
+func (s *ListingSectionsItemOptionsItem) GetValue() jx.Raw {
+	return s.Value
+}
+
+// SetApply sets the value of Apply.
+func (s *ListingSectionsItemOptionsItem) SetApply(val OptString) {
+	s.Apply = val
+}
+
+// SetDefault sets the value of Default.
+func (s *ListingSectionsItemOptionsItem) SetDefault(val jx.Raw) {
+	s.Default = val
+}
+
+// SetDeprecated sets the value of Deprecated.
+func (s *ListingSectionsItemOptionsItem) SetDeprecated(val OptString) {
+	s.Deprecated = val
+}
+
+// SetEntry sets the value of Entry.
+func (s *ListingSectionsItemOptionsItem) SetEntry(val OptString) {
+	s.Entry = val
+}
+
+// SetEntryLabel sets the value of EntryLabel.
+func (s *ListingSectionsItemOptionsItem) SetEntryLabel(val OptString) {
+	s.EntryLabel = val
+}
+
+// SetEntryOf sets the value of EntryOf.
+func (s *ListingSectionsItemOptionsItem) SetEntryOf(val OptString) {
+	s.EntryOf = val
+}
+
+// SetEnum sets the value of Enum.
+func (s *ListingSectionsItemOptionsItem) SetEnum(val []string) {
+	s.Enum = val
+}
+
+// SetEnv sets the value of Env.
+func (s *ListingSectionsItemOptionsItem) SetEnv(val OptString) {
+	s.Env = val
+}
+
+// SetExternal sets the value of External.
+func (s *ListingSectionsItemOptionsItem) SetExternal(val OptBool) {
+	s.External = val
+}
+
+// SetFields sets the value of Fields.
+func (s *ListingSectionsItemOptionsItem) SetFields(val []ListingSectionsItemOptionsItemFieldsItem) {
+	s.Fields = val
+}
+
+// SetFileEntriesSecret sets the value of FileEntriesSecret.
+func (s *ListingSectionsItemOptionsItem) SetFileEntriesSecret(val OptBool) {
+	s.FileEntriesSecret = val
+}
+
+// SetFileKeys sets the value of FileKeys.
+func (s *ListingSectionsItemOptionsItem) SetFileKeys(val []string) {
+	s.FileKeys = val
+}
+
+// SetFlag sets the value of Flag.
+func (s *ListingSectionsItemOptionsItem) SetFlag(val OptString) {
+	s.Flag = val
+}
+
+// SetGroup sets the value of Group.
+func (s *ListingSectionsItemOptionsItem) SetGroup(val OptString) {
+	s.Group = val
+}
+
+// SetHelp sets the value of Help.
+func (s *ListingSectionsItemOptionsItem) SetHelp(val OptString) {
+	s.Help = val
+}
+
+// SetInheritFrom sets the value of InheritFrom.
+func (s *ListingSectionsItemOptionsItem) SetInheritFrom(val OptString) {
+	s.InheritFrom = val
+}
+
+// SetKey sets the value of Key.
+func (s *ListingSectionsItemOptionsItem) SetKey(val OptString) {
+	s.Key = val
+}
+
+// SetKind sets the value of Kind.
+func (s *ListingSectionsItemOptionsItem) SetKind(val OptString) {
+	s.Kind = val
+}
+
+// SetMax sets the value of Max.
+func (s *ListingSectionsItemOptionsItem) SetMax(val OptNilInt) {
+	s.Max = val
+}
+
+// SetMin sets the value of Min.
+func (s *ListingSectionsItemOptionsItem) SetMin(val OptNilInt) {
+	s.Min = val
+}
+
+// SetPending sets the value of Pending.
+func (s *ListingSectionsItemOptionsItem) SetPending(val OptBool) {
+	s.Pending = val
+}
+
+// SetRunning sets the value of Running.
+func (s *ListingSectionsItemOptionsItem) SetRunning(val jx.Raw) {
+	s.Running = val
+}
+
+// SetSecret sets the value of Secret.
+func (s *ListingSectionsItemOptionsItem) SetSecret(val OptBool) {
+	s.Secret = val
+}
+
+// SetShadowed sets the value of Shadowed.
+func (s *ListingSectionsItemOptionsItem) SetShadowed(val OptBool) {
+	s.Shadowed = val
+}
+
+// SetSource sets the value of Source.
+func (s *ListingSectionsItemOptionsItem) SetSource(val OptString) {
+	s.Source = val
+}
+
+// SetStored sets the value of Stored.
+func (s *ListingSectionsItemOptionsItem) SetStored(val jx.Raw) {
+	s.Stored = val
+}
+
+// SetSummary sets the value of Summary.
+func (s *ListingSectionsItemOptionsItem) SetSummary(val OptString) {
+	s.Summary = val
+}
+
+// SetUnit sets the value of Unit.
+func (s *ListingSectionsItemOptionsItem) SetUnit(val OptString) {
+	s.Unit = val
+}
+
+// SetValue sets the value of Value.
+func (s *ListingSectionsItemOptionsItem) SetValue(val jx.Raw) {
+	s.Value = val
+}
+
+type ListingSectionsItemOptionsItemFieldsItem struct {
+	Help     OptString `json:"help"`
+	Kind     OptString `json:"kind"`
+	Name     OptString `json:"name"`
+	Required OptBool   `json:"required"`
+	Summary  OptString `json:"summary"`
+}
+
+// GetHelp returns the value of Help.
+func (s *ListingSectionsItemOptionsItemFieldsItem) GetHelp() OptString {
+	return s.Help
+}
+
+// GetKind returns the value of Kind.
+func (s *ListingSectionsItemOptionsItemFieldsItem) GetKind() OptString {
+	return s.Kind
+}
+
+// GetName returns the value of Name.
+func (s *ListingSectionsItemOptionsItemFieldsItem) GetName() OptString {
+	return s.Name
+}
+
+// GetRequired returns the value of Required.
+func (s *ListingSectionsItemOptionsItemFieldsItem) GetRequired() OptBool {
+	return s.Required
+}
+
+// GetSummary returns the value of Summary.
+func (s *ListingSectionsItemOptionsItemFieldsItem) GetSummary() OptString {
+	return s.Summary
+}
+
+// SetHelp sets the value of Help.
+func (s *ListingSectionsItemOptionsItemFieldsItem) SetHelp(val OptString) {
+	s.Help = val
+}
+
+// SetKind sets the value of Kind.
+func (s *ListingSectionsItemOptionsItemFieldsItem) SetKind(val OptString) {
+	s.Kind = val
+}
+
+// SetName sets the value of Name.
+func (s *ListingSectionsItemOptionsItemFieldsItem) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetRequired sets the value of Required.
+func (s *ListingSectionsItemOptionsItemFieldsItem) SetRequired(val OptBool) {
+	s.Required = val
+}
+
+// SetSummary sets the value of Summary.
+func (s *ListingSectionsItemOptionsItemFieldsItem) SetSummary(val OptString) {
+	s.Summary = val
 }
 
 // NextAddressResponse schema.
@@ -11373,6 +11885,69 @@ func (o OptNilDataDumpImagesItemProvisionTemplates) Or(d DataDumpImagesItemProvi
 	return d
 }
 
+// NewOptNilDataDumpSettingsItemArray returns new OptNilDataDumpSettingsItemArray with value set to v.
+func NewOptNilDataDumpSettingsItemArray(v []DataDumpSettingsItem) OptNilDataDumpSettingsItemArray {
+	return OptNilDataDumpSettingsItemArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilDataDumpSettingsItemArray is optional nullable []DataDumpSettingsItem.
+type OptNilDataDumpSettingsItemArray struct {
+	Value []DataDumpSettingsItem
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilDataDumpSettingsItemArray was set.
+func (o OptNilDataDumpSettingsItemArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilDataDumpSettingsItemArray) Reset() {
+	var v []DataDumpSettingsItem
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilDataDumpSettingsItemArray) SetTo(v []DataDumpSettingsItem) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilDataDumpSettingsItemArray) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilDataDumpSettingsItemArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []DataDumpSettingsItem
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilDataDumpSettingsItemArray) Get() (v []DataDumpSettingsItem, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilDataDumpSettingsItemArray) Or(d []DataDumpSettingsItem) []DataDumpSettingsItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilDateTime returns new OptNilDateTime with value set to v.
 func NewOptNilDateTime(v time.Time) OptNilDateTime {
 	return OptNilDateTime{
@@ -12330,6 +12905,52 @@ func (o OptPatchRolesRequestPermissionListItemKind) Or(d PatchRolesRequestPermis
 	return d
 }
 
+// NewOptPatchSettingsRequestSet returns new OptPatchSettingsRequestSet with value set to v.
+func NewOptPatchSettingsRequestSet(v PatchSettingsRequestSet) OptPatchSettingsRequestSet {
+	return OptPatchSettingsRequestSet{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptPatchSettingsRequestSet is optional PatchSettingsRequestSet.
+type OptPatchSettingsRequestSet struct {
+	Value PatchSettingsRequestSet
+	Set   bool
+}
+
+// IsSet returns true if OptPatchSettingsRequestSet was set.
+func (o OptPatchSettingsRequestSet) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptPatchSettingsRequestSet) Reset() {
+	var v PatchSettingsRequestSet
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptPatchSettingsRequestSet) SetTo(v PatchSettingsRequestSet) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptPatchSettingsRequestSet) Get() (v PatchSettingsRequestSet, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptPatchSettingsRequestSet) Or(d PatchSettingsRequestSet) PatchSettingsRequestSet {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
 	return OptString{
@@ -12507,6 +13128,44 @@ func (s *PatchRolesRequestPermissionListItemKind) UnmarshalText(data []byte) err
 	default:
 		return errors.Errorf("invalid value: %q", data)
 	}
+}
+
+// PatchSettingsRequest schema.
+// Ref: #/components/schemas/PatchSettingsRequest
+type PatchSettingsRequest struct {
+	Set   OptPatchSettingsRequestSet `json:"set"`
+	Unset []string                   `json:"unset"`
+}
+
+// GetSet returns the value of Set.
+func (s *PatchSettingsRequest) GetSet() OptPatchSettingsRequestSet {
+	return s.Set
+}
+
+// GetUnset returns the value of Unset.
+func (s *PatchSettingsRequest) GetUnset() []string {
+	return s.Unset
+}
+
+// SetSet sets the value of Set.
+func (s *PatchSettingsRequest) SetSet(val OptPatchSettingsRequestSet) {
+	s.Set = val
+}
+
+// SetUnset sets the value of Unset.
+func (s *PatchSettingsRequest) SetUnset(val []string) {
+	s.Unset = val
+}
+
+type PatchSettingsRequestSet map[string]jx.Raw
+
+func (s *PatchSettingsRequestSet) init() PatchSettingsRequestSet {
+	m := *s
+	if m == nil {
+		m = map[string]jx.Raw{}
+		*s = m
+	}
+	return m
 }
 
 // PostRolesRequest schema.

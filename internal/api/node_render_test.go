@@ -12,9 +12,9 @@ import (
 	"testing"
 
 	"github.com/go-fuego/fuego"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/ubccr/grendel/internal/settings/settingstest"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
 )
@@ -27,8 +27,7 @@ func renderFixture(t *testing.T, custom string) (*Handler, string) {
 	dir := t.TempDir()
 	require.NoError(t, os.WriteFile(filepath.Join(dir, "custom.tmpl"), []byte(custom), 0o644))
 	require.NoError(t, os.WriteFile(filepath.Join(dir, "vmlinuz-x86_64"), []byte("kernel"), 0o644))
-	viper.Set("provision.templates_dir", dir)
-	t.Cleanup(func() { viper.Set("provision.templates_dir", nil) })
+	settingstest.Set(t, "provision.templates_dir", dir)
 
 	image := &model.BootImage{
 		Name:               "render-test",

@@ -19,7 +19,7 @@ import (
 
 	"github.com/facette/natsort"
 	"github.com/go-fuego/fuego"
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/internal/tors"
 	"github.com/ubccr/grendel/pkg/model"
 	"golang.org/x/sync/errgroup"
@@ -85,10 +85,10 @@ func (h *Handler) SwitchScan(c fuego.ContextNoBody) (*SwitchScanResponse, error)
 		log.Debugf("could not clear the write deadline: %s", err)
 	}
 
-	cfg := tors.ConfigFromViper()
+	cfg := tors.ConfigFromSettings()
 	out := make([]SwitchScanResult, len(selected))
 	var g errgroup.Group
-	g.SetLimit(max(viper.GetInt("bmc.fanout"), 1))
+	g.SetLimit(max(settings.BMCFanout.Get(), 1))
 	for i, host := range selected {
 		g.Go(func() error {
 			ctx, cancel := context.WithTimeout(c.Context(), cfg.Timeout)

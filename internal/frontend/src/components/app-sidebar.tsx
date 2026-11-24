@@ -5,6 +5,7 @@ import {
   Plus,
   Server,
   ShieldUser,
+  SlidersHorizontal,
   SquareMenu,
   UserPen,
 } from "lucide-react";
@@ -59,6 +60,7 @@ const administration: NavGroup = {
   items: [
     { title: "Roles", url: "/account/roles", icon: ShieldUser },
     { title: "Users", url: "/account/users", icon: UserPen },
+    { title: "Settings", url: "/settings", icon: SlidersHorizontal },
   ],
 };
 

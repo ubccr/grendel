@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/segmentio/ksuid"
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/logger"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
 )
@@ -26,11 +26,6 @@ const (
 )
 
 const tidyInterval = time.Minute
-
-func init() {
-	viper.SetDefault("events.retention", "2160h")
-	viper.SetDefault("bmc.firmware_timeout", "2h")
-}
 
 // Recorder writes events to the store. Recording never gets in the way of what is being recorded, so a failure is only logged
 type Recorder struct {
@@ -118,7 +113,7 @@ func (r *Recorder) Tidy(now time.Time) {
 	stalledAfter := map[model.EventKind]time.Duration{
 		model.EventKindProvision: ProvisionStalledAfter,
 		model.EventKindBmc:       bmcStalledAfter,
-		model.EventKindFirmware:  viper.GetDuration("bmc.firmware_timeout"),
+		model.EventKindFirmware:  settings.BMCFirmwareTimeout.Get(),
 	}
 	for kind, after := range stalledAfter {
 		if after <= 0 {
@@ -139,7 +134,7 @@ func (r *Recorder) Tidy(now time.Time) {
 		}
 	}
 
-	if keep := viper.GetDuration("events.retention"); keep > 0 {
+	if keep := settings.EventsRetention.Get(); keep > 0 {
 		pruned, err := r.DB.PruneEvents(now.Add(-keep))
 		if err != nil {
 			log.Warnf("failed to prune events: %s", err)
@@ -149,22 +144,8 @@ func (r *Recorder) Tidy(now time.Time) {
 	}
 }
 
-// warnBadDuration flags a setting viper would read as zero or as nanoseconds, since a retention of "60d" silently keeps events forever
-func warnBadDuration(key string) {
-	v := viper.GetString(key)
-	if v == "" || v == "0" {
-		return
-	}
-	if _, err := time.ParseDuration(v); err != nil {
-		log.Warnf("%s is %q, which is not a duration such as \"2160h\"", key, v)
-	}
-}
-
 // Run tidies the events every minute until the context ends
 func (r *Recorder) Run(ctx context.Context) error {
-	warnBadDuration("events.retention")
-	warnBadDuration("bmc.firmware_timeout")
-
 	tidy := time.NewTicker(tidyInterval)
 	defer tidy.Stop()
 

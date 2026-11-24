@@ -4,11 +4,5 @@
 
 package sqlstore
 
-import "github.com/spf13/viper"
-
 const defaultMaxReadConns = 8
 const defaultDriver = "sqlite3"
-
-func init() {
-	viper.SetDefault("database.max_read_conns", defaultMaxReadConns)
-}

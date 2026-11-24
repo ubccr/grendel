@@ -6,6 +6,7 @@ package provision
 
 import (
 	"bytes"
+	"cmp"
 	"errors"
 	"net"
 	"net/http"
@@ -16,8 +17,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/render"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
 	"github.com/ubccr/grendel/pkg/netbox"
@@ -27,11 +28,6 @@ type Handler struct {
 	DB               store.Store
 	DefaultImageName string
 	Templates        *render.Set
-}
-
-func init() {
-	viper.SetDefault("provision.enable_prometheus_sd", false)
-	viper.SetDefault("provision.prometheus_sd_refresh_interval", "3600")
 }
 
 func NewHandler(db store.Store, defaultImageName string) (*Handler, error) {
@@ -52,10 +48,12 @@ func NewHandler(db store.Store, defaultImageName string) (*Handler, error) {
 }
 
 func (h *Handler) LoadBootImageWithDefault(name string) (*model.BootImage, error) {
-	if name == "" && h.DefaultImageName == "" {
-		log.Warn("Cannot find boot image! Please either set a boot_image on the node or a default in the config file under provision.default_image")
+	// the setting is read each time so a new default applies without a restart, and the name the handler was built with stands in when it is unset
+	defaultImage := cmp.Or(settings.ProvisionDefaultImage.Get(), h.DefaultImageName)
+	if name == "" && defaultImage == "" {
+		log.Warn("Cannot find boot image! Please either set a boot_image on the node or the provision.default_image setting")
 	} else if name == "" {
-		name = h.DefaultImageName
+		name = defaultImage
 	}
 
 	return h.DB.LoadBootImage(name)
@@ -65,10 +63,9 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	e.GET("/", h.Index).Name = "index"
 	e.GET("/onie-installer*", h.Onie).Name = "onie"
 	e.GET("/onie-updater*", h.Onie).Name = "onie"
-	if viper.GetBool("provision.enable_prometheus_sd") {
-		e.GET("/service-discovery/:tag/:port", h.ServiceDiscovery).Name = "sd"
-		e.GET("/pdu-service-discovery/:tag/:port", h.PDUServiceDiscovery).Name = "psd"
-	}
+	sd := e.Group("", prometheusSDEnabled)
+	sd.GET("/service-discovery/:tag/:port", h.ServiceDiscovery).Name = "sd"
+	sd.GET("/pdu-service-discovery/:tag/:port", h.PDUServiceDiscovery).Name = "psd"
 
 	e.GET("/beacon/:arch", h.Beacon).Name = "beacon"
 
@@ -90,8 +87,18 @@ func (h *Handler) SetupRoutes(e *echo.Echo) {
 	boot.GET("provision/:name", h.ProvisionTemplate)
 	boot.GET("bmc/:name", h.BmcTemplate)
 	boot.POST("proxmox", h.Proxmox)
-	if viper.IsSet("provision.netbox_token") && viper.IsSet("provision.netbox_url") {
+	if settings.ProvisionNetboxToken.Get() != "" && settings.ProvisionNetboxURL.Get() != "" {
 		boot.GET("netbox/render-config", h.NetBoxRenderConfig)
+	}
+}
+
+// prometheusSDEnabled answers 404 while service discovery is turned off, which is checked per request so turning it on needs no restart
+func prometheusSDEnabled(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		if !settings.ProvisionEnablePrometheusSD.Get() {
+			return echo.ErrNotFound
+		}
+		return next(c)
 	}
 }
 
@@ -444,7 +451,7 @@ func (h *Handler) Onie(c echo.Context) error {
 			"bootimage":  bootImage,
 			"host":       host,
 			"headers":    c.Request().Header,
-			"extra_vars": viper.GetStringMap("provision.extra_vars"),
+			"extra_vars": settings.ProvisionExtraVars.Get(),
 		}
 		kernel, err := h.imagePath("kernel", host, bootImage, data)
 		if err != nil {

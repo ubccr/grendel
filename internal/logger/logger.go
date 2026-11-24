@@ -10,6 +10,7 @@ import (
 
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
+	"github.com/ubccr/grendel/internal/settings"
 )
 
 var (
@@ -37,4 +38,19 @@ func GetLogger(prefix string) *logrus.Entry {
 // WithFile logs to the specified file in addition to the existing output.
 func WithFile(log *logrus.Entry, logfile string) {
 	log.Logger.AddHook(lfshook.NewHook(logfile, &logrus.TextFormatter{}))
+}
+
+func level(name string) logrus.Level {
+	switch name {
+	case "debug":
+		return logrus.DebugLevel
+	case "info":
+		return logrus.InfoLevel
+	}
+	return logrus.WarnLevel
+}
+
+// Apply sets the shared logger's level from the settings. It is safe to call while other goroutines log.
+func Apply() {
+	GetLogger("").Logger.SetLevel(level(settings.MostVerboseLogLevel()))
 }

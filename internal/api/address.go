@@ -15,9 +15,9 @@ import (
 	"time"
 
 	"github.com/go-fuego/fuego"
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/config"
 	"github.com/ubccr/grendel/internal/ping"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/pkg/model"
 	"go4.org/netipx"
 )
@@ -222,12 +222,12 @@ type gateways struct {
 }
 
 func configuredGateways() gateways {
-	g := gateways{octet4: -1, static: config.DefaultGateway}
-	for _, s := range config.Subnets {
+	g := gateways{octet4: -1, static: config.DefaultGateway()}
+	for _, s := range config.Subnets() {
 		g.subnets = append(g.subnets, s.Gateway)
 	}
-	if viper.IsSet("dhcp.router_octet4") {
-		g.octet4 = viper.GetInt("dhcp.router_octet4")
+	if octet := settings.DHCPRouterOctet4.Get(); octet > 0 {
+		g.octet4 = octet
 	}
 	return g
 }
@@ -255,7 +255,7 @@ func (g gateways) has(a netip.Addr, bits int) bool {
 // configuredBits is the prefix length of the smallest dhcp.subnets entry that holds the whole range
 func configuredBits(r netip.Prefix) (int, bool) {
 	best := -1
-	for _, s := range config.Subnets {
+	for _, s := range config.Subnets() {
 		if s.Gateway.Bits() <= r.Bits() && s.Gateway.Contains(r.Addr()) {
 			best = max(best, s.Gateway.Bits())
 		}

@@ -19,7 +19,7 @@ import (
 	sqlite3 "github.com/mattn/go-sqlite3"
 	"github.com/segmentio/ksuid"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/store/migrations"
 	"github.com/ubccr/grendel/internal/store/sqlstore/db"
@@ -40,7 +40,7 @@ type SqlStore struct {
 func New(filename string) (*SqlStore, error) {
 	cfg := Config{
 		Driver:       defaultDriver,
-		MaxReadConns: viper.GetInt("database.max_read_conns"),
+		MaxReadConns: settings.DatabaseMaxReadConns.Get(),
 	}
 
 	rw, err := sql.Open(cfg.Driver, cfg.DataSourceName(filename, true))

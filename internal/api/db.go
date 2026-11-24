@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"github.com/go-fuego/fuego"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -28,6 +29,14 @@ func (h *Handler) Restore(c fuego.ContextWithBody[model.DataDump]) (*GenericResp
 			Err:    err,
 			Title:  "Error",
 			Detail: "failed to restore db",
+		}
+	}
+
+	if err := h.restoreSettings(body.Settings, actor(c.Context())); err != nil {
+		return nil, fuego.HTTPError{
+			Err:    err,
+			Title:  "Error",
+			Detail: "failed to restore settings",
 		}
 	}
 
@@ -83,11 +92,29 @@ func (h *Handler) Dump(c fuego.ContextNoBody) (*model.DataDump, error) {
 		}
 	}
 
+	rows, _, err := h.DB.Settings()
+	if err != nil {
+		return nil, fuego.HTTPError{
+			Err:    err,
+			Title:  "Error",
+			Detail: "failed to dump settings from db",
+		}
+	}
+	stored := []model.StoredSetting{}
+	for _, row := range rows {
+		// a generated secret is this install's own, and restoring it elsewhere would make two servers accept each other's tokens
+		if !settings.Dumped(row.Key) {
+			continue
+		}
+		stored = append(stored, model.StoredSetting{Key: row.Key, Value: string(row.Value)})
+	}
+
 	dump := &model.DataDump{
-		Hosts:  nodeList,
-		Images: imageList,
-		Users:  userList,
-		Roles:  userCreatedRoles,
+		Hosts:    nodeList,
+		Images:   imageList,
+		Users:    userList,
+		Roles:    userCreatedRoles,
+		Settings: stored,
 	}
 
 	return dump, nil

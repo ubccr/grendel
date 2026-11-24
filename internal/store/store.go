@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/ubccr/grendel/internal/logger"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/pkg/model"
 	"github.com/ubccr/grendel/pkg/nodeset"
 )
@@ -166,4 +167,14 @@ type Store interface {
 	PruneEvents(before time.Time) (int64, error)
 
 	Close() error
+
+	// Settings returns the configuration stored in the database and a revision that changes whenever it does
+	Settings() ([]settings.Row, int64, error)
+
+	SettingsRevision() (int64, error)
+
+	// InsertSettings stores the settings whose keys are not there yet, leaves the rest as they are, and returns the new revision
+	InsertSettings(set []settings.Row, actor string) (int64, error)
+	// UpdateSettings stores set and removes unset in one transaction, recording actor as who changed them, and returns the new revision
+	UpdateSettings(set []settings.Row, unset []string, actor string) (int64, error)
 }

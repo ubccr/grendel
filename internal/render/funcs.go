@@ -15,8 +15,8 @@ import (
 	_ "github.com/GehirnInc/crypt/sha256_crypt"
 	_ "github.com/GehirnInc/crypt/sha512_crypt"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/logger"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/pkg/model"
 	"github.com/ubccr/grendel/pkg/netbox"
 )
@@ -67,16 +67,52 @@ func Mul(a, b int) int {
 	return a * b
 }
 
-func ConfigValueString(key string) string {
-	return viper.GetString(key)
+// configValue reads a setting for a template. Secrets are refused, since a template's output is handed to whoever boots: a value a template needs belongs in provision.extra_vars.
+func configValue(key string) (any, error) {
+	o, ok := settings.Lookup(key)
+	if !ok {
+		return nil, fmt.Errorf("%s is not a setting", key)
+	}
+	if o.Secret {
+		return nil, fmt.Errorf("%s is a secret and cannot be read from a template, pass it through provision.extra_vars", key)
+	}
+	v, _ := settings.Value(key)
+	return v, nil
 }
 
-func ConfigValueStringSlice(key string) []string {
-	return viper.GetStringSlice(key)
+func ConfigValueString(key string) (string, error) {
+	v, err := configValue(key)
+	if err != nil {
+		return "", err
+	}
+	if s, ok := v.(string); ok {
+		return s, nil
+	}
+	return settings.Text(v), nil
 }
 
-func ConfigValueBool(key string) bool {
-	return viper.GetBool(key)
+func ConfigValueStringSlice(key string) ([]string, error) {
+	v, err := configValue(key)
+	if err != nil {
+		return nil, err
+	}
+	list, ok := v.([]string)
+	if !ok {
+		return nil, fmt.Errorf("%s is not a list", key)
+	}
+	return list, nil
+}
+
+func ConfigValueBool(key string) (bool, error) {
+	v, err := configValue(key)
+	if err != nil {
+		return false, err
+	}
+	b, ok := v.(bool)
+	if !ok {
+		return false, fmt.Errorf("%s is not true or false", key)
+	}
+	return b, nil
 }
 
 func CryptSHA512(pass, salt string) string {

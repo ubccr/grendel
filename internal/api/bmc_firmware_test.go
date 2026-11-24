@@ -11,10 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/spf13/viper"
-
 	"github.com/stmcginnis/gofish/schemas"
 	"github.com/ubccr/grendel/internal/redfish"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/internal/tests"
 	"github.com/ubccr/grendel/pkg/model"
 )
@@ -146,7 +145,7 @@ func TestCheckFirmware(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	timeout := viper.GetDuration("bmc.firmware_timeout")
+	timeout := settings.BMCFirmwareTimeout.Get()
 
 	event := h.Events.Open(model.Event{
 		Kind:    model.EventKindFirmware,

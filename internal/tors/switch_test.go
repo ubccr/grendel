@@ -9,8 +9,9 @@ import (
 	"fmt"
 	"net/netip"
 	"testing"
+	"time"
 
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/settings/settingstest"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -104,16 +105,15 @@ func TestGNMINeedsCredentialsButSNMPDoesNot(t *testing.T) {
 	}
 }
 
-func TestConfigFromViper(t *testing.T) {
-	t.Cleanup(viper.Reset)
-	viper.Set("bmc.switch_admin_username", "legacy")
-	viper.Set("bmc.switch_admin_password", "legacy-pw")
-	viper.Set("switch.gnmi.port", 6030)
-	viper.Set("switch.gnmi.sonic.port", 8080)
-	viper.Set("switch.gnmi.sonic.plaintext", false)
-	viper.Set("switch.gnmi.plaintext", true)
+func TestConfigFromSettings(t *testing.T) {
+	settingstest.Set(t, "bmc.switch_admin_username", "legacy")
+	settingstest.Set(t, "bmc.switch_admin_password", "legacy-pw")
+	settingstest.Set(t, "switch.gnmi.port", 6030)
+	settingstest.Set(t, "switch.gnmi.sonic.port", 8080)
+	settingstest.Set(t, "switch.gnmi.sonic.plaintext", false)
+	settingstest.Set(t, "switch.gnmi.plaintext", true)
 
-	cfg := ConfigFromViper()
+	cfg := ConfigFromSettings()
 	if cfg.Username != "legacy" || cfg.Password != "legacy-pw" {
 		t.Errorf("legacy bmc.switch_admin_* not used: %q/%q", cfg.Username, cfg.Password)
 	}
@@ -124,19 +124,19 @@ func TestConfigFromViper(t *testing.T) {
 		t.Errorf("sonic = %+v, want its overrides", g)
 	}
 
-	viper.Set("switch.username", "only-user")
-	if c := ConfigFromViper(); c.Username != "only-user" || c.Password != "legacy-pw" {
+	settingstest.Set(t, "switch.username", "only-user")
+	if c := ConfigFromSettings(); c.Username != "only-user" || c.Password != "legacy-pw" {
 		t.Errorf("a username alone should still take the legacy password: %q/%q", c.Username, c.Password)
 	}
-	viper.Set("switch.username", "")
+	settingstest.Set(t, "switch.username", "")
 
-	if cfg.Timeout != defaultConfig.Timeout || cfg.SNMP.Port != 161 || !cfg.gnmiFor(NOSSonic).SkipVerify {
+	if cfg.Timeout != 30*time.Second || cfg.SNMP.Port != 161 || !cfg.gnmiFor(NOSSonic).SkipVerify {
 		t.Errorf("defaults lost once [switch] has keys: %+v", cfg)
 	}
 
-	viper.Set("switch.username", "new")
-	viper.Set("switch.password", "new-pw")
-	if cfg := ConfigFromViper(); cfg.Username != "new" {
+	settingstest.Set(t, "switch.username", "new")
+	settingstest.Set(t, "switch.password", "new-pw")
+	if cfg := ConfigFromSettings(); cfg.Username != "new" {
 		t.Errorf("switch.username = %q, want it to win over the legacy keys", cfg.Username)
 	}
 }

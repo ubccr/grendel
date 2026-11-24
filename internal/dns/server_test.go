@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/miekg/dns"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
+	"github.com/ubccr/grendel/internal/settings/settingstest"
 	"github.com/ubccr/grendel/internal/store/sqlstore"
 	"github.com/ubccr/grendel/pkg/model"
 )
@@ -107,9 +107,7 @@ func TestDns(t *testing.T) {
 
 	upstream := newStubResolver(t, upstreamFQDN, upstreamIP)
 
-	// viper is process global and this key leaks into every later test in the package, so put it back.
-	t.Cleanup(func() { viper.Set("dns.forward", "") })
-	viper.Set("dns.forward", upstream)
+	settingstest.Set(t, "dns.forward", upstream)
 
 	// A name grendel knows is still answered locally, not forwarded.
 	m4 := new(dns.Msg)

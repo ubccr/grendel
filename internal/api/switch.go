@@ -53,7 +53,7 @@ func (h *Handler) SwitchGetLLDP(c fuego.ContextNoBody) (*model.SwitchLLDPList, e
 		}
 	}
 
-	netSwitch, err := tors.New(nodeList[0], tors.ConfigFromViper())
+	netSwitch, err := tors.New(nodeList[0], tors.ConfigFromSettings())
 	if err != nil {
 		return nil, fuego.HTTPError{
 			Err:    err,

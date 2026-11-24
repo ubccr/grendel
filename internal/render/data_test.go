@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/ubccr/grendel/internal/settings/settingstest"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -36,8 +36,7 @@ func TestBeaconTimeout(t *testing.T) {
 	assert.Empty(t, beaconTimeout(token, expires.Add(time.Minute)), "an expired token")
 	assert.Empty(t, beaconTimeout("not a token!", now))
 
-	viper.Set("provision.token_ttl", 0)
-	t.Cleanup(func() { viper.Set("provision.token_ttl", 60*60) })
+	settingstest.Set(t, "provision.token_ttl", 0)
 	assert.Empty(t, beaconTimeout(token, now), "tokens that never expire leave the beacon its own default")
 }
 

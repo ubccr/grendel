@@ -19,9 +19,9 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/ubccr/grendel/internal/settings/settingstest"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
 	"github.com/ubccr/grendel/pkg/nodeset"
@@ -101,8 +101,7 @@ func TestStatusReport(t *testing.T) {
 		_, err = h.DB.LoadProvisionStatus(host.UID.String())
 		assert.ErrorIs(t, err, store.ErrNotFound)
 
-		viper.Set("provision.status_check_source", false)
-		t.Cleanup(func() { viper.Set("provision.status_check_source", true) })
+		settingstest.Set(t, "provision.status_check_source", false)
 		_, err = postStatus(t, h, host, `{"state":"completed"}`)
 		assert.NoError(t, err)
 	})
@@ -303,8 +302,7 @@ func TestBeaconDownload(t *testing.T) {
 
 	dir := t.TempDir()
 	require.NoError(t, os.WriteFile(filepath.Join(dir, "grendel-beacon-amd64"), []byte("binary"), 0o755))
-	viper.Set("provision.beacon.dir", dir)
-	t.Cleanup(func() { viper.Set("provision.beacon.dir", "") })
+	settingstest.Set(t, "provision.beacon.dir", dir)
 
 	rec, err := get("amd64")
 	require.NoError(t, err)
@@ -317,14 +315,9 @@ func TestBeaconDownload(t *testing.T) {
 }
 
 func TestIgnitionBeacon(t *testing.T) {
-	viper.Set("provision.beacon.enabled", true)
-	viper.Set("provision.beacon.dir", "/srv/beacon")
-	viper.Set("provision.beacon.complete", true)
-	t.Cleanup(func() {
-		viper.Set("provision.beacon.enabled", false)
-		viper.Set("provision.beacon.dir", "")
-		viper.Set("provision.beacon.complete", false)
-	})
+	settingstest.Set(t, "provision.beacon.enabled", true)
+	settingstest.Set(t, "provision.beacon.dir", "/srv/beacon")
+	settingstest.Set(t, "provision.beacon.complete", true)
 
 	rec, err := requestIgnition(t, "")
 	require.NoError(t, err)

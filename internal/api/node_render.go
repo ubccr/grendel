@@ -13,9 +13,9 @@ import (
 	"slices"
 
 	"github.com/go-fuego/fuego"
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/config"
 	"github.com/ubccr/grendel/internal/render"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/internal/util"
 	"github.com/ubccr/grendel/pkg/model"
@@ -120,7 +120,7 @@ func (h *Handler) newRenderer(c fuego.ContextNoBody) (*renderer, error) {
 	}
 
 	if r.server = c.QueryParam("server"); r.server == "" {
-		listen := config.ProvisionAddr.Addr().String()
+		listen := config.ProvisionAddr().Addr().String()
 		if r.server, err = util.ServerAddress(listen); err != nil {
 			return nil, fuego.HTTPError{Err: err, Title: "Error", Detail: "failed to find the provision server's address, give one as server"}
 		}
@@ -132,7 +132,7 @@ func (h *Handler) newRenderer(c fuego.ContextNoBody) (*renderer, error) {
 // image loads a node's boot image, or the default one for a node with none, once however many nodes share it
 func (r *renderer) image(name string) (*model.BootImage, error) {
 	if name == "" {
-		name = viper.GetString("provision.default_image")
+		name = settings.ProvisionDefaultImage.Get()
 	}
 	if name == "" {
 		return nil, errors.New("no boot image is set on the node, and provision.default_image is not set")

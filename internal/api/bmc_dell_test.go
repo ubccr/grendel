@@ -10,9 +10,9 @@ import (
 	"testing"
 
 	"github.com/go-faster/jx"
-	"github.com/spf13/viper"
 	"github.com/stmcginnis/gofish/oem/dell"
 	"github.com/ubccr/grendel/internal/redfish"
+	"github.com/ubccr/grendel/internal/settings/settingstest"
 	"github.com/ubccr/grendel/internal/tests"
 	"github.com/ubccr/grendel/pkg/client"
 	"github.com/ubccr/grendel/pkg/model"
@@ -71,9 +71,8 @@ func TestInstallFirmwareRequest(t *testing.T) {
 }
 
 func TestImportShare(t *testing.T) {
-	v := viper.New()
-	v.Set("provision.listen", "10.1.0.5:80")
-	share, err := importShare(v)
+	settingstest.Set(t, "provision.listen", "10.1.0.5:80")
+	share, err := importShare()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -81,10 +80,10 @@ func TestImportShare(t *testing.T) {
 		t.Errorf("listen address share = %+v", share)
 	}
 
-	v.Set("bmc.config_share_ip", "192.168.0.9")
-	v.Set("provision.cert", "/etc/grendel/cert.pem")
-	v.Set("bmc.config_ignore_certificate_warning", "Enabled")
-	share, err = importShare(v)
+	settingstest.Set(t, "bmc.config_share_ip", "192.168.0.9")
+	settingstest.Set(t, "provision.cert", "/etc/grendel/cert.pem")
+	settingstest.Set(t, "bmc.config_ignore_certificate_warning", "Enabled")
+	share, err = importShare()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -93,8 +92,8 @@ func TestImportShare(t *testing.T) {
 		t.Errorf("override share = %+v", share)
 	}
 
-	v.Set("provision.listen", "0.0.0.0:443")
-	share, err = importShare(v)
+	settingstest.Set(t, "provision.listen", "0.0.0.0:443")
+	share, err = importShare()
 	if err != nil {
 		t.Fatal(err)
 	}

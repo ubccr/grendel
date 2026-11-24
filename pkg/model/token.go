@@ -12,27 +12,14 @@ import (
 
 	"github.com/eknkc/basex"
 	"github.com/hako/branca"
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/firmware"
-	"github.com/ubccr/grendel/internal/util"
+	"github.com/ubccr/grendel/internal/settings"
 )
 
 type BootClaims struct {
 	ID   string `json:"id"`
 	MAC  string `json:"mac"`
 	Arch string `json:"arch,omitempty"`
-}
-
-func init() {
-	viper.SetDefault("provision.token_ttl", 60*60)
-
-	if !viper.IsSet("provision.secret") {
-		secret, err := util.GenerateSecret(16)
-		if err != nil {
-			panic(err)
-		}
-		viper.SetDefault("provision.secret", secret)
-	}
 }
 
 func NewBootToken(id, mac string) (string, error) {
@@ -52,8 +39,8 @@ func NewBootTokenWithArch(id, mac, arch string) (string, error) {
 		return "", err
 	}
 
-	b := branca.NewBranca(viper.GetString("provision.secret"))
-	b.SetTTL(viper.GetUint32("provision.token_ttl"))
+	b := branca.NewBranca(settings.ProvisionSecret.Get())
+	b.SetTTL(uint32(settings.ProvisionTokenTTL.Get()))
 
 	token, err := b.EncodeToString(string(jsonBytes))
 	if err != nil {
@@ -64,8 +51,8 @@ func NewBootTokenWithArch(id, mac, arch string) (string, error) {
 }
 
 func ParseBootToken(token string) (*BootClaims, error) {
-	b := branca.NewBranca(viper.GetString("provision.secret"))
-	b.SetTTL(viper.GetUint32("provision.token_ttl"))
+	b := branca.NewBranca(settings.ProvisionSecret.Get())
+	b.SetTTL(uint32(settings.ProvisionTokenTTL.Get()))
 
 	message, err := b.DecodeToString(token)
 	if err != nil {
@@ -86,7 +73,7 @@ const brancaAlphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrst
 
 // BootTokenExpiry is when a boot token stops being accepted, or the zero time when provision.token_ttl is 0 and tokens never expire. Branca decodes a token without saying when it was made, so that is read from its header: a version byte, then the time as four big-endian bytes. The header is not checked here, so this is only for a token already parsed
 func BootTokenExpiry(token string) (time.Time, error) {
-	ttl := viper.GetUint32("provision.token_ttl")
+	ttl := uint32(settings.ProvisionTokenTTL.Get())
 	if ttl == 0 {
 		return time.Time{}, nil
 	}
@@ -108,8 +95,8 @@ func BootTokenExpiry(token string) (time.Time, error) {
 }
 
 func NewFirmwareToken(mac string, fwtype firmware.Build) (string, error) {
-	b := branca.NewBranca(viper.GetString("provision.secret"))
-	b.SetTTL(viper.GetUint32("provision.token_ttl"))
+	b := branca.NewBranca(settings.ProvisionSecret.Get())
+	b.SetTTL(uint32(settings.ProvisionTokenTTL.Get()))
 
 	token, err := b.EncodeToString(fwtype.String())
 	if err != nil {
@@ -120,8 +107,8 @@ func NewFirmwareToken(mac string, fwtype firmware.Build) (string, error) {
 }
 
 func ParseFirmwareToken(token string) (firmware.Build, error) {
-	b := branca.NewBranca(viper.GetString("provision.secret"))
-	b.SetTTL(viper.GetUint32("provision.token_ttl"))
+	b := branca.NewBranca(settings.ProvisionSecret.Get())
+	b.SetTTL(uint32(settings.ProvisionTokenTTL.Get()))
 
 	message, err := b.DecodeToString(token)
 	if err != nil {

@@ -64,20 +64,20 @@ func (s *Service) connect(ctx context.Context, t Target) (*conn, error) {
 	if t.Addr == "" {
 		return nil, errors.New("bmc interface has no usable ip address")
 	}
-	if len(s.cfg.Credentials) == 0 {
+	if len(s.source().cfg.Credentials) == 0 {
 		return nil, errors.New("no bmc credentials configured, set bmc.user and bmc.password")
 	}
 
 	base := s.clientConfig(t)
 
 	var lastErr error
-	for i, cred := range s.cfg.Credentials {
+	for i, cred := range s.source().cfg.Credentials {
 		cfg := base
 		cfg.Username = cred.User
 		cfg.Password = cred.Password
 
 		client, err := gofish.ConnectContext(ctx, cfg)
-		if err == nil && s.cfg.BasicAuth && i < len(s.cfg.Credentials)-1 {
+		if err == nil && s.source().cfg.BasicAuth && i < len(s.source().cfg.Credentials)-1 {
 			err = checkBasicAuth(client)
 		}
 		if err == nil {
@@ -106,8 +106,8 @@ func checkBasicAuth(client *gofish.APIClient) error {
 }
 
 func (s *Service) credentialUsers() []string {
-	users := make([]string, 0, len(s.cfg.Credentials))
-	for _, c := range s.cfg.Credentials {
+	users := make([]string, 0, len(s.source().cfg.Credentials))
+	for _, c := range s.source().cfg.Credentials {
 		users = append(users, c.User)
 	}
 	return users
@@ -126,24 +126,24 @@ func isAuthFailure(err error) bool {
 
 func (s *Service) clientConfig(t Target) gofish.ClientConfig {
 	return gofish.ClientConfig{
-		Endpoint: endpoint(s.cfg.Scheme, t.Addr),
-		Insecure: s.cfg.Insecure,
+		Endpoint: endpoint(s.source().cfg.Scheme, t.Addr),
+		Insecure: s.source().cfg.Insecure,
 		// BasicAuth avoids creating and tearing down a Redfish session, which is two extra round trips per node per operation
-		BasicAuth: s.cfg.BasicAuth,
+		BasicAuth: s.source().cfg.BasicAuth,
 		HTTPClient: &http.Client{
-			Timeout: s.cfg.ClientTimeout,
+			Timeout: s.source().cfg.ClientTimeout,
 			Transport: &http.Transport{
 				DialContext: (&net.Dialer{
-					Timeout:   s.cfg.DialTimeout,
-					KeepAlive: s.cfg.DialKeepAlive,
+					Timeout:   s.source().cfg.DialTimeout,
+					KeepAlive: s.source().cfg.DialKeepAlive,
 				}).DialContext,
-				TLSHandshakeTimeout: s.cfg.TLSHandshakeTimeout,
-				IdleConnTimeout:     s.cfg.IdleConnTimeout,
+				TLSHandshakeTimeout: s.source().cfg.TLSHandshakeTimeout,
+				IdleConnTimeout:     s.source().cfg.IdleConnTimeout,
 			},
 		},
-		MaxConcurrentRequests: s.cfg.MaxConcurrentRequests,
-		ReuseConnections:      s.cfg.ReuseConnections,
-		AutoExpand:            s.cfg.AutoExpand,
+		MaxConcurrentRequests: s.source().cfg.MaxConcurrentRequests,
+		ReuseConnections:      s.source().cfg.ReuseConnections,
+		AutoExpand:            s.source().cfg.AutoExpand,
 	}
 }
 

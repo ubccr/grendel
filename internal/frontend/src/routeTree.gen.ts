@@ -32,6 +32,7 @@ import { Route as NodesIndexRouteImport } from './routes/nodes/index'
 import { Route as NodesNodeRouteRouteImport } from './routes/nodes/$node/route'
 import { Route as RacksIndexRouteImport } from './routes/racks/index'
 import { Route as RacksRackRouteImport } from './routes/racks/$rack'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as TemplatesIndexRouteImport } from './routes/templates/index'
 import { Route as TemplatesTemplateRouteImport } from './routes/templates/$template'
 import { Route as AccountAccountResetRouteImport } from './routes/account/_account/reset'
@@ -171,6 +172,11 @@ const RacksRackRoute = RacksRackRouteImport.update({
   id: '/$rack',
   path: '/$rack',
   getParentRoute: () => RacksRouteRoute,
+} as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const TemplatesIndexRoute = TemplatesIndexRouteImport.update({
   id: '/',
@@ -318,6 +324,7 @@ export interface FileRoutesByFullPath {
   '/images/': typeof ImagesIndexRoute
   '/nodes/': typeof NodesIndexRoute
   '/racks/': typeof RacksIndexRoute
+  '/settings/': typeof SettingsIndexRoute
   '/templates/': typeof TemplatesIndexRoute
   '/account/reset': typeof AccountAccountResetRoute
   '/account/token': typeof AccountAccountTokenRoute
@@ -360,6 +367,7 @@ export interface FileRoutesByTo {
   '/images': typeof ImagesIndexRoute
   '/nodes': typeof NodesIndexRoute
   '/racks': typeof RacksIndexRoute
+  '/settings': typeof SettingsIndexRoute
   '/templates': typeof TemplatesIndexRoute
   '/account/reset': typeof AccountAccountResetRoute
   '/account/token': typeof AccountAccountTokenRoute
@@ -410,6 +418,7 @@ export interface FileRoutesById {
   '/images/': typeof ImagesIndexRoute
   '/nodes/': typeof NodesIndexRoute
   '/racks/': typeof RacksIndexRoute
+  '/settings/': typeof SettingsIndexRoute
   '/templates/': typeof TemplatesIndexRoute
   '/account/_account/reset': typeof AccountAccountResetRoute
   '/account/_account/token': typeof AccountAccountTokenRoute
@@ -461,6 +470,7 @@ export interface FileRouteTypes {
     | '/images/'
     | '/nodes/'
     | '/racks/'
+    | '/settings/'
     | '/templates/'
     | '/account/reset'
     | '/account/token'
@@ -503,6 +513,7 @@ export interface FileRouteTypes {
     | '/images'
     | '/nodes'
     | '/racks'
+    | '/settings'
     | '/templates'
     | '/account/reset'
     | '/account/token'
@@ -552,6 +563,7 @@ export interface FileRouteTypes {
     | '/images/'
     | '/nodes/'
     | '/racks/'
+    | '/settings/'
     | '/templates/'
     | '/account/_account/reset'
     | '/account/_account/token'
@@ -595,6 +607,7 @@ export interface RootRouteChildren {
   AddRoleRoute: typeof AddRoleRoute
   AddTemplateRoute: typeof AddTemplateRoute
   AccountIndexRoute: typeof AccountIndexRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
   AccountUsersIndexRoute: typeof AccountUsersIndexRoute
 }
 
@@ -760,6 +773,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/racks/$rack'
       preLoaderRoute: typeof RacksRackRouteImport
       parentRoute: typeof RacksRouteRoute
+    }
+    '/settings/': {
+      id: '/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/templates/': {
       id: '/templates/'
@@ -1077,6 +1097,7 @@ const rootRouteChildren: RootRouteChildren = {
   AddRoleRoute: AddRoleRoute,
   AddTemplateRoute: AddTemplateRoute,
   AccountIndexRoute: AccountIndexRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
   AccountUsersIndexRoute: AccountUsersIndexRoute,
 }
 export const routeTree = rootRouteImport

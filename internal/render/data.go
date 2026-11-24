@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -41,12 +41,12 @@ func Data(r Request) map[string]any {
 		"nic":        r.NIC,
 		"host":       r.Host,
 		"headers":    r.Headers,
-		"extra_vars": viper.GetStringMap("provision.extra_vars"),
+		"extra_vars": settings.ProvisionExtraVars.Get(),
 		"beacon": map[string]any{
-			"enabled":  viper.GetBool("provision.beacon.enabled"),
-			"served":   viper.GetString("provision.beacon.dir") != "",
-			"path":     viper.GetString("provision.beacon.path"),
-			"complete": viper.GetBool("provision.beacon.complete"),
+			"enabled":  settings.ProvisionBeaconEnabled.Get(),
+			"served":   settings.ProvisionBeaconDir.Get() != "",
+			"path":     settings.ProvisionBeaconPath.Get(),
+			"complete": settings.ProvisionBeaconComplete.Get(),
 			"url":      endpoints.BeaconURL(r.Host.ArchDebian()),
 			"timeout":  beaconTimeout(r.Token, time.Now()),
 		},

@@ -12,16 +12,16 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/cmd/shared"
 	"github.com/ubccr/grendel/internal/events"
+	"github.com/ubccr/grendel/internal/settings"
 	"golang.org/x/sync/errgroup"
 )
 
 const defaultShutdownTimeout = 10 * time.Second
 
 func shutdownTimeout() time.Duration {
-	d := viper.GetDuration("shutdown_timeout")
+	d := settings.ShutdownTimeout.Get()
 	if d <= 0 {
 		return defaultShutdownTimeout
 	}
@@ -39,6 +39,8 @@ func normalize(err error) error {
 }
 
 // run starts every selected service and blocks until they have all stopped. The first service to fail, and a cancelled ctx, both bring down the rest
+const settingsWatchInterval = 5 * time.Second
+
 func run(ctx context.Context, svcs []*Service) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -101,6 +103,12 @@ func run(ctx context.Context, svcs []*Service) error {
 
 	// whichever services run, something has to mark stalled nodes, close the events they leave finished and delete old ones
 	g.Go(func() error { return events.New(DB).Run(gctx) })
+
+	// services can run as separate processes on one database, and a setting saved through the api process has to reach the others
+	g.Go(func() error {
+		settings.Watch(gctx, DB, settingsWatchInterval, func(err error) { shared.Log.Warnf("failed to reload settings: %s", err) })
+		return nil
+	})
 
 	return g.Wait()
 }

@@ -5,7 +5,7 @@
 package serve
 
 import (
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/internal/tftp"
 )
 
@@ -14,10 +14,6 @@ const (
 )
 
 func init() {
-	serveCmd.PersistentFlags().String("tftp-listen", "0.0.0.0:69", "address to listen on")
-	viper.BindPFlag("tftp.listen", serveCmd.PersistentFlags().Lookup("tftp-listen"))
-	serveCmd.PersistentFlags().String("tftp-firmware-dir", "", "directory of iPXE EFI builds to serve in place of the embedded ones, such as signed copies written by 'grendeld firmware export'")
-	viper.BindPFlag("tftp.firmware_dir", serveCmd.PersistentFlags().Lookup("tftp-firmware-dir"))
 
 	register(&Service{
 		Name: "tftp",
@@ -26,5 +22,5 @@ func init() {
 }
 
 func newTFTP() (Runner, error) {
-	return tftp.NewServer(DB, getListenAddress("tftp.listen"), viper.GetString("tftp.firmware_dir"))
+	return tftp.NewServer(DB, getListenAddress("tftp.listen"), settings.TFTPFirmwareDir.Get())
 }

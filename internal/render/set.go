@@ -20,7 +20,7 @@ import (
 	"github.com/coreos/butane/config"
 	"github.com/coreos/butane/config/common"
 	"github.com/fsnotify/fsnotify"
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/settings"
 )
 
 //go:embed templates/ipxe.tmpl
@@ -102,8 +102,8 @@ func buildTemplates(quiet bool) (*template.Template, error) {
 		return nil, err
 	}
 
-	if viper.IsSet("provision.templates_dir") {
-		dir := filepath.Join(viper.GetString("provision.templates_dir"), "*.tmpl")
+	if templates := settings.ProvisionTemplatesDir.Get(); templates != "" {
+		dir := filepath.Join(templates, "*.tmpl")
 		matches, err := filepath.Glob(dir)
 		if err != nil {
 			return nil, err
@@ -138,7 +138,7 @@ func (s *Set) reload() error {
 }
 
 func (s *Set) Watch(ctx context.Context) error {
-	if !viper.IsSet("provision.templates_dir") {
+	if settings.ProvisionTemplatesDir.Get() == "" {
 		return nil
 	}
 
@@ -147,7 +147,7 @@ func (s *Set) Watch(ctx context.Context) error {
 		return err
 	}
 
-	err = w.Add(viper.GetString("provision.templates_dir"))
+	err = w.Add(settings.ProvisionTemplatesDir.Get())
 	if err != nil {
 		return fmt.Errorf("failed to monitor template directory: %w", err)
 	}

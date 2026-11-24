@@ -296,6 +296,11 @@ type GETV1RolesParams struct {
 	Accept OptString `json:",omitempty,omitzero"`
 }
 
+// GETV1SettingsParams is parameters of GET_/v1/settings operation.
+type GETV1SettingsParams struct {
+	Accept OptString `json:",omitempty,omitzero"`
+}
+
 // GETV1SwitchNodesetLldpParams is parameters of GET_/v1/switch/:nodeset/lldp operation.
 type GETV1SwitchNodesetLldpParams struct {
 	// Filter by port name.
@@ -358,6 +363,11 @@ type PATCHV1NodesTagsActionParams struct {
 
 // PATCHV1RolesParams is parameters of PATCH_/v1/roles operation.
 type PATCHV1RolesParams struct {
+	Accept OptString `json:",omitempty,omitzero"`
+}
+
+// PATCHV1SettingsParams is parameters of PATCH_/v1/settings operation.
+type PATCHV1SettingsParams struct {
 	Accept OptString `json:",omitempty,omitzero"`
 }
 

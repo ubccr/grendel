@@ -75,18 +75,18 @@ func (s *Service) ipmiConnect(ctx context.Context, t Target) (*ipmi.Client, erro
 	if t.Addr == "" {
 		return nil, errors.New("bmc interface has no usable ip address")
 	}
-	if len(s.cfg.Credentials) == 0 {
+	if len(s.source().cfg.Credentials) == 0 {
 		return nil, errors.New("no bmc credentials configured, set bmc.user and bmc.password")
 	}
 
-	suites := make([]types.CipherSuiteID, 0, len(s.cfg.IPMICipherSuites))
-	for _, id := range s.cfg.IPMICipherSuites {
+	suites := make([]types.CipherSuiteID, 0, len(s.source().cfg.IPMICipherSuites))
+	for _, id := range s.source().cfg.IPMICipherSuites {
 		suites = append(suites, types.CipherSuiteID(id))
 	}
 
 	var lastErr error
-	for _, cred := range s.cfg.Credentials {
-		c, err := ipmi.NewClient(t.Addr, s.cfg.IPMIPort, cred.User, cred.Password)
+	for _, cred := range s.source().cfg.Credentials {
+		c, err := ipmi.NewClient(t.Addr, s.source().cfg.IPMIPort, cred.User, cred.Password)
 		if err != nil {
 			return nil, err
 		}

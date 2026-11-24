@@ -5,23 +5,11 @@
 package serve
 
 import (
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/provision"
+	"github.com/ubccr/grendel/internal/settings"
 )
 
 func init() {
-	serveCmd.PersistentFlags().String("provision-listen", "0.0.0.0:80", "address to listen on")
-	viper.BindPFlag("provision.listen", serveCmd.PersistentFlags().Lookup("provision-listen"))
-	serveCmd.PersistentFlags().String("provision-cert", "", "path to ssl cert")
-	viper.BindPFlag("provision.cert", serveCmd.PersistentFlags().Lookup("provision-cert"))
-	serveCmd.PersistentFlags().String("provision-key", "", "path to ssl key")
-	viper.BindPFlag("provision.key", serveCmd.PersistentFlags().Lookup("provision-key"))
-	serveCmd.PersistentFlags().String("default-image", "", "default image name")
-	viper.BindPFlag("provision.default_image", serveCmd.PersistentFlags().Lookup("default-image"))
-	serveCmd.PersistentFlags().String("repo-dir", "", "path to repo dir")
-	viper.BindPFlag("provision.repo_dir", serveCmd.PersistentFlags().Lookup("repo-dir"))
-	serveCmd.PersistentFlags().String("templates-dir", "", "path to templates dir")
-	viper.BindPFlag("provision.templates_dir", serveCmd.PersistentFlags().Lookup("templates-dir"))
 
 	register(&Service{
 		Name: "provision",
@@ -47,10 +35,10 @@ func newProvision() (Runner, error) {
 		return nil, err
 	}
 
-	srv.KeyFile = viper.GetString("provision.key")
-	srv.CertFile = viper.GetString("provision.cert")
-	srv.RepoDir = viper.GetString("provision.repo_dir")
-	srv.TemplatesDir = viper.GetString("provision.templates_dir")
+	srv.KeyFile = settings.ProvisionKey.Get()
+	srv.CertFile = settings.ProvisionCert.Get()
+	srv.RepoDir = settings.ProvisionRepoDir.Get()
+	srv.TemplatesDir = settings.ProvisionTemplatesDir.Get()
 
-	return &provisionRunner{Server: srv, defaultImage: viper.GetString("provision.default_image")}, nil
+	return &provisionRunner{Server: srv, defaultImage: settings.ProvisionDefaultImage.Get()}, nil
 }

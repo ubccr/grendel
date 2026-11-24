@@ -14,7 +14,7 @@ import (
 
 	"github.com/go-fuego/fuego"
 	"github.com/rs/cors"
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/settings"
 )
 
 func (h *Handler) authMiddleware(next http.Handler) http.Handler {
@@ -49,7 +49,7 @@ func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 
 		token := strings.TrimPrefix(rawToken, "Bearer ")
 
-		claims, err := ParseToken(token, viper.GetString("api.secret"))
+		claims, err := ParseToken(token, settings.APISecret.Get())
 		if err != nil {
 			err := fuego.HTTPError{
 				Status: http.StatusBadRequest,
@@ -100,7 +100,7 @@ func (h *Handler) authMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		if (!slices.Contains(*validRoles, claims.role) || !slices.Contains(*validRoles, user.Role)) && !viper.GetBool("api.dev") {
+		if (!slices.Contains(*validRoles, claims.role) || !slices.Contains(*validRoles, user.Role)) && !settings.APIDev.Get() {
 
 			err := fuego.HTTPError{
 				Status: http.StatusForbidden,

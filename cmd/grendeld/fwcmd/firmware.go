@@ -13,9 +13,9 @@ import (
 
 	"github.com/jedib0t/go-pretty/v6/text"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/cmd/shared"
 	"github.com/ubccr/grendel/internal/firmware"
+	"github.com/ubccr/grendel/internal/settings"
 )
 
 var (
@@ -58,7 +58,7 @@ Sign the files in place, point tftp.firmware_dir at the directory, and restart g
 		RunE: func(command *cobra.Command, args []string) error {
 			dir := listDir
 			if !command.Flags().Changed("dir") {
-				dir = viper.GetString("tftp.firmware_dir")
+				dir = settings.TFTPFirmwareDir.Get()
 			}
 
 			set, err := firmware.Load(dir)

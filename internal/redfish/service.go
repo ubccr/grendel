@@ -11,20 +11,33 @@ import (
 
 	"github.com/stmcginnis/gofish/oem/dell"
 	"github.com/stmcginnis/gofish/schemas"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
 type Service struct {
-	cfg        Config
-	opts       Options
+	// source gives the config to use for one operation, which for a service built from the settings follows them as they change
+	source     func() conf
 	registries registryCache
 }
 
-func New(cfg Config) *Service {
-	return &Service{cfg: cfg, opts: cfg.options()}
+type conf struct {
+	cfg  Config
+	opts Options
 }
 
-func NewFromViper() *Service { return New(ConfigFromViper()) }
+func New(cfg Config) *Service {
+	c := conf{cfg: cfg, opts: cfg.options()}
+	return &Service{source: func() conf { return c }}
+}
+
+func NewFromSettings() *Service {
+	live := settings.Derive(func() conf {
+		cfg := ConfigFromSettings()
+		return conf{cfg: cfg, opts: cfg.options()}
+	})
+	return &Service{source: live.Get}
+}
 
 type PowerRequest struct {
 	Target PowerTarget
@@ -133,13 +146,13 @@ func (s *Service) InstallFirmware(ctx context.Context, targets []Target, req Ins
 
 // run applies bmc.run_timeout, so a large nodeset of wedged BMCs still produces a response in bounded time
 func run[T any](ctx context.Context, s *Service, targets []Target, fn func(context.Context, Target) (*T, error)) []NodeResult[T] {
-	if s.cfg.RunTimeout > 0 {
+	if s.source().cfg.RunTimeout > 0 {
 		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(ctx, s.cfg.RunTimeout)
+		ctx, cancel = context.WithTimeout(ctx, s.source().cfg.RunTimeout)
 		defer cancel()
 	}
 
-	return Run(ctx, targets, s.opts, fn)
+	return Run(ctx, targets, s.source().opts, fn)
 }
 
 // done is the payload for operations that report nothing but their outcome

@@ -2903,6 +2903,11 @@ func (s *DataDump) SetFake() {
 	}
 	{
 		{
+			s.Settings.SetFake()
+		}
+	}
+	{
+		{
 			s.Users = nil
 			for i := 0; i < 0; i++ {
 				var elem DataDumpUsersItem
@@ -3254,6 +3259,20 @@ func (s *DataDumpRolesItemUnassignedPermissionListItem) SetFake() {
 // SetFake set fake values.
 func (s *DataDumpRolesItemUnassignedPermissionListItemKind) SetFake() {
 	*s = DataDumpRolesItemUnassignedPermissionListItemKindView
+}
+
+// SetFake set fake values.
+func (s *DataDumpSettingsItem) SetFake() {
+	{
+		{
+			s.Key.SetFake()
+		}
+	}
+	{
+		{
+			s.Value.SetFake()
+		}
+	}
 }
 
 // SetFake set fake values.
@@ -3897,6 +3916,267 @@ func (s *LLDP) SetFake() {
 	{
 		{
 			s.SystemName.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *Listing) SetFake() {
+	{
+		{
+			s.ConfigFile.SetFake()
+		}
+	}
+	{
+		{
+			s.Pending.SetFake()
+		}
+	}
+	{
+		{
+			s.Persistent.SetFake()
+		}
+	}
+	{
+		{
+			s.Sections = nil
+			for i := 0; i < 0; i++ {
+				var elem ListingSectionsItem
+				{
+					elem.SetFake()
+				}
+				s.Sections = append(s.Sections, elem)
+			}
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *ListingSectionsItem) SetFake() {
+	{
+		{
+			s.Description.SetFake()
+		}
+	}
+	{
+		{
+			s.ID.SetFake()
+		}
+	}
+	{
+		{
+			s.Options = nil
+			for i := 0; i < 0; i++ {
+				var elem ListingSectionsItemOptionsItem
+				{
+					elem.SetFake()
+				}
+				s.Options = append(s.Options, elem)
+			}
+		}
+	}
+	{
+		{
+			s.Title.SetFake()
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *ListingSectionsItemOptionsItem) SetFake() {
+	{
+		{
+			s.Apply.SetFake()
+		}
+	}
+	{
+		{
+			s.Default = []byte("null")
+		}
+	}
+	{
+		{
+			s.Deprecated.SetFake()
+		}
+	}
+	{
+		{
+			s.Entry.SetFake()
+		}
+	}
+	{
+		{
+			s.EntryLabel.SetFake()
+		}
+	}
+	{
+		{
+			s.EntryOf.SetFake()
+		}
+	}
+	{
+		{
+			s.Enum = nil
+			for i := 0; i < 0; i++ {
+				var elem string
+				{
+					elem = "string"
+				}
+				s.Enum = append(s.Enum, elem)
+			}
+		}
+	}
+	{
+		{
+			s.Env.SetFake()
+		}
+	}
+	{
+		{
+			s.External.SetFake()
+		}
+	}
+	{
+		{
+			s.Fields = nil
+			for i := 0; i < 0; i++ {
+				var elem ListingSectionsItemOptionsItemFieldsItem
+				{
+					elem.SetFake()
+				}
+				s.Fields = append(s.Fields, elem)
+			}
+		}
+	}
+	{
+		{
+			s.FileEntriesSecret.SetFake()
+		}
+	}
+	{
+		{
+			s.FileKeys = nil
+			for i := 0; i < 0; i++ {
+				var elem string
+				{
+					elem = "string"
+				}
+				s.FileKeys = append(s.FileKeys, elem)
+			}
+		}
+	}
+	{
+		{
+			s.Flag.SetFake()
+		}
+	}
+	{
+		{
+			s.Group.SetFake()
+		}
+	}
+	{
+		{
+			s.Help.SetFake()
+		}
+	}
+	{
+		{
+			s.InheritFrom.SetFake()
+		}
+	}
+	{
+		{
+			s.Key.SetFake()
+		}
+	}
+	{
+		{
+			s.Kind.SetFake()
+		}
+	}
+	{
+		{
+			s.Max.SetFake()
+		}
+	}
+	{
+		{
+			s.Min.SetFake()
+		}
+	}
+	{
+		{
+			s.Pending.SetFake()
+		}
+	}
+	{
+		{
+			s.Running = []byte("null")
+		}
+	}
+	{
+		{
+			s.Secret.SetFake()
+		}
+	}
+	{
+		{
+			s.Shadowed.SetFake()
+		}
+	}
+	{
+		{
+			s.Source.SetFake()
+		}
+	}
+	{
+		{
+			s.Stored = []byte("null")
+		}
+	}
+	{
+		{
+			s.Summary.SetFake()
+		}
+	}
+	{
+		{
+			s.Unit.SetFake()
+		}
+	}
+	{
+		{
+			s.Value = []byte("null")
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *ListingSectionsItemOptionsItemFieldsItem) SetFake() {
+	{
+		{
+			s.Help.SetFake()
+		}
+	}
+	{
+		{
+			s.Kind.SetFake()
+		}
+	}
+	{
+		{
+			s.Name.SetFake()
+		}
+	}
+	{
+		{
+			s.Required.SetFake()
+		}
+	}
+	{
+		{
+			s.Summary.SetFake()
 		}
 	}
 }
@@ -4972,6 +5252,12 @@ func (s *OptNilDataDumpImagesItemProvisionTemplates) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptNilDataDumpSettingsItemArray) SetFake() {
+	s.Null = true
+	s.Set = true
+}
+
+// SetFake set fake values.
 func (s *OptNilDateTime) SetFake() {
 	s.Null = true
 	s.Set = true
@@ -5077,6 +5363,15 @@ func (s *OptPatchRolesRequestPermissionListItemKind) SetFake() {
 }
 
 // SetFake set fake values.
+func (s *OptPatchSettingsRequestSet) SetFake() {
+	var elem PatchSettingsRequestSet
+	{
+		elem.SetFake()
+	}
+	s.SetTo(elem)
+}
+
+// SetFake set fake values.
 func (s *OptString) SetFake() {
 	var elem string
 	{
@@ -5138,6 +5433,38 @@ func (s *PatchRolesRequestPermissionListItem) SetFake() {
 // SetFake set fake values.
 func (s *PatchRolesRequestPermissionListItemKind) SetFake() {
 	*s = PatchRolesRequestPermissionListItemKindView
+}
+
+// SetFake set fake values.
+func (s *PatchSettingsRequest) SetFake() {
+	{
+		{
+			s.Set.SetFake()
+		}
+	}
+	{
+		{
+			s.Unset = nil
+			for i := 0; i < 0; i++ {
+				var elem string
+				{
+					elem = "string"
+				}
+				s.Unset = append(s.Unset, elem)
+			}
+		}
+	}
+}
+
+// SetFake set fake values.
+func (s *PatchSettingsRequestSet) SetFake() {
+	var (
+		elem jx.Raw
+		m    map[string]jx.Raw = s.init()
+	)
+	for i := 0; i < 0; i++ {
+		m[fmt.Sprintf("fake%d", i)] = elem
+	}
 }
 
 // SetFake set fake values.

@@ -14,10 +14,9 @@ import (
 	"testing"
 
 	"github.com/labstack/echo/v4"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/ubccr/grendel/internal/config"
+	"github.com/ubccr/grendel/internal/settings/settingstest"
 	"github.com/ubccr/grendel/internal/store"
 	"github.com/ubccr/grendel/pkg/model"
 )
@@ -47,9 +46,7 @@ func requestIgnition(t *testing.T, tmplName string) (*httptest.ResponseRecorder,
 func requestIgnitionFor(t *testing.T, tmplName string) (*Handler, *model.Host, *httptest.ResponseRecorder, error) {
 	t.Helper()
 
-	origDNS := config.DefaultDNS
-	t.Cleanup(func() { config.DefaultDNS = origDNS })
-	config.DefaultDNS = []net.IP{net.ParseIP("10.0.0.2")}
+	settingstest.Set(t, "dhcp.dns_servers", []string{"10.0.0.2"})
 
 	templates := newTestTemplates(t)
 	h := &Handler{DB: newTestDB(t), Templates: templates}
@@ -83,8 +80,7 @@ func requestIgnitionFor(t *testing.T, tmplName string) (*Handler, *model.Host, *
 
 func TestIgnitionRecordsStageOnceRendered(t *testing.T) {
 	dir := t.TempDir()
-	viper.Set("provision.templates_dir", dir)
-	t.Cleanup(func() { viper.Set("provision.templates_dir", nil) })
+	settingstest.Set(t, "provision.templates_dir", dir)
 
 	require.NoError(t, os.WriteFile(filepath.Join(dir, "custom.tmpl"), []byte("variant: flatcar\nversion: 1.0.0\nstorge: {}\n"), 0o644))
 	h, host, _, err := requestIgnitionFor(t, "custom.tmpl")
@@ -114,8 +110,7 @@ func TestIgnitionBuiltinTemplate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			viper.Set("provision.extra_vars", tt.extraVars)
-			t.Cleanup(func() { viper.Set("provision.extra_vars", nil) })
+			settingstest.Set(t, "provision.extra_vars", tt.extraVars)
 
 			rec, err := requestIgnition(t, "")
 			require.NoError(t, err)
@@ -173,8 +168,7 @@ func TestIgnitionStrict(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			dir := t.TempDir()
 			require.NoError(t, os.WriteFile(filepath.Join(dir, "custom.tmpl"), []byte(tt.template), 0o644))
-			viper.Set("provision.templates_dir", dir)
-			t.Cleanup(func() { viper.Set("provision.templates_dir", nil) })
+			settingstest.Set(t, "provision.templates_dir", dir)
 
 			rec, err := requestIgnition(t, "custom.tmpl")
 

@@ -12,8 +12,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/spf13/viper"
 	"github.com/ubccr/grendel/internal/render"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -44,7 +44,7 @@ func (s *Server) imageFileHandler(filePath string, rf io.ReaderFrom) error {
 	// TFTP requests carry no host context so only image level data is available to path templates
 	data := map[string]any{
 		"bootimage":  bootImage,
-		"extra_vars": viper.GetStringMap("provision.extra_vars"),
+		"extra_vars": settings.ProvisionExtraVars.Get(),
 	}
 
 	path, err := render.FilePath(bootImage, fileType, data)

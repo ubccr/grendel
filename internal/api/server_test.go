@@ -14,9 +14,9 @@ import (
 
 	"github.com/coder/websocket"
 	"github.com/go-fuego/fuego"
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 	"github.com/ubccr/grendel/internal/redfish"
+	"github.com/ubccr/grendel/internal/settings/settingstest"
 	"github.com/ubccr/grendel/internal/store/sqlstore"
 	"github.com/ubccr/grendel/internal/tests"
 	"github.com/ubccr/grendel/pkg/model"
@@ -54,8 +54,7 @@ func TestShutdownBeforeServe(t *testing.T) {
 
 func newWiredTestServer(t *testing.T) (*sqlstore.SqlStore, *fuego.Server) {
 	t.Helper()
-	viper.Set("api.secret", "wired-test-secret-0123456789abcdef")
-	t.Cleanup(func() { viper.Set("api.secret", nil) })
+	settingstest.Set(t, "api.secret", "wired-test-secret-0123456789abcdef")
 
 	db, err := sqlstore.New(":memory:")
 	require.NoError(t, err)

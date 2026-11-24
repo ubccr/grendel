@@ -13,7 +13,7 @@ import (
 
 	"github.com/go-fuego/fuego"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/spf13/viper"
+	"github.com/ubccr/grendel/internal/settings"
 	"github.com/ubccr/grendel/pkg/model"
 )
 
@@ -89,7 +89,7 @@ func (h *Handler) AuthSignin(c fuego.ContextWithBody[AuthRequest]) (*AuthRespons
 		TokenExpire:   exp.Unix(),
 	}
 
-	token, err := NewToken(claims, viper.GetString("api.secret"))
+	token, err := NewToken(claims, settings.APISecret.Get())
 	if err != nil {
 		return nil, fuego.HTTPError{
 			Err:    err,
@@ -102,7 +102,7 @@ func (h *Handler) AuthSignin(c fuego.ContextWithBody[AuthRequest]) (*AuthRespons
 		Name:     "Authorization",
 		Value:    "Bearer " + token,
 		Expires:  exp,
-		Secure:   viper.IsSet("api.cert"),
+		Secure:   settings.APICert.Get() != "",
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 		Path:     "/",
@@ -138,7 +138,7 @@ func (h *Handler) AuthSignup(c fuego.ContextWithBody[AuthSignupRequest]) (*AuthR
 		TokenExpire:   exp.Unix(),
 	}
 
-	token, err := NewToken(claims, viper.GetString("api.secret"))
+	token, err := NewToken(claims, settings.APISecret.Get())
 	if err != nil {
 		return nil, fuego.HTTPError{
 			Err:    err,
@@ -151,7 +151,7 @@ func (h *Handler) AuthSignup(c fuego.ContextWithBody[AuthSignupRequest]) (*AuthR
 		Name:     "Authorization",
 		Value:    "Bearer " + token,
 		Expires:  exp,
-		Secure:   viper.IsSet("api.cert"),
+		Secure:   settings.APICert.Get() != "",
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 		Path:     "/",
@@ -169,7 +169,7 @@ func (h *Handler) AuthSignout(c fuego.ContextNoBody) (*GenericResponse, error) {
 		Name:     "Authorization",
 		Value:    "",
 		Expires:  time.Now(),
-		Secure:   viper.IsSet("api.cert"),
+		Secure:   settings.APICert.Get() != "",
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 		Path:     "/",
@@ -198,7 +198,7 @@ func (h *Handler) AuthToken(c fuego.ContextWithBody[AuthTokenRequest]) (*AuthTok
 	}
 
 	// skip access control if running on a unix socket
-	if !viper.IsSet("api.socket_path") {
+	if settings.APISocketPath.Get() == "" {
 		tokenRole, err := h.DB.GetRolesByName(body.Role)
 		if err != nil {
 			return nil, fuego.HTTPError{
@@ -283,7 +283,7 @@ func (h *Handler) AuthToken(c fuego.ContextWithBody[AuthTokenRequest]) (*AuthTok
 		claims[TokenExpire] = time.Now().Add(exp).Unix()
 	}
 
-	token, err := NewToken(claims, viper.GetString("api.secret"))
+	token, err := NewToken(claims, settings.APISecret.Get())
 	if err != nil {
 		return nil, fuego.HTTPError{
 			Err:    err,

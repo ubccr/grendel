@@ -14127,6 +14127,12 @@ func (s *DataDump) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.Settings.Set {
+			e.FieldStart("Settings")
+			s.Settings.Encode(e)
+		}
+	}
+	{
 		if s.Users != nil {
 			e.FieldStart("Users")
 			e.ArrStart()
@@ -14138,11 +14144,12 @@ func (s *DataDump) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfDataDump = [4]string{
+var jsonFieldsNameOfDataDump = [5]string{
 	0: "Hosts",
 	1: "Images",
 	2: "Roles",
-	3: "Users",
+	3: "Settings",
+	4: "Users",
 }
 
 // Decode decodes DataDump from json.
@@ -14203,6 +14210,16 @@ func (s *DataDump) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"Roles\"")
+			}
+		case "Settings":
+			if err := func() error {
+				s.Settings.Reset()
+				if err := s.Settings.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Settings\"")
 			}
 		case "Users":
 			if err := func() error {
@@ -15655,6 +15672,86 @@ func (s DataDumpRolesItemUnassignedPermissionListItemKind) MarshalJSON() ([]byte
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *DataDumpRolesItemUnassignedPermissionListItemKind) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *DataDumpSettingsItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *DataDumpSettingsItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Key.Set {
+			e.FieldStart("key")
+			s.Key.Encode(e)
+		}
+	}
+	{
+		if s.Value.Set {
+			e.FieldStart("value")
+			s.Value.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfDataDumpSettingsItem = [2]string{
+	0: "key",
+	1: "value",
+}
+
+// Decode decodes DataDumpSettingsItem from json.
+func (s *DataDumpSettingsItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode DataDumpSettingsItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "key":
+			if err := func() error {
+				s.Key.Reset()
+				if err := s.Key.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"key\"")
+			}
+		case "value":
+			if err := func() error {
+				s.Value.Reset()
+				if err := s.Value.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"value\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode DataDumpSettingsItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *DataDumpSettingsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *DataDumpSettingsItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -18563,6 +18660,967 @@ func (s *LLDP) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *LLDP) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *Listing) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *Listing) encodeFields(e *jx.Encoder) {
+	{
+		if s.ConfigFile.Set {
+			e.FieldStart("config_file")
+			s.ConfigFile.Encode(e)
+		}
+	}
+	{
+		if s.Pending.Set {
+			e.FieldStart("pending")
+			s.Pending.Encode(e)
+		}
+	}
+	{
+		if s.Persistent.Set {
+			e.FieldStart("persistent")
+			s.Persistent.Encode(e)
+		}
+	}
+	{
+		if s.Sections != nil {
+			e.FieldStart("sections")
+			e.ArrStart()
+			for _, elem := range s.Sections {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+}
+
+var jsonFieldsNameOfListing = [4]string{
+	0: "config_file",
+	1: "pending",
+	2: "persistent",
+	3: "sections",
+}
+
+// Decode decodes Listing from json.
+func (s *Listing) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode Listing to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "config_file":
+			if err := func() error {
+				s.ConfigFile.Reset()
+				if err := s.ConfigFile.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"config_file\"")
+			}
+		case "pending":
+			if err := func() error {
+				s.Pending.Reset()
+				if err := s.Pending.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"pending\"")
+			}
+		case "persistent":
+			if err := func() error {
+				s.Persistent.Reset()
+				if err := s.Persistent.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"persistent\"")
+			}
+		case "sections":
+			if err := func() error {
+				s.Sections = make([]ListingSectionsItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem ListingSectionsItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Sections = append(s.Sections, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"sections\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode Listing")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *Listing) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *Listing) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *ListingSectionsItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ListingSectionsItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Description.Set {
+			e.FieldStart("description")
+			s.Description.Encode(e)
+		}
+	}
+	{
+		if s.ID.Set {
+			e.FieldStart("id")
+			s.ID.Encode(e)
+		}
+	}
+	{
+		if s.Options != nil {
+			e.FieldStart("options")
+			e.ArrStart()
+			for _, elem := range s.Options {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.Title.Set {
+			e.FieldStart("title")
+			s.Title.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfListingSectionsItem = [4]string{
+	0: "description",
+	1: "id",
+	2: "options",
+	3: "title",
+}
+
+// Decode decodes ListingSectionsItem from json.
+func (s *ListingSectionsItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ListingSectionsItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "description":
+			if err := func() error {
+				s.Description.Reset()
+				if err := s.Description.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"description\"")
+			}
+		case "id":
+			if err := func() error {
+				s.ID.Reset()
+				if err := s.ID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"id\"")
+			}
+		case "options":
+			if err := func() error {
+				s.Options = make([]ListingSectionsItemOptionsItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem ListingSectionsItemOptionsItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Options = append(s.Options, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"options\"")
+			}
+		case "title":
+			if err := func() error {
+				s.Title.Reset()
+				if err := s.Title.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"title\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode ListingSectionsItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ListingSectionsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ListingSectionsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *ListingSectionsItemOptionsItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ListingSectionsItemOptionsItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Apply.Set {
+			e.FieldStart("apply")
+			s.Apply.Encode(e)
+		}
+	}
+	{
+		if len(s.Default) != 0 {
+			e.FieldStart("default")
+			e.Raw(s.Default)
+		}
+	}
+	{
+		if s.Deprecated.Set {
+			e.FieldStart("deprecated")
+			s.Deprecated.Encode(e)
+		}
+	}
+	{
+		if s.Entry.Set {
+			e.FieldStart("entry")
+			s.Entry.Encode(e)
+		}
+	}
+	{
+		if s.EntryLabel.Set {
+			e.FieldStart("entry_label")
+			s.EntryLabel.Encode(e)
+		}
+	}
+	{
+		if s.EntryOf.Set {
+			e.FieldStart("entry_of")
+			s.EntryOf.Encode(e)
+		}
+	}
+	{
+		if s.Enum != nil {
+			e.FieldStart("enum")
+			e.ArrStart()
+			for _, elem := range s.Enum {
+				e.Str(elem)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.Env.Set {
+			e.FieldStart("env")
+			s.Env.Encode(e)
+		}
+	}
+	{
+		if s.External.Set {
+			e.FieldStart("external")
+			s.External.Encode(e)
+		}
+	}
+	{
+		if s.Fields != nil {
+			e.FieldStart("fields")
+			e.ArrStart()
+			for _, elem := range s.Fields {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.FileEntriesSecret.Set {
+			e.FieldStart("file_entries_secret")
+			s.FileEntriesSecret.Encode(e)
+		}
+	}
+	{
+		if s.FileKeys != nil {
+			e.FieldStart("file_keys")
+			e.ArrStart()
+			for _, elem := range s.FileKeys {
+				e.Str(elem)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.Flag.Set {
+			e.FieldStart("flag")
+			s.Flag.Encode(e)
+		}
+	}
+	{
+		if s.Group.Set {
+			e.FieldStart("group")
+			s.Group.Encode(e)
+		}
+	}
+	{
+		if s.Help.Set {
+			e.FieldStart("help")
+			s.Help.Encode(e)
+		}
+	}
+	{
+		if s.InheritFrom.Set {
+			e.FieldStart("inherit_from")
+			s.InheritFrom.Encode(e)
+		}
+	}
+	{
+		if s.Key.Set {
+			e.FieldStart("key")
+			s.Key.Encode(e)
+		}
+	}
+	{
+		if s.Kind.Set {
+			e.FieldStart("kind")
+			s.Kind.Encode(e)
+		}
+	}
+	{
+		if s.Max.Set {
+			e.FieldStart("max")
+			s.Max.Encode(e)
+		}
+	}
+	{
+		if s.Min.Set {
+			e.FieldStart("min")
+			s.Min.Encode(e)
+		}
+	}
+	{
+		if s.Pending.Set {
+			e.FieldStart("pending")
+			s.Pending.Encode(e)
+		}
+	}
+	{
+		if len(s.Running) != 0 {
+			e.FieldStart("running")
+			e.Raw(s.Running)
+		}
+	}
+	{
+		if s.Secret.Set {
+			e.FieldStart("secret")
+			s.Secret.Encode(e)
+		}
+	}
+	{
+		if s.Shadowed.Set {
+			e.FieldStart("shadowed")
+			s.Shadowed.Encode(e)
+		}
+	}
+	{
+		if s.Source.Set {
+			e.FieldStart("source")
+			s.Source.Encode(e)
+		}
+	}
+	{
+		if len(s.Stored) != 0 {
+			e.FieldStart("stored")
+			e.Raw(s.Stored)
+		}
+	}
+	{
+		if s.Summary.Set {
+			e.FieldStart("summary")
+			s.Summary.Encode(e)
+		}
+	}
+	{
+		if s.Unit.Set {
+			e.FieldStart("unit")
+			s.Unit.Encode(e)
+		}
+	}
+	{
+		if len(s.Value) != 0 {
+			e.FieldStart("value")
+			e.Raw(s.Value)
+		}
+	}
+}
+
+var jsonFieldsNameOfListingSectionsItemOptionsItem = [29]string{
+	0:  "apply",
+	1:  "default",
+	2:  "deprecated",
+	3:  "entry",
+	4:  "entry_label",
+	5:  "entry_of",
+	6:  "enum",
+	7:  "env",
+	8:  "external",
+	9:  "fields",
+	10: "file_entries_secret",
+	11: "file_keys",
+	12: "flag",
+	13: "group",
+	14: "help",
+	15: "inherit_from",
+	16: "key",
+	17: "kind",
+	18: "max",
+	19: "min",
+	20: "pending",
+	21: "running",
+	22: "secret",
+	23: "shadowed",
+	24: "source",
+	25: "stored",
+	26: "summary",
+	27: "unit",
+	28: "value",
+}
+
+// Decode decodes ListingSectionsItemOptionsItem from json.
+func (s *ListingSectionsItemOptionsItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ListingSectionsItemOptionsItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "apply":
+			if err := func() error {
+				s.Apply.Reset()
+				if err := s.Apply.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"apply\"")
+			}
+		case "default":
+			if err := func() error {
+				v, err := d.RawAppend(nil)
+				s.Default = jx.Raw(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"default\"")
+			}
+		case "deprecated":
+			if err := func() error {
+				s.Deprecated.Reset()
+				if err := s.Deprecated.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"deprecated\"")
+			}
+		case "entry":
+			if err := func() error {
+				s.Entry.Reset()
+				if err := s.Entry.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"entry\"")
+			}
+		case "entry_label":
+			if err := func() error {
+				s.EntryLabel.Reset()
+				if err := s.EntryLabel.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"entry_label\"")
+			}
+		case "entry_of":
+			if err := func() error {
+				s.EntryOf.Reset()
+				if err := s.EntryOf.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"entry_of\"")
+			}
+		case "enum":
+			if err := func() error {
+				s.Enum = make([]string, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem string
+					v, err := d.Str()
+					elem = string(v)
+					if err != nil {
+						return err
+					}
+					s.Enum = append(s.Enum, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"enum\"")
+			}
+		case "env":
+			if err := func() error {
+				s.Env.Reset()
+				if err := s.Env.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"env\"")
+			}
+		case "external":
+			if err := func() error {
+				s.External.Reset()
+				if err := s.External.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"external\"")
+			}
+		case "fields":
+			if err := func() error {
+				s.Fields = make([]ListingSectionsItemOptionsItemFieldsItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem ListingSectionsItemOptionsItemFieldsItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Fields = append(s.Fields, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"fields\"")
+			}
+		case "file_entries_secret":
+			if err := func() error {
+				s.FileEntriesSecret.Reset()
+				if err := s.FileEntriesSecret.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"file_entries_secret\"")
+			}
+		case "file_keys":
+			if err := func() error {
+				s.FileKeys = make([]string, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem string
+					v, err := d.Str()
+					elem = string(v)
+					if err != nil {
+						return err
+					}
+					s.FileKeys = append(s.FileKeys, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"file_keys\"")
+			}
+		case "flag":
+			if err := func() error {
+				s.Flag.Reset()
+				if err := s.Flag.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"flag\"")
+			}
+		case "group":
+			if err := func() error {
+				s.Group.Reset()
+				if err := s.Group.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"group\"")
+			}
+		case "help":
+			if err := func() error {
+				s.Help.Reset()
+				if err := s.Help.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"help\"")
+			}
+		case "inherit_from":
+			if err := func() error {
+				s.InheritFrom.Reset()
+				if err := s.InheritFrom.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"inherit_from\"")
+			}
+		case "key":
+			if err := func() error {
+				s.Key.Reset()
+				if err := s.Key.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"key\"")
+			}
+		case "kind":
+			if err := func() error {
+				s.Kind.Reset()
+				if err := s.Kind.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kind\"")
+			}
+		case "max":
+			if err := func() error {
+				s.Max.Reset()
+				if err := s.Max.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"max\"")
+			}
+		case "min":
+			if err := func() error {
+				s.Min.Reset()
+				if err := s.Min.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"min\"")
+			}
+		case "pending":
+			if err := func() error {
+				s.Pending.Reset()
+				if err := s.Pending.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"pending\"")
+			}
+		case "running":
+			if err := func() error {
+				v, err := d.RawAppend(nil)
+				s.Running = jx.Raw(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"running\"")
+			}
+		case "secret":
+			if err := func() error {
+				s.Secret.Reset()
+				if err := s.Secret.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"secret\"")
+			}
+		case "shadowed":
+			if err := func() error {
+				s.Shadowed.Reset()
+				if err := s.Shadowed.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"shadowed\"")
+			}
+		case "source":
+			if err := func() error {
+				s.Source.Reset()
+				if err := s.Source.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"source\"")
+			}
+		case "stored":
+			if err := func() error {
+				v, err := d.RawAppend(nil)
+				s.Stored = jx.Raw(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"stored\"")
+			}
+		case "summary":
+			if err := func() error {
+				s.Summary.Reset()
+				if err := s.Summary.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"summary\"")
+			}
+		case "unit":
+			if err := func() error {
+				s.Unit.Reset()
+				if err := s.Unit.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"unit\"")
+			}
+		case "value":
+			if err := func() error {
+				v, err := d.RawAppend(nil)
+				s.Value = jx.Raw(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"value\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode ListingSectionsItemOptionsItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ListingSectionsItemOptionsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ListingSectionsItemOptionsItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *ListingSectionsItemOptionsItemFieldsItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ListingSectionsItemOptionsItemFieldsItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Help.Set {
+			e.FieldStart("help")
+			s.Help.Encode(e)
+		}
+	}
+	{
+		if s.Kind.Set {
+			e.FieldStart("kind")
+			s.Kind.Encode(e)
+		}
+	}
+	{
+		if s.Name.Set {
+			e.FieldStart("name")
+			s.Name.Encode(e)
+		}
+	}
+	{
+		if s.Required.Set {
+			e.FieldStart("required")
+			s.Required.Encode(e)
+		}
+	}
+	{
+		if s.Summary.Set {
+			e.FieldStart("summary")
+			s.Summary.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfListingSectionsItemOptionsItemFieldsItem = [5]string{
+	0: "help",
+	1: "kind",
+	2: "name",
+	3: "required",
+	4: "summary",
+}
+
+// Decode decodes ListingSectionsItemOptionsItemFieldsItem from json.
+func (s *ListingSectionsItemOptionsItemFieldsItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ListingSectionsItemOptionsItemFieldsItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "help":
+			if err := func() error {
+				s.Help.Reset()
+				if err := s.Help.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"help\"")
+			}
+		case "kind":
+			if err := func() error {
+				s.Kind.Reset()
+				if err := s.Kind.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"kind\"")
+			}
+		case "name":
+			if err := func() error {
+				s.Name.Reset()
+				if err := s.Name.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"name\"")
+			}
+		case "required":
+			if err := func() error {
+				s.Required.Reset()
+				if err := s.Required.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"required\"")
+			}
+		case "summary":
+			if err := func() error {
+				s.Summary.Reset()
+				if err := s.Summary.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"summary\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode ListingSectionsItemOptionsItemFieldsItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ListingSectionsItemOptionsItemFieldsItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ListingSectionsItemOptionsItemFieldsItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -23657,6 +24715,67 @@ func (s *OptNilDataDumpImagesItemProvisionTemplates) UnmarshalJSON(data []byte) 
 	return s.Decode(d)
 }
 
+// Encode encodes []DataDumpSettingsItem as json.
+func (o OptNilDataDumpSettingsItemArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []DataDumpSettingsItem from json.
+func (o *OptNilDataDumpSettingsItemArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilDataDumpSettingsItemArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []DataDumpSettingsItem
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]DataDumpSettingsItem, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem DataDumpSettingsItem
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilDataDumpSettingsItemArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilDataDumpSettingsItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes time.Time as json.
 func (o OptNilDateTime) Encode(e *jx.Encoder, format func(*jx.Encoder, time.Time)) {
 	if !o.Set {
@@ -24457,6 +25576,40 @@ func (s *OptPatchRolesRequestPermissionListItemKind) UnmarshalJSON(data []byte) 
 	return s.Decode(d)
 }
 
+// Encode encodes PatchSettingsRequestSet as json.
+func (o OptPatchSettingsRequestSet) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes PatchSettingsRequestSet from json.
+func (o *OptPatchSettingsRequestSet) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptPatchSettingsRequestSet to nil")
+	}
+	o.Set = true
+	o.Value = make(PatchSettingsRequestSet)
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptPatchSettingsRequestSet) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptPatchSettingsRequestSet) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes string as json.
 func (o OptString) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -24752,6 +25905,157 @@ func (s PatchRolesRequestPermissionListItemKind) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *PatchRolesRequestPermissionListItemKind) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *PatchSettingsRequest) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *PatchSettingsRequest) encodeFields(e *jx.Encoder) {
+	{
+		if s.Set.Set {
+			e.FieldStart("set")
+			s.Set.Encode(e)
+		}
+	}
+	{
+		if s.Unset != nil {
+			e.FieldStart("unset")
+			e.ArrStart()
+			for _, elem := range s.Unset {
+				e.Str(elem)
+			}
+			e.ArrEnd()
+		}
+	}
+}
+
+var jsonFieldsNameOfPatchSettingsRequest = [2]string{
+	0: "set",
+	1: "unset",
+}
+
+// Decode decodes PatchSettingsRequest from json.
+func (s *PatchSettingsRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PatchSettingsRequest to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "set":
+			if err := func() error {
+				s.Set.Reset()
+				if err := s.Set.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"set\"")
+			}
+		case "unset":
+			if err := func() error {
+				s.Unset = make([]string, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem string
+					v, err := d.Str()
+					elem = string(v)
+					if err != nil {
+						return err
+					}
+					s.Unset = append(s.Unset, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"unset\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode PatchSettingsRequest")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *PatchSettingsRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PatchSettingsRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s PatchSettingsRequestSet) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields implements json.Marshaler.
+func (s PatchSettingsRequestSet) encodeFields(e *jx.Encoder) {
+	for k, elem := range s {
+		e.FieldStart(k)
+
+		if len(elem) != 0 {
+			e.Raw(elem)
+		}
+	}
+}
+
+// Decode decodes PatchSettingsRequestSet from json.
+func (s *PatchSettingsRequestSet) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PatchSettingsRequestSet to nil")
+	}
+	m := s.init()
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		var elem jx.Raw
+		if err := func() error {
+			v, err := d.RawAppend(nil)
+			elem = jx.Raw(v)
+			if err != nil {
+				return err
+			}
+			return nil
+		}(); err != nil {
+			return errors.Wrapf(err, "decode field %q", k)
+		}
+		m[string(k)] = elem
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode PatchSettingsRequestSet")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s PatchSettingsRequestSet) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PatchSettingsRequestSet) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

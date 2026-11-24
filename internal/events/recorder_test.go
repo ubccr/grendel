@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/ubccr/grendel/internal/settings/settingstest"
 	"github.com/ubccr/grendel/internal/store/sqlstore"
 	"github.com/ubccr/grendel/pkg/model"
 )
@@ -82,8 +82,7 @@ func TestTrackedEvent(t *testing.T) {
 
 func TestTidy(t *testing.T) {
 	r := newRecorder(t)
-	viper.Set("events.retention", "24h")
-	t.Cleanup(func() { viper.Set("events.retention", "2160h") })
+	settingstest.Set(t, "events.retention", "24h")
 	now := time.Now().UTC()
 
 	// a provisioning whose last node went quiet is closed once that node counts as stalled

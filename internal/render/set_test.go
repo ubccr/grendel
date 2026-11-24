@@ -12,9 +12,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/ubccr/grendel/internal/settings/settingstest"
 )
 
 func TestWatchRecoversFromFailedReload(t *testing.T) {
@@ -22,8 +22,7 @@ func TestWatchRecoversFromFailedReload(t *testing.T) {
 	path := filepath.Join(dir, "custom.tmpl")
 	require.NoError(t, os.WriteFile(path, []byte("v1"), 0o644))
 
-	viper.Set("provision.templates_dir", dir)
-	t.Cleanup(func() { viper.Set("provision.templates_dir", nil) })
+	settingstest.Set(t, "provision.templates_dir", dir)
 
 	set, err := NewSet()
 	require.NoError(t, err)

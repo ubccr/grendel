@@ -52,19 +52,19 @@ func (e *Endpoints) RepoURL() string {
 
 func (e *Endpoints) BaseURL() string {
 	host := e.host
-	if config.ProvisionHostname != "" {
-		host = config.ProvisionHostname
+	if config.ProvisionHostname() != "" {
+		host = config.ProvisionHostname()
 	}
 
-	baseURL := fmt.Sprintf("%s://%s", config.ProvisionScheme, host)
+	baseURL := fmt.Sprintf("%s://%s", config.ProvisionScheme(), host)
 
 	// DHCP passes a bare IP while HTTP requests pass the Host header, which already includes any non default port
 	if _, _, err := net.SplitHostPort(host); err == nil {
 		return baseURL
 	}
 
-	if config.ProvisionAddr.Port() != 80 && config.ProvisionAddr.Port() != 443 {
-		baseURL += fmt.Sprintf(":%d", config.ProvisionAddr.Port())
+	if config.ProvisionAddr().Port() != 80 && config.ProvisionAddr().Port() != 443 {
+		baseURL += fmt.Sprintf(":%d", config.ProvisionAddr().Port())
 	}
 
 	return baseURL
