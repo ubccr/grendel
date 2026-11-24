@@ -7,8 +7,10 @@ package configcmd
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"maps"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 	"syscall"
@@ -23,8 +25,13 @@ var (
 	configCmd = &cobra.Command{
 		Use:   "config",
 		Short: "Move settings between a config file and the database",
-		Long:  "Move settings between a config file and the database. These commands open the database directly, so they work whether or not grendeld is running. Use `grendel config` to view and change individual settings.",
+		Long:  "Move settings between a config file and the database. These commands open the database directly, so they work whether or not grendeld is running. Where grendeld runs as its own user, run them as root, since they read its config file and write its database. Use `grendel config` to view and change individual settings.",
 		PersistentPreRunE: func(command *cobra.Command, args []string) error {
+			// the root command only stops printing usage once logging is set up, which is after this check
+			command.SilenceUsage, command.SilenceErrors = true, true
+			if err := checkAccess(settings.List().ConfigFile, settings.DBPath.Get()); err != nil {
+				return err
+			}
 			problems, err := serve.OpenDB()
 			if err != nil {
 				return err
@@ -58,10 +65,10 @@ Secrets and settings that can only be set in the config file are always skipped,
 Entries of provision.extra_vars are skipped unless named with --entry, since it often holds passwords.
 
 --replace rewrites the file to hold only what was skipped and still has to be set in a file, keeping the original beside it with .bak added to its name. --remaining writes that to another file instead and leaves the original alone. What is kept is: secrets, file-only settings, client settings and the provision.extra_vars entries that were not imported. Defaults, deprecated keys and unknown keys are left out. Restart grendeld afterwards, as a value in the config file wins over the database.`,
-		Example: `  grendeld config import
-  grendeld config import --apply --replace
-  grendeld config import old.toml --apply --remaining /etc/grendel/grendel.toml
-  grendeld config import --apply --entry provision.extra_vars=timezone`,
+		Example: `  sudo grendeld config import
+  sudo grendeld config import --apply --replace
+  sudo grendeld config import old.toml --apply --remaining /etc/grendel/grendel.toml
+  sudo grendeld config import --apply --entry provision.extra_vars=timezone`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
 			path := settings.List().ConfigFile
@@ -73,7 +80,7 @@ Entries of provision.extra_vars are skipped unless named with --entry, since it 
 			}
 			file, err := shared.ReadSettingsFile(path)
 			if err != nil {
-				return err
+				return asRoot(err)
 			}
 
 			entries := map[string][]string{}
@@ -88,12 +95,15 @@ Entries of provision.extra_vars are skipped unless named with --entry, since it 
 			if importReplace && !importApply {
 				return errors.New("--replace needs --apply, as it removes from the file what the import stores")
 			}
-			if importReplace {
-				for _, taken := range []string{path + ".bak", path + ".new"} {
-					if _, err := os.Stat(taken); err == nil {
-						return fmt.Errorf("nothing was changed: %s is already there, so move it away first", taken)
-					}
-				}
+			// checked before anything is stored, so a file that cannot be written does not leave the import half done
+			switch {
+			case importReplace:
+				err = canReplace(path)
+			case importRemaining != "":
+				err = canCreate(importRemaining)
+			}
+			if err != nil {
+				return fmt.Errorf("nothing was changed: %w", err)
 			}
 
 			plan, err := settings.PlanImport(file, entries)
@@ -121,7 +131,7 @@ Entries of provision.extra_vars are skipped unless named with --entry, since it 
 			}
 
 			if !importApply {
-				fmt.Printf("%d setting(s) will be imported from %s into %s. Run again with --apply to import them.\n", plan.Count(), path, settings.DBPath.Get())
+				fmt.Printf("%d setting(s) will be imported from %s into %s. Run again with --apply to import them.\n", plan.Count(), path, absolute(settings.DBPath.Get()))
 			} else {
 				refused, err := plan.Apply(serve.DB, "grendeld config import")
 				if err != nil {
@@ -133,7 +143,7 @@ Entries of provision.extra_vars are skipped unless named with --entry, since it 
 					}
 					return errors.New("nothing was imported")
 				}
-				fmt.Printf("Imported %d setting(s) from %s into %s.\n", plan.Count(), path, settings.DBPath.Get())
+				fmt.Printf("Imported %d setting(s) from %s into %s.\n", plan.Count(), path, absolute(settings.DBPath.Get()))
 			}
 
 			switch {
@@ -162,6 +172,85 @@ Entries of provision.extra_vars are skipped unless named with --entry, since it 
 )
 
 const remainingHeader = "# Settings that have to be set in this file. The rest are in the database: see `grendel config list`.\n\n"
+
+func asRoot(err error) error {
+	if errors.Is(err, fs.ErrPermission) && os.Geteuid() != 0 {
+		return fmt.Errorf("%w: run this as root, for example with sudo", err)
+	}
+	return err
+}
+
+func absolute(path string) string {
+	if abs, err := filepath.Abs(path); err == nil {
+		return abs
+	}
+	return path
+}
+
+func checkAccess(configFile, dbPath string) error {
+	// a config file that is found but cannot be read leaves every setting at its default, dbpath among them
+	if configFile != "" {
+		f, err := os.Open(configFile)
+		if err != nil {
+			return asRoot(err)
+		}
+		f.Close()
+	}
+
+	if strings.Contains(dbPath, ":memory:") {
+		return nil
+	}
+	// opening a database that is not there creates an empty one, owned by whoever runs this rather than by grendeld
+	f, err := os.OpenFile(dbPath, os.O_RDWR, 0)
+	if errors.Is(err, fs.ErrNotExist) {
+		return fmt.Errorf("there is no database at %s: start grendeld once to create it, or check dbpath", absolute(dbPath))
+	}
+	if err != nil {
+		return asRoot(err)
+	}
+	return f.Close()
+}
+
+func canCreate(path string) error {
+	if _, err := os.Lstat(path); err == nil {
+		return fmt.Errorf("%s is already there, so move it away first", path)
+	}
+	dir := filepath.Dir(path)
+	probe, err := os.CreateTemp(dir, filepath.Base(path)+".check-*")
+	if err != nil {
+		return asRoot(fmt.Errorf("cannot write in %s: %w", dir, cause(err)))
+	}
+	probe.Close()
+	return os.Remove(probe.Name())
+}
+
+// cause drops the path from a file error, which here names a probe file rather than anything the user asked for
+func cause(err error) error {
+	var path *fs.PathError
+	var link *os.LinkError
+	switch {
+	case errors.As(err, &path):
+		return path.Err
+	case errors.As(err, &link):
+		return link.Err
+	}
+	return err
+}
+
+// canReplace tries what replaceFile does beside source, so a step added there needs its check here
+func canReplace(source string) error {
+	for _, next := range []string{source + ".bak", source + ".new"} {
+		if err := canCreate(next); err != nil {
+			return err
+		}
+	}
+	// the backup is a hard link, which the kernel refuses for a file the user neither owns nor can write
+	probe := source + ".check-link"
+	if err := os.Link(source, probe); err != nil {
+		return asRoot(fmt.Errorf("cannot keep %s as a backup: %w", source, cause(err)))
+	}
+	return os.Remove(probe)
+}
 
 // create writes a file that holds secrets, and never replaces an existing one
 func create(path, content string) error {

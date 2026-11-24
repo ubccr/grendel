@@ -111,6 +111,29 @@ dbpath = "/var/lib/grendel/grendel.db"
 
 Any changes to the Grendel database will be persisted between restarts.
 
+## Moving settings into the database
+
+With a database on disk, most settings can be kept in it instead of the config
+file, and changed with `grendel config set` or the web UI. Import the ones your
+config file sets:
+
+```
+# Show what would be imported
+sudo grendeld config import
+
+# Import, and leave only what has to stay in the config file
+sudo grendeld config import --apply --replace
+sudo systemctl restart grendel
+```
+
+- Run it as root. The config file and database belong to the `grendel` user,
+  and `/etc/grendel` to root.
+- Start grendeld once first, so the database exists.
+- The original config file is kept as `grendel.toml.bak`.
+- Secrets and paths such as `dbpath` stay in the config file.
+- A setting in the config file wins over the database until it is removed from
+  the file and grendeld is restarted.
+
 ## DNS Stub Resolver
 
 Grendel is not a recursive DNS resolver. In production deployments it's
